@@ -189,6 +189,7 @@ RESPONSE_WINDOW_ONLY_EFFECTS = {
     "phase_out",
     "redirect_removal",
 }
+COUNTERLIKE_EFFECTS = {"counter", "counter_spell"}
 SILENCE_WINDOW_EFFECTS = {
     "silence_opponents",
     "silence_spell",
@@ -930,7 +931,7 @@ def attach_direct_resolution_context(
 def can_cast_in_phase(card, effect_data, phase):
     if is_effective_land(card):
         return False
-    if effect_data.get("effect") == "counter":
+    if str(effect_data.get("effect") or "").lower() in COUNTERLIKE_EFFECTS:
         return False
     if effect_data.get("effect") == "creature" and phase not in MAIN_PHASES:
         return False
@@ -3182,6 +3183,13 @@ def apply_oracle_effect_normalization(effect_data, effect, *, target=None):
             effect_data["_rule_oracle_normalized_target_from"] = previous_target
             effect_data["_rule_oracle_normalized_target_to"] = target
         effect_data["target"] = target
+    runtime_selection = effect_data.get("_rule_runtime_selection")
+    if isinstance(runtime_selection, dict):
+        selection = dict(runtime_selection)
+        selection["selected_effect"] = effect_data.get("effect")
+        if effect_data.get("target") is not None:
+            selection["selected_target"] = effect_data.get("target")
+        effect_data["_rule_runtime_selection"] = selection
     return effect_data
 
 
@@ -3649,6 +3657,40 @@ def normalize_effect_by_oracle(card, effect_data):
             normalized["effect"] = "creature"
         else:
             normalized["effect"] = "unknown"
+
+    ritual_scope = str(normalized.get("battle_model_scope") or "")
+    if normalized.get("effect") == "ramp_ritual" and ritual_scope in {
+        "single_shot_red_ritual_v1",
+        "rite_of_flame_singleton_baseline_red_ritual_v1",
+    }:
+        normalized.setdefault("produces", "R")
+        normalized["mana_color_status"] = "abstracted_to_generic_pool_runtime"
+        normalized["pg058_l3b_simple_red_ritual_family"] = "deck6_simple_red_rituals"
+        if ritual_scope == "rite_of_flame_singleton_baseline_red_ritual_v1":
+            normalized["singleton_commander_baseline"] = True
+            normalized["graveyard_named_copy_scaling_status"] = "annotation_only"
+            normalized["oracle_runtime_scope"] = (
+                "single_shot_red_ritual_runtime_graveyard_copy_scaling_annotation_only"
+            )
+
+    if normalized_name == "angel's grace" and normalized.get("effect") == "cannot_lose_turn":
+        normalized["battle_model_scope"] = (
+            "split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1"
+        )
+        normalized["oracle_runtime_scope"] = (
+            "cannot_lose_opponents_cannot_win_damage_life_floor_split_second_annotation"
+        )
+        normalized["opponents_cant_win_this_turn"] = True
+        normalized["split_second"] = True
+        normalized["life_floor_on_damage"] = int(normalized.get("life_floor_on_damage") or 1)
+
+    runtime_selection = normalized.get("_rule_runtime_selection")
+    if isinstance(runtime_selection, dict):
+        selection = dict(runtime_selection)
+        selection["selected_effect"] = normalized.get("effect")
+        if normalized.get("target") is not None:
+            selection["selected_target"] = normalized.get("target")
+        normalized["_rule_runtime_selection"] = selection
     return normalized
 
 
@@ -5036,8 +5078,8 @@ class Player:
         counters = [
             card
             for card in self.hand
-            if get_card_effect(card).get("effect") == "counter"
-            or card.get("effect") == "counter"
+            if get_card_effect(card).get("effect") in COUNTERLIKE_EFFECTS
+            or card.get("effect") in COUNTERLIKE_EFFECTS
             or card_has_functional_tag(card, "counter", "protection")
         ]
         if castable_only:
@@ -6888,6 +6930,8 @@ def has_immediate_silence_payoff(player, phase):
 
 def should_hold_for_response_window(player, card, effect_data, phase):
     effect = str((effect_data or {}).get("effect") or card.get("effect") or "").lower()
+    if effect in COUNTERLIKE_EFFECTS:
+        return True
     if effect == "copy_spell" and is_instant_or_sorcery_spell(card):
         return True
     if effect in RESPONSE_WINDOW_ONLY_EFFECTS:
@@ -7203,6 +7247,7 @@ def _is_reactive_interaction_card(card, effect_data):
     effect = str(effect_data.get("effect") or card.get("effect") or "").lower()
     if effect in (
         "counter",
+        "counter_spell",
         "phase_out",
         "indestructible",
         "cannot_lose_turn",
@@ -14715,7 +14760,7 @@ def try_lorehold_miracle_cast(
     if player.available_mana() < miracle_cost:
         return False
     eff = get_card_effect(last_drawn)
-    if eff.get("effect") == "counter":
+    if str(eff.get("effect") or "").lower() in COUNTERLIKE_EFFECTS:
         return False
     miracle_can_use_modal_boros_charm = (
         eff.get("effect") == "modal_boros_charm"
@@ -18611,7 +18656,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             not is_effective_land(candidate)
             and player.can_pay_card(candidate)
             and can_cast_in_phase(candidate, get_card_effect(candidate), phase)
-            and get_card_effect(candidate).get("effect") not in ("counter", "unknown")
+            and str(get_card_effect(candidate).get("effect") or "").lower()
+            not in COUNTERLIKE_EFFECTS.union({"unknown"})
             and not should_hold_for_response_window(
                 player,
                 candidate,
@@ -18659,7 +18705,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 if candidate is ritual_card or is_effective_land(candidate):
                     continue
                 candidate_effect = get_card_effect(candidate)
-                if candidate_effect.get("effect") in ("counter", "unknown", "ramp_ritual"):
+                if str(candidate_effect.get("effect") or "").lower() in COUNTERLIKE_EFFECTS.union({"unknown", "ramp_ritual"}):
                     continue
                 if not can_cast_in_phase(candidate, candidate_effect, phase):
                     continue
@@ -18719,7 +18765,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 continue
             candidate_effect = get_card_effect(candidate)
             effect_name = str(candidate_effect.get("effect") or "unknown")
-            if effect_name in ("counter", "unknown", "ramp_ritual", "ramp_permanent", "ramp_engine", "land_ramp", "land_recursion"):
+            if effect_name in COUNTERLIKE_EFFECTS.union({"unknown", "ramp_ritual", "ramp_permanent", "ramp_engine", "land_ramp", "land_recursion"}):
                 continue
             if should_hold_for_response_window(player, candidate, candidate_effect, phase):
                 continue

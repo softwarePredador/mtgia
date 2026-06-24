@@ -1726,6 +1726,78 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             )
         )
 
+    normalized_text = _normalized_rules_text(rules_text)
+
+    if "CreateTokenCopyTargetEffect" in effect_classes:
+        if _oracle_has(
+            rules_text,
+            "create a token that's a copy of target creature you control",
+            "sacrifice this token",
+        ):
+            extra_fields = {
+                "copy_target_types": ["creature"],
+                "target_controller": "own",
+                "token_haste": "has haste" in normalized_text,
+                "sacrifice_token_at_end_step": "sacrifice it at the beginning of the next end step" in normalized_text
+                or "sacrifice this token" in normalized_text,
+            }
+            candidates.append(
+                _candidate(
+                    effect="copy_creature_token",
+                    scope="copy_target_creature_you_control_haste_sacrifice_end_step_v1",
+                    reason="Oracle and XMage structure match a temporary token copy of a creature you control with haste and end-step sacrifice.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=True,
+                    extra_effect_fields=extra_fields,
+                    matched_signals=["CreateTokenCopyTargetEffect", "copy_creature_you_control", "sacrifice_end_step"],
+                )
+            )
+
+    card_types = {
+        str(value or "").upper()
+        for value in ((index_entry.get("constructor_metadata") or {}).get("card_types") or [])
+        if value
+    }
+
+    if "CreateTokenEffect" in effect_classes:
+        if (
+            "treasuretoken" in normalized_text
+            and "drawcardsourcecontrollereffect(2)" in normalized_text
+            and "discardcardcost" in normalized_text
+            and card_types == {"SORCERY"}
+        ) or _oracle_has(rules_text, "draw two cards", "create two treasure tokens"):
+            candidates.append(
+                _candidate(
+                    effect="treasure_maker",
+                    scope="discard_draw_two_create_two_treasures_v1",
+                    reason="Oracle and XMage structure match a discard-to-draw-two plus create-two-Treasures sorcery.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "draw_count": 2,
+                        "treasure_count": 2,
+                        "requires_discard_card": True,
+                    },
+                    matched_signals=["CreateTokenEffect", "DrawCardSourceControllerEffect", "two_treasures"],
+                )
+            )
+        elif (
+            "treasuretoken" in normalized_text
+            and "drawcardsourcecontrollereffect" not in normalized_text
+            and card_types == {"SORCERY"}
+        ) or (_oracle_has(rules_text, "create a treasure token") and "draw two cards" not in normalized_text):
+            candidates.append(
+                _candidate(
+                    effect="treasure_maker",
+                    scope="single_treasure_creation_v1",
+                    reason="Oracle and XMage structure match a one-shot Treasure creation effect.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={"treasure_count": 1},
+                    matched_signals=["CreateTokenEffect", "single_treasure"],
+                )
+            )
+
     if "CreateTokenEffect" in effect_classes or "CreateTokenCopyTargetEffect" in effect_classes:
         candidates.append(
             _candidate(

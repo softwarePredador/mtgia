@@ -109,6 +109,63 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertEqual(payload["Lightning Greaves"]["battle_rule_execution_status"], "auto")
         self.assertEqual(payload["Lightning Greaves"]["battle_rule_logical_key"], "battle_rule_v1:deadbeef")
 
+    def test_export_canonical_snapshot_preserves_existing_runtime_annotations_when_rule_identity_matches(self) -> None:
+        rows = [
+            {
+                "card_name": "Seething Song",
+                "effect_json": {
+                    "effect": "ramp_ritual",
+                    "produces": "R",
+                    "mana_produced": 5,
+                    "battle_model_scope": "single_shot_red_ritual_v1",
+                },
+                "source": "curated",
+                "confidence": 0.97,
+                "review_status": "verified",
+                "rule_version": 2,
+                "oracle_hash": "ritual-hash",
+                "logical_rule_key": "battle_rule_v1:ritual",
+            }
+        ]
+        existing_payload = {
+            "Seething Song": {
+                "effect": "ramp_ritual",
+                "produces": "R",
+                "mana_produced": 5,
+                "battle_model_scope": "single_shot_red_ritual_v1",
+                "battle_rule_source": "curated",
+                "battle_rule_review_status": "verified",
+                "battle_rule_execution_status": "auto",
+                "battle_rule_version": 2,
+                "battle_rule_oracle_hash": "ritual-hash",
+                "battle_rule_logical_key": "battle_rule_v1:ritual",
+                "mana_color_status": "abstracted_to_generic_pool_runtime",
+                "pg058_l3b_simple_red_ritual_family": "deck6_simple_red_rituals",
+            }
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_path = Path(tmpdir) / "knowledge.db"
+            sqlite_path.touch()
+            snapshot_path = Path(tmpdir) / "known_cards_canonical_snapshot.json"
+            snapshot_path.write_text(json.dumps(existing_payload), encoding="utf-8")
+
+            exported = sync_pg.export_canonical_snapshot(
+                rows,
+                sqlite_db=str(sqlite_path),
+                output_path=snapshot_path,
+            )
+            payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(exported, 1)
+        self.assertEqual(
+            payload["Seething Song"]["mana_color_status"],
+            "abstracted_to_generic_pool_runtime",
+        )
+        self.assertEqual(
+            payload["Seething Song"]["pg058_l3b_simple_red_ritual_family"],
+            "deck6_simple_red_rituals",
+        )
+
     def test_filter_rows_for_current_reviewed_curated_drops_superseded_pg_curated_row(self) -> None:
         rows = [
             {
@@ -260,6 +317,104 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
 
         self.assertEqual(len(merged), 1)
         self.assertEqual(merged[0]["logical_rule_key"], "pg-new")
+
+    def test_filter_rows_for_current_reviewed_curated_drops_manual_review_placeholder_when_reviewed_rule_exists(self) -> None:
+        rows = [
+            {
+                "card_name": "Vexing Bauble",
+                "logical_rule_key": "pg-manual-review",
+                "effect_json": {
+                    "effect": "artifact",
+                    "trigger_counter_spell_if_no_mana_was_spent": True,
+                    "activated_generic_one_tap_sacrifice_draw": 1,
+                    "battle_model_scope": "counter_no_mana_spent_spells_and_cantrip_sacrifice_v1",
+                },
+                "deck_role_json": {
+                    "category": "manual_review",
+                    "effect": "external_reference_required_manual_model",
+                },
+                "source": "curated",
+                "review_status": "verified",
+                "execution_status": "auto",
+            },
+            {
+                "card_name": "Vexing Bauble",
+                "logical_rule_key": "generated",
+                "effect_json": {"effect": "draw_cards", "count": 1},
+                "deck_role_json": {"category": "draw", "effect": "draw_cards"},
+                "source": "generated",
+                "review_status": "needs_review",
+                "execution_status": "disabled",
+            },
+        ]
+        reviewed_rows = [
+            {
+                "card_name": "Vexing Bauble",
+                "logical_rule_key": "reviewed-hate-artifact",
+                "effect_json": {
+                    "effect": "hate_artifact",
+                    "counters_free_spells": True,
+                    "activated_draw_on_self_sacrifice": True,
+                    "activation_cost_generic": 1,
+                    "battle_model_scope": "free_spell_hate_artifact_v1",
+                },
+                "deck_role_json": {"category": "interaction", "effect": "hate_artifact"},
+                "source": "curated",
+            }
+        ]
+
+        filtered = sync_pg.filter_rows_for_current_reviewed_curated(rows, reviewed_rows)
+
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]["logical_rule_key"], "generated")
+
+    def test_merge_pg_rows_reappends_reviewed_rule_when_only_pg_curated_row_is_manual_review_placeholder(self) -> None:
+        rows = [
+            {
+                "card_name": "Vexing Bauble",
+                "normalized_name": "vexing bauble",
+                "logical_rule_key": "pg-manual-review",
+                "effect_json": {
+                    "effect": "artifact",
+                    "trigger_counter_spell_if_no_mana_was_spent": True,
+                    "activated_generic_one_tap_sacrifice_draw": 1,
+                    "battle_model_scope": "counter_no_mana_spent_spells_and_cantrip_sacrifice_v1",
+                },
+                "deck_role_json": {
+                    "category": "manual_review",
+                    "effect": "external_reference_required_manual_model",
+                },
+                "source": "curated",
+                "review_status": "verified",
+                "execution_status": "auto",
+                "rule_version": 2,
+            }
+        ]
+        reviewed_rows = [
+            {
+                "card_name": "Vexing Bauble",
+                "logical_rule_key": "reviewed-hate-artifact",
+                "effect_json": {
+                    "effect": "hate_artifact",
+                    "counters_free_spells": True,
+                    "activated_draw_on_self_sacrifice": True,
+                    "activation_cost_generic": 1,
+                    "battle_model_scope": "free_spell_hate_artifact_v1",
+                },
+                "deck_role_json": {"category": "interaction", "effect": "hate_artifact"},
+                "source": "curated",
+                "review_status": "verified",
+                "execution_status": "auto",
+            }
+        ]
+
+        merged = sync_pg.merge_pg_rows_with_reviewed_runtime_rows(rows, reviewed_rows)
+
+        self.assertEqual(len(merged), 2)
+        self.assertEqual(
+            sorted(row["logical_rule_key"] for row in merged),
+            ["pg-manual-review", "reviewed-hate-artifact"],
+        )
 
     def test_upsert_pg_rules_preserves_execution_status_in_batch_values(self) -> None:
         captured: dict[str, object] = {}

@@ -40,6 +40,19 @@ SNAPSHOT_META_KEYS = {
     "battle_rule_oracle_hash",
 }
 
+PRESERVED_RUNTIME_ANNOTATION_KEYS = {
+    "battle_model_scope",
+    "oracle_runtime_scope",
+    "mana_color_status",
+    "pg058_l3b_simple_red_ritual_family",
+    "opponents_cant_win_this_turn",
+    "split_second",
+    "life_floor_on_damage",
+    "damage_prevention_scope",
+    "singleton_commander_baseline",
+    "graveyard_named_copy_scaling_status",
+}
+
 
 def resolve_canonical_snapshot_path() -> Path:
     env_path = os.environ.get("MANALOOM_CANONICAL_KNOWN_CARDS_JSON")
@@ -208,6 +221,42 @@ def build_snapshot_payload(rows: list[dict[str, Any]]) -> dict[str, dict[str, An
             ),
         )
     return dict(sorted(payload.items(), key=lambda item: normalize_card_name(item[0])))
+
+
+def merge_runtime_annotations_from_existing_snapshot(
+    payload: dict[str, dict[str, Any]],
+    existing_payload: dict[str, dict[str, Any]] | None,
+) -> dict[str, dict[str, Any]]:
+    if not existing_payload:
+        return payload
+
+    merged_payload: dict[str, dict[str, Any]] = {}
+    for card_name, entry in payload.items():
+        merged_entry = dict(entry)
+        existing_entry = existing_payload.get(card_name)
+        if not isinstance(existing_entry, dict):
+            merged_payload[card_name] = merged_entry
+            continue
+
+        new_key = str(merged_entry.get("battle_rule_logical_key") or "")
+        old_key = str(existing_entry.get("battle_rule_logical_key") or "")
+        if new_key and old_key and new_key != old_key:
+            merged_payload[card_name] = merged_entry
+            continue
+
+        new_hash = str(merged_entry.get("battle_rule_oracle_hash") or "")
+        old_hash = str(existing_entry.get("battle_rule_oracle_hash") or "")
+        if new_hash and old_hash and new_hash != old_hash:
+            merged_payload[card_name] = merged_entry
+            continue
+
+        for key in PRESERVED_RUNTIME_ANNOTATION_KEYS:
+            if merged_entry.get(key) in (None, "", [], {}):
+                value = existing_entry.get(key)
+                if value not in (None, "", [], {}):
+                    merged_entry[key] = value
+        merged_payload[card_name] = merged_entry
+    return merged_payload
 
 
 def write_snapshot_payload(path: str | Path, payload: dict[str, dict[str, Any]]) -> None:

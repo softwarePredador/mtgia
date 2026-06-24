@@ -49,6 +49,20 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "implement_family_before_metadata_batch",
     },
+    "treasure_maker": {
+        "effects": {"treasure_maker"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "treasure creation and discard-draw riders",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "copy_creature_token": {
+        "effects": {"copy_creature_token"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "copy-target token creation with haste and end-step cleanup",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
     "token_maker": {
         "effects": {"token_maker"},
         "support_status": "runtime_family_required",
@@ -421,6 +435,32 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target") == "spell"
             and bool(effect_json.get("instant"))
             and int(effect_json.get("cost_reduction_generic_if_control_wizard") or 0) == 1
+        )
+
+    if effect == "treasure_maker" and scope == "single_treasure_creation_v1":
+        return (
+            types == {"SORCERY"}
+            and "CreateTokenEffect" in effect_classes
+            and int(effect_json.get("treasure_count") or 0) == 1
+        )
+
+    if effect == "treasure_maker" and scope == "discard_draw_two_create_two_treasures_v1":
+        return (
+            types == {"SORCERY"}
+            and {"CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and int(effect_json.get("treasure_count") or 0) == 2
+            and int(effect_json.get("draw_count") or 0) == 2
+            and bool(effect_json.get("requires_discard_card"))
+        )
+
+    if effect == "copy_creature_token" and scope == "copy_target_creature_you_control_haste_sacrifice_end_step_v1":
+        return (
+            types == {"SORCERY"}
+            and "CreateTokenCopyTargetEffect" in effect_classes
+            and effect_json.get("copy_target_types") == ["creature"]
+            and effect_json.get("target_controller") == "own"
+            and bool(effect_json.get("token_haste"))
+            and bool(effect_json.get("sacrifice_token_at_end_step"))
         )
 
     if effect == "creature" and scope == "sacrifice_creature_put_plus_one_counter_on_self_cant_block_v1":

@@ -211,6 +211,15 @@ OPTIMIZER_BASENAMES = {
     "test_universal_optimizer_known_cards.py",
 }
 
+FOCUSED_EVIDENCE_BASENAMES = {
+    "external_card_rule_reference_harvester.py",
+    "test_external_card_rule_reference_harvester.py",
+    "xmage_current_replay_batch_pipeline.py",
+    "test_xmage_current_replay_batch_pipeline.py",
+    "xmage_local_rule_indexer.py",
+    "test_xmage_local_rule_indexer.py",
+}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -272,6 +281,8 @@ def category_for(rel_path: Path) -> str | None:
     if rel.startswith("server/bin/auto_promote_battle_rules.py"):
         return "focused evidence/promotion"
     if rel.startswith("server/bin/test_auto_promote_battle_rules.py"):
+        return "focused evidence/promotion"
+    if name in FOCUSED_EVIDENCE_BASENAMES:
         return "focused evidence/promotion"
     if name in LEARNED_DECK_BASENAMES:
         return "learned-deck source"

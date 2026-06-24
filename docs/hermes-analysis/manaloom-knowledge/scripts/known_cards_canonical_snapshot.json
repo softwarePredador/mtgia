@@ -555,22 +555,22 @@
     "battle_rule_logical_key": "battle_rule_v1:cf96c8b18d8dfab017117a0db838abc1"
   },
   "Akroma's Will": {
-    "battle_model_scope": "combat_keyword_grant_until_eot_v1",
-    "cmc": 4.0,
     "effect": "pump_all",
     "instant": true,
     "keywords": [
       "flying",
       "double_strike",
+      "vigilance",
       "lifelink",
+      "protection_all",
       "indestructible"
     ],
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.94,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:1134718ef1509d04fbc1291dbdbdf23e"
+    "battle_rule_logical_key": "battle_rule_v1:0e870121f472307183c1364d02e3dca9"
   },
   "Alchemist's Refuge": {
     "effect": "land",
@@ -806,17 +806,17 @@
     "battle_rule_logical_key": "battle_rule_v1:daba32c8520253f16f82ebe7f31d795c"
   },
   "Ancient Den": {
-    "battle_model_scope": "artifact_land_colored_source_v1",
-    "cmc": 0.0,
     "effect": "land",
     "mana_produced": 1,
     "produces": "W",
+    "type_line": "Artifact Land",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.99,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ea7e00f2d90b2ceead4036ab10cd0200"
+    "battle_rule_logical_key": "battle_rule_v1:de34474f6f5b2a79ee296beec14c8f1c",
+    "battle_rule_oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf"
   },
   "Ancient Gold Dragon": {
     "cmc": 7.0,
@@ -850,20 +850,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Ancient Tomb": {
-    "ancient_tomb_bonus_life_cost": 2,
-    "ancient_tomb_bonus_mana": 1,
-    "battle_model_scope": "ancient_tomb_bonus_mana_on_tap_v1",
-    "cmc": 0.0,
+    "damage_on_tap": 2,
     "effect": "land",
     "mana_produced": 1,
     "produces": "C",
+    "type_line": "Land",
+    "ancient_tomb_bonus_mana": 1,
+    "ancient_tomb_bonus_life_cost": 2,
     "utility_land_profile": "ancient_tomb_contextual_fast_mana_v1",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.98,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c364544e9bd651211acf851db2313ccd"
+    "battle_rule_logical_key": "battle_rule_v1:778677cb1baf3abdb20067499dbdcffd",
+    "battle_rule_oracle_hash": "5f61966c5bfc67508502d929ca891af3"
   },
   "Ancient Ziggurat": {
     "effect": "land",
@@ -885,18 +886,18 @@
     "battle_rule_logical_key": "battle_rule_v1:d83f2e5cb364c71f107f223491fa2dfb"
   },
   "Angel's Grace": {
-    "battle_model_scope": "split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1",
-    "cmc": 1,
+    "cmc": 1.0,
     "effect": "cannot_lose_turn",
     "instant": true,
     "life_floor_on_damage": 1,
-    "opponents_cant_win_this_turn": true,
+    "battle_model_scope": "split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1",
     "oracle_runtime_scope": "cannot_lose_opponents_cannot_win_damage_life_floor_split_second_annotation",
+    "opponents_cant_win_this_turn": true,
     "split_second": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.97,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227",
     "battle_rule_oracle_hash": "627c4ce7adf5be44b93e2b850159e5d9"
@@ -2548,21 +2549,23 @@
     "battle_rule_logical_key": "battle_rule_v1:345563db14bee1de3ce7d5adc6aee777"
   },
   "Birgi, God of Storytelling": {
-    "battle_model_scope": "spell_cast_red_mana_trigger_v1",
-    "cmc": 3.0,
-    "effect": "creature",
+    "effect": "ramp_engine",
     "is_creature_permanent": true,
+    "mana_persists_steps": true,
+    "mana_produced": 0,
     "power": 3,
+    "produces": "R",
     "spell_cast_add_mana": 1,
     "spell_cast_mana_color": "R",
     "toughness": 3,
     "trigger": "spell_cast",
+    "type_line": "Legendary Creature \u2014 God",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.92,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a7af0fd25d7c196baa8ff58d193b2695"
+    "battle_rule_logical_key": "battle_rule_v1:fd9213204fd7a0807ce29f8979b4bc42"
   },
   "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
     "back_face": {
@@ -4848,8 +4851,6 @@
     "battle_rule_logical_key": "battle_rule_v1:7ff862e1720f195ee0374e3a6767b0da"
   },
   "Chrome Mox": {
-    "battle_model_scope": "imprint_fast_mana_v1",
-    "cmc": 0.0,
     "effect": "ramp_permanent",
     "mana_produced": 1,
     "produces": "WUBRGC",
@@ -4857,9 +4858,9 @@
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.98,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:baf0ceea81b709c31104e0fcb4fc4e95"
+    "battle_rule_logical_key": "battle_rule_v1:2fd572ec82183a60a322a493a2ba9d69"
   },
   "Chronicle of Victory": {
     "cmc": 6.0,
@@ -6018,19 +6019,18 @@
     "battle_rule_logical_key": "battle_rule_v1:cf02bd166a0ffd1d5e60e5ffd1201c07"
   },
   "Crop Rotation": {
-    "battle_model_scope": "sacrifice_land_for_high_value_land_v1",
-    "cmc": 1.0,
     "effect": "land_ramp",
     "instant": true,
     "land_count": 1,
     "land_enters_tapped": false,
+    "land_target_kind": "any",
     "requires_sacrifice_land": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.97,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0cae4a7bd1e862a0063b9c606ff96e6c"
+    "battle_rule_logical_key": "battle_rule_v1:5515fa238b3e4279866e0fd54b2d14dd"
   },
   "Crosis's Catacombs": {
     "effect": "land",
@@ -8514,17 +8514,16 @@
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
   },
   "Electroduplicate": {
-    "battle_model_scope": "temporary_hasty_copy_token_v1",
-    "cmc": 3.0,
     "effect": "copy_creature_token",
+    "flashback_cost": "{2}{R}{R}",
     "sacrifice_token_at_end_step": true,
     "token_haste": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.91,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:908888276dcbc8c3db1126707691ae2c"
+    "battle_rule_logical_key": "battle_rule_v1:5daa159bf1d0f49653e8d7fafcf8e0c7"
   },
   "Electrostatic Field": {
     "cmc": 2.0,
@@ -9081,18 +9080,15 @@
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
   },
   "Entomb": {
-    "battle_model_scope": "graveyard_tutor_single_card_v1",
-    "cmc": 1.0,
-    "count": 1,
     "effect": "tutor",
     "instant": true,
     "target": "graveyard",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.97,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:eb8223965ca43b8748902c1f16770332"
+    "battle_rule_logical_key": "battle_rule_v1:d61021fe4fa1357803be53fa0d1d915a"
   },
   "Ephemerate": {
     "cmc": 1.0,
@@ -9295,19 +9291,17 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Everflowing Chalice": {
-    "ability_kind": "one_shot",
-    "battle_model_scope": "multikicker_charge_counter_mana_rock_v1",
-    "effect": "artifact",
-    "etb_charge_counters_per_kick": true,
-    "multikicker_cost": "{2}",
-    "tap_add_colorless_per_charge_counter": true,
+    "battle_model_scope": "multikicker_charge_mana_artifact_v1",
+    "cmc": 0.0,
+    "effect": "ramp_permanent",
+    "min_kicker_count_for_mana": 1,
+    "multikicker_generic_cost": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.94,
-    "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:b1b7f5c96002524c469ae4efa7f7bf71",
-    "battle_rule_oracle_hash": "2916ac287962232283ac7b1dbe684b7d"
+    "battle_rule_confidence": 0.97,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:67f848a7a9f40c7337ec0c13e0c1de7c"
   },
   "Everglades": {
     "effect": "land",
@@ -10856,18 +10850,16 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Formidable Speaker": {
-    "battle_model_scope": "etb_discard_then_creature_tutor_unexecuted_v1",
-    "cmc": 3.0,
     "effect": "creature",
     "is_creature_permanent": true,
     "power": 2,
     "toughness": 4,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.88,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ba0c54df93c61d9c92a11905c50b7bea"
+    "battle_rule_logical_key": "battle_rule_v1:b54d4b38d4a3a0651d48d70380e8c615"
   },
   "Forsaken City": {
     "effect": "land",
@@ -11435,17 +11427,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Gemstone Caverns": {
-    "battle_model_scope": "pregame_fixing_land_partial_v1",
-    "cmc": 0.0,
     "effect": "land",
     "mana_produced": 1,
+    "opening_hand_luck_counter": true,
     "produces": "WUBRGC",
+    "type_line": "Legendary Land",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.84,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9384b4cf2ffc3b4afc5cb65fb4febaea"
+    "battle_rule_logical_key": "battle_rule_v1:14d76f420635e9a9c729484d5534e1ef",
+    "battle_rule_oracle_hash": "2c25335e12791e77b9c19c9b3af0a413"
   },
   "Gemstone Mine": {
     "effect": "land",
@@ -12558,17 +12551,17 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Great Furnace": {
-    "battle_model_scope": "artifact_land_colored_source_v1",
-    "cmc": 0.0,
     "effect": "land",
     "mana_produced": 1,
     "produces": "R",
+    "type_line": "Artifact Land",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.99,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9a28465081dd2ac48819f94e919646a6"
+    "battle_rule_logical_key": "battle_rule_v1:b1b88ec4c0a57d2b77bcf45a55e61efd",
+    "battle_rule_oracle_hash": "ed6887f502cae452812d5f5d0a0c5792"
   },
   "Great Hall of Starnheim": {
     "effect": "land",
@@ -13007,18 +13000,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Hall of Heliod's Generosity": {
-    "battle_model_scope": "colorless_utility_recursion_land_v1",
-    "cmc": 0.0,
+    "activated_recursion_target": "enchantment",
     "effect": "land",
     "mana_produced": 1,
     "produces": "C",
-    "utility_land_profile": "hall_of_heliods_generosity_v1",
+    "type_line": "Legendary Land",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.9,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4bddcb4c084d969a7ac60a4e378b06dd"
+    "battle_rule_logical_key": "battle_rule_v1:7b61466434b5d74670c128cd21c8d542",
+    "battle_rule_oracle_hash": "cf91d14269b30b7db1f05234d34db931"
   },
   "Hall of Oracles": {
     "effect": "land",
@@ -14857,18 +14850,19 @@
     "battle_rule_logical_key": "battle_rule_v1:dcd2fccb53628953104dd6a59b0b7f96"
   },
   "Inventors' Fair": {
-    "battle_model_scope": "artifact_threshold_utility_land_v1",
-    "cmc": 0.0,
+    "activated_tutor_target": "artifact",
+    "artifact_count_lifegain": true,
     "effect": "land",
     "mana_produced": 1,
     "produces": "C",
-    "utility_land_profile": "inventors_fair_v1",
+    "type_line": "Legendary Land",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.9,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c11487143935b327650306d7e7e8c8e2"
+    "battle_rule_logical_key": "battle_rule_v1:9846e9ea7ebb39aac856b7725204f506",
+    "battle_rule_oracle_hash": "9529349d5e874f6304264ddf6a2d0c2f"
   },
   "Invert Polarity": {
     "cmc": 3.0,
@@ -17137,20 +17131,20 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Lumra, Bellow of the Woods": {
-    "battle_model_scope": "mill_four_then_return_all_graveyard_lands_tapped_v1",
-    "cmc": 6.0,
     "effect": "land_recursion_creature",
+    "keywords": [
+      "vigilance",
+      "reach"
+    ],
     "mill_count": 4,
     "power_equals_lands": true,
-    "reach": true,
     "toughness_equals_lands": true,
-    "vigilance": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.96,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:847f9ee3ec1da14f043c8a52a4dbfb52"
+    "battle_rule_logical_key": "battle_rule_v1:7121868497e89831b067a8f08e3eada9"
   },
   "Lupinflower Village": {
     "effect": "land",
@@ -18351,17 +18345,16 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Miscast": {
-    "battle_model_scope": "soft_noncreature_counter_v1",
-    "cmc": 1.0,
     "effect": "counter",
     "instant": true,
     "target": "instant_or_sorcery",
+    "tax": 3,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.93,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6b480fbda0d69779cde9b6a366089c4a"
+    "battle_rule_logical_key": "battle_rule_v1:fa5a0d9591038e16bf53776ed71da147"
   },
   "Misdirection": {
     "effect": "redirect_removal",
@@ -18931,8 +18924,6 @@
     "battle_rule_oracle_hash": "e47b40cf2afc4c9ceac6bf91815da706"
   },
   "Mox Diamond": {
-    "battle_model_scope": "discard_land_fast_mana_v1",
-    "cmc": 0.0,
     "effect": "ramp_permanent",
     "mana_produced": 1,
     "produces": "WUBRGC",
@@ -18940,9 +18931,9 @@
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.98,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:80a4b5beca8834e0c642dc8c0663106c"
+    "battle_rule_logical_key": "battle_rule_v1:9d471de3e4077cab690b3b960d08130d"
   },
   "Mox Jasper": {
     "cmc": 0.0,
@@ -19268,17 +19259,15 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Mystical Tutor": {
-    "battle_model_scope": "instant_or_sorcery_tutor_topdeck_partial_v1",
-    "cmc": 1.0,
     "effect": "tutor",
     "instant": true,
     "target": "instant_or_sorcery",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.95,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:86137800253980cc4594e0cf3fd78953"
+    "battle_rule_logical_key": "battle_rule_v1:3499e9383db9ef72521ae851c55b0482"
   },
   "Mystifying Maze": {
     "effect": "land",
@@ -22366,17 +22355,14 @@
   },
   "Rampant Growth": {
     "basic_only": true,
-    "battle_model_scope": "basic_land_ramp_tapped_v1",
-    "cmc": 2.0,
     "effect": "land_ramp",
     "land_count": 1,
-    "land_enters_tapped": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.98,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:439f162ed0ffa2321dd21b0692f07af4"
+    "battle_rule_logical_key": "battle_rule_v1:46ba2b759b0c9a870fc137d59e42ecd5"
   },
   "Ramunap Ruins": {
     "effect": "land",
@@ -22629,18 +22615,16 @@
     "battle_rule_logical_key": "battle_rule_v1:6ef4e3fb06fb42f336d38ac6e724ccdd"
   },
   "Reanimate": {
-    "battle_model_scope": "single_creature_graveyard_to_battlefield_v1",
-    "cmc": 1.0,
     "count": 1,
     "destination": "battlefield",
     "effect": "recursion",
     "target": "creature",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.95,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:853d724485700fc5e29a050e9f5856a4"
+    "battle_rule_logical_key": "battle_rule_v1:4d539456ce3026ca5a85fbadc3e7b339"
   },
   "Reassembling Skeleton": {
     "cmc": 2.0,
@@ -24097,18 +24081,17 @@
     "battle_rule_logical_key": "battle_rule_v1:abcfd8a217652da7900e0b2e59338ac4"
   },
   "Runaway Steam-Kin": {
-    "battle_model_scope": "creature_counter_engine_unexecuted_v1",
-    "cmc": 2.0,
     "effect": "creature",
     "is_creature_permanent": true,
     "power": 1,
+    "red_spell_counter_mana_engine": true,
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.9,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:955e0141660dfdc8b31aaf15056693aa"
+    "battle_rule_logical_key": "battle_rule_v1:ad73fefa5aa5c9367eb4a895d71a59ed"
   },
   "Rune-Scarred Demon": {
     "cmc": 7.0,
@@ -24293,17 +24276,15 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Sami's Curiosity": {
-    "battle_model_scope": "gain_life_make_lander_token_v1",
-    "cmc": 1.0,
     "effect": "lander_token_maker",
     "life_gain": 2,
     "token_count": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.9,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b25c35d72e00a057dc20945c38059d0e"
+    "battle_rule_logical_key": "battle_rule_v1:b411c1b26599c890aeef40da1a43d162"
   },
   "Sanctum of Eternity": {
     "effect": "land",
@@ -25148,11 +25129,10 @@
     "cmc": 3.0,
     "effect": "ramp_ritual",
     "instant": true,
-    "mana_color_status": "abstracted_to_generic_pool_runtime",
     "mana_produced": 5,
-    "oracle_runtime_scope": "single_shot_red_ritual_runtime_generic_pool_color_annotation",
-    "pg058_l3b_simple_red_ritual_family": "deck6_simple_red_rituals",
     "produces": "R",
+    "mana_color_status": "abstracted_to_generic_pool_runtime",
+    "pg058_l3b_simple_red_ritual_family": "deck6_simple_red_rituals",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -26276,18 +26256,13 @@
     "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
   },
   "Skullclamp": {
-    "battle_model_scope": "equipment_stat_mod_draw_on_death_partial_v1",
-    "cmc": 1.0,
-    "draw_on_equipped_death": 2,
     "effect": "passive",
-    "equipment_power_boost": 1,
-    "equipment_toughness_boost": -1,
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.95,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f996204e0cd900b700b6bf7defb607a6"
+    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
   },
   "Sky Diamond": {
     "cmc": 2.0,
@@ -26925,19 +26900,17 @@
     "battle_rule_logical_key": "battle_rule_v1:a2c478eb91086987f990c46671af3084"
   },
   "Soul-Guide Lantern": {
-    "ability_kind": "triggered",
-    "activated_generic_one_tap_sacrifice_draw": 1,
-    "activated_tap_sacrifice_exile_each_opponents_graveyard": true,
-    "battle_model_scope": "etb_exile_graveyard_card_or_sacrifice_for_mass_graveyard_exile_or_draw_v1",
-    "effect": "artifact",
-    "etb_exile_target_card_from_graveyard": true,
+    "activated_self_sacrifice_draw": true,
+    "battle_model_scope": "graveyard_hate_cantrip_artifact_v1",
+    "cmc": 1.0,
+    "effect": "hate_artifact",
+    "etb_exile_single_graveyard_card": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.94,
-    "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:720260c93bdae63518a0721df51089c3",
-    "battle_rule_oracle_hash": "6a9e4cf9a4397715ccd0737e1b8cf270"
+    "battle_rule_confidence": 0.93,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:3454aa122d10a4abd906132eb7745339"
   },
   "Soulfire Eruption": {
     "amount": 5,
@@ -27298,15 +27271,13 @@
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
   },
   "Splendid Reclamation": {
-    "battle_model_scope": "graveyard_lands_to_battlefield_tapped_v1",
-    "cmc": 4.0,
     "effect": "land_recursion",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.96,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:323e4e2c6e95da761c1614e4dff44778"
+    "battle_rule_logical_key": "battle_rule_v1:70e713cd31334c7d5d77c042af8ba27b"
   },
   "Splinter's Technique": {
     "effect": "tutor",
@@ -27431,18 +27402,15 @@
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
   },
   "Staff of Compleation": {
-    "battle_model_scope": "multi_mode_life_payment_utility_artifact_partial_v1",
-    "cmc": 3.0,
     "effect": "ramp_permanent",
     "mana_produced": 1,
     "produces": "WUBRGC",
-    "utility_artifact_profile": "staff_of_compleation_v1",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.9,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d464d25de43eb912c79baea1cee783e5"
+    "battle_rule_logical_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d"
   },
   "Staff of Domination": {
     "count": 1,
@@ -28101,18 +28069,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Sunbaked Canyon": {
-    "battle_model_scope": "pain_cycle_sac_draw_land_v1",
-    "cmc": 0.0,
     "effect": "land",
     "mana_produced": 1,
     "produces": "WR",
-    "utility_land_profile": "sunbaked_canyon_v1",
+    "sacrifice_draw": 1,
+    "type_line": "Land",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.93,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:07c97c73f65d524510e30b6bbfca0b61"
+    "battle_rule_logical_key": "battle_rule_v1:cb662594169e859ebcb0a10731310099",
+    "battle_rule_oracle_hash": "eae946655b75e4666adfbdb760bee0ff"
   },
   "Sunbillow Verge": {
     "battle_model_scope": "verge_dual_source_condition_annotation_v1",
@@ -32377,18 +32345,19 @@
     "battle_rule_logical_key": "battle_rule_v1:8d54214335142fbda9e139f79184cd30"
   },
   "Urza's Saga": {
-    "battle_model_scope": "saga_land_token_then_tutor_partial_v1",
-    "cmc": 0.0,
     "effect": "land",
     "mana_produced": 1,
     "produces": "C",
-    "utility_land_profile": "urzas_saga_v1",
+    "saga_artifact_tutor_cmc_max": 0,
+    "saga_construct_token": true,
+    "type_line": "Enchantment Land \u2014 Urza's Saga",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.91,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b62b6dfa5cdc9db4b8b21faf7bfc0498"
+    "battle_rule_logical_key": "battle_rule_v1:e9cb68d2e2a585c86ff5699757221488",
+    "battle_rule_oracle_hash": "43e3b1636425f22bbd834442ddb93bc0"
   },
   "Urza's Tower": {
     "effect": "land",
@@ -32771,18 +32740,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Vexing Bauble": {
-    "ability_kind": "triggered",
-    "activated_generic_one_tap_sacrifice_draw": 1,
-    "battle_model_scope": "counter_no_mana_spent_spells_and_cantrip_sacrifice_v1",
-    "effect": "artifact",
-    "trigger_counter_spell_if_no_mana_was_spent": true,
+    "activated_draw_on_self_sacrifice": true,
+    "activation_cost_generic": 1,
+    "battle_model_scope": "free_spell_hate_artifact_v1",
+    "cmc": 1.0,
+    "counters_free_spells": true,
+    "effect": "hate_artifact",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.94,
-    "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:ad19691a7b388a47b6775f5e16275403",
-    "battle_rule_oracle_hash": "020e696ec9560830bb82bf0244595d69"
+    "battle_rule_confidence": 0.95,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:6a85170698c85498bf618c0c0283a770"
   },
   "Veyran, Voice of Duality": {
     "cmc": 3.0,
@@ -33312,18 +33281,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "War Room": {
-    "battle_model_scope": "colorless_life_paid_draw_land_v1",
-    "cmc": 0.0,
+    "activated_draw": 1,
     "effect": "land",
     "mana_produced": 1,
     "produces": "C",
-    "utility_land_profile": "war_room_v1",
+    "type_line": "Land",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.93,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9cdb33ac0e813c0a25d960b65dbc7417"
+    "battle_rule_logical_key": "battle_rule_v1:06ce85b0e6bb33b863792a41eb6e5adc",
+    "battle_rule_oracle_hash": "d9c250570bb91d94ceae9fcd74081ef5"
   },
   "Warden of the Grove": {
     "ability_kind": "triggered",
@@ -34298,20 +34267,13 @@
     "battle_rule_logical_key": "battle_rule_v1:cbc31597c59b4deef51aec39e807d64d"
   },
   "Worldfire": {
-    "battle_model_scope": "worldfire_total_reset_v1",
-    "cmc": 9.0,
     "effect": "worldfire_reset",
-    "exile_all_graveyards": true,
-    "exile_all_hands": true,
-    "exile_all_permanents": true,
-    "set_life_total": 1,
-    "sorcery": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.99,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:1b9bb9bfd6774cc55d21e50009efa9f3"
+    "battle_rule_logical_key": "battle_rule_v1:f56f3819b7773777b293a363b5cf432a"
   },
   "Worldly Tutor": {
     "effect": "tutor",
@@ -34572,15 +34534,13 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Zuran Orb": {
-    "battle_model_scope": "sacrifice_land_gain_life_artifact_v1",
-    "cmc": 0.0,
     "effect": "life_artifact",
     "sacrifice_land_gain_life": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.97,
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d977323f1ef9834d148ef87dc519ba37"
+    "battle_rule_logical_key": "battle_rule_v1:2c294b705a02af9c6d9b71749a512057"
   }
 }

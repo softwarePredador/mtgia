@@ -30,6 +30,8 @@ from battle_rule_registry import (
 )
 from known_cards_fallback_snapshot import (
     build_snapshot_payload,
+    load_snapshot_file,
+    merge_runtime_annotations_from_existing_snapshot,
     write_snapshot_payload,
 )
 from reviewed_battle_card_rules import (
@@ -339,6 +341,10 @@ def main() -> int:
 
         active_rows = load_active_snapshot_rows(args.sqlite_db)
         payload = build_snapshot_payload(active_rows)
+        payload = merge_runtime_annotations_from_existing_snapshot(
+            payload,
+            load_snapshot_file(args.export_canonical_fallback_json),
+        )
         write_snapshot_payload(args.export_canonical_fallback_json, payload)
         report["canonical_snapshot_rows_exported"] = len(payload)
 

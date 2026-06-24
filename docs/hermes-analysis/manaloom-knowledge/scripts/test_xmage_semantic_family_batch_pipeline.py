@@ -189,6 +189,75 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_single_treasure_creation_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Strike It Rich",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "StrikeItRich",
+                            "path": "/xmage/StrikeItRich.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["CreateTokenEffect"],
+                            "primary_effect": {
+                                "effect": "treasure_maker",
+                                "battle_model_scope": "single_treasure_creation_v1",
+                                "ability_kind": "one_shot",
+                                "treasure_count": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "treasure_maker")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_simple_copy_creature_token_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Electroduplicate",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Electroduplicate",
+                            "path": "/xmage/Electroduplicate.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["CreateTokenCopyTargetEffect"],
+                            "primary_effect": {
+                                "effect": "copy_creature_token",
+                                "battle_model_scope": "copy_target_creature_you_control_haste_sacrifice_end_step_v1",
+                                "ability_kind": "one_shot",
+                                "copy_target_types": ["creature"],
+                                "target_controller": "own",
+                                "token_haste": True,
+                                "sacrifice_token_at_end_step": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_creature_token")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_package_builder_writes_review_only_sql_package_for_safe_proposals(self) -> None:
         proposal_report = generator.build_generator_report(
             batch_audit=sample_batch_audit(),

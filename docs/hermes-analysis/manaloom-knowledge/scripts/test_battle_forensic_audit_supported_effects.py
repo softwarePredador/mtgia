@@ -678,10 +678,10 @@ def test_oracle_normalized_creature_bounce_marks_effect_override():
 
     assert flood_maw["effect"] == "remove_creature"
     assert flood_maw["target"] == "creature"
-    assert flood_maw["_rule_runtime_selection"]["selected_effect"] == "remove_permanent"
-    assert fields["rule_oracle_normalized_effect_from"] == "remove_permanent"
+    assert flood_maw["_rule_runtime_selection"]["selected_effect"] == "remove_creature"
+    assert fields["rule_oracle_normalized_effect_from"] == "bounce"
     assert fields["rule_oracle_normalized_effect_to"] == "remove_creature"
-    assert fields["rule_oracle_normalized_target_from"] == "nonland"
+    assert fields["rule_oracle_normalized_target_from"] == "opponent_creature"
     assert fields["rule_oracle_normalized_target_to"] == "creature"
 
 
@@ -694,14 +694,14 @@ def test_forensic_accepts_explicit_oracle_effect_normalization():
             "rule_source": "curated",
             "rule_review_status": "verified",
             "rule_logical_key": "battle_rule_v1:flood-maw-runtime",
-            "rule_oracle_normalized_effect_from": "remove_permanent",
+            "rule_oracle_normalized_effect_from": "bounce",
             "rule_oracle_normalized_effect_to": "remove_creature",
             "turn": 7,
         }
     ]
     rules = {
         "into the flood maw": {
-            "effect_json": {"effect": "remove_permanent"},
+            "effect_json": {"effect": "bounce"},
             "source": "curated",
             "review_status": "verified",
             "logical_rule_key": "battle_rule_v1:flood-maw-runtime",

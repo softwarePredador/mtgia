@@ -71,6 +71,37 @@ def external_card(name: str, *, mana_cost: str = "{3}", type_line: str = "Artifa
 
 
 class XMageBatchValidityAuditTests(unittest.TestCase):
+    def test_actionable_coherence_card_skips_trusted_rule_with_only_oracle_hash_gap(self) -> None:
+        card = {
+            "card_name": "Covered Card",
+            "severity": "medium",
+            "findings": [{"code": "trusted_rule_without_oracle_hash"}],
+            "trusted_executable_rule_count": 1,
+            "review_only_rule_count": 0,
+            "active_rule_count": 1,
+        }
+
+        self.assertFalse(audit.actionable_coherence_card(card))
+
+    def test_high_medium_cards_keeps_real_rule_gap_and_drops_metadata_only_gap(self) -> None:
+        report = {
+            "cards": [
+                {
+                    "card_name": "Covered Card",
+                    "severity": "medium",
+                    "findings": [{"code": "trusted_rule_without_oracle_hash"}],
+                    "trusted_executable_rule_count": 1,
+                    "review_only_rule_count": 0,
+                    "active_rule_count": 1,
+                },
+                coherence_card("Needs Work"),
+            ]
+        }
+
+        actionable = audit.high_medium_cards(report)
+
+        self.assertEqual([card["card_name"] for card in actionable], ["Needs Work"])
+
     def test_expected_types_from_split_type_line(self) -> None:
         self.assertEqual(
             audit.expected_types_from_type_line("Sorcery // Land"),

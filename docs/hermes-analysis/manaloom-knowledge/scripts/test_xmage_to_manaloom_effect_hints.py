@@ -241,6 +241,63 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["effect"], "exile_instant_sorcery_boost_combat_damage_copy_cast")
         self.assertEqual(primary["target_constraints"]["zone"], "graveyard")
 
+    def test_strike_it_rich_maps_to_single_treasure_creation(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["FlashbackAbility"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+            },
+            "Create a Treasure token. Flashback {2}{R}.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "treasure_maker")
+        self.assertEqual(primary["battle_model_scope"], "single_treasure_creation_v1")
+        self.assertEqual(primary["treasure_count"], 1)
+
+    def test_pirates_pillage_maps_to_discard_draw_two_create_two_treasures(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+            },
+            "As an additional cost to cast this spell, discard a card. Draw two cards and create two Treasure tokens.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "treasure_maker")
+        self.assertEqual(primary["battle_model_scope"], "discard_draw_two_create_two_treasures_v1")
+        self.assertEqual(primary["draw_count"], 2)
+        self.assertEqual(primary["treasure_count"], 2)
+        self.assertTrue(primary["requires_discard_card"])
+
+    def test_electroduplicate_maps_to_copy_creature_token(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Electroduplicate",
+                "effect_classes": ["CreateTokenCopyTargetEffect"],
+                "ability_classes": ["FlashbackAbility"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+            },
+            "Create a token that's a copy of target creature you control, except it has haste and \"At the beginning of the end step, sacrifice this token.\"",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_creature_token")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "copy_target_creature_you_control_haste_sacrifice_end_step_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["creature"])
+        self.assertEqual(primary["target_controller"], "own")
+        self.assertTrue(primary["token_haste"])
+        self.assertTrue(primary["sacrifice_token_at_end_step"])
+
     def test_natures_claim_maps_to_artifact_or_enchantment_lifegain_removal(self) -> None:
         result = hints.build_effect_hints(
             {

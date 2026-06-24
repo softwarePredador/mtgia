@@ -9,10 +9,10 @@ import battle_runtime_surface_manifest as manifest_mod
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-EXPECTED_TOTAL_FILES = 116
+EXPECTED_TOTAL_FILES = 122
 EXPECTED_CATEGORY_COUNTS = {
     "core runtime": 31,
-    "focused evidence/promotion": 4,
+    "focused evidence/promotion": 10,
     "learned-deck source": 16,
     "optimizer/scorecard": 15,
     "recurring audit gate": 28,
@@ -23,13 +23,13 @@ EXPECTED_CATEGORY_COUNTS = {
 EXPECTED_AUTOMATION_COVERAGE_COUNTS = {
     "covered_by_recurring_run": 31,
     "imported_by_core_runtime": 6,
-    "outside_recurring_run": 79,
+    "outside_recurring_run": 85,
 }
 EXPECTED_GATE_EXPECTED_COUNTS = {
     "core_runtime_import_regression": 6,
     "recurring_audit_required": 31,
-    "targeted_manual_gate_required_before_change": 34,
-    "targeted_test_required_before_change": 45,
+    "targeted_manual_gate_required_before_change": 37,
+    "targeted_test_required_before_change": 48,
 }
 REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",

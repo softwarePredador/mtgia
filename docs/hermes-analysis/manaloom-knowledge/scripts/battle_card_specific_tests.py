@@ -4665,6 +4665,86 @@ def register_tests(battle, player):
         assert treasure_event["rule_logical_key"] == "battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4"
         assert treasure_event["rule_oracle_hash"] == "9c4fbe06104051a2e8b1d295d307b26a"
 
+    def test_strike_it_rich_creates_one_treasure_from_reviewed_runtime_rule(self):
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            strike = {"name": "Strike It Rich", "cmc": 1, "mana_cost": "{R}", "type_line": "Sorcery"}
+            effect_data = battle.get_card_effect(strike)
+
+            assert effect_data["effect"] == "treasure_maker"
+            assert effect_data["treasure_count"] == 1
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                strike,
+                3,
+                random.Random(1167),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.treasures == 1
+        treasure_event = next(
+            data
+            for event, data in events
+            if event == "treasure_created" and data.get("card") == "Strike It Rich"
+        )
+        assert treasure_event["treasures_created"] == 1
+        assert treasure_event["cards_drawn"] == 0
+        assert treasure_event["rule_logical_key"] == "battle_rule_v1:c7150bc991226fde4b186bf65bd1e9ec"
+
+    def test_pirates_pillage_discards_draws_two_and_creates_two_treasures(self):
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            active.hand = [
+                {"name": "Pirate's Pillage", "cmc": 4, "mana_cost": "{3}{R}", "type_line": "Sorcery"},
+                {"name": "Discard Me", "cmc": 6, "type_line": "Sorcery", "effect": "draw_cards"},
+            ]
+            active.library = [
+                {"name": "Drawn One", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Drawn Two", "cmc": 1, "type_line": "Sorcery"},
+            ]
+            pillage = active.hand[0]
+            effect_data = battle.get_card_effect(pillage)
+
+            assert effect_data["effect"] == "treasure_maker"
+            assert effect_data["draw_count"] == 2
+            assert effect_data["treasure_count"] == 2
+            assert effect_data["requires_discard_card"] is True
+            assert effect_data["battle_model_scope"] == "discard_draw_two_create_two_treasures_v1"
+            assert effect_data["_rule_oracle_hash"] == "9c4fbe06104051a2e8b1d295d307b26a"
+
+            active.hand.remove(pillage)
+            battle.apply_effect_immediate(
+                active,
+                [],
+                pillage,
+                5,
+                random.Random(1168),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.treasures == 2
+        assert [card.get("name") for card in active.hand] == ["Drawn One", "Drawn Two"]
+        assert any(card.get("name") == "Discard Me" for card in active.graveyard)
+        treasure_event = next(
+            data
+            for event, data in events
+            if event == "treasure_created" and data.get("card") == "Pirate's Pillage"
+        )
+        assert treasure_event["treasures_created"] == 2
+        assert treasure_event["cards_drawn"] == 2
+
     def test_pg070_faithless_looting_draws_two_discards_two_with_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER

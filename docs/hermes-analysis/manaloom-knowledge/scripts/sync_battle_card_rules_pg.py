@@ -31,6 +31,8 @@ import battle_rule_registry
 from battle_rule_registry import DEFAULT_DB, normalize_card_name, upsert_battle_card_rule
 from known_cards_fallback_snapshot import (
     build_snapshot_payload,
+    load_snapshot_file,
+    merge_runtime_annotations_from_existing_snapshot,
     resolve_canonical_snapshot_path,
     write_snapshot_payload,
 )
@@ -758,6 +760,8 @@ def filter_rows_for_current_reviewed_curated(
             str(row.get("review_status") or "") in {"verified", "active"}
             and str(row.get("execution_status") or "") != "disabled"
         ):
+            if is_manual_review_placeholder(row) and allowed_by_name.get(normalized):
+                continue
             filtered.append(row)
             continue
         if active_pg_curated_by_name.get(normalized):
@@ -797,6 +801,16 @@ def runtime_rule_key(row: dict[str, Any]) -> tuple[str, str] | None:
     return normalize_card_name(card_name), logical_rule_key
 
 
+def is_manual_review_placeholder(row: dict[str, Any]) -> bool:
+    deck_role_json = json_obj(row.get("deck_role_json"))
+    if str(deck_role_json.get("effect") or "") == "external_reference_required_manual_model":
+        return True
+    if str(deck_role_json.get("category") or "") == "manual_review":
+        return True
+    effect_json = json_obj(row.get("effect_json"))
+    return str(effect_json.get("effect") or "") == "external_reference_required_manual_model"
+
+
 def merge_pg_rows_with_reviewed_runtime_rows(
     rows: list[dict[str, Any]],
     reviewed_rows: list[dict[str, Any]],
@@ -816,6 +830,8 @@ def merge_pg_rows_with_reviewed_runtime_rows(
         if str(row.get("review_status") or "") not in {"verified", "active"}:
             continue
         if str(row.get("execution_status") or "") == "disabled":
+            continue
+        if is_manual_review_placeholder(row):
             continue
         normalized = normalize_card_name(str(row.get("card_name") or row.get("normalized_name") or ""))
         if normalized:
@@ -965,6 +981,10 @@ def export_canonical_snapshot(
 ) -> int:
     normalized_rows = _oracle_normalized_rows(sqlite_db, rows)
     payload = build_snapshot_payload(normalized_rows)
+    payload = merge_runtime_annotations_from_existing_snapshot(
+        payload,
+        load_snapshot_file(output_path),
+    )
     write_snapshot_payload(output_path, payload)
     return len(payload)
 

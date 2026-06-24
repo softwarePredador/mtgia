@@ -49,8 +49,31 @@ def high_medium_cards(coherence_report: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         card
         for card in coherence_report.get("cards", [])
-        if isinstance(card, dict) and card.get("severity") in SEVERITIES
+        if isinstance(card, dict) and actionable_coherence_card(card)
     ]
+
+
+def actionable_coherence_card(card: dict[str, Any]) -> bool:
+    if card.get("severity") not in SEVERITIES:
+        return False
+    findings = [
+        str(finding.get("code") or "")
+        for finding in card.get("findings", [])
+        if isinstance(finding, dict)
+    ]
+    if not findings:
+        return True
+    only_oracle_hash_gap = set(findings) == {"trusted_rule_without_oracle_hash"}
+    if not only_oracle_hash_gap:
+        return True
+    trusted_executable = int(card.get("trusted_executable_rule_count") or 0)
+    review_only = int(card.get("review_only_rule_count") or 0)
+    active_rule_count = int(card.get("active_rule_count") or 0)
+    return not (
+        trusted_executable > 0
+        and review_only == 0
+        and active_rule_count == trusted_executable
+    )
 
 
 def by_card_name(report: dict[str, Any]) -> dict[str, dict[str, Any]]:

@@ -1,0 +1,27 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg138_current_replay_batch_three_strike_pillage_electrod",
+  "deploy_id": "PG138",
+  "family_counts": {
+    "copy_creature_token": 1,
+    "treasure_maker": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg138_current_replay_batch_three_strike_pillage_electroduplicate_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg138_current_replay_batch_three_strike_pillage_electroduplicate_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg138_current_replay_batch_three_strike_pillage_electroduplicate_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg138_current_replay_batch_three_strike_pillage_electroduplicate_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg138_current_replay_batch_three_strike_pillage_electroduplicate_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg138_current_replay_batch_three_strike_pillage_electroduplicate_rollback.sql"
+  },
+  "generated_at": "2026-06-24T02:32:18+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Electroduplicate",
+    "Pirate's Pillage",
+    "Strike It Rich"
+  ],
+  "selected_count": 3,
+  "slug": "current_replay_batch_three_strike_pillage_electroduplicate",
+  "status": "prepared_read_only_pending_apply_approval"
+}
