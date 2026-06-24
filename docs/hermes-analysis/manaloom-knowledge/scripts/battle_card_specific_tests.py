@@ -6736,6 +6736,64 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_caldera_pyremaw_instant_sorcery_trigger_adds_counter_then_deals_power_damage():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Lorehold")
+            opponent = player("Opponent")
+            caster.battlefield = [
+                {
+                    "name": "Caldera Pyremaw",
+                    "cmc": 5,
+                    "type_line": "Creature - Dragon",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                    "flying": True,
+                    "trigger": "instant_sorcery_cast",
+                    "trigger_effect": "source_counter_then_power_damage",
+                    "trigger_add_plus_one_counter": 1,
+                    "trigger_damage_amount_source": "source_power_after_counter",
+                    "target": "opponent",
+                    "battle_model_scope": "instant_sorcery_cast_add_counter_then_power_damage_target_opponent_v1",
+                    "_rule_logical_key": "battle_rule_v1:caldera_pyremaw",
+                    "_rule_oracle_hash": "hash_caldera_pyremaw",
+                }
+            ]
+            battle.trigger_spell_cast_engines(
+                caster,
+                [caster, opponent],
+                {"name": "Lightning Helix", "type_line": "Instant", "cmc": 2},
+                turn=6,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        pyremaw = caster.battlefield[0]
+        assert pyremaw["power"] == 4
+        assert pyremaw["toughness"] == 4
+        assert pyremaw["plus_one_counters"] == 1
+        assert opponent.life == 36
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Caldera Pyremaw"
+            and data.get("trigger") == "instant_sorcery_cast"
+            and data.get("trigger_spell") == "Lightning Helix"
+            and data.get("effect") == "source_counter_then_power_damage"
+            and data.get("counters_added") == 1
+            and data.get("source_power_before") == 3
+            and data.get("source_power_after") == 4
+            and data.get("amount") == 4
+            and data.get("target_player") == "Opponent"
+            and data.get("target_life_after") == 36
+            and data.get("rule_logical_key") == "battle_rule_v1:caldera_pyremaw"
+            and data.get("rule_oracle_hash") == "hash_caldera_pyremaw"
+            for event, data in events
+        )
+
     def test_lotho_second_spell_trigger_creates_treasure_and_loses_life():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -12957,6 +13015,7 @@ def register_tests(battle, player):
         test_geths_grimoire_and_megrim_trigger_on_opponent_discard_with_rule_provenance,
         test_feast_of_sanity_triggers_on_controller_discard_and_gains_life,
         test_lightning_helix_damage_spell_gains_life_with_rule_provenance,
+        test_caldera_pyremaw_instant_sorcery_trigger_adds_counter_then_deals_power_damage,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,

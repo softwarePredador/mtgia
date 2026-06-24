@@ -10385,3 +10385,102 @@ Register decision:
   `targeted_interaction/direct_damage/targeted_damage_variant_v1` (`21`
   cards) or with a smaller high-impact exact scope if it yields a safer batch.
 - Next package number is PG187.
+
+## PG187 - Caldera Pyremaw spell-cast counter and source-power damage rule
+
+Timestamp: 2026-06-24 17:53 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes one Lorehold variant card used by deck `614`: `Caldera Pyremaw`.
+- Replaces two stale generated `finisher` review-only shadows with one
+  verified auto rule.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Caldera Pyremaw`:
+  `battle_rule_v1:5b5d2301b71ddde9e1d8a44a7b3d3efb`,
+  `oracle_hash=80925ba3ca250947cbae3cf0812df235`,
+  `effect=creature`,
+  `battle_model_scope=instant_sorcery_cast_add_counter_then_power_damage_target_opponent_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps the exact `SpellCastControllerTriggeredAbility` +
+  `AddCountersSourceEffect` + `DamageTargetEffect` + `TargetOpponent` creature
+  pattern to a triggered creature rule.
+- Validity/classifier pipeline now preserves `target_classes` so batch-safe
+  decisions can verify the exact XMage target class.
+- Battle runtime resolves the `instant_sorcery_cast` trigger by adding the
+  +1/+1 counter first and then dealing damage equal to the source's
+  post-counter power to an opponent.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg187_caldera_pyremaw_spellcast_damage_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg187_caldera_pyremaw_spellcast_damage_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg187_caldera_pyremaw_spellcast_damage_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg187_caldera_pyremaw_spellcast_damage_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg187_caldera_pyremaw_spellcast_damage_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Shadow inspection:
+  both existing rows were generated `needs_review/review_only`, lacked
+  `oracle_hash`, and modeled the card as `finisher`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg187_caldera_pyremaw_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3239`.
+- SQLite verification:
+  local active `battle_card_rules` row is `verified/auto` with
+  `instant_sorcery_cast_add_counter_then_power_damage_target_opponent_v1`.
+- Battle loader verification:
+  `get_card_effect({"name":"Caldera Pyremaw"})` selects the curated
+  `creature` rule with one active alternative.
+- Tests:
+  `python3 -m unittest test_xmage_batch_validity_audit.py test_xmage_to_manaloom_effect_hints.py test_xmage_semantic_family_batch_pipeline.py`
+  ran `326` tests OK;
+  `python3 test_battle_analyst_v10_3.py` passed, including
+  `test_caldera_pyremaw_instant_sorcery_trigger_adds_counter_then_deals_power_damage`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg187_caldera_pyremaw_postsync_v1.json`;
+  expanded scope rows `709`, `battle_ready=458`,
+  `needs_rule_before_strategy=251`, `split_scope=60`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg187_caldera_pyremaw_postsync_v1.json`;
+  `package_ready_unprepared=0`, `package_already_prepared=0`,
+  `split_scope_backlog=78`, `runtime_family_backlog=24`,
+  `manual_mapper_backlog=261`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg187_caldera_pyremaw_postsync_v1.json`;
+  `18/18` pass.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck614_battle_rule_coherence_pg187_postsync_20260624.json`;
+  deck `614` has `high=24`, `medium=2`, `pass=65`;
+  `Caldera Pyremaw` is `pass` with one trusted executable rule.
+
+Register decision:
+
+- PG187 is closed as applied, postchecked, synced, tested, and
+  strategy-audited.
+- Do not reuse PG187.
+- Continue next with remaining Lorehold `needs_rule_before_strategy` cards,
+  prioritizing reusable exact scopes over broad targeted-damage variants.
+- Next package number is PG188.

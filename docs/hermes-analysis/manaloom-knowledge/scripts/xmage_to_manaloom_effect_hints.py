@@ -1697,6 +1697,43 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        card_types == {"CREATURE"}
+        and effect_classes == {"AddCountersSourceEffect", "DamageTargetEffect"}
+        and {"FlyingAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+        and "TargetOpponent" in target_classes
+        and (
+            xmage_class_name == "CalderaPyremaw"
+            or _oracle_has(
+                rules_text,
+                "whenever you cast an instant or sorcery spell",
+                "put a +1/+1 counter on this creature",
+                "deals damage equal to its power to target opponent",
+            )
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "instant_sorcery_cast_add_counter_then_power_damage_target_opponent_v1",
+            "fields": {
+                "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text) or 3,
+                "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text) or 3,
+                "flying": True,
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "source_counter_then_power_damage",
+                "trigger_add_plus_one_counter": 1,
+                "trigger_damage_amount_source": "source_power_after_counter",
+                "target": "opponent",
+            },
+            "reason": "XMage structure matches a flying creature that gets a +1/+1 counter whenever its controller casts an instant or sorcery, then deals damage equal to its post-counter power to target opponent.",
+            "signals": [
+                "SpellCastControllerTriggeredAbility",
+                "AddCountersSourceEffect",
+                "DamageTargetEffect",
+                "TargetOpponent",
+            ],
+        }
+
+    if (
         card_types == {"ARTIFACT"}
         and effect_classes == {"DrawCardSourceControllerEffect"}
         and ability_classes == {"DiscardsACardOpponentTriggeredAbility"}

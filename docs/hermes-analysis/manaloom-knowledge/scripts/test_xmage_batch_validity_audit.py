@@ -30,6 +30,7 @@ def xmage_card(
         "card_name": name,
         "status": "found",
         "xmage_class_name": "TestCard",
+        "target_classes": ["TargetOpponent"],
         "constructor_metadata": {
             "mana_cost": mana_cost,
             "card_types": types or ["ARTIFACT"],
@@ -123,6 +124,7 @@ class XMageBatchValidityAuditTests(unittest.TestCase):
         self.assertTrue(result["valid_xmage_source"])
         self.assertTrue(result["ready_for_structured_pull"])
         self.assertTrue(result["checks"]["focused_test_scenarios_present"])
+        self.assertEqual(result["xmage"]["target_classes"], ["TargetOpponent"])
 
     def test_generic_manual_effect_requires_mapper(self) -> None:
         result = audit.classify_card(

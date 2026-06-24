@@ -21165,6 +21165,55 @@ def trigger_spell_cast_engines(
                 all_players=all_players,
             )
             continue
+        if permanent.get("trigger_effect") == "source_counter_then_power_damage":
+            counter_count = max(0, int(permanent.get("trigger_add_plus_one_counter") or 1))
+
+            def resolve_counter_then_power_damage_trigger(
+                permanent=permanent,
+                counter_count=counter_count,
+            ):
+                source_power_before = card_power_value(permanent, default=0)
+                add_plus_one_counters(permanent, counter_count)
+                source_power_after = card_power_value(permanent, default=source_power_before)
+                amount = source_power_after
+                alive_opponents = [
+                    opponent
+                    for opponent in all_players
+                    if opponent is not player and opponent.is_alive()
+                ]
+                target = max(alive_opponents, key=lambda opponent: opponent.life) if alive_opponents else None
+                target_life_before = target.life if target is not None else None
+                dealt = deal_damage(target, amount) if target is not None and amount > 0 else False
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    effect="source_counter_then_power_damage",
+                    counters_added=counter_count,
+                    source_power_before=source_power_before,
+                    source_power_after=source_power_after,
+                    amount=amount,
+                    target_player=target.name if target is not None else None,
+                    target_life_before=target_life_before,
+                    target_life_after=target.life if target is not None else None,
+                    result="player_damage" if dealt else "no_legal_target_or_zero_damage",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "instant_sorcery_cast",
+                resolve_counter_then_power_damage_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         if permanent.get("trigger_effect") != "damage_each_opponent":
             continue
         amount = int(permanent.get("damage") or 2)

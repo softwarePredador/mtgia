@@ -3339,6 +3339,42 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target"], "any_target")
         self.assertTrue(primary["instant"])
 
+    def test_caldera_pyremaw_maps_to_counter_then_power_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CalderaPyremaw",
+                "effect_classes": ["AddCountersSourceEffect", "DamageTargetEffect"],
+                "ability_classes": ["FlyingAbility", "SpellCastControllerTriggeredAbility"],
+                "target_classes": ["TargetOpponent"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(3); this.toughness = new MageInt(3); "
+                    "this.addAbility(FlyingAbility.getInstance()); "
+                    "Ability ability = new SpellCastControllerTriggeredAbility("
+                    "new AddCountersSourceEffect(CounterType.P1P1.createInstance()), "
+                    "StaticFilters.FILTER_SPELL_AN_INSTANT_OR_SORCERY, false); "
+                    "ability.addEffect(new DamageTargetEffect(SourcePermanentPowerValue.NOT_NEGATIVE)); "
+                    "ability.addTarget(new TargetOpponent());"
+                ),
+            },
+            "Whenever you cast an instant or sorcery spell, put a +1/+1 counter on this creature. Then this creature deals damage equal to its power to target opponent.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "instant_sorcery_cast_add_counter_then_power_damage_target_opponent_v1",
+        )
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["trigger"], "instant_sorcery_cast")
+        self.assertEqual(primary["trigger_effect"], "source_counter_then_power_damage")
+        self.assertEqual(primary["trigger_add_plus_one_counter"], 1)
+        self.assertEqual(primary["trigger_damage_amount_source"], "source_power_after_counter")
+        self.assertEqual(primary["target"], "opponent")
+
     def test_faerie_mastermind_maps_to_exact_draw_trigger_creature_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -2363,6 +2363,48 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "targeted_interaction")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_caldera_pyremaw_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Caldera Pyremaw",
+                        "severity": "high",
+                        "oracle_hash": "calderahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "CalderaPyremaw",
+                            "path": "/xmage/CalderaPyremaw.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["AddCountersSourceEffect", "DamageTargetEffect"],
+                            "ability_classes": ["FlyingAbility", "SpellCastControllerTriggeredAbility"],
+                            "target_classes": ["TargetOpponent"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "instant_sorcery_cast_add_counter_then_power_damage_target_opponent_v1",
+                                "power": 3,
+                                "toughness": 3,
+                                "flying": True,
+                                "trigger": "instant_sorcery_cast",
+                                "trigger_effect": "source_counter_then_power_damage",
+                                "trigger_add_plus_one_counter": 1,
+                                "trigger_damage_amount_source": "source_power_after_counter",
+                                "target": "opponent",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_faerie_mastermind_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

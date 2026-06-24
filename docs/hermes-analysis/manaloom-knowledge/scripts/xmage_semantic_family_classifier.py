@@ -289,7 +289,9 @@ def xmage_cost_classes(card: dict[str, Any]) -> set[str]:
 
 
 def xmage_target_classes(card: dict[str, Any]) -> set[str]:
-    return {str(value or "") for value in ((card.get("xmage") or {}).get("target_classes") or []) if value}
+    nested = (card.get("xmage") or {}).get("target_classes") or []
+    summarized = card.get("xmage_target_classes") or []
+    return {str(value or "") for value in [*nested, *summarized] if value}
 
 
 def xmage_condition_classes(card: dict[str, Any]) -> set[str]:
@@ -1672,6 +1674,23 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("opponent_draws_card_may_draw") or 0) == 2
         )
 
+    if effect == "creature" and scope == "instant_sorcery_cast_add_counter_then_power_damage_target_opponent_v1":
+        target_classes = xmage_target_classes(card)
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"AddCountersSourceEffect", "DamageTargetEffect"}
+            and {"FlyingAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+            and target_classes == {"TargetOpponent"}
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 3
+            and bool(effect_json.get("flying"))
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and effect_json.get("trigger_effect") == "source_counter_then_power_damage"
+            and int(effect_json.get("trigger_add_plus_one_counter") or 0) == 1
+            and effect_json.get("trigger_damage_amount_source") == "source_power_after_counter"
+            and effect_json.get("target") == "opponent"
+        )
+
     if scope == "opponent_draws_card_damage_that_player_v1":
         common = (
             effect_json.get("trigger") == "opponent_draw"
@@ -2228,6 +2247,7 @@ def classify_card(card: dict[str, Any]) -> dict[str, Any]:
         "xmage_types": sorted(xmage_types(card)),
         "xmage_ability_classes": sorted(xmage_ability_classes(card)),
         "xmage_effect_classes": sorted(xmage_effect_classes(card)),
+        "xmage_target_classes": sorted(xmage_target_classes(card)),
         "xmage_condition_classes": sorted(xmage_condition_classes(card)),
         "focused_test_scenario_count": (card.get("checks") or {}).get("focused_test_scenario_count") or 0,
         "effect_json": effect_json,
