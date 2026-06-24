@@ -442,6 +442,27 @@ PG package:
    `mandatory_gate_divergences=[]`, tests `18/18` pass,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
 
+`Sun Titan` is the eighth completed proof and the first exact creature
+ETB-or-attack recursion scope:
+
+1. XMage local source matched `EntersBattlefieldOrAttacksSourceTriggeredAbility`
+   + `ReturnFromGraveyardToBattlefieldTargetEffect` +
+   `TargetCardInYourGraveyard(FilterPermanentCard)` with mana value `< 4`.
+2. The mapper/classifier promoted only the exact
+   `sun_titan_etb_attack_return_permanent_mv_lte_3_v1` scope.
+3. Battle runtime now supports permanent-triggered graveyard recursion on ETB
+   and attack with a mana-value ceiling, resolving attack recursion only for
+   declared attackers.
+4. PG193 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made deck `611` report `Sun Titan` as `pass`, and the
+   Lorehold-focused matrix moved it to `battle_ready` / `watchlist_candidate`.
+6. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_233222/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, `forensic_rule_findings=0`, and
+   `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

@@ -5835,6 +5835,55 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_sun_titan_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Sun Titan",
+                        "severity": "high",
+                        "oracle_hash": "suntitanhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SunTitan",
+                            "path": "/xmage/SunTitan.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["ReturnFromGraveyardToBattlefieldTargetEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldOrAttacksSourceTriggeredAbility",
+                                "VigilanceAbility",
+                            ],
+                            "target_classes": ["TargetCardInYourGraveyard"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": (
+                                    "sun_titan_etb_attack_return_permanent_mv_lte_3_v1"
+                                ),
+                                "power": 6,
+                                "toughness": 6,
+                                "vigilance": True,
+                                "etb_recursion_count": 1,
+                                "etb_recursion_target": "permanent",
+                                "etb_recursion_destination": "battlefield",
+                                "etb_recursion_mana_value_max": 3,
+                                "attack_trigger_graveyard_recursion": True,
+                                "attack_recursion_count": 1,
+                                "attack_recursion_target": "permanent",
+                                "attack_recursion_destination": "battlefield",
+                                "attack_recursion_mana_value_max": 3,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_snap_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

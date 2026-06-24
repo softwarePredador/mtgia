@@ -506,6 +506,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
     ability_classes = xmage_ability_classes(card)
     effect_classes = xmage_effect_classes(card)
     cost_classes = xmage_cost_classes(card)
+    target_classes = xmage_target_classes(card)
 
     if effect == "draw_cards" and scope == "veil_of_summer_draw_and_protection_waiver_v1":
         return (
@@ -544,6 +545,26 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("vigilance"))
             and bool(effect_json.get("creatures_tap_for_any_color"))
             and effect_json.get("death_return_status") == "annotation_only"
+        )
+
+    if effect == "creature" and scope == "sun_titan_etb_attack_return_permanent_mv_lte_3_v1":
+        return (
+            types == {"CREATURE"}
+            and "ReturnFromGraveyardToBattlefieldTargetEffect" in effect_classes
+            and {"EntersBattlefieldOrAttacksSourceTriggeredAbility", "VigilanceAbility"}.issubset(ability_classes)
+            and "TargetCardInYourGraveyard" in target_classes
+            and int(effect_json.get("power") or 0) == 6
+            and int(effect_json.get("toughness") or 0) == 6
+            and bool(effect_json.get("vigilance"))
+            and int(effect_json.get("etb_recursion_count") or 0) == 1
+            and effect_json.get("etb_recursion_target") == "permanent"
+            and effect_json.get("etb_recursion_destination") == "battlefield"
+            and int(effect_json.get("etb_recursion_mana_value_max") or 0) == 3
+            and bool(effect_json.get("attack_trigger_graveyard_recursion"))
+            and int(effect_json.get("attack_recursion_count") or 0) == 1
+            and effect_json.get("attack_recursion_target") == "permanent"
+            and effect_json.get("attack_recursion_destination") == "battlefield"
+            and int(effect_json.get("attack_recursion_mana_value_max") or 0) == 3
         )
 
     if effect == "counter_spell" and scope == "pact_of_negation_delayed_upkeep_counter_v1":

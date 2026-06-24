@@ -4355,6 +4355,44 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["adapt_counters"], 2)
         self.assertTrue(primary["counters_trigger_reanimate_exiled_creature_with_finality_haste_and_sacrifice_eot"])
 
+    def test_sun_titan_maps_to_exact_etb_attack_recursion_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "SunTitan",
+                "effect_classes": ["ReturnFromGraveyardToBattlefieldTargetEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldOrAttacksSourceTriggeredAbility",
+                    "VigilanceAbility",
+                ],
+                "target_classes": ["TargetCardInYourGraveyard"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "FilterPermanentCard filter = new FilterPermanentCard(\"permanent card "
+                    "with mana value 3 or less from your graveyard\"); "
+                    "filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 4));"
+                ),
+            },
+            "Whenever Sun Titan enters the battlefield or attacks, you may return target permanent card "
+            "with mana value 3 or less from your graveyard to the battlefield.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "sun_titan_etb_attack_return_permanent_mv_lte_3_v1",
+        )
+        self.assertEqual(primary["power"], 6)
+        self.assertEqual(primary["toughness"], 6)
+        self.assertTrue(primary["vigilance"])
+        self.assertEqual(primary["etb_recursion_target"], "permanent")
+        self.assertEqual(primary["etb_recursion_destination"], "battlefield")
+        self.assertEqual(primary["etb_recursion_mana_value_max"], 3)
+        self.assertTrue(primary["attack_trigger_graveyard_recursion"])
+        self.assertEqual(primary["attack_recursion_target"], "permanent")
+        self.assertEqual(primary["attack_recursion_destination"], "battlefield")
+        self.assertEqual(primary["attack_recursion_mana_value_max"], 3)
+
 
 if __name__ == "__main__":
     unittest.main()

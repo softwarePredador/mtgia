@@ -1506,6 +1506,46 @@ def _build_exact_runtime_variant_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        card_types == {"CREATURE"}
+        and xmage_class_name == "SunTitan"
+        and "ReturnFromGraveyardToBattlefieldTargetEffect" in effect_classes
+        and "EntersBattlefieldOrAttacksSourceTriggeredAbility" in ability_classes
+        and "TargetCardInYourGraveyard" in target_classes
+        and (
+            "FilterPermanentCard" in rules_text
+            or "permanent card with mana value 3 or less" in normalized
+            or "manavaluepredicate(comparisontype.fewer_than, 4)" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "sun_titan_etb_attack_return_permanent_mv_lte_3_v1",
+            "fields": {
+                "power": 6,
+                "toughness": 6,
+                "vigilance": True,
+                "etb_recursion_count": 1,
+                "etb_recursion_target": "permanent",
+                "etb_recursion_destination": "battlefield",
+                "etb_recursion_mana_value_max": 3,
+                "attack_trigger_graveyard_recursion": True,
+                "attack_recursion_count": 1,
+                "attack_recursion_target": "permanent",
+                "attack_recursion_destination": "battlefield",
+                "attack_recursion_mana_value_max": 3,
+            },
+            "reason": "XMage structure matches Sun Titan: a 6/6 vigilance creature whose ETB-or-attack trigger returns one target permanent card with mana value 3 or less from your graveyard to the battlefield.",
+            "signals": [
+                "EntersBattlefieldOrAttacksSourceTriggeredAbility",
+                "ReturnFromGraveyardToBattlefieldTargetEffect",
+                "TargetCardInYourGraveyard",
+                "FilterPermanentCard",
+                "ManaValuePredicate(<4)",
+                "VigilanceAbility",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and xmage_class_name == "InvokeCalamity"
         and {

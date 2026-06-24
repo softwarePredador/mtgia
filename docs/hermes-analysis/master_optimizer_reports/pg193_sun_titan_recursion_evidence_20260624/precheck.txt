@@ -1,0 +1,4 @@
+ card_name | normalized_name |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+-----------+-----------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Sun Titan | sun titan       | b68b06366771bd3478d05d58aeeaaef8 | battle_rule_v1:0b081cba052dad667f72d7533ae26c98 |                1 | e960bfc8-d21e-414e-b667-5ef0da7eb8ae |                  2 |                         0 |                           2
+(1 row)

@@ -11326,6 +11326,85 @@ def register_tests(battle, player):
         assert any(event == "rebound_exiled" and data.get("card") == "Profound Journey" for event, data in events)
         assert any(event == "rebound_cast" and data.get("card") == "Profound Journey" for event, data in events)
 
+    def test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            sun_titan = {
+                "name": "Sun Titan",
+                "cmc": 6,
+                "type_line": "Creature — Giant",
+                "effect": "creature",
+                "power": 6,
+                "toughness": 6,
+                "vigilance": True,
+                "summoning_sick": False,
+                "tapped": False,
+                "etb_recursion_count": 1,
+                "etb_recursion_target": "permanent",
+                "etb_recursion_destination": "battlefield",
+                "etb_recursion_mana_value_max": 3,
+                "attack_trigger_graveyard_recursion": True,
+                "attack_recursion_count": 1,
+                "attack_recursion_target": "permanent",
+                "attack_recursion_destination": "battlefield",
+                "attack_recursion_mana_value_max": 3,
+                "battle_model_scope": "sun_titan_etb_attack_return_permanent_mv_lte_3_v1",
+                "_rule_logical_key": "battle_rule_v1:sun-titan-test",
+                "_rule_oracle_hash": "sun-titan-test-hash",
+            }
+            active.battlefield = [sun_titan]
+            active.graveyard = [
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Smothering Tithe", "cmc": 4, "type_line": "Enchantment", "effect": "ramp_engine"},
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                sun_titan,
+                sun_titan,
+                turn=6,
+                rng=random.Random(193),
+            )
+            battle.combat_phase_v8(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=6,
+                rng=random.Random(194),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        battlefield_names = [card.get("name") for card in active.battlefield if isinstance(card, dict)]
+        graveyard_names = [card.get("name") for card in active.graveyard]
+        assert "Sun Titan" in battlefield_names
+        assert "Sol Ring" in battlefield_names
+        assert "Mountain" in battlefield_names
+        assert "Smothering Tithe" in graveyard_names
+        assert any(
+            event == "etb_recursion_resolved"
+            and data.get("card") == "Sun Titan"
+            and data.get("recovered") == ["Sol Ring"]
+            and data.get("mana_value_max") == 3
+            and data.get("rule_logical_key") == "battle_rule_v1:sun-titan-test"
+            for event, data in events
+        )
+        assert any(
+            event == "recursion_resolved"
+            and data.get("card") == "Sun Titan"
+            and data.get("trigger") == "attack"
+            and data.get("recovered") == ["Mountain"]
+            and data.get("mana_value_max") == 3
+            and data.get("rule_oracle_hash") == "sun-titan-test-hash"
+            for event, data in events
+        )
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -13799,6 +13878,7 @@ def register_tests(battle, player):
         test_double_vision_copies_only_first_instant_or_sorcery_each_turn,
         test_swarm_intelligence_copies_second_instant_or_sorcery_spell_too,
         test_profound_journey_rebounds_and_returns_permanents_to_battlefield,
+        test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,

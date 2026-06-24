@@ -760,17 +760,7 @@ def filter_rows_for_current_reviewed_curated(
             str(row.get("review_status") or "") in {"verified", "active"}
             and str(row.get("execution_status") or "") != "disabled"
         ):
-            effect_json = json_obj(row.get("effect_json"))
-            explicit_scope = str(effect_json.get("battle_model_scope") or "")
-            if (
-                is_manual_review_placeholder(row)
-                and allowed_by_name.get(normalized)
-                and (
-                    explicit_scope in {"", "xmage_reference_requires_manual_model_review_v1"}
-                    or str(effect_json.get("effect") or "")
-                    == "external_reference_required_manual_model"
-                )
-            ):
+            if is_manual_review_placeholder(row) and allowed_by_name.get(normalized):
                 continue
             filtered.append(row)
             continue

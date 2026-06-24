@@ -19610,10 +19610,16 @@ def return_graveyard_lands_to_battlefield(player, card, turn, *, opponents=None,
     return returned
 
 
-def graveyard_card_matches_recursion_target(card, target_type):
+def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max=None):
     """Return whether a graveyard card matches a narrow recursion target."""
     if not isinstance(card, dict):
         return False
+    if mana_value_max is not None:
+        try:
+            if card_mana_value(card) > int(float(mana_value_max)):
+                return False
+        except (TypeError, ValueError):
+            return False
     target = str(target_type or "nonland").lower()
     type_line = str(card.get("type_line") or "").lower()
     if target in ("permanent", "permanent_card"):
@@ -19648,6 +19654,22 @@ def graveyard_card_matches_recursion_target(card, target_type):
     if target in ("instant_or_sorcery", "instant_or_sorcery_card"):
         return is_instant(card) or is_sorcery(card)
     return False
+
+
+def recursion_mana_value_max(effect_data, *keys):
+    for key in keys:
+        if effect_data.get(key) is not None:
+            return effect_data.get(key)
+    for key in (
+        "recursion_mana_value_max",
+        "target_mana_value_max",
+        "target_cmc_max",
+        "max_target_mana_value",
+        "max_target_cmc",
+    ):
+        if effect_data.get(key) is not None:
+            return effect_data.get(key)
+    return None
 
 
 def trigger_opponent_land_play_engines(
@@ -20483,10 +20505,15 @@ def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
     count = max(1, int(effect_data.get("etb_recursion_count") or 1))
     target_type = effect_data.get("etb_recursion_target") or "nonland"
     destination = effect_data.get("etb_recursion_destination", "hand")
+    mana_value_max = recursion_mana_value_max(effect_data, "etb_recursion_mana_value_max")
     candidates = [
         grave_card
         for grave_card in list(player.graveyard)
-        if graveyard_card_matches_recursion_target(grave_card, target_type)
+        if graveyard_card_matches_recursion_target(
+            grave_card,
+            target_type,
+            mana_value_max=mana_value_max,
+        )
     ]
     recovered = []
     for recovered_card in remove_cards_from_graveyard(
@@ -20516,12 +20543,81 @@ def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
         trigger="enters_battlefield",
         target_type=target_type,
         destination=destination,
+        mana_value_max=mana_value_max,
         recovered=[recovered_card.get("name", "?") for recovered_card in recovered],
         recovered_count=len(recovered),
         turn=turn,
         **replay_rule_fields(effect_data),
     )
     return recovered
+
+
+def resolve_attack_graveyard_recursion_triggers(player, attackers, turn, *, phase="combat"):
+    trigger_events = []
+    for permanent in list(attackers or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not (
+            permanent.get("attack_trigger_graveyard_recursion")
+            or permanent.get("attack_recursion_count")
+        ):
+            continue
+        if permanent not in getattr(player, "battlefield", []):
+            continue
+        count = max(1, int(permanent.get("attack_recursion_count") or 1))
+        target_type = permanent.get("attack_recursion_target") or permanent.get("etb_recursion_target") or "nonland"
+        destination = permanent.get("attack_recursion_destination") or permanent.get("etb_recursion_destination") or "hand"
+        mana_value_max = recursion_mana_value_max(
+            permanent,
+            "attack_recursion_mana_value_max",
+            "etb_recursion_mana_value_max",
+        )
+        candidates = [
+            grave_card
+            for grave_card in list(getattr(player, "graveyard", []) or [])
+            if graveyard_card_matches_recursion_target(
+                grave_card,
+                target_type,
+                mana_value_max=mana_value_max,
+            )
+        ]
+        recovered = []
+        for recovered_card in remove_cards_from_graveyard(
+            player,
+            candidates[:count],
+            turn=turn,
+            source_event="attack_recursion",
+        ):
+            recovered.append(recovered_card)
+            if destination == "battlefield":
+                permanent_effect = get_card_effect(recovered_card)
+                recovered_permanent = prepare_entering_permanent(
+                    enrich_card({**recovered_card, **permanent_effect}),
+                    controller=player,
+                    all_players=[player],
+                    turn=turn,
+                )
+                if is_creature_card(recovered_card):
+                    recovered_permanent["effect"] = "creature"
+                player.battlefield.append(recovered_permanent)
+            else:
+                player.hand.append(recovered_card)
+        payload = {
+            "player": player.name,
+            "card": permanent.get("name", "?"),
+            "trigger": "attack",
+            "target_type": target_type,
+            "destination": destination,
+            "mana_value_max": mana_value_max,
+            "recovered": [recovered_card.get("name", "?") for recovered_card in recovered],
+            "recovered_count": len(recovered),
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(permanent),
+        }
+        emit_replay_event("recursion_resolved", **payload)
+        trigger_events.append(payload)
+    return trigger_events
 
 
 def resolve_etb_removal(player, opponents, card, effect_data, turn, rng):
@@ -25756,10 +25852,15 @@ def apply_effect_immediate(
     elif effect == "recursion":
         count = int(effect_data.get("count") or 2)
         target_type = effect_data.get("target")
+        mana_value_max = recursion_mana_value_max(effect_data)
         candidates = [
             grave_card
             for grave_card in player.graveyard
-            if graveyard_card_matches_recursion_target(grave_card, target_type)
+            if graveyard_card_matches_recursion_target(
+                grave_card,
+                target_type,
+                mana_value_max=mana_value_max,
+            )
         ]
         recovered = candidates[:count]
         destination = effect_data.get("destination", "hand")
@@ -25786,6 +25887,7 @@ def apply_effect_immediate(
             card=card.get("name", "?"),
             recovered=[recovered_card.get("name", "?") for recovered_card in recovered],
             destination=destination,
+            mana_value_max=mana_value_max,
             turn=turn,
         )
         if effect_data.get("exiles_self"):
@@ -27920,6 +28022,12 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
             turn,
             phase="combat",
         )
+    resolve_attack_graveyard_recursion_triggers(
+        attacker,
+        attackers,
+        turn,
+        phase="combat",
+    )
     resolve_attack_class_rummage_triggers(
         attacker,
         alive_defenders,

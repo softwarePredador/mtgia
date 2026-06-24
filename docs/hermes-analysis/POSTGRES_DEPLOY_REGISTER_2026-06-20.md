@@ -11038,3 +11038,100 @@ Register decision:
   `Taii Wakeen, Perfect Shot`, `Deflecting Palm`,
   `Primal Amulet // Primal Wellspring`, and `Squee, Goblin Nabob`.
 - Next package number is PG193.
+
+## PG193 - Sun Titan triggered recursion scope
+
+Timestamp: 2026-06-24 20:32 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes `Sun Titan` from the Lorehold deck `611` backlog.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Sun Titan`:
+  `battle_rule_v1:0b081cba052dad667f72d7533ae26c98`,
+  `oracle_hash=b68b06366771bd3478d05d58aeeaaef8`,
+  `effect=creature`,
+  `battle_model_scope=sun_titan_etb_attack_return_permanent_mv_lte_3_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps `SunTitan` from
+  `EntersBattlefieldOrAttacksSourceTriggeredAbility` +
+  `ReturnFromGraveyardToBattlefieldTargetEffect` +
+  `TargetCardInYourGraveyard(FilterPermanentCard)` with mana value `< 4`.
+- Battle runtime now supports triggered permanent recursion with an optional
+  mana-value ceiling for ETB and attack triggers.
+- Combat now resolves attack graveyard-recursion triggers only for declared
+  attackers, preserving the existing generic attack-trigger flow.
+- PG sync selection now drops stale manual-review placeholders when the
+  current reviewed curated layer already supplies the active rule for a card.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg193_sun_titan_recursion_package_20260624_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg193_sun_titan_recursion_package_20260624_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg193_sun_titan_recursion_package_20260624_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg193_sun_titan_recursion_package_20260624_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg193_sun_titan_recursion_package_20260624_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg193_sun_titan_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=3`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3240`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg193_sun_titan_postsync_v1_manifest.json`;
+  expanded scope moved to `high=404`, `medium=63`, `pass=495`.
+- Lorehold-focused post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg193_sun_titan_postsync_v1.json`;
+  scoped rows `395`, `battle_ready=278`,
+  `needs_rule_before_strategy=117`, `runtime_needed=9`,
+  `mapper_manual=87`, `split_scope=19`.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck611_pg193_sun_titan_20260624.json`;
+  deck `611` reports `Sun Titan` as `pass/coherent_for_current_gate` and
+  deck totals `high=19`, `medium=4`, `pass=67`.
+- Tests:
+  mapper tests ran `173` tests OK; classifier tests ran `159` tests OK;
+  `battle_card_specific_tests.py`, `battle_decision_trace_tests.py`,
+  event-contract static tests, decision-trace taxonomy tests, forensic
+  supported-effects tests, and sync PG selection tests passed.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_233222/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `event_contract_static_status=event_contract_static_ready`.
+
+Register decision:
+
+- PG193 is applied, postchecked, synced, locally tested, deck-coherence
+  validated for deck `611`, and strategy-audited.
+- Do not reuse PG193.
+- Continue next with the remaining Lorehold `needs_rule_before_strategy`
+  cards. Current top items after PG193 are `Glint-Horn Buccaneer`,
+  `Taii Wakeen, Perfect Shot`, `Deflecting Palm`,
+  `Primal Amulet // Primal Wellspring`, and `Squee, Goblin Nabob`.
+- Next package number is PG194.
