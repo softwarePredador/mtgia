@@ -690,6 +690,152 @@ def _build_creature_variant_fields(
             ],
         }
 
+    if (
+        card_types == {"CREATURE"}
+        and effect_classes == {"DrawCardSourceControllerEffect"}
+        and "FlyingAbility" in ability_classes
+        and "ConsecratedSphinxTriggeredAbility" in ability_classes
+    ):
+        return {
+            "effect": "creature",
+            "scope": "flying_may_draw_two_when_opponent_draws_card_v1",
+            "fields": {
+                "power": 4,
+                "toughness": 6,
+                "flying": True,
+                "opponent_draws_card_may_draw": 2,
+            },
+            "reason": "XMage structure matches Consecrated Sphinx flying body with a may trigger to draw two whenever an opponent draws a card.",
+            "signals": [
+                "ConsecratedSphinxTriggeredAbility",
+                "DrawCardSourceControllerEffect",
+                "FlyingAbility",
+            ],
+        }
+
+    return None
+
+
+def _build_exact_runtime_variant_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    normalized = _normalized_rules_text(rules_text)
+
+    if (
+        card_types == {"INSTANT"}
+        and {"CastAsThoughItHadFlashAllEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+    ):
+        return {
+            "effect": "draw_cards",
+            "scope": "draw_one_and_source_controller_spells_gain_flash_until_eot_v1",
+            "fields": {
+                "count": 1,
+                "instant": True,
+                "source_controller_spells_have_flash_until_eot": True,
+            },
+            "reason": "XMage structure matches Borne Upon a Wind drawing one card and allowing the controller to cast spells as though they had flash this turn.",
+            "signals": [
+                "CastAsThoughItHadFlashAllEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and effect_classes == {"DamageTargetEffect"}
+        and ability_classes == {"SimpleActivatedAbility"}
+        and "SacrificeTargetCost" in cost_classes
+    ):
+        return {
+            "effect": "direct_damage",
+            "scope": "activated_sacrifice_creature_deal_one_any_target_v1",
+            "fields": {
+                "activation_cost": "sacrifice_creature",
+                "damage": 1,
+                "target": "any_target",
+            },
+            "reason": "XMage structure matches Goblin Bombardment sacrificing a creature to deal 1 damage to any target.",
+            "signals": [
+                "DamageTargetEffect",
+                "SacrificeTargetCost",
+                "TargetAnyTarget",
+            ],
+        }
+
+    if (
+        card_types == {"ARTIFACT"}
+        and {"ExileTargetEffect", "DrawCardSourceControllerEffect", "OneShotEffect"}.issubset(effect_classes)
+        and {"EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+        and {"TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
+        and "GenericManaCost" in cost_classes
+    ):
+        return {
+            "effect": "artifact",
+            "scope": "etb_exile_graveyard_card_or_sacrifice_for_mass_graveyard_exile_or_draw_v1",
+            "fields": {
+                "etb_exile_target_card_from_graveyard": True,
+                "activated_tap_sacrifice_exile_each_opponents_graveyard": True,
+                "activated_generic_one_tap_sacrifice_draw": 1,
+            },
+            "reason": "XMage structure matches Soul-Guide Lantern ETB graveyard pickoff plus sacrifice modes for mass graveyard exile or card draw.",
+            "signals": [
+                "EntersBattlefieldTriggeredAbility",
+                "ExileTargetEffect",
+                "DrawCardSourceControllerEffect",
+                "SoulGuideLanternEffect",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
+        and effect_classes == {"ReturnToHandTargetEffect"}
+        and ability_classes == {"OverloadAbility"}
+        and "targetcontroller.not_you" in normalized
+    ):
+        return {
+            "effect": "bounce",
+            "scope": "return_target_nonland_permanent_you_dont_control_or_overload_all_opponents_nonlands_v1",
+            "fields": {
+                "instant": True,
+                "target": "nonland_permanent_you_dont_control",
+                "overload_cost": "{6}{U}",
+                "overload_bounces_each_nonland_permanent_you_dont_control": True,
+            },
+            "reason": "XMage structure matches Cyclonic Rift single-target bounce with overload for each nonland permanent you do not control.",
+            "signals": [
+                "ReturnToHandTargetEffect",
+                "OverloadAbility",
+                "TargetController.NOT_YOU",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
+        and {"CounterTargetEffect", "DestroyTargetEffect"}.issubset(effect_classes)
+        and "blue spell" in normalized
+        and "blue permanent" in normalized
+    ):
+        return {
+            "effect": "modal_spell",
+            "scope": "counter_target_blue_spell_or_destroy_target_blue_permanent_v1",
+            "fields": {
+                "counter_target_blue_spell": True,
+                "destroy_target_blue_permanent": True,
+                "instant": True,
+            },
+            "reason": "XMage structure matches Red Elemental Blast choosing between countering a blue spell and destroying a blue permanent.",
+            "signals": [
+                "CounterTargetEffect",
+                "DestroyTargetEffect",
+                "blue_spell_or_permanent",
+            ],
+        }
+
     return None
 
 
@@ -892,6 +1038,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(creature_variant_fields["fields"]),
                 matched_signals=list(creature_variant_fields["signals"]),
+            )
+        )
+
+    exact_runtime_variant_fields = _build_exact_runtime_variant_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if exact_runtime_variant_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(exact_runtime_variant_fields["effect"]),
+                scope=str(exact_runtime_variant_fields["scope"]),
+                reason=str(exact_runtime_variant_fields["reason"]),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(exact_runtime_variant_fields["fields"]),
+                matched_signals=list(exact_runtime_variant_fields["signals"]),
             )
         )
 

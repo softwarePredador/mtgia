@@ -507,6 +507,69 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("activation_cost") == "sacrifice_self"
         )
 
+    if effect == "creature" and scope == "flying_may_draw_two_when_opponent_draws_card_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"DrawCardSourceControllerEffect"}
+            and {"FlyingAbility", "ConsecratedSphinxTriggeredAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 6
+            and bool(effect_json.get("flying"))
+            and int(effect_json.get("opponent_draws_card_may_draw") or 0) == 2
+        )
+
+    if effect == "draw_cards" and scope == "draw_one_and_source_controller_spells_gain_flash_until_eot_v1":
+        return (
+            types == {"INSTANT"}
+            and {"CastAsThoughItHadFlashAllEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and int(effect_json.get("count") or 0) == 1
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("source_controller_spells_have_flash_until_eot"))
+        )
+
+    if effect == "direct_damage" and scope == "activated_sacrifice_creature_deal_one_any_target_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"DamageTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and "SacrificeTargetCost" in xmage_cost_classes(card)
+            and effect_json.get("activation_cost") == "sacrifice_creature"
+            and int(effect_json.get("damage") or 0) == 1
+            and effect_json.get("target") == "any_target"
+        )
+
+    if effect == "artifact" and scope == "etb_exile_graveyard_card_or_sacrifice_for_mass_graveyard_exile_or_draw_v1":
+        return (
+            types == {"ARTIFACT"}
+            and {"ExileTargetEffect", "DrawCardSourceControllerEffect", "OneShotEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"TapSourceCost", "SacrificeSourceCost", "GenericManaCost"}.issubset(xmage_cost_classes(card))
+            and bool(effect_json.get("etb_exile_target_card_from_graveyard"))
+            and bool(effect_json.get("activated_tap_sacrifice_exile_each_opponents_graveyard"))
+            and int(effect_json.get("activated_generic_one_tap_sacrifice_draw") or 0) == 1
+        )
+
+    if effect == "bounce" and scope == "return_target_nonland_permanent_you_dont_control_or_overload_all_opponents_nonlands_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"ReturnToHandTargetEffect"}
+            and ability_classes == {"OverloadAbility"}
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "nonland_permanent_you_dont_control"
+            and effect_json.get("overload_cost") == "{6}{U}"
+            and bool(effect_json.get("overload_bounces_each_nonland_permanent_you_dont_control"))
+        )
+
+    if effect == "modal_spell" and scope == "counter_target_blue_spell_or_destroy_target_blue_permanent_v1":
+        return (
+            types == {"INSTANT"}
+            and {"CounterTargetEffect", "DestroyTargetEffect"}.issubset(effect_classes)
+            and not ability_classes
+            and bool(effect_json.get("counter_target_blue_spell"))
+            and bool(effect_json.get("destroy_target_blue_permanent"))
+            and bool(effect_json.get("instant"))
+        )
+
     return False
 
 

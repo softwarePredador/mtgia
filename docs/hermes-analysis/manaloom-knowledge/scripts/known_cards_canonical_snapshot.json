@@ -3224,15 +3224,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Borne Upon a Wind": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "draw_one_and_source_controller_spells_gain_flash_until_eot_v1",
     "count": 1,
     "effect": "draw_cards",
     "instant": true,
+    "source_controller_spells_have_flash_until_eot": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2c7f9928e7ec6b0c81264f34fc673446"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ff4327093d44df534a0f3aba335e124d",
+    "battle_rule_oracle_hash": "98781dc70ac6e93dcf8ca5c63fce075d"
   },
   "Boromir, Warden of the Tower": {
     "cmc": 3.0,
@@ -5562,19 +5566,20 @@
     "battle_rule_logical_key": "battle_rule_v1:8150b442466da53a812627c24f820e4d"
   },
   "Consecrated Sphinx": {
-    "cmc": 6.0,
-    "draw_count": 2,
-    "effect": "draw_engine",
+    "ability_kind": "triggered",
+    "battle_model_scope": "flying_may_draw_two_when_opponent_draws_card_v1",
+    "effect": "creature",
     "flying": true,
+    "opponent_draws_card_may_draw": 2,
     "power": 4,
     "toughness": 6,
-    "trigger": "opponent_draw",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.9,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:92a06fbe789d8b0b35f4ec5eba73083f"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:17b32b3c6d4d9bca3e737793e4c72218",
+    "battle_rule_oracle_hash": "a241f637a4819314371b3a7c36d8f6ce"
   },
   "Conservatory": {
     "effect": "land",
@@ -6355,15 +6360,20 @@
     "battle_rule_logical_key": "battle_rule_v1:ec9c870dd58d78bc15537f68438a0f47"
   },
   "Cyclonic Rift": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "return_target_nonland_permanent_you_dont_control_or_overload_all_opponents_nonlands_v1",
     "effect": "remove_permanent",
     "instant": true,
-    "target": "nonland",
+    "overload_bounces_each_nonland_permanent_you_dont_control": true,
+    "overload_cost": "{6}{U}",
+    "target": "nonland_permanent_you_dont_control",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f6d96db6081c2fd3f48828c7594f4fcf"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a477e4ac3fa3dc3fd4429fa8ac2d7939",
+    "battle_rule_oracle_hash": "581d2a5939d6cbf464ecd85a7495604e"
   },
   "Daily Bugle Building": {
     "effect": "land",
@@ -22668,15 +22678,19 @@
     "battle_rule_oracle_hash": "aaa06784ff51d908d553ccc81d6854cd"
   },
   "Red Elemental Blast": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_target_blue_spell_or_destroy_target_blue_permanent_v1",
+    "counter_target_blue_spell": true,
+    "destroy_target_blue_permanent": true,
     "effect": "counter",
     "instant": true,
-    "target": "blue_spell_or_permanent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d7328f000cbeb639e2816886a1eb6c4",
+    "battle_rule_oracle_hash": "ea84473287e1d30863243dcebf80a012"
   },
   "Redirect Lightning": {
     "additional_cost_status": "pay_five_life_or_two_generic_annotation",
@@ -26812,17 +26826,19 @@
     "battle_rule_logical_key": "battle_rule_v1:a2c478eb91086987f990c46671af3084"
   },
   "Soul-Guide Lantern": {
-    "activated_self_sacrifice_draw": true,
-    "battle_model_scope": "graveyard_hate_cantrip_artifact_v1",
-    "cmc": 1.0,
-    "effect": "hate_artifact",
-    "etb_exile_single_graveyard_card": true,
+    "ability_kind": "triggered",
+    "activated_generic_one_tap_sacrifice_draw": 1,
+    "activated_tap_sacrifice_exile_each_opponents_graveyard": true,
+    "battle_model_scope": "etb_exile_graveyard_card_or_sacrifice_for_mass_graveyard_exile_or_draw_v1",
+    "effect": "artifact",
+    "etb_exile_target_card_from_graveyard": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.93,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3454aa122d10a4abd906132eb7745339"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:720260c93bdae63518a0721df51089c3",
+    "battle_rule_oracle_hash": "6a9e4cf9a4397715ccd0737e1b8cf270"
   },
   "Soulfire Eruption": {
     "amount": 5,

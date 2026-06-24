@@ -681,6 +681,229 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_borne_upon_a_wind_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Borne Upon a Wind",
+                        "severity": "high",
+                        "oracle_hash": "bornehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "BorneUponAWind",
+                            "path": "/xmage/BorneUponAWind.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CastAsThoughItHadFlashAllEffect", "DrawCardSourceControllerEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "draw_cards",
+                                "battle_model_scope": "draw_one_and_source_controller_spells_gain_flash_until_eot_v1",
+                                "count": 1,
+                                "instant": True,
+                                "source_controller_spells_have_flash_until_eot": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_consecrated_sphinx_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Consecrated Sphinx",
+                        "severity": "high",
+                        "oracle_hash": "sphinxhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "ConsecratedSphinx",
+                            "path": "/xmage/ConsecratedSphinx.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DrawCardSourceControllerEffect"],
+                            "ability_classes": ["ConsecratedSphinxTriggeredAbility", "FlyingAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "flying_may_draw_two_when_opponent_draws_card_v1",
+                                "power": 4,
+                                "toughness": 6,
+                                "flying": True,
+                                "opponent_draws_card_may_draw": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_goblin_bombardment_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Goblin Bombardment",
+                        "severity": "high",
+                        "oracle_hash": "bombardmenthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "GoblinBombardment",
+                            "path": "/xmage/GoblinBombardment.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DamageTargetEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["SacrificeTargetCost"],
+                            "primary_effect": {
+                                "effect": "direct_damage",
+                                "battle_model_scope": "activated_sacrifice_creature_deal_one_any_target_v1",
+                                "activation_cost": "sacrifice_creature",
+                                "damage": 1,
+                                "target": "any_target",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_soul_guide_lantern_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Soul-Guide Lantern",
+                        "severity": "high",
+                        "oracle_hash": "lanternhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SoulGuideLantern",
+                            "path": "/xmage/SoulGuideLantern.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": [
+                                "ExileTargetEffect",
+                                "DrawCardSourceControllerEffect",
+                                "OneShotEffect",
+                                "SoulGuideLanternEffect",
+                            ],
+                            "ability_classes": ["EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["TapSourceCost", "SacrificeSourceCost", "GenericManaCost"],
+                            "primary_effect": {
+                                "effect": "artifact",
+                                "battle_model_scope": "etb_exile_graveyard_card_or_sacrifice_for_mass_graveyard_exile_or_draw_v1",
+                                "etb_exile_target_card_from_graveyard": True,
+                                "activated_tap_sacrifice_exile_each_opponents_graveyard": True,
+                                "activated_generic_one_tap_sacrifice_draw": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_cyclonic_rift_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Cyclonic Rift",
+                        "severity": "high",
+                        "oracle_hash": "rifthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "CyclonicRift",
+                            "path": "/xmage/CyclonicRift.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["ReturnToHandTargetEffect"],
+                            "ability_classes": ["OverloadAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "bounce",
+                                "battle_model_scope": "return_target_nonland_permanent_you_dont_control_or_overload_all_opponents_nonlands_v1",
+                                "instant": True,
+                                "target": "nonland_permanent_you_dont_control",
+                                "overload_cost": "{6}{U}",
+                                "overload_bounces_each_nonland_permanent_you_dont_control": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_red_elemental_blast_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Red Elemental Blast",
+                        "severity": "high",
+                        "oracle_hash": "rebehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "RedElementalBlast",
+                            "path": "/xmage/RedElementalBlast.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterTargetEffect", "DestroyTargetEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "modal_spell",
+                                "battle_model_scope": "counter_target_blue_spell_or_destroy_target_blue_permanent_v1",
+                                "counter_target_blue_spell": True,
+                                "destroy_target_blue_permanent": True,
+                                "instant": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_an_offer_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

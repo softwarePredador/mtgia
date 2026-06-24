@@ -757,6 +757,154 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["activated_counter_noncreature_spell_cost"], "{U}")
         self.assertEqual(primary["activation_cost"], "sacrifice_self")
 
+    def test_borne_upon_a_wind_maps_to_exact_flash_draw_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CastAsThoughItHadFlashAllEffect", "DrawCardSourceControllerEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new CastAsThoughItHadFlashAllEffect(Duration.EndOfTurn, filter)); "
+                    "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "draw_cards")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "draw_one_and_source_controller_spells_gain_flash_until_eot_v1",
+        )
+        self.assertEqual(primary["count"], 1)
+        self.assertTrue(primary["instant"])
+        self.assertTrue(primary["source_controller_spells_have_flash_until_eot"])
+
+    def test_consecrated_sphinx_maps_to_exact_draw_two_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DrawCardSourceControllerEffect"],
+                "ability_classes": ["ConsecratedSphinxTriggeredAbility", "FlyingAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(4); this.toughness = new MageInt(6); "
+                    "this.addAbility(FlyingAbility.getInstance()); "
+                    "this.addAbility(new ConsecratedSphinxTriggeredAbility()); "
+                    "new DrawCardSourceControllerEffect(2)"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "flying_may_draw_two_when_opponent_draws_card_v1",
+        )
+        self.assertEqual(primary["power"], 4)
+        self.assertEqual(primary["toughness"], 6)
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["opponent_draws_card_may_draw"], 2)
+
+    def test_goblin_bombardment_maps_to_exact_sacrifice_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DamageTargetEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(1), "
+                    "new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE)); "
+                    "ability.addTarget(new TargetAnyTarget());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "direct_damage")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_sacrifice_creature_deal_one_any_target_v1",
+        )
+        self.assertEqual(primary["activation_cost"], "sacrifice_creature")
+        self.assertEqual(primary["damage"], 1)
+        self.assertEqual(primary["target"], "any_target")
+
+    def test_soul_guide_lantern_maps_to_exact_graveyard_hate_artifact_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["ExileTargetEffect", "DrawCardSourceControllerEffect", "OneShotEffect", "SoulGuideLanternEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["TapSourceCost", "SacrificeSourceCost", "GenericManaCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new ExileTargetEffect()); "
+                    "ability = new SimpleActivatedAbility(new SoulGuideLanternEffect(), new TapSourceCost()); "
+                    "ability.addCost(new SacrificeSourceCost()); "
+                    "ability = new SimpleActivatedAbility(new DrawCardSourceControllerEffect(1), new GenericManaCost(1)); "
+                    "ability.addCost(new TapSourceCost()); ability.addCost(new SacrificeSourceCost());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "artifact")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_exile_graveyard_card_or_sacrifice_for_mass_graveyard_exile_or_draw_v1",
+        )
+        self.assertTrue(primary["etb_exile_target_card_from_graveyard"])
+        self.assertTrue(primary["activated_tap_sacrifice_exile_each_opponents_graveyard"])
+        self.assertEqual(primary["activated_generic_one_tap_sacrifice_draw"], 1)
+
+    def test_cyclonic_rift_maps_to_exact_overload_bounce_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["ReturnToHandTargetEffect"],
+                "ability_classes": ["OverloadAbility"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "OverloadAbility.implementOverloadAbility(this, new ManaCostsImpl<>(\"{6}{U}\"), "
+                    "new TargetPermanent(filter), new ReturnToHandTargetEffect()); "
+                    "filter.add(TargetController.NOT_YOU.getControllerPredicate());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "bounce")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_target_nonland_permanent_you_dont_control_or_overload_all_opponents_nonlands_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "nonland_permanent_you_dont_control")
+        self.assertEqual(primary["overload_cost"], "{6}{U}")
+        self.assertTrue(primary["overload_bounces_each_nonland_permanent_you_dont_control"])
+
+    def test_red_elemental_blast_maps_to_exact_modal_blue_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterTargetEffect", "DestroyTargetEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "Choose one - Counter target blue spell; or destroy target blue permanent. "
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect()); "
+                    "Mode mode = new Mode(new DestroyTargetEffect());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "modal_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "counter_target_blue_spell_or_destroy_target_blue_permanent_v1",
+        )
+        self.assertTrue(primary["counter_target_blue_spell"])
+        self.assertTrue(primary["destroy_target_blue_permanent"])
+        self.assertTrue(primary["instant"])
+
 
 if __name__ == "__main__":
     unittest.main()
