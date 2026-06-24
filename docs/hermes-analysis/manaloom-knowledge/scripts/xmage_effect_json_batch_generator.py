@@ -33,6 +33,8 @@ DECK_ROLE_BY_FAMILY: dict[str, dict[str, Any]] = {
     "token_maker": {"category": "board_development", "effect": "token_maker", "timing": "resolution_or_trigger"},
     "copy_creature_token": {"category": "board_development", "effect": "copy_creature_token", "timing": "resolution"},
     "copy_permanent_etb": {"category": "board_development", "effect": "copy_permanent_etb", "timing": "battlefield"},
+    "mill_spell": {"category": "combo_value", "effect": "mill", "subtype": "library_mill", "timing": "resolution_or_activation"},
+    "life_drain_engine": {"category": "aristocrats", "effect": "life_drain", "timing": "triggered"},
     "board_wipe_choice": {"category": "interaction", "effect": "board_control", "subtype": "wipe_or_sacrifice", "timing": "resolution"},
     "discard_modal_trigger": {"category": "value_engine", "effect": "discard_trigger_modal", "timing": "triggered"},
     "modal_spell": {"category": "interaction", "effect": "modal_spell", "timing": "resolution"},

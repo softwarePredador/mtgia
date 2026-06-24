@@ -96,6 +96,7 @@ SUPPORTED_EFFECTS = {
     "ripple_engine",
     "silence_opponents",
     "silence_spell",
+    "static_cost_reduction",
     "steal_all_creatures",
     "thassa_oracle",
     "token_maker",

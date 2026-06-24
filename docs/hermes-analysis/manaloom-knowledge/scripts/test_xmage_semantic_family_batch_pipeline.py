@@ -156,6 +156,74 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_supported_brain_freeze_and_cabal_runtime_scopes_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Brain Freeze",
+                        "severity": "high",
+                        "oracle_hash": "brain-freeze-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "BrainFreeze",
+                            "path": "/xmage/BrainFreeze.java",
+                            "types": ["INSTANT"],
+                            "ability_classes": ["StormAbility"],
+                            "effect_classes": ["MillCardsTargetEffect"],
+                            "primary_effect": {
+                                "effect": "brain_freeze",
+                                "battle_model_scope": "storm_target_player_mill_fixed_count_v1",
+                                "ability_kind": "one_shot",
+                                "instant": True,
+                                "target": "player",
+                                "mill_count": 3,
+                                "storm": True,
+                            },
+                        },
+                    },
+                    {
+                        "card_name": "Cabal Ritual",
+                        "severity": "high",
+                        "oracle_hash": "cabal-ritual-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "CabalRitual",
+                            "path": "/xmage/CabalRitual.java",
+                            "types": ["INSTANT"],
+                            "ability_classes": [],
+                            "effect_classes": ["BasicManaEffect", "ConditionalManaEffect"],
+                            "condition_classes": ["ThresholdCondition"],
+                            "primary_effect": {
+                                "effect": "ramp_ritual",
+                                "battle_model_scope": "threshold_three_or_five_black_mana_ritual_v1",
+                                "ability_kind": "one_shot",
+                                "instant": True,
+                                "mana_produced": 3,
+                                "produces": "B",
+                                "threshold_graveyard_count": 7,
+                                "threshold_mana_produced": 5,
+                            },
+                        },
+                    },
+                ]
+            }
+        )
+
+        by_name = {card["card_name"]: card for card in report["cards"]}
+        self.assertEqual(by_name["Brain Freeze"]["family_id"], "mill_spell")
+        self.assertEqual(by_name["Brain Freeze"]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+        self.assertEqual(by_name["Cabal Ritual"]["family_id"], "ramp_ritual")
+        self.assertEqual(by_name["Cabal Ritual"]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_variable_self_spell_cost_reducer_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

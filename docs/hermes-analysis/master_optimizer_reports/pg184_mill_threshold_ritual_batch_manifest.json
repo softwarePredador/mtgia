@@ -1,0 +1,47 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg184_mill_threshold_ritual_batch_20260624_192504",
+  "deploy_id": "PG184",
+  "family_counts": {
+    "mill_spell": 1,
+    "ramp_ritual": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_rollback.sql"
+  },
+  "generated_at": "2026-06-24T19:25:04+00:00",
+  "mutations_performed": [
+    {
+      "artifact": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_precheck_current_20260624.tsv",
+      "status": "completed",
+      "step": "precheck"
+    },
+    {
+      "artifact": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_apply_current_20260624.out",
+      "status": "completed",
+      "step": "apply"
+    },
+    {
+      "artifact": "docs/hermes-analysis/master_optimizer_reports/pg184_mill_threshold_ritual_batch_postcheck_current_20260624.tsv",
+      "status": "completed",
+      "step": "postcheck"
+    },
+    {
+      "artifact": "docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg184_mill_threshold_ritual_20260624.json",
+      "status": "completed",
+      "step": "pg_to_sqlite_sync"
+    }
+  ],
+  "selected_card_names": [
+    "Brain Freeze",
+    "Cabal Ritual"
+  ],
+  "selected_count": 2,
+  "slug": "mill_threshold_ritual_batch",
+  "status": "applied_postchecked_synced"
+}

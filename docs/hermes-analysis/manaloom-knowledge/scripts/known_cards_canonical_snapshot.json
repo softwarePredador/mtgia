@@ -3552,13 +3552,20 @@
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
   },
   "Brain Freeze": {
-    "effect": "finisher",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "storm_target_player_mill_fixed_count_v1",
+    "effect": "brain_freeze",
+    "instant": true,
+    "mill_count": 3,
+    "storm": true,
+    "target": "player",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3895145eecb0a2ac9b7805febd67ea54"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b992316c10714f267a5a33a4c62795d4",
+    "battle_rule_oracle_hash": "ae7c7b244cb9842dde5c406ae7773fca"
   },
   "Brainstone": {
     "activation_cost_generic": 2,
@@ -3999,14 +4006,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Cabal Ritual": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "threshold_three_or_five_black_mana_ritual_v1",
     "effect": "ramp_ritual",
+    "instant": true,
     "mana_produced": 3,
+    "produces": "B",
+    "threshold_graveyard_count": 7,
+    "threshold_mana_produced": 5,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:69a79cc3b7a3409d74c03674dfdd3e05"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1842b9d1707a9f8b0fb6ca71e5585e0e",
+    "battle_rule_oracle_hash": "549542c2ab124b22c3757819f8d2d44e"
   },
   "Cabal Stronghold": {
     "effect": "land",

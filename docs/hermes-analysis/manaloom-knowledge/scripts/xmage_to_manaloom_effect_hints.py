@@ -508,6 +508,32 @@ def _build_counter_variant_fields(
 
     normalized = _normalized_rules_text(rules_text)
 
+    if (
+        "CounterUnlessPaysEffect" in effect_classes
+        and "StormAbility" in ability_classes
+        and "counterunlesspayseffect(new manacostsimpl<>" in normalized
+        and "{1}" in normalized
+    ):
+        return {
+            "effect": "counter_spell",
+            "scope": "storm_counter_instant_or_sorcery_unless_controller_pays_one_v1",
+            "fields": {
+                "target": "instant_or_sorcery_spell",
+                "instant": True,
+                "unless_controller_pays_generic": 1,
+                "storm": True,
+            },
+            "reason": (
+                "XMage structure matches a storm soft counter against an instant or sorcery unless its controller pays 1."
+            ),
+            "signals": [
+                "CounterUnlessPaysEffect",
+                "ManaCostsImpl({1})",
+                "StormAbility",
+                "FILTER_SPELL_INSTANT_OR_SORCERY",
+            ],
+        }
+
     if "CounterUnlessPaysEffect" in effect_classes:
         if "counterunlesspayseffect(new genericmanacost(3))" in normalized:
             if "filter_spell_instant_or_sorcery" in normalized:
@@ -677,6 +703,174 @@ def _build_counter_variant_fields(
         }
 
     return None
+
+
+def _build_mill_spell_fields(
+    *,
+    xmage_class_name: str,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if "MillCardsTargetEffect" not in effect_classes:
+        return None
+    normalized = _normalized_rules_text(rules_text)
+    mill_count = _first_int(r"MillCardsTargetEffect\((\d+)\)", rules_text) or 0
+
+    if (
+        card_types == {"INSTANT"}
+        and effect_classes == {"MillCardsTargetEffect"}
+        and ability_classes == {"StormAbility"}
+        and not cost_classes
+        and mill_count > 0
+    ):
+        return {
+            "effect": "brain_freeze" if xmage_class_name == "BrainFreeze" else "mill_cards",
+            "scope": "storm_target_player_mill_fixed_count_v1",
+            "fields": {
+                "instant": True,
+                "target": "player",
+                "mill_count": mill_count,
+                "storm": True,
+            },
+            "reason": "XMage structure matches a storm instant that mills a fixed number of cards per copy.",
+            "signals": ["MillCardsTargetEffect", "StormAbility", "TargetPlayer"],
+        }
+
+    if card_types in ({"INSTANT"}, {"SORCERY"}) and mill_count > 0:
+        return {
+            "effect": "mill_cards",
+            "scope": "target_player_mill_fixed_or_x_variant_v1",
+            "fields": {
+                "instant": card_types == {"INSTANT"},
+                "target": "player",
+                "mill_count": mill_count,
+            },
+            "reason": "XMage structure includes a target-player mill effect; exact count/scaling still requires scope review.",
+            "signals": ["MillCardsTargetEffect", "TargetPlayer"],
+        }
+
+    if (
+        card_types == {"ARTIFACT"}
+        and "SimpleActivatedAbility" in ability_classes
+        and {"TapSourceCost", "SacrificeTargetCost"}.issubset(cost_classes)
+        and mill_count > 0
+    ):
+        return {
+            "effect": "mill_engine",
+            "scope": "artifact_tap_sacrifice_permanent_target_player_mill_v1",
+            "fields": {
+                "activation_requires_tap": True,
+                "activation_requires_sacrifice_permanent": True,
+                "target": "player",
+                "mill_count": mill_count,
+            },
+            "reason": "XMage structure matches an activated artifact that taps and sacrifices a permanent to mill a target player.",
+            "signals": ["MillCardsTargetEffect", "SimpleActivatedAbility", "TapSourceCost", "SacrificeTargetCost"],
+        }
+
+    return None
+
+
+def _build_chain_of_vapor_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"INSTANT"} or "ChainOfVaporEffect" not in effect_classes:
+        return None
+    if not _oracle_has(
+        rules_text,
+        "return target nonland permanent",
+        "sacrifice a land",
+        "copy this spell",
+    ):
+        return None
+    return {
+        "effect": "bounce",
+        "scope": "return_target_nonland_permanent_controller_may_sacrifice_land_copy_v1",
+        "fields": {
+            "instant": True,
+            "target": "nonland_permanent",
+            "target_controller_may_sacrifice_land_to_copy": True,
+            "copy_may_choose_new_target": True,
+        },
+        "reason": "XMage custom ChainOfVaporEffect contains the target nonland permanent bounce plus land-sacrifice copy rider.",
+        "signals": ["ChainOfVaporEffect", "TargetNonlandPermanent", "TargetSacrifice"],
+    }
+
+
+def _build_life_drain_trigger_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if not {"LoseLifeTargetEffect", "GainLifeEffect"}.issubset(effect_classes):
+        return None
+    if "DiesThisOrAnotherTriggeredAbility" not in ability_classes:
+        return None
+    life_loss = _first_int(r"LoseLifeTargetEffect\((\d+)\)", rules_text) or 1
+    life_gain = _first_int(r"GainLifeEffect\((\d+)\)", rules_text) or life_loss
+    if card_types == {"CREATURE"}:
+        return {
+            "effect": "creature",
+            "scope": "another_creature_dies_target_player_loses_life_you_gain_life_v1",
+            "fields": {
+                "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text),
+                "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text),
+                "trigger": "creature_dies",
+                "dies_this_or_another": True,
+                "target_player_loses_life": life_loss,
+                "controller_gains_life": life_gain,
+            },
+            "reason": "XMage structure matches a Blood Artist style death trigger that drains a target player and gains life.",
+            "signals": ["DiesThisOrAnotherTriggeredAbility", "LoseLifeTargetEffect", "GainLifeEffect"],
+        }
+    return {
+        "effect": "life_drain_engine",
+        "scope": "permanent_death_trigger_target_player_loses_life_you_gain_life_v1",
+        "fields": {
+            "trigger": "creature_dies",
+            "dies_this_or_another": True,
+            "target_player_loses_life": life_loss,
+            "controller_gains_life": life_gain,
+        },
+        "reason": "XMage structure matches a permanent death-trigger drain engine.",
+        "signals": ["DiesThisOrAnotherTriggeredAbility", "LoseLifeTargetEffect", "GainLifeEffect"],
+    }
+
+
+def _build_copy_stack_spell_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if "CopyTargetStackObjectEffect" not in effect_classes:
+        return None
+    if "TargetSpell" not in rules_text and "targetspell" not in _normalized_rules_text(rules_text):
+        return None
+    fields: dict[str, Any] = {
+        "instant": "INSTANT" in card_types,
+        "target": "instant_or_sorcery_spell",
+        "may_choose_new_targets": True,
+        "choose_new_targets_status": "may",
+    }
+    if "CommanderStormAbility" in ability_classes:
+        fields["commander_storm"] = True
+    return {
+        "effect": "copy_spell",
+        "scope": "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1",
+        "fields": fields,
+        "reason": "XMage structure matches copying a target instant or sorcery spell on the stack.",
+        "signals": ["CopyTargetStackObjectEffect", "TargetSpell"],
+    }
 
 
 def _build_source_add_counters_creature_fields(
@@ -2876,18 +3070,141 @@ def _build_tutor_to_hand_fields(
     card_types: set[str],
     effect_classes: set[str],
     ability_classes: set[str],
+    condition_classes: set[str],
     cost_classes: set[str],
     rules_text: str,
 ) -> dict[str, Any] | None:
     normalized = _normalized_rules_text(rules_text)
 
+    if "SearchLibraryPutInHandEffect" not in effect_classes:
+        return None
+
+    def tutor_target() -> str:
+        if "filter_card_artifact" in normalized or "filter_card_artifact_an" in normalized or "artifact card" in normalized:
+            return "artifact_to_hand"
+        if "subtype.equipment" in normalized or "equipment card" in normalized:
+            return "equipment_to_hand"
+        if "filtercreaturecard( green creature card" in normalized or (
+            "filtercreaturecard" in normalized and "objectcolor.green" in normalized
+        ):
+            return "green_creature_to_hand"
+        if "legendary creature card" in normalized:
+            return "legendary_creature_to_hand"
+        if "filter_card_creature" in normalized or "creature card" in normalized:
+            return "creature_to_hand"
+        if "filterlandcard" in normalized or "land card" in normalized:
+            return "land_to_hand"
+        if "demon card" in normalized or "subtype.demon" in normalized:
+            return "demon_to_hand"
+        return "any_to_hand"
+
+    if card_types in ({"INSTANT"}, {"SORCERY"}):
+        is_instant = card_types == {"INSTANT"}
+        target = tutor_target()
+        if "ConditionalOneShotEffect" in effect_classes and "DeliriumCondition" in condition_classes:
+            return {
+                "effect": "tutor",
+                "scope": "conditional_delirium_restricted_or_any_tutor_to_hand_v1",
+                "ability_kind": "one_shot",
+                "fields": {
+                    "instant": is_instant,
+                    "target": target,
+                    "delirium_target": "any_to_hand",
+                    "delirium_graveyard_card_type_count": 4,
+                    "tutor_destination": "hand",
+                },
+                "reason": "XMage structure matches a conditional tutor that upgrades to any-card-to-hand under delirium.",
+                "signals": ["SearchLibraryPutInHandEffect", "ConditionalOneShotEffect", "DeliriumCondition"],
+            }
+        if "CreateDelayedTriggeredAbilityEffect" in effect_classes and "PactDelayedTriggeredAbility" in ability_classes:
+            return {
+                "effect": "tutor",
+                "scope": "pact_green_creature_tutor_to_hand_delayed_payment_v1",
+                "ability_kind": "one_shot",
+                "fields": {
+                    "instant": is_instant,
+                    "target": target,
+                    "tutor_destination": "hand",
+                    "delayed_upkeep_mana_payment": "{2}{G}{G}",
+                    "lose_game_if_unpaid": True,
+                },
+                "reason": "XMage structure matches a pact tutor with delayed upkeep payment-or-lose trigger.",
+                "signals": ["SearchLibraryPutInHandEffect", "CreateDelayedTriggeredAbilityEffect", "PactDelayedTriggeredAbility"],
+            }
+        if "RecklessHandlingEffect" in effect_classes:
+            return {
+                "effect": "tutor",
+                "scope": "artifact_tutor_to_hand_random_discard_damage_if_artifact_discarded_v1",
+                "ability_kind": "one_shot",
+                "fields": {
+                    "instant": is_instant,
+                    "target": target,
+                    "tutor_destination": "hand",
+                    "random_discard_after_tutor": 1,
+                    "damage_each_opponent_if_artifact_discarded": 2,
+                },
+                "reason": "XMage structure matches artifact tutor to hand plus random discard and artifact-discard damage rider.",
+                "signals": ["SearchLibraryPutInHandEffect", "RecklessHandlingEffect"],
+            }
+        if "ReturnFromGraveyardToHandTargetEffect" in effect_classes:
+            return {
+                "effect": "modal_spell",
+                "scope": "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1",
+                "ability_kind": "one_shot",
+                "fields": {
+                    "instant": is_instant,
+                    "mode_min": 1,
+                    "mode_max": 2,
+                    "mode_one_target": target,
+                    "mode_two_target": "artifact_from_graveyard_to_hand",
+                },
+                "reason": "XMage structure matches a modal spell that can tutor an artifact to hand or return an artifact from graveyard to hand.",
+                "signals": ["SearchLibraryPutInHandEffect", "ReturnFromGraveyardToHandTargetEffect"],
+            }
+        if "LoseLifeSourceControllerEffect" in effect_classes:
+            return {
+                "effect": "tutor",
+                "scope": "any_tutor_to_hand_controller_loses_life_v1",
+                "ability_kind": "one_shot",
+                "fields": {
+                    "instant": is_instant,
+                    "target": target,
+                    "tutor_destination": "hand",
+                    "controller_loses_life_after_tutor": _first_int(r"LoseLifeSourceControllerEffect\((\d+)\)", rules_text) or 3,
+                },
+                "reason": "XMage structure matches any-card tutor to hand with controller life-loss rider.",
+                "signals": ["SearchLibraryPutInHandEffect", "LoseLifeSourceControllerEffect"],
+            }
+
     if (
         card_types == {"ARTIFACT"}
-        and effect_classes == {"SearchLibraryPutInHandEffect"}
+        and "SearchLibraryPutInHandEffect" in effect_classes
         and "TapSourceCost" in cost_classes
-        and "SacrificeSourceCost" in cost_classes
         and "SimpleActivatedAbility" in ability_classes
     ):
+        if "RemoveCountersSourceCost" in cost_classes and "GainControlTargetEffect" in effect_classes:
+            return {
+                "effect": "tutor",
+                "scope": "artifact_wish_counter_any_tutor_to_hand_then_opponent_gains_control_v1",
+                "ability_kind": "activated",
+                "fields": {
+                    "activated_tutor_to_hand": True,
+                    "activation_cost_generic": _first_int(r"GenericManaCost\((\d+)\)", rules_text) or 1,
+                    "activation_requires_tap": True,
+                    "activation_removes_counter": "wish",
+                    "activation_condition": "your_turn",
+                    "enters_with_counters": {"wish": 3},
+                    "tutor_target": "any_to_hand",
+                    "tutor_destination": "hand",
+                    "opponent_gains_control_after_activation": True,
+                },
+                "reason": "XMage structure matches Wishclaw-style activated any-card tutor with wish counters and opponent-control rider.",
+                "signals": ["SearchLibraryPutInHandEffect", "RemoveCountersSourceCost", "GainControlTargetEffect"],
+            }
+
+        if "SacrificeSourceCost" not in cost_classes:
+            return None
+
         activation_cost_generic = _first_int(r"GenericManaCost\((\d+)\)", rules_text)
         if (
             xmage_class_name == "MoonsilverKey"
@@ -2995,8 +3312,29 @@ def _build_tutor_to_hand_fields(
 
         return None
 
-    if card_types != {"CREATURE"} or effect_classes != {"SearchLibraryPutInHandEffect"}:
+    if card_types != {"CREATURE"} or "SearchLibraryPutInHandEffect" not in effect_classes:
         return None
+
+    if (
+        "SimpleActivatedAbility" in ability_classes
+        and {"PayLifeCost", "SacrificeTargetCost"}.issubset(cost_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "activated_pay_life_sacrifice_creature_any_tutor_to_hand_v1",
+            "ability_kind": "activated",
+            "fields": {
+                "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text),
+                "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text),
+                "activated_tutor_to_hand": True,
+                "activation_pay_life": _first_int(r"PayLifeCost\((\d+)\)", rules_text) or 2,
+                "activation_requires_sacrifice_creature": True,
+                "tutor_target": "any_to_hand",
+                "tutor_destination": "hand",
+            },
+            "reason": "XMage structure matches an activated creature that pays life and sacrifices another creature to tutor any card to hand.",
+            "signals": ["SearchLibraryPutInHandEffect", "PayLifeCost", "SacrificeTargetCost"],
+        }
 
     if (
         "ActivateIfConditionActivatedAbility" in ability_classes
@@ -3035,7 +3373,7 @@ def _build_tutor_to_hand_fields(
             ],
         }
 
-    if ability_classes != {"EntersBattlefieldTriggeredAbility"} or cost_classes:
+    if "EntersBattlefieldTriggeredAbility" not in ability_classes or cost_classes:
         return None
 
     if (
@@ -3090,6 +3428,26 @@ def _build_tutor_to_hand_fields(
                 "CardType.ARTIFACT",
                 "ManaValuePredicate(=3)",
             ],
+        }
+
+    if (
+        "EntersBattlefieldTriggeredAbility" in ability_classes
+        and effect_classes == {"SearchLibraryPutInHandEffect"}
+        and not cost_classes
+    ):
+        target = tutor_target()
+        return {
+            "effect": "creature",
+            "scope": "etb_tutor_to_hand_creature_variant_v1",
+            "ability_kind": "triggered",
+            "fields": {
+                "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text),
+                "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text),
+                "etb_tutor_target": target,
+                "tutor_destination": "hand",
+            },
+            "reason": "XMage structure matches a creature ETB tutor-to-hand variant with target constraints preserved after exact ETB tutor scopes are excluded.",
+            "signals": ["SearchLibraryPutInHandEffect", "EntersBattlefieldTriggeredAbility", target],
         }
 
     return None
@@ -3372,13 +3730,37 @@ def _build_basic_ritual_fields(
     card_types: set[str],
     effect_classes: set[str],
     ability_classes: set[str],
+    condition_classes: set[str],
     card_subtypes: set[str],
     rules_text: str,
 ) -> dict[str, Any] | None:
-    if card_types != {"INSTANT"} or effect_classes != {"BasicManaEffect"}:
+    if card_types != {"INSTANT"} or "BasicManaEffect" not in effect_classes:
         return None
 
     normalized = _normalized_rules_text(rules_text)
+
+    if (
+        effect_classes == {"BasicManaEffect", "ConditionalManaEffect"}
+        and "ThresholdCondition" in condition_classes
+        and "mana.blackmana(5)" in normalized
+        and "mana.blackmana(3)" in normalized
+    ):
+        return {
+            "effect": "ramp_ritual",
+            "scope": "threshold_three_or_five_black_mana_ritual_v1",
+            "fields": {
+                "instant": True,
+                "mana_produced": 3,
+                "produces": "B",
+                "threshold_graveyard_count": 7,
+                "threshold_mana_produced": 5,
+            },
+            "reason": "XMage structure matches Cabal Ritual adding three black mana, or five black mana with threshold.",
+            "signals": ["ConditionalManaEffect", "BasicManaEffect", "ThresholdCondition", "BlackMana(3)", "BlackMana(5)"],
+        }
+
+    if effect_classes != {"BasicManaEffect"}:
+        return None
 
     if "mana.blackmana(3)" in normalized:
         return {
@@ -3777,6 +4159,87 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             )
         )
 
+    mill_spell_fields = _build_mill_spell_fields(
+        xmage_class_name=xmage_class_name,
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if mill_spell_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(mill_spell_fields["effect"]),
+                scope=str(mill_spell_fields["scope"]),
+                reason=str(mill_spell_fields["reason"]),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(mill_spell_fields["fields"]),
+                matched_signals=list(mill_spell_fields["signals"]),
+            )
+        )
+
+    chain_of_vapor_fields = _build_chain_of_vapor_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        rules_text=rules_text,
+    )
+    if chain_of_vapor_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(chain_of_vapor_fields["effect"]),
+                scope=str(chain_of_vapor_fields["scope"]),
+                reason=str(chain_of_vapor_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(chain_of_vapor_fields["fields"]),
+                matched_signals=list(chain_of_vapor_fields["signals"]),
+            )
+        )
+
+    life_drain_trigger_fields = _build_life_drain_trigger_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if life_drain_trigger_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(life_drain_trigger_fields["effect"]),
+                scope=str(life_drain_trigger_fields["scope"]),
+                reason=str(life_drain_trigger_fields["reason"]),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    key: value
+                    for key, value in dict(life_drain_trigger_fields["fields"]).items()
+                    if value is not None
+                },
+                matched_signals=list(life_drain_trigger_fields["signals"]),
+            )
+        )
+
+    copy_stack_spell_fields = _build_copy_stack_spell_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if copy_stack_spell_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(copy_stack_spell_fields["effect"]),
+                scope=str(copy_stack_spell_fields["scope"]),
+                reason=str(copy_stack_spell_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(copy_stack_spell_fields["fields"]),
+                matched_signals=list(copy_stack_spell_fields["signals"]),
+            )
+        )
+
     source_add_counters_creature_fields = _build_source_add_counters_creature_fields(
         card_types=card_types,
         effect_classes=effect_classes,
@@ -3976,6 +4439,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         card_types=card_types,
         effect_classes=effect_classes,
         ability_classes=ability_classes,
+        condition_classes=condition_classes,
         cost_classes=cost_classes,
         rules_text=rules_text,
     )
@@ -4096,6 +4560,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         card_types=card_types,
         effect_classes=effect_classes,
         ability_classes=ability_classes,
+        condition_classes=condition_classes,
         card_subtypes={
             str(value or "").upper()
             for value in ((index_entry.get("constructor_metadata") or {}).get("subtypes") or [])

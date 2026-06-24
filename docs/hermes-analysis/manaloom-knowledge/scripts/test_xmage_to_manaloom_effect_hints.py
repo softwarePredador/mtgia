@@ -1797,6 +1797,54 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["instant"])
         self.assertEqual(primary["unless_controller_pays_generic"], 2)
 
+    def test_flusterstorm_maps_to_storm_soft_counter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Flusterstorm",
+                "effect_classes": ["CounterUnlessPaysEffect"],
+                "ability_classes": ["StormAbility"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    'this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(new ManaCostsImpl<>("{1}"))); '
+                    "this.getSpellAbility().addTarget(new TargetSpell(StaticFilters.FILTER_SPELL_INSTANT_OR_SORCERY)); "
+                    "this.addAbility(new StormAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "storm_counter_instant_or_sorcery_unless_controller_pays_one_v1",
+        )
+        self.assertEqual(primary["target"], "instant_or_sorcery_spell")
+        self.assertEqual(primary["unless_controller_pays_generic"], 1)
+        self.assertTrue(primary["storm"])
+
+    def test_brain_freeze_maps_to_storm_mill_runtime_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BrainFreeze",
+                "effect_classes": ["MillCardsTargetEffect"],
+                "ability_classes": ["StormAbility"],
+                "target_classes": ["TargetPlayer"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addTarget(new TargetPlayer()); "
+                    "this.getSpellAbility().addEffect(new MillCardsTargetEffect(3)); "
+                    "this.addAbility(new StormAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "brain_freeze")
+        self.assertEqual(primary["battle_model_scope"], "storm_target_player_mill_fixed_count_v1")
+        self.assertEqual(primary["mill_count"], 3)
+        self.assertTrue(primary["storm"])
+
     def test_dark_ritual_maps_to_exact_black_ritual_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -1812,6 +1860,29 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["instant"])
         self.assertEqual(primary["mana_produced"], 3)
         self.assertEqual(primary["produces"], "B")
+
+    def test_cabal_ritual_maps_to_threshold_black_ritual_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CabalRitual",
+                "effect_classes": ["BasicManaEffect", "ConditionalManaEffect"],
+                "condition_classes": ["ThresholdCondition"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "new ConditionalManaEffect("
+                    "new BasicManaEffect(Mana.BlackMana(5)), "
+                    "new BasicManaEffect(Mana.BlackMana(3)), "
+                    "ThresholdCondition.instance)"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_ritual")
+        self.assertEqual(primary["battle_model_scope"], "threshold_three_or_five_black_mana_ritual_v1")
+        self.assertEqual(primary["mana_produced"], 3)
+        self.assertEqual(primary["threshold_graveyard_count"], 7)
+        self.assertEqual(primary["threshold_mana_produced"], 5)
 
     def test_pyretic_ritual_maps_to_exact_red_ritual_scope(self) -> None:
         result = hints.build_effect_hints(
@@ -1926,6 +1997,79 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertFalse(primary["instant"])
         self.assertTrue(primary["requires_sacrifice_creature"])
 
+    def test_chain_of_vapor_maps_to_bounce_copy_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ChainOfVapor",
+                "effect_classes": ["ChainOfVaporEffect", "OneShotEffect"],
+                "target_classes": ["TargetNonlandPermanent", "TargetSacrifice"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "Return target nonland permanent to its owner's hand. Then that permanent's controller "
+                    "may sacrifice a land of their choice. If the player does, they may copy this spell "
+                    "and may choose a new target for that copy"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "bounce")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_target_nonland_permanent_controller_may_sacrifice_land_copy_v1",
+        )
+        self.assertEqual(primary["target"], "nonland_permanent")
+        self.assertTrue(primary["target_controller_may_sacrifice_land_to_copy"])
+
+    def test_blood_artist_maps_to_death_life_drain_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BloodArtist",
+                "effect_classes": ["GainLifeEffect", "LoseLifeTargetEffect"],
+                "ability_classes": ["DiesThisOrAnotherTriggeredAbility"],
+                "target_classes": ["TargetPlayer"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(0); this.toughness = new MageInt(1); "
+                    "new DiesThisOrAnotherTriggeredAbility(new LoseLifeTargetEffect(1), false); "
+                    "new GainLifeEffect(1)"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "another_creature_dies_target_player_loses_life_you_gain_life_v1",
+        )
+        self.assertEqual(primary["target_player_loses_life"], 1)
+        self.assertEqual(primary["controller_gains_life"], 1)
+
+    def test_fury_storm_maps_to_copy_stack_spell_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "FuryStorm",
+                "effect_classes": ["CopyTargetStackObjectEffect"],
+                "ability_classes": ["CommanderStormAbility"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new CommanderStormAbility(true)); "
+                    "this.getSpellAbility().addEffect(new CopyTargetStackObjectEffect()); "
+                    "this.getSpellAbility().addTarget(new TargetSpell(StaticFilters.FILTER_SPELL_INSTANT_OR_SORCERY));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "copy_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1",
+        )
+        self.assertTrue(primary["commander_storm"])
+
     def test_mystical_tutor_maps_to_instant_or_sorcery_topdeck_tutor_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -1943,7 +2087,102 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["effect"], "tutor")
         self.assertEqual(primary["battle_model_scope"], "instant_or_sorcery_tutor_to_top_v1")
         self.assertTrue(primary["instant"])
-        self.assertEqual(primary["target"], "instant_or_sorcery_to_top")
+
+    def test_grim_tutor_maps_to_any_tutor_with_life_loss_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "GrimTutor",
+                "effect_classes": ["LoseLifeSourceControllerEffect", "SearchLibraryPutInHandEffect"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(), false, true)); "
+                    "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(3));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "any_tutor_to_hand_controller_loses_life_v1")
+        self.assertEqual(primary["target"], "any_to_hand")
+        self.assertEqual(primary["controller_loses_life_after_tutor"], 3)
+
+    def test_demonic_counsel_maps_to_delirium_upgrade_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "DemonicCounsel",
+                "effect_classes": ["ConditionalOneShotEffect", "SearchLibraryPutInHandEffect"],
+                "condition_classes": ["DeliriumCondition"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "new SearchLibraryPutInHandEffect(new TargetCardInLibrary(new FilterCard(\"a Demon card\")), true); "
+                    "new ConditionalOneShotEffect(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(), false), "
+                    "new SearchLibraryPutInHandEffect(new TargetCardInLibrary(new FilterCard(\"a Demon card\")), true), "
+                    "DeliriumCondition.instance);"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "conditional_delirium_restricted_or_any_tutor_to_hand_v1")
+        self.assertEqual(primary["target"], "demon_to_hand")
+        self.assertEqual(primary["delirium_target"], "any_to_hand")
+        self.assertEqual(primary["delirium_graveyard_card_type_count"], 4)
+
+    def test_wishclaw_talisman_maps_to_counter_artifact_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "WishclawTalisman",
+                "effect_classes": [
+                    "ContinuousEffect",
+                    "GainControlTargetEffect",
+                    "OneShotEffect",
+                    "SearchLibraryPutInHandEffect",
+                    "WishclawTalismanEffect",
+                ],
+                "ability_classes": ["ActivateIfConditionActivatedAbility", "EntersBattlefieldWithCountersAbility", "SimpleActivatedAbility"],
+                "condition_classes": ["MyTurnCondition"],
+                "cost_classes": ["GenericManaCost", "RemoveCountersSourceCost", "TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new EntersBattlefieldWithCountersAbility(CounterType.WISH.createInstance(3))); "
+                    "new SearchLibraryPutInHandEffect(new TargetCardInLibrary(), false); "
+                    "new GenericManaCost(1); ability.addCost(new TapSourceCost()); "
+                    "ability.addCost(new RemoveCountersSourceCost(CounterType.WISH.createInstance())); "
+                    "new GainControlTargetEffect();"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "artifact_wish_counter_any_tutor_to_hand_then_opponent_gains_control_v1",
+        )
+        self.assertEqual(primary["activation_removes_counter"], "wish")
+        self.assertTrue(primary["opponent_gains_control_after_activation"])
+
+    def test_rune_scarred_demon_maps_to_etb_creature_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "RuneScarredDemon",
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(6); this.toughness = new MageInt(6); "
+                    "new EntersBattlefieldTriggeredAbility(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(), false));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "etb_tutor_to_hand_creature_variant_v1")
+        self.assertEqual(primary["etb_tutor_target"], "any_to_hand")
+        self.assertEqual(primary["power"], 6)
 
     def test_worldly_tutor_maps_to_creature_topdeck_tutor_scope(self) -> None:
         result = hints.build_effect_hints(

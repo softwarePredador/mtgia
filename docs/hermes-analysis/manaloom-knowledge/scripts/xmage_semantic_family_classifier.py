@@ -112,6 +112,20 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
+    "mill_spell": {
+        "effects": {"brain_freeze", "mill_cards", "mill_engine"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "target-player library milling, storm copy counting, and activated mill engines",
+        "family_tests": ["test_brain_freeze_mills_library_instead_of_dealing_life_damage"],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "life_drain_engine": {
+        "effects": {"life_drain_engine"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "death/draw/discard trigger life-loss and controller-gain bookkeeping",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
     "copy_permanent_etb": {
         "effects": {"copy_permanent_etb"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -276,6 +290,10 @@ def xmage_cost_classes(card: dict[str, Any]) -> set[str]:
 
 def xmage_target_classes(card: dict[str, Any]) -> set[str]:
     return {str(value or "") for value in ((card.get("xmage") or {}).get("target_classes") or []) if value}
+
+
+def xmage_condition_classes(card: dict[str, Any]) -> set[str]:
+    return {str(value or "") for value in ((card.get("xmage") or {}).get("condition_classes") or []) if value}
 
 
 def family_for_effect(effect: str | None) -> str:
@@ -588,6 +606,17 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("unless_controller_pays_generic") or 0) == 2
         )
 
+    if effect == "brain_freeze" and scope == "storm_target_player_mill_fixed_count_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"MillCardsTargetEffect"}
+            and ability_classes == {"StormAbility"}
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "player"
+            and int(effect_json.get("mill_count") or 0) == 3
+            and bool(effect_json.get("storm"))
+        )
+
     if effect == "ramp_ritual" and scope == "three_black_mana_ritual_v1":
         return (
             types == {"INSTANT"}
@@ -596,6 +625,23 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("instant"))
             and int(effect_json.get("mana_produced") or 0) == 3
             and effect_json.get("produces") == "B"
+        )
+
+    if effect == "ramp_ritual" and scope == "threshold_three_or_five_black_mana_ritual_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"BasicManaEffect", "ConditionalManaEffect"}
+            and not ability_classes
+            and "ThresholdCondition" in {
+                str(value or "")
+                for value in ((card.get("xmage") or {}).get("condition_classes") or [])
+                if value
+            }
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("mana_produced") or 0) == 3
+            and effect_json.get("produces") == "B"
+            and int(effect_json.get("threshold_graveyard_count") or 0) == 7
+            and int(effect_json.get("threshold_mana_produced") or 0) == 5
         )
 
     if effect == "ramp_ritual" and scope == "three_red_mana_ritual_v1":
@@ -2155,6 +2201,7 @@ def classify_card(card: dict[str, Any]) -> dict[str, Any]:
         "xmage_types": sorted(xmage_types(card)),
         "xmage_ability_classes": sorted(xmage_ability_classes(card)),
         "xmage_effect_classes": sorted(xmage_effect_classes(card)),
+        "xmage_condition_classes": sorted(xmage_condition_classes(card)),
         "focused_test_scenario_count": (card.get("checks") or {}).get("focused_test_scenario_count") or 0,
         "effect_json": effect_json,
     }

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import importlib.util
+import random
 import sys
 from pathlib import Path
 
@@ -50,6 +51,7 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "equipment_static_attachment" in audit.SUPPORTED_EFFECTS
     assert "exile_top_nonland_free_cast" in audit.SUPPORTED_EFFECTS
     assert "redistribute_life_totals" in audit.SUPPORTED_EFFECTS
+    assert "static_cost_reduction" in audit.SUPPORTED_EFFECTS
     assert "thassa_oracle" in audit.SUPPORTED_EFFECTS
 
 
@@ -326,6 +328,72 @@ def test_sacrifice_waiver_uses_sacrificed_creature_mana_value():
     ) is True
     assert effect["_last_sacrificed_cmc"] == 4
     assert battle.ritual_mana_produced(player, effect) == 4
+
+
+def test_brain_freeze_runtime_resolves_storm_mill_event():
+    player = battle.Player("Lorehold", None, [])
+    opponent = battle.Player(
+        "Opponent",
+        None,
+        [
+            {"name": f"Library Card {index}", "type_line": "Creature"}
+            for index in range(1, 11)
+        ],
+    )
+    player.spells_cast_this_turn = 3
+    spell = {
+        "name": "Brain Freeze",
+        "type_line": "Instant",
+    }
+    effect = {
+        "effect": "brain_freeze",
+        "mill_count": 3,
+        "storm": True,
+        "target": "player",
+        "card_id": 999001,
+        "semantic_hash": "sha256:brain-freeze-runtime-test",
+        "_rule_source": "postgres",
+        "_rule_review_status": "verified",
+        "_rule_execution_status": "verified_auto",
+        "_rule_confidence": 1.0,
+        "_rule_version": "xmage_mapper_runtime_batch_v1",
+        "_rule_logical_key": (
+            "battle_rule_v1:brain-freeze:"
+            "storm-target-player-mill-fixed-count-v1"
+        ),
+    }
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        battle.apply_effect_immediate(
+            player,
+            [opponent],
+            spell,
+            turn=4,
+            rng=random.Random(17),
+            effect_data_override=effect,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    mill_events = [data for event, data in events if event == "mill_resolved"]
+    assert len(mill_events) == 1
+    resolved = mill_events[0]
+    assert resolved["card"] == "Brain Freeze"
+    assert resolved["target_player"] == "Opponent"
+    assert resolved["copies"] == 3
+    assert resolved["storm_copies"] == 2
+    assert resolved["requested_mill"] == 9
+    assert resolved["cards_milled"] == 9
+    assert resolved["target_library_before"] == 10
+    assert resolved["target_library_after"] == 1
+    assert len(opponent.graveyard) == 9
+    assert len(opponent.library) == 1
+    assert spell in player.graveyard
+    assert resolved["rule_source"] == "postgres"
+    assert resolved["rule_execution_status"] == "verified_auto"
+    assert resolved["rule_logical_key"].endswith("storm-target-player-mill-fixed-count-v1")
 
 
 def test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule():
@@ -853,6 +921,7 @@ if __name__ == "__main__":
         test_manual_runtime_waiver_cards_do_not_use_functional_tags,
         test_promoted_infernal_plunge_uses_curated_pg_rule_not_functional_tags,
         test_sacrifice_waiver_uses_sacrificed_creature_mana_value,
+        test_brain_freeze_runtime_resolves_storm_mill_event,
         test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule,
         test_aura_of_silence_promoted_rule_has_identity_for_forensic,
         test_forensic_accepts_type_line_creature_fact_without_rule_identity,
