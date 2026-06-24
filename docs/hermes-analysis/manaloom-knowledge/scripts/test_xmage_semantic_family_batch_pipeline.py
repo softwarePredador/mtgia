@@ -2378,6 +2378,55 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_invoke_calamity_exact_free_cast_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Invoke Calamity",
+                        "severity": "high",
+                        "oracle_hash": "invokehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "InvokeCalamity",
+                            "path": "/xmage/InvokeCalamity.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "ExileSpellEffect",
+                                "InvokeCalamityEffect",
+                                "InvokeCalamityReplacementEffect",
+                                "OneShotEffect",
+                            ],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "free_cast",
+                                "battle_model_scope": (
+                                    "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1"
+                                ),
+                                "instant": True,
+                                "free_cast_from_zones": ["hand", "graveyard"],
+                                "free_cast_card_types": ["instant", "sorcery"],
+                                "free_cast_max_count": 2,
+                                "free_cast_total_mana_value_max": 6,
+                                "cast_without_paying_mana_cost": True,
+                                "selected_spells_exile_instead_of_graveyard": True,
+                                "exiles_self": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "free_cast")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_lightning_helix_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

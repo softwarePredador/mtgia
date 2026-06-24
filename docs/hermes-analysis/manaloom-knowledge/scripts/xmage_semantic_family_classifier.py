@@ -112,6 +112,17 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
+    "free_cast": {
+        "effects": {"free_cast", "exile_top_nonland_free_cast"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping",
+        "family_tests": [
+            "test_pg102_creative_technique_demonstrates_top_nonland_free_casts",
+            "test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them",
+            "test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit",
+        ],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
     "mill_spell": {
         "effects": {"brain_freeze", "mill_cards", "mill_engine"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -2036,6 +2047,30 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("controller_discard_damage_each_opponent_level_min") or 0) == 2
             and bool(effect_json.get("class_level3_tutor_any_to_hand_random_discard"))
             and effect_json.get("draw_on_enter") is False
+        )
+
+    if (
+        effect == "free_cast"
+        and scope == "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1"
+    ):
+        return (
+            types == {"INSTANT"}
+            and {
+                "ExileSpellEffect",
+                "InvokeCalamityEffect",
+                "InvokeCalamityReplacementEffect",
+                "OneShotEffect",
+            }.issubset(effect_classes)
+            and not ability_classes
+            and not cost_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("free_cast_from_zones") == ["hand", "graveyard"]
+            and effect_json.get("free_cast_card_types") == ["instant", "sorcery"]
+            and int(effect_json.get("free_cast_max_count") or 0) == 2
+            and int(effect_json.get("free_cast_total_mana_value_max") or 0) == 6
+            and bool(effect_json.get("cast_without_paying_mana_cost"))
+            and bool(effect_json.get("selected_spells_exile_instead_of_graveyard"))
+            and bool(effect_json.get("exiles_self"))
         )
 
     if effect == "direct_damage" and scope == "damage_any_target_and_gain_life_v1":

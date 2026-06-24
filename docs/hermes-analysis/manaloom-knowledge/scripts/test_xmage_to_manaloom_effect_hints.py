@@ -3436,6 +3436,49 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["controller_discard_damage_each_opponent_level_min"], 2)
         self.assertTrue(primary["class_level3_tutor_any_to_hand_random_discard"])
 
+    def test_invoke_calamity_maps_to_exact_free_cast_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "InvokeCalamity",
+                "effect_classes": [
+                    "ExileSpellEffect",
+                    "InvokeCalamityEffect",
+                    "InvokeCalamityReplacementEffect",
+                    "OneShotEffect",
+                ],
+                "ability_classes": [],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "CardUtil.castMultipleWithAttributeForFree(player, source, game, cards, "
+                    "StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY, 2, new InvokeCalamityTracker()); "
+                    "return card.getManaValue() + totalManaValue <= 6; "
+                    "new InvokeCalamityReplacementEffect(card.getId()); "
+                    "this.getSpellAbility().addEffect(new ExileSpellEffect());"
+                ),
+            },
+            (
+                "You may cast up to two instant and/or sorcery spells with total mana value "
+                "6 or less from your graveyard and/or hand without paying their mana costs. "
+                "If those spells would be put into your graveyard, exile them instead. "
+                "Exile Invoke Calamity."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "free_cast")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1",
+        )
+        self.assertEqual(primary["free_cast_from_zones"], ["hand", "graveyard"])
+        self.assertEqual(primary["free_cast_card_types"], ["instant", "sorcery"])
+        self.assertEqual(primary["free_cast_max_count"], 2)
+        self.assertEqual(primary["free_cast_total_mana_value_max"], 6)
+        self.assertTrue(primary["cast_without_paying_mana_cost"])
+        self.assertTrue(primary["selected_spells_exile_instead_of_graveyard"])
+        self.assertTrue(primary["exiles_self"])
+
     def test_lightning_helix_maps_to_exact_damage_any_target_and_lifegain_scope(self) -> None:
         result = hints.build_effect_hints(
             {

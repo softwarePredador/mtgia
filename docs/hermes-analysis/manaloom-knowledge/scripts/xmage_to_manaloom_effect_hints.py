@@ -1506,6 +1506,52 @@ def _build_exact_runtime_variant_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        card_types == {"INSTANT"}
+        and xmage_class_name == "InvokeCalamity"
+        and {
+            "ExileSpellEffect",
+            "InvokeCalamityEffect",
+            "InvokeCalamityReplacementEffect",
+            "OneShotEffect",
+        }.issubset(effect_classes)
+        and not ability_classes
+        and not target_classes
+        and not cost_classes
+        and "castmultiplewithattributeforfree" in normalized
+        and "filter_card_instant_or_sorcery" in normalized
+        and "up to two instant and/or sorcery spells" in normalized
+        and "total mana value 6 or less" in normalized
+        and "from your graveyard and/or hand" in normalized
+        and "without paying their mana costs" in normalized
+        and "exile them instead" in normalized
+        and "new exilespelleffect" in normalized
+    ):
+        return {
+            "effect": "free_cast",
+            "scope": "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1",
+            "fields": {
+                "instant": True,
+                "free_cast_from_zones": ["hand", "graveyard"],
+                "free_cast_card_types": ["instant", "sorcery"],
+                "free_cast_max_count": 2,
+                "free_cast_total_mana_value_max": 6,
+                "cast_without_paying_mana_cost": True,
+                "selected_spells_exile_instead_of_graveyard": True,
+                "exiles_self": True,
+            },
+            "reason": "XMage structure matches Invoke Calamity: cast up to two instant/sorcery cards from hand and/or graveyard for free with combined mana value 6 or less, then exile those spells instead of returning them to graveyard.",
+            "signals": [
+                "InvokeCalamityEffect",
+                "InvokeCalamityTracker",
+                "castMultipleWithAttributeForFree",
+                "FILTER_CARD_INSTANT_OR_SORCERY",
+                "totalManaValue <= 6",
+                "InvokeCalamityReplacementEffect",
+                "ExileSpellEffect",
+            ],
+        }
+
+    if (
         card_types == {"ENCHANTMENT"}
         and xmage_class_name == "CoolButRude"
         and {

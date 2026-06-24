@@ -10796,3 +10796,121 @@ Register decision:
   `Perch Protection` (`runtime_needed`), `Sand Scout` (`runtime_needed`), and
   `Sun Titan` (`split_scope`).
 - Next package number is PG191.
+
+## PG191 - Invoke Calamity free-cast replacement rule
+
+Timestamp: 2026-06-24 19:00 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes one Lorehold/opponent card used by decks `609`, `614`, `615`, and
+  `616`: `Invoke Calamity`.
+- Replaces two stale generated review-only recursion shadows with one verified
+  auto free-cast rule.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Invoke Calamity`:
+  `battle_rule_v1:e03eac4195eedb90d857524236208104`,
+  `oracle_hash=0afc1197bd6fd20cb7ec808ac6594595`,
+  `effect=free_cast`,
+  `battle_model_scope=cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps the exact `InvokeCalamity` source with
+  `InvokeCalamityEffect`, `InvokeCalamityReplacementEffect`,
+  `ExileSpellEffect`, `castMultipleWithAttributeForFree`,
+  `FILTER_CARD_INSTANT_OR_SORCERY`, and Oracle/static text for up to two
+  instant/sorcery cards from hand and/or graveyard with total mana value six or
+  less.
+- Semantic classifier promotes only the exact instant/free-cast source with
+  `free_cast_from_zones=["hand","graveyard"]`,
+  `free_cast_card_types=["instant","sorcery"]`, `free_cast_max_count=2`,
+  `free_cast_total_mana_value_max=6`, `cast_without_paying_mana_cost=true`,
+  `selected_spells_exile_instead_of_graveyard=true`, and `exiles_self=true`.
+- Battle runtime now supports the scoped free-cast pattern through
+  `resolve_invoke_calamity_free_casts`, deterministic candidate selection,
+  zero-cost cast context, normal `spell_cast`/`spell_resolved` ledger events,
+  and replacement exiling for the selected spells.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg191_invoke_calamity_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=3`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3239`.
+- SQLite verification:
+  local `get_card_effect({"name":"Invoke Calamity"})` selects the curated
+  `free_cast` rule with `verified/auto` provenance and
+  `cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1`.
+- Tests:
+  `python3 -m unittest test_xmage_to_manaloom_effect_hints.py test_xmage_semantic_family_batch_pipeline.py`
+  ran `326` tests OK;
+  `python3 test_battle_analyst_v10_3.py` passed, including
+  `test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them`
+  and
+  `test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg191_invoke_calamity_postsync_v1_manifest.json`;
+  expanded scope severity moved to `high=322`, `medium=54`, `pass=333`.
+- Lorehold-focused post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg191_invoke_calamity_postsync_lorehold_v1.json`;
+  scoped rows `395`, `battle_ready=275`,
+  `needs_rule_before_strategy=120`, `mapper_manual=87`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg191_invoke_calamity_postsync_v1.json`;
+  `package_ready_unprepared=0`, `package_already_prepared=0`,
+  `split_scope_backlog=75`, `runtime_family_backlog=24`,
+  `manual_mapper_backlog=260`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg191_invoke_calamity_postsync_v1.json`;
+  `18/18` pass.
+- Affected deck audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck609_battle_rule_coherence_pg191_invoke_calamity_postsync_v1.json`
+  reports deck `609` as `high=20`, `medium=8`, `pass=64`, with
+  `Invoke Calamity` as `pass`;
+  `docs/hermes-analysis/master_optimizer_reports/deck614_battle_rule_coherence_pg191_invoke_calamity_postsync_v1.json`
+  reports deck `614` as `high=23`, `medium=2`, `pass=66`, with
+  `Invoke Calamity` as `pass`;
+  `docs/hermes-analysis/master_optimizer_reports/deck615_battle_rule_coherence_pg191_invoke_calamity_postsync_v1.json`
+  reports deck `615` as `high=19`, `medium=6`, `pass=59`, with
+  `Invoke Calamity` as `pass`;
+  `docs/hermes-analysis/master_optimizer_reports/deck616_battle_rule_coherence_pg191_invoke_calamity_postsync_v1.json`
+  reports deck `616` as `high=39`, `medium=4`, `pass=41`, with
+  `Invoke Calamity` as `pass`.
+
+Register decision:
+
+- PG191 is closed as applied, postchecked, synced, tested, and
+  strategy-audited.
+- Do not reuse PG191.
+- Continue next with remaining Lorehold `needs_rule_before_strategy` cards.
+  Current top items are `Perch Protection` (`runtime_needed`), `Sand Scout`
+  (`runtime_needed`), `Sun Titan` (`split_scope`), and
+  `Glint-Horn Buccaneer` (`split_scope`).
+- Next package number is PG192.

@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg191_invoke_calamity_free_cast_20260624_215739",
+  "deploy_id": "PG191",
+  "family_counts": {
+    "free_cast": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg191_invoke_calamity_free_cast_rollback.sql"
+  },
+  "generated_at": "2026-06-24T21:57:39+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Invoke Calamity"
+  ],
+  "selected_count": 1,
+  "slug": "invoke-calamity-free-cast",
+  "status": "prepared_read_only_pending_apply_approval"
+}

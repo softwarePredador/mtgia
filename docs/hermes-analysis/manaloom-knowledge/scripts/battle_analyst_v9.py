@@ -2313,6 +2313,18 @@ def finish_countered_spell(player, card):
 
 
 def finish_resolved_spell(player, card, turn=None, effect_data=None):
+    if isinstance(card, dict) and card.get("_exile_on_resolution"):
+        reason = card.get("_exile_on_resolution_reason") or "replacement_exile_on_resolution"
+        move_to_exile(player, card, reason=reason, turn=turn)
+        emit_replay_event(
+            "replacement_exiled_on_resolution",
+            player=player.name,
+            card=card.get("name", "?"),
+            replacement_reason=reason,
+            turn=turn,
+            **replay_rule_fields(effect_data or {}),
+        )
+        return
     if is_first_rebound_resolution(card, effect_data):
         if isinstance(card, dict):
             card["_rebound_pending"] = True
@@ -10437,6 +10449,291 @@ def cast_exiled_card_without_paying_mana(
         phase=cast_phase,
     )
     return True, "cast_without_paying_mana"
+
+
+def _remove_card_from_zone(zone, card):
+    if not isinstance(zone, list):
+        return False
+    for index, candidate in enumerate(zone):
+        if candidate is card:
+            del zone[index]
+            return True
+    try:
+        zone.remove(card)
+        return True
+    except ValueError:
+        return False
+
+
+def _invoke_calamity_candidate_zone(player, card):
+    if card in getattr(player, "hand", []) or []:
+        return "hand"
+    if card in getattr(player, "graveyard", []) or []:
+        return "graveyard"
+    return None
+
+
+def invoke_calamity_free_cast_candidates(player, source_card, effect_data):
+    allowed_zones = set(effect_data.get("free_cast_from_zones") or ["hand", "graveyard"])
+    max_total_mana_value = int(effect_data.get("free_cast_total_mana_value_max") or 6)
+    candidates = []
+    for zone_name in ("hand", "graveyard"):
+        if zone_name not in allowed_zones:
+            continue
+        for candidate in list(getattr(player, zone_name, []) or []):
+            if not isinstance(candidate, dict) or candidate is source_card:
+                continue
+            if candidate.get("name") == source_card.get("name"):
+                continue
+            if not is_instant_or_sorcery_spell(candidate):
+                continue
+            mana_value = card_mana_value(candidate)
+            if mana_value > max_total_mana_value:
+                continue
+            candidate_effect = get_card_effect(candidate)
+            if candidate_effect.get("effect") in {"unknown", "land", "counter", "free_cast"}:
+                continue
+            candidates.append(
+                {
+                    "card": candidate,
+                    "zone": zone_name,
+                    "effect_data": candidate_effect,
+                    "mana_value": mana_value,
+                }
+            )
+    return candidates
+
+
+def choose_invoke_calamity_free_casts(player, opponents, source_card, effect_data, turn):
+    max_count = int(effect_data.get("free_cast_max_count") or 2)
+    max_total_mana_value = int(effect_data.get("free_cast_total_mana_value_max") or 6)
+    all_players = [player] + list(opponents or [])
+    candidates = invoke_calamity_free_cast_candidates(player, source_card, effect_data)
+    scored = []
+    for candidate in candidates:
+        card = candidate["card"]
+        candidate_effect = candidate["effect_data"]
+        score = threat_score(
+            candidate_effect.get("effect", "unknown"),
+            card.get("name", "?"),
+            player,
+            all_players,
+            turn,
+        )
+        if candidate_effect.get("effect") in TARGETED_REMOVAL_EFFECTS:
+            targeted_effect, declared = prepare_declared_removal_targets(
+                player,
+                opponents,
+                card,
+                copy.deepcopy(candidate_effect),
+            )
+            if not declared:
+                continue
+            candidate_effect = targeted_effect
+            score += 8
+        elif candidate_effect.get("effect") == "direct_damage":
+            score += int(candidate_effect.get("damage") or 0)
+        elif candidate_effect.get("effect") == "draw_cards":
+            score += 4 * int(candidate_effect.get("count") or 1)
+        scored.append({**candidate, "effect_data": candidate_effect, "score": score})
+
+    best_combo = []
+    best_key = (-1, -1, ())
+    for index, first in enumerate(scored):
+        combos = [[first]]
+        for second in scored[index + 1 :]:
+            combos.append([first, second])
+        for combo in combos:
+            if len(combo) > max_count:
+                continue
+            total_mana_value = sum(int(row["mana_value"] or 0) for row in combo)
+            if total_mana_value > max_total_mana_value:
+                continue
+            total_score = sum(float(row["score"] or 0) for row in combo)
+            names = tuple(sorted(str(row["card"].get("name", "")) for row in combo))
+            key = (total_score, total_mana_value, names)
+            if key > best_key:
+                best_key = key
+                best_combo = combo
+    return best_combo
+
+
+def cast_invoke_calamity_selected_spell(
+    player,
+    opponents,
+    all_players,
+    source_card,
+    selected,
+    turn,
+    rng,
+    *,
+    source_effect_data,
+    stack=None,
+    phase=None,
+    sequence=1,
+):
+    selected_card = selected["card"]
+    source_zone = selected.get("zone") or _invoke_calamity_candidate_zone(player, selected_card)
+    if source_zone not in {"hand", "graveyard"}:
+        return False, "not_in_hand_or_graveyard"
+    selected_effect = copy.deepcopy(selected.get("effect_data") or get_card_effect(selected_card))
+    cast_phase = phase or "resolution"
+    cast_ctx = begin_cast_context(
+        player,
+        selected_card,
+        cast_phase,
+        effect_data=selected_effect,
+        role="invoke_calamity",
+        modes=["cast_without_paying_mana", "invoke_calamity"],
+        alternative_cost="{0}",
+        source_zone=source_zone,
+        alternative_cost_kind="invoke_calamity",
+    )
+    cast_ctx.is_legal = True
+    cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+    store_cast_context_fields(
+        selected_effect,
+        {
+            "phase": cast_phase,
+            **cast_ctx.to_replay_fields(),
+        },
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False, "cast_payment_failed"
+    if source_zone == "graveyard":
+        removed = bool(
+            remove_cards_from_graveyard(
+                player,
+                [selected_card],
+                turn=turn,
+                source_event="invoke_calamity_free_cast",
+            )
+        )
+    else:
+        removed = _remove_card_from_zone(player.hand, selected_card)
+    if not removed:
+        return False, "source_zone_remove_failed"
+    selected_card["_exile_on_resolution"] = True
+    selected_card["_exile_on_resolution_reason"] = "invoke_calamity_replacement"
+    selected_card["_invoke_calamity_cast"] = True
+    selected_effect["_invoke_calamity_cast"] = True
+    emit_replay_event(
+        "invoke_calamity_free_cast",
+        player=player.name,
+        card=source_card.get("name", "?"),
+        cast_card=selected_card.get("name", "?"),
+        cast_effect=selected_effect.get("effect", "unknown"),
+        cast_without_paying_mana_cost=True,
+        selected_source_zone=source_zone,
+        sequence=sequence,
+        selected_mana_value=card_mana_value(selected_card),
+        total_mana_value_limit=source_effect_data.get("free_cast_total_mana_value_max"),
+        turn=turn,
+        phase=cast_phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(source_effect_data),
+    )
+    emit_replay_event(
+        "spell_cast",
+        player=player.name,
+        card=selected_card.get("name", "?"),
+        effect=selected_effect.get("effect", "unknown"),
+        type_line=selected_card.get("type_line", ""),
+        cmc=selected_card.get("cmc", 0),
+        turn=turn,
+        phase=cast_phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(selected_effect),
+    )
+    mark_cast_ledger_emitted(selected_effect)
+    trigger_spell_cast_engines(
+        player,
+        all_players,
+        selected_card,
+        turn,
+        cast_phase,
+        stack=stack,
+        active_player=player,
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        selected_card,
+        turn,
+        cast_phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
+    apply_effect_immediate(
+        player,
+        opponents,
+        selected_card,
+        turn,
+        rng,
+        effect_data_override=selected_effect,
+        stack=stack,
+        phase=cast_phase,
+    )
+    return True, "cast_without_paying_mana"
+
+
+def resolve_invoke_calamity_free_casts(
+    player,
+    opponents,
+    all_players,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    stack=None,
+    phase=None,
+):
+    selected_cards = choose_invoke_calamity_free_casts(player, opponents, card, effect_data, turn)
+    results = []
+    for index, selected in enumerate(selected_cards, start=1):
+        success, result = cast_invoke_calamity_selected_spell(
+            player,
+            opponents,
+            all_players,
+            card,
+            selected,
+            turn,
+            rng,
+            source_effect_data=effect_data,
+            stack=stack,
+            phase=phase,
+            sequence=index,
+        )
+        results.append(
+            {
+                "card": selected["card"].get("name", "?"),
+                "source_zone": selected.get("zone"),
+                "mana_value": selected.get("mana_value"),
+                "success": bool(success),
+                "result": result,
+            }
+        )
+    emit_replay_event(
+        "invoke_calamity_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        selected_count=sum(1 for row in results if row["success"]),
+        selected_total_mana_value=sum(int(row.get("mana_value") or 0) for row in results if row["success"]),
+        selected_cards=results,
+        max_count=effect_data.get("free_cast_max_count"),
+        total_mana_value_limit=effect_data.get("free_cast_total_mana_value_max"),
+        selected_spells_exile_instead_of_graveyard=bool(
+            effect_data.get("selected_spells_exile_instead_of_graveyard")
+        ),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return results
 
 
 def _effect_source_zone(effect_data):
@@ -24357,6 +24654,24 @@ def apply_effect_immediate(
     elif effect == "graveyard_flashback_grant":
         grant_graveyard_flashback_until_eot(player, card, effect_data, turn)
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "free_cast":
+        if (
+            effect_data.get("battle_model_scope")
+            == "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1"
+        ):
+            resolve_invoke_calamity_free_casts(
+                player,
+                opponents,
+                all_players_for_entry,
+                card,
+                effect_data,
+                turn,
+                rng,
+                stack=stack,
+                phase=phase,
+            )
+        else:
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "exile_top_nonland_free_cast":
         resolve_demonstrate_top_nonland_free_cast(
             player,

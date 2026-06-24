@@ -4105,14 +4105,24 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Caldera Pyremaw": {
-    "cmc": 5.0,
-    "effect": "finisher",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:daf1e5ac212a20bdfc37ca53384ade16"
+    "ability_kind": "triggered",
+    "battle_model_scope": "instant_sorcery_cast_add_counter_then_power_damage_target_opponent_v1",
+    "effect": "creature",
+    "flying": true,
+    "power": 3,
+    "target": "opponent",
+    "toughness": 3,
+    "trigger": "instant_sorcery_cast",
+    "trigger_add_plus_one_counter": 1,
+    "trigger_damage_amount_source": "source_power_after_counter",
+    "trigger_effect": "source_counter_then_power_damage",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b5d2301b71ddde9e1d8a44a7b3d3efb",
+    "battle_rule_oracle_hash": "80925ba3ca250947cbae3cf0812df235"
   },
   "Call Forth the Tempest": {
     "battle_model_scope": "cascade_cascade_other_spells_mana_value_opponent_creature_damage_v1",
@@ -5866,15 +5876,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Cool but Rude": {
-    "cmc": 2.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
+    "ability_kind": "triggered",
+    "attack_trigger_optional_discard_draw": true,
+    "battle_model_scope": "cool_but_rude_class_attack_rummage_level_damage_tutor_v1",
+    "class_level3_tutor_any_to_hand_random_discard": true,
+    "class_level_costs": {
+      "2": "{1}{R}",
+      "3": "{1}{R}"
+    },
+    "class_level_start": 1,
+    "controller_discard_damage_each_opponent": 2,
+    "controller_discard_damage_each_opponent_level_min": 2,
+    "draw_on_enter": false,
+    "effect": "draw_engine",
+    "trigger": "controller_discard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5d3a49840003607e0e0174ff2ef46be4",
+    "battle_rule_oracle_hash": "aec5006936a17b54f6fc3dddb2786c82"
   },
   "Copperline Gorge": {
     "effect": "land",
@@ -15351,16 +15373,30 @@
     "battle_rule_logical_key": "battle_rule_v1:b4d4d4d0206647e43ced18286275b69a"
   },
   "Invoke Calamity": {
-    "cmc": 5.0,
-    "count": 1,
-    "effect": "recursion",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1",
+    "cast_without_paying_mana_cost": true,
+    "effect": "free_cast",
+    "exiles_self": true,
+    "free_cast_card_types": [
+      "instant",
+      "sorcery"
+    ],
+    "free_cast_from_zones": [
+      "hand",
+      "graveyard"
+    ],
+    "free_cast_max_count": 2,
+    "free_cast_total_mana_value_max": 6,
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f0503653f112a2e1138ae3a6fbe9f0ce"
+    "selected_spells_exile_instead_of_graveyard": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e03eac4195eedb90d857524236208104",
+    "battle_rule_oracle_hash": "0afc1197bd6fd20cb7ec808ac6594595"
   },
   "Invoke Justice": {
     "ability_kind": "one_shot",
@@ -17091,15 +17127,20 @@
     "battle_rule_oracle_hash": "4a4c71d3cc58637cf00a3d7fe2331353"
   },
   "Lightning Helix": {
-    "cmc": 2.0,
-    "effect": "remove_creature",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "damage_any_target_and_gain_life_v1",
+    "damage": 3,
+    "effect": "direct_damage",
+    "gain_life": 3,
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
+    "target": "any_target",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:87f923455c48b6cb1bb53b4dc6823630",
+    "battle_rule_oracle_hash": "20f51722269781f323d10dbd434f6578"
   },
   "Lightning Rift": {
     "cmc": 2.0,
@@ -22557,15 +22598,22 @@
     "battle_rule_oracle_hash": "606b21e85871f60d1804eaabcd59ac5b"
   },
   "Profound Journey": {
-    "cmc": 7.0,
-    "count": 2,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "return_target_permanent_from_graveyard_to_battlefield_rebound_v1",
+    "count": 1,
+    "destination": "battlefield",
     "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:50d41c84784b1b94a7650a195d12eaf4"
+    "rebound": true,
+    "target": "permanent",
+    "target_controller": "self",
+    "target_zone": "graveyard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3d604bc1b145027e23d76f9c9b5804d1",
+    "battle_rule_oracle_hash": "fd8bfd2a04b8a975ddb20ad80d24230d"
   },
   "Proft's Eidetic Memory": {
     "cmc": 2.0,
@@ -22806,14 +22854,24 @@
     "battle_rule_logical_key": "battle_rule_v1:dbfba32fbd58b0d3483c87f324b21cc9"
   },
   "Pyromancer Ascension": {
-    "cmc": 2.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "pyromancer_ascension_quest_counter_copy_spell_v1",
+    "choose_new_targets_status": "may",
     "effect": "copy_spell",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5587a91620ce662d2bde7280dbca8b12"
+    "may_choose_new_targets": true,
+    "quest_counter_name_match_zone": "graveyard",
+    "quest_counter_on_same_name_in_graveyard": true,
+    "quest_counter_threshold_to_copy": 2,
+    "target": "own_instant_or_sorcery_on_stack",
+    "trigger": "instant_sorcery_cast",
+    "trigger_effect": "pyromancer_ascension",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ebe94a8e6b11cc83126424b87aecca2b",
+    "battle_rule_oracle_hash": "84cc013b799522990904777d7a3e458e"
   },
   "Pyromancer's Goggles": {
     "cmc": 5.0,

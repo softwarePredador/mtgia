@@ -11285,6 +11285,132 @@ def register_tests(battle, player):
             for data in free_creature_resolutions
         )
 
+    def test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.hand = [
+                {"name": "Hand Cantrip", "type_line": "Instant", "cmc": 2, "effect": "draw"},
+            ]
+            active.graveyard = [
+                {"name": "Graveyard Cantrip", "type_line": "Sorcery", "cmc": 3, "effect": "draw"},
+            ]
+            active.library = [
+                {"name": f"Library Card {index}", "type_line": "Sorcery", "cmc": 1}
+                for index in range(6)
+            ]
+            invoke_calamity = {"name": "Invoke Calamity", "type_line": "Instant", "cmc": 5}
+            effect_data = {
+                "effect": "free_cast",
+                "instant": True,
+                "free_cast_from_zones": ["hand", "graveyard"],
+                "free_cast_card_types": ["instant", "sorcery"],
+                "free_cast_max_count": 2,
+                "free_cast_total_mana_value_max": 6,
+                "cast_without_paying_mana_cost": True,
+                "selected_spells_exile_instead_of_graveyard": True,
+                "exiles_self": True,
+                "battle_model_scope": "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1",
+                "_rule_logical_key": "battle_rule_v1:invoke-calamity-test",
+                "_rule_oracle_hash": "invoke-calamity-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            battle.apply_effect_immediate(
+                active,
+                [],
+                invoke_calamity,
+                turn=5,
+                rng=random.Random(191),
+                effect_data_override=effect_data,
+                stack=battle.Stack(),
+                phase="resolution",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        exile_names = [card.get("name") for card in active.exile if isinstance(card, dict)]
+        assert set(exile_names) == {"Hand Cantrip", "Graveyard Cantrip", "Invoke Calamity"}
+        assert active.graveyard == []
+        assert not any(card.get("name") == "Hand Cantrip" for card in active.hand if isinstance(card, dict))
+        resolved = next(data for event, data in events if event == "invoke_calamity_resolved")
+        assert resolved["selected_count"] == 2
+        assert resolved["selected_total_mana_value"] == 5
+        free_cast_events = [data for event, data in events if event == "invoke_calamity_free_cast"]
+        assert len(free_cast_events) == 2
+        assert {data["selected_source_zone"] for data in free_cast_events} == {"hand", "graveyard"}
+        assert all(data["cast_without_paying_mana_cost"] is True for data in free_cast_events)
+        selected_resolutions = [
+            data
+            for event, data in events
+            if event == "spell_resolved"
+            and data.get("card") in {"Hand Cantrip", "Graveyard Cantrip"}
+        ]
+        assert len(selected_resolutions) == 2
+        assert all(
+            data["locked_cost"]["spend_tags"] == ["cast_without_paying_mana_cost"]
+            for data in selected_resolutions
+        )
+        assert any(event == "replacement_exiled_on_resolution" for event, _data in events)
+        assert any(event == "self_exiled_on_resolution" and data.get("card") == "Invoke Calamity" for event, data in events)
+
+    def test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.hand = [
+                {"name": "Cheap Cantrip A", "type_line": "Instant", "cmc": 2, "effect": "draw"},
+                {"name": "Cheap Cantrip B", "type_line": "Instant", "cmc": 2, "effect": "draw"},
+                {"name": "Cheap Cantrip C", "type_line": "Sorcery", "cmc": 2, "effect": "draw"},
+                {"name": "Expensive Cantrip", "type_line": "Instant", "cmc": 7, "effect": "draw"},
+            ]
+            active.library = [
+                {"name": f"Limit Draw {index}", "type_line": "Sorcery", "cmc": 1}
+                for index in range(8)
+            ]
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Invoke Calamity", "type_line": "Instant", "cmc": 5},
+                turn=6,
+                rng=random.Random(192),
+                effect_data_override={
+                    "effect": "free_cast",
+                    "instant": True,
+                    "free_cast_from_zones": ["hand", "graveyard"],
+                    "free_cast_card_types": ["instant", "sorcery"],
+                    "free_cast_max_count": 2,
+                    "free_cast_total_mana_value_max": 6,
+                    "cast_without_paying_mana_cost": True,
+                    "selected_spells_exile_instead_of_graveyard": True,
+                    "exiles_self": True,
+                    "battle_model_scope": "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1",
+                    "_rule_logical_key": "battle_rule_v1:invoke-calamity-limit-test",
+                    "_rule_oracle_hash": "invoke-calamity-limit-test-hash",
+                    "_rule_review_status": "verified",
+                    "_rule_execution_status": "auto",
+                },
+                stack=battle.Stack(),
+                phase="resolution",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        resolved = next(data for event, data in events if event == "invoke_calamity_resolved")
+        assert resolved["selected_count"] == 2
+        assert resolved["selected_total_mana_value"] <= 6
+        selected_names = {
+            row["card"]
+            for row in resolved["selected_cards"]
+            if row["success"]
+        }
+        assert len(selected_names) == 2
+        assert "Expensive Cantrip" not in selected_names
+        assert any(card.get("name") == "Expensive Cantrip" for card in active.hand if isinstance(card, dict))
+        assert len([data for event, data in events if event == "invoke_calamity_free_cast"]) == 2
+
     def test_pg079_flare_of_duplication_keeps_copy_spell_as_stack_targeted_instant():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -13404,6 +13530,8 @@ def register_tests(battle, player):
         test_thrumming_stone_ripples_dragons_approach_without_bonus_damage,
         test_pg079_powerbalance_casts_same_mana_value_top_card_without_paying,
         test_pg102_creative_technique_demonstrates_top_nonland_free_casts,
+        test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them,
+        test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit,
         test_everything_comes_to_dust_oracle_normalizes_to_convoke_exile_wipe,
         test_everything_comes_to_dust_exiles_artifacts_enchantments_and_nonshared_creatures,
         test_fated_clash_oracle_normalizes_to_protect_then_destroy_wipe,
