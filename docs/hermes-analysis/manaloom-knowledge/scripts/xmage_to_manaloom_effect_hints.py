@@ -2181,6 +2181,61 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 )
             )
         elif (
+            card_types == {"CREATURE"}
+            and effect_classes == {"CreateTokenEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and "UntapSourceCost" in cost_classes
+            and (
+                xmage_class_name == "PatrolSignaler"
+                or (
+                    "kithkinsoldiertoken" in normalized_text
+                    and "untapsourcecost" in normalized_text
+                    and "{1}{w}" in normalized_text
+                )
+                or (
+                    set(((index_entry.get("constructor_metadata") or {}).get("subtypes") or []))
+                    == {"KITHKIN", "SOLDIER"}
+                    and "kithkinsoldiertoken" in normalized_text
+                )
+                or (
+                    card_types == {"CREATURE"}
+                    and "kithkinsoldiertoken" in normalized_text
+                    and "untapsourcecost" in normalized_text
+                )
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="creature",
+                    scope="activated_untap_self_create_1_1_white_kithkin_soldier_token_v1",
+                    reason="Oracle and XMage structure match a creature that pays {1}{W} and untaps itself to create a 1/1 white Kithkin Soldier token.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "is_creature_permanent": True,
+                        "power": 1,
+                        "toughness": 1,
+                        "activated_create_token": True,
+                        "activation_requires_source_tapped": True,
+                        "activation_uses_untap_symbol": True,
+                        "activation_cost_generic": 1,
+                        "activation_cost_colors": ["W"],
+                        "token_count": 1,
+                        "token_name": "Kithkin Soldier Token",
+                        "token_subtype": "Kithkin Soldier",
+                        "token_colors": ["W"],
+                        "token_power": 1,
+                        "token_toughness": 1,
+                    },
+                    matched_signals=[
+                        "CreateTokenEffect",
+                        "SimpleActivatedAbility",
+                        "UntapSourceCost",
+                        "kithkin_token_activation",
+                    ],
+                )
+            )
+        elif (
             "treasuretoken" in normalized_text
             and "drawcardsourcecontrollereffect" not in normalized_text
             and card_types == {"SORCERY"}

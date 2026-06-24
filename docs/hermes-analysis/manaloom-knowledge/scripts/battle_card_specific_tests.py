@@ -10470,6 +10470,147 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_patrol_signaler_postcombat_activation_creates_token_and_untaps():
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Lorehold")
+            active.battlefield = [
+                {
+                    "name": "Patrol Signaler",
+                    "cmc": 2,
+                    "type_line": "Creature - Kithkin Soldier",
+                    "effect": "creature",
+                    "power": 1,
+                    "toughness": 1,
+                    "activated_create_token": True,
+                    "activation_requires_source_tapped": True,
+                    "activation_uses_untap_symbol": True,
+                    "activation_cost_generic": 1,
+                    "activation_cost_colors": ["W"],
+                    "token_count": 1,
+                    "token_name": "Kithkin Soldier Token",
+                    "token_subtype": "Kithkin Soldier",
+                    "token_colors": ["W"],
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "summoning_sick": False,
+                    "tapped": True,
+                    "battle_model_scope": "activated_untap_self_create_1_1_white_kithkin_soldier_token_v1",
+                    "_rule_logical_key": "battle_rule_v1:patrolsignaler",
+                    "_rule_oracle_hash": "patrolsignalerhash",
+                },
+                {
+                    "name": "Plains",
+                    "effect": "land",
+                    "type_line": "Basic Land - Plains",
+                    "produces": "W",
+                    "mana_produced": 1,
+                },
+                {
+                    "name": "Mountain",
+                    "effect": "land",
+                    "type_line": "Basic Land - Mountain",
+                    "produces": "R",
+                    "mana_produced": 1,
+                },
+            ]
+            active.refresh_mana_sources(turn=5)
+
+            battle.activate_postcombat_token_creatures(active, [player("Opponent")], turn=5)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        signaler = next(card for card in active.battlefield if isinstance(card, dict) and card.get("name") == "Patrol Signaler")
+        kithkins = [
+            card
+            for card in active.battlefield
+            if isinstance(card, dict) and card.get("name") == "Kithkin Soldier Token"
+        ]
+        assert signaler.get("tapped") is False
+        assert len(kithkins) == 1
+        assert kithkins[0].get("power") == 1
+        assert kithkins[0].get("toughness") == 1
+        assert kithkins[0].get("colors") == ["W"]
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Patrol Signaler"
+            and data.get("activation_kind") == "untap_self_create_token"
+            and data.get("tokens_created") == 1
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_creature_activation"
+            and decision.get("chosen_option", {}).get("action") == "activate_postcombat_token_maker"
+            for decision in decisions
+        )
+
+    def test_patrol_signaler_skips_when_not_tapped_for_untap_activation():
+        events = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.battlefield = [
+                {
+                    "name": "Patrol Signaler",
+                    "cmc": 2,
+                    "type_line": "Creature - Kithkin Soldier",
+                    "effect": "creature",
+                    "power": 1,
+                    "toughness": 1,
+                    "activated_create_token": True,
+                    "activation_requires_source_tapped": True,
+                    "activation_uses_untap_symbol": True,
+                    "activation_cost_generic": 1,
+                    "activation_cost_colors": ["W"],
+                    "token_count": 1,
+                    "token_name": "Kithkin Soldier Token",
+                    "token_subtype": "Kithkin Soldier",
+                    "token_colors": ["W"],
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "summoning_sick": False,
+                    "tapped": False,
+                    "battle_model_scope": "activated_untap_self_create_1_1_white_kithkin_soldier_token_v1",
+                },
+                {
+                    "name": "Plains",
+                    "effect": "land",
+                    "type_line": "Basic Land - Plains",
+                    "produces": "W",
+                    "mana_produced": 1,
+                },
+                {
+                    "name": "Mountain",
+                    "effect": "land",
+                    "type_line": "Basic Land - Mountain",
+                    "produces": "R",
+                    "mana_produced": 1,
+                },
+            ]
+            active.refresh_mana_sources(turn=5)
+
+            battle.activate_postcombat_token_creatures(active, [player("Opponent")], turn=5)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+
+        assert not any(
+            isinstance(card, dict) and card.get("name") == "Kithkin Soldier Token"
+            for card in active.battlefield
+        )
+        assert any(
+            event == "activated_ability_skipped"
+            and data.get("card") == "Patrol Signaler"
+            and data.get("reason") == "source_not_tapped_for_untap_activation"
+            for event, data in events
+        )
+
     def test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache():
         expected_single_rules = {
             "Furygale Flocking": (
@@ -11079,6 +11220,8 @@ def register_tests(battle, player):
         test_pg089_removal_compensation_creature_tokens_are_created_for_target_controller,
         test_pg089_l6_removal_compensation_rules_resolve_from_sqlite_cache,
         test_pg091_token_maker_family_runtime_support,
+        test_patrol_signaler_postcombat_activation_creates_token_and_untaps,
+        test_patrol_signaler_skips_when_not_tapped_for_untap_activation,
         test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache,
         test_pg114_emerias_call_creates_angels_and_protects_non_angels_until_next_turn,
         test_pg114_emerias_call_rule_resolves_from_sqlite_cache,

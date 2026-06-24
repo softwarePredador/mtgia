@@ -299,6 +299,44 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["treasure_count_source"], "x_value")
         self.assertEqual(primary["treasure_count_per_x"], 1)
 
+    def test_patrol_signaler_maps_to_exact_untap_token_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "PatrolSignaler",
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["UntapSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new CreateTokenEffect(new KithkinSoldierToken()); "
+                    "new ManaCostsImpl<>(\"{1}{W}\"); ability.addCost(new UntapSourceCost())"
+                ),
+            },
+            "{1}{W}, {Q}: Create a 1/1 white Kithkin Soldier creature token.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_untap_self_create_1_1_white_kithkin_soldier_token_v1",
+        )
+        self.assertTrue(primary["is_creature_permanent"])
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["activated_create_token"])
+        self.assertTrue(primary["activation_requires_source_tapped"])
+        self.assertTrue(primary["activation_uses_untap_symbol"])
+        self.assertEqual(primary["activation_cost_generic"], 1)
+        self.assertEqual(primary["activation_cost_colors"], ["W"])
+        self.assertEqual(primary["token_count"], 1)
+        self.assertEqual(primary["token_name"], "Kithkin Soldier Token")
+        self.assertEqual(primary["token_subtype"], "Kithkin Soldier")
+        self.assertEqual(primary["token_colors"], ["W"])
+        self.assertEqual(primary["token_power"], 1)
+        self.assertEqual(primary["token_toughness"], 1)
+
     def test_electroduplicate_maps_to_copy_creature_token(self) -> None:
         result = hints.build_effect_hints(
             {

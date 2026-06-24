@@ -17122,6 +17122,144 @@ def activate_land_tutor_creatures(player, turn):
         return
 
 
+def activate_postcombat_token_creatures(player, opponents, turn, *, phase="postcombat_main"):
+    if not player.is_alive() or phase != "postcombat_main":
+        return 0
+
+    activations = 0
+    for permanent in list(player.battlefield):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") != "creature" or not permanent.get("activated_create_token"):
+            continue
+        if permanent.get("summoning_sick"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="token_maker",
+                reason="summoning_sick",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if permanent.get("activation_requires_source_tapped") and not permanent.get("tapped"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="token_maker",
+                reason="source_not_tapped_for_untap_activation",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+
+        activation_colors = list(permanent.get("activation_cost_colors") or [])
+        activation_cost_generic = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(permanent.get("activation_cost_generic") or 0),
+            activation_colors=activation_colors,
+        )
+        activation_cost_text = ""
+        if activation_cost_generic > 0:
+            activation_cost_text += "{%d}" % activation_cost_generic
+        activation_cost_text += "".join("{%s}" % color for color in activation_colors)
+        if not activation_cost_text:
+            activation_cost_text = "{0}"
+        if not player.can_pay(activation_cost_text):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="token_maker",
+                reason="failed_to_pay_activation_cost",
+                activation_cost=activation_cost_text,
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if not player.spend_mana(activation_cost_text):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="token_maker",
+                reason="failed_to_spend_activation_cost",
+                activation_cost=activation_cost_text,
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+
+        if permanent.get("activation_uses_untap_symbol"):
+            permanent["tapped"] = False
+        token_count = create_creature_tokens_from_effect(
+            player,
+            permanent,
+            count=int(permanent.get("token_count") or 1),
+            opponents=opponents,
+        )
+        activations += 1
+        emit_decision_trace(
+            decision_type="utility_creature_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    permanent,
+                    action="activate_postcombat_token_maker",
+                    effect="creature",
+                    score=24,
+                )
+            ],
+            chosen_option=decision_card_option(
+                permanent,
+                action="activate_postcombat_token_maker",
+                effect="creature",
+                score=24,
+            ),
+            score_components={
+                "activation_cost_generic": activation_cost_generic,
+                "activation_cost_colors": activation_colors,
+                "tokens_created": token_count,
+            },
+            rule_source="utility_creature_activation_v1",
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=24,
+            reason="convert_postcombat_tapped_creature_into_persistent_board_presence",
+            strategic_principle="cash_in leftover postcombat mana when the creature can untap into a token",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "mana": -(activation_cost_generic + len(activation_colors)),
+                "tokens": token_count,
+                "untapped_source": permanent.get("name", "?"),
+            },
+            risk_flags=["postcombat_mana_sink", "untap_symbol_activation"],
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            effect="token_maker",
+            activation_kind="untap_self_create_token",
+            activation_cost=activation_cost_text,
+            tokens_created=token_count,
+            token_name=permanent.get("token_name", "Token"),
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+    return activations
+
+
 def resolve_land_recursion_creature(player, card, effect_data, turn):
     permanent = enrich_card({**card, **effect_data})
     permanent["effect"] = "creature"
@@ -24216,6 +24354,12 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         all_players,
         turn,
         rng,
+        phase="postcombat_main",
+    )
+    activate_postcombat_token_creatures(
+        player,
+        opponents,
+        turn,
         phase="postcombat_main",
     )
     activate_utility_lands(player, turn, rng, phase="postcombat_main")

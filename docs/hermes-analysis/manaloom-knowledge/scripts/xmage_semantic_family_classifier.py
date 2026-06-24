@@ -583,6 +583,28 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("encore_cost") == "{3}{R}"
         )
 
+    if effect == "creature" and scope == "activated_untap_self_create_1_1_white_kithkin_soldier_token_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"CreateTokenEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and "UntapSourceCost" in cost_classes
+            and bool(effect_json.get("is_creature_permanent"))
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("activated_create_token"))
+            and bool(effect_json.get("activation_requires_source_tapped"))
+            and bool(effect_json.get("activation_uses_untap_symbol"))
+            and int(effect_json.get("activation_cost_generic") or 0) == 1
+            and effect_json.get("activation_cost_colors") == ["W"]
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_name") == "Kithkin Soldier Token"
+            and effect_json.get("token_subtype") == "Kithkin Soldier"
+            and effect_json.get("token_colors") == ["W"]
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+        )
+
     if effect == "creature" and scope == "etb_copy_target_noncreature_permanent_twice_as_3_3_flying_dragon_v1":
         return (
             types == {"CREATURE"}

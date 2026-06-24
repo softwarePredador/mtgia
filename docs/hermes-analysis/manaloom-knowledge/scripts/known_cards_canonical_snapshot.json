@@ -20936,6 +20936,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:0366bf085185ab68e66e6e0969dd2406"
   },
+  "Patrol Signaler": {
+    "ability_kind": "activated",
+    "activated_create_token": true,
+    "activation_cost_colors": [
+      "W"
+    ],
+    "activation_cost_generic": 1,
+    "activation_requires_source_tapped": true,
+    "activation_uses_untap_symbol": true,
+    "battle_model_scope": "activated_untap_self_create_1_1_white_kithkin_soldier_token_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "power": 1,
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 1,
+    "token_name": "Kithkin Soldier Token",
+    "token_power": 1,
+    "token_subtype": "Kithkin Soldier",
+    "token_toughness": 1,
+    "toughness": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:71fdf492f246cca38306ceeffbc2e3bc",
+    "battle_rule_oracle_hash": "199fbfaa5dc0d7c94211ead7a2e71734"
+  },
   "Patron of the Arts": {
     "cmc": 3.0,
     "effect": "ramp_engine",
