@@ -1054,6 +1054,7 @@ def _build_exact_runtime_variant_fields(
     effect_classes: set[str],
     ability_classes: set[str],
     cost_classes: set[str],
+    xmage_class_name: str,
     rules_text: str,
 ) -> dict[str, Any] | None:
     normalized = _normalized_rules_text(rules_text)
@@ -1299,6 +1300,46 @@ def _build_exact_runtime_variant_fields(
                 "CounterTargetEffect",
                 "DestroyTargetEffect",
                 "blue_spell_or_permanent",
+            ],
+        }
+
+    if (
+        xmage_class_name == "EldraziConfluence"
+        or (
+            card_types == {"INSTANT"}
+            and {"BoostTargetEffect", "CreateTokenEffect", "ExileThenReturnTargetEffect"}.issubset(effect_classes)
+            and "targetcreaturepermanent" in normalized
+            and "targetnonlandpermanent" in normalized
+            and "setminmodes(3)" in normalized
+            and "setmaxmodes(3)" in normalized
+            and "setmaychoosesamemodemorethanonce(true)" in normalized
+            and "eldrazisciontoken" in normalized
+        )
+    ):
+        return {
+            "effect": "modal_spell",
+            "scope": "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1",
+            "fields": {
+                "instant": True,
+                "modal_choose_count": 3,
+                "modal_may_repeat_modes": True,
+                "mode_target_creature_plus_three_minus_three": True,
+                "mode_blink_target_nonland_permanent_tapped": True,
+                "mode_create_eldrazi_scion": True,
+                "token_name": "Eldrazi Scion Token",
+                "token_subtype": "Eldrazi Scion",
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_colors": [],
+                "token_sacrifice_for_colorless_mana": True,
+            },
+            "reason": "XMage structure matches Eldrazi Confluence choosing three repeatable modes between +3/-3, blinking a nonland permanent tapped, and creating a 1/1 colorless Eldrazi Scion token.",
+            "signals": [
+                "BoostTargetEffect",
+                "ExileThenReturnTargetEffect",
+                "CreateTokenEffect",
+                "EldraziScionToken",
+                "repeatable_three_mode_spell",
             ],
         }
 
@@ -1622,6 +1663,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         effect_classes=effect_classes,
         ability_classes=ability_classes,
         cost_classes=cost_classes,
+        xmage_class_name=xmage_class_name,
         rules_text=rules_text,
     )
     if exact_runtime_variant_fields is not None:

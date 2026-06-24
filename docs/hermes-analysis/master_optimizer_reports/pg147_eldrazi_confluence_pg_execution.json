@@ -1,0 +1,44 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "precheck_rows": [
+    {
+      "card_name": "Eldrazi Confluence",
+      "normalized_name": "eldrazi confluence",
+      "oracle_hash": "62340dc75c903ea4f9936ac536cc0a76",
+      "logical_rule_key": "battle_rule_v1:14c689c3a27f3fb564fd4f2741c1be3a",
+      "target_card_rows": 1,
+      "canonical_card_id": "e00e4f09-7ef7-4fbc-980a-92fc8670a48d",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 0,
+      "would_deprecate_shadow_rows": 1
+    }
+  ],
+  "apply_rows": [],
+  "postcheck_rows": [
+    {
+      "card_name": "Eldrazi Confluence",
+      "normalized_name": "eldrazi confluence",
+      "logical_rule_key": "battle_rule_v1:14c689c3a27f3fb564fd4f2741c1be3a",
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1,
+      "promoted_oracle_hash_rows": 1,
+      "backup_rows": 1
+    }
+  ],
+  "current_rows": [
+    {
+      "normalized_name": "eldrazi confluence",
+      "logical_rule_key": "battle_rule_v1:14c689c3a27f3fb564fd4f2741c1be3a",
+      "oracle_hash": "62340dc75c903ea4f9936ac536cc0a76",
+      "review_status": "verified",
+      "execution_status": "auto"
+    },
+    {
+      "normalized_name": "eldrazi confluence",
+      "logical_rule_key": "battle_rule_v1:f6d96db6081c2fd3f48828c7594f4fcf",
+      "oracle_hash": null,
+      "review_status": "deprecated",
+      "execution_status": "disabled"
+    }
+  ]
+}

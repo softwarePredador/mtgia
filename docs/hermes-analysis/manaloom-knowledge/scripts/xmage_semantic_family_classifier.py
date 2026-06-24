@@ -104,6 +104,13 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "implement_family_before_metadata_batch",
     },
+    "modal_spell": {
+        "effects": {"modal_spell"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "exact-scope modal resolution with repeated mode selection when the card allows it",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
     "graveyard_spell_copy_cast": {
         "effects": {"exile_instant_sorcery_boost_combat_damage_copy_cast"},
         "support_status": "runtime_family_required",
@@ -189,6 +196,10 @@ def xmage_effect_classes(card: dict[str, Any]) -> set[str]:
 
 def xmage_cost_classes(card: dict[str, Any]) -> set[str]:
     return {str(value or "") for value in ((card.get("xmage") or {}).get("cost_classes") or []) if value}
+
+
+def xmage_target_classes(card: dict[str, Any]) -> set[str]:
+    return {str(value or "") for value in ((card.get("xmage") or {}).get("target_classes") or []) if value}
 
 
 def family_for_effect(effect: str | None) -> str:
@@ -490,7 +501,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
 
     if effect == "copy_creature_token" and scope == "copy_target_creature_you_control_haste_sacrifice_end_step_v1":
         return (
-            types == {"SORCERY"}
+            "SORCERY" in types
             and "CreateTokenCopyTargetEffect" in effect_classes
             and effect_json.get("copy_target_types") == ["creature"]
             and effect_json.get("target_controller") == "own"
@@ -1087,6 +1098,36 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("counter_target_blue_spell"))
             and bool(effect_json.get("destroy_target_blue_permanent"))
             and bool(effect_json.get("instant"))
+        )
+
+    if effect == "modal_spell" and scope == "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1":
+        return (
+            types == {"INSTANT"}
+            and {
+                "BoostTargetEffect",
+                "CreateTokenEffect",
+                "ExileThenReturnTargetEffect",
+            }.issubset(effect_classes)
+            and (
+                (card.get("xmage") or {}).get("class_name") == "EldraziConfluence"
+                or (
+                    "TargetCreaturePermanent" in xmage_target_classes(card)
+                    and "TargetNonlandPermanent" in xmage_target_classes(card)
+                )
+            )
+            and not ability_classes
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("modal_choose_count") or 0) == 3
+            and bool(effect_json.get("modal_may_repeat_modes"))
+            and bool(effect_json.get("mode_target_creature_plus_three_minus_three"))
+            and bool(effect_json.get("mode_blink_target_nonland_permanent_tapped"))
+            and bool(effect_json.get("mode_create_eldrazi_scion"))
+            and effect_json.get("token_name") == "Eldrazi Scion Token"
+            and effect_json.get("token_subtype") == "Eldrazi Scion"
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+            and effect_json.get("token_colors") == []
+            and bool(effect_json.get("token_sacrifice_for_colorless_mana"))
         )
 
     if effect == "bounce" and scope == "gift_bounce_opponent_creature_or_nonland_v1":

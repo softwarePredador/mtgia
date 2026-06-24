@@ -8450,15 +8450,29 @@
     "battle_rule_logical_key": "battle_rule_v1:6ef4e3fb06fb42f336d38ac6e724ccdd"
   },
   "Eldrazi Confluence": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1",
     "effect": "remove_permanent",
     "instant": true,
+    "modal_choose_count": 3,
+    "modal_may_repeat_modes": true,
+    "mode_blink_target_nonland_permanent_tapped": true,
+    "mode_create_eldrazi_scion": true,
+    "mode_target_creature_plus_three_minus_three": true,
+    "token_colors": [],
+    "token_name": "Eldrazi Scion Token",
+    "token_power": 1,
+    "token_sacrifice_for_colorless_mana": true,
+    "token_subtype": "Eldrazi Scion",
+    "token_toughness": 1,
     "target": "nonland_permanent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f6d96db6081c2fd3f48828c7594f4fcf"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:14c689c3a27f3fb564fd4f2741c1be3a",
+    "battle_rule_oracle_hash": "62340dc75c903ea4f9936ac536cc0a76"
   },
   "Eldrazi Conscription": {
     "cmc": 8.0,
@@ -15772,6 +15786,24 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8150b442466da53a812627c24f820e4d"
+  },
+  "Kindle the Inner Flame": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "copy_target_creature_you_control_haste_sacrifice_end_step_v1",
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_creature_token",
+    "sacrifice_token_at_end_step": true,
+    "target_controller": "own",
+    "token_haste": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9848e8b1ad7b2614ad42014b999a2f24",
+    "battle_rule_oracle_hash": "b4cf1d743f674aafb6cc8f81303f28ce"
   },
   "Kindred Discovery": {
     "cmc": 5.0,

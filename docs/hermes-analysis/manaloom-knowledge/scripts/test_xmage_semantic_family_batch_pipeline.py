@@ -359,6 +359,47 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "copy_creature_token")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_kindred_sorcery_copy_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Kindle the Inner Flame",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "KindleTheInnerFlame",
+                            "path": "/xmage/KindleTheInnerFlame.java",
+                            "types": ["KINDRED", "SORCERY"],
+                            "effect_classes": ["CreateTokenCopyTargetEffect", "SacrificeSourceEffect"],
+                            "ability_classes": [
+                                "BeginningOfEndStepTriggeredAbility",
+                                "FlashbackAbility",
+                                "HasteAbility",
+                            ],
+                            "primary_effect": {
+                                "effect": "copy_creature_token",
+                                "battle_model_scope": "copy_target_creature_you_control_haste_sacrifice_end_step_v1",
+                                "ability_kind": "triggered",
+                                "copy_target_types": ["creature"],
+                                "target_controller": "own",
+                                "token_haste": True,
+                                "sacrifice_token_at_end_step": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_creature_token")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_copy_target_permanent_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -2929,6 +2970,108 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "mode_search_creature_or_land_reveal_put_land_battlefield_tapped_else_hand": True,
                                 "mode_put_plus_one_counter_on_controlled_creature_then_fight": True,
                                 "mode_exile_target_artifact_or_enchantment": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_eldrazi_confluence_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Eldrazi Confluence",
+                        "severity": "high",
+                        "oracle_hash": "eldraziconfluencehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "EldraziConfluence",
+                            "path": "/xmage/EldraziConfluence.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "BoostTargetEffect",
+                                "CreateTokenEffect",
+                                "ExileTargetEffect",
+                                "ExileThenReturnTargetEffect",
+                                "PhaseOutTargetEffect",
+                                "ProliferateEffect",
+                            ],
+                            "ability_classes": [],
+                            "target_classes": ["TargetCreaturePermanent", "TargetNonlandPermanent"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "modal_spell",
+                                "battle_model_scope": "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1",
+                                "instant": True,
+                                "modal_choose_count": 3,
+                                "modal_may_repeat_modes": True,
+                                "mode_target_creature_plus_three_minus_three": True,
+                                "mode_blink_target_nonland_permanent_tapped": True,
+                                "mode_create_eldrazi_scion": True,
+                                "token_name": "Eldrazi Scion Token",
+                                "token_subtype": "Eldrazi Scion",
+                                "token_power": 1,
+                                "token_toughness": 1,
+                                "token_colors": [],
+                                "token_sacrifice_for_colorless_mana": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "modal_spell")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_eldrazi_confluence_batch_safe_without_target_classes_in_validity_stage(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Eldrazi Confluence",
+                        "severity": "high",
+                        "oracle_hash": "eldraziconfluencehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "EldraziConfluence",
+                            "path": "/xmage/EldraziConfluence.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "BoostTargetEffect",
+                                "CreateTokenEffect",
+                                "ExileTargetEffect",
+                                "ExileThenReturnTargetEffect",
+                                "PhaseOutTargetEffect",
+                                "ProliferateEffect",
+                            ],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "modal_spell",
+                                "battle_model_scope": "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1",
+                                "instant": True,
+                                "modal_choose_count": 3,
+                                "modal_may_repeat_modes": True,
+                                "mode_target_creature_plus_three_minus_three": True,
+                                "mode_blink_target_nonland_permanent_tapped": True,
+                                "mode_create_eldrazi_scion": True,
+                                "token_name": "Eldrazi Scion Token",
+                                "token_subtype": "Eldrazi Scion",
+                                "token_power": 1,
+                                "token_toughness": 1,
+                                "token_colors": [],
+                                "token_sacrifice_for_colorless_mana": True,
                             },
                         },
                     }

@@ -8338,6 +8338,181 @@ def resolve_generic_permanent_etb(player, opponents, permanent, effect_data, tur
         resolve_etb_copy_tokens(player, opponents, permanent, effect_data, turn)
 
 
+def _eldrazi_confluence_pump_target(opponents, legal_target_ids=None):
+    candidates = []
+    for opponent in opponents or []:
+        if not opponent.is_alive():
+            continue
+        for permanent in getattr(opponent, "battlefield", []) or []:
+            if not is_battlefield_creature(permanent):
+                continue
+            if legal_target_ids is not None and id(permanent) not in legal_target_ids:
+                continue
+            remaining_toughness = int(permanent.get("toughness") or 0) - 3
+            kill_bonus = 100 if remaining_toughness <= 0 else 0
+            score = (kill_bonus, *target_priority(permanent))
+            candidates.append((score, opponent, permanent))
+    if not candidates:
+        return None, None, None
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    return candidates[0]
+
+
+def _eldrazi_confluence_blink_target(player, all_players, used_target_ids, legal_target_ids=None):
+    candidates = []
+    for participant in all_players or []:
+        if participant is None or not getattr(participant, "is_alive", lambda: True)():
+            continue
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
+                continue
+            if id(permanent) in used_target_ids:
+                continue
+            if legal_target_ids is not None and id(permanent) not in legal_target_ids:
+                continue
+            type_line = str(permanent.get("type_line") or "").lower()
+            if "land" in type_line:
+                continue
+            if participant is player:
+                score = 40 + max(0, _harnessed_blink_target_score(permanent))
+            else:
+                score = 15 + int(permanent.get("cmc") or 0) * 3
+                if is_battlefield_creature(permanent):
+                    score += int(permanent.get("power") or 0) + int(permanent.get("toughness") or 0)
+                if permanent.get("effect") in {"draw_engine", "ramp_engine", "passive", "creature"}:
+                    score += 8
+            if score <= 20:
+                continue
+            candidates.append((score, participant, permanent))
+    if not candidates:
+        return None, None, None
+    candidates.sort(key=lambda item: (-item[0], item[2].get("name", "?")))
+    return candidates[0]
+
+
+def resolve_eldrazi_confluence(player, opponents, card, effect_data, turn, rng, *, all_players):
+    selected_modes = []
+    blink_target_ids = set()
+    mode_count = max(1, int(effect_data.get("modal_choose_count") or 3))
+    legal_pump_target_ids = {
+        id(permanent)
+        for opponent in opponents or []
+        if opponent is not None and getattr(opponent, "is_alive", lambda: True)()
+        for permanent in getattr(opponent, "battlefield", []) or []
+        if is_battlefield_creature(permanent)
+    }
+    legal_blink_target_ids = {
+        id(permanent)
+        for participant in all_players or []
+        if participant is not None and getattr(participant, "is_alive", lambda: True)()
+        for permanent in getattr(participant, "battlefield", []) or []
+        if isinstance(permanent, dict)
+        and "land" not in str(permanent.get("type_line") or "").lower()
+    }
+
+    for _ in range(mode_count):
+        scored_modes = []
+        pump_score, pump_controller, pump_target = _eldrazi_confluence_pump_target(
+            opponents,
+            legal_pump_target_ids,
+        )
+        if pump_target is not None:
+            scored_modes.append(("pump", pump_score, pump_controller, pump_target))
+        blink_score, blink_controller, blink_target = _eldrazi_confluence_blink_target(
+            player,
+            all_players,
+            blink_target_ids,
+            legal_blink_target_ids,
+        )
+        if blink_target is not None:
+            scored_modes.append(("blink", (blink_score,), blink_controller, blink_target))
+        scored_modes.append(("scion", (20,), player, None))
+        scored_modes.sort(key=lambda item: item[1], reverse=True)
+        mode_name, _score, controller, target = scored_modes[0]
+
+        if mode_name == "pump" and target is not None:
+            remember_until_eot(target, "power")
+            remember_until_eot(target, "toughness")
+            target["power"] = int(target.get("power") or 0) + 3
+            target["toughness"] = int(target.get("toughness") or 0) - 3
+            selected_modes.append(
+                {
+                    "mode": "target_creature_plus_three_minus_three",
+                    "target_player": getattr(controller, "name", "?"),
+                    "target": target.get("name", "?"),
+                    "target_score": list(target_priority(target)),
+                }
+            )
+            check_sbas_until_stable(all_players)
+            continue
+
+        if mode_name == "blink" and target is not None:
+            blink_target_ids.add(id(target))
+            if target in controller.battlefield:
+                controller.battlefield.remove(target)
+            target_effect = get_card_effect(target)
+            reentry_payload = {**target_effect, **target, "enters_tapped": True}
+            for transient_key in (
+                "tapped",
+                "summoning_sick",
+                "utility_artifact_used_this_turn",
+                "utility_land_used_this_turn",
+                "discard_modal_modes_used_this_turn",
+            ):
+                reentry_payload.pop(transient_key, None)
+            returned = prepare_entering_permanent(
+                enrich_card(reentry_payload),
+                controller=controller,
+                all_players=all_players,
+                turn=turn,
+            )
+            controller.battlefield.append(returned)
+            resolve_generic_permanent_etb(
+                controller,
+                [participant for participant in all_players if participant is not controller],
+                returned,
+                reentry_payload,
+                turn,
+                rng,
+            )
+            selected_modes.append(
+                {
+                    "mode": "blink_target_nonland_permanent_tapped",
+                    "target_player": getattr(controller, "name", "?"),
+                    "target": target.get("name", "?"),
+                    "returned_tapped": True,
+                }
+            )
+            continue
+
+        scion = create_creature_token(
+            player,
+            name=effect_data.get("token_name", "Eldrazi Scion Token"),
+            power=int(effect_data.get("token_power") or 1),
+            toughness=int(effect_data.get("token_toughness") or 1),
+            subtype=effect_data.get("token_subtype", "Eldrazi Scion"),
+            colors=list(effect_data.get("token_colors") or []),
+        )
+        scion["sacrifice_for_colorless_mana"] = bool(effect_data.get("token_sacrifice_for_colorless_mana"))
+        selected_modes.append(
+            {
+                "mode": "create_eldrazi_scion",
+                "created": scion.get("name", "?"),
+            }
+        )
+
+    emit_replay_event(
+        "modal_spell_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        selected_modes=selected_modes,
+        mode_count=len(selected_modes),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
 def _harnessed_blink_target_score(permanent):
     if not isinstance(permanent, dict):
         return -999
@@ -16483,6 +16658,13 @@ def create_creature_tokens_from_effect(player, effect_data, *, count=None, oppon
     return token_count
 
 
+def battlefield_controller_for_permanent(permanent, participants):
+    for participant in participants or []:
+        if permanent in (getattr(participant, "battlefield", []) or []):
+            return participant
+    return None
+
+
 def permanent_is_opponent_enter_tapped_subject(permanent):
     if not isinstance(permanent, dict):
         return False
@@ -20940,6 +21122,19 @@ def apply_effect_immediate(
         )
     elif effect == "land_recursion_creature":
         resolve_land_recursion_creature(player, card, effect_data, turn)
+    elif effect == "modal_spell":
+        if effect_data.get("battle_model_scope") == "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1":
+            resolve_eldrazi_confluence(
+                player,
+                opponents,
+                card,
+                effect_data,
+                turn,
+                rng,
+                all_players=all_players_for_entry,
+            )
+            return
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "draw_cards":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)

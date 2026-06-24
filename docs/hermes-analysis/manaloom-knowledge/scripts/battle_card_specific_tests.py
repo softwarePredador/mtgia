@@ -10611,6 +10611,143 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_eldrazi_confluence_creates_three_scions_when_no_other_modes_are_live():
+        events = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Eldrazi Confluence", "type_line": "Instant", "cmc": 4},
+                turn=8,
+                rng=random.Random(1461),
+                effect_data_override={
+                    "effect": "modal_spell",
+                    "instant": True,
+                    "modal_choose_count": 3,
+                    "modal_may_repeat_modes": True,
+                    "mode_target_creature_plus_three_minus_three": True,
+                    "mode_blink_target_nonland_permanent_tapped": True,
+                    "mode_create_eldrazi_scion": True,
+                    "token_name": "Eldrazi Scion Token",
+                    "token_subtype": "Eldrazi Scion",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_colors": [],
+                    "token_sacrifice_for_colorless_mana": True,
+                    "battle_model_scope": "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1",
+                    "_rule_logical_key": "battle_rule_v1:eldrazi_confluence",
+                    "_rule_oracle_hash": "eldrazi_confluence_hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+
+        scions = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Eldrazi Scion Token"
+        ]
+        assert len(scions) == 3
+        assert all(permanent.get("sacrifice_for_colorless_mana") is True for permanent in scions)
+        resolved = next(
+            data
+            for event, data in events
+            if event == "modal_spell_resolved" and data.get("card") == "Eldrazi Confluence"
+        )
+        assert [entry.get("mode") for entry in resolved.get("selected_modes", [])] == [
+            "create_eldrazi_scion",
+            "create_eldrazi_scion",
+            "create_eldrazi_scion",
+        ]
+
+    def test_eldrazi_confluence_uses_pump_then_blink_then_scion_when_context_exists():
+        events = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.library = [{"name": "Blink Draw", "type_line": "Instant", "cmc": 1}]
+            wall = {
+                "name": "Wall of Omens",
+                "cmc": 2,
+                "effect": "creature",
+                "type_line": "Creature - Wall",
+                "power": 0,
+                "toughness": 4,
+                "etb_draw_count": 1,
+            }
+            active.battlefield = [wall]
+            opponent = player("Opponent")
+            opponent.battlefield = [
+                {
+                    "name": "Opp Threat",
+                    "cmc": 3,
+                    "effect": "creature",
+                    "type_line": "Creature - Beast",
+                    "power": 3,
+                    "toughness": 3,
+                }
+            ]
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Eldrazi Confluence", "type_line": "Instant", "cmc": 4},
+                turn=8,
+                rng=random.Random(1462),
+                effect_data_override={
+                    "effect": "modal_spell",
+                    "instant": True,
+                    "modal_choose_count": 3,
+                    "modal_may_repeat_modes": True,
+                    "mode_target_creature_plus_three_minus_three": True,
+                    "mode_blink_target_nonland_permanent_tapped": True,
+                    "mode_create_eldrazi_scion": True,
+                    "token_name": "Eldrazi Scion Token",
+                    "token_subtype": "Eldrazi Scion",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_colors": [],
+                    "token_sacrifice_for_colorless_mana": True,
+                    "battle_model_scope": "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1",
+                    "_rule_logical_key": "battle_rule_v1:eldrazi_confluence",
+                    "_rule_oracle_hash": "eldrazi_confluence_hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+
+        assert not any(
+            isinstance(permanent, dict) and permanent.get("name") == "Opp Threat"
+            for permanent in opponent.battlefield
+        )
+        wall_after = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Wall of Omens"
+        )
+        scions = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Eldrazi Scion Token"
+        ]
+        assert wall_after.get("tapped") is True
+        assert [card.get("name") for card in active.hand] == ["Blink Draw"]
+        assert len(scions) == 1
+        resolved = next(
+            data
+            for event, data in events
+            if event == "modal_spell_resolved" and data.get("card") == "Eldrazi Confluence"
+        )
+        assert [entry.get("mode") for entry in resolved.get("selected_modes", [])] == [
+            "target_creature_plus_three_minus_three",
+            "blink_target_nonland_permanent_tapped",
+            "create_eldrazi_scion",
+        ]
+
     def test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache():
         expected_single_rules = {
             "Furygale Flocking": (
@@ -11222,6 +11359,8 @@ def register_tests(battle, player):
         test_pg091_token_maker_family_runtime_support,
         test_patrol_signaler_postcombat_activation_creates_token_and_untaps,
         test_patrol_signaler_skips_when_not_tapped_for_untap_activation,
+        test_eldrazi_confluence_creates_three_scions_when_no_other_modes_are_live,
+        test_eldrazi_confluence_uses_pump_then_blink_then_scion_when_context_exists,
         test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache,
         test_pg114_emerias_call_creates_angels_and_protects_non_angels_until_next_turn,
         test_pg114_emerias_call_rule_resolves_from_sqlite_cache,

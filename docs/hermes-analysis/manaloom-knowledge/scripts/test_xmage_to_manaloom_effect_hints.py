@@ -1876,6 +1876,50 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["mode_put_plus_one_counter_on_controlled_creature_then_fight"])
         self.assertTrue(primary["mode_exile_target_artifact_or_enchantment"])
 
+    def test_eldrazi_confluence_maps_to_exact_repeatable_three_mode_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "EldraziConfluence",
+                "effect_classes": [
+                    "BoostTargetEffect",
+                    "CreateTokenEffect",
+                    "ExileTargetEffect",
+                    "ExileThenReturnTargetEffect",
+                    "PhaseOutTargetEffect",
+                    "ProliferateEffect",
+                ],
+                "target_classes": ["TargetCreaturePermanent", "TargetNonlandPermanent"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().getModes().setMinModes(3); "
+                    "this.getSpellAbility().getModes().setMaxModes(3); "
+                    "this.getSpellAbility().getModes().setMayChooseSameModeMoreThanOnce(true); "
+                    "this.getSpellAbility().addEffect(new BoostTargetEffect(3, -3)); "
+                    "this.getSpellAbility().addMode(new Mode(new ExileThenReturnTargetEffect(false, false, PutCards.BATTLEFIELD_TAPPED)).addTarget(new TargetNonlandPermanent())); "
+                    "this.getSpellAbility().addMode(new Mode(new CreateTokenEffect(new EldraziScionToken())));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "modal_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["modal_choose_count"], 3)
+        self.assertTrue(primary["modal_may_repeat_modes"])
+        self.assertTrue(primary["mode_target_creature_plus_three_minus_three"])
+        self.assertTrue(primary["mode_blink_target_nonland_permanent_tapped"])
+        self.assertTrue(primary["mode_create_eldrazi_scion"])
+        self.assertEqual(primary["token_name"], "Eldrazi Scion Token")
+        self.assertEqual(primary["token_subtype"], "Eldrazi Scion")
+        self.assertEqual(primary["token_power"], 1)
+        self.assertEqual(primary["token_toughness"], 1)
+        self.assertEqual(primary["token_colors"], [])
+        self.assertTrue(primary["token_sacrifice_for_colorless_mana"])
+
     def test_ruthless_technomancer_maps_to_exact_treasure_and_reanimate_scope(self) -> None:
         result = hints.build_effect_hints(
             {
