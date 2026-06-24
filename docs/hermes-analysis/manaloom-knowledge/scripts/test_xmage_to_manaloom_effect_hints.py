@@ -1169,6 +1169,114 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["destroy_target_blue_permanent"])
         self.assertTrue(primary["instant"])
 
+    def test_into_the_flood_maw_maps_to_exact_gift_bounce_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["ReturnToHandTargetEffect"],
+                "ability_classes": ["GiftAbility"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "bounce")
+        self.assertEqual(primary["battle_model_scope"], "gift_bounce_opponent_creature_or_nonland_v1")
+        self.assertTrue(primary["instant"])
+        self.assertTrue(primary["gift_tapped_fish"])
+        self.assertEqual(primary["target"], "opponent_creature")
+        self.assertEqual(primary["gift_promised_target"], "opponent_nonland_permanent")
+
+    def test_snap_maps_to_exact_bounce_and_untap_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["ReturnToHandTargetEffect", "UntapLandsEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "bounce")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_target_creature_then_untap_up_to_two_lands_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "creature")
+        self.assertEqual(primary["untap_lands_count"], 2)
+
+    def test_manamorphose_maps_to_exact_mana_then_draw_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddManaInAnyCombinationEffect", "DrawCardSourceControllerEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "draw_cards")
+        self.assertEqual(primary["battle_model_scope"], "add_two_mana_any_combination_then_draw_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["count"], 1)
+        self.assertEqual(primary["add_mana_any_combination"], 2)
+
+    def test_tinder_wall_maps_to_exact_defender_sacrifice_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DamageTargetEffect"],
+                "ability_classes": ["DefenderAbility", "SimpleActivatedAbility", "SimpleManaAbility"],
+                "cost_classes": ["SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "defender_sacrifice_for_rr_or_blocking_damage_v1")
+        self.assertEqual(primary["power"], 0)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertTrue(primary["defender"])
+        self.assertEqual(primary["sacrifice_for_red_mana"], 2)
+        self.assertEqual(primary["red_sacrifice_damage_blocking_creature"], 2)
+
+    def test_walking_ballista_maps_to_exact_counter_ping_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "AddCountersSourceEffect",
+                    "DamageTargetEffect",
+                    "EntersBattlefieldWithXCountersEffect",
+                ],
+                "ability_classes": ["EntersBattlefieldAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["GenericManaCost", "RemoveCountersSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT", "CREATURE"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "x_etb_counters_add_counter_or_remove_counter_ping_v1")
+        self.assertEqual(primary["power"], 0)
+        self.assertEqual(primary["toughness"], 0)
+        self.assertTrue(primary["enters_with_x_plus_one_counters"])
+        self.assertEqual(primary["activated_generic_four_add_plus_one_counter"], 1)
+        self.assertEqual(primary["activated_remove_plus_one_counter_damage_any_target"], 1)
+
+    def test_everflowing_chalice_maps_to_exact_multikicker_charge_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersSourceEffect"],
+                "ability_classes": ["DynamicManaAbility", "EntersBattlefieldAbility", "MultikickerAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "artifact")
+        self.assertEqual(primary["battle_model_scope"], "multikicker_charge_counter_mana_rock_v1")
+        self.assertEqual(primary["multikicker_cost"], "{2}")
+        self.assertTrue(primary["etb_charge_counters_per_kick"])
+        self.assertTrue(primary["tap_add_colorless_per_charge_counter"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -863,6 +863,56 @@ def _build_creature_variant_fields(
             ],
         }
 
+    if (
+        card_types == {"CREATURE"}
+        and effect_classes == {"DamageTargetEffect"}
+        and {"DefenderAbility", "SimpleActivatedAbility", "SimpleManaAbility"}.issubset(ability_classes)
+        and "SacrificeSourceCost" in cost_classes
+    ):
+        return {
+            "effect": "creature",
+            "scope": "defender_sacrifice_for_rr_or_blocking_damage_v1",
+            "fields": {
+                "power": 0,
+                "toughness": 3,
+                "defender": True,
+                "sacrifice_for_red_mana": 2,
+                "red_sacrifice_damage_blocking_creature": 2,
+            },
+            "reason": "XMage structure matches Tinder Wall's defender body, sacrifice-for-{R}{R} mana ability, and red plus sacrifice damage mode against a creature it is blocking.",
+            "signals": [
+                "DefenderAbility",
+                "SimpleManaAbility",
+                "DamageTargetEffect",
+                "BlockingOrBlockedBySourcePredicate",
+            ],
+        }
+
+    if (
+        card_types == {"ARTIFACT", "CREATURE"}
+        and {"AddCountersSourceEffect", "DamageTargetEffect", "EntersBattlefieldWithXCountersEffect"}.issubset(effect_classes)
+        and {"EntersBattlefieldAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+        and {"GenericManaCost", "RemoveCountersSourceCost"}.issubset(cost_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "x_etb_counters_add_counter_or_remove_counter_ping_v1",
+            "fields": {
+                "power": 0,
+                "toughness": 0,
+                "enters_with_x_plus_one_counters": True,
+                "activated_generic_four_add_plus_one_counter": 1,
+                "activated_remove_plus_one_counter_damage_any_target": 1,
+            },
+            "reason": "XMage structure matches Walking Ballista entering with X +1/+1 counters, adding counters for {4}, and removing a counter to ping any target.",
+            "signals": [
+                "EntersBattlefieldWithXCountersEffect",
+                "AddCountersSourceEffect",
+                "RemoveCountersSourceCost",
+                "DamageTargetEffect",
+            ],
+        }
+
     return None
 
 
@@ -1004,6 +1054,91 @@ def _build_exact_runtime_variant_fields(
                 "CounterTargetEffect",
                 "DestroyTargetEffect",
                 "blue_spell_or_permanent",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
+        and effect_classes == {"ReturnToHandTargetEffect"}
+        and ability_classes == {"GiftAbility"}
+    ):
+        return {
+            "effect": "bounce",
+            "scope": "gift_bounce_opponent_creature_or_nonland_v1",
+            "fields": {
+                "instant": True,
+                "gift_tapped_fish": True,
+                "target": "opponent_creature",
+                "gift_promised_target": "opponent_nonland_permanent",
+            },
+            "reason": "XMage structure matches Into the Flood Maw bouncing an opposing creature by default or an opposing nonland permanent if the tapped Fish gift was promised.",
+            "signals": [
+                "GiftAbility",
+                "ReturnToHandTargetEffect",
+                "TargetOpponentsCreaturePermanent",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
+        and effect_classes == {"ReturnToHandTargetEffect", "UntapLandsEffect"}
+        and not ability_classes
+    ):
+        return {
+            "effect": "bounce",
+            "scope": "return_target_creature_then_untap_up_to_two_lands_v1",
+            "fields": {
+                "instant": True,
+                "target": "creature",
+                "untap_lands_count": 2,
+            },
+            "reason": "XMage structure matches Snap returning a target creature and untapping up to two lands.",
+            "signals": [
+                "ReturnToHandTargetEffect",
+                "UntapLandsEffect",
+                "TargetCreaturePermanent",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
+        and {"AddManaInAnyCombinationEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+        and not ability_classes
+    ):
+        return {
+            "effect": "draw_cards",
+            "scope": "add_two_mana_any_combination_then_draw_v1",
+            "fields": {
+                "count": 1,
+                "instant": True,
+                "add_mana_any_combination": 2,
+            },
+            "reason": "XMage structure matches Manamorphose adding two mana in any combination of colors and then drawing a card.",
+            "signals": [
+                "AddManaInAnyCombinationEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+        }
+
+    if (
+        card_types == {"ARTIFACT"}
+        and effect_classes == {"AddCountersSourceEffect"}
+        and {"DynamicManaAbility", "EntersBattlefieldAbility", "MultikickerAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "artifact",
+            "scope": "multikicker_charge_counter_mana_rock_v1",
+            "fields": {
+                "multikicker_cost": "{2}",
+                "etb_charge_counters_per_kick": True,
+                "tap_add_colorless_per_charge_counter": True,
+            },
+            "reason": "XMage structure matches Everflowing Chalice multikicker, charge counters per kick, and tap-for-colorless-per-charge-counter mana production.",
+            "signals": [
+                "MultikickerAbility",
+                "EntersBattlefieldAbility",
+                "DynamicManaAbility",
+                "AddCountersSourceEffect",
             ],
         }
 

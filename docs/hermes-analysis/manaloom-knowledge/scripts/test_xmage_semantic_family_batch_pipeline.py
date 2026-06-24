@@ -1635,6 +1635,219 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(proposal["effect_json"]["mana_produced"], 2)
         self.assertEqual(proposal["effect_json"]["draw_on_self_sacrifice"], 2)
 
+    def test_classifier_marks_into_the_flood_maw_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Into the Flood Maw",
+                        "severity": "high",
+                        "oracle_hash": "floodhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "IntoTheFloodMaw",
+                            "path": "/xmage/IntoTheFloodMaw.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["ReturnToHandTargetEffect"],
+                            "ability_classes": ["GiftAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "bounce",
+                                "battle_model_scope": "gift_bounce_opponent_creature_or_nonland_v1",
+                                "instant": True,
+                                "gift_tapped_fish": True,
+                                "target": "opponent_creature",
+                                "gift_promised_target": "opponent_nonland_permanent",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_snap_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Snap",
+                        "severity": "high",
+                        "oracle_hash": "snaphash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Snap",
+                            "path": "/xmage/Snap.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["ReturnToHandTargetEffect", "UntapLandsEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "bounce",
+                                "battle_model_scope": "return_target_creature_then_untap_up_to_two_lands_v1",
+                                "instant": True,
+                                "target": "creature",
+                                "untap_lands_count": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_manamorphose_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Manamorphose",
+                        "severity": "high",
+                        "oracle_hash": "manahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Manamorphose",
+                            "path": "/xmage/Manamorphose.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["AddManaInAnyCombinationEffect", "DrawCardSourceControllerEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "draw_cards",
+                                "battle_model_scope": "add_two_mana_any_combination_then_draw_v1",
+                                "count": 1,
+                                "instant": True,
+                                "add_mana_any_combination": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_tinder_wall_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Tinder Wall",
+                        "severity": "high",
+                        "oracle_hash": "tinderhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TinderWall",
+                            "path": "/xmage/TinderWall.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DamageTargetEffect"],
+                            "ability_classes": ["DefenderAbility", "SimpleActivatedAbility", "SimpleManaAbility"],
+                            "cost_classes": ["SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "defender_sacrifice_for_rr_or_blocking_damage_v1",
+                                "power": 0,
+                                "toughness": 3,
+                                "defender": True,
+                                "sacrifice_for_red_mana": 2,
+                                "red_sacrifice_damage_blocking_creature": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_walking_ballista_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Walking Ballista",
+                        "severity": "high",
+                        "oracle_hash": "ballistahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "WalkingBallista",
+                            "path": "/xmage/WalkingBallista.java",
+                            "types": ["ARTIFACT", "CREATURE"],
+                            "effect_classes": [
+                                "AddCountersSourceEffect",
+                                "DamageTargetEffect",
+                                "EntersBattlefieldWithXCountersEffect",
+                            ],
+                            "ability_classes": ["EntersBattlefieldAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["GenericManaCost", "RemoveCountersSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "x_etb_counters_add_counter_or_remove_counter_ping_v1",
+                                "power": 0,
+                                "toughness": 0,
+                                "enters_with_x_plus_one_counters": True,
+                                "activated_generic_four_add_plus_one_counter": 1,
+                                "activated_remove_plus_one_counter_damage_any_target": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_everflowing_chalice_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Everflowing Chalice",
+                        "severity": "high",
+                        "oracle_hash": "chalicehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "EverflowingChalice",
+                            "path": "/xmage/EverflowingChalice.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["AddCountersSourceEffect"],
+                            "ability_classes": ["DynamicManaAbility", "EntersBattlefieldAbility", "MultikickerAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "artifact",
+                                "battle_model_scope": "multikicker_charge_counter_mana_rock_v1",
+                                "multikicker_cost": "{2}",
+                                "etb_charge_counters_per_kick": True,
+                                "tap_add_colorless_per_charge_counter": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
 
 if __name__ == "__main__":
     unittest.main()

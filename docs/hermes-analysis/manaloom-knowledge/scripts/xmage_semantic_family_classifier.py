@@ -599,6 +599,32 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("green_tap_exile_creature_from_graveyard_gain_life") or 0) == 2
         )
 
+    if effect == "creature" and scope == "defender_sacrifice_for_rr_or_blocking_damage_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"DamageTargetEffect"}
+            and {"DefenderAbility", "SimpleActivatedAbility", "SimpleManaAbility"}.issubset(ability_classes)
+            and "SacrificeSourceCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 0
+            and int(effect_json.get("toughness") or 0) == 3
+            and bool(effect_json.get("defender"))
+            and int(effect_json.get("sacrifice_for_red_mana") or 0) == 2
+            and int(effect_json.get("red_sacrifice_damage_blocking_creature") or 0) == 2
+        )
+
+    if effect == "creature" and scope == "x_etb_counters_add_counter_or_remove_counter_ping_v1":
+        return (
+            types == {"ARTIFACT", "CREATURE"}
+            and {"AddCountersSourceEffect", "DamageTargetEffect", "EntersBattlefieldWithXCountersEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"GenericManaCost", "RemoveCountersSourceCost"}.issubset(xmage_cost_classes(card))
+            and int(effect_json.get("power") or 0) == 0
+            and int(effect_json.get("toughness") or 0) == 0
+            and bool(effect_json.get("enters_with_x_plus_one_counters"))
+            and int(effect_json.get("activated_generic_four_add_plus_one_counter") or 0) == 1
+            and int(effect_json.get("activated_remove_plus_one_counter_damage_any_target") or 0) == 1
+        )
+
     if effect == "draw_cards" and scope == "draw_one_and_source_controller_spells_gain_flash_until_eot_v1":
         return (
             types == {"INSTANT"}
@@ -606,6 +632,16 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("count") or 0) == 1
             and bool(effect_json.get("instant"))
             and bool(effect_json.get("source_controller_spells_have_flash_until_eot"))
+        )
+
+    if effect == "draw_cards" and scope == "add_two_mana_any_combination_then_draw_v1":
+        return (
+            types == {"INSTANT"}
+            and {"AddManaInAnyCombinationEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and not ability_classes
+            and int(effect_json.get("count") or 0) == 1
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("add_mana_any_combination") or 0) == 2
         )
 
     if effect == "direct_damage" and scope == "activated_sacrifice_creature_deal_one_any_target_v1":
@@ -640,6 +676,16 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("activated_generic_one_tap_sacrifice_draw") or 0) == 1
         )
 
+    if effect == "artifact" and scope == "multikicker_charge_counter_mana_rock_v1":
+        return (
+            types == {"ARTIFACT"}
+            and effect_classes == {"AddCountersSourceEffect"}
+            and {"DynamicManaAbility", "EntersBattlefieldAbility", "MultikickerAbility"}.issubset(ability_classes)
+            and effect_json.get("multikicker_cost") == "{2}"
+            and bool(effect_json.get("etb_charge_counters_per_kick"))
+            and bool(effect_json.get("tap_add_colorless_per_charge_counter"))
+        )
+
     if effect == "planeswalker" and scope == "opponents_sorcery_speed_only_plus1_sorcery_flash_minus3_bounce_draw_v1":
         return (
             types == {"PLANESWALKER"}
@@ -670,6 +716,27 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("counter_target_blue_spell"))
             and bool(effect_json.get("destroy_target_blue_permanent"))
             and bool(effect_json.get("instant"))
+        )
+
+    if effect == "bounce" and scope == "gift_bounce_opponent_creature_or_nonland_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"ReturnToHandTargetEffect"}
+            and ability_classes == {"GiftAbility"}
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("gift_tapped_fish"))
+            and effect_json.get("target") == "opponent_creature"
+            and effect_json.get("gift_promised_target") == "opponent_nonland_permanent"
+        )
+
+    if effect == "bounce" and scope == "return_target_creature_then_untap_up_to_two_lands_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"ReturnToHandTargetEffect", "UntapLandsEffect"}
+            and not ability_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "creature"
+            and int(effect_json.get("untap_lands_count") or 0) == 2
         )
 
     return False

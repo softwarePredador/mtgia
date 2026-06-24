@@ -9247,17 +9247,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Everflowing Chalice": {
-    "battle_model_scope": "multikicker_charge_mana_artifact_v1",
-    "cmc": 0.0,
-    "effect": "ramp_permanent",
-    "min_kicker_count_for_mana": 1,
-    "multikicker_generic_cost": 2,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "multikicker_charge_counter_mana_rock_v1",
+    "effect": "artifact",
+    "etb_charge_counters_per_kick": true,
+    "multikicker_cost": "{2}",
+    "tap_add_colorless_per_charge_counter": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:67f848a7a9f40c7337ec0c13e0c1de7c"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b1b7f5c96002524c469ae4efa7f7bf71",
+    "battle_rule_oracle_hash": "2916ac287962232283ac7b1dbe684b7d"
   },
   "Everglades": {
     "effect": "land",
@@ -14745,19 +14747,24 @@
     "battle_rule_logical_key": "battle_rule_v1:0be5c810a7dfffc0c756577871b07374"
   },
   "Into the Flood Maw": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "gift_bounce_opponent_creature_or_nonland_v1",
     "effect": "remove_creature",
+    "gift_promised_target": "opponent_nonland_permanent",
+    "gift_tapped_fish": true,
     "instant": true,
     "target": "creature",
-    "_rule_oracle_normalized_effect_from": "remove_permanent",
+    "_rule_oracle_normalized_effect_from": "bounce",
     "_rule_oracle_normalized_effect_to": "remove_creature",
-    "_rule_oracle_normalized_target_from": "nonland",
+    "_rule_oracle_normalized_target_from": "opponent_creature",
     "_rule_oracle_normalized_target_to": "creature",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f6d96db6081c2fd3f48828c7594f4fcf"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cab6dca71d1d5e86c85ef5f8089f1648",
+    "battle_rule_oracle_hash": "933b432b00f3ba798aa68a96ae301199"
   },
   "Into the Time Vortex": {
     "cmc": 5.0,
@@ -17491,16 +17498,19 @@
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
   },
   "Manamorphose": {
-    "draw_count": 1,
-    "effect": "treasure_maker",
+    "ability_kind": "one_shot",
+    "add_mana_any_combination": 2,
+    "battle_model_scope": "add_two_mana_any_combination_then_draw_v1",
+    "count": 1,
+    "effect": "draw_cards",
     "instant": true,
-    "treasure_count": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0a516c943d34868170c663d2006b273d"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:92f71fffeac9247368bb3fa7518ba19c",
+    "battle_rule_oracle_hash": "b503154ebcc4ece0544e5b2aa6c9c63c"
   },
   "Mangara, the Diplomat": {
     "cmc": 4.0,
@@ -26519,15 +26529,21 @@
     "battle_rule_logical_key": "battle_rule_v1:8d046af1537edde0d6707bd4d927f321"
   },
   "Snap": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "return_target_creature_then_untap_up_to_two_lands_v1",
     "effect": "remove_creature",
     "instant": true,
     "target": "creature",
+    "untap_lands_count": 2,
+    "_rule_oracle_normalized_effect_from": "bounce",
+    "_rule_oracle_normalized_effect_to": "remove_creature",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:abcfd8a217652da7900e0b2e59338ac4"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:98961b0f9243bcc73308c30365ad835c",
+    "battle_rule_oracle_hash": "2b6f112205366b8884ae4af9cb129827"
   },
   "Snapback": {
     "ability_kind": "one_shot",
@@ -30740,19 +30756,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Tinder Wall": {
+    "ability_kind": "activated",
+    "battle_model_scope": "defender_sacrifice_for_rr_or_blocking_damage_v1",
+    "defender": true,
     "effect": "creature",
-    "is_creature_permanent": true,
-    "is_mana_source": true,
-    "mana_produced": 2,
     "power": 0,
-    "produces": "R",
+    "red_sacrifice_damage_blocking_creature": 2,
+    "sacrifice_for_red_mana": 2,
     "toughness": 3,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:421737070a5ac42f8e5f0bcd689a1754"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:af96afc668607664ff18de6e8c51a1b0",
+    "battle_rule_oracle_hash": "e604ec678cf1ef5437418b9a5f1f3888"
   },
   "Tireless Provisioner": {
     "cmc": 3.0,
@@ -33132,17 +33150,21 @@
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
   },
   "Walking Ballista": {
-    "activated_damage": true,
+    "ability_kind": "activated",
+    "activated_generic_four_add_plus_one_counter": 1,
+    "activated_remove_plus_one_counter_damage_any_target": 1,
+    "battle_model_scope": "x_etb_counters_add_counter_or_remove_counter_ping_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
-    "power": 1,
-    "toughness": 1,
+    "enters_with_x_plus_one_counters": true,
+    "power": 0,
+    "toughness": 0,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b58d72c0c85377310f27aa73a28c36d8"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cc7e65cfa812dc06a42f853773180ca1",
+    "battle_rule_oracle_hash": "fe0669ba2732ea2399168950556378ec"
   },
   "Wall of Blossoms": {
     "cmc": 2.0,
