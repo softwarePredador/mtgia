@@ -1630,6 +1630,55 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "passive")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_magda_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Magda, Brazen Outlaw",
+                        "severity": "high",
+                        "oracle_hash": "magdahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "MagdaBrazenOutlaw",
+                            "path": "/xmage/MagdaBrazenOutlaw.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "BoostControlledEffect",
+                                "CreateTokenEffect",
+                                "SearchLibraryPutInPlayEffect",
+                            ],
+                            "ability_classes": [
+                                "BecomesTappedTriggeredAbility",
+                                "SimpleActivatedAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "cost_classes": ["SacrificeTargetCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "magda_dwarf_tap_treasure_and_five_treasure_tutor_v1",
+                                "power": 2,
+                                "toughness": 1,
+                                "other_dwarves_you_control_get_plus_one_power": True,
+                                "controlled_dwarf_becomes_tapped_creates_treasure": True,
+                                "activated_sacrifice_five_treasures_tutor_artifact_or_dragon": True,
+                                "activated_treasure_tutor_cost": 5,
+                                "activated_treasure_tutor_destination": "battlefield",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "creature")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_colossal_skyturtle_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -2535,6 +2584,41 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "toughness": 1,
                                 "cant_block": True,
                                 "activation_cost": "sacrifice_creature",
+                                "self_add_plus_one_counter": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_bartolome_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Bartolomé del Presidio",
+                        "severity": "high",
+                        "oracle_hash": "bartolomehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "BartolomeDelPresidio",
+                            "path": "/xmage/BartolomeDelPresidio.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["AddCountersSourceEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["SacrificeTargetCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "sacrifice_another_creature_or_artifact_put_plus_one_counter_on_self_v1",
+                                "power": 2,
+                                "toughness": 1,
+                                "activation_cost": "sacrifice_creature_or_artifact",
                                 "self_add_plus_one_counter": 1,
                             },
                         },

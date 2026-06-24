@@ -874,6 +874,38 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["etb_plus_one_counter_targets"], 2)
         self.assertTrue(primary["countered_creatures_tap_for_mana"])
 
+    def test_bartolome_maps_to_exact_self_counter_sacrifice_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersSourceEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "public BartolomeDelPresidio(UUID ownerId, CardSetInfo setInfo) { "
+                    "super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, \"{W}{B}\"); "
+                    "this.power = new MageInt(2); this.toughness = new MageInt(1); "
+                    "this.addAbility(new SimpleActivatedAbility("
+                    "new AddCountersSourceEffect(CounterType.P1P1.createInstance()), "
+                    "new SacrificeTargetCost(StaticFilters.FILTER_CONTROLLED_ANOTHER_CREATURE_OR_ARTIFACT)"
+                    ")); }"
+                ),
+            },
+            "Sacrifice another creature or artifact: Put a +1/+1 counter on Bartolomé del Presidio.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "sacrifice_another_creature_or_artifact_put_plus_one_counter_on_self_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertEqual(primary["activation_cost"], "sacrifice_creature_or_artifact")
+        self.assertEqual(primary["self_add_plus_one_counter"], 1)
+
     def test_insidious_roots_maps_to_exact_passive_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -917,6 +949,50 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["token_power"], 0)
         self.assertEqual(primary["token_toughness"], 1)
         self.assertEqual(primary["token_colors"], ["G"])
+
+    def test_magda_maps_to_exact_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "BoostControlledEffect",
+                    "CreateTokenEffect",
+                    "SearchLibraryPutInPlayEffect",
+                ],
+                "ability_classes": [
+                    "BecomesTappedTriggeredAbility",
+                    "SimpleActivatedAbility",
+                    "SimpleStaticAbility",
+                ],
+                "cost_classes": ["SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect(1, 0, Duration.WhileOnBattlefield, filter, true))); "
+                    "this.addAbility(new BecomesTappedTriggeredAbility(new CreateTokenEffect(new TreasureToken()), false, filter2)); "
+                    "this.addAbility(new SimpleActivatedAbility(new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(filter3), false, true), "
+                    "new SacrificeTargetCost(5, filter4)));"
+                ),
+            },
+            (
+                "Other Dwarves you control get +1/+0. "
+                "Whenever a Dwarf you control becomes tapped, create a Treasure token. "
+                "Sacrifice five Treasures: Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle your library."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "magda_dwarf_tap_treasure_and_five_treasure_tutor_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["other_dwarves_you_control_get_plus_one_power"])
+        self.assertTrue(primary["controlled_dwarf_becomes_tapped_creates_treasure"])
+        self.assertTrue(primary["activated_sacrifice_five_treasures_tutor_artifact_or_dragon"])
+        self.assertEqual(primary["activated_treasure_tutor_cost"], 5)
+        self.assertEqual(primary["activated_treasure_tutor_destination"], "battlefield")
 
     def test_an_offer_you_cant_refuse_maps_to_exact_counter_treasure_scope(self) -> None:
         result = hints.build_effect_hints(

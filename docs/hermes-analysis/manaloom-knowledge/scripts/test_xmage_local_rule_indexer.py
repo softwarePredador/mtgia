@@ -29,6 +29,7 @@ public final class PearlMedallion extends CardImpl {
 
     public PearlMedallion(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{2}");
+        String rulesText = "White spells you cast cost {1} less to cast.";
         this.addAbility(new SimpleStaticAbility(new SpellsCostReductionControllerEffect(filter, 1)));
     }
 }
@@ -102,6 +103,48 @@ public final class TheMindStone extends CardImpl {
 }
 """
 
+MOUNTAIN_JAVA = """
+package mage.cards.basiclands;
+
+import mage.abilities.mana.RedManaAbility;
+import mage.cards.CardSetInfo;
+
+import java.util.UUID;
+
+public class Mountain extends BasicLand {
+    public Mountain(UUID ownerId, CardSetInfo setInfo) {
+        super(ownerId, setInfo, new RedManaAbility());
+    }
+}
+"""
+
+BARTOLOME_DEL_PRESIDIO_JAVA = """
+package mage.cards.b;
+
+import mage.MageInt;
+import mage.abilities.common.SimpleActivatedAbility;
+import mage.abilities.costs.common.SacrificeTargetCost;
+import mage.abilities.effects.common.counter.AddCountersSourceEffect;
+import mage.cards.CardImpl;
+import mage.cards.CardSetInfo;
+import mage.constants.CardType;
+import mage.counters.CounterType;
+
+import java.util.UUID;
+
+public final class BartolomeDelPresidio extends CardImpl {
+    public BartolomeDelPresidio(UUID ownerId, CardSetInfo setInfo) {
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{W}{B}");
+        this.power = new MageInt(2);
+        this.toughness = new MageInt(1);
+        this.addAbility(new SimpleActivatedAbility(
+                new AddCountersSourceEffect(CounterType.P1P1.createInstance()),
+                new SacrificeTargetCost(StaticFilters.FILTER_CONTROLLED_ANOTHER_CREATURE_OR_ARTIFACT)
+        ));
+    }
+}
+"""
+
 
 class XMageLocalRuleIndexerTests(unittest.TestCase):
     def _fixture_root(self) -> Path:
@@ -115,15 +158,25 @@ class XMageLocalRuleIndexerTests(unittest.TestCase):
         e_bucket = root / "Mage.Sets" / "src" / "mage" / "cards" / "e"
         e_bucket.mkdir(parents=True)
         (e_bucket / "EmeriasCall.java").write_text(EMERIAS_CALL_JAVA, encoding="utf-8")
+        b_bucket = root / "Mage.Sets" / "src" / "mage" / "cards" / "b"
+        b_bucket.mkdir(parents=True)
+        (b_bucket / "BartolomeDelPresidio.java").write_text(BARTOLOME_DEL_PRESIDIO_JAVA, encoding="utf-8")
         t_bucket = root / "Mage.Sets" / "src" / "mage" / "cards" / "t"
         t_bucket.mkdir(parents=True)
         (t_bucket / "TheMindStone.java").write_text(THE_MIND_STONE_JAVA, encoding="utf-8")
+        basic_bucket = root / "Mage" / "src" / "main" / "java" / "mage" / "cards" / "basiclands"
+        basic_bucket.mkdir(parents=True)
+        (basic_bucket / "Mountain.java").write_text(MOUNTAIN_JAVA, encoding="utf-8")
         return root
 
     def test_class_candidates_strip_punctuation_and_use_first_face(self) -> None:
         self.assertEqual(
             indexer.xmage_class_candidates("Emeria's Call // Emeria, Shattered Skyclave")[0],
             "EmeriasCall",
+        )
+        self.assertEqual(
+            indexer.xmage_class_candidates("Bartolomé del Presidio")[0],
+            "BartolomeDelPresidio",
         )
 
     def test_parse_local_cost_reducer_reference(self) -> None:
@@ -142,6 +195,23 @@ class XMageLocalRuleIndexerTests(unittest.TestCase):
             entry["candidate_effect_hints"]["primary_candidate"]["effect_json"]["effect"],
             "static_cost_reduction",
         )
+
+    def test_resolves_basic_land_from_core_mage_tree(self) -> None:
+        root = self._fixture_root()
+        entry = indexer.build_index_for_card("Mountain", xmage_root=root)
+
+        self.assertEqual(entry["status"], "found")
+        self.assertEqual(entry["xmage_class_name"], "Mountain")
+        self.assertIn("/Mage/src/main/java/mage/cards/basiclands/Mountain.java", entry["xmage_path"])
+        self.assertEqual(entry["constructor_metadata"]["card_types"], ["LAND"])
+        self.assertEqual(entry["constructor_metadata"]["subtypes"], ["MOUNTAIN"])
+
+    def test_resolves_accented_card_name_to_ascii_java_class(self) -> None:
+        root = self._fixture_root()
+        entry = indexer.build_index_for_card("Bartolomé del Presidio", xmage_root=root)
+
+        self.assertEqual(entry["status"], "found")
+        self.assertEqual(entry["xmage_class_name"], "BartolomeDelPresidio")
 
     def test_parse_modal_double_faced_constructor_metadata(self) -> None:
         root = self._fixture_root()

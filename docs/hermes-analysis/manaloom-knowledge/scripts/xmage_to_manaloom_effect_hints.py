@@ -505,6 +505,27 @@ def _build_source_add_counters_creature_fields(
 
     normalized = _normalized_rules_text(rules_text)
 
+    if (
+        "addcounterssourceeffect(countertype.p1p1.createinstance())" in normalized
+        and "sacrificetargetcost(staticfilters.filter_controlled_another_creature_or_artifact)" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "sacrifice_another_creature_or_artifact_put_plus_one_counter_on_self_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 1,
+                "activation_cost": "sacrifice_creature_or_artifact",
+                "self_add_plus_one_counter": 1,
+            },
+            "reason": "XMage structure matches Bartolome del Presidio sacrificing another creature or artifact to put a +1/+1 counter on itself.",
+            "signals": [
+                "AddCountersSourceEffect",
+                "SacrificeTargetCost",
+                "FILTER_CONTROLLED_ANOTHER_CREATURE_OR_ARTIFACT",
+            ],
+        }
+
     if "cantblockability" in normalized and "sacrificetargetcost" in normalized:
         return {
             "effect": "creature",
@@ -1502,6 +1523,76 @@ def _build_rishkar_fields(
     }
 
 
+def _build_magda_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"CREATURE"}:
+        return None
+    if not {
+        "BoostControlledEffect",
+        "CreateTokenEffect",
+        "SearchLibraryPutInPlayEffect",
+    }.issubset(effect_classes):
+        return None
+    if not {
+        "BecomesTappedTriggeredAbility",
+        "SimpleActivatedAbility",
+        "SimpleStaticAbility",
+    }.issubset(ability_classes):
+        return None
+    if "SacrificeTargetCost" not in cost_classes:
+        return None
+    normalized_text = _normalized_rules_text(rules_text)
+    if not (
+        _oracle_has(
+            rules_text,
+            "other dwarves you control get +1/+0",
+            "whenever a dwarf you control becomes tapped, create a treasure token",
+            "sacrifice five treasures",
+            "search your library for an artifact or dragon card",
+            "put that card onto the battlefield",
+        )
+        or (
+            "becomestappedtriggeredability" in normalized_text
+            and "treasuretoken" in normalized_text
+            and "searchlibraryputinplayeffect" in normalized_text
+            and "subtype.dwarf" in normalized_text
+            and "subtype.treasure" in normalized_text
+            and "subtype.dragon" in normalized_text
+        )
+    ):
+        return None
+    return {
+        "effect": "creature",
+        "scope": "magda_dwarf_tap_treasure_and_five_treasure_tutor_v1",
+        "fields": {
+            "power": 2,
+            "toughness": 1,
+            "other_dwarves_you_control_get_plus_one_power": True,
+            "controlled_dwarf_becomes_tapped_creates_treasure": True,
+            "activated_sacrifice_five_treasures_tutor_artifact_or_dragon": True,
+            "activated_treasure_tutor_cost": 5,
+            "activated_treasure_tutor_destination": "battlefield",
+        },
+        "reason": (
+            "XMage structure matches Magda's Dwarf lord text, the tapped-Dwarf Treasure trigger, "
+            "and the five-Treasures activated tutor for an artifact or Dragon onto the battlefield."
+        ),
+        "signals": [
+            "BoostControlledEffect",
+            "BecomesTappedTriggeredAbility",
+            "CreateTokenEffect",
+            "SearchLibraryPutInPlayEffect",
+            "SacrificeTargetCost",
+        ],
+    }
+
+
 def _build_insidious_roots_fields(
     *,
     card_types: set[str],
@@ -1771,6 +1862,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(rishkar_fields["fields"]),
                 matched_signals=list(rishkar_fields["signals"]),
+            )
+        )
+
+    magda_fields = _build_magda_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if magda_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(magda_fields["effect"]),
+                scope=str(magda_fields["scope"]),
+                reason=str(magda_fields["reason"]),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(magda_fields["fields"]),
+                matched_signals=list(magda_fields["signals"]),
             )
         )
 

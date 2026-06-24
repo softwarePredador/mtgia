@@ -10136,6 +10136,235 @@ def register_tests(battle, player):
             and data.get("trigger") == "creature_cards_leave_graveyard"
         ]
 
+    def test_pg151_magda_tapped_dwarf_creates_treasure():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            magda = {
+                "name": "Magda, Brazen Outlaw",
+                "cmc": 2,
+                "type_line": "Legendary Creature — Dwarf Berserker",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 1,
+                "other_dwarves_you_control_get_plus_one_power": True,
+                "controlled_dwarf_becomes_tapped_creates_treasure": True,
+                "activated_sacrifice_five_treasures_tutor_artifact_or_dragon": True,
+                "activated_treasure_tutor_cost": 5,
+                "activated_treasure_tutor_destination": "battlefield",
+                "summoning_sick": True,
+                "tapped": False,
+                "_rule_logical_key": "battle_rule_v1:magda-test",
+                "_rule_oracle_hash": "magda-test-hash",
+            }
+            other_dwarf = {
+                "name": "Axgard Cavalry",
+                "cmc": 2,
+                "type_line": "Creature — Dwarf Berserker",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "summoning_sick": False,
+                "tapped": False,
+            }
+            active.battlefield = [magda, other_dwarf]
+
+            battle.combat_phase_v8(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=4,
+                rng=random.Random(9153),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.treasures == 1
+        assert other_dwarf.get("tapped") is True
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Magda, Brazen Outlaw"
+            and data.get("trigger") == "controlled_dwarf_tapped"
+            and data.get("tapped_permanent") == "Axgard Cavalry"
+            and data.get("treasures_created") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:magda-test"
+            for event, data in events
+        )
+
+    def test_pg152_bartolome_normalizes_to_exact_scope():
+        effect_data = battle.normalize_effect_by_oracle(
+            {
+                "name": "Bartolomé del Presidio",
+                "cmc": 2,
+                "type_line": "Legendary Creature — Vampire Knight",
+                "oracle_text": "Sacrifice another creature or artifact: Put a +1/+1 counter on Bartolomé del Presidio.",
+            },
+            battle.with_rule_metadata(
+                {
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 1,
+                    "activation_cost": "sacrifice_creature_or_artifact",
+                    "self_add_plus_one_counter": 1,
+                    "battle_model_scope": "sacrifice_another_creature_or_artifact_put_plus_one_counter_on_self_v1",
+                },
+                source="test_curated_rule",
+                review_status="verified",
+                confidence=1.0,
+            ),
+        )
+
+        assert effect_data["effect"] == "creature"
+        assert (
+            effect_data["battle_model_scope"]
+            == "sacrifice_another_creature_or_artifact_put_plus_one_counter_on_self_v1"
+        )
+        assert effect_data["activation_cost"] == "sacrifice_creature_or_artifact"
+        assert effect_data["self_add_plus_one_counter"] == 1
+
+    def test_pg152_bartolome_sacrifices_treasure_and_grows_precombat():
+        events = []
+        decisions = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            bartolome = {
+                "name": "Bartolomé del Presidio",
+                "cmc": 2,
+                "type_line": "Legendary Creature — Vampire Knight",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 1,
+                "activation_cost": "sacrifice_creature_or_artifact",
+                "self_add_plus_one_counter": 1,
+                "summoning_sick": False,
+                "_rule_logical_key": "battle_rule_v1:bartolome-test",
+                "_rule_oracle_hash": "bartolome-test-hash",
+            }
+            treasure = {
+                "name": "Treasure",
+                "cmc": 0,
+                "type_line": "Artifact Token — Treasure",
+                "effect": "ramp_permanent",
+                "is_token": True,
+                "tag": "token",
+                "is_mana_source": True,
+            }
+            active.battlefield = [bartolome, treasure]
+
+            activations = battle.activate_self_counter_sacrifice_outlets(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=5,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+            battle.DECISION_TRACE_HANDLER = None
+
+        assert activations == 1
+        assert bartolome["power"] == 3
+        assert bartolome["toughness"] == 2
+        assert bartolome["plus_one_counters"] == 1
+        assert not any(
+            permanent for permanent in active.battlefield if permanent.get("name") == "Treasure"
+        )
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Bartolomé del Presidio"
+            and data.get("activation_kind") == "self_counter_growth"
+            and data.get("sacrificed") == "Treasure"
+            and data.get("plus_one_counters_added") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:bartolome-test"
+            for event, data in events
+        )
+        assert any(trace.get("decision_type") == "activated_self_counter_growth" for trace in decisions)
+
+    def test_pg151_magda_sacrifices_five_treasures_to_tutor_valid_target():
+        events = []
+        decisions = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            active.treasures = 5
+            magda = {
+                "name": "Magda, Brazen Outlaw",
+                "cmc": 2,
+                "type_line": "Legendary Creature — Dwarf Berserker",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 1,
+                "other_dwarves_you_control_get_plus_one_power": True,
+                "controlled_dwarf_becomes_tapped_creates_treasure": True,
+                "activated_sacrifice_five_treasures_tutor_artifact_or_dragon": True,
+                "activated_treasure_tutor_cost": 5,
+                "activated_treasure_tutor_destination": "battlefield",
+                "summoning_sick": False,
+                "tapped": False,
+                "_rule_logical_key": "battle_rule_v1:magda-test",
+                "_rule_oracle_hash": "magda-test-hash",
+            }
+            active.battlefield = [magda]
+            active.library = [
+                {
+                    "name": "Goldspan Dragon",
+                    "cmc": 5,
+                    "type_line": "Creature — Dragon",
+                    "effect": "finisher",
+                    "power": 4,
+                    "toughness": 4,
+                },
+                {
+                    "name": "Cleanup Spell",
+                    "cmc": 2,
+                    "type_line": "Sorcery",
+                    "effect": "draw_cards",
+                },
+            ]
+
+            activations = battle.activate_treasure_tutor_creatures(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=6,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+            battle.DECISION_TRACE_HANDLER = None
+
+        assert activations == 1
+        assert active.treasures == 0
+        assert any(
+            isinstance(permanent, dict)
+            and permanent.get("name") == "Goldspan Dragon"
+            for permanent in active.battlefield
+        )
+        assert not any(card.get("name") == "Goldspan Dragon" for card in active.library)
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Magda, Brazen Outlaw"
+            and data.get("activation_kind") == "sacrifice_five_treasures_tutor_artifact_or_dragon"
+            and data.get("found") == "Goldspan Dragon"
+            and data.get("treasures_spent") == 5
+            and data.get("destination") == "battlefield"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_creature_activation"
+            and decision.get("chosen_option", {}).get("card") == "Goldspan Dragon"
+            and decision.get("rule_status") == "needs_review"
+            for decision in decisions
+        )
+
     def test_pg081_redirect_lightning_redirects_single_target_stack_object():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -11500,6 +11729,10 @@ def register_tests(battle, player):
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,
         test_pg150_insidious_roots_creature_recursion_creates_buffed_plant_and_unlocks_token_mana,
         test_pg150_insidious_roots_ignores_noncreature_flashback_from_graveyard,
+        test_pg152_bartolome_normalizes_to_exact_scope,
+        test_pg152_bartolome_sacrifices_treasure_and_grows_precombat,
+        test_pg151_magda_tapped_dwarf_creates_treasure,
+        test_pg151_magda_sacrifices_five_treasures_to_tutor_valid_target,
         test_pg081_redirect_lightning_redirects_single_target_stack_object,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,

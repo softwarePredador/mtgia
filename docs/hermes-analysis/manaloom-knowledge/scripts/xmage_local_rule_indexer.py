@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -40,6 +41,11 @@ def first_face_name(card_name: str) -> str:
 
 def java_class_name(value: str) -> str:
     normalized = str(value or "").replace("'", "").replace("\u2019", "")
+    normalized = (
+        unicodedata.normalize("NFKD", normalized)
+        .encode("ascii", "ignore")
+        .decode("ascii")
+    )
     words = re.findall(r"[A-Za-z0-9]+", normalized)
     return "".join(word[:1].upper() + word[1:] for word in words)
 
@@ -57,20 +63,30 @@ def xmage_class_candidates(card_name: str) -> list[str]:
     return candidates
 
 
-def cards_source_root(xmage_root: Path) -> Path:
-    return xmage_root / "Mage.Sets" / "src" / "mage" / "cards"
+def cards_source_roots(xmage_root: Path) -> list[Path]:
+    return [
+        xmage_root / "Mage.Sets" / "src" / "mage" / "cards",
+        xmage_root / "Mage" / "src" / "main" / "java" / "mage" / "cards",
+    ]
 
 
-def direct_card_path(xmage_root: Path, class_name: str) -> Path:
+def direct_card_paths(xmage_root: Path, class_name: str) -> list[Path]:
     bucket = class_name[:1].lower() if class_name else "_"
-    return cards_source_root(xmage_root) / bucket / f"{class_name}.java"
+    paths: list[Path] = []
+    for root in cards_source_roots(xmage_root):
+        paths.append(root / bucket / f"{class_name}.java")
+        paths.append(root / "basiclands" / f"{class_name}.java")
+    return paths
 
 
 def build_card_class_index(xmage_root: Path) -> dict[str, Path]:
-    root = cards_source_root(xmage_root)
-    if not root.exists():
-        return {}
-    return {path.stem: path for path in root.glob("*/*.java")}
+    index: dict[str, Path] = {}
+    for root in cards_source_roots(xmage_root):
+        if not root.exists():
+            continue
+        for path in root.glob("*/*.java"):
+            index[path.stem] = path
+    return index
 
 
 def resolve_card_source(
@@ -79,9 +95,9 @@ def resolve_card_source(
     class_index: dict[str, Path] | None = None,
 ) -> ResolvedSource | None:
     for class_name in xmage_class_candidates(card_name):
-        direct = direct_card_path(xmage_root, class_name)
-        if direct.exists():
-            return ResolvedSource(class_name=class_name, path=direct, resolution="direct_bucket_candidate")
+        for direct in direct_card_paths(xmage_root, class_name):
+            if direct.exists():
+                return ResolvedSource(class_name=class_name, path=direct, resolution="direct_bucket_candidate")
     if class_index is None:
         class_index = build_card_class_index(xmage_root)
     for class_name in xmage_class_candidates(card_name):
@@ -188,6 +204,34 @@ def _constructor_metadata(source: str, *, card_name: str | None = None) -> dict[
     }
 
 
+def _apply_superclass_metadata_overrides(
+    metadata: dict[str, Any],
+    *,
+    superclass: str | None,
+    class_name: str | None,
+) -> dict[str, Any]:
+    if superclass != "BasicLand":
+        return metadata
+    adjusted = dict(metadata)
+    if not adjusted.get("card_types"):
+        adjusted["card_types"] = ["LAND"]
+    land_subtype = str(class_name or "").upper()
+    if land_subtype in {"PLAINS", "ISLAND", "SWAMP", "MOUNTAIN", "FOREST", "WASTES"}:
+        subtypes = _as_list(adjusted.get("subtypes"))
+        if land_subtype not in subtypes:
+            subtypes.append(land_subtype)
+        adjusted["subtypes"] = sorted(set(subtypes))
+    return adjusted
+
+
+def _as_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item) for item in value if item]
+    if value:
+        return [str(value)]
+    return []
+
+
 def _dot_tokens(source: str, owner: str) -> list[str]:
     return _unique_sorted(re.findall(rf"\b{owner}\.([A-Z0-9_]+)", source))
 
@@ -279,6 +323,11 @@ def parse_java_card_source(
         "class_declarations": _class_declarations(source),
         "raw_excerpt": excerpt_text(source),
     }
+    entry["constructor_metadata"] = _apply_superclass_metadata_overrides(
+        entry["constructor_metadata"],
+        superclass=superclass,
+        class_name=entry.get("xmage_class_name"),
+    )
     entry["custom_inner_classes"] = [
         declaration
         for declaration in entry["class_declarations"]

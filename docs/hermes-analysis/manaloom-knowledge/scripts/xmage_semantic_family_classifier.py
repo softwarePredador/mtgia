@@ -719,6 +719,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("self_add_plus_one_counter") or 0) == 1
         )
 
+    if effect == "creature" and scope == "sacrifice_another_creature_or_artifact_put_plus_one_counter_on_self_v1":
+        return (
+            types == {"CREATURE"}
+            and "AddCountersSourceEffect" in effect_classes
+            and "SimpleActivatedAbility" in ability_classes
+            and "SacrificeTargetCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 1
+            and effect_json.get("activation_cost") == "sacrifice_creature_or_artifact"
+            and int(effect_json.get("self_add_plus_one_counter") or 0) == 1
+        )
+
     if effect == "creature" and scope == "credit_counter_upkeep_growth_sacrifice_for_life_v1":
         return (
             types == {"CREATURE"}
@@ -1057,6 +1069,29 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("token_power") or 0) == 0
             and int(effect_json.get("token_toughness") or 0) == 1
             and effect_json.get("token_colors") == ["G"]
+        )
+
+    if effect == "creature" and scope == "magda_dwarf_tap_treasure_and_five_treasure_tutor_v1":
+        return (
+            types == {"CREATURE"}
+            and {
+                "BoostControlledEffect",
+                "CreateTokenEffect",
+                "SearchLibraryPutInPlayEffect",
+            }.issubset(effect_classes)
+            and {
+                "BecomesTappedTriggeredAbility",
+                "SimpleActivatedAbility",
+                "SimpleStaticAbility",
+            }.issubset(ability_classes)
+            and "SacrificeTargetCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("other_dwarves_you_control_get_plus_one_power"))
+            and bool(effect_json.get("controlled_dwarf_becomes_tapped_creates_treasure"))
+            and bool(effect_json.get("activated_sacrifice_five_treasures_tutor_artifact_or_dragon"))
+            and int(effect_json.get("activated_treasure_tutor_cost") or 0) == 5
+            and effect_json.get("activated_treasure_tutor_destination") == "battlefield"
         )
 
     if effect == "draw_engine" and scope == "skip_draw_discard_exile_pay_life_face_down_draw_next_end_step_v1":

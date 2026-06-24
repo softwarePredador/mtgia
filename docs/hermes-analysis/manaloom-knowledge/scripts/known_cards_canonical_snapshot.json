@@ -2193,6 +2193,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Bartolom\u00e9 del Presidio": {
+    "ability_kind": "triggered",
+    "activation_cost": "sacrifice_creature_or_artifact",
+    "battle_model_scope": "sacrifice_another_creature_or_artifact_put_plus_one_counter_on_self_v1",
+    "effect": "creature",
+    "power": 2,
+    "self_add_plus_one_counter": 1,
+    "toughness": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f05bd490c5e9f3917fda923e6aba233c",
+    "battle_rule_oracle_hash": "5fb6e6a8fa62d2d0698978462ee5b295"
+  },
   "Basalt Monolith": {
     "effect": "ramp_permanent",
     "mana_produced": 3,
@@ -17398,16 +17414,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Magda, Brazen Outlaw": {
+    "ability_kind": "triggered",
+    "activated_sacrifice_five_treasures_tutor_artifact_or_dragon": true,
+    "activated_treasure_tutor_cost": 5,
+    "activated_treasure_tutor_destination": "battlefield",
+    "battle_model_scope": "magda_dwarf_tap_treasure_and_five_treasure_tutor_v1",
+    "controlled_dwarf_becomes_tapped_creates_treasure": true,
     "effect": "creature",
-    "is_creature_permanent": true,
+    "other_dwarves_you_control_get_plus_one_power": true,
     "power": 2,
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:26190cd09ff09f21859165388f24587b"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1e7c9717d7de72cb2fd8d0d4be803266",
+    "battle_rule_oracle_hash": "536fa7f4075ea638002ba2b13e3798c7"
   },
   "Magda, the Hoardmaster": {
     "cmc": 2.0,

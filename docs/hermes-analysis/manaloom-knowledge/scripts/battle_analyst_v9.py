@@ -2171,6 +2171,12 @@ def activate_station_ability(player, station, tapper, phase, stack):
     if tapper.get("tapped") or tapper.get("summoning_sick"):
         return False
     tapper["tapped"] = True
+    resolve_controlled_dwarf_tap_treasure_triggers(
+        player,
+        tapper,
+        CURRENT_REPLAY_TURN,
+        phase=phase,
+    )
     added = int(tapper.get("power") or 0)
     station["charge_counters"] = int(station.get("charge_counters") or 0) + max(0, added)
     threshold = int(station.get("station_threshold") or station.get("unlock_threshold") or 0)
@@ -8924,6 +8930,56 @@ def resolve_leave_battlefield_treasure_trigger(owner, permanent, *, destination,
     )
 
 
+def _permanent_has_subtype(permanent, subtype):
+    if not isinstance(permanent, dict):
+        return False
+    needle = str(subtype or "").strip().lower()
+    if not needle:
+        return False
+    type_line = str(permanent.get("type_line") or "").lower()
+    subtype_field = str(permanent.get("subtype") or "").lower()
+    return needle in type_line or needle in subtype_field
+
+
+def _has_controlled_dwarf_tap_treasure_trigger(permanent):
+    return bool(
+        isinstance(permanent, dict)
+        and (
+            permanent.get("controlled_dwarf_becomes_tapped_creates_treasure")
+            or permanent.get("dwarf_tapped_creates_treasure")
+        )
+    )
+
+
+def resolve_controlled_dwarf_tap_treasure_triggers(player, tapped_permanent, turn, *, phase=None):
+    if not isinstance(tapped_permanent, dict):
+        return 0
+    if not _permanent_has_subtype(tapped_permanent, "dwarf"):
+        return 0
+    triggers = 0
+    for source in list(player.battlefield):
+        if not _has_controlled_dwarf_tap_treasure_trigger(source):
+            continue
+        treasures_before = int(player.treasures or 0)
+        player.treasures += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=source.get("name", "?"),
+            trigger="controlled_dwarf_tapped",
+            effect="create_treasure",
+            tapped_permanent=tapped_permanent.get("name", "?"),
+            treasures_created=1,
+            treasures_before=treasures_before,
+            treasures_after=player.treasures,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(source),
+        )
+        triggers += 1
+    return triggers
+
+
 def is_artifact_permanent(card):
     if not isinstance(card, dict):
         return False
@@ -12751,6 +12807,173 @@ def _sacrifice_damage_creature_score(creature):
     return score
 
 
+def _is_expendable_counter_growth_fodder(permanent, outlet, *, allow_artifacts):
+    if not isinstance(permanent, dict) or permanent is outlet:
+        return False
+    if permanent.get("is_commander"):
+        return False
+    if is_battlefield_creature(permanent):
+        return _is_expendable_sacrifice_creature(permanent)
+    if not allow_artifacts or not is_artifact_permanent(permanent):
+        return False
+    if permanent.get("is_mana_source") and normalize_card_name(permanent.get("name", "")) not in {"treasure"}:
+        return False
+    return True
+
+
+def _counter_growth_fodder_score(permanent):
+    if is_battlefield_creature(permanent):
+        return _sacrifice_damage_creature_score(permanent)
+    type_line = str(permanent.get("type_line") or "").lower()
+    normalized_name = normalize_card_name(permanent.get("name", ""))
+    is_token = bool(permanent.get("is_token")) or permanent.get("tag") == "token" or "token" in type_line
+    cmc = int(float(permanent.get("cmc") or 0))
+    score = 16
+    if normalized_name == "treasure":
+        score += 28
+    elif is_token:
+        score += 18
+    elif permanent.get("is_mana_source"):
+        score -= 12
+    score -= cmc * 2
+    return score
+
+
+def activate_self_counter_sacrifice_outlets(player, opponents, all_players, turn, *, phase="precombat_main"):
+    if not player.is_alive():
+        return 0
+    outlets = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and not permanent.get("utility_activation_used_this_turn")
+        and int(permanent.get("self_add_plus_one_counter") or 0) > 0
+        and str(permanent.get("activation_cost") or "") in {"sacrifice_creature", "sacrifice_creature_or_artifact"}
+    ]
+    if not outlets:
+        return 0
+
+    for outlet in outlets:
+        if outlet.get("summoning_sick"):
+            continue
+        allow_artifacts = str(outlet.get("activation_cost") or "") == "sacrifice_creature_or_artifact"
+        candidates = [
+            permanent
+            for permanent in player.battlefield
+            if _is_expendable_counter_growth_fodder(permanent, outlet, allow_artifacts=allow_artifacts)
+        ]
+        if not candidates:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=outlet.get("name", "?"),
+                reason="strategic_guardrail",
+                strategic_guardrail_reason="no_expendable_sacrifice_fodder",
+                activation_kind="self_counter_growth",
+                phase=phase,
+                turn=turn,
+            )
+            continue
+
+        scored_candidates = sorted(
+            (
+                {"permanent": permanent, "score": _counter_growth_fodder_score(permanent)}
+                for permanent in candidates
+            ),
+            key=lambda item: item["score"],
+            reverse=True,
+        )
+        chosen = scored_candidates[0]
+        if chosen["score"] < 18:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=outlet.get("name", "?"),
+                reason="strategic_guardrail",
+                strategic_guardrail_reason="sacrifice_fodder_value_too_high_for_single_counter",
+                activation_kind="self_counter_growth",
+                phase=phase,
+                turn=turn,
+            )
+            continue
+
+        sacrificed = chosen["permanent"]
+        if sacrificed in player.battlefield:
+            player.battlefield.remove(sacrificed)
+        type_line = str(sacrificed.get("type_line") or "").lower()
+        is_token = bool(sacrificed.get("is_token")) or sacrificed.get("tag") == "token" or "token" in type_line
+        if is_token:
+            emit_replay_event(
+                "token_ceased_to_exist",
+                player=player.name,
+                token=sacrificed.get("name", "?"),
+                from_zone="battlefield",
+                turn=turn,
+            )
+        else:
+            player.graveyard.append(sacrificed)
+        player.record_permanent_sacrificed(sacrificed, CURRENT_REPLAY_TURN)
+        add_plus_one_counters(outlet, int(outlet.get("self_add_plus_one_counter") or 1))
+        outlet["utility_activation_used_this_turn"] = True
+
+        available_options = [
+            decision_card_option(
+                item["permanent"],
+                action="sacrifice_for_self_counter",
+                effect="self_counter_growth",
+                score=item["score"],
+                target=outlet.get("name", "?"),
+            )
+            for item in scored_candidates[:8]
+        ]
+        emit_decision_trace(
+            decision_type="activated_self_counter_growth",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=available_options,
+            chosen_option=available_options[0],
+            rejected_options=available_options[1:],
+            score_components={
+                "counter_gain": int(outlet.get("self_add_plus_one_counter") or 1),
+                "sacrificed": sacrificed.get("name", "?"),
+                "outlet_power_after": outlet.get("power"),
+                "outlet_toughness_after": outlet.get("toughness"),
+            },
+            rule_source=outlet.get("_rule_source", "focused_battle_rule_evidence"),
+            rule_status=outlet.get("_rule_review_status", "needs_review"),
+            confidence="medium",
+            expected_benefit_score=available_options[0].get("score", 0),
+            actual_outcome="permanent_sacrificed_source_grew",
+            reason="convert_expendable_permanent_into_permanent_power_toughness_growth",
+            strategic_principle="spend_low_value_fodder_for_scaling_board_presence",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "battlefield_permanents": -1,
+                "plus_one_counters_added": int(outlet.get("self_add_plus_one_counter") or 1),
+                "target": outlet.get("name", "?"),
+            },
+            risk_flags=["sacrifice_creature_or_artifact"],
+            rejected_reason="lower_sacrifice_value_score",
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=player.name,
+            card=outlet.get("name", "?"),
+            activation_kind="self_counter_growth",
+            sacrificed=sacrificed.get("name", "?"),
+            plus_one_counters_added=int(outlet.get("self_add_plus_one_counter") or 1),
+            power_after=outlet.get("power"),
+            toughness_after=outlet.get("toughness"),
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(outlet),
+        )
+        check_sbas_until_stable(all_players)
+        return 1
+    return 0
+
+
 def activate_sacrifice_damage_outlets(player, opponents, all_players, turn, rng, *, phase="precombat_main"):
     """Activate simple sacrifice outlets that convert an expendable creature into damage.
 
@@ -13201,6 +13424,147 @@ def resolve_attack_artifact_tutor_trigger(player, source, opponents, all_players
         "artifact_sacrificed": sacrificed_name,
         "found": target.get("name", "?"),
     }
+
+
+def activate_treasure_tutor_creatures(player, opponents, all_players, turn, *, phase="precombat_main"):
+    if not player.is_alive() or phase not in MAIN_PHASES:
+        return 0
+
+    activations = 0
+    for permanent in list(player.battlefield):
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("activated_sacrifice_five_treasures_tutor_artifact_or_dragon"):
+            continue
+
+        treasure_cost = int(permanent.get("activated_treasure_tutor_cost") or 5)
+        if int(player.treasures or 0) < treasure_cost:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="creature",
+                reason="insufficient_treasures_for_tutor_activation",
+                treasures_available=int(player.treasures or 0),
+                treasures_required=treasure_cost,
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+
+        target_type = "artifact_or_dragon_to_battlefield"
+        scored_candidates = [
+            (
+                candidate,
+                *tutor_candidate_score(candidate, target_type, player, opponents, turn),
+            )
+            for candidate in library_tutor_candidates(player, target_type)
+        ]
+        scored_candidates.sort(
+            key=lambda item: (
+                -item[1],
+                -int(float(item[0].get("cmc") or 0)),
+                item[0].get("name", ""),
+            )
+        )
+        if not scored_candidates:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="creature",
+                reason="no_valid_artifact_or_dragon_tutor_target",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+
+        chosen_card, chosen_score, chosen_reason = scored_candidates[0]
+        treasures_before = int(player.treasures or 0)
+        player.treasures = max(0, treasures_before - treasure_cost)
+        moved, destination = move_library_tutor_selection(
+            player,
+            [chosen_card],
+            target_type,
+        )
+        found_name = moved[0].get("name", "?") if moved else None
+        activations += 1
+        emit_decision_trace(
+            decision_type="utility_creature_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    candidate,
+                    action="sacrifice_treasures_tutor_to_battlefield",
+                    effect="creature",
+                    score=score,
+                    target=candidate.get("name", "?"),
+                    reason=reason,
+                )
+                for candidate, score, reason in scored_candidates[:8]
+            ],
+            chosen_option=decision_card_option(
+                chosen_card,
+                action="sacrifice_treasures_tutor_to_battlefield",
+                effect="creature",
+                score=chosen_score,
+                target=chosen_card.get("name", "?"),
+                reason=chosen_reason,
+            ),
+            rejected_options=[
+                decision_card_option(
+                    candidate,
+                    action="defer_treasure_tutor_target",
+                    effect="creature",
+                    score=score,
+                    target=candidate.get("name", "?"),
+                    reason=reason,
+                )
+                for candidate, score, reason in scored_candidates[1:8]
+            ],
+            score_components={
+                "treasures_before": treasures_before,
+                "treasures_spent": treasure_cost,
+                "treasures_after": player.treasures,
+                "candidate_count": len(scored_candidates),
+            },
+            rule_source=permanent.get("_rule_source", "focused_battle_rule_evidence"),
+            rule_status=permanent.get("_rule_review_status", "needs_review"),
+            confidence="medium",
+            expected_benefit_score=chosen_score,
+            actual_outcome="treasures_converted_into_library_tutor",
+            reason=chosen_reason,
+            strategic_principle="convert spare Treasures into immediate battlefield material when the top target is meaningful",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "treasures": -treasure_cost,
+                "found": found_name,
+                "destination": destination,
+            },
+            risk_flags=["treasure_commitment", "library_search"],
+            rejected_reason="lower_contextual_tutor_value",
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            effect="creature",
+            activation_kind="sacrifice_five_treasures_tutor_artifact_or_dragon",
+            treasures_before=treasures_before,
+            treasures_spent=treasure_cost,
+            treasures_after=player.treasures,
+            found=found_name,
+            destination=destination,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        check_sbas_until_stable(all_players)
+    return activations
 
 
 def creature_sacrifice_has_strategic_benefit(player, creature, chosen_unlock):
@@ -16123,6 +16487,9 @@ def library_tutor_candidates(player, target_type):
                 and candidate.get("name") != "Approach of the Second Sun"
             ):
                 candidates.append(candidate)
+        elif target_type in ("artifact_or_dragon", "artifact_or_dragon_to_battlefield"):
+            if "artifact" in type_line or "dragon" in type_line:
+                candidates.append(candidate)
         elif target_type == "land":
             if is_effective_land(candidate):
                 candidates.append(candidate)
@@ -17492,6 +17859,12 @@ def activate_land_tutor_creatures(player, turn):
         player.spend_mana(activation_cost)
         if is_creature:
             permanent["tapped"] = True
+            resolve_controlled_dwarf_tap_treasure_triggers(
+                player,
+                permanent,
+                turn,
+                phase="precombat_main",
+            )
         player.battlefield.remove(land_to_sacrifice)
         player.graveyard.append(land_to_sacrifice)
         player.library.remove(land_to_find)
@@ -23715,6 +24088,12 @@ def declare_attackers_step(attacker, opponents, all_players, turn):
     for creature in attackers:
         if not has_vigilance(creature):
             creature["tapped"] = True
+            resolve_controlled_dwarf_tap_treasure_triggers(
+                attacker,
+                creature,
+                turn,
+                phase="combat",
+            )
 
     emit_decision_trace(
         decision_type="combat_attack",
@@ -24704,6 +25083,20 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         while not stack.empty() or _pending_triggers:
             priority_round(player, all_players, stack, turn, rng)
     activate_land_tutor_creatures(player, turn)
+    activate_treasure_tutor_creatures(
+        player,
+        opponents,
+        all_players,
+        turn,
+        phase="precombat_main",
+    )
+    activate_self_counter_sacrifice_outlets(
+        player,
+        opponents,
+        all_players,
+        turn,
+        phase="precombat_main",
+    )
     activate_precombat_utility_mana_lands(
         player,
         opponents,
