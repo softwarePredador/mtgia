@@ -518,6 +518,34 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("opponent_draws_card_may_draw") or 0) == 2
         )
 
+    if effect == "creature" and scope == "flash_flying_second_opponent_draw_draw_one_and_activated_each_player_draw_v1":
+        return (
+            types == {"CREATURE"}
+            and {"DrawCardSourceControllerEffect", "DrawCardAllEffect"}.issubset(effect_classes)
+            and {"DrawNthCardTriggeredAbility", "FlashAbility", "FlyingAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("flash"))
+            and bool(effect_json.get("flying"))
+            and int(effect_json.get("opponent_second_card_each_turn_draw") or 0) == 1
+            and effect_json.get("activated_each_player_draw_cost") == "{3}{U}"
+            and int(effect_json.get("activated_each_player_draw_count") or 0) == 1
+        )
+
+    if effect == "creature" and scope == "cant_be_countered_no_max_hand_opponent_noncreature_cast_draw_exile_blink_v1":
+        return (
+            types == {"CREATURE"}
+            and {"DrawCardSourceControllerEffect", "ExileReturnBattlefieldOwnerNextEndStepSourceEffect", "MaximumHandSizeControllerEffect"}.issubset(effect_classes)
+            and {"CantBeCounteredSourceAbility", "SimpleActivatedAbility", "SimpleStaticAbility", "SpellCastOpponentTriggeredAbility"}.issubset(ability_classes)
+            and "DiscardTargetCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 7
+            and int(effect_json.get("toughness") or 0) == 7
+            and bool(effect_json.get("cant_be_countered"))
+            and bool(effect_json.get("no_maximum_hand_size"))
+            and int(effect_json.get("opponent_casts_noncreature_draw") or 0) == 1
+            and int(effect_json.get("activated_discard_cards_to_exile_and_return_tapped_count") or 0) == 3
+        )
+
     if effect == "draw_cards" and scope == "draw_one_and_source_controller_spells_gain_flash_until_eot_v1":
         return (
             types == {"INSTANT"}
@@ -546,6 +574,16 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and {"TapSourceCost", "SacrificeSourceCost", "GenericManaCost"}.issubset(xmage_cost_classes(card))
             and bool(effect_json.get("etb_exile_target_card_from_graveyard"))
             and bool(effect_json.get("activated_tap_sacrifice_exile_each_opponents_graveyard"))
+            and int(effect_json.get("activated_generic_one_tap_sacrifice_draw") or 0) == 1
+        )
+
+    if effect == "artifact" and scope == "counter_no_mana_spent_spells_and_cantrip_sacrifice_v1":
+        return (
+            types == {"ARTIFACT"}
+            and {"CounterTargetEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and {"SpellCastAllTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"GenericManaCost", "TapSourceCost", "SacrificeSourceCost"}.issubset(xmage_cost_classes(card))
+            and bool(effect_json.get("trigger_counter_spell_if_no_mana_was_spent"))
             and int(effect_json.get("activated_generic_one_tap_sacrifice_draw") or 0) == 1
         )
 

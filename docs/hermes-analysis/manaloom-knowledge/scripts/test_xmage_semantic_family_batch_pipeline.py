@@ -754,6 +754,99 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_faerie_mastermind_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Faerie Mastermind",
+                        "severity": "high",
+                        "oracle_hash": "faeriehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "FaerieMastermind",
+                            "path": "/xmage/FaerieMastermind.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DrawCardSourceControllerEffect", "DrawCardAllEffect"],
+                            "ability_classes": [
+                                "DrawNthCardTriggeredAbility",
+                                "FlashAbility",
+                                "FlyingAbility",
+                                "SimpleActivatedAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "flash_flying_second_opponent_draw_draw_one_and_activated_each_player_draw_v1",
+                                "power": 2,
+                                "toughness": 1,
+                                "flash": True,
+                                "flying": True,
+                                "opponent_second_card_each_turn_draw": 1,
+                                "activated_each_player_draw_cost": "{3}{U}",
+                                "activated_each_player_draw_count": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_nezahal_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Nezahal, Primal Tide",
+                        "severity": "high",
+                        "oracle_hash": "nezahalhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "NezahalPrimalTide",
+                            "path": "/xmage/NezahalPrimalTide.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "DrawCardSourceControllerEffect",
+                                "ExileReturnBattlefieldOwnerNextEndStepSourceEffect",
+                                "MaximumHandSizeControllerEffect",
+                            ],
+                            "ability_classes": [
+                                "CantBeCounteredSourceAbility",
+                                "SimpleActivatedAbility",
+                                "SimpleStaticAbility",
+                                "SpellCastOpponentTriggeredAbility",
+                            ],
+                            "cost_classes": ["DiscardTargetCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "cant_be_countered_no_max_hand_opponent_noncreature_cast_draw_exile_blink_v1",
+                                "power": 7,
+                                "toughness": 7,
+                                "cant_be_countered": True,
+                                "no_maximum_hand_size": True,
+                                "opponent_casts_noncreature_draw": 1,
+                                "activated_discard_cards_to_exile_and_return_tapped_count": 3,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_goblin_bombardment_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -780,6 +873,41 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "activation_cost": "sacrifice_creature",
                                 "damage": 1,
                                 "target": "any_target",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_vexing_bauble_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Vexing Bauble",
+                        "severity": "high",
+                        "oracle_hash": "baublehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "VexingBauble",
+                            "path": "/xmage/VexingBauble.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["CounterTargetEffect", "DrawCardSourceControllerEffect"],
+                            "ability_classes": ["SpellCastAllTriggeredAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "artifact",
+                                "battle_model_scope": "counter_no_mana_spent_spells_and_cantrip_sacrifice_v1",
+                                "trigger_counter_spell_if_no_mana_was_spent": True,
+                                "activated_generic_one_tap_sacrifice_draw": 1,
                             },
                         },
                     }

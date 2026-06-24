@@ -9620,20 +9620,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Faerie Mastermind": {
+    "ability_kind": "triggered",
+    "activated_each_player_draw_cost": "{3}{U}",
+    "activated_each_player_draw_count": 1,
+    "battle_model_scope": "flash_flying_second_opponent_draw_draw_one_and_activated_each_player_draw_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
-    "keywords": [
-      "flash",
-      "flying"
-    ],
+    "flash": true,
+    "flying": true,
+    "opponent_second_card_each_turn_draw": 1,
     "power": 2,
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:1f26dde3112dc95d335eb5bcb395e3b6"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d71dbf6903f52abd4bfe443bab1dc0a9",
+    "battle_rule_oracle_hash": "92f520c17a15390fa0d0ea1b1272bc6c"
   },
   "Faithless Looting": {
     "battle_model_scope": "draw_two_discard_two_flashback_annotation_v1",
@@ -11971,19 +11974,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Goblin Bombardment": {
-    "activated_sacrifice_creature_damage": true,
-    "battle_model_scope": "sacrifice_creature_damage_outlet_v1",
-    "cmc": 2.0,
+    "ability_kind": "activated",
+    "activation_cost": "sacrifice_creature",
+    "battle_model_scope": "activated_sacrifice_creature_deal_one_any_target_v1",
     "damage": 1,
-    "effect": "passive",
-    "sacrifice_creature_damage": true,
-    "target": "any",
+    "effect": "direct_damage",
+    "target": "any_target",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.93,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ec93fec310ca51ac3454c50ef25937ef",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ffe71629f57698b324c049ad34b25642",
     "battle_rule_oracle_hash": "ef9c15ab8b53ba7f859a366cddd3e7e7"
   },
   "Goblin Burrows": {
@@ -19534,18 +19536,22 @@
     "battle_rule_logical_key": "battle_rule_v1:9fb0f80ea996b7572a8d34788d851962"
   },
   "Nezahal, Primal Tide": {
-    "effect": "draw_engine",
-    "is_creature_permanent": true,
+    "ability_kind": "triggered",
+    "activated_discard_cards_to_exile_and_return_tapped_count": 3,
+    "battle_model_scope": "cant_be_countered_no_max_hand_opponent_noncreature_cast_draw_exile_blink_v1",
+    "cant_be_countered": true,
+    "effect": "creature",
+    "no_maximum_hand_size": true,
+    "opponent_casts_noncreature_draw": 1,
     "power": 7,
     "toughness": 7,
-    "trigger": "opponent_noncreature_spell",
-    "uncounterable": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2523c233aa7ae0a3d219abe99368df87"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7b908a525415c4da327930f6d4b29aba",
+    "battle_rule_oracle_hash": "64ff656e777df4caae96816eccf5a387"
   },
   "Nibelheim Aflame": {
     "cmc": 4.0,
@@ -32663,18 +32669,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Vexing Bauble": {
-    "activated_draw_on_self_sacrifice": true,
-    "activation_cost_generic": 1,
-    "battle_model_scope": "free_spell_hate_artifact_v1",
-    "cmc": 1.0,
-    "counters_free_spells": true,
-    "effect": "hate_artifact",
+    "ability_kind": "triggered",
+    "activated_generic_one_tap_sacrifice_draw": 1,
+    "battle_model_scope": "counter_no_mana_spent_spells_and_cantrip_sacrifice_v1",
+    "effect": "artifact",
+    "trigger_counter_spell_if_no_mana_was_spent": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.95,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6a85170698c85498bf618c0c0283a770"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ad19691a7b388a47b6775f5e16275403",
+    "battle_rule_oracle_hash": "020e696ec9560830bb82bf0244595d69"
   },
   "Veyran, Voice of Duality": {
     "cmc": 3.0,

@@ -805,6 +805,79 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["flying"])
         self.assertEqual(primary["opponent_draws_card_may_draw"], 2)
 
+    def test_faerie_mastermind_maps_to_exact_draw_trigger_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DrawCardSourceControllerEffect", "DrawCardAllEffect"],
+                "ability_classes": [
+                    "DrawNthCardTriggeredAbility",
+                    "FlashAbility",
+                    "FlyingAbility",
+                    "SimpleActivatedAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(2); this.toughness = new MageInt(1); "
+                    "this.addAbility(FlashAbility.getInstance()); this.addAbility(FlyingAbility.getInstance()); "
+                    "new DrawNthCardTriggeredAbility(new DrawCardSourceControllerEffect(1, true), false, TargetController.OPPONENT, 2); "
+                    "this.addAbility(new SimpleActivatedAbility(new DrawCardAllEffect(1), new ManaCostsImpl<>(\"{3}{U}\")));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "flash_flying_second_opponent_draw_draw_one_and_activated_each_player_draw_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["flash"])
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["opponent_second_card_each_turn_draw"], 1)
+        self.assertEqual(primary["activated_each_player_draw_cost"], "{3}{U}")
+        self.assertEqual(primary["activated_each_player_draw_count"], 1)
+
+    def test_nezahal_maps_to_exact_static_draw_blink_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "DrawCardSourceControllerEffect",
+                    "ExileReturnBattlefieldOwnerNextEndStepSourceEffect",
+                    "MaximumHandSizeControllerEffect",
+                ],
+                "ability_classes": [
+                    "CantBeCounteredSourceAbility",
+                    "SimpleActivatedAbility",
+                    "SimpleStaticAbility",
+                    "SpellCastOpponentTriggeredAbility",
+                ],
+                "cost_classes": ["DiscardTargetCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(7); this.toughness = new MageInt(7); "
+                    "this.addAbility(new CantBeCounteredSourceAbility()); "
+                    "this.addAbility(new SimpleStaticAbility(new MaximumHandSizeControllerEffect(Integer.MAX_VALUE, Duration.WhileOnBattlefield, MaximumHandSizeControllerEffect.HandSizeModification.SET))); "
+                    "this.addAbility(new SpellCastOpponentTriggeredAbility(Zone.BATTLEFIELD, new DrawCardSourceControllerEffect(1), StaticFilters.FILTER_SPELL_A_NON_CREATURE, false, SetTargetPointer.NONE)); "
+                    "this.addAbility(new SimpleActivatedAbility(new ExileReturnBattlefieldOwnerNextEndStepSourceEffect(true), new DiscardTargetCost(new TargetCardInHand(3, StaticFilters.FILTER_CARD_CARDS))));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "cant_be_countered_no_max_hand_opponent_noncreature_cast_draw_exile_blink_v1",
+        )
+        self.assertEqual(primary["power"], 7)
+        self.assertEqual(primary["toughness"], 7)
+        self.assertTrue(primary["cant_be_countered"])
+        self.assertTrue(primary["no_maximum_hand_size"])
+        self.assertEqual(primary["opponent_casts_noncreature_draw"], 1)
+        self.assertEqual(primary["activated_discard_cards_to_exile_and_return_tapped_count"], 3)
+
     def test_goblin_bombardment_maps_to_exact_sacrifice_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -855,6 +928,30 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
         self.assertTrue(primary["etb_exile_target_card_from_graveyard"])
         self.assertTrue(primary["activated_tap_sacrifice_exile_each_opponents_graveyard"])
+        self.assertEqual(primary["activated_generic_one_tap_sacrifice_draw"], 1)
+
+    def test_vexing_bauble_maps_to_exact_counter_free_spell_artifact_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterTargetEffect", "DrawCardSourceControllerEffect"],
+                "ability_classes": ["SpellCastAllTriggeredAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new SpellCastAllTriggeredAbility(new CounterTargetEffect(), StaticFilters.FILTER_SPELL_NO_MANA_SPENT, false, SetTargetPointer.SPELL)); "
+                    "Ability ability = new SimpleActivatedAbility(new DrawCardSourceControllerEffect(1), new GenericManaCost(1)); "
+                    "ability.addCost(new TapSourceCost()); ability.addCost(new SacrificeSourceCost());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "artifact")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "counter_no_mana_spent_spells_and_cantrip_sacrifice_v1",
+        )
+        self.assertTrue(primary["trigger_counter_spell_if_no_mana_was_spent"])
         self.assertEqual(primary["activated_generic_one_tap_sacrifice_draw"], 1)
 
     def test_cyclonic_rift_maps_to_exact_overload_bounce_scope(self) -> None:

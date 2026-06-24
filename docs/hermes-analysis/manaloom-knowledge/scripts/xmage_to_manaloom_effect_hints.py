@@ -713,6 +713,57 @@ def _build_creature_variant_fields(
             ],
         }
 
+    if (
+        card_types == {"CREATURE"}
+        and {"DrawCardSourceControllerEffect", "DrawCardAllEffect"}.issubset(effect_classes)
+        and {"DrawNthCardTriggeredAbility", "FlashAbility", "FlyingAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "flash_flying_second_opponent_draw_draw_one_and_activated_each_player_draw_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 1,
+                "flash": True,
+                "flying": True,
+                "opponent_second_card_each_turn_draw": 1,
+                "activated_each_player_draw_cost": "{3}{U}",
+                "activated_each_player_draw_count": 1,
+            },
+            "reason": "XMage structure matches Faerie Mastermind flash/flying body, second-opponent-draw trigger, and activated each-player-draw mode.",
+            "signals": [
+                "DrawNthCardTriggeredAbility",
+                "DrawCardSourceControllerEffect",
+                "DrawCardAllEffect",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and {"DrawCardSourceControllerEffect", "ExileReturnBattlefieldOwnerNextEndStepSourceEffect", "MaximumHandSizeControllerEffect"}.issubset(effect_classes)
+        and {"CantBeCounteredSourceAbility", "SimpleActivatedAbility", "SimpleStaticAbility", "SpellCastOpponentTriggeredAbility"}.issubset(ability_classes)
+        and "DiscardTargetCost" in cost_classes
+    ):
+        return {
+            "effect": "creature",
+            "scope": "cant_be_countered_no_max_hand_opponent_noncreature_cast_draw_exile_blink_v1",
+            "fields": {
+                "power": 7,
+                "toughness": 7,
+                "cant_be_countered": True,
+                "no_maximum_hand_size": True,
+                "opponent_casts_noncreature_draw": 1,
+                "activated_discard_cards_to_exile_and_return_tapped_count": 3,
+            },
+            "reason": "XMage structure matches Nezahal static protections, opponent noncreature draw trigger, and discard-three self-blink activation.",
+            "signals": [
+                "CantBeCounteredSourceAbility",
+                "MaximumHandSizeControllerEffect",
+                "SpellCastOpponentTriggeredAbility",
+                "DiscardTargetCost",
+            ],
+        }
+
     return None
 
 
@@ -788,6 +839,27 @@ def _build_exact_runtime_variant_fields(
                 "ExileTargetEffect",
                 "DrawCardSourceControllerEffect",
                 "SoulGuideLanternEffect",
+            ],
+        }
+
+    if (
+        card_types == {"ARTIFACT"}
+        and {"CounterTargetEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+        and {"SpellCastAllTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+        and {"GenericManaCost", "TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
+    ):
+        return {
+            "effect": "artifact",
+            "scope": "counter_no_mana_spent_spells_and_cantrip_sacrifice_v1",
+            "fields": {
+                "trigger_counter_spell_if_no_mana_was_spent": True,
+                "activated_generic_one_tap_sacrifice_draw": 1,
+            },
+            "reason": "XMage structure matches Vexing Bauble countering spells cast without mana spent plus the one-mana tap-sacrifice cantrip mode.",
+            "signals": [
+                "SpellCastAllTriggeredAbility",
+                "CounterTargetEffect",
+                "DrawCardSourceControllerEffect",
             ],
         }
 
