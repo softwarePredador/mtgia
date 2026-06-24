@@ -1498,6 +1498,7 @@ def _build_exact_runtime_variant_fields(
     card_types: set[str],
     effect_classes: set[str],
     ability_classes: set[str],
+    target_classes: set[str],
     cost_classes: set[str],
     xmage_class_name: str,
     rules_text: str,
@@ -1772,6 +1773,36 @@ def _build_exact_runtime_variant_fields(
                 "DamageTargetEffect",
                 "GainLifeEffect",
                 "controller_discard_damage_and_life",
+            ],
+        }
+
+    if (
+        card_types.issubset({"INSTANT", "SORCERY"})
+        and card_types
+        and effect_classes == {"DamageTargetEffect", "GainLifeEffect"}
+        and not ability_classes
+        and "TargetAnyTarget" in target_classes
+        and (
+            xmage_class_name == "LightningHelix"
+            or _oracle_has(rules_text, "deals 3 damage to any target", "gain 3 life")
+        )
+    ):
+        damage = _first_int(r"DamageTargetEffect\((\d+)\)", rules_text) or 3
+        life_gain = _first_int(r"GainLifeEffect\((\d+)\)", rules_text) or damage
+        return {
+            "effect": "direct_damage",
+            "scope": "damage_any_target_and_gain_life_v1",
+            "fields": {
+                "damage": damage,
+                "gain_life": life_gain,
+                "target": "any_target",
+                "instant": "INSTANT" in card_types,
+            },
+            "reason": "XMage structure matches an instant or sorcery that deals damage to any target and gains life for its controller.",
+            "signals": [
+                "DamageTargetEffect",
+                "GainLifeEffect",
+                "TargetAnyTarget",
             ],
         }
 
@@ -4605,6 +4636,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         card_types=card_types,
         effect_classes=effect_classes,
         ability_classes=ability_classes,
+        target_classes=target_classes,
         cost_classes=cost_classes,
         xmage_class_name=xmage_class_name,
         rules_text=rules_text,

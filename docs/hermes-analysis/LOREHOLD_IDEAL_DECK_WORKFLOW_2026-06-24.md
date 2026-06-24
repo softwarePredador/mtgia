@@ -29,18 +29,22 @@ Current generated evidence:
 
 - initial matrix:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.json`
-- current post-PG185 matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_copy_spell_postsync_v3.json`
-- current post-PG185 strategy audit:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_lorehold_copy_spell_postsync_v3.json`
+- current post-PG186 expanded matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg186_lightning_helix_postsync_v2.json`
+- current post-PG186 strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg186_lightning_helix_postsync_v2.json`
+- current post-PG186 effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg186_lightning_helix_postsync_v2.json`
 
 The script reads:
 
 - active Lorehold deck `6`;
 - prior Lorehold variants `606` and `607`;
 - new Lorehold variants `608` through `616`;
+- expanded opponent/non-Lorehold comparison decks `58`, `74`, `105`, and
+  `617` through `619`;
 - current XMage proposal report
-  `xmage_current_replay_batch_pipeline_20260624_lorehold_copy_spell_postsync_v3_proposals.json`;
+  `xmage_current_replay_batch_pipeline_20260624_pg186_lightning_helix_postsync_v2_proposals.json`;
 - Hermes SQLite battle-rule cache for rule readiness.
 
 It does not mutate deck rows, SQLite, or PostgreSQL.
@@ -98,11 +102,46 @@ PG185 closure evidence:
 - strategy consistency:
   `18/18` pass.
 
+Post-PG186 expanded matrix generated on 2026-06-24 after closing
+`Lightning Helix` and including decks `6`, `58`, `74`, `105`, and `606` through
+`619`:
+
+- total scoped cards in matrix: `709`;
+- `core_keep`: `91`;
+- `priority_benchmark_candidate`: `65`;
+- `watchlist_candidate`: `180`;
+- `needs_rule_before_strategy`: `252`;
+- `active_low_confidence_review`: `9`;
+- `low_priority`: `109`;
+- `policy_blocked`: `3`.
+
+Post-PG186 rule-readiness split:
+
+- `battle_ready`: `457`;
+- `mapper_manual`: `163`;
+- `split_scope`: `61`;
+- `runtime_needed`: `21`;
+- `blocked_missing_xmage_source`: `4`;
+- `no_rule_signal`: `3`.
+
+PG186 closure evidence:
+
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/pg186_lightning_helix_damage_lifegain_package.md`;
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg186_lightning_helix_20260624.json`;
+- affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck616_battle_rule_coherence_pg186_postsync_20260624.json`;
+- final pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg186_lightning_helix_postsync_v2_manifest.json`;
+- strategy consistency:
+  `18/18` pass.
+
 Operational interpretation:
 
-- The `127` `needs_rule_before_strategy` cards must not drive deck swaps yet.
-  They first need mapper/runtime/split-scope closure.
-- The `35` `priority_benchmark_candidate` cards are the first practical swap
+- The `252` `needs_rule_before_strategy` cards in the expanded scope must not
+  drive deck swaps yet. They first need mapper/runtime/split-scope closure.
+- The `65` `priority_benchmark_candidate` cards are the first practical swap
   candidates after baseline hash guard and battle gate review.
 - `Chrome Mox` and `Mox Opal` are policy-blocked for the current no-premium-Mox
   Lorehold lane even if they have rule evidence.
@@ -118,7 +157,7 @@ Start with:
   `Pyromancer Ascension`, `Cool but Rude`, `Profound Journey`,
   `Sun Titan`, `Glint-Horn Buccaneer`,
   `Taii Wakeen, Perfect Shot`, `Primal Amulet // Primal Wellspring`,
-  `Starfield Shepherd`, `Erode`, and `Lightning Helix`;
+  `Starfield Shepherd`, `Erode`, `Kederekt Parasite`, and `Rakdos Charm`;
 - runtime-needed token or damage families only when the exact scope is
   reusable and has focused test coverage;
 - manual mapper cards last unless they are blocking a top Lorehold role gap.
@@ -131,6 +170,19 @@ Start with:
 4. PG -> Hermes sync inserted/updated one local battle rule.
 5. Matrix moved the card to `battle_ready` and
    `priority_benchmark_candidate`.
+
+`Lightning Helix` is the second completed proof and the first direct-damage
+lifegain subpattern:
+
+1. XMage local source matched `DamageTargetEffect(3)` +
+   `GainLifeEffect(3)` + `TargetAnyTarget`.
+2. The hint/classifier promoted only the exact
+   `damage_any_target_and_gain_life_v1` scope.
+3. Battle runtime now executes `direct_damage` with explicit controller
+   `gain_life` and replay provenance.
+4. PG186 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated `remove_creature` shadows.
+5. PG -> Hermes sync made deck `616` report `Lightning Helix` as `pass`.
 
 ## Current Benchmark Candidate Lane
 

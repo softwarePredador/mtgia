@@ -2324,6 +2324,45 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_lightning_helix_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Lightning Helix",
+                        "severity": "high",
+                        "oracle_hash": "helixhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "LightningHelix",
+                            "path": "/xmage/LightningHelix.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["DamageTargetEffect", "GainLifeEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "direct_damage",
+                                "battle_model_scope": "damage_any_target_and_gain_life_v1",
+                                "ability_kind": "one_shot",
+                                "damage": 3,
+                                "gain_life": 3,
+                                "target": "any_target",
+                                "instant": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "targeted_interaction")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_faerie_mastermind_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

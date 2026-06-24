@@ -20273,6 +20273,15 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
         amount = max(1, int(card.get("cmc") or 0), player.available_mana())
     else:
         amount = int(raw_amount)
+    life_gain_requested = int(effect_data.get("gain_life") or effect_data.get("controller_gain_life") or 0)
+
+    def apply_controller_lifegain():
+        if life_gain_requested <= 0:
+            return 0, player.life, player.life
+        controller_life_before = player.life
+        gain_life(player, life_gain_requested)
+        return player.life - controller_life_before, controller_life_before, player.life
+
     for opp in opponents:
         targets = [
             target
@@ -20287,6 +20296,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 reason="damage",
                 source=card,
             )
+            life_gained, controller_life_before, controller_life_after = apply_controller_lifegain()
             emit_replay_event(
                 "damage_resolved",
                 player=player.name,
@@ -20296,7 +20306,12 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 target=target.get("name", "?"),
                 result="creature_destroyed",
                 destination=destination,
+                life_gain_requested=life_gain_requested,
+                life_gained=life_gained,
+                controller_life_before=controller_life_before,
+                controller_life_after=controller_life_after,
                 turn=turn,
+                **replay_rule_fields(effect_data),
             )
             player.graveyard.append(card)
             return
@@ -20305,6 +20320,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
         target_player = min(alive_opponents, key=lambda opp: opp.life)
         life_before = target_player.life
         dealt = deal_damage(target_player, amount)
+        life_gained, controller_life_before, controller_life_after = apply_controller_lifegain()
         emit_replay_event(
             "damage_resolved",
             player=player.name,
@@ -20315,7 +20331,12 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             cause="direct_damage",
             life_before=life_before,
             life_after=target_player.life,
+            life_gain_requested=life_gain_requested,
+            life_gained=life_gained,
+            controller_life_before=controller_life_before,
+            controller_life_after=controller_life_after,
             turn=turn,
+            **replay_rule_fields(effect_data),
         )
     player.graveyard.append(card)
 
@@ -23883,7 +23904,7 @@ def apply_effect_immediate(
                 create_removal_compensation_tokens(effect_data, opp, card, turn)
                 break
         finish_resolved_spell(player, card, turn=turn)
-    elif effect == "deal_damage":
+    elif effect in ("deal_damage", "direct_damage"):
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_player_and_creatures":
         apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng)

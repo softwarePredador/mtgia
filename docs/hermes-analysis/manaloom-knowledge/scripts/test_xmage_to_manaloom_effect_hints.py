@@ -3314,6 +3314,31 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["controller_discard_damage_any_target"], 1)
         self.assertEqual(primary["controller_discard_gain_life"], 1)
 
+    def test_lightning_helix_maps_to_exact_damage_any_target_and_lifegain_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "LightningHelix",
+                "effect_classes": ["DamageTargetEffect", "GainLifeEffect"],
+                "ability_classes": [],
+                "target_classes": ["TargetAnyTarget"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addTarget(new TargetAnyTarget()); "
+                    "this.getSpellAbility().addEffect(new DamageTargetEffect(3)); "
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(3).concatBy(\"and\"));"
+                ),
+            },
+            "Lightning Helix deals 3 damage to any target and you gain 3 life.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "direct_damage")
+        self.assertEqual(primary["battle_model_scope"], "damage_any_target_and_gain_life_v1")
+        self.assertEqual(primary["damage"], 3)
+        self.assertEqual(primary["gain_life"], 3)
+        self.assertEqual(primary["target"], "any_target")
+        self.assertTrue(primary["instant"])
+
     def test_faerie_mastermind_maps_to_exact_draw_trigger_creature_scope(self) -> None:
         result = hints.build_effect_hints(
             {

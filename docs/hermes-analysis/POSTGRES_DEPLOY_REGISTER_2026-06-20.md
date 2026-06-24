@@ -10286,3 +10286,102 @@ Register decision:
 - Do not reuse PG185.
 - Continue next with the remaining Lorehold `split_scope` and `runtime_needed`
   families, starting from the post-sync matrix.
+
+## PG186 - Lightning Helix damage lifegain rule
+
+Timestamp: 2026-06-24 17:37 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes one Lorehold variant card used by deck `616`: `Lightning Helix`.
+- Replaces two stale generated `remove_creature` review-only shadows with one
+  verified auto rule.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Lightning Helix`:
+  `battle_rule_v1:87f923455c48b6cb1bb53b4dc6823630`,
+  `oracle_hash=20f51722269781f323d10dbd434f6578`,
+  `effect=direct_damage`,
+  `battle_model_scope=damage_any_target_and_gain_life_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps the exact `DamageTargetEffect(3)` + `GainLifeEffect(3)` +
+  `TargetAnyTarget` instant/sorcery pattern to `direct_damage`.
+- Semantic classifier promotes only the exact instant/sorcery structure with no
+  abilities or costs and matching positive `damage`/`gain_life` values.
+- Battle runtime accepts `direct_damage` in the same dispatcher path as
+  `deal_damage` and applies explicit controller lifegain with replay
+  provenance.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg186_lightning_helix_damage_lifegain_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg186_lightning_helix_damage_lifegain_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg186_lightning_helix_damage_lifegain_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg186_lightning_helix_damage_lifegain_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg186_lightning_helix_damage_lifegain_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Shadow inspection:
+  both existing rows were generated `needs_review/review_only`, lacked
+  `oracle_hash`, and modeled the card as `remove_creature`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg186_lightning_helix_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3239`.
+- SQLite verification:
+  local active `battle_card_rules` row is `verified/auto` with
+  `damage_any_target_and_gain_life_v1`, `damage=3`, `gain_life=3`.
+- Battle loader verification:
+  `get_card_effect({"name":"Lightning Helix"})` selects the curated
+  `direct_damage` rule with one active alternative.
+- Tests:
+  `python3 -m unittest test_xmage_to_manaloom_effect_hints.py test_xmage_semantic_family_batch_pipeline.py`
+  ran `316` tests OK;
+  `python3 test_battle_analyst_v10_3.py` passed, including
+  `test_lightning_helix_damage_spell_gains_life_with_rule_provenance`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg186_lightning_helix_postsync_v2.json`;
+  expanded scope rows `709`, `battle_ready=457`,
+  `needs_rule_before_strategy=252`, `split_scope=61`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg186_lightning_helix_postsync_v2.json`;
+  `package_ready_unprepared=0`, `package_already_prepared=0`,
+  `split_scope_backlog=79`, `runtime_family_backlog=24`,
+  `manual_mapper_backlog=261`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg186_lightning_helix_postsync_v2.json`;
+  `18/18` pass.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck616_battle_rule_coherence_pg186_postsync_20260624.json`;
+  deck `616` has `high=40`, `medium=4`, `pass=40`;
+  `Lightning Helix` is `pass` with one trusted executable rule.
+
+Register decision:
+
+- PG186 is closed as applied, postchecked, synced, tested, and
+  strategy-audited.
+- Do not reuse PG186.
+- Continue next with the largest effective split-scope cluster:
+  `targeted_interaction/direct_damage/targeted_damage_variant_v1` (`21`
+  cards) or with a smaller high-impact exact scope if it yields a safer batch.
+- Next package number is PG187.

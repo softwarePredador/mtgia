@@ -1963,6 +1963,20 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("controller_discard_gain_life") or 0) == 1
         )
 
+    if effect == "direct_damage" and scope == "damage_any_target_and_gain_life_v1":
+        return (
+            types.issubset({"INSTANT", "SORCERY"})
+            and bool(types)
+            and effect_classes == {"DamageTargetEffect", "GainLifeEffect"}
+            and not ability_classes
+            and not cost_classes
+            and str(effect_json.get("target") or "") == "any_target"
+            and int(effect_json.get("damage") or 0) > 0
+            and int(effect_json.get("gain_life") or 0) > 0
+            and int(effect_json.get("damage") or 0) == int(effect_json.get("gain_life") or 0)
+            and bool(effect_json.get("instant")) == ("INSTANT" in types)
+        )
+
     if effect == "creature" and scope == "magda_dwarf_tap_treasure_and_five_treasure_tutor_v1":
         return (
             types == {"CREATURE"}

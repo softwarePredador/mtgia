@@ -6693,6 +6693,49 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_lightning_helix_damage_spell_gains_life_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            caster.life = 30
+            opponent = player("Opponent")
+            battle.apply_effect_immediate(
+                caster,
+                [opponent],
+                {"name": "Lightning Helix", "cmc": 2, "type_line": "Instant"},
+                turn=4,
+                rng=random.Random(616),
+                effect_data_override={
+                    "effect": "direct_damage",
+                    "damage": 3,
+                    "gain_life": 3,
+                    "target": "any_target",
+                    "battle_model_scope": "damage_any_target_and_gain_life_v1",
+                    "_rule_logical_key": "battle_rule_v1:lightning_helix",
+                    "_rule_oracle_hash": "hash_lightning_helix",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert caster.life == 33
+        assert opponent.life == 37
+        assert any(card.get("name") == "Lightning Helix" for card in caster.graveyard)
+        assert any(
+            event == "damage_resolved"
+            and data.get("card") == "Lightning Helix"
+            and data.get("amount") == 3
+            and data.get("target_player") == "Opponent"
+            and data.get("result") == "player_damage"
+            and data.get("life_gained") == 3
+            and data.get("controller_life_after") == 33
+            and data.get("rule_logical_key") == "battle_rule_v1:lightning_helix"
+            and data.get("rule_oracle_hash") == "hash_lightning_helix"
+            for event, data in events
+        )
+
     def test_lotho_second_spell_trigger_creates_treasure_and_loses_life():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -12913,6 +12956,7 @@ def register_tests(battle, player):
         test_underworld_dreams_and_fate_unraveler_punish_each_opponent_drawn_card,
         test_geths_grimoire_and_megrim_trigger_on_opponent_discard_with_rule_provenance,
         test_feast_of_sanity_triggers_on_controller_discard_and_gains_life,
+        test_lightning_helix_damage_spell_gains_life_with_rule_provenance,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,
