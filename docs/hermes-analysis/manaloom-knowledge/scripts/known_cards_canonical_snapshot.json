@@ -29068,14 +29068,27 @@
     "battle_rule_logical_key": "battle_rule_v1:90345eb5573a6295450e7f625c28b943"
   },
   "Tataru Taru": {
-    "cmc": 2.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "etb_draw_target_opponent_may_draw_off_turn_once_each_turn_tapped_treasure_v1",
     "effect": "ramp_engine",
+    "etb_draw_count": 1,
+    "etb_target_opponent_may_draw_choice_model": "compact_assume_yes_single_card_v1",
+    "etb_target_opponent_may_draw_count": 1,
+    "is_creature_permanent": true,
+    "power": 0,
+    "toughness": 3,
+    "treasure_count": 1,
+    "treasure_tokens_tapped": true,
+    "trigger": "opponent_draw",
+    "trigger_limit_each_turn": 1,
+    "trigger_only_off_turn_opponent_draw": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:960ad0edc1ebb1be6c68610387478149"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:78e8097d6f3437e339ab729d87e5099a",
+    "battle_rule_oracle_hash": "313b5afad418df592c6011b08c80d972"
   },
   "Tatyova, Benthic Druid": {
     "cmc": 5.0,

@@ -601,6 +601,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and not bool(effect_json.get("draw_on_enter"))
         )
 
+    if effect == "ramp_engine" and scope == "etb_draw_target_opponent_may_draw_off_turn_once_each_turn_tapped_treasure_v1":
+        return (
+            types == {"CREATURE"}
+            and {"CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and {"DrawCardOpponentTriggeredAbility", "EntersBattlefieldTriggeredAbility"}.issubset(ability_classes)
+            and bool(effect_json.get("is_creature_permanent"))
+            and int(effect_json.get("power") or 0) == 0
+            and int(effect_json.get("toughness") or 0) == 3
+            and effect_json.get("trigger") == "opponent_draw"
+            and int(effect_json.get("treasure_count") or 0) == 1
+            and bool(effect_json.get("treasure_tokens_tapped"))
+            and bool(effect_json.get("trigger_only_off_turn_opponent_draw"))
+            and int(effect_json.get("trigger_limit_each_turn") or 0) == 1
+            and int(effect_json.get("etb_draw_count") or 0) == 1
+            and int(effect_json.get("etb_target_opponent_may_draw_count") or 0) == 1
+            and effect_json.get("etb_target_opponent_may_draw_choice_model")
+            == "compact_assume_yes_single_card_v1"
+        )
+
     if effect == "creature" and scope == "sacrifice_creature_put_plus_one_counter_on_self_cant_block_v1":
         return (
             types == {"CREATURE"}

@@ -1,0 +1,51 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "precheck_rows": [
+    {
+      "card_name": "Tataru Taru",
+      "normalized_name": "tataru taru",
+      "oracle_hash": "313b5afad418df592c6011b08c80d972",
+      "logical_rule_key": "battle_rule_v1:78e8097d6f3437e339ab729d87e5099a",
+      "target_card_rows": 1,
+      "canonical_card_id": "de32495a-d3d3-4edb-af74-0a0e28e564a4",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "would_deprecate_shadow_rows": 2
+    }
+  ],
+  "apply_rows": [],
+  "postcheck_rows": [
+    {
+      "card_name": "Tataru Taru",
+      "normalized_name": "tataru taru",
+      "logical_rule_key": "battle_rule_v1:78e8097d6f3437e339ab729d87e5099a",
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1,
+      "promoted_oracle_hash_rows": 1,
+      "backup_rows": 2
+    }
+  ],
+  "current_rows": [
+    {
+      "normalized_name": "tataru taru",
+      "logical_rule_key": "battle_rule_v1:78e8097d6f3437e339ab729d87e5099a",
+      "oracle_hash": "313b5afad418df592c6011b08c80d972",
+      "review_status": "verified",
+      "execution_status": "auto"
+    },
+    {
+      "normalized_name": "tataru taru",
+      "logical_rule_key": "battle_rule_v1:960ad0edc1ebb1be6c68610387478149",
+      "oracle_hash": null,
+      "review_status": "deprecated",
+      "execution_status": "disabled"
+    },
+    {
+      "normalized_name": "tataru taru",
+      "logical_rule_key": "battle_rule_v1:faf0412d36f280c62b14904ec21807cc",
+      "oracle_hash": null,
+      "review_status": "deprecated",
+      "execution_status": "disabled"
+    }
+  ]
+}

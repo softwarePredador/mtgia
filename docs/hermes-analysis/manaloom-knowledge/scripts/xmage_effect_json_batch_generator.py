@@ -26,6 +26,7 @@ DECK_ROLE_BY_FAMILY: dict[str, dict[str, Any]] = {
     "static_cost_reducer": {"category": "support", "effect": "static_cost_reduction", "subtype": "cost_reducer", "timing": "static"},
     "other_turn_mana_rock": {"category": "ramp", "effect": "ramp_permanent", "subtype": "mana_rock", "timing": "activated"},
     "modal_mana_rock": {"category": "ramp", "effect": "ramp_permanent", "subtype": "modal_mana_rock", "timing": "activated"},
+    "ramp_engine": {"category": "ramp", "effect": "ramp_engine", "timing": "triggered"},
     "token_maker": {"category": "board_development", "effect": "token_maker", "timing": "resolution_or_trigger"},
     "board_wipe_choice": {"category": "interaction", "effect": "board_control", "subtype": "wipe_or_sacrifice", "timing": "resolution"},
     "discard_modal_trigger": {"category": "value_engine", "effect": "discard_trigger_modal", "timing": "triggered"},

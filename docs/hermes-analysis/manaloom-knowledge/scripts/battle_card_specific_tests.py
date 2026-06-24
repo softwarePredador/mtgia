@@ -5756,6 +5756,131 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg143_tataru_taru_etb_and_off_turn_draw_trigger_create_single_tapped_treasure():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Tataru Controller")
+            active.library = [
+                _card("Controller Draw", cmc=1, effect="draw_cards"),
+                _card("Controller Draw Two", cmc=1, effect="draw_cards"),
+            ]
+            opponent = player("Opponent")
+            opponent.library = [
+                _card("Gift Draw", cmc=1, effect="draw_cards"),
+                _card("Same Turn Extra Draw", cmc=1, effect="draw_cards"),
+                _card("Own Turn Draw", cmc=1, effect="draw_cards"),
+                _card("Off Turn Next Draw", cmc=1, effect="draw_cards"),
+            ]
+            card = {
+                "name": "Tataru Taru",
+                "cmc": 2,
+                "type_line": "Legendary Creature - Dwarf Advisor",
+            }
+            effect_data = {
+                "effect": "ramp_engine",
+                "ability_kind": "triggered",
+                "battle_model_scope": "etb_draw_target_opponent_may_draw_off_turn_once_each_turn_tapped_treasure_v1",
+                "etb_draw_count": 1,
+                "etb_target_opponent_may_draw_choice_model": "compact_assume_yes_single_card_v1",
+                "etb_target_opponent_may_draw_count": 1,
+                "is_creature_permanent": True,
+                "power": 0,
+                "toughness": 3,
+                "treasure_count": 1,
+                "treasure_tokens_tapped": True,
+                "trigger": "opponent_draw",
+                "trigger_limit_each_turn": 1,
+                "trigger_only_off_turn_opponent_draw": True,
+                "_rule_logical_key": "battle_rule_v1:78e8097d6f3437e339ab729d87e5099a",
+                "_rule_oracle_hash": "313b5afad418df592c6011b08c80d972",
+            }
+
+            assert effect_data["effect"] == "ramp_engine"
+            assert (
+                effect_data["battle_model_scope"]
+                == "etb_draw_target_opponent_may_draw_off_turn_once_each_turn_tapped_treasure_v1"
+            )
+            assert effect_data["trigger"] == "opponent_draw"
+            assert effect_data["treasure_count"] == 1
+            assert effect_data["treasure_tokens_tapped"] is True
+            assert effect_data["trigger_only_off_turn_opponent_draw"] is True
+            assert effect_data["trigger_limit_each_turn"] == 1
+            assert effect_data["etb_draw_count"] == 1
+            assert effect_data["etb_target_opponent_may_draw_count"] == 1
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                turn=3,
+                rng=random.Random(143),
+                phase="precombat_main",
+                effect_data_override=effect_data,
+            )
+
+            assert active.treasures == 1
+            assert [entry.get("name") for entry in active.hand] == ["Controller Draw"]
+            assert [entry.get("name") for entry in opponent.hand] == ["Gift Draw"]
+
+            same_turn_drawn = opponent.draw(1, random.Random(144))
+            battle.process_player_draw_triggers(
+                opponent,
+                len(same_turn_drawn),
+                3,
+                "postcombat_main",
+                [active, opponent],
+                turn_player=active,
+            )
+            assert active.treasures == 1
+
+            own_turn_drawn = opponent.draw(1, random.Random(145))
+            battle.process_player_draw_triggers(
+                opponent,
+                len(own_turn_drawn),
+                4,
+                "draw_step",
+                [active, opponent],
+                turn_player=opponent,
+            )
+            assert active.treasures == 1
+
+            off_turn_drawn = opponent.draw(1, random.Random(146))
+            battle.process_player_draw_triggers(
+                opponent,
+                len(off_turn_drawn),
+                4,
+                "end_step",
+                [active, opponent],
+                turn_player=active,
+            )
+            assert active.treasures == 2
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        treasure_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Tataru Taru"
+            and data.get("trigger") == "opponent_draw"
+        ]
+        assert len(treasure_events) == 2
+        assert all(data.get("treasures_created") == 1 for data in treasure_events)
+        assert all(data.get("treasure_tokens_tapped") is True for data in treasure_events)
+        assert all(data.get("trigger_only_off_turn_opponent_draw") is True for data in treasure_events)
+        assert all(data.get("trigger_limit_each_turn") == 1 for data in treasure_events)
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Tataru Taru"
+            and data.get("trigger") == "etb_target_opponent_may_draw"
+            and data.get("target_player") == "Opponent"
+            and data.get("cards_drawn") == 1
+            and data.get("choice_model") == "compact_assume_yes_single_card_v1"
+            for event, data in events
+        )
+
     def test_lotho_second_spell_trigger_creates_treasure_and_loses_life():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -10703,6 +10828,7 @@ def register_tests(battle, player):
         test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime,
         test_pg076_support_passive_annotations_and_ranger_small_creature_tutor,
         test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance,
+        test_pg143_tataru_taru_etb_and_off_turn_draw_trigger_create_single_tapped_treasure,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,

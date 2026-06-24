@@ -11666,6 +11666,7 @@ def resolve_wheel_of_misfortune(player, opponents, card, draw_count, turn, rng, 
 
     results = []
     total_opponent_drawn = 0
+    treasures_before = player.treasures
     for participant in participants:
         if participant.name in lowest_players:
             results.append({
@@ -11689,6 +11690,14 @@ def resolve_wheel_of_misfortune(player, opponents, card, draw_count, turn, rng, 
             rng=rng,
         )
         drawn = participant.draw(draw_count, rng)
+        process_player_draw_triggers(
+            participant,
+            len(drawn),
+            turn,
+            "resolution",
+            participants,
+            turn_player=player,
+        )
         if participant is not player:
             total_opponent_drawn += len(drawn)
         results.append({
@@ -11704,6 +11713,7 @@ def resolve_wheel_of_misfortune(player, opponents, card, draw_count, turn, rng, 
             "hand_after": len(participant.hand),
         })
 
+    treasures_created = max(0, player.treasures - treasures_before)
     emit_replay_event(
         "wheel_resolved",
         player=player.name,
@@ -11728,6 +11738,7 @@ def resolve_wheel_of_misfortune(player, opponents, card, draw_count, turn, rng, 
             "discard_draw_model",
             "runtime_non_lowest_discard_draw_seven",
         ),
+        treasures_created=treasures_created,
         turn=turn,
         **fields,
     )
@@ -11750,6 +11761,7 @@ def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng, effe
     participants = [participant for participant in [player] + list(opponents) if participant.is_alive()]
     results = []
     total_opponent_drawn = 0
+    treasures_before = player.treasures
     for participant in participants:
         discarded_cards = list(participant.hand)
         participant.hand = []
@@ -11763,6 +11775,14 @@ def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng, effe
             rng=rng,
         )
         drawn = participant.draw(draw_count, rng)
+        process_player_draw_triggers(
+            participant,
+            len(drawn),
+            turn,
+            "resolution",
+            participants,
+            turn_player=player,
+        )
         if participant is not player:
             total_opponent_drawn += len(drawn)
         results.append({
@@ -11775,15 +11795,7 @@ def resolve_wheel_like_draw(player, opponents, card, draw_count, turn, rng, effe
             "drawn": len(drawn),
             "hand_after": len(participant.hand),
         })
-    payoff_names = {
-        permanent.get("name")
-        for permanent in player.battlefield
-        if isinstance(permanent, dict)
-    }
-    treasures_created = 0
-    if "Smothering Tithe" in payoff_names and total_opponent_drawn:
-        treasures_created = min(total_opponent_drawn, 20)
-        player.treasures += treasures_created
+    treasures_created = max(0, player.treasures - treasures_before)
     emit_replay_event(
         "wheel_resolved",
         player=player.name,
@@ -18598,7 +18610,16 @@ def trigger_opponent_spell_draw_engines(
                     caster.spend_mana(tax)
                     result = "tax_paid"
                 else:
-                    opponent.draw(1, rng)
+                    drawn = opponent.draw(1, rng)
+                    process_player_draw_triggers(
+                        opponent,
+                        len(drawn),
+                        turn,
+                        phase,
+                        all_players or [caster, *opponents],
+                        stack=stack,
+                        turn_player=caster,
+                    )
                     result = "card_drawn"
                 emit_replay_event(
                     "trigger_resolved",
@@ -18647,6 +18668,7 @@ def trigger_opponent_draw_resource_engines(
     *,
     stack=None,
     all_players=None,
+    turn_player=None,
 ):
     if drawn_count <= 0:
         return
@@ -18658,7 +18680,23 @@ def trigger_opponent_draw_resource_engines(
                 continue
             if permanent.get("effect") != "ramp_engine":
                 continue
-            if permanent.get("trigger") != "opponent_draw":
+            trigger_kind = permanent.get("trigger")
+            if (
+                trigger_kind != "opponent_draw"
+                and normalize_card_name(permanent.get("name", "")) == "smothering tithe"
+            ):
+                trigger_kind = "opponent_draw"
+            if trigger_kind != "opponent_draw":
+                continue
+            if (
+                permanent.get("trigger_only_off_turn_opponent_draw")
+                and turn_player is drawing_player
+            ):
+                continue
+            if (
+                int(permanent.get("trigger_limit_each_turn") or 0) > 0
+                and permanent.get("opponent_draw_last_trigger_turn") == turn
+            ):
                 continue
             treasure_per_card = int(
                 permanent.get("treasure_count_per_card_drawn")
@@ -18673,6 +18711,8 @@ def trigger_opponent_draw_resource_engines(
                 treasure_count=treasure_count,
             ):
                 treasures_before = opponent.treasures
+                if int(permanent.get("trigger_limit_each_turn") or 0) > 0:
+                    permanent["opponent_draw_last_trigger_turn"] = turn
                 permanent["counter"] = permanent.get("counter", 0) + drawn_count
                 # Compact model: the drawing player does not pay the optional {2}.
                 opponent.treasures += treasure_count
@@ -18692,7 +18732,16 @@ def trigger_opponent_draw_resource_engines(
                         "tax_payment_status",
                         "annotation_only_assume_unpaid",
                     ),
+                    trigger_only_off_turn_opponent_draw=bool(
+                        permanent.get("trigger_only_off_turn_opponent_draw")
+                    ),
+                    trigger_limit_each_turn=int(
+                        permanent.get("trigger_limit_each_turn") or 0
+                    ),
                     treasures_created=treasure_count,
+                    treasure_tokens_tapped=bool(
+                        permanent.get("treasure_tokens_tapped")
+                    ),
                     treasures_before=treasures_before,
                     treasures_after=opponent.treasures,
                     turn=turn,
@@ -18709,6 +18758,35 @@ def trigger_opponent_draw_resource_engines(
                 active_player=drawing_player,
                 all_players=all_players or [drawing_player, *opponents],
             )
+
+
+def process_player_draw_triggers(
+    drawing_player,
+    drawn_count,
+    turn,
+    phase,
+    all_players,
+    *,
+    stack=None,
+    turn_player=None,
+):
+    if drawn_count <= 0 or not all_players:
+        return
+    opponents = [
+        candidate
+        for candidate in all_players
+        if candidate is not drawing_player and getattr(candidate, "is_alive", lambda: True)()
+    ]
+    trigger_opponent_draw_resource_engines(
+        drawing_player,
+        opponents,
+        drawn_count,
+        turn,
+        phase,
+        stack=stack,
+        all_players=all_players,
+        turn_player=turn_player,
+    )
 
 
 
@@ -20453,6 +20531,53 @@ def apply_effect_immediate(
         player.battlefield.append(permanent)
         treasure_count = int(effect_data.get("enters_treasure") or 0)
         player.treasures += treasure_count
+        if effect_data.get("etb_draw_count"):
+            drawn = player.draw(int(effect_data.get("etb_draw_count") or 1), rng)
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase or "resolution",
+                all_players_for_entry,
+                stack=stack,
+                turn_player=player,
+            )
+        if effect_data.get("etb_target_opponent_may_draw_count") and opponents:
+            target_opponent = next(
+                iter(prioritize_evaluation_target_opponents(player, opponents)),
+                None,
+            )
+            if target_opponent is not None:
+                drawn = target_opponent.draw(
+                    int(effect_data.get("etb_target_opponent_may_draw_count") or 1),
+                    rng,
+                )
+                process_player_draw_triggers(
+                    target_opponent,
+                    len(drawn),
+                    turn,
+                    phase or "resolution",
+                    all_players_for_entry,
+                    stack=stack,
+                    turn_player=player,
+                )
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    trigger="etb_target_opponent_may_draw",
+                    effect="draw_cards",
+                    target_player=target_opponent.name,
+                    cards_drawn=len(drawn),
+                    choice_model=effect_data.get(
+                        "etb_target_opponent_may_draw_choice_model",
+                        "compact_assume_yes_single_card_v1",
+                    ),
+                    result="target_draws",
+                    turn=turn,
+                    phase=phase or "resolution",
+                    **replay_rule_fields(effect_data),
+                )
         if effect_data.get("etb_tutor_target"):
             resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn)
     elif effect == "draw_engine":
@@ -20481,7 +20606,16 @@ def apply_effect_immediate(
         if draw_on_enter is None:
             draw_on_enter = not is_the_one_ring(card)
         if draw_on_enter:
-            player.draw(1, rng)
+            drawn = player.draw(1, rng)
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase or "resolution",
+                all_players_for_entry,
+                stack=stack,
+                turn_player=player,
+            )
     elif effect == "cantrip_mana_filter_artifact":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "cantrip_mana_filter_artifact"
@@ -20577,6 +20711,15 @@ def apply_effect_immediate(
                 rng=rng,
             )
             drawn = player.draw(len(discarded_cards), rng)
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase or "resolution",
+                all_players_for_entry,
+                stack=stack,
+                turn_player=player,
+            )
             emit_replay_event(
                 "draw_equal_to_discarded_hand_resolved",
                 player=player.name,
@@ -20594,6 +20737,15 @@ def apply_effect_immediate(
             )
         else:
             drawn = player.draw(n, rng)
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase or "resolution",
+                all_players_for_entry,
+                stack=stack,
+                turn_player=player,
+            )
             emit_replay_event(
                 "draw_cards_resolved",
                 player=player.name,
@@ -20619,7 +20771,16 @@ def apply_effect_immediate(
         player.treasures += treasure_count
         draw_count = int(effect_data.get("draw_count") or 0)
         if draw_count > 0:
-            player.draw(draw_count, rng)
+            drawn = player.draw(draw_count, rng)
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase or "resolution",
+                all_players_for_entry,
+                stack=stack,
+                turn_player=player,
+            )
         emit_replay_event(
             "treasure_created",
             player=player.name,
@@ -23724,6 +23885,15 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
     # ── DRAW ──
     drawn_for_turn = player.draw(1, rng)
+    process_player_draw_triggers(
+        player,
+        len(drawn_for_turn),
+        turn,
+        "draw_step",
+        all_players,
+        stack=stack,
+        turn_player=player,
+    )
     if check_sbas(all_players):
         return
 
@@ -23736,15 +23906,6 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         rng,
         stack,
         source="draw_step",
-    )
-    trigger_opponent_draw_resource_engines(
-        player,
-        opponents,
-        len(drawn_for_turn),
-        turn,
-        "draw_step",
-        stack=stack,
-        all_players=all_players,
     )
     while not stack.empty() or _pending_triggers:
         priority_round(player, all_players, stack, turn, rng, phase="draw_step")

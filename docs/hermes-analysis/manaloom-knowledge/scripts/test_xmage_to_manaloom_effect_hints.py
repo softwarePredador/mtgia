@@ -1197,6 +1197,49 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["activated_each_player_draw_cost"], "{3}{U}")
         self.assertEqual(primary["activated_each_player_draw_count"], 1)
 
+    def test_tataru_taru_maps_to_exact_off_turn_treasure_engine_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+                "ability_classes": [
+                    "DrawCardOpponentTriggeredAbility",
+                    "EntersBattlefieldTriggeredAbility",
+                ],
+                "target_classes": ["TargetOpponent"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(0); this.toughness = new MageInt(3); "
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1, true)); "
+                    "ability.addTarget(new TargetOpponent()); "
+                    "this.addAbility(new DrawCardOpponentTriggeredAbility(new CreateTokenEffect(new TreasureToken(), 1, true), false, false)"
+                    ".setTriggersLimitEachTurn(1).withInterveningIf(TataruTaruCondition.instance));"
+                ),
+                "oracle_text": (
+                    "When Tataru Taru enters, you draw a card and target opponent may draw a card.\n"
+                    "Whenever an opponent draws a card, if it isn't that player's turn, create a tapped Treasure token. "
+                    "This ability triggers only once each turn."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_draw_target_opponent_may_draw_off_turn_once_each_turn_tapped_treasure_v1",
+        )
+        self.assertEqual(primary["trigger"], "opponent_draw")
+        self.assertEqual(primary["treasure_count"], 1)
+        self.assertTrue(primary["treasure_tokens_tapped"])
+        self.assertTrue(primary["trigger_only_off_turn_opponent_draw"])
+        self.assertEqual(primary["trigger_limit_each_turn"], 1)
+        self.assertEqual(primary["etb_draw_count"], 1)
+        self.assertEqual(primary["etb_target_opponent_may_draw_count"], 1)
+        self.assertEqual(
+            primary["etb_target_opponent_may_draw_choice_model"],
+            "compact_assume_yes_single_card_v1",
+        )
+
     def test_wan_shi_tong_maps_to_exact_x_growth_draw_creature_scope(self) -> None:
         result = hints.build_effect_hints(
             {

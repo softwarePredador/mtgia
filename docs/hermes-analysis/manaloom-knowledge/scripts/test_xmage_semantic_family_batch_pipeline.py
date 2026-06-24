@@ -490,6 +490,113 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "ramp_engine")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_tataru_taru_treasure_engine_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Tataru Taru",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TataruTaru",
+                            "path": "/xmage/TataruTaru.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+                            "ability_classes": [
+                                "DrawCardOpponentTriggeredAbility",
+                                "EntersBattlefieldTriggeredAbility",
+                            ],
+                            "primary_effect": {
+                                "effect": "ramp_engine",
+                                "battle_model_scope": "etb_draw_target_opponent_may_draw_off_turn_once_each_turn_tapped_treasure_v1",
+                                "ability_kind": "triggered",
+                                "is_creature_permanent": True,
+                                "power": 0,
+                                "toughness": 3,
+                                "trigger": "opponent_draw",
+                                "treasure_count": 1,
+                                "treasure_tokens_tapped": True,
+                                "trigger_only_off_turn_opponent_draw": True,
+                                "trigger_limit_each_turn": 1,
+                                "etb_draw_count": 1,
+                                "etb_target_opponent_may_draw_count": 1,
+                                "etb_target_opponent_may_draw_choice_model": "compact_assume_yes_single_card_v1",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "ramp_engine")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_generator_uses_ramp_role_for_tataru_taru_batch_candidate(self) -> None:
+        report = generator.build_generator_report(
+            batch_audit={
+                "cards": [
+                    {
+                        "card_name": "Tataru Taru",
+                        "severity": "high",
+                        "oracle_hash": "313b5afad418df592c6011b08c80d972",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TataruTaru",
+                            "path": "/xmage/TataruTaru.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+                            "ability_classes": [
+                                "DrawCardOpponentTriggeredAbility",
+                                "EntersBattlefieldTriggeredAbility",
+                            ],
+                            "primary_effect": {
+                                "effect": "ramp_engine",
+                                "battle_model_scope": "etb_draw_target_opponent_may_draw_off_turn_once_each_turn_tapped_treasure_v1",
+                                "ability_kind": "triggered",
+                                "is_creature_permanent": True,
+                                "power": 0,
+                                "toughness": 3,
+                                "trigger": "opponent_draw",
+                                "treasure_count": 1,
+                                "treasure_tokens_tapped": True,
+                                "trigger_only_off_turn_opponent_draw": True,
+                                "trigger_limit_each_turn": 1,
+                                "etb_draw_count": 1,
+                                "etb_target_opponent_may_draw_count": 1,
+                                "etb_target_opponent_may_draw_choice_model": "compact_assume_yes_single_card_v1",
+                            },
+                        },
+                    }
+                ]
+            },
+            external_harvest={
+                "status": "ready_for_manual_review",
+                "cards": [
+                    {
+                        "card_name": "Tataru Taru",
+                        "candidate_rule": {
+                            "oracle_hash": "313b5afad418df592c6011b08c80d972",
+                        },
+                    }
+                ],
+            },
+        )
+
+        proposal = report["proposals"][0]
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+        self.assertEqual(proposal["deck_role_json"]["category"], "ramp")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "ramp_engine")
+
     def test_classifier_marks_impulsive_pilferer_death_treasure_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

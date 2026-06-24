@@ -2035,6 +2035,55 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 )
             )
         elif (
+            card_types == {"CREATURE"}
+            and {"CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and {"DrawCardOpponentTriggeredAbility", "EntersBattlefieldTriggeredAbility"}.issubset(ability_classes)
+            and "TargetOpponent" in target_classes
+            and (
+                _oracle_has(
+                    rules_text,
+                    "target opponent may draw a card",
+                    "if it isn't that player's turn",
+                    "create a tapped treasure token",
+                )
+                or (
+                    "tatarutarucondition.instance" in normalized_text
+                    and "settriggerslimiteachturn(1)" in normalized_text
+                    and "treasuretoken" in normalized_text
+                )
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="ramp_engine",
+                    scope="etb_draw_target_opponent_may_draw_off_turn_once_each_turn_tapped_treasure_v1",
+                    reason="Oracle and XMage structure match Tataru Taru ETB self-draw plus target-opponent may-draw and an off-turn once-each-turn tapped-Treasure trigger.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "is_creature_permanent": True,
+                        "power": 0,
+                        "toughness": 3,
+                        "trigger": "opponent_draw",
+                        "treasure_count": 1,
+                        "treasure_tokens_tapped": True,
+                        "trigger_only_off_turn_opponent_draw": True,
+                        "trigger_limit_each_turn": 1,
+                        "etb_draw_count": 1,
+                        "etb_target_opponent_may_draw_count": 1,
+                        "etb_target_opponent_may_draw_choice_model": "compact_assume_yes_single_card_v1",
+                    },
+                    matched_signals=[
+                        "CreateTokenEffect",
+                        "DrawCardSourceControllerEffect",
+                        "DrawCardOpponentTriggeredAbility",
+                        "EntersBattlefieldTriggeredAbility",
+                        "TargetOpponent",
+                        "tataru_taru_treasure",
+                    ],
+                )
+            )
+        elif (
             "treasuretoken" in normalized_text
             and "drawcardsourcecontrollereffect(2)" in normalized_text
             and "discardcardcost" in normalized_text
