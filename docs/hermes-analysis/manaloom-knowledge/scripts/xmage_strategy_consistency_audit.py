@@ -24,12 +24,12 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_REPORT_DIR = REPO_ROOT / "docs/hermes-analysis/master_optimizer_reports"
 DEFAULT_BENCHMARK = DEFAULT_REPORT_DIR / "xmage_acceleration_strategy_benchmark_20260624_pg166_181_postsync_real_v2.json"
 DEFAULT_PATTERN_REGISTRY = (
-    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_pattern_registry.json"
+    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_pattern_registry.json"
 )
 DEFAULT_PATTERN_SCHEMA = DEFAULT_REPORT_DIR / "xmage_pattern_registry_20260624_pg166_181_postsync_real_v2_schema_proposal.sql"
-DEFAULT_EFFECTIVE_QUEUE = DEFAULT_REPORT_DIR / "xmage_effective_queue_20260624_pg166_181_postsync_real_v3.json"
+DEFAULT_EFFECTIVE_QUEUE = DEFAULT_REPORT_DIR / "xmage_effective_queue_20260624_mapper_runtime_batch_v3_post_pg184.json"
 DEFAULT_PIPELINE_MANIFEST = (
-    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_manifest.json"
+    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_manifest.json"
 )
 DEFAULT_EXPECTED_EFFECTIVE_DECK_IDS = list(range(608, 620))
 
@@ -96,6 +96,7 @@ def audit_docs() -> list[Check]:
             REPO_ROOT / "docs/hermes-analysis/README.md",
             [
                 "XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md",
+                "LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md",
                 "hybrid_effective_queue_pattern_registry",
                 "pattern registry shadow-only",
             ],
@@ -116,6 +117,16 @@ def audit_docs() -> list[Check]:
                 "can_execute_in_battle=false",
                 "shadow pattern registry",
                 "hybrid_effective_queue_pattern_registry",
+            ],
+        ),
+        contains_all(
+            REPO_ROOT / "docs/hermes-analysis/LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md",
+            [
+                "lorehold_ideal_deck_candidate_matrix.py",
+                "needs_rule_before_strategy",
+                "priority_benchmark_candidate",
+                "build_optimized_deck.py",
+                "universal_optimizer.py",
             ],
         ),
     ]
@@ -224,15 +235,43 @@ def audit_pipeline_manifest(path: Path, expected_effective_deck_ids: list[int]) 
     else:
         checks.append(fail("pipeline_manifest.forced_include_deck_ids", f"missing={missing_forced}"))
 
+    learned_deck_ids = {int(deck_id) for deck_id in scope.get("learned_deck_ids", [])}
     materialized = [
-        row.get("learned_deck_id")
+        row
         for row in report.get("materialization", [])
         if isinstance(row, dict) and bool(row.get("apply"))
     ]
-    if not materialized:
-        checks.append(ok("pipeline_manifest.materialization_apply", "none"))
+    unsafe_materialized = []
+    allowed_materialized = []
+    for row in materialized:
+        learned_deck_id = row.get("learned_deck_id")
+        target_deck_id = row.get("target_deck_id")
+        sqlite_db = str(row.get("sqlite_db") or "")
+        try:
+            learned_int = int(learned_deck_id)
+            target_int = int(target_deck_id)
+        except Exception:
+            unsafe_materialized.append(row)
+            continue
+        local_learned_deck_stage = (
+            learned_int in learned_deck_ids
+            and target_int == learned_int
+            and sqlite_db.endswith("knowledge.db")
+        )
+        if local_learned_deck_stage:
+            allowed_materialized.append(learned_int)
+        else:
+            unsafe_materialized.append(row)
+    if not unsafe_materialized:
+        detail = "none" if not allowed_materialized else f"local_sqlite_learned_decks={sorted(allowed_materialized)}"
+        checks.append(ok("pipeline_manifest.materialization_apply", detail))
     else:
-        checks.append(fail("pipeline_manifest.materialization_apply", json.dumps(materialized, sort_keys=True)))
+        checks.append(
+            fail(
+                "pipeline_manifest.materialization_apply",
+                json.dumps(unsafe_materialized, sort_keys=True),
+            )
+        )
     return checks
 
 

@@ -47,6 +47,10 @@ def print_legacy_battle_gate_banner() -> None:
         print(line)
 
 
+def legacy_optimizer_execution_allowed() -> bool:
+    return os.environ.get("MANALOOM_ALLOW_LEGACY_UNIVERSAL_OPTIMIZER") == "1" or "--allow-legacy" in sys.argv
+
+
 def choose_primary_category(categories: list[str]) -> str | None:
     present = set(categories)
     for category in REAL_CATEGORY_PRIORITY:
@@ -87,6 +91,13 @@ def load_known_cards(db_path: str) -> dict[str, dict[str, object]]:
 
 # ── Concurrency lock ──
 print_legacy_battle_gate_banner()
+if not legacy_optimizer_execution_allowed():
+    print("universal_optimizer_execution=blocked")
+    print("replacement=lorehold_ideal_deck_candidate_matrix.py_then_slot_optimizer.py")
+    print("override=MANALOOM_ALLOW_LEGACY_UNIVERSAL_OPTIMIZER=1 or --allow-legacy")
+    sys.exit(2)
+if "--allow-legacy" in sys.argv:
+    sys.argv.remove("--allow-legacy")
 if os.path.exists(LOCK_FILE):
     age = time.time() - os.path.getmtime(LOCK_FILE)
     if age < 36000:  # 10h max runtime

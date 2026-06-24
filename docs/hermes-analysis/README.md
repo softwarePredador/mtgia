@@ -25,6 +25,19 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Define lanes, comandos, gates, pattern registry shadow-only e quando
     regenerar o benchmark.
 
+## Decisao atual Lorehold deckbuilding
+
+- `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md`
+  - Workflow canonico para sair do ajuste lento carta-a-carta e chegar no deck
+    ideal de Lorehold com evidencia.
+  - Primeiro fecha cartas que tocam Lorehold por prontidao de regra
+    XMage/ManaLoom; depois testa somente candidatos rule-ready pelo master
+    optimizer seguro.
+  - O gerador ativo e
+    `manaloom-knowledge/scripts/lorehold_ideal_deck_candidate_matrix.py`.
+  - `build_optimized_deck.py` e `universal_optimizer.py` ficam como historicos
+    bloqueados/legados, nao como caminho de handoff.
+
 ## Triagens recentes
 
 - `BRANCH_RETENTION_AUDIT_2026-06-11.md`

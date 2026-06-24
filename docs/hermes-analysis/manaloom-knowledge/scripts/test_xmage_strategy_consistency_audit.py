@@ -179,6 +179,36 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
         self.assertEqual(statuses["effective_queue.package_ready_unprepared"], "pass")
         self.assertEqual(statuses["effective_queue.package_already_prepared"], "pass")
 
+    def test_pipeline_manifest_allows_local_learned_deck_materialization(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "manifest.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "aggregate_scope": {
+                            "artifact_deck_ids": [6],
+                            "learned_deck_ids": [25],
+                            "forced_include_deck_ids": [6, 608],
+                            "effective_deck_ids": [6, 25, 608],
+                        },
+                        "materialization": [
+                            {
+                                "apply": True,
+                                "learned_deck_id": 25,
+                                "target_deck_id": 25,
+                                "sqlite_db": "/tmp/knowledge.db",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            checks = audit.audit_pipeline_manifest(path, [608])
+
+        statuses = {check.name: check.status for check in checks}
+        self.assertEqual(statuses["pipeline_manifest.materialization_apply"], "pass")
+
 
 if __name__ == "__main__":
     unittest.main()

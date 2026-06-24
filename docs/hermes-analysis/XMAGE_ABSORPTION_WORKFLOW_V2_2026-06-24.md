@@ -179,19 +179,19 @@ Rule:
 ## Current effective queue
 
 Current queue from
-`xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_proposals.json`
-after applying PG166-PG181 and syncing PG -> Hermes:
+`xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_proposals.json`
+after applying PG184 and syncing the selected rules PG -> Hermes:
 
-- `package_already_prepared=0`
+- `package_already_prepared=2`
 - `package_ready_unprepared=0`
-- `split_scope_backlog=68`
+- `split_scope_backlog=81`
 - `runtime_family_backlog=24`
-- `manual_mapper_backlog=352`
+- `manual_mapper_backlog=337`
 - `blocked_missing_xmage_source=2`
 
 ## Current execution order
 
-1. The prepared package lane is closed for this scope. PG166-PG181 applied
+1. The original prepared package lane was closed for this scope. PG166-PG181 applied
    `54` rule upserts, deprecated `80` stale shadow rows, and PG -> Hermes sync
    refreshed `5356` SQLite rows from `5500` PG rows.
 2. PG182 and PG183 were targeted provenance repairs discovered by runtime
@@ -209,19 +209,32 @@ after applying PG166-PG181 and syncing PG -> Hermes:
    status remains `blocked` by mandatory review gates:
    `decision_trace_taxonomy`, `event_contract_static`, `forensic_audit`,
    `replay_decision_audit`, and `strategy_audit`.
-5. Hit the largest split-scope clusters in order:
+5. PG184 then closed the mapper/runtime batch package-ready lane for
+   `Brain Freeze` and `Cabal Ritual`:
+   - before PG184: `package_ready_unprepared=2`,
+     `manual_mapper_backlog=337`;
+   - after PG184: `package_ready_unprepared=0`,
+     `package_already_prepared=2`;
+   - focused runtime/audit evidence:
+     `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_193554`.
+6. For deckbuilding, use
+   `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` and
+   `lorehold_ideal_deck_candidate_matrix.py` before proposing any Lorehold
+   swap. Current matrix result: `395` Lorehold-touching cards, `127`
+   rule-first cards, `35` priority benchmark candidates.
+7. Hit the largest split-scope clusters in order:
    - `targeted_damage_variant_v1` (`21`)
    - `source_controller_draw_variant_v1` (`17`)
    - `source_add_counters_variant_v1` (`11`)
    - `targeted_destroy_variant_v1` (`10`)
-6. For `targeted_damage_variant_v1`, split into subpatterns before promotion.
+8. For `targeted_damage_variant_v1`, split into subpatterns before promotion.
    The XMage test miner found references for `7/21` cards and only `2/21`
    directly usable scenario candidates, so this is a high-value cluster but not
    one executable behavior.
-7. Only then open new runtime on the most reusable exact-scope groups:
+9. Only then open new runtime on the most reusable exact-scope groups:
    - `damage_all_variant_v1` (`2`)
    - `destroy_all_permanents_or_creatures_variant_v1` (`2`)
-8. Do not let `token_maker` lead runtime work yet:
+10. Do not let `token_maker` lead runtime work yet:
    - it is `20` cards across `20` scopes;
    - first it needs taxonomy/test-miner support, not direct executor work.
 
@@ -231,9 +244,9 @@ Rebuild the effective queue:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_effective_queue_report.py \
-  --proposal-report docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v5_proposals.json \
+  --proposal-report docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_proposals.json \
   --report-dir docs/hermes-analysis/master_optimizer_reports \
-  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_expanded_608_619_real_v2
+  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_mapper_runtime_batch_v3_post_pg184
 ```
 
 Use XMage inventory as the global direction layer:
@@ -256,8 +269,15 @@ Build the shadow pattern registry:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_pattern_registry_builder.py \
-  --proposal-report docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v5_proposals.json \
-  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_pattern_registry_20260624_expanded_608_619_real_v1
+  --proposal-report docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_proposals.json \
+  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_pattern_registry_20260624_mapper_runtime_batch_v2
+```
+
+Build the Lorehold ideal-deck candidate matrix:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_ideal_deck_candidate_matrix.py \
+  --output-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1
 ```
 
 Run the integrated current-scope pipeline without materializing Hermes data:

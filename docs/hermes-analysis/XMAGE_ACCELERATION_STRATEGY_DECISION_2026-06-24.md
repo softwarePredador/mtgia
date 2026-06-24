@@ -32,7 +32,7 @@ Benchmark artifact:
 
 - `docs/hermes-analysis/master_optimizer_reports/xmage_acceleration_strategy_benchmark_20260624_expanded_608_619_real_v1.md`
 
-Current real queue:
+Current expanded queue before the later PG184 mapper/runtime package:
 
 - proposals: `504`;
 - package already prepared: `54`;
@@ -41,6 +41,29 @@ Current real queue:
 - runtime backlog: `24`;
 - manual mapper backlog: `356`;
 - missing XMage source: `2`.
+
+Current PG184-postsync queue for the active Lorehold/opponent scope:
+
+- proposal report:
+  `xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_proposals.json`;
+- effective queue:
+  `xmage_effective_queue_20260624_mapper_runtime_batch_v3_post_pg184.json`;
+- proposals: `446`;
+- package already prepared: `2`;
+- package ready unprepared: `0`;
+- split-scope backlog: `81`;
+- runtime backlog: `24`;
+- manual mapper backlog: `337`;
+- missing XMage source: `2`.
+
+Current Lorehold deckbuilding overlay:
+
+- workflow: `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md`;
+- matrix:
+  `master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.json`;
+- Lorehold-touching cards: `395`;
+- rule-first cards before strategy swap: `127`;
+- priority benchmark candidates after rule readiness: `35`.
 
 Benchmark ranking:
 
@@ -127,7 +150,8 @@ Current implementation guarantee:
 
 ## Next required implementation lane
 
-After PG166-PG181 apply and PG -> Hermes sync, the package lane is closed:
+After PG166-PG181 apply and PG -> Hermes sync, the initial package lane was
+closed:
 
 - applied packages: `15` (`PG166`, `PG167`, `PG168`, `PG169`, `PG171`,
   `PG172`, `PG173`, `PG174`, `PG175`, `PG176`, `PG177`, `PG178`, `PG179`,
@@ -171,7 +195,9 @@ Validation after PG183:
   `strategy_audit=review_required`.
 
 The next implementation lane is now exact-scope modeling. Start with
-`targeted_damage_variant_v1`, but split it before promotion.
+`targeted_damage_variant_v1`, but split it before promotion. For Lorehold deck
+improvement specifically, run the candidate matrix first and only benchmark
+cards that are already rule-ready.
 
 Evidence:
 
@@ -183,6 +209,17 @@ Therefore `targeted_damage_variant_v1` is a useful queue label, not a single
 runtime behavior. The next step is to split it into concrete subpatterns such as
 spell-target damage, triggered damage, damage redirection/reflection, event
 punisher damage, and damage-plus-life/draw/counter variants.
+
+PG184 update:
+
+- `Brain Freeze` and `Cabal Ritual` were promoted through PG184 and synced into
+  Hermes/SQLite;
+- package-ready lane is now `0`;
+- `package_already_prepared=2` remains as evidence, not modeling work;
+- focused audit `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_193554`
+  executed `18` tests with `forensic_rule_findings=0`;
+- remaining status is `review_required` because of decision/event taxonomy
+  gates, not because PG184 failed.
 
 ## Required project instruction
 

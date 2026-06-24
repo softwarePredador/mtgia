@@ -193,6 +193,53 @@ warn that raw WR numbers moved across snapshots and should be treated as
 operational evidence, not absolute truth. Any proposed swap should still rerun
 baseline, hash guard, slot scan, quality gate, confirmation, and handoff.
 
+## Lorehold Ideal Deck Routing Update - 2026-06-24
+
+Rafael approved making the Lorehold path objective and faster: close every card
+that touches Lorehold first, then benchmark only rule-ready candidates.
+
+The active deckbuilding workflow is now:
+
+- `docs/hermes-analysis/LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md`
+- `docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_ideal_deck_candidate_matrix.py`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.md`
+
+Current matrix scope:
+
+- active deck `6`;
+- prior Lorehold variants `606` and `607`;
+- new Lorehold variants `608` through `616`;
+- XMage proposal report
+  `xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_proposals.json`;
+- Hermes SQLite `battle_card_rules` readiness.
+
+Current matrix result:
+
+- `395` Lorehold-touching cards;
+- `127` `needs_rule_before_strategy`;
+- `35` `priority_benchmark_candidate`;
+- `88` `watchlist_candidate`;
+- `87` `core_keep`;
+- `2` `policy_blocked`.
+
+Operational rule:
+
+- do not use raw XMage, raw WR, or the old hardcoded deck builder as the deck
+  oracle;
+- close rule confidence first for the `needs_rule_before_strategy` lane;
+- then run safe temporary slot benchmarks only for matrix candidates whose rule
+  status is ready;
+- keep no-premium-Mox policy active for this Lorehold lane.
+
+Legacy cleanup:
+
+- `build_optimized_deck.py` now exits as historical/disabled;
+- `universal_optimizer.py` now blocks execution unless explicitly overridden
+  because its legacy quick/full path is not authorized for current handoff;
+- active handoff must use the matrix plus `slot_optimizer.py` and the master
+  optimizer gates.
+
 ## Pressure-Simulation Correction - 2026-06-20 16:00 -0300
 
 Rafael's review exposed a methodology bug in the prior battle interpretation:
