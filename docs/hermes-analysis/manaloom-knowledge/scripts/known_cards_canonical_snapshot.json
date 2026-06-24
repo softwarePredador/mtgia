@@ -8514,16 +8514,17 @@
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
   },
   "Electroduplicate": {
+    "battle_model_scope": "temporary_hasty_copy_token_v1",
+    "cmc": 3.0,
     "effect": "copy_creature_token",
-    "flashback_cost": "{2}{R}{R}",
     "sacrifice_token_at_end_step": true,
     "token_haste": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.91,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5daa159bf1d0f49653e8d7fafcf8e0c7"
+    "battle_rule_logical_key": "battle_rule_v1:908888276dcbc8c3db1126707691ae2c"
   },
   "Electrostatic Field": {
     "cmc": 2.0,
@@ -27803,14 +27804,17 @@
     "battle_rule_logical_key": "battle_rule_v1:d3659e696cf7a80cb0f747f12e32f7a1"
   },
   "Strike It Rich": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "single_treasure_creation_v1",
     "effect": "treasure_maker",
     "treasure_count": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c7150bc991226fde4b186bf65bd1e9ec"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:64d1b921f178816f331ef011862f40ae",
+    "battle_rule_oracle_hash": "ac6a1738bb963034e826d875966ffca4"
   },
   "Strionic Resonator": {
     "cmc": 2.0,
