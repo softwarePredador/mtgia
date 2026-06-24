@@ -1,0 +1,29 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg161_tutor_to_hand_20260624_094937",
+  "deploy_id": "PG161",
+  "family_counts": {
+    "creature": 2,
+    "manual_model": 3
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg161_tutor_to_hand_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg161_tutor_to_hand_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg161_tutor_to_hand_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg161_tutor_to_hand_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg161_tutor_to_hand_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg161_tutor_to_hand_rollback.sql"
+  },
+  "generated_at": "2026-06-24T09:49:37+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Demonic Tutor",
+    "Diabolic Intent",
+    "Spellseeker",
+    "Sylvan Scrying",
+    "Trophy Mage"
+  ],
+  "selected_count": 5,
+  "slug": "tutor-to-hand",
+  "status": "prepared_read_only_pending_apply_approval"
+}

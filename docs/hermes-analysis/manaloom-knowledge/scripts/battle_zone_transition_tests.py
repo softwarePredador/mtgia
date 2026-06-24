@@ -477,6 +477,149 @@ def register_tests(battle, player, card):
         assert active.life == 16
         assert spell in active.graveyard
 
+    def test_demonic_tutor_puts_best_card_into_hand(self):
+        active = player("Active")
+        land = {"name": "Forest", "cmc": 0, "type_line": "Land", "effect": "land"}
+        engine = {"name": "Rhystic Study", "cmc": 3, "type_line": "Enchantment", "effect": "draw_engine"}
+        active.library = [land, engine]
+        spell = {"name": "Demonic Tutor", "cmc": 2, "type_line": "Sorcery"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            spell,
+            turn=10,
+            rng=random.Random(81),
+            effect_data_override={
+                "effect": "tutor",
+                "instant": False,
+                "target": "any_to_hand",
+                "battle_model_scope": "any_tutor_to_hand_v1",
+            },
+        )
+
+        assert engine not in active.library
+        assert engine in active.hand
+        assert spell in active.graveyard
+
+    def test_diabolic_intent_sacrifices_creature_and_puts_best_card_into_hand(self):
+        active = player("Active")
+        fodder = {
+            "name": "Young Wolf",
+            "cmc": 1,
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+        engine = {"name": "Necropotence", "cmc": 3, "type_line": "Enchantment", "effect": "draw_engine"}
+        land = {"name": "Swamp", "cmc": 0, "type_line": "Land", "effect": "land"}
+        active.battlefield = [fodder]
+        active.library = [land, engine]
+        spell = {"name": "Diabolic Intent", "cmc": 2, "type_line": "Sorcery"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            spell,
+            turn=10,
+            rng=random.Random(82),
+            effect_data_override={
+                "effect": "tutor",
+                "instant": False,
+                "target": "any_to_hand",
+                "requires_sacrifice_creature": True,
+                "battle_model_scope": "sacrifice_creature_any_tutor_to_hand_v1",
+            },
+        )
+
+        assert fodder not in active.battlefield
+        assert fodder in active.graveyard
+        assert engine in active.hand
+        assert spell in active.graveyard
+
+    def test_sylvan_scrying_puts_land_into_hand(self):
+        active = player("Active")
+        land = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+        spell_card = {"name": "Counterspell", "cmc": 2, "type_line": "Instant", "effect": "counter"}
+        active.library = [spell_card, land]
+        spell = {"name": "Sylvan Scrying", "cmc": 2, "type_line": "Sorcery"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            spell,
+            turn=10,
+            rng=random.Random(83),
+            effect_data_override={
+                "effect": "tutor",
+                "instant": False,
+                "target": "land_to_hand",
+                "battle_model_scope": "land_tutor_to_hand_v1",
+            },
+        )
+
+        assert land in active.hand
+        assert land not in active.library
+        assert spell_card in active.library
+        assert spell in active.graveyard
+
+    def test_spellseeker_etb_finds_cheap_instant_or_sorcery_only(self):
+        active = player("Active")
+        removal = {"name": "Swords to Plowshares", "cmc": 1, "type_line": "Instant", "effect": "remove_creature"}
+        big_spell = {"name": "Time Warp", "cmc": 5, "type_line": "Sorcery", "effect": "extra_turn"}
+        creature = {"name": "Birds of Paradise", "cmc": 1, "type_line": "Creature", "effect": "creature"}
+        active.library = [big_spell, creature, removal]
+        spellseeker = {"name": "Spellseeker", "cmc": 3, "type_line": "Creature"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            spellseeker,
+            turn=10,
+            rng=random.Random(84),
+            effect_data_override={
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "etb_tutor_target": "cheap_instant_or_sorcery",
+                "battle_model_scope": "spellseeker_etb_instant_or_sorcery_mana_value_2_or_less_to_hand_v1",
+            },
+        )
+
+        assert removal in active.hand
+        assert removal not in active.library
+        assert big_spell in active.library
+        assert creature in active.library
+
+    def test_trophy_mage_etb_finds_artifact_with_mana_value_three_only(self):
+        active = player("Active")
+        cheap_artifact = {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"}
+        target_artifact = {"name": "Chromatic Lantern", "cmc": 3, "type_line": "Artifact", "effect": "ramp_engine"}
+        creature = {"name": "Hullbreaker Horror", "cmc": 7, "type_line": "Creature", "effect": "creature"}
+        active.library = [cheap_artifact, creature, target_artifact]
+        trophy_mage = {"name": "Trophy Mage", "cmc": 3, "type_line": "Creature"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            trophy_mage,
+            turn=10,
+            rng=random.Random(85),
+            effect_data_override={
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "etb_tutor_target": "artifact_mana_value_3",
+                "battle_model_scope": "trophy_mage_etb_artifact_mana_value_3_to_hand_v1",
+            },
+        )
+
+        assert target_artifact in active.hand
+        assert target_artifact not in active.library
+        assert cheap_artifact in active.library
+        assert creature in active.library
+
     def test_tutor_trace_uses_contextual_target_scoring():
         decisions = []
         battle.DECISION_TRACE_HANDLER = lambda payload: decisions.append(payload)

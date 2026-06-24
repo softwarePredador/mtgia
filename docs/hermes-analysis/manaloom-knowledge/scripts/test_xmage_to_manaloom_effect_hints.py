@@ -1509,6 +1509,108 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target"], "any_to_top")
         self.assertEqual(primary["controller_loses_life_after_tutor"], 2)
 
+    def test_demonic_tutor_maps_to_any_tutor_to_hand_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect("
+                    "new SearchLibraryPutInHandEffect(new TargetCardInLibrary(), false, true));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "any_tutor_to_hand_v1")
+        self.assertFalse(primary["instant"])
+        self.assertEqual(primary["target"], "any_to_hand")
+
+    def test_diabolic_intent_maps_to_sacrifice_creature_any_tutor_to_hand_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "cost_classes": ["SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE)); "
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(), false, true));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "sacrifice_creature_any_tutor_to_hand_v1")
+        self.assertEqual(primary["target"], "any_to_hand")
+        self.assertTrue(primary["requires_sacrifice_creature"])
+
+    def test_sylvan_scrying_maps_to_land_tutor_to_hand_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    'private static final FilterLandCard filter = new FilterLandCard("land card"); '
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "land_tutor_to_hand_v1")
+        self.assertEqual(primary["target"], "land_to_hand")
+
+    def test_spellseeker_maps_to_etb_cheap_instant_or_sorcery_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "Spellseeker",
+                "raw_excerpt": (
+                    'private static final FilterInstantOrSorceryCard filter = new FilterInstantOrSorceryCard("an instant or sorcery card with mana value 2 or less"); '
+                    "filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 3)); "
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true), true));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "spellseeker_etb_instant_or_sorcery_mana_value_2_or_less_to_hand_v1",
+        )
+        self.assertEqual(primary["etb_tutor_target"], "cheap_instant_or_sorcery")
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+
+    def test_trophy_mage_maps_to_etb_artifact_mana_value_three_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "TrophyMage",
+                "raw_excerpt": (
+                    'private static final FilterCard filter = new FilterCard("an artifact card with mana value 3"); '
+                    "filter.add(CardType.ARTIFACT.getPredicate()); "
+                    "filter.add(new ManaValuePredicate(ComparisonType.EQUAL_TO, 3)); "
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true), true));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "trophy_mage_etb_artifact_mana_value_3_to_hand_v1")
+        self.assertEqual(primary["etb_tutor_target"], "artifact_mana_value_3")
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 2)
+
     def test_carrion_feeder_maps_to_exact_sacrifice_self_growth_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -16552,6 +16552,28 @@ def library_tutor_candidates(player, target_type):
         elif target_type == "instant_or_sorcery":
             if is_instant_or_sorcery_spell(candidate):
                 candidates.append(candidate)
+        elif target_type == "cheap_instant_or_sorcery":
+            try:
+                candidate_cmc = int(float(candidate.get("cmc") or candidate.get("mana_value")))
+            except (TypeError, ValueError):
+                candidate_cmc = None
+            if (
+                is_instant_or_sorcery_spell(candidate)
+                and candidate_cmc is not None
+                and candidate_cmc <= 2
+            ):
+                candidates.append(candidate)
+        elif target_type == "artifact_mana_value_3":
+            try:
+                candidate_cmc = int(float(candidate.get("cmc") or candidate.get("mana_value")))
+            except (TypeError, ValueError):
+                candidate_cmc = None
+            if (
+                "artifact" in type_line
+                and candidate_cmc is not None
+                and candidate_cmc == 3
+            ):
+                candidates.append(candidate)
         elif target_type in ("green_creature", "green_creature_to_battlefield"):
             if is_creature_card(candidate) and card_has_color(candidate, "G"):
                 candidates.append(candidate)

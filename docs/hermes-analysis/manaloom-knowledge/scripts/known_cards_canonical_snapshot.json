@@ -7149,14 +7149,18 @@
     "battle_rule_logical_key": "battle_rule_v1:807cdb2c6bd08602999fa89c4b4b712a"
   },
   "Demonic Tutor": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "any_tutor_to_hand_v1",
     "effect": "tutor",
-    "target": "any",
+    "instant": false,
+    "target": "any_to_hand",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:807cdb2c6bd08602999fa89c4b4b712a"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c7ff42f8ce9a2bca4470fba16cab034a",
+    "battle_rule_oracle_hash": "7c881aaacf79f25b41c9788cf307e795"
   },
   "Den of the Bugbear": {
     "effect": "land",
@@ -7406,15 +7410,19 @@
     "battle_rule_logical_key": "battle_rule_v1:b9c8732f6cafef392e640b0d77d92737"
   },
   "Diabolic Intent": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "sacrifice_creature_any_tutor_to_hand_v1",
     "effect": "tutor",
+    "instant": false,
     "requires_sacrifice_creature": true,
-    "target": "any",
+    "target": "any_to_hand",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:7bb62d7f12caccab589eb3ec04916f5d"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e83b8e386f8ebf8e037dab9688873ce0",
+    "battle_rule_oracle_hash": "f9559e8f061153f5b7b70303f2f322f4"
   },
   "Diabolic Tutor": {
     "cmc": 4.0,
@@ -27370,17 +27378,21 @@
     "battle_rule_logical_key": "battle_rule_v1:5112a61521124fd47e89c61029e7d3fe"
   },
   "Spellseeker": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "spellseeker_etb_instant_or_sorcery_mana_value_2_or_less_to_hand_v1",
     "effect": "creature",
+    "etb_tutor_status": "runtime_library_to_hand",
     "etb_tutor_target": "cheap_instant_or_sorcery",
-    "is_creature_permanent": true,
+    "oracle_runtime_scope": "creature_etb_instant_or_sorcery_mana_value_lte_2_to_hand_runtime",
     "power": 1,
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:dea660937c6eed6d5a254f18d857d0cc"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8367cbf70da28b3f24fef4a034deae63",
+    "battle_rule_oracle_hash": "bf9a9c70cf24b529d0246eadd91693ee"
   },
   "Spelltwine": {
     "battle_model_scope": "graveyard_instant_sorcery_copy_cast_annotation_v1",
@@ -28918,14 +28930,18 @@
     "battle_rule_logical_key": "battle_rule_v1:85d8c93e5ff3b531d4ab9217bd956948"
   },
   "Sylvan Scrying": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "land_tutor_to_hand_v1",
     "effect": "tutor",
-    "target": "land",
+    "instant": false,
+    "target": "land_to_hand",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2c9500a06e3b1ace28acad47010e1e21"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:200b39b38bf6e0159b901a483e9ee85d",
+    "battle_rule_oracle_hash": "00c22a38ec99c54ac1e7fb02a6230ed9"
   },
   "Sylvan Tutor": {
     "effect": "tutor",
@@ -31778,14 +31794,21 @@
     "battle_rule_logical_key": "battle_rule_v1:e90b582e4b128b4c890db8959fb6005c"
   },
   "Trophy Mage": {
-    "effect": "tutor",
-    "target": "artifact_or_enchantment",
+    "ability_kind": "triggered",
+    "battle_model_scope": "trophy_mage_etb_artifact_mana_value_3_to_hand_v1",
+    "effect": "creature",
+    "etb_tutor_status": "runtime_library_to_hand",
+    "etb_tutor_target": "artifact_mana_value_3",
+    "oracle_runtime_scope": "creature_etb_artifact_mana_value_3_to_hand_runtime",
+    "power": 2,
+    "toughness": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:19a6b12e4f32350914e970a7184a5a45"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9fc4f9774e576f908fd306318ce50ef7",
+    "battle_rule_oracle_hash": "5b696e4c373fb6e0b78e1d3229809a51"
   },
   "Tropical Island": {
     "effect": "land",

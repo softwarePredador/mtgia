@@ -601,6 +601,61 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("controller_loses_life_after_tutor") or 0) == 2
         )
 
+    if effect == "tutor" and scope == "any_tutor_to_hand_v1":
+        return (
+            types in ({"INSTANT"}, {"SORCERY"})
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and not ability_classes
+            and not cost_classes
+            and bool(effect_json.get("instant")) == (types == {"INSTANT"})
+            and effect_json.get("target") == "any_to_hand"
+        )
+
+    if effect == "tutor" and scope == "sacrifice_creature_any_tutor_to_hand_v1":
+        return (
+            types in ({"INSTANT"}, {"SORCERY"})
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and not ability_classes
+            and cost_classes == {"SacrificeTargetCost"}
+            and bool(effect_json.get("instant")) == (types == {"INSTANT"})
+            and effect_json.get("target") == "any_to_hand"
+            and bool(effect_json.get("requires_sacrifice_creature"))
+        )
+
+    if effect == "tutor" and scope == "land_tutor_to_hand_v1":
+        return (
+            types in ({"INSTANT"}, {"SORCERY"})
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and not ability_classes
+            and not cost_classes
+            and bool(effect_json.get("instant")) == (types == {"INSTANT"})
+            and effect_json.get("target") == "land_to_hand"
+        )
+
+    if effect == "creature" and scope == "spellseeker_etb_instant_or_sorcery_mana_value_2_or_less_to_hand_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and ability_classes == {"EntersBattlefieldTriggeredAbility"}
+            and not cost_classes
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and effect_json.get("etb_tutor_target") == "cheap_instant_or_sorcery"
+            and effect_json.get("etb_tutor_status") == "runtime_library_to_hand"
+        )
+
+    if effect == "creature" and scope == "trophy_mage_etb_artifact_mana_value_3_to_hand_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and ability_classes == {"EntersBattlefieldTriggeredAbility"}
+            and not cost_classes
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 2
+            and effect_json.get("etb_tutor_target") == "artifact_mana_value_3"
+            and effect_json.get("etb_tutor_status") == "runtime_library_to_hand"
+        )
+
     if effect == "treasure_maker" and scope == "single_treasure_creation_v1":
         return (
             types == {"SORCERY"}

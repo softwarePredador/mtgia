@@ -1849,6 +1849,131 @@ def _build_topdeck_tutor_fields(
     return None
 
 
+def _build_tutor_to_hand_fields(
+    *,
+    xmage_class_name: str,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    normalized = _normalized_rules_text(rules_text)
+
+    if card_types in ({"INSTANT"}, {"SORCERY"}):
+        is_instant = card_types == {"INSTANT"}
+
+        if effect_classes == {"SearchLibraryPutInHandEffect"} and not ability_classes:
+            if not cost_classes:
+                if "filterlandcard" in normalized or "land card" in normalized:
+                    return {
+                        "effect": "tutor",
+                        "scope": "land_tutor_to_hand_v1",
+                        "ability_kind": "one_shot",
+                        "fields": {
+                            "instant": is_instant,
+                            "target": "land_to_hand",
+                        },
+                        "reason": "XMage structure matches a spell that finds a land card and puts it into its controller's hand.",
+                        "signals": [
+                            "SearchLibraryPutInHandEffect",
+                            "FilterLandCard",
+                        ],
+                    }
+
+                return {
+                    "effect": "tutor",
+                    "scope": "any_tutor_to_hand_v1",
+                    "ability_kind": "one_shot",
+                    "fields": {
+                        "instant": is_instant,
+                        "target": "any_to_hand",
+                    },
+                    "reason": "XMage structure matches a spell that finds any card and puts it into its controller's hand.",
+                    "signals": ["SearchLibraryPutInHandEffect"],
+                }
+
+            if cost_classes == {"SacrificeTargetCost"}:
+                return {
+                    "effect": "tutor",
+                    "scope": "sacrifice_creature_any_tutor_to_hand_v1",
+                    "ability_kind": "one_shot",
+                    "fields": {
+                        "instant": is_instant,
+                        "target": "any_to_hand",
+                        "requires_sacrifice_creature": True,
+                    },
+                    "reason": "XMage structure matches a spell that sacrifices a creature as an additional cost to tutor any card into hand.",
+                    "signals": [
+                        "SearchLibraryPutInHandEffect",
+                        "SacrificeTargetCost",
+                    ],
+                }
+
+        return None
+
+    if card_types != {"CREATURE"} or effect_classes != {"SearchLibraryPutInHandEffect"}:
+        return None
+    if ability_classes != {"EntersBattlefieldTriggeredAbility"} or cost_classes:
+        return None
+
+    if (
+        xmage_class_name == "Spellseeker"
+        or (
+            "filterinstantorsorcerycard" in normalized
+            and "manavaluepredicate(comparisontype.fewer_than,3)" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "spellseeker_etb_instant_or_sorcery_mana_value_2_or_less_to_hand_v1",
+            "ability_kind": "triggered",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "etb_tutor_target": "cheap_instant_or_sorcery",
+                "etb_tutor_status": "runtime_library_to_hand",
+                "oracle_runtime_scope": "creature_etb_instant_or_sorcery_mana_value_lte_2_to_hand_runtime",
+            },
+            "reason": "XMage structure matches Spellseeker's ETB tutor for an instant or sorcery card with mana value 2 or less into hand.",
+            "signals": [
+                "EntersBattlefieldTriggeredAbility",
+                "SearchLibraryPutInHandEffect",
+                "FilterInstantOrSorceryCard",
+                "ManaValuePredicate(<3)",
+            ],
+        }
+
+    if (
+        xmage_class_name == "TrophyMage"
+        or (
+            "cardtype.artifact.getpredicate()" in normalized
+            and "manavaluepredicate(comparisontype.equal_to,3)" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "trophy_mage_etb_artifact_mana_value_3_to_hand_v1",
+            "ability_kind": "triggered",
+            "fields": {
+                "power": 2,
+                "toughness": 2,
+                "etb_tutor_target": "artifact_mana_value_3",
+                "etb_tutor_status": "runtime_library_to_hand",
+                "oracle_runtime_scope": "creature_etb_artifact_mana_value_3_to_hand_runtime",
+            },
+            "reason": "XMage structure matches Trophy Mage's ETB tutor for an artifact card with mana value 3 into hand.",
+            "signals": [
+                "EntersBattlefieldTriggeredAbility",
+                "SearchLibraryPutInHandEffect",
+                "CardType.ARTIFACT",
+                "ManaValuePredicate(=3)",
+            ],
+        }
+
+    return None
+
+
 def _build_basic_ritual_fields(
     *,
     card_types: set[str],
@@ -2297,6 +2422,27 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(creature_sacrifice_ritual_fields["fields"]),
                 matched_signals=list(creature_sacrifice_ritual_fields["signals"]),
+            )
+        )
+
+    tutor_to_hand_fields = _build_tutor_to_hand_fields(
+        xmage_class_name=xmage_class_name,
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if tutor_to_hand_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(tutor_to_hand_fields["effect"]),
+                scope=str(tutor_to_hand_fields["scope"]),
+                reason=str(tutor_to_hand_fields["reason"]),
+                ability_kind=str(tutor_to_hand_fields["ability_kind"]),
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(tutor_to_hand_fields["fields"]),
+                matched_signals=list(tutor_to_hand_fields["signals"]),
             )
         )
 
