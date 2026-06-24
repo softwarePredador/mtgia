@@ -1678,6 +1678,8 @@ def _build_basic_ritual_fields(
     *,
     card_types: set[str],
     effect_classes: set[str],
+    ability_classes: set[str],
+    card_subtypes: set[str],
     rules_text: str,
 ) -> dict[str, Any] | None:
     if card_types != {"INSTANT"} or effect_classes != {"BasicManaEffect"}:
@@ -1696,6 +1698,28 @@ def _build_basic_ritual_fields(
             },
             "reason": "XMage structure matches a one-shot ritual that adds three black mana.",
             "signals": ["BasicManaEffect", "BlackMana(3)"],
+        }
+
+    if (
+        "mana.redmana(3)" in normalized
+        and ability_classes == {"SpliceAbility"}
+        and "ARCANE" in card_subtypes
+        and "spliceability" in normalized
+        and "arcane" in normalized
+        and "{1}{r}" in normalized
+    ):
+        return {
+            "effect": "ramp_ritual",
+            "scope": "three_red_mana_arcane_splice_ritual_v1",
+            "fields": {
+                "instant": True,
+                "mana_produced": 3,
+                "produces": "R",
+                "subtype_arcane": True,
+                "splice_arcane_cost": "{1}{R}",
+            },
+            "reason": "XMage structure matches an Arcane ritual that adds three red mana and carries splice onto Arcane for {1}{R}.",
+            "signals": ["BasicManaEffect", "RedMana(3)", "SpliceAbility", "SubType.ARCANE"],
         }
 
     if "mana.redmana(3)" in normalized:
@@ -2064,6 +2088,12 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     basic_ritual_fields = _build_basic_ritual_fields(
         card_types=card_types,
         effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        card_subtypes={
+            str(value or "").upper()
+            for value in ((index_entry.get("constructor_metadata") or {}).get("subtypes") or [])
+            if value
+        },
         rules_text=rules_text,
     )
     if basic_ritual_fields is not None:

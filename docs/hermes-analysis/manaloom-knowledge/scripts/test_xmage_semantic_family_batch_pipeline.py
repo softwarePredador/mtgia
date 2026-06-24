@@ -2732,6 +2732,43 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_desperate_ritual_arcane_splice_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Desperate Ritual",
+                        "severity": "high",
+                        "oracle_hash": "desperatehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "DesperateRitual",
+                            "path": "/xmage/DesperateRitual.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["BasicManaEffect"],
+                            "ability_classes": ["SpliceAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "ramp_ritual",
+                                "battle_model_scope": "three_red_mana_arcane_splice_ritual_v1",
+                                "instant": True,
+                                "mana_produced": 3,
+                                "produces": "R",
+                                "subtype_arcane": True,
+                                "splice_arcane_cost": "{1}{R}",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_carrion_feeder_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

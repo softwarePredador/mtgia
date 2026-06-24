@@ -1337,6 +1337,29 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["mana_produced"], 3)
         self.assertEqual(primary["produces"], "R")
 
+    def test_desperate_ritual_maps_to_arcane_splice_red_ritual_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["BasicManaEffect"],
+                "ability_classes": ["SpliceAbility"],
+                "constructor_metadata": {"card_types": ["INSTANT"], "subtypes": ["ARCANE"]},
+                "raw_excerpt": (
+                    "this.subtype.add(SubType.ARCANE); "
+                    "this.getSpellAbility().addEffect(new BasicManaEffect(Mana.RedMana(3))); "
+                    'this.addAbility(new SpliceAbility(SpliceAbility.ARCANE, "{1}{R}"));'
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_ritual")
+        self.assertEqual(primary["battle_model_scope"], "three_red_mana_arcane_splice_ritual_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["mana_produced"], 3)
+        self.assertEqual(primary["produces"], "R")
+        self.assertTrue(primary["subtype_arcane"])
+        self.assertEqual(primary["splice_arcane_cost"], "{1}{R}")
+
     def test_carrion_feeder_maps_to_exact_sacrifice_self_growth_scope(self) -> None:
         result = hints.build_effect_hints(
             {

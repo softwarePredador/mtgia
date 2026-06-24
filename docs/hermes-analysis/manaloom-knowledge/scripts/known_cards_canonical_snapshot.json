@@ -7307,15 +7307,21 @@
     "battle_rule_logical_key": "battle_rule_v1:8b297552724d5caee8f0cac7f8e26426"
   },
   "Desperate Ritual": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "three_red_mana_arcane_splice_ritual_v1",
     "effect": "ramp_ritual",
     "instant": true,
     "mana_produced": 3,
+    "produces": "R",
+    "splice_arcane_cost": "{1}{R}",
+    "subtype_arcane": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:071d9c92eecbefcd8762c29fdadf79cb"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:68a0d55c37b303fd715a47489725bf83",
+    "battle_rule_oracle_hash": "59c851be23c680eb37effc14f0bf5339"
   },
   "Destiny Spinner": {
     "cmc": 2.0,

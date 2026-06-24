@@ -520,6 +520,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("produces") == "R"
         )
 
+    if effect == "ramp_ritual" and scope == "three_red_mana_arcane_splice_ritual_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"BasicManaEffect"}
+            and ability_classes == {"SpliceAbility"}
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("mana_produced") or 0) == 3
+            and effect_json.get("produces") == "R"
+            and bool(effect_json.get("subtype_arcane"))
+            and effect_json.get("splice_arcane_cost") == "{1}{R}"
+        )
+
     if effect == "treasure_maker" and scope == "single_treasure_creation_v1":
         return (
             types == {"SORCERY"}
