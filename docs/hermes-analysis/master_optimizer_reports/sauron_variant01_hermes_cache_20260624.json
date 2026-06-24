@@ -1,0 +1,66 @@
+{
+  "after": {
+    "deck": {
+      "archetype": "grixis-reanimator-ring-control-variant",
+      "deck_name": "VARIANT Sauron Variant 01 - Rafael Paste 2026-06-24",
+      "id": 620,
+      "notes": "source_ref=sauron_variant01_20260624_6aa4f012e11d; pg_deck_id=c2230827-7963-52e4-a6ba-298d7be3478a; pg_learned_id=28600f83-7925-5ce8-99ed-833d7c00febc; deck_hash=6aa4f012e11d7122d4652beead17c02c7e06e5e872de9932ab914f3b5556cadc; status=registered_pending_card_rule_validation",
+      "total_cards": 100
+    },
+    "deck_cards": {
+      "commanders": 1,
+      "qty": 100,
+      "rows": 89
+    },
+    "first_cards": [
+      {
+        "card_id": "b1d1f972-d8ec-4b9c-8374-cbb531e6ead6",
+        "card_name": "Sauron, the Dark Lord",
+        "is_commander": 1,
+        "quantity": 1
+      },
+      {
+        "card_id": "e05923da-8741-4878-876f-9addcdd049d4",
+        "card_name": "Afterlife from the Loam",
+        "is_commander": 0,
+        "quantity": 1
+      },
+      {
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "card_name": "An Offer You Can't Refuse",
+        "is_commander": 0,
+        "quantity": 1
+      },
+      {
+        "card_id": "5abc10ba-aa66-4a0b-824e-031ff27b6922",
+        "card_name": "Ancient Tomb",
+        "is_commander": 0,
+        "quantity": 1
+      },
+      {
+        "card_id": "d0fe7386-ed51-410e-ac94-8aba50620014",
+        "card_name": "Anger",
+        "is_commander": 0,
+        "quantity": 1
+      }
+    ]
+  },
+  "before": {
+    "deck": {
+      "deck_rows": 0
+    },
+    "deck_cards": {
+      "commanders": 0,
+      "qty": 0,
+      "rows": 0
+    }
+  },
+  "database": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "deck_hash": "6aa4f012e11d7122d4652beead17c02c7e06e5e872de9932ab914f3b5556cadc",
+  "hermes_deck_id": 620,
+  "pg_deck_id": "c2230827-7963-52e4-a6ba-298d7be3478a",
+  "pg_learned_id": "28600f83-7925-5ce8-99ed-833d7c00febc",
+  "scope": "Hermes local cache mirror only; PostgreSQL remains source of truth.",
+  "source_ref": "sauron_variant01_20260624_6aa4f012e11d",
+  "status": "ready"
+}

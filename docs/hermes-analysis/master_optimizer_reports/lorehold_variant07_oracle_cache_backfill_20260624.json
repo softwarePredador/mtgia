@@ -1,0 +1,162 @@
+{
+  "cache_aliases": [
+    {
+      "name": "Boros Reckoner",
+      "normalized_name": "boros reckoner",
+      "pg_name": "Boros Reckoner",
+      "requested_name": "Boros Reckoner"
+    },
+    {
+      "name": "Charmbreaker Devils",
+      "normalized_name": "charmbreaker devils",
+      "pg_name": "Charmbreaker Devils",
+      "requested_name": "Charmbreaker Devils"
+    },
+    {
+      "name": "Rem Karolus, Stalwart Slayer",
+      "normalized_name": "rem karolus, stalwart slayer",
+      "pg_name": "Rem Karolus, Stalwart Slayer",
+      "requested_name": "Rem Karolus, Stalwart Slayer"
+    },
+    {
+      "name": "Repercussion",
+      "normalized_name": "repercussion",
+      "pg_name": "Repercussion",
+      "requested_name": "Repercussion"
+    },
+    {
+      "name": "Taii Wakeen, Perfect Shot",
+      "normalized_name": "taii wakeen, perfect shot",
+      "pg_name": "Taii Wakeen, Perfect Shot",
+      "requested_name": "Taii Wakeen, Perfect Shot"
+    },
+    {
+      "name": "Toralf, God of Fury // Toralf's Hammer",
+      "normalized_name": "toralf, god of fury",
+      "pg_name": "Toralf, God of Fury // Toralf's Hammer",
+      "requested_name": "Toralf, God of Fury"
+    },
+    {
+      "name": "Toralf, God of Fury // Toralf's Hammer",
+      "normalized_name": "toralf, god of fury // toralf's hammer",
+      "pg_name": "Toralf, God of Fury // Toralf's Hammer",
+      "requested_name": "Toralf, God of Fury"
+    },
+    {
+      "name": "Wild Ricochet",
+      "normalized_name": "wild ricochet",
+      "pg_name": "Wild Ricochet",
+      "requested_name": "Wild Ricochet"
+    }
+  ],
+  "cache_rows_written": 8,
+  "cards": [
+    {
+      "cmc": 3.0,
+      "collector_number": null,
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "oracle_id": "5f079a75-899e-467d-b443-3b87ce2fb548",
+      "pg_card_id": "49f57d9a-5dc6-44c4-8064-585cae7f393c",
+      "pg_name": "Boros Reckoner",
+      "requested_name": "Boros Reckoner",
+      "scryfall_id": "5f079a75-899e-467d-b443-3b87ce2fb548",
+      "set_code": "gk1",
+      "type_line": "Creature \u2014 Minotaur Wizard"
+    },
+    {
+      "cmc": 6.0,
+      "collector_number": null,
+      "color_identity": [
+        "R"
+      ],
+      "oracle_id": "1b9df437-6988-4ddc-80c4-893e11076067",
+      "pg_card_id": "0959db9a-658a-45aa-9e00-e23ae22960b2",
+      "pg_name": "Charmbreaker Devils",
+      "requested_name": "Charmbreaker Devils",
+      "scryfall_id": "1b9df437-6988-4ddc-80c4-893e11076067",
+      "set_code": "c13",
+      "type_line": "Creature \u2014 Devil"
+    },
+    {
+      "cmc": 3.0,
+      "collector_number": null,
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "oracle_id": "21971c8b-ff9b-40f8-8c9a-93d26c2615b7",
+      "pg_card_id": "b86af6f6-3cdc-400b-b350-09488c322d83",
+      "pg_name": "Rem Karolus, Stalwart Slayer",
+      "requested_name": "Rem Karolus, Stalwart Slayer",
+      "scryfall_id": "21971c8b-ff9b-40f8-8c9a-93d26c2615b7",
+      "set_code": "dbl",
+      "type_line": "Legendary Creature \u2014 Human Knight"
+    },
+    {
+      "cmc": 3.0,
+      "collector_number": null,
+      "color_identity": [
+        "R"
+      ],
+      "oracle_id": "f6069a4f-744e-43e8-9f8b-7c13b8b0187f",
+      "pg_card_id": "695c0204-f340-403f-94c9-c765a6ece343",
+      "pg_name": "Repercussion",
+      "requested_name": "Repercussion",
+      "scryfall_id": "f6069a4f-744e-43e8-9f8b-7c13b8b0187f",
+      "set_code": "sld",
+      "type_line": "Enchantment"
+    },
+    {
+      "cmc": 2.0,
+      "collector_number": null,
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "oracle_id": "17327d50-be12-423d-9d37-d6bae519f50c",
+      "pg_card_id": "833adee2-99a8-4e57-ab43-7ff37d5483c3",
+      "pg_name": "Taii Wakeen, Perfect Shot",
+      "requested_name": "Taii Wakeen, Perfect Shot",
+      "scryfall_id": "17327d50-be12-423d-9d37-d6bae519f50c",
+      "set_code": "otj",
+      "type_line": "Legendary Creature \u2014 Human Mercenary"
+    },
+    {
+      "cmc": 4.0,
+      "collector_number": null,
+      "color_identity": [
+        "R"
+      ],
+      "oracle_id": "fffcb71f-e802-436e-917d-eaa6607ab74f",
+      "pg_card_id": "2820ae7a-21a1-454b-80a6-0c386676f025",
+      "pg_name": "Toralf, God of Fury // Toralf's Hammer",
+      "requested_name": "Toralf, God of Fury",
+      "scryfall_id": "fffcb71f-e802-436e-917d-eaa6607ab74f",
+      "set_code": "khm",
+      "type_line": "Legendary Creature \u2014 God"
+    },
+    {
+      "cmc": 4.0,
+      "collector_number": null,
+      "color_identity": [
+        "R"
+      ],
+      "oracle_id": "8c35fd11-be45-4984-bd83-6e4f3fbc47a9",
+      "pg_card_id": "0323cac7-0f52-430e-901e-28ce8c28cb59",
+      "pg_name": "Wild Ricochet",
+      "requested_name": "Wild Ricochet",
+      "scryfall_id": "8c35fd11-be45-4984-bd83-6e4f3fbc47a9",
+      "set_code": "c13",
+      "type_line": "Instant"
+    }
+  ],
+  "generated_at": "2026-06-24T12:27:41Z",
+  "pg_records": 7,
+  "pg_snapshot": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant07_pg_cards_from_pg_20260624.json",
+  "purpose": "Backfill local Hermes oracle metadata from PostgreSQL cards for Lorehold Variant 07 staging. No card rule validation.",
+  "source": "PostgreSQL public.cards via server/.env psql",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+}

@@ -1,0 +1,66 @@
+{
+  "after": {
+    "deck": {
+      "archetype": "esper-life-drain-control-variant",
+      "deck_name": "VARIANT Y'shtola Variant 01 - Rafael Paste 2026-06-24",
+      "id": 621,
+      "notes": "source_ref=yshtola_variant01_20260624_2165c4d41e85; pg_deck_id=982cf6a6-c84a-5c3e-b9fc-e79127598b89; pg_learned_id=3ee6a17e-c72f-540e-90fe-e05dc37ed5e9; deck_hash=2165c4d41e8526ce5b0deae48422dba71d5a585747cdde5c9d6fdca0d34406fd; status=registered_pending_card_rule_validation",
+      "total_cards": 100
+    },
+    "deck_cards": {
+      "commanders": 1,
+      "qty": 100,
+      "rows": 93
+    },
+    "first_cards": [
+      {
+        "card_id": "85610f6d-9f88-46c5-86b3-44d7ffc00432",
+        "card_name": "Y'shtola, Night's Blessed",
+        "is_commander": 1,
+        "quantity": 1
+      },
+      {
+        "card_id": "65cfd096-2f93-48d6-8755-9b038d8c2980",
+        "card_name": "Adarkar Wastes",
+        "is_commander": 0,
+        "quantity": 1
+      },
+      {
+        "card_id": "752104f0-b216-4ce4-8afe-07e41e0190b3",
+        "card_name": "An Offer You Can't Refuse",
+        "is_commander": 0,
+        "quantity": 1
+      },
+      {
+        "card_id": "5abc10ba-aa66-4a0b-824e-031ff27b6922",
+        "card_name": "Ancient Tomb",
+        "is_commander": 0,
+        "quantity": 1
+      },
+      {
+        "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+        "card_name": "Arcane Signet",
+        "is_commander": 0,
+        "quantity": 1
+      }
+    ]
+  },
+  "before": {
+    "deck": {
+      "deck_rows": 0
+    },
+    "deck_cards": {
+      "commanders": 0,
+      "qty": 0,
+      "rows": 0
+    }
+  },
+  "database": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "deck_hash": "2165c4d41e8526ce5b0deae48422dba71d5a585747cdde5c9d6fdca0d34406fd",
+  "hermes_deck_id": 621,
+  "pg_deck_id": "982cf6a6-c84a-5c3e-b9fc-e79127598b89",
+  "pg_learned_id": "3ee6a17e-c72f-540e-90fe-e05dc37ed5e9",
+  "scope": "Hermes local cache mirror only; PostgreSQL remains source of truth.",
+  "source_ref": "yshtola_variant01_20260624_2165c4d41e85",
+  "status": "ready"
+}

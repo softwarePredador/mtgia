@@ -1,0 +1,21 @@
+Pager usage is off.
+         check_name         |               deck_id                |                            name                             |  format   |        archetype         | is_public | not_deleted 
+----------------------------+--------------------------------------+-------------------------------------------------------------+-----------+--------------------------+-----------+-------------
+ pg_lorehold_variant05_deck | 8aa57962-3a3e-5351-89fd-e4651456a3bd | PG REGISTERED Lorehold Variant 05 - Rafael Paste 2026-06-24 | commander | artifact-control-variant | f         | t
+(1 row)
+
+            check_name            | rows | qty | commander_qty | distinct_cards 
+----------------------------------+------+-----+---------------+----------------
+ pg_lorehold_variant05_deck_cards |   95 | 100 |             1 |             95
+(1 row)
+
+          check_name           |              learned_id              |     commander_name      |                   deck_name                   |         source_system         |                source_ref                | card_count |              legal_status               | is_active |                            deck_hash                             | hermes_deck_id |         metadata_pg_deck_id          
+-------------------------------+--------------------------------------+-------------------------+-----------------------------------------------+-------------------------------+------------------------------------------+------------+-----------------------------------------+-----------+------------------------------------------------------------------+----------------+--------------------------------------
+ pg_lorehold_variant05_learned | 757f8ebd-10a4-5f33-82a1-749603afa7e1 | Lorehold, the Historian | Lorehold Variant 05 - Rafael Paste 2026-06-24 | manual_user_deck_registration | lorehold_variant05_20260624_5154c88a8b0b |        100 | registered_pending_card_rule_validation | f         | 5154c88a8b0bff4bff121c164b0aff180b4515e52d46a3fac8b972c4ee026836 | 610            | 8aa57962-3a3e-5351-89fd-e4651456a3bd
+(1 row)
+
+               check_name                | missing_card_rows 
+-----------------------------------------+-------------------
+ pg_lorehold_variant05_missing_card_rows |                 0
+(1 row)
+

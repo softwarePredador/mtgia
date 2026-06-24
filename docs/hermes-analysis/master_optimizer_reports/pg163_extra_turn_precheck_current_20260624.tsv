@@ -1,0 +1,3 @@
+card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
+Final Fortune	final fortune	059f0f01430a2d44ac0d143bf8e40ed6	battle_rule_v1:10a7179930eacb06c18e6734c0e93add	1	c6d1c380-dc9e-4e35-a822-cda83f96e02a	3	1	0
+Last Chance	last chance	059f0f01430a2d44ac0d143bf8e40ed6	battle_rule_v1:9f5103721cb05db1501499eb5f49de56	1	8d822df3-82d6-4669-a78a-71d08d90c6ea	3	1	0

@@ -127,7 +127,51 @@ Current implementation guarantee:
 
 ## Next required implementation lane
 
-Start with `targeted_damage_variant_v1`, but split it before promotion.
+After PG166-PG181 apply and PG -> Hermes sync, the package lane is closed:
+
+- applied packages: `15` (`PG166`, `PG167`, `PG168`, `PG169`, `PG171`,
+  `PG172`, `PG173`, `PG174`, `PG175`, `PG176`, `PG177`, `PG178`, `PG179`,
+  `PG180`, `PG181`);
+- card battle rule upserts: `54`;
+- deprecated stale shadow rows: `80`;
+- Hermes SQLite sync: `pg_rows_loaded=5500`,
+  `sqlite_inserted_or_updated=5356`;
+- effective queue: `package_already_prepared=0`,
+  `package_ready_unprepared=0`, `split_scope_backlog=68`,
+  `runtime_family_backlog=24`, `manual_mapper_backlog=352`,
+  `blocked_missing_xmage_source=2`.
+
+Follow-up runtime validation exposed two provenance-only inconsistencies in
+already active verified rules. These were fixed as targeted PostgreSQL repair
+packages, not as new family promotion work:
+
+- `PG182` restored `oracle_hash` for `Seething Song`
+  (`updated_rows=1`, postcheck `matching_oracle_hash_rows=1`);
+- `PG183` restored `oracle_hash` for `Angel's Grace`
+  (`updated_rows=1`, postcheck `matching_oracle_hash_rows=1`);
+- latest PG -> Hermes sync after PG183: `pg_rows_loaded=5500`,
+  `sqlite_inserted_or_updated=5328`,
+  `canonical_snapshot_rows_exported=3243`;
+- consolidated evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg166_183_apply_summary_20260624.md`.
+
+Validation after PG183:
+
+- `xmage_strategy_consistency_audit_20260624_pg166_183_postsync_real_v1_default.json`
+  passed `17/17`;
+- battle strategy audit run
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_154831`
+  completed `16/16` seeds and `18/18` internal tests with command exit code
+  `0`;
+- the battle replay final status is still `blocked` by mandatory audit gates
+  outside the package lane:
+  `decision_trace_taxonomy=review_required`,
+  `event_contract_static=review_required`, `forensic_audit=blocked`,
+  `replay_decision_audit=review_required`, and
+  `strategy_audit=review_required`.
+
+The next implementation lane is now exact-scope modeling. Start with
+`targeted_damage_variant_v1`, but split it before promotion.
 
 Evidence:
 

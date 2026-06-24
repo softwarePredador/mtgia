@@ -1,0 +1,11 @@
+Pager usage is off.
+                 check_name                 |                  id                  |             scryfall_id              |              oracle_id               |               name               | set_code | collector_number | mana_cost |              type_line               | cmc 
+--------------------------------------------+--------------------------------------+--------------------------------------+--------------------------------------+----------------------------------+----------+------------------+-----------+--------------------------------------+-----
+ kaalia_alicia_card_backfill_postcheck_card | 2beb2cbd-d9d7-5b59-9c70-b72cc76c2b47 | 3db94749-340c-4454-a15d-ba6353e0c4a4 | 223504ba-174a-46f2-a4a2-5d663a82dfd3 | Alicia Masters, Skilled Sculptor | msc      | 48               | {1}{R}    | Legendary Creature — Human Artificer | 2.0
+(1 row)
+
+                    check_name                    | legality_rows | commander_legal_rows 
+--------------------------------------------------+---------------+----------------------
+ kaalia_alicia_card_backfill_postcheck_legalities |            23 |                    1
+(1 row)
+

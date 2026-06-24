@@ -1,0 +1,29 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg171_draw_engines_and_land_tutors_20260624_121147",
+  "deploy_id": "PG171",
+  "family_counts": {
+    "creature": 1,
+    "draw_engine": 2,
+    "land_ramp": 1
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg171_draw_engines_and_land_tutors_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg171_draw_engines_and_land_tutors_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg171_draw_engines_and_land_tutors_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg171_draw_engines_and_land_tutors_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg171_draw_engines_and_land_tutors_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg171_draw_engines_and_land_tutors_rollback.sql"
+  },
+  "generated_at": "2026-06-24T12:11:47+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Mystic Remora",
+    "Rhystic Study",
+    "Crop Rotation",
+    "Elvish Reclaimer"
+  ],
+  "selected_count": 4,
+  "slug": "draw_engines_and_land_tutors",
+  "status": "prepared_read_only_pending_apply_approval"
+}

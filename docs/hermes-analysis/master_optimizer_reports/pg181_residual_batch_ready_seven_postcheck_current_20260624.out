@@ -1,0 +1,11 @@
+      card_name       |   normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+----------------------+----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Bedevil              | bedevil              | battle_rule_v1:24839f966a77da6656c462aa885ccaa4 |                  1 |                           1 |                         1 |          14
+ Brass's Bounty       | brass's bounty       | battle_rule_v1:b5dabaaaba6b2cd47cd998989c11a1fa |                  1 |                           1 |                         1 |          14
+ Cathartic Reunion    | cathartic reunion    | battle_rule_v1:3af05007acd54aabd195ff390b8f082f |                  1 |                           1 |                         1 |          14
+ Crackle with Power   | crackle with power   | battle_rule_v1:a939ce51bf83fe086fc16a40d344752d |                  1 |                           1 |                         1 |          14
+ Invoke Justice       | invoke justice       | battle_rule_v1:13150949864474c123d5a02a7a007722 |                  1 |                           1 |                         1 |          14
+ Locket of Yesterdays | locket of yesterdays | battle_rule_v1:09662427b256781a39f50dd00ba9735b |                  1 |                           1 |                         1 |          14
+ Steelshaper's Gift   | steelshaper's gift   | battle_rule_v1:c7ff42f8ce9a2bca4470fba16cab034a |                  1 |                           1 |                         1 |          14
+(7 rows)
+

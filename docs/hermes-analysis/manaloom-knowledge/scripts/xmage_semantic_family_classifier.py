@@ -49,6 +49,13 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "implement_family_before_metadata_batch",
     },
+    "ramp_ritual": {
+        "effects": {"ramp_ritual"},
+        "support_status": "runtime_supported_by_local_artifact",
+        "implementation_unit": "one-shot and activated ritual mana bursts already modeled by the battle runtime",
+        "family_tests": [],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "ramp_permanent": {
         "effects": {"ramp_permanent"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -56,10 +63,31 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
+    "land_ramp": {
+        "effects": {"land_ramp"},
+        "support_status": "runtime_supported_by_local_artifact",
+        "implementation_unit": "search-based land tutoring and battlefield land entry with landfall-aware zone movement",
+        "family_tests": [],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
+    "land": {
+        "effects": {"land"},
+        "support_status": "runtime_supported_by_local_artifact",
+        "implementation_unit": "basic and simple land mana-source modeling already consumed by the battle runtime",
+        "family_tests": [],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "ramp_engine": {
         "effects": {"ramp_engine"},
         "support_status": "runtime_family_partially_supported_review_required",
         "implementation_unit": "triggered battlefield resource engines and resource-event bookkeeping",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "untap_land_engine": {
+        "effects": {"untap_land_engine"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "activated land-untap engines that convert board resources into contextual extra mana",
         "family_tests": [],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
@@ -75,6 +103,23 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "support_status": "runtime_family_partially_supported_review_required",
         "implementation_unit": "copy-target token creation with haste and end-step cleanup",
         "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "copy_spell_engine": {
+        "effects": {"copy_spell"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "stack spell copying from ETB, instant responses, and spell-cast battlefield triggers",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "copy_permanent_etb": {
+        "effects": {"copy_permanent_etb"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "permanent enters-the-battlefield copy replacement with optional extra card types",
+        "family_tests": [
+            "test_phyrexian_metamorph_enters_as_copy_of_best_creature_and_keeps_artifact_type",
+            "test_copy_enchantment_without_target_enters_as_self",
+        ],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
     "token_maker": {
@@ -146,6 +191,13 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "effects": {"draw_engine"},
         "support_status": "runtime_family_partially_supported_review_required",
         "implementation_unit": "static and activated draw-engine bookkeeping with delayed card movement",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "tutor": {
+        "effects": {"tutor"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "library search, constrained target selection, and zone movement to hand, top, graveyard, or battlefield",
         "family_tests": [],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
@@ -440,6 +492,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("produces") == "G"
         )
 
+    if effect == "creature" and scope == "vigilance_three_three_creatures_tap_any_color_v1":
+        return (
+            types == {"CREATURE", "ENCHANTMENT"}
+            and "GainAbilityControlledEffect" in effect_classes
+            and {"AnyColorManaAbility", "SimpleStaticAbility", "VigilanceAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 3
+            and bool(effect_json.get("vigilance"))
+            and bool(effect_json.get("creatures_tap_for_any_color"))
+            and effect_json.get("death_return_status") == "annotation_only"
+        )
+
     if effect == "counter_spell" and scope == "pact_of_negation_delayed_upkeep_counter_v1":
         return (
             types == {"INSTANT"}
@@ -578,6 +642,17 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("requires_sacrifice_creature"))
             and int(effect_json.get("mana_produced") or 0) == 3
             and effect_json.get("produces") == "R"
+        )
+
+    if effect == "ramp_ritual" and scope == "hand_exile_add_one_green_mana_ritual_v1":
+        return (
+            types == {"CREATURE"}
+            and not effect_classes
+            and ability_classes == {"SimpleManaAbility"}
+            and cost_classes == {"ExileSourceFromHandCost"}
+            and bool(effect_json.get("hand_exile_mana_ability"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "G"
         )
 
     if effect == "ramp_permanent" and scope == "self_sacrifice_fetch_land_two_land_subtypes_v1":
@@ -723,6 +798,153 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("tutor_destination") == "hand"
         )
 
+    if effect == "creature" and scope == "activated_land_tutor_with_land_sacrifice_and_graveyard_growth_v1":
+        return (
+            types == {"CREATURE"}
+            and {
+                "BoostSourceEffect",
+                "ConditionalContinuousEffect",
+                "SearchLibraryPutInPlayEffect",
+            }.issubset(effect_classes)
+            and {"SimpleActivatedAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and {"GenericManaCost", "SacrificeTargetCost", "TapSourceCost"}.issubset(cost_classes)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 2
+            and bool(effect_json.get("land_tutor_activated"))
+            and int(effect_json.get("activation_cost_generic") or 0) == 2
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("requires_sacrifice_land"))
+            and int(effect_json.get("land_count") or 0) == 1
+            and int(effect_json.get("lands_to_battlefield") or 0) == 1
+            and bool(effect_json.get("land_enters_tapped"))
+            and effect_json.get("tutor_target") == "land"
+            and bool(effect_json.get("plus_two_two_if_three_lands_in_your_graveyard"))
+        )
+
+    if effect == "tutor" and scope == "convoke_creature_tutor_to_battlefield_mana_value_x_or_less_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"SearchLibraryWithLessCMCPutInPlayEffect"}
+            and "ConvokeAbility" in ability_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "creature_to_battlefield"
+            and bool(effect_json.get("target_mana_value_max_from_x"))
+            and bool(effect_json.get("convoke"))
+        )
+
+    if effect == "tutor" and scope == "green_creature_tutor_to_battlefield_mana_value_x_or_less_then_shuffle_self_v1":
+        return (
+            types == {"SORCERY"}
+            and {"SearchLibraryWithLessCMCPutInPlayEffect", "ShuffleSpellEffect"}.issubset(effect_classes)
+            and not ability_classes
+            and not bool(effect_json.get("instant"))
+            and effect_json.get("target") == "green_creature_to_battlefield"
+            and bool(effect_json.get("target_mana_value_max_from_x"))
+            and bool(effect_json.get("shuffle_self_into_library_on_resolution"))
+        )
+
+    if effect == "tutor" and scope == "improvise_artifact_tutor_to_battlefield_mana_value_x_or_less_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"SearchLibraryWithLessCMCPutInPlayEffect"}
+            and "ImproviseAbility" in ability_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "artifact_to_battlefield"
+            and bool(effect_json.get("target_mana_value_max_from_x"))
+            and bool(effect_json.get("improvise"))
+        )
+
+    if effect == "tutor" and scope == "creature_tutor_to_battlefield_mana_value_x_or_less_harmonize_v1":
+        return (
+            types == {"SORCERY"}
+            and effect_classes == {"SearchLibraryPutInPlayEffect"}
+            and "HarmonizeAbility" in ability_classes
+            and not bool(effect_json.get("instant"))
+            and effect_json.get("target") == "creature_to_battlefield"
+            and bool(effect_json.get("target_mana_value_max_from_x"))
+            and bool(effect_json.get("harmonize"))
+        )
+
+    if effect == "copy_spell" and scope == "first_instant_sorcery_cast_each_turn_copy_own_spell_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"CopyTargetStackObjectEffect"}
+            and {"DoubleVisionCopyTriggeredAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and effect_json.get("trigger_effect") == "copy_spell"
+            and effect_json.get("target") == "own_instant_or_sorcery_on_stack"
+            and bool(effect_json.get("may_choose_new_targets"))
+            and bool(effect_json.get("trigger_first_instant_or_sorcery_each_turn"))
+        )
+
+    if effect == "copy_spell" and scope == "instant_sorcery_cast_copy_own_spell_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"CopyTargetStackObjectEffect"}
+            and ability_classes == {"SpellCastControllerTriggeredAbility"}
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and effect_json.get("trigger_effect") == "copy_spell"
+            and effect_json.get("target") == "own_instant_or_sorcery_on_stack"
+            and bool(effect_json.get("may_choose_new_targets"))
+            and not bool(effect_json.get("trigger_first_instant_or_sorcery_each_turn"))
+        )
+
+    if effect == "untap_land_engine" and scope == "x_tap_untap_x_lands_v1":
+        return (
+            types == {"ARTIFACT"}
+            and effect_classes == {"UntapTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"TapSourceCost"}
+            and bool(effect_json.get("activated_untap_lands_for_mana_unlock"))
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("activation_cost_generic_from_x"))
+            and bool(effect_json.get("untap_target_land_count_from_x"))
+            and effect_json.get("untap_target_land_restriction") == "land"
+        )
+
+    if effect == "untap_land_engine" and scope == "tap_untapped_creature_untap_target_basic_land_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"UntapTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"TapTargetCost"}
+            and bool(effect_json.get("activated_untap_lands_for_mana_unlock"))
+            and bool(effect_json.get("activation_taps_untapped_creature_you_control"))
+            and int(effect_json.get("untap_target_land_count") or 0) == 1
+            and bool(effect_json.get("untap_target_land_basic_only"))
+        )
+
+    if effect == "untap_land_engine" and scope == "creature_x_tap_untap_x_lands_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"UntapTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"TapSourceCost"}
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 2
+            and bool(effect_json.get("activated_untap_lands_for_mana_unlock"))
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("activation_cost_generic_from_x"))
+            and bool(effect_json.get("untap_target_land_count_from_x"))
+            and effect_json.get("untap_target_land_restriction") == "land"
+        )
+
+    if effect == "untap_land_engine" and scope == "pay_two_return_land_untap_target_land_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"UntapTargetEffect"}
+            and {"FlyingAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"GenericManaCost", "ReturnToHandChosenControlledPermanentCost"}.issubset(cost_classes)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("activated_untap_lands_for_mana_unlock"))
+            and int(effect_json.get("activation_cost_generic") or 0) == 2
+            and bool(effect_json.get("activation_returns_land_to_hand"))
+            and int(effect_json.get("untap_target_land_count") or 0) == 1
+            and effect_json.get("untap_target_land_restriction") == "land"
+        )
+
     if effect == "extra_turn" and scope == "single_extra_turn_then_lose_game_v1":
         return (
             types in ({"INSTANT"}, {"SORCERY"})
@@ -866,6 +1088,53 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("token_flying"))
             and bool(effect_json.get("token_haste"))
             and bool(effect_json.get("sacrifice_token_at_end_step"))
+        )
+
+    if effect == "copy_permanent_etb" and scope == "etb_copy_target_permanent_with_optional_extra_type_v1":
+        target_types = effect_json.get("copy_target_types")
+        additional_types = effect_json.get("copy_additional_types") or []
+        return (
+            bool(types)
+            and types.issubset({"ARTIFACT", "CREATURE", "ENCHANTMENT"})
+            and "CopyPermanentEffect" in effect_classes
+            and "EntersBattlefieldAbility" in ability_classes
+            and target_types in (
+                ["artifact"],
+                ["artifact", "creature"],
+                ["artifact", "enchantment"],
+                ["enchantment"],
+                ["nonland_permanent"],
+            )
+            and effect_json.get("target_controller") == "any"
+            and set(additional_types).issubset({"artifact", "enchantment"})
+        )
+
+    if effect == "copy_permanent_etb" and scope == "etb_copy_target_creature_with_copy_applier_modifiers_v1":
+        additional_types = effect_json.get("copy_additional_types") or []
+        additional_subtypes = effect_json.get("copy_additional_subtypes") or []
+        granted_keywords = effect_json.get("copy_granted_keywords") or []
+        overwrite_types = effect_json.get("copy_overwrite_types") or []
+        overwrite_subtypes = effect_json.get("copy_overwrite_subtypes") or []
+        crew_value = effect_json.get("copy_vehicle_crew_value")
+        return (
+            bool(types)
+            and types.issubset({"ARTIFACT", "CREATURE"})
+            and "CopyPermanentEffect" in effect_classes
+            and "EntersBattlefieldAbility" in ability_classes
+            and effect_json.get("copy_target_types") == ["creature"]
+            and effect_json.get("target_controller") in {"any", "opponent"}
+            and set(additional_types).issubset({"artifact"})
+            and set(additional_subtypes).issubset({"Bird", "Illusion"})
+            and set(granted_keywords).issubset({"flying", "haste"})
+            and set(overwrite_types).issubset({"artifact"})
+            and set(overwrite_subtypes).issubset({"Vehicle"})
+            and (crew_value is None or int(crew_value) == 3)
+            and effect_json.get("copy_target_mana_value_lte_source_mana_value") in {None, False, True}
+            and (
+                effect_json.get("copy_grant_vanishing_if_missing") is None
+                or int(effect_json.get("copy_grant_vanishing_if_missing") or 0) == 3
+            )
+            and effect_json.get("copy_sacrifice_when_targeted") in {None, False, True}
         )
 
     if effect == "creature" and scope == "landfall_optional_pay_copy_attached_creature_else_insect_v1":
@@ -1039,6 +1308,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("produces") == "G"
         )
 
+    if effect == "creature" and scope == "one_mana_one_one_black_pain_mana_dork_v1":
+        return (
+            types == {"CREATURE"}
+            and ability_classes == {"SimpleManaAbility"}
+            and effect_classes == {"DamageControllerEffect"}
+            and xmage_cost_classes(card) == {"TapSourceCost"}
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("is_mana_source"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "B"
+            and int(effect_json.get("damage_on_tap") or 0) == 1
+            and effect_json.get("tap_damage_status") == "annotation_only"
+        )
+
     if effect == "creature" and scope == "one_mana_one_one_white_mana_dork_v1":
         return (
             types == {"CREATURE"}
@@ -1062,6 +1346,154 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("is_mana_source"))
             and int(effect_json.get("mana_produced") or 0) == 1
             and effect_json.get("produces") == "WUBRG"
+        )
+
+    if effect == "creature" and scope == "one_mana_zero_one_exalted_tricolor_mana_dork_v1":
+        return (
+            types == {"CREATURE"}
+            and ability_classes in (
+                {"BlueManaAbility", "ExaltedAbility", "GreenManaAbility", "WhiteManaAbility"},
+                {"BlackManaAbility", "ExaltedAbility", "GreenManaAbility", "RedManaAbility"},
+            )
+            and not effect_classes
+            and int(effect_json.get("power") or 0) == 0
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("exalted"))
+            and bool(effect_json.get("is_mana_source"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") in {"GWU", "BRG"}
+        )
+
+    if effect == "creature" and scope == "one_one_color_diversity_mana_dork_v1":
+        return (
+            types == {"CREATURE"}
+            and ability_classes == {"AddEachControlledColorManaAbility"}
+            and not effect_classes
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("is_mana_source"))
+            and bool(effect_json.get("mana_produced_from_colors_among_permanents"))
+            and bool(effect_json.get("mana_colors_from_controlled_permanents"))
+            and effect_json.get("produces") == "WUBRG"
+        )
+
+    if effect == "creature" and scope == "two_one_green_per_creature_mana_dork_v1":
+        return (
+            types == {"CREATURE"}
+            and ability_classes == {"DynamicManaAbility"}
+            and not effect_classes
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("is_mana_source"))
+            and bool(effect_json.get("mana_produced_from_controlled_creatures"))
+            and effect_json.get("produces") == "G"
+        )
+
+    if effect == "land" and scope == "basic_one_color_land_v1":
+        return (
+            types == {"LAND"}
+            and not effect_classes
+            and ability_classes in ({"WhiteManaAbility"}, {"RedManaAbility"})
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") in {"W", "R"}
+            and effect_json.get("basic_land_types") in (["Plains"], ["Mountain"])
+        )
+
+    if effect == "land" and scope == "any_color_from_opponent_land_production_v1":
+        return (
+            types == {"LAND"}
+            and not effect_classes
+            and ability_classes == {"AnyColorLandsProduceManaAbility"}
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "WUBRG"
+            and bool(effect_json.get("opponent_land_color_dependency"))
+        )
+
+    if effect == "land" and scope == "colorless_or_any_color_pain_land_v1":
+        return (
+            types == {"LAND"}
+            and effect_classes == {"DamageControllerEffect"}
+            and ability_classes == {"AnyColorManaAbility", "SimpleManaAbility"}
+            and xmage_cost_classes(card) == {"TapSourceCost"}
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "CWUBRG"
+            and int(effect_json.get("life_for_colored_mana") or 0) == 3
+            and effect_json.get("life_loss_on_colored_mana_status") == "annotation_only"
+        )
+
+    if effect == "ramp_permanent" and scope == "creature_support_any_color_mana_rock_v1":
+        return (
+            types == {"ARTIFACT"}
+            and ability_classes == {"AnyColorManaAbility"}
+            and not effect_classes
+            and xmage_cost_classes(card) == {"TapTargetCost"}
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "WUBRG"
+            and bool(effect_json.get("mana_source_requires_untapped_creature"))
+        )
+
+    if effect == "ramp_permanent" and scope == "one_any_color_mana_rock_v1":
+        return (
+            types == {"ARTIFACT"}
+            and ability_classes == {"AnyColorManaAbility"}
+            and not effect_classes
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "WUBRG"
+            and not effect_json.get("mana_source_requires_untapped_creature")
+        )
+
+    if effect == "ramp_permanent" and scope == "pain_talisman_color_pair_partial_v1":
+        return (
+            types == {"ARTIFACT"}
+            and "ColorlessManaAbility" in ability_classes
+            and effect_classes == {"DamageControllerEffect"}
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and isinstance(effect_json.get("produces"), str)
+            and len(effect_json.get("produces")) == 3
+            and "C" in effect_json.get("produces")
+            and int(effect_json.get("life_for_colored_mana") or 0) == 1
+        )
+
+    if effect == "ramp_permanent" and scope == "artifact_or_creature_support_colorless_mana_rock_v1":
+        return (
+            types == {"ARTIFACT"}
+            and "ColorlessManaAbility" in ability_classes
+            and "TapTargetCost" in xmage_cost_classes(card)
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "C"
+            and bool(effect_json.get("mana_source_requires_untapped_artifact_or_creature"))
+        )
+
+    if effect == "ramp_permanent" and scope == "three_colorless_monolith_mana_rock_v1":
+        return (
+            types == {"ARTIFACT"}
+            and {
+                "DontUntapInControllersUntapStepSourceEffect",
+                "UntapSourceEffect",
+            }.issubset(effect_classes)
+            and {
+                "SimpleActivatedAbility",
+                "SimpleManaAbility",
+                "SimpleStaticAbility",
+            }.issubset(ability_classes)
+            and int(effect_json.get("mana_produced") or 0) == 3
+            and effect_json.get("produces") == "C"
+            and bool(effect_json.get("does_not_untap_in_untap_step"))
+            and int(effect_json.get("activated_untap_cost_generic") or 0) in {3, 4}
+        )
+
+    if effect == "land_ramp" and scope == "sacrifice_land_for_any_land_to_battlefield_untapped_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"SearchLibraryPutInPlayEffect"}
+            and not ability_classes
+            and cost_classes == {"SacrificeTargetCost"}
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("requires_sacrifice_land"))
+            and int(effect_json.get("land_count") or 0) == 1
+            and int(effect_json.get("lands_to_battlefield") or 0) == 1
+            and not bool(effect_json.get("land_enters_tapped"))
+            and effect_json.get("tutor_target") == "land"
         )
 
     if effect == "ramp_permanent" and scope == "two_colorless_mana_rock_v1":
@@ -1180,6 +1612,24 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("flying"))
             and int(effect_json.get("opponent_draws_card_may_draw") or 0) == 2
         )
+
+    if scope == "opponent_draws_card_damage_that_player_v1":
+        common = (
+            effect_json.get("trigger") == "opponent_draw"
+            and int(effect_json.get("opponent_draw_damage_per_card") or 0) == 1
+            and effect_classes == {"DamageTargetEffect"}
+            and ability_classes == {"DrawCardOpponentTriggeredAbility"}
+        )
+        if effect == "creature":
+            return (
+                common
+                and types == {"CREATURE", "ENCHANTMENT"}
+                and int(effect_json.get("power") or 0) == 3
+                and int(effect_json.get("toughness") or 0) == 4
+            )
+        if effect == "passive":
+            return common and types == {"ENCHANTMENT"}
+        return False
 
     if effect == "creature" and scope == "flash_flying_second_opponent_draw_draw_one_and_activated_each_player_draw_v1":
         return (
@@ -1425,6 +1875,35 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("token_colors") == ["G"]
         )
 
+    if effect == "passive" and scope == "creatures_tap_any_color_static_enchantment_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"GainAbilityControlledEffect"}
+            and ability_classes == {"AnyColorManaAbility", "SimpleStaticAbility"}
+            and bool(effect_json.get("creatures_tap_for_any_color"))
+        )
+
+    if effect == "passive" and scope == "opponent_discards_card_damage_that_player_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"DamageTargetEffect"}
+            and ability_classes == {"DiscardsACardOpponentTriggeredAbility"}
+            and not cost_classes
+            and effect_json.get("trigger") == "opponent_discard"
+            and int(effect_json.get("opponent_discard_damage_per_card") or 0) == 2
+        )
+
+    if effect == "passive" and scope == "controller_discards_card_damage_any_target_and_gain_life_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {"DamageTargetEffect", "GainLifeEffect"}.issubset(effect_classes)
+            and ability_classes == {"DiscardCardControllerTriggeredAbility"}
+            and not cost_classes
+            and effect_json.get("trigger") == "controller_discard"
+            and int(effect_json.get("controller_discard_damage_any_target") or 0) == 1
+            and int(effect_json.get("controller_discard_gain_life") or 0) == 1
+        )
+
     if effect == "creature" and scope == "magda_dwarf_tap_treasure_and_five_treasure_tutor_v1":
         return (
             types == {"CREATURE"}
@@ -1470,6 +1949,40 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("activated_pay_life") or 0) == 1
             and bool(effect_json.get("activated_exile_top_card_face_down"))
             and bool(effect_json.get("activated_put_exiled_card_into_hand_next_end_step"))
+        )
+
+    if effect == "draw_engine" and scope == "opponent_spell_pay_one_or_draw_engine_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"OneShotEffect", "RhysticStudyDrawEffect"}
+            and ability_classes == {"SpellCastOpponentTriggeredAbility"}
+            and not cost_classes
+            and effect_json.get("trigger") == "opponent_spell"
+            and int(effect_json.get("tax") or 0) == 1
+            and not bool(effect_json.get("draw_on_enter"))
+        )
+
+    if effect == "draw_engine" and scope == "opponent_noncreature_spell_pay_four_draw_engine_with_cumulative_upkeep_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"MysticRemoraEffect", "OneShotEffect"}
+            and {"CumulativeUpkeepAbility", "MysticRemoraTriggeredAbility"}.issubset(ability_classes)
+            and not cost_classes
+            and effect_json.get("trigger") == "opponent_noncreature_spell"
+            and int(effect_json.get("tax") or 0) == 4
+            and not bool(effect_json.get("draw_on_enter"))
+            and int(effect_json.get("cumulative_upkeep_generic") or 0) == 1
+        )
+
+    if effect == "draw_engine" and scope == "opponent_discards_card_may_draw_v1":
+        return (
+            types == {"ARTIFACT"}
+            and effect_classes == {"DrawCardSourceControllerEffect"}
+            and ability_classes == {"DiscardsACardOpponentTriggeredAbility"}
+            and not cost_classes
+            and effect_json.get("trigger") == "opponent_discard"
+            and int(effect_json.get("opponent_discard_draw_per_card") or 0) == 1
+            and not bool(effect_json.get("draw_on_enter"))
         )
 
     if effect == "artifact" and scope == "multikicker_charge_counter_mana_rock_v1":

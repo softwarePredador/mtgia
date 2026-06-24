@@ -1,0 +1,5 @@
+   card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Exotic Orchard | exotic orchard  | battle_rule_v1:f07edd2f4f3e3c9897f03ec390a5cf44 |                  1 |                           1 |                         1 |           2
+(1 row)
+

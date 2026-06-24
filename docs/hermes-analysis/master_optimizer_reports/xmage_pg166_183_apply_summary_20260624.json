@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-06-24T15:58:00Z",
+  "scope": "XMage -> ManaLoom current Lorehold/opponent queue",
+  "apply_gate": "Approved in chat by Rafael with: sincronize, suba pg se for preciso, commite, faca tudo.",
+  "postgres_source_of_truth": true,
+  "hermes_sqlite_role": "sync_cache_evidence",
+  "package_wave": {
+    "pg166_181": {
+      "packages_applied": 15,
+      "rule_upserts": 54,
+      "deprecated_stale_shadow_rows": 80,
+      "postcheck_verified_auto_rows": 54,
+      "summary_json": "docs/hermes-analysis/master_optimizer_reports/xmage_pg166_181_apply_summary_20260624.json"
+    },
+    "pg182": {
+      "package": "pg182_seething_song_oracle_hash",
+      "purpose": "restore oracle_hash provenance for active Seething Song verified/auto rule",
+      "updated_rows": 1,
+      "postcheck_matching_oracle_hash_rows": 1
+    },
+    "pg183": {
+      "package": "pg183_angels_grace_oracle_hash",
+      "purpose": "restore oracle_hash provenance for active Angel's Grace verified/auto rule",
+      "updated_rows": 1,
+      "postcheck_matching_oracle_hash_rows": 1
+    }
+  },
+  "sync_reports": [
+    {
+      "report": "docs/hermes-analysis/master_optimizer_reports/battle_card_rules_cache_sync_pg166_181_20260624.json",
+      "pg_rows_loaded": 5500,
+      "sqlite_inserted_or_updated": 5356,
+      "canonical_snapshot_rows_exported": 3243
+    },
+    {
+      "report": "docs/hermes-analysis/master_optimizer_reports/battle_card_rules_cache_sync_pg182_20260624.json",
+      "pg_rows_loaded": 5500,
+      "sqlite_inserted_or_updated": 5328,
+      "canonical_snapshot_rows_exported": 3243
+    },
+    {
+      "report": "docs/hermes-analysis/master_optimizer_reports/battle_card_rules_cache_sync_pg183_20260624.json",
+      "pg_rows_loaded": 5500,
+      "sqlite_inserted_or_updated": 5328,
+      "canonical_snapshot_rows_exported": 3243
+    }
+  ],
+  "effective_queue_after_pg166_181": {
+    "package_already_prepared": 0,
+    "package_ready_unprepared": 0,
+    "split_scope_backlog": 68,
+    "runtime_family_backlog": 24,
+    "manual_mapper_backlog": 352,
+    "blocked_missing_xmage_source": 2
+  },
+  "validation": {
+    "strategy_consistency_audit": {
+      "report": "docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg166_183_postsync_real_v1_default.json",
+      "status": "pass",
+      "checks": 17
+    },
+    "battle_strategy_audit": {
+      "run_dir": "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_154831",
+      "seeds_completed": "16/16",
+      "test_results_status_counts": {
+        "pass": 18
+      },
+      "command_exit_code": 0,
+      "battle_replay_final_status": "blocked",
+      "battle_replay_final_status_reason": "one_or_more_mandatory_gates_blocked",
+      "remaining_mandatory_gate_divergences": [
+        "decision_trace_taxonomy=review_required",
+        "event_contract_static=review_required",
+        "forensic_audit=blocked",
+        "replay_decision_audit=review_required",
+        "strategy_audit=review_required"
+      ]
+    }
+  }
+}

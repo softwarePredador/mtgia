@@ -37,6 +37,7 @@ ADDITIONAL_CANONICAL_NAMES = {
     "Harrow",
     "Hullbreaker Horror",
     "Icatian Moneychanger",
+    "Infernal Plunge",
     "Momentary Blink",
     "Mox Diamond",
     "Mental Misstep",

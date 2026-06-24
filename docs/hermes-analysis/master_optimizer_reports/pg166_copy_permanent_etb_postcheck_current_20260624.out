@@ -1,0 +1,9 @@
+      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+---------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Clever Impersonator | clever impersonator | battle_rule_v1:743bc58026f68050c6ef7c902ce85cde |                  1 |                           1 |                         1 |           4
+ Copy Artifact       | copy artifact       | battle_rule_v1:d466142f168d3c2d58c0594eb14214c9 |                  1 |                           1 |                         1 |           4
+ Copy Enchantment    | copy enchantment    | battle_rule_v1:ca58149e510c6834c2ed6ae602074483 |                  1 |                           1 |                         1 |           4
+ Mirrormade          | mirrormade          | battle_rule_v1:d267ffd54ecf9c5026b8aaf43076edc9 |                  1 |                           1 |                         1 |           4
+ Phyrexian Metamorph | phyrexian metamorph | battle_rule_v1:1c9b7206e4e878ac743fc9186cdf5beb |                  1 |                           1 |                         1 |           4
+(5 rows)
+

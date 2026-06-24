@@ -1,0 +1,28 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg166_copy_permanent_etb_20260624_111014",
+  "deploy_id": "PG166",
+  "family_counts": {
+    "copy_permanent_etb": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg166_copy_permanent_etb_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg166_copy_permanent_etb_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg166_copy_permanent_etb_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg166_copy_permanent_etb_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg166_copy_permanent_etb_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg166_copy_permanent_etb_rollback.sql"
+  },
+  "generated_at": "2026-06-24T11:10:14+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Copy Enchantment",
+    "Mirrormade",
+    "Phyrexian Metamorph",
+    "Clever Impersonator",
+    "Copy Artifact"
+  ],
+  "selected_count": 5,
+  "slug": "copy_permanent_etb",
+  "status": "prepared_read_only_pending_apply_approval"
+}

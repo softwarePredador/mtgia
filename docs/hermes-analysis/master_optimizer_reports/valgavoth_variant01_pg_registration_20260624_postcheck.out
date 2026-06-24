@@ -1,0 +1,16 @@
+Pager usage is off.
+              check_name               |                  id                  |                             name                             |          archetype           | deck_card_rows | deck_qty | commander_qty 
+---------------------------------------+--------------------------------------+--------------------------------------------------------------+------------------------------+----------------+----------+---------------
+ pg_valgavoth_variant01_postcheck_deck | c77cb83c-dd28-5d66-a0d8-799079a848bb | PG REGISTERED Valgavoth Variant 01 - Rafael Paste 2026-06-24 | rakdos-pain-punisher-variant |             87 |      100 |             1
+(1 row)
+
+                check_name                |                  id                  |        commander_name        |         source_system         |                source_ref                 | card_count |              legal_status               | is_active | promoted_at 
+------------------------------------------+--------------------------------------+------------------------------+-------------------------------+-------------------------------------------+------------+-----------------------------------------+-----------+-------------
+ pg_valgavoth_variant01_postcheck_learned | acdbd53f-f1a9-5c78-823e-3127d92c8b02 | Valgavoth, Harrower of Souls | manual_user_deck_registration | valgavoth_variant01_20260624_b037751a69fa |        100 | registered_pending_card_rule_validation | f         | 
+(1 row)
+
+                     check_name                      | missing_rows 
+-----------------------------------------------------+--------------
+ pg_valgavoth_variant01_postcheck_missing_deck_cards |            0
+(1 row)
+

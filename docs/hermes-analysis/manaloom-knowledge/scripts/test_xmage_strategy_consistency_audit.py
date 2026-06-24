@@ -133,6 +133,52 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
         self.assertEqual(report["status"], "pass", report["checks"])
         self.assertEqual(report["summary"]["status_counts"].get("fail", 0), 0)
 
+    def test_benchmark_audit_accepts_exact_scope_as_post_package_next_lane(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "benchmark.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "summary": {
+                            "recommended_strategy_id": "hybrid_effective_queue_pattern_registry",
+                            "ranking": [
+                                {"strategy_id": "exact_scope_cluster_first", "decision_score": 73.21},
+                                {"strategy_id": "hybrid_effective_queue_pattern_registry", "decision_score": 67.91},
+                            ],
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            checks = audit.audit_benchmark(path)
+
+        statuses = {check.name: check.status for check in checks}
+        self.assertEqual(statuses["benchmark.recommended_strategy"], "pass")
+        self.assertEqual(statuses["benchmark.hybrid_strategy_ranked"], "pass")
+        self.assertEqual(statuses["benchmark.ranking_first"], "pass")
+
+    def test_effective_queue_audit_accepts_zero_prepared_packages_after_apply(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "queue.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "effective_queue": {
+                            "lane_counts": {
+                                "package_ready_unprepared": 0,
+                                "package_already_prepared": 0,
+                            }
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            checks = audit.audit_effective_queue(path)
+
+        statuses = {check.name: check.status for check in checks}
+        self.assertEqual(statuses["effective_queue.package_ready_unprepared"], "pass")
+        self.assertEqual(statuses["effective_queue.package_already_prepared"], "pass")
+
 
 if __name__ == "__main__":
     unittest.main()

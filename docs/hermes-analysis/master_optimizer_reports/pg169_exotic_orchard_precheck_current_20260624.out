@@ -1,0 +1,5 @@
+   card_name    | normalized_name |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+----------------+-----------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Exotic Orchard | exotic orchard  | d63befc8ac40d9a38732f9b5c1a7414a | battle_rule_v1:f07edd2f4f3e3c9897f03ec390a5cf44 |                1 | f9fecf31-2518-4620-97bd-1e0abcc4785e |                  2 |                         0 |                           2
+(1 row)
+

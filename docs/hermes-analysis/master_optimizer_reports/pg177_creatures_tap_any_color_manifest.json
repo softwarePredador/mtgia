@@ -1,0 +1,26 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg177_creatures_tap_any_color_20260624_131953",
+  "deploy_id": "PG177",
+  "family_counts": {
+    "creature": 1,
+    "passive": 1
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg177_creatures_tap_any_color_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg177_creatures_tap_any_color_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg177_creatures_tap_any_color_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg177_creatures_tap_any_color_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg177_creatures_tap_any_color_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg177_creatures_tap_any_color_rollback.sql"
+  },
+  "generated_at": "2026-06-24T13:19:53+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Enduring Vitality",
+    "Cryptolith Rite"
+  ],
+  "selected_count": 2,
+  "slug": "creatures_tap_any_color",
+  "status": "prepared_read_only_pending_apply_approval"
+}

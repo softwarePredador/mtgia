@@ -179,34 +179,49 @@ Rule:
 ## Current effective queue
 
 Current queue from
-`xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v5_proposals.json`
-after subtracting prepared package manifests:
+`xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_proposals.json`
+after applying PG166-PG181 and syncing PG -> Hermes:
 
-- `package_already_prepared=54`
+- `package_already_prepared=0`
 - `package_ready_unprepared=0`
 - `split_scope_backlog=68`
 - `runtime_family_backlog=24`
-- `manual_mapper_backlog=356`
+- `manual_mapper_backlog=352`
 - `blocked_missing_xmage_source=2`
 
 ## Current execution order
 
-1. Do not remodel the `54` cards already covered by prepared PG package
-   manifests. Move them through precheck/apply/postcheck/sync/audit only after
-   explicit approval for the exact PostgreSQL command.
-2. Hit the largest split-scope clusters in order:
+1. The prepared package lane is closed for this scope. PG166-PG181 applied
+   `54` rule upserts, deprecated `80` stale shadow rows, and PG -> Hermes sync
+   refreshed `5356` SQLite rows from `5500` PG rows.
+2. PG182 and PG183 were targeted provenance repairs discovered by runtime
+   validation after sync:
+   - PG182 restored `Seething Song` `oracle_hash`;
+   - PG183 restored `Angel's Grace` `oracle_hash`;
+   - the latest PG -> Hermes sync refreshed `5328` SQLite rows from `5500`
+     PG rows and exported `3243` canonical snapshot rows.
+3. The latest strategy consistency audit
+   `xmage_strategy_consistency_audit_20260624_pg166_183_postsync_real_v1_default.json`
+   passed `17/17`.
+4. Battle audit
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_154831`
+   completed `16/16` seeds and `18/18` internal tests, but the final replay
+   status remains `blocked` by mandatory review gates:
+   `decision_trace_taxonomy`, `event_contract_static`, `forensic_audit`,
+   `replay_decision_audit`, and `strategy_audit`.
+5. Hit the largest split-scope clusters in order:
    - `targeted_damage_variant_v1` (`21`)
    - `source_controller_draw_variant_v1` (`17`)
    - `source_add_counters_variant_v1` (`11`)
    - `targeted_destroy_variant_v1` (`10`)
-3. For `targeted_damage_variant_v1`, split into subpatterns before promotion.
+6. For `targeted_damage_variant_v1`, split into subpatterns before promotion.
    The XMage test miner found references for `7/21` cards and only `2/21`
    directly usable scenario candidates, so this is a high-value cluster but not
    one executable behavior.
-4. Only then open new runtime on the most reusable exact-scope groups:
+7. Only then open new runtime on the most reusable exact-scope groups:
    - `damage_all_variant_v1` (`2`)
    - `destroy_all_permanents_or_creatures_variant_v1` (`2`)
-5. Do not let `token_maker` lead runtime work yet:
+8. Do not let `token_maker` lead runtime work yet:
    - it is `20` cards across `20` scopes;
    - first it needs taxonomy/test-miner support, not direct executor work.
 
@@ -254,16 +269,16 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_current_replay_bat
   --include-deck-id 611 --include-deck-id 612 --include-deck-id 613 \
   --include-deck-id 614 --include-deck-id 615 --include-deck-id 616 \
   --include-deck-id 617 --include-deck-id 618 --include-deck-id 619 \
-  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7
+  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8
 ```
 
 Validate strategy/project consistency:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py \
-  --pattern-registry-report docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_pattern_registry.json \
-  --pipeline-manifest docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_manifest.json \
-  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_expanded_608_619_real_v4_pipeline_registry_v7_manifest
+  --pattern-registry-report docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_pattern_registry.json \
+  --pipeline-manifest docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_manifest.json \
+  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg166_181_postsync_real_v5
 ```
 
 ## Definition of a good next cycle

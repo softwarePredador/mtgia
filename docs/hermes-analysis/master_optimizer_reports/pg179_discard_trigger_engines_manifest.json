@@ -1,0 +1,27 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg179_discard_trigger_engines_20260624_140220",
+  "deploy_id": "PG179",
+  "family_counts": {
+    "draw_engine": 1,
+    "passive": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg179_discard_trigger_engines_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg179_discard_trigger_engines_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg179_discard_trigger_engines_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg179_discard_trigger_engines_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg179_discard_trigger_engines_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg179_discard_trigger_engines_rollback.sql"
+  },
+  "generated_at": "2026-06-24T14:04:19+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Feast of Sanity",
+    "Geth's Grimoire",
+    "Megrim"
+  ],
+  "selected_count": 3,
+  "slug": "discard_trigger_engines",
+  "status": "prepared_read_only_pending_apply_approval"
+}

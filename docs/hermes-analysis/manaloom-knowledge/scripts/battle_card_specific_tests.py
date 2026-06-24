@@ -3344,8 +3344,8 @@ def register_tests(battle, player):
             ),
             (
                 {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact"},
-                "colorless_two_mana_rock_v1",
-                "battle_rule_v1:54660395e3972806e107ca61c374b218",
+                "two_colorless_mana_rock_v1",
+                "battle_rule_v1:42621fcae461313f674d46db0da059af",
                 "7d286f5619ac8934fb07abf152ffcb60",
                 2,
             ),
@@ -3726,7 +3726,7 @@ def register_tests(battle, player):
 
         assert miscast["effect"] == "counter"
         assert miscast["instant"] is True
-        assert miscast["target"] == "instant_or_sorcery"
+        assert miscast["target"] == "instant_or_sorcery_spell"
         assert steamkin["effect"] == "creature"
         assert steamkin["effect"] != "ramp_ritual"
         assert steamkin["is_creature_permanent"] is True
@@ -3788,6 +3788,461 @@ def register_tests(battle, player):
         assert lumberjack_fields["rule_source"] == "manual_runtime_waiver"
         assert lumberjack_fields["rule_review_status"] == "verified"
         assert lumberjack_fields["rule_logical_key"]
+
+    def test_summoning_sick_mana_creature_does_not_add_mana_when_cast():
+        active = player("Active")
+        opponent = player("Opponent")
+        active.hand = [{"name": "Llanowar Elves", "cmc": 1, "type_line": "Creature — Elf Druid"}]
+        active.battlefield = [{"name": "Forest", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1}]
+        active.refresh_mana_sources(turn=2)
+
+        acted = battle.cast_spells_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=2,
+            phase="precombat_main",
+            stack=battle.Stack(),
+            rng=random.Random(20624),
+        )
+
+        assert acted is True
+        assert any(permanent.get("name") == "Llanowar Elves" for permanent in active.battlefield if isinstance(permanent, dict))
+        assert active.available_mana() == 0
+
+    def test_bloom_tender_refresh_counts_distinct_colors_among_controlled_permanents():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Bloom Tender",
+                "effect": "creature",
+                "type_line": "Creature — Elf Druid",
+                "power": 1,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced_from_colors_among_permanents": True,
+                "mana_colors_from_controlled_permanents": True,
+                "produces": "WUBRG",
+            },
+            {"name": "Forest", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+            {"name": "Island", "effect": "land", "type_line": "Land", "produces": "U", "mana_produced": 1},
+            {"name": "Plains", "effect": "land", "type_line": "Land", "produces": "W", "mana_produced": 1},
+        ]
+
+        active.refresh_mana_sources(turn=4)
+
+        assert active.available_mana() == 6
+        assert active.mana_pool.generic == 3
+
+    def test_circle_of_dreams_druid_refresh_counts_controlled_creatures():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Circle of Dreams Druid",
+                "effect": "creature",
+                "type_line": "Creature — Elf Druid",
+                "power": 2,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced_from_controlled_creatures": True,
+                "produces": "G",
+            },
+            {"name": "Elf Token", "effect": "creature", "type_line": "Creature — Elf", "power": 1, "toughness": 1},
+            {"name": "Bird Token", "effect": "creature", "type_line": "Creature — Bird", "power": 1, "toughness": 1},
+        ]
+
+        active.refresh_mana_sources(turn=5)
+
+        assert active.mana_pool.green == 3
+        assert active.available_mana() == 3
+
+    def test_springleaf_drum_requires_untapped_creature_support_for_mana_refresh():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Springleaf Drum",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "mana_source_requires_untapped_creature": True,
+            }
+        ]
+
+        active.refresh_mana_sources(turn=6)
+        assert active.available_mana() == 0
+
+        active.battlefield.append(
+            {
+                "name": "Support Creature",
+                "effect": "creature",
+                "type_line": "Creature — Elf",
+                "power": 1,
+                "toughness": 1,
+            }
+        )
+        active.refresh_mana_sources(turn=7)
+        assert active.available_mana() == 1
+
+    def test_monolith_refresh_adds_three_colorless_when_untapped():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Basalt Monolith",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "mana_produced": 3,
+                "produces": "C",
+                "does_not_untap_in_untap_step": True,
+                "activated_untap_cost_generic": 3,
+                "tapped": False,
+            }
+        ]
+
+        active.refresh_mana_sources(turn=8)
+
+        assert active.available_mana() == 3
+        assert active.mana_pool.colorless == 3
+
+    def test_monolith_does_not_untap_during_untap_step():
+        active = player("Active")
+        opponent = player("Opponent")
+        monolith = {
+            "name": "Grim Monolith",
+            "effect": "ramp_permanent",
+            "type_line": "Artifact",
+            "mana_produced": 3,
+            "produces": "C",
+            "does_not_untap_in_untap_step": True,
+            "activated_untap_cost_generic": 4,
+            "tapped": True,
+        }
+        active.battlefield = [
+            monolith,
+            {"name": "Plains", "effect": "land", "type_line": "Land", "produces": "W", "mana_produced": 1},
+        ]
+
+        battle.play_turn_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=9,
+            rng=random.Random(20625),
+            stack=battle.Stack(),
+        )
+
+        assert monolith["tapped"] is True
+
+    def test_candelabra_of_tawnos_reuses_ancient_tomb_for_contextual_unlock():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Candelabra of Tawnos",
+                    "effect": "untap_land_engine",
+                    "type_line": "Artifact",
+                    "activation_requires_tap": True,
+                    "activation_cost_generic_from_x": True,
+                    "untap_target_land_count_from_x": True,
+                    "untap_target_land_restriction": "land",
+                },
+                {"name": "Ancient Tomb", "effect": "land", "type_line": "Land", "produces": "C", "mana_produced": 2},
+                {"name": "Plains A", "effect": "land", "type_line": "Basic Land - Plains", "produces": "W", "mana_produced": 1},
+                {"name": "Plains B", "effect": "land", "type_line": "Basic Land - Plains", "produces": "W", "mana_produced": 1},
+            ]
+            active.hand = [
+                {"name": "Big Spell", "effect": "draw_cards", "type_line": "Sorcery", "cmc": 5, "mana_cost": "{5}"}
+            ]
+            active.refresh_mana_sources(turn=11)
+
+            activations = battle.activate_untap_land_engines(
+                active,
+                [opponent],
+                [active, opponent],
+                11,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert activations == 1
+        assert active.available_mana() == 5
+        candelabra = next(card for card in active.battlefield if card.get("name") == "Candelabra of Tawnos")
+        assert candelabra["tapped"] is True
+        activation = next(
+            data
+            for event, data in events
+            if event == "activated_ability" and data.get("card") == "Candelabra of Tawnos"
+        )
+        assert activation["target_lands"] == ["Ancient Tomb"]
+        assert activation["mana_added"] == 2
+        assert activation["unlock_target"] == "Big Spell"
+
+    def test_earthcraft_taps_summoning_sick_creature_to_reuse_basic_land():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            support_creature = {
+                "name": "Fresh Token",
+                "effect": "creature",
+                "type_line": "Creature Token",
+                "power": 1,
+                "toughness": 1,
+                "summoning_sick": True,
+                "tapped": False,
+            }
+            active.battlefield = [
+                {
+                    "name": "Earthcraft",
+                    "effect": "untap_land_engine",
+                    "type_line": "Enchantment",
+                    "activation_taps_untapped_creature_you_control": True,
+                    "untap_target_land_count": 1,
+                    "untap_target_land_restriction": "land",
+                    "untap_target_land_basic_only": True,
+                },
+                support_creature,
+                {"name": "Forest", "effect": "land", "type_line": "Basic Land - Forest", "produces": "G", "mana_produced": 1},
+            ]
+            active.hand = [
+                {"name": "Rampant Growth", "effect": "land_ramp", "type_line": "Sorcery", "cmc": 2, "mana_cost": "{1}{G}"}
+            ]
+            active.refresh_mana_sources(turn=12)
+
+            activations = battle.activate_untap_land_engines(
+                active,
+                [opponent],
+                [active, opponent],
+                12,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert activations == 1
+        assert active.available_mana() == 2
+        assert support_creature["tapped"] is True
+        activation = next(
+            data
+            for event, data in events
+            if event == "activated_ability" and data.get("card") == "Earthcraft"
+        )
+        assert activation["target_lands"] == ["Forest"]
+        assert activation["tapped_creature_cost"] == "Fresh Token"
+        assert activation["unlock_target"] == "Rampant Growth"
+
+    def test_magus_of_the_candelabra_skips_when_summoning_sick():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Magus of the Candelabra",
+                    "effect": "untap_land_engine",
+                    "type_line": "Creature — Human Wizard",
+                    "power": 1,
+                    "toughness": 2,
+                    "activation_requires_tap": True,
+                    "activation_cost_generic_from_x": True,
+                    "untap_target_land_count_from_x": True,
+                    "untap_target_land_restriction": "land",
+                    "summoning_sick": True,
+                    "tapped": False,
+                },
+                {"name": "Ancient Tomb", "effect": "land", "type_line": "Land", "produces": "C", "mana_produced": 2},
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land - Plains", "produces": "W", "mana_produced": 1},
+                {"name": "Plains Two", "effect": "land", "type_line": "Basic Land - Plains", "produces": "W", "mana_produced": 1},
+            ]
+            active.hand = [
+                {"name": "Big Spell", "effect": "draw_cards", "type_line": "Sorcery", "cmc": 5, "mana_cost": "{5}"}
+            ]
+            active.refresh_mana_sources(turn=13)
+
+            activations = battle.activate_untap_land_engines(
+                active,
+                [opponent],
+                [active, opponent],
+                13,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert activations == 0
+        assert any(
+            event == "activated_ability_skipped"
+            and data.get("card") == "Magus of the Candelabra"
+            and data.get("strategic_guardrail_reason") == "summoning_sick_source_cannot_pay_tap_activation"
+            for event, data in events
+        )
+
+    def test_oboro_breezecaller_returns_land_to_hand_for_contextual_unlock():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Oboro Breezecaller",
+                    "effect": "untap_land_engine",
+                    "type_line": "Creature — Moonfolk Wizard",
+                    "power": 1,
+                    "toughness": 1,
+                    "flying": True,
+                    "activation_cost_generic": 2,
+                    "activation_returns_land_to_hand": True,
+                    "untap_target_land_count": 1,
+                    "untap_target_land_restriction": "land",
+                },
+                {"name": "Gaea's Cradle", "effect": "land", "type_line": "Legendary Land", "produces": "G", "mana_produced_from_controlled_creatures": True},
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land - Plains", "produces": "W", "mana_produced": 1},
+                {"name": "Elf A", "effect": "creature", "type_line": "Creature — Elf", "power": 1, "toughness": 1},
+                {"name": "Elf B", "effect": "creature", "type_line": "Creature — Elf", "power": 1, "toughness": 1},
+            ]
+            active.hand = [
+                {"name": "Big Spell", "effect": "draw_cards", "type_line": "Sorcery", "cmc": 5, "mana_cost": "{5}"}
+            ]
+            active.refresh_mana_sources(turn=14)
+
+            activations = battle.activate_untap_land_engines(
+                active,
+                [opponent],
+                [active, opponent],
+                14,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert activations == 1
+        assert active.available_mana() == 5
+        assert any(card.get("name") == "Plains" for card in active.hand if isinstance(card, dict))
+        assert not any(card.get("name") == "Plains" for card in active.battlefield if isinstance(card, dict))
+        activation = next(
+            data
+            for event, data in events
+            if event == "activated_ability" and data.get("card") == "Oboro Breezecaller"
+        )
+        assert activation["returned_land"] == "Plains"
+        assert activation["target_lands"] == ["Gaea's Cradle"]
+        assert activation["mana_added"] == 3
+        assert activation["unlock_target"] == "Big Spell"
+
+    def test_runtime_cast_plan_chooses_highest_affordable_x_for_battlefield_tutor():
+        active = player("Active")
+        active.battlefield = [
+            {"name": "Forest A", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+            {"name": "Forest B", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+            {"name": "Forest C", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+            {"name": "Forest D", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+        ]
+        active.refresh_mana_sources(turn=10)
+        card = {"name": "Green Sun's Zenith", "mana_cost": "{X}{G}", "cmc": 1, "type_line": "Sorcery"}
+        effect_data = {
+            "effect": "tutor",
+            "target": "green_creature_to_battlefield",
+            "target_mana_value_max_from_x": True,
+            "shuffle_self_into_library_on_resolution": True,
+        }
+
+        plan = battle.runtime_cast_plan_for_card(active, card, effect_data)
+
+        assert plan is not None
+        assert plan["x_value"] == 3
+
+    def test_chord_of_calling_x_scope_tutors_only_within_x_limit():
+        active = player("Active")
+        active.library = [
+            {"name": "Too Big", "cmc": 4, "type_line": "Creature — Beast", "effect": "creature", "power": 4, "toughness": 4},
+            {"name": "Legal Target", "cmc": 3, "type_line": "Creature — Elf", "effect": "creature", "power": 3, "toughness": 3},
+        ]
+        card = {"name": "Chord of Calling", "cmc": 3, "type_line": "Instant"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            card,
+            10,
+            random.Random(20626),
+            effect_data_override={
+                "effect": "tutor",
+                "target": "creature_to_battlefield",
+                "target_mana_value_max_from_x": True,
+                "convoke": True,
+                "_cast_context": {"x_value": 3},
+            },
+        )
+
+        assert any(card.get("name") == "Legal Target" for card in active.battlefield if isinstance(card, dict))
+        assert not any(card.get("name") == "Too Big" for card in active.battlefield if isinstance(card, dict))
+
+    def test_green_suns_zenith_x_scope_shuffles_self_after_tutor():
+        active = player("Active")
+        active.battlefield = [
+            {"name": "Forest A", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+            {"name": "Forest B", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+            {"name": "Forest C", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+            {"name": "Forest D", "effect": "land", "type_line": "Land", "produces": "G", "mana_produced": 1},
+        ]
+        active.library = [
+            {"name": "Off Color", "cmc": 2, "type_line": "Creature — Beast", "effect": "creature", "power": 2, "toughness": 2},
+            {"name": "Dryad Arbor", "cmc": 0, "type_line": "Creature Land — Forest Dryad", "effect": "creature", "power": 1, "toughness": 1, "colors": ["G"]},
+            {"name": "Green Target", "cmc": 2, "type_line": "Creature — Elf", "effect": "creature", "power": 2, "toughness": 2, "colors": ["G"]},
+        ]
+        card = {"name": "Green Sun's Zenith", "cmc": 1, "type_line": "Sorcery"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            card,
+            10,
+            random.Random(20627),
+            effect_data_override={
+                "effect": "tutor",
+                "target": "green_creature_to_battlefield",
+                "target_mana_value_max_from_x": True,
+                "shuffle_self_into_library_on_resolution": True,
+                "_cast_context": {"x_value": 2},
+            },
+        )
+
+        assert any(card_obj.get("name") == "Green Target" for card_obj in active.battlefield if isinstance(card_obj, dict))
+        assert any(card_obj.get("name") == "Green Sun's Zenith" for card_obj in active.library if isinstance(card_obj, dict))
+        assert not any(card_obj.get("name") == "Green Sun's Zenith" for card_obj in active.graveyard if isinstance(card_obj, dict))
+
+    def test_whir_of_invention_x_scope_tutors_artifact_within_x_limit():
+        active = player("Active")
+        active.library = [
+            {"name": "Big Artifact", "cmc": 5, "type_line": "Artifact", "effect": "ramp_permanent"},
+            {"name": "Legal Artifact", "cmc": 3, "type_line": "Artifact", "effect": "ramp_permanent"},
+        ]
+        card = {"name": "Whir of Invention", "cmc": 3, "type_line": "Instant"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            card,
+            10,
+            random.Random(20628),
+            effect_data_override={
+                "effect": "tutor",
+                "target": "artifact_to_battlefield",
+                "target_mana_value_max_from_x": True,
+                "improvise": True,
+                "_cast_context": {"x_value": 3},
+            },
+        )
+
+        assert any(card_obj.get("name") == "Legal Artifact" for card_obj in active.battlefield if isinstance(card_obj, dict))
+        assert not any(card_obj.get("name") == "Big Artifact" for card_obj in active.battlefield if isinstance(card_obj, dict))
 
     def test_basking_broodscale_enters_as_creature_not_immediate_token_maker():
         events = []
@@ -5524,6 +5979,105 @@ def register_tests(battle, player):
         assert first_event["rule_logical_key"] == "battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d"
         assert first_event["rule_oracle_hash"] == "d8e8e60e34140942af13aa1be250a961"
 
+    def test_rhystic_study_exact_scope_draws_on_opponent_spell():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            controller = player("Rhystic")
+            controller.library = [_card("Rhystic Draw", cmc=1, effect="draw_cards")]
+            permanent = battle.prepare_entering_permanent(
+                {
+                    "name": "Rhystic Study",
+                    "type_line": "Enchantment",
+                    "effect": "draw_engine",
+                    "trigger": "opponent_spell",
+                    "tax": 1,
+                    "draw_on_enter": False,
+                    "battle_model_scope": "opponent_spell_pay_one_or_draw_engine_v1",
+                },
+                controller=controller,
+                all_players=[caster, controller],
+                turn=4,
+            )
+            controller.battlefield = [permanent]
+
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [controller],
+                {"name": "Any Spell", "cmc": 2, "type_line": "Instant"},
+                turn=4,
+                phase="main",
+                rng=random.Random(7076),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        trigger = next(
+            data
+            for event, data in events
+            if event == "trigger_resolved" and data.get("card") == "Rhystic Study"
+        )
+        assert trigger["trigger"] == "opponent_spell"
+        assert trigger["trigger_spell"] == "Any Spell"
+        assert trigger["tax_amount"] == 1
+        assert [card.get("name") for card in controller.hand] == ["Rhystic Draw"]
+
+    def test_mystic_remora_exact_scope_ignores_creatures_and_draws_on_noncreatures():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Caster")
+            controller = player("Remora")
+            controller.library = [_card("Remora Draw", cmc=1, effect="draw_cards")]
+            permanent = battle.prepare_entering_permanent(
+                {
+                    "name": "Mystic Remora",
+                    "type_line": "Enchantment",
+                    "effect": "draw_engine",
+                    "trigger": "opponent_noncreature_spell",
+                    "tax": 4,
+                    "draw_on_enter": False,
+                    "cumulative_upkeep_generic": 1,
+                    "battle_model_scope": "opponent_noncreature_spell_pay_four_draw_engine_with_cumulative_upkeep_v1",
+                },
+                controller=controller,
+                all_players=[caster, controller],
+                turn=4,
+            )
+            controller.battlefield = [permanent]
+
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [controller],
+                {"name": "Creature Spell", "cmc": 2, "type_line": "Creature", "effect": "creature"},
+                turn=4,
+                phase="main",
+                rng=random.Random(7077),
+            )
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [controller],
+                {"name": "Noncreature Spell", "cmc": 2, "type_line": "Instant"},
+                turn=4,
+                phase="main",
+                rng=random.Random(7077),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        trigger_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved" and data.get("card") == "Mystic Remora"
+        ]
+        assert len(trigger_events) == 1
+        assert trigger_events[0]["trigger_spell"] == "Noncreature Spell"
+        assert trigger_events[0]["tax_amount"] == 4
+        assert [card.get("name") for card in controller.hand] == ["Remora Draw"]
+
     def test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -5878,6 +6432,264 @@ def register_tests(battle, player):
             and data.get("target_player") == "Opponent"
             and data.get("cards_drawn") == 1
             and data.get("choice_model") == "compact_assume_yes_single_card_v1"
+            for event, data in events
+        )
+
+    def test_consecrated_sphinx_opponent_draw_trigger_draws_two_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Sphinx Controller")
+            controller.library = [
+                _card("Sphinx Draw 1", cmc=1, effect="draw_cards"),
+                _card("Sphinx Draw 2", cmc=1, effect="draw_cards"),
+                _card("Sphinx Draw 3", cmc=1, effect="draw_cards"),
+            ]
+            controller.battlefield = [
+                {
+                    "name": "Consecrated Sphinx",
+                    "cmc": 6,
+                    "type_line": "Creature - Sphinx",
+                    "effect": "creature",
+                    "power": 4,
+                    "toughness": 6,
+                    "flying": True,
+                    "opponent_draws_card_may_draw": 2,
+                    "battle_model_scope": "flying_may_draw_two_when_opponent_draws_card_v1",
+                    "_rule_logical_key": "battle_rule_v1:consecrated_sphinx",
+                    "_rule_oracle_hash": "hash_consecrated_sphinx",
+                }
+            ]
+            opponent = player("Opponent")
+            opponent.library = [_card("Opponent Draw", cmc=1, effect="draw_cards")]
+
+            drawn = opponent.draw(1, random.Random(501))
+            battle.process_player_draw_triggers(
+                opponent,
+                len(drawn),
+                6,
+                "draw_step",
+                [controller, opponent],
+                turn_player=opponent,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert [card.get("name") for card in controller.hand] == ["Sphinx Draw 1", "Sphinx Draw 2"]
+        assert any(
+            event == "trigger_resolved"
+            and data.get("player") == "Sphinx Controller"
+            and data.get("card") == "Consecrated Sphinx"
+            and data.get("trigger") == "opponent_draw"
+            and data.get("drawing_player") == "Opponent"
+            and data.get("effect") == "draw_cards"
+            and data.get("cards_drawn") == 2
+            and data.get("opponent_draws_card_may_draw") == 2
+            and data.get("rule_logical_key") == "battle_rule_v1:consecrated_sphinx"
+            and data.get("rule_oracle_hash") == "hash_consecrated_sphinx"
+            for event, data in events
+        )
+
+    def test_underworld_dreams_and_fate_unraveler_punish_each_opponent_drawn_card():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Punisher Controller")
+            controller.battlefield = [
+                {
+                    "name": "Underworld Dreams",
+                    "cmc": 3,
+                    "type_line": "Enchantment",
+                    "effect": "passive",
+                    "trigger": "opponent_draw",
+                    "opponent_draw_damage_per_card": 1,
+                    "battle_model_scope": "opponent_draws_card_damage_that_player_v1",
+                    "_rule_logical_key": "battle_rule_v1:underworld_dreams",
+                    "_rule_oracle_hash": "hash_underworld_dreams",
+                },
+                {
+                    "name": "Fate Unraveler",
+                    "cmc": 4,
+                    "type_line": "Enchantment Creature - Hag",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 4,
+                    "trigger": "opponent_draw",
+                    "opponent_draw_damage_per_card": 1,
+                    "battle_model_scope": "opponent_draws_card_damage_that_player_v1",
+                    "_rule_logical_key": "battle_rule_v1:fate_unraveler",
+                    "_rule_oracle_hash": "hash_fate_unraveler",
+                },
+            ]
+            opponent = player("Opponent")
+            opponent.library = [
+                _card("Opponent Draw 1", cmc=1, effect="draw_cards"),
+                _card("Opponent Draw 2", cmc=1, effect="draw_cards"),
+            ]
+
+            drawn = opponent.draw(2, random.Random(502))
+            battle.process_player_draw_triggers(
+                opponent,
+                len(drawn),
+                6,
+                "draw_step",
+                [controller, opponent],
+                turn_player=opponent,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert opponent.life == 36
+        punisher_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") in {"Underworld Dreams", "Fate Unraveler"}
+            and data.get("trigger") == "opponent_draw"
+        ]
+        assert len(punisher_events) == 2
+        assert all(data.get("effect") == "direct_damage" for data in punisher_events)
+        assert all(data.get("cards_drawn") == 2 for data in punisher_events)
+        assert all(data.get("damage_per_card") == 1 for data in punisher_events)
+        assert all(data.get("damage") == 2 for data in punisher_events)
+        assert {data.get("rule_logical_key") for data in punisher_events} == {
+            "battle_rule_v1:underworld_dreams",
+            "battle_rule_v1:fate_unraveler",
+        }
+
+    def test_geths_grimoire_and_megrim_trigger_on_opponent_discard_with_rule_provenance():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Discard Controller")
+            controller.library = [
+                _card("Grimoire Draw 1", cmc=1, effect="draw_cards"),
+                _card("Grimoire Draw 2", cmc=1, effect="draw_cards"),
+            ]
+            controller.battlefield = [
+                {
+                    "name": "Geth's Grimoire",
+                    "cmc": 4,
+                    "type_line": "Artifact",
+                    "effect": "draw_engine",
+                    "draw_on_enter": False,
+                    "trigger": "opponent_discard",
+                    "opponent_discard_draw_per_card": 1,
+                    "battle_model_scope": "opponent_discards_card_may_draw_v1",
+                    "_rule_logical_key": "battle_rule_v1:geths_grimoire",
+                    "_rule_oracle_hash": "hash_geths_grimoire",
+                },
+                {
+                    "name": "Megrim",
+                    "cmc": 3,
+                    "type_line": "Enchantment",
+                    "effect": "passive",
+                    "trigger": "opponent_discard",
+                    "opponent_discard_damage_per_card": 2,
+                    "battle_model_scope": "opponent_discards_card_damage_that_player_v1",
+                    "_rule_logical_key": "battle_rule_v1:megrim",
+                    "_rule_oracle_hash": "hash_megrim",
+                },
+            ]
+            opponent = player("Opponent")
+            opponent.hand = [
+                _card("Discarded 1", cmc=1, effect="draw_cards"),
+                _card("Discarded 2", cmc=1, effect="draw_cards"),
+            ]
+
+            discarded_cards = list(opponent.hand)
+            opponent.hand = []
+            battle.resolve_effect_discard_cards(
+                opponent,
+                discarded_cards,
+                opponents=[controller],
+                turn=7,
+                phase="resolution",
+                rng=random.Random(601),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert [card.get("name") for card in controller.hand] == ["Grimoire Draw 1", "Grimoire Draw 2"]
+        assert opponent.life == 36
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Geth's Grimoire"
+            and data.get("trigger") == "opponent_discard"
+            and data.get("discarding_player") == "Opponent"
+            and data.get("effect") == "draw_cards"
+            and data.get("cards_drawn") == 2
+            and data.get("rule_logical_key") == "battle_rule_v1:geths_grimoire"
+            and data.get("rule_oracle_hash") == "hash_geths_grimoire"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Megrim"
+            and data.get("trigger") == "opponent_discard"
+            and data.get("discarding_player") == "Opponent"
+            and data.get("effect") == "direct_damage"
+            and data.get("damage") == 4
+            and data.get("damage_per_card") == 2
+            and data.get("life_after") == 36
+            and data.get("rule_logical_key") == "battle_rule_v1:megrim"
+            and data.get("rule_oracle_hash") == "hash_megrim"
+            for event, data in events
+        )
+
+    def test_feast_of_sanity_triggers_on_controller_discard_and_gains_life():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Feast Controller")
+            controller.life = 30
+            controller.hand = [_card("Discard Me", cmc=1, effect="draw_cards")]
+            controller.battlefield = [
+                {
+                    "name": "Feast of Sanity",
+                    "cmc": 4,
+                    "type_line": "Enchantment",
+                    "effect": "passive",
+                    "trigger": "controller_discard",
+                    "controller_discard_damage_any_target": 1,
+                    "controller_discard_gain_life": 1,
+                    "battle_model_scope": "controller_discards_card_damage_any_target_and_gain_life_v1",
+                    "_rule_logical_key": "battle_rule_v1:feast_of_sanity",
+                    "_rule_oracle_hash": "hash_feast_of_sanity",
+                }
+            ]
+            opponent = player("Opponent")
+
+            discarded_cards = list(controller.hand)
+            controller.hand = []
+            battle.resolve_effect_discard_cards(
+                controller,
+                discarded_cards,
+                opponents=[opponent],
+                turn=7,
+                phase="resolution",
+                rng=random.Random(602),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert controller.life == 31
+        assert opponent.life == 39
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Feast of Sanity"
+            and data.get("trigger") == "controller_discard"
+            and data.get("effect") == "direct_damage"
+            and data.get("target_player") == "Opponent"
+            and data.get("damage") == 1
+            and data.get("life_gained") == 1
+            and data.get("controller_life_after") == 31
+            and data.get("rule_logical_key") == "battle_rule_v1:feast_of_sanity"
+            and data.get("rule_oracle_hash") == "hash_feast_of_sanity"
             for event, data in events
         )
 
@@ -6460,6 +7272,223 @@ def register_tests(battle, player):
             if isinstance(permanent, dict) and permanent.get("token")
         )
         assert copied == ["A Threat", "A Utility"]
+
+    def test_phyrexian_metamorph_enters_as_copy_of_best_creature_and_keeps_artifact_type():
+        active = player("Active")
+        active.library = [
+            {"name": "Draw One"},
+            {"name": "Draw Two"},
+        ]
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Mulldrifter",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+                "etb_draw_count": 2,
+            }
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Phyrexian Metamorph", "cmc": 4, "type_line": "Artifact Creature"},
+            6,
+            random.Random(686),
+            effect_data_override={
+                "effect": "copy_permanent_etb",
+                "copy_target_types": ["artifact", "creature"],
+                "copy_additional_types": ["artifact"],
+                "target_controller": "any",
+                "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+                "_rule_logical_key": "battle_rule_v1:phyrexian_metamorph_copy_scope",
+                "_rule_oracle_hash": "phyrexian_metamorph_oracle_hash",
+            },
+        )
+
+        copied = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("entered_as_copy_of") == "Mulldrifter"
+        )
+        assert copied["name"] == "Mulldrifter"
+        assert copied["effect"] == "creature"
+        assert "artifact" in copied.get("type_line", "").lower()
+        assert copied.get("summoning_sick") is True
+        assert len(active.hand) == 2
+
+    def test_copy_enchantment_without_target_enters_as_self():
+        active = player("Active")
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Copy Enchantment", "cmc": 3, "type_line": "Enchantment"},
+            6,
+            random.Random(687),
+            effect_data_override={
+                "effect": "copy_permanent_etb",
+                "copy_target_types": ["enchantment"],
+                "target_controller": "any",
+                "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+                "_rule_logical_key": "battle_rule_v1:copy_enchantment_copy_scope",
+                "_rule_oracle_hash": "copy_enchantment_oracle_hash",
+            },
+        )
+
+        permanent = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Copy Enchantment"
+        )
+        assert permanent["effect"] == "copy_permanent_etb"
+        assert permanent.get("entered_as_copy_of") is None
+        assert "enchantment" in permanent.get("type_line", "").lower()
+
+    def test_mockingbird_copies_only_creature_within_source_mana_value_and_keeps_bird_flying():
+        active = player("Active")
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Two Drop",
+                "effect": "creature",
+                "type_line": "Creature — Human Wizard",
+                "cmc": 2,
+                "power": 2,
+                "toughness": 2,
+            },
+            {
+                "name": "Four Drop",
+                "effect": "creature",
+                "type_line": "Creature — Giant",
+                "cmc": 4,
+                "power": 4,
+                "toughness": 4,
+            },
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Mockingbird", "cmc": 2, "type_line": "Creature — Bird Bard", "power": 1, "toughness": 1},
+            6,
+            random.Random(688),
+            effect_data_override={
+                "effect": "copy_permanent_etb",
+                "copy_target_types": ["creature"],
+                "copy_additional_subtypes": ["Bird"],
+                "copy_granted_keywords": ["flying"],
+                "copy_target_mana_value_lte_source_mana_value": True,
+                "target_controller": "any",
+                "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+                "_rule_logical_key": "battle_rule_v1:mockingbird_copy_scope",
+                "_rule_oracle_hash": "mockingbird_oracle_hash",
+            },
+        )
+
+        copied = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("entered_as_copy_of") == "Two Drop"
+        )
+        assert copied["name"] == "Two Drop"
+        assert "bird" in copied.get("type_line", "").lower()
+        assert copied.get("flying") is True
+        assert all(permanent.get("entered_as_copy_of") != "Four Drop" for permanent in active.battlefield if isinstance(permanent, dict))
+
+    def test_imposter_mech_copies_only_opponent_creature_and_overwrites_vehicle_type_line():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Own Utility",
+                "effect": "creature",
+                "type_line": "Creature — Human",
+                "cmc": 2,
+                "power": 2,
+                "toughness": 1,
+            }
+        ]
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Opponent Threat",
+                "effect": "creature",
+                "type_line": "Creature — Angel",
+                "cmc": 5,
+                "power": 5,
+                "toughness": 5,
+            }
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Imposter Mech", "cmc": 2, "type_line": "Artifact — Vehicle", "power": 3, "toughness": 1},
+            6,
+            random.Random(689),
+            effect_data_override={
+                "effect": "copy_permanent_etb",
+                "copy_target_types": ["creature"],
+                "target_controller": "opponent",
+                "copy_overwrite_types": ["artifact"],
+                "copy_overwrite_subtypes": ["Vehicle"],
+                "copy_vehicle_crew_value": 3,
+                "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+                "_rule_logical_key": "battle_rule_v1:imposter_mech_copy_scope",
+                "_rule_oracle_hash": "imposter_mech_oracle_hash",
+            },
+        )
+
+        copied = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("entered_as_copy_of") == "Opponent Threat"
+        )
+        assert copied["name"] == "Opponent Threat"
+        assert copied.get("type_line") == "Artifact — Vehicle"
+        assert copied.get("crew_value") == 3
+
+    def test_phantasmal_image_adds_illusion_subtype_and_targeted_sacrifice_marker():
+        active = player("Active")
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Copy Target",
+                "effect": "creature",
+                "type_line": "Creature — Wizard",
+                "cmc": 3,
+                "power": 2,
+                "toughness": 3,
+            }
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Phantasmal Image", "cmc": 2, "type_line": "Creature — Illusion", "power": 0, "toughness": 0},
+            6,
+            random.Random(690),
+            effect_data_override={
+                "effect": "copy_permanent_etb",
+                "copy_target_types": ["creature"],
+                "target_controller": "any",
+                "copy_additional_subtypes": ["Illusion"],
+                "copy_sacrifice_when_targeted": True,
+                "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+                "_rule_logical_key": "battle_rule_v1:phantasmal_image_copy_scope",
+                "_rule_oracle_hash": "phantasmal_image_oracle_hash",
+            },
+        )
+
+        copied = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("entered_as_copy_of") == "Copy Target"
+        )
+        assert "illusion" in copied.get("type_line", "").lower()
+        assert copied.get("sacrifice_when_targeted") is True
 
     def test_astral_dragon_etb_creates_two_dragon_copies_of_noncreature_permanent():
         active = player("Active")
@@ -9634,6 +10663,169 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_double_vision_copies_only_first_instant_or_sorcery_each_turn():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Izzet")
+            opponent = player("Opponent")
+            active.library = [
+                {"name": "Card A", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Card B", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Card C", "cmc": 1, "type_line": "Sorcery"},
+            ]
+            active.battlefield = [
+                {
+                    "name": "Double Vision",
+                    "cmc": 5,
+                    "type_line": "Enchantment",
+                    "effect": "copy_spell",
+                    "trigger": "instant_sorcery_cast",
+                    "trigger_effect": "copy_spell",
+                    "target": "own_instant_or_sorcery_on_stack",
+                    "may_choose_new_targets": True,
+                    "choose_new_targets_status": "may",
+                    "trigger_first_instant_or_sorcery_each_turn": True,
+                    "battle_model_scope": "first_instant_sorcery_cast_each_turn_copy_own_spell_v1",
+                }
+            ]
+            stack = battle.Stack()
+            spell = {"name": "Opt", "type_line": "Instant", "cmc": 1}
+            spell_effect = {
+                "effect": "draw_cards",
+                "count": 1,
+                "instant": True,
+                "battle_model_scope": "test_draw_one_spell",
+            }
+
+            active.record_spell_cast(7, card=spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                spell,
+                turn=7,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(spell, active, spell_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 7, random.Random(611), phase="precombat_main")
+
+            second_spell = {"name": "Consider", "type_line": "Instant", "cmc": 1}
+            active.record_spell_cast(7, card=second_spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                second_spell,
+                turn=7,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(second_spell, active, spell_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 7, random.Random(612), phase="precombat_main")
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert len(active.hand) == 3
+        copied_events = [
+            data
+            for event, data in events
+            if event == "spell_copied" and data.get("card") == "Double Vision"
+        ]
+        assert len(copied_events) == 1
+        assert copied_events[0]["trigger_spell"] == "Opt"
+        assert copied_events[0]["first_each_turn"] is True
+        assert not any(
+            event == "spell_copied"
+            and data.get("card") == "Double Vision"
+            and data.get("trigger_spell") == "Consider"
+            for event, data in events
+        )
+
+    def test_swarm_intelligence_copies_second_instant_or_sorcery_spell_too():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Temur")
+            opponent = player("Opponent")
+            active.library = [
+                {"name": "Card A", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Card B", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Card C", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "Card D", "cmc": 1, "type_line": "Sorcery"},
+            ]
+            active.battlefield = [
+                {
+                    "name": "Swarm Intelligence",
+                    "cmc": 7,
+                    "type_line": "Enchantment",
+                    "effect": "copy_spell",
+                    "trigger": "instant_sorcery_cast",
+                    "trigger_effect": "copy_spell",
+                    "target": "own_instant_or_sorcery_on_stack",
+                    "may_choose_new_targets": True,
+                    "choose_new_targets_status": "may",
+                    "battle_model_scope": "instant_sorcery_cast_copy_own_spell_v1",
+                }
+            ]
+            stack = battle.Stack()
+            first_spell = {"name": "Brainstorm", "type_line": "Instant", "cmc": 1}
+            second_spell = {"name": "Ponder", "type_line": "Sorcery", "cmc": 1}
+            first_spell_effect = {
+                "effect": "draw_cards",
+                "count": 1,
+                "instant": True,
+                "battle_model_scope": "test_draw_one_spell",
+            }
+            second_spell_effect = {
+                "effect": "draw_cards",
+                "count": 1,
+                "instant": False,
+                "battle_model_scope": "test_draw_one_spell",
+            }
+
+            active.record_spell_cast(8, card=first_spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                first_spell,
+                turn=8,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(first_spell, active, first_spell_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 8, random.Random(613), phase="precombat_main")
+
+            active.record_spell_cast(8, card=second_spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                second_spell,
+                turn=8,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(second_spell, active, second_spell_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 8, random.Random(614), phase="precombat_main")
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert len(active.hand) == 4
+        copied_events = [
+            data
+            for event, data in events
+            if event == "spell_copied" and data.get("card") == "Swarm Intelligence"
+        ]
+        assert len(copied_events) == 2
+        assert [data["trigger_spell"] for data in copied_events] == ["Brainstorm", "Ponder"]
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -11717,6 +12909,10 @@ def register_tests(battle, player):
         test_pg076_support_passive_annotations_and_ranger_small_creature_tutor,
         test_smothering_tithe_draw_step_creates_treasure_with_rule_provenance,
         test_pg143_tataru_taru_etb_and_off_turn_draw_trigger_create_single_tapped_treasure,
+        test_consecrated_sphinx_opponent_draw_trigger_draws_two_with_rule_provenance,
+        test_underworld_dreams_and_fate_unraveler_punish_each_opponent_drawn_card,
+        test_geths_grimoire_and_megrim_trigger_on_opponent_discard_with_rule_provenance,
+        test_feast_of_sanity_triggers_on_controller_discard_and_gains_life,
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,
@@ -11730,6 +12926,11 @@ def register_tests(battle, player):
         test_molten_duplication_copies_own_artifact_as_artifact_and_sacrifices_token,
         test_flash_photography_copies_target_permanent_without_temporary_cleanup,
         test_clone_legion_copies_each_creature_controlled_by_target_player,
+        test_phyrexian_metamorph_enters_as_copy_of_best_creature_and_keeps_artifact_type,
+        test_copy_enchantment_without_target_enters_as_self,
+        test_mockingbird_copies_only_creature_within_source_mana_value_and_keeps_bird_flying,
+        test_imposter_mech_copies_only_opponent_creature_and_overwrites_vehicle_type_line,
+        test_phantasmal_image_adds_illusion_subtype_and_targeted_sacrifice_marker,
         test_astral_dragon_etb_creates_two_dragon_copies_of_noncreature_permanent,
         test_valakut_awakening_filters_hand_and_draws_plus_one,
         test_valakut_awakening_preserves_approach_as_win_condition,
@@ -11776,6 +12977,22 @@ def register_tests(battle, player):
         test_recruiter_of_the_guard_etb_tutors_toughness_two_creature_to_hand,
         test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor,
         test_natural_order_does_not_cast_without_green_creature_to_sacrifice,
+        test_summoning_sick_mana_creature_does_not_add_mana_when_cast,
+        test_bloom_tender_refresh_counts_distinct_colors_among_controlled_permanents,
+        test_circle_of_dreams_druid_refresh_counts_controlled_creatures,
+        test_springleaf_drum_requires_untapped_creature_support_for_mana_refresh,
+        test_monolith_refresh_adds_three_colorless_when_untapped,
+        test_monolith_does_not_untap_during_untap_step,
+        test_candelabra_of_tawnos_reuses_ancient_tomb_for_contextual_unlock,
+        test_earthcraft_taps_summoning_sick_creature_to_reuse_basic_land,
+        test_magus_of_the_candelabra_skips_when_summoning_sick,
+        test_oboro_breezecaller_returns_land_to_hand_for_contextual_unlock,
+        test_runtime_cast_plan_chooses_highest_affordable_x_for_battlefield_tutor,
+        test_chord_of_calling_x_scope_tutors_only_within_x_limit,
+        test_green_suns_zenith_x_scope_shuffles_self_after_tutor,
+        test_whir_of_invention_x_scope_tutors_artifact_within_x_limit,
+        test_rhystic_study_exact_scope_draws_on_opponent_spell,
+        test_mystic_remora_exact_scope_ignores_creatures_and_draws_on_noncreatures,
         test_dismember_applies_stat_modifier_and_kills_indestructible_zero_toughness,
         test_ashnods_altar_sacrifices_token_only_for_contextual_mana_unlock,
         test_goblin_bombardment_sacrifices_expendable_token_for_damage,
@@ -11815,6 +13032,8 @@ def register_tests(battle, player):
         test_pg079_deck606_high_rules_resolve_from_sqlite_cache,
         test_pg079_storm_herd_creates_life_total_flying_pegasus_tokens,
         test_pg079_rite_of_the_dragoncaller_creates_flying_dragon_on_instant_sorcery_cast,
+        test_double_vision_copies_only_first_instant_or_sorcery_each_turn,
+        test_swarm_intelligence_copies_second_instant_or_sorcery_spell_too,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,

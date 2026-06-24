@@ -243,7 +243,11 @@ def _candidate(
 
 
 def _combined_rules_text(index_entry: dict[str, Any], oracle_text: str) -> str:
-    parts = [str(oracle_text or ""), str(index_entry.get("raw_excerpt") or "")]
+    parts = [
+        str(oracle_text or ""),
+        str(index_entry.get("oracle_text") or ""),
+        str(index_entry.get("raw_excerpt") or ""),
+    ]
     metadata = index_entry.get("constructor_metadata")
     if isinstance(metadata, dict):
         parts.append(str(metadata.get("super_call") or ""))
@@ -269,6 +273,116 @@ def _constructor_card_types(index_entry: dict[str, Any]) -> set[str]:
         str(value or "").upper()
         for value in (metadata.get("card_types") or [])
         if value
+    }
+
+
+def _build_copy_permanent_etb_fields(
+    *,
+    index_entry: dict[str, Any],
+    rules_text: str,
+    effect_classes: set[str],
+    ability_classes: set[str],
+) -> dict[str, Any] | None:
+    if "CopyPermanentEffect" not in effect_classes or "EntersBattlefieldAbility" not in ability_classes:
+        return None
+    text = _normalized_rules_text(rules_text)
+    if "until end of turn" in text:
+        return None
+    target_types: list[str] | None = None
+    target_controller = "any"
+    if "filter_permanent_enchantment" in text or _oracle_has(rules_text, "copy of an enchantment"):
+        target_types = ["enchantment"]
+    elif "filter_permanent_artifact_or_enchantment" in text or _oracle_has(
+        rules_text, "copy of any artifact or enchantment"
+    ):
+        target_types = ["artifact", "enchantment"]
+    elif "filter_permanent_artifact_or_creature" in text or _oracle_has(
+        rules_text, "copy of any artifact or creature"
+    ):
+        target_types = ["artifact", "creature"]
+    elif "filternonlandpermanent" in text or _oracle_has(rules_text, "copy of any nonland permanent"):
+        target_types = ["nonland_permanent"]
+    elif (
+        "filter_opponents_permanent_a_creature" in text
+        or _oracle_has(rules_text, "copy of a creature an opponent controls")
+    ):
+        target_types = ["creature"]
+        target_controller = "opponent"
+    elif "filter_permanent_creature" in text or _oracle_has(rules_text, "copy of any creature on the battlefield"):
+        target_types = ["creature"]
+    elif "filterartifactpermanent" in text or _oracle_has(rules_text, "copy of any artifact"):
+        target_types = ["artifact"]
+    if not target_types:
+        return None
+    extra_types: list[str] = []
+    if "artifact in addition to its other types" in text:
+        extra_types.append("artifact")
+    if "enchantment in addition to its other types" in text:
+        extra_types.append("enchantment")
+    extra_subtypes: list[str] = []
+    if "bird in addition to its other types" in text:
+        extra_subtypes.append("Bird")
+    if "illusion in addition to its other types" in text:
+        extra_subtypes.append("Illusion")
+    extra_keywords: list[str] = []
+    if "has flying" in text:
+        extra_keywords.append("flying")
+    if "has haste" in text:
+        extra_keywords.append("haste")
+    overwrite_types: list[str] = []
+    overwrite_subtypes: list[str] = []
+    crew_value: int | None = None
+    if "vehicle artifact with crew 3" in text and "loses all other card types" in text:
+        overwrite_types = ["artifact"]
+        overwrite_subtypes = ["Vehicle"]
+        crew_value = 3
+    modifier_fields: dict[str, Any] = {}
+    if extra_subtypes:
+        modifier_fields["copy_additional_subtypes"] = extra_subtypes
+    if extra_keywords:
+        modifier_fields["copy_granted_keywords"] = extra_keywords
+    if overwrite_types:
+        modifier_fields["copy_overwrite_types"] = overwrite_types
+    if overwrite_subtypes:
+        modifier_fields["copy_overwrite_subtypes"] = overwrite_subtypes
+    if crew_value is not None:
+        modifier_fields["copy_vehicle_crew_value"] = crew_value
+    if "mana value less than or equal to the amount of mana spent to cast" in text:
+        modifier_fields["copy_target_mana_value_lte_source_mana_value"] = True
+    if "vanishing 3 if that creature doesn't have vanishing" in text:
+        modifier_fields["copy_grant_vanishing_if_missing"] = 3
+    if "becomes the target of a spell or ability, sacrifice it" in text:
+        modifier_fields["copy_sacrifice_when_targeted"] = True
+    if modifier_fields:
+        if extra_types:
+            modifier_fields["copy_additional_types"] = extra_types
+        return {
+            "effect": "copy_permanent_etb",
+            "scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+            "reason": (
+                "XMage structure matches a permanent entering as a copy of a creature, "
+                "with explicit CopyApplier modifier text preserved in structured fields."
+            ),
+            "fields": {
+                "copy_target_types": target_types,
+                "target_controller": target_controller,
+                **modifier_fields,
+            },
+            "signals": ["CopyPermanentEffect", "EntersBattlefieldAbility", "CopyApplier"],
+        }
+    return {
+        "effect": "copy_permanent_etb",
+        "scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+        "reason": (
+            "XMage structure matches a permanent entering as a copy of another permanent, "
+            "with optional extra card types from the source text."
+        ),
+        "fields": {
+            "copy_target_types": target_types,
+            "target_controller": target_controller,
+            **({"copy_additional_types": extra_types} if extra_types else {}),
+        },
+        "signals": ["CopyPermanentEffect", "EntersBattlefieldAbility"],
     }
 
 
@@ -842,6 +956,49 @@ def _build_creature_variant_fields(
         }
 
     if (
+        "DamageTargetEffect" in effect_classes
+        and "DrawCardOpponentTriggeredAbility" in ability_classes
+        and card_types in ({"ENCHANTMENT"}, {"ENCHANTMENT", "CREATURE"})
+        and _oracle_has(
+            rules_text,
+            "whenever an opponent draws a card",
+            "deals 1 damage to that player",
+        )
+    ):
+        damage_per_card = _first_int(r"DamageTargetEffect\((\d+)\)", rules_text) or 1
+        base_fields: dict[str, Any] = {
+            "trigger": "opponent_draw",
+            "opponent_draw_damage_per_card": damage_per_card,
+        }
+        if "CREATURE" in card_types:
+            return {
+                "effect": "creature",
+                "scope": "opponent_draws_card_damage_that_player_v1",
+                "fields": {
+                    **base_fields,
+                    "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text) or 0,
+                    "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text) or 0,
+                },
+                "reason": "XMage structure matches a creature that damages the drawing opponent whenever that opponent draws a card.",
+                "signals": [
+                    "DrawCardOpponentTriggeredAbility",
+                    "DamageTargetEffect",
+                    "opponent_draw_damage",
+                ],
+            }
+        return {
+            "effect": "passive",
+            "scope": "opponent_draws_card_damage_that_player_v1",
+            "fields": base_fields,
+            "reason": "XMage structure matches an enchantment that damages the drawing opponent whenever that opponent draws a card.",
+            "signals": [
+                "DrawCardOpponentTriggeredAbility",
+                "DamageTargetEffect",
+                "opponent_draw_damage",
+            ],
+        }
+
+    if (
         card_types == {"CREATURE"}
         and {"DrawCardSourceControllerEffect", "DrawCardAllEffect"}.issubset(effect_classes)
         and {"DrawNthCardTriggeredAbility", "FlashAbility", "FlyingAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
@@ -1154,6 +1311,132 @@ def _build_exact_runtime_variant_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        card_types == {"ENCHANTMENT"}
+        and effect_classes == {"OneShotEffect", "RhysticStudyDrawEffect"}
+        and ability_classes == {"SpellCastOpponentTriggeredAbility"}
+        and (
+            xmage_class_name == "RhysticStudy"
+            or _oracle_has(rules_text, "unless that player pays {1}")
+        )
+    ):
+        return {
+            "effect": "draw_engine",
+            "scope": "opponent_spell_pay_one_or_draw_engine_v1",
+            "fields": {
+                "trigger": "opponent_spell",
+                "tax": 1,
+                "draw_on_enter": False,
+            },
+            "reason": "XMage structure matches Rhystic Study triggering on each opponent spell and drawing unless that player pays {1}.",
+            "signals": [
+                "SpellCastOpponentTriggeredAbility",
+                "RhysticStudyDrawEffect",
+                "unless_that_player_pays_1",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and effect_classes == {"MysticRemoraEffect", "OneShotEffect"}
+        and {"CumulativeUpkeepAbility", "MysticRemoraTriggeredAbility"}.issubset(ability_classes)
+        and (
+            xmage_class_name == "MysticRemora"
+            or (
+                "!spell.iscreature(game)" in normalized
+                and _oracle_has(rules_text, "pay {4}", "cumulativeupkeepability")
+            )
+        )
+    ):
+        return {
+            "effect": "draw_engine",
+            "scope": "opponent_noncreature_spell_pay_four_draw_engine_with_cumulative_upkeep_v1",
+            "fields": {
+                "trigger": "opponent_noncreature_spell",
+                "tax": 4,
+                "draw_on_enter": False,
+                "cumulative_upkeep_generic": 1,
+            },
+            "reason": "XMage structure matches Mystic Remora's cumulative upkeep and the opponent noncreature-spell draw trigger unless that player pays {4}.",
+            "signals": [
+                "MysticRemoraTriggeredAbility",
+                "CumulativeUpkeepAbility",
+                "noncreature_spell_tax_draw",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
+        and effect_classes == {"SearchLibraryPutInPlayEffect"}
+        and not ability_classes
+        and cost_classes == {"SacrificeTargetCost"}
+        and (
+            xmage_class_name == "CropRotation"
+            or ("filterlandcard" in normalized and "sacrificetargetcost(staticfilters.filter_land)" in normalized)
+        )
+    ):
+        return {
+            "effect": "land_ramp",
+            "scope": "sacrifice_land_for_any_land_to_battlefield_untapped_v1",
+            "fields": {
+                "instant": True,
+                "requires_sacrifice_land": True,
+                "land_count": 1,
+                "lands_to_battlefield": 1,
+                "land_enters_tapped": False,
+                "tutor_target": "land",
+            },
+            "reason": "XMage structure matches Crop Rotation sacrificing a land to tutor any land directly onto the battlefield untapped.",
+            "signals": [
+                "SearchLibraryPutInPlayEffect",
+                "SacrificeTargetCost",
+                "FilterLandCard",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and {
+            "BoostSourceEffect",
+            "ConditionalContinuousEffect",
+            "SearchLibraryPutInPlayEffect",
+        }.issubset(effect_classes)
+        and {"SimpleActivatedAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+        and {"GenericManaCost", "SacrificeTargetCost", "TapSourceCost"}.issubset(cost_classes)
+        and (
+            xmage_class_name == "ElvishReclaimer"
+            or (
+                "cardsincontrollergraveyardcondition(3" in normalized
+                and "searchlibraryputinplayeffect" in normalized
+                and "staticfilters.filter_card_land_a" in normalized
+            )
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "activated_land_tutor_with_land_sacrifice_and_graveyard_growth_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 2,
+                "land_tutor_activated": True,
+                "activation_cost_generic": 2,
+                "activation_requires_tap": True,
+                "requires_sacrifice_land": True,
+                "land_count": 1,
+                "lands_to_battlefield": 1,
+                "land_enters_tapped": True,
+                "tutor_target": "land",
+                "plus_two_two_if_three_lands_in_your_graveyard": True,
+            },
+            "reason": "XMage structure matches Elvish Reclaimer's static +2/+2 growth with three lands in graveyard and the activated land-sacrifice tutor that puts a land onto the battlefield tapped.",
+            "signals": [
+                "ConditionalContinuousEffect",
+                "BoostSourceEffect",
+                "SearchLibraryPutInPlayEffect",
+                "CardsInControllerGraveyardCondition(3)",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and {"CastAsThoughItHadFlashAllEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
     ):
@@ -1169,6 +1452,132 @@ def _build_exact_runtime_variant_fields(
             "signals": [
                 "CastAsThoughItHadFlashAllEffect",
                 "DrawCardSourceControllerEffect",
+            ],
+        }
+
+    if (
+        "DamageTargetEffect" in effect_classes
+        and "DrawCardOpponentTriggeredAbility" in ability_classes
+        and card_types in ({"ENCHANTMENT"}, {"ENCHANTMENT", "CREATURE"})
+        and (
+            xmage_class_name in {"FateUnraveler", "UnderworldDreams"}
+            or _oracle_has(
+                rules_text,
+                "whenever an opponent draws a card",
+                "deals 1 damage to that player",
+            )
+        )
+    ):
+        damage_per_card = _first_int(r"DamageTargetEffect\((\d+)\)", rules_text) or 1
+        if "CREATURE" in card_types:
+            return {
+                "effect": "creature",
+                "scope": "opponent_draws_card_damage_that_player_v1",
+                "fields": {
+                    "trigger": "opponent_draw",
+                    "opponent_draw_damage_per_card": damage_per_card,
+                    "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text) or 3,
+                    "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text) or 4,
+                },
+                "reason": "XMage structure matches a creature that damages the drawing opponent whenever that opponent draws a card.",
+                "signals": [
+                    "DrawCardOpponentTriggeredAbility",
+                    "DamageTargetEffect",
+                    "opponent_draw_damage",
+                ],
+            }
+        return {
+            "effect": "passive",
+            "scope": "opponent_draws_card_damage_that_player_v1",
+            "fields": {
+                "trigger": "opponent_draw",
+                "opponent_draw_damage_per_card": damage_per_card,
+            },
+            "reason": "XMage structure matches an enchantment that damages the drawing opponent whenever that opponent draws a card.",
+            "signals": [
+                "DrawCardOpponentTriggeredAbility",
+                "DamageTargetEffect",
+                "opponent_draw_damage",
+            ],
+        }
+
+    if (
+        card_types == {"ARTIFACT"}
+        and effect_classes == {"DrawCardSourceControllerEffect"}
+        and ability_classes == {"DiscardsACardOpponentTriggeredAbility"}
+        and (
+            xmage_class_name == "GethsGrimoire"
+            or _oracle_has(rules_text, "whenever an opponent discards a card", "you may draw a card")
+        )
+    ):
+        return {
+            "effect": "draw_engine",
+            "scope": "opponent_discards_card_may_draw_v1",
+            "fields": {
+                "draw_on_enter": False,
+                "trigger": "opponent_discard",
+                "opponent_discard_draw_per_card": 1,
+            },
+            "reason": "XMage structure matches an artifact that lets you draw whenever an opponent discards a card.",
+            "signals": [
+                "DiscardsACardOpponentTriggeredAbility",
+                "DrawCardSourceControllerEffect",
+                "opponent_discard_draw",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and effect_classes == {"DamageTargetEffect"}
+        and ability_classes == {"DiscardsACardOpponentTriggeredAbility"}
+        and (
+            xmage_class_name == "Megrim"
+            or _oracle_has(rules_text, "whenever an opponent discards a card", "deals 2 damage to that player")
+        )
+    ):
+        return {
+            "effect": "passive",
+            "scope": "opponent_discards_card_damage_that_player_v1",
+            "fields": {
+                "trigger": "opponent_discard",
+                "opponent_discard_damage_per_card": 2,
+            },
+            "reason": "XMage structure matches an enchantment that damages the discarding opponent whenever that opponent discards a card.",
+            "signals": [
+                "DiscardsACardOpponentTriggeredAbility",
+                "DamageTargetEffect",
+                "opponent_discard_damage",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and {"DamageTargetEffect", "GainLifeEffect"}.issubset(effect_classes)
+        and ability_classes == {"DiscardCardControllerTriggeredAbility"}
+        and (
+            xmage_class_name == "FeastOfSanity"
+            or _oracle_has(
+                rules_text,
+                "whenever you discard a card",
+                "deals 1 damage to any target",
+                "gain 1 life",
+            )
+        )
+    ):
+        return {
+            "effect": "passive",
+            "scope": "controller_discards_card_damage_any_target_and_gain_life_v1",
+            "fields": {
+                "trigger": "controller_discard",
+                "controller_discard_damage_any_target": 1,
+                "controller_discard_gain_life": 1,
+            },
+            "reason": "XMage structure matches an enchantment that pings any target and gains life whenever you discard a card.",
+            "signals": [
+                "DiscardCardControllerTriggeredAbility",
+                "DamageTargetEffect",
+                "GainLifeEffect",
+                "controller_discard_damage_and_life",
             ],
         }
 
@@ -1303,6 +1712,232 @@ def _build_exact_runtime_variant_fields(
                 "SpellCastAllTriggeredAbility",
                 "CounterTargetEffect",
                 "DrawCardSourceControllerEffect",
+            ],
+        }
+
+    untap_cost = None
+    untap_match = re.search(
+        r"new\s+simpleactivatedability\s*\(\s*new\s+untapsourceeffect\s*\(\s*\)\s*,\s*new\s+genericmanacost\s*\(\s*(\d+)\s*\)\s*\)",
+        normalized,
+    )
+    if untap_match:
+        untap_cost = int(untap_match.group(1))
+    else:
+        untap_match = re.search(
+            r"new\s+simpleactivatedability\s*\(\s*new\s+untapsourceeffect\s*\(\s*\)\s*,\s*new\s+manacostsimpl\s*<>\s*\(\s*\{(\d+)\}\s*\)\s*\)",
+            normalized,
+        )
+        if untap_match:
+            untap_cost = int(untap_match.group(1))
+
+    if (
+        card_types == {"ARTIFACT"}
+        and {"DontUntapInControllersUntapStepSourceEffect", "UntapSourceEffect"}.issubset(effect_classes)
+        and {"SimpleActivatedAbility", "SimpleManaAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+        and untap_cost in {3, 4}
+        and "mana.colorlessmana(3)" in normalized
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "three_colorless_monolith_mana_rock_v1",
+            "fields": {
+                "mana_produced": 3,
+                "produces": "C",
+                "does_not_untap_in_untap_step": True,
+                "activated_untap_cost_generic": untap_cost,
+            },
+            "reason": "XMage structure matches a Monolith-style mana rock that taps for {C}{C}{C}, does not untap during its controller's untap step, and has a paid untap activation.",
+            "signals": [
+                "SimpleManaAbility",
+                "DontUntapInControllersUntapStepSourceEffect",
+                "UntapSourceEffect",
+                f"untap_cost_{untap_cost}",
+            ],
+        }
+
+    if (
+        xmage_class_name == "DoubleVision"
+        or (
+            card_types == {"ENCHANTMENT"}
+            and effect_classes == {"CopyTargetStackObjectEffect"}
+            and {"DoubleVisionCopyTriggeredAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+            and "isfirstinstantorsorcerycastbyplayeronturn" in normalized
+        )
+    ):
+        return {
+            "effect": "copy_spell",
+            "scope": "first_instant_sorcery_cast_each_turn_copy_own_spell_v1",
+            "fields": {
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "copy_spell",
+                "target": "own_instant_or_sorcery_on_stack",
+                "may_choose_new_targets": True,
+                "choose_new_targets_status": "may",
+                "trigger_first_instant_or_sorcery_each_turn": True,
+            },
+            "reason": "XMage structure matches Double Vision copying the first instant or sorcery spell its controller casts each turn, with optional new targets for the copy.",
+            "signals": [
+                "CopyTargetStackObjectEffect",
+                "SpellCastControllerTriggeredAbility",
+                "first_instant_or_sorcery_each_turn",
+            ],
+        }
+
+    if (
+        xmage_class_name == "SwarmIntelligence"
+        or (
+            card_types == {"ENCHANTMENT"}
+            and effect_classes == {"CopyTargetStackObjectEffect"}
+            and ability_classes == {"SpellCastControllerTriggeredAbility"}
+            and "an instant or sorcery spell" in normalized
+            and "you may copy that spell" in normalized
+        )
+    ):
+        return {
+            "effect": "copy_spell",
+            "scope": "instant_sorcery_cast_copy_own_spell_v1",
+            "fields": {
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "copy_spell",
+                "target": "own_instant_or_sorcery_on_stack",
+                "may_choose_new_targets": True,
+                "choose_new_targets_status": "may",
+            },
+            "reason": "XMage structure matches Swarm Intelligence copying an instant or sorcery spell its controller casts, with optional new targets for the copy.",
+            "signals": [
+                "CopyTargetStackObjectEffect",
+                "SpellCastControllerTriggeredAbility",
+                "instant_sorcery_cast_copy",
+            ],
+        }
+
+    if (
+        xmage_class_name == "CandelabraOfTawnos"
+        or (
+            card_types == {"ARTIFACT"}
+            and effect_classes == {"UntapTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"TapSourceCost"}
+            and "effect.settext( untap x target lands )" in normalized
+            and "xtargetscountadjuster" in normalized
+            and "manacostsimpl<>( {x} )" in normalized
+        )
+    ):
+        return {
+            "effect": "untap_land_engine",
+            "scope": "x_tap_untap_x_lands_v1",
+            "fields": {
+                "activated_untap_lands_for_mana_unlock": True,
+                "activation_requires_tap": True,
+                "activation_cost_generic_from_x": True,
+                "untap_target_land_count_from_x": True,
+                "untap_target_land_restriction": "land",
+            },
+            "reason": "XMage structure matches Candelabra of Tawnos paying X and tapping to untap X target lands, modeled as a contextual land-untap mana engine.",
+            "signals": [
+                "UntapTargetEffect",
+                "TapSourceCost",
+                "XTargetsCountAdjuster",
+                "ManaCostsImpl({X})",
+            ],
+        }
+
+    if (
+        xmage_class_name == "Earthcraft"
+        or (
+            card_types == {"ENCHANTMENT"}
+            and effect_classes == {"UntapTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"TapTargetCost"}
+            and "basic land" in normalized
+            and "filter_controlled_untapped_creature" in normalized
+        )
+    ):
+        return {
+            "effect": "untap_land_engine",
+            "scope": "tap_untapped_creature_untap_target_basic_land_v1",
+            "fields": {
+                "activated_untap_lands_for_mana_unlock": True,
+                "activation_taps_untapped_creature_you_control": True,
+                "untap_target_land_count": 1,
+                "untap_target_land_restriction": "land",
+                "untap_target_land_basic_only": True,
+            },
+            "reason": "XMage structure matches Earthcraft tapping an untapped creature you control to untap target basic land, modeled as a contextual land-untap mana engine.",
+            "signals": [
+                "UntapTargetEffect",
+                "TapTargetCost",
+                "basic_land_target",
+                "untapped_creature_you_control",
+            ],
+        }
+
+    if (
+        xmage_class_name == "MagusOfTheCandelabra"
+        or (
+            card_types == {"CREATURE"}
+            and effect_classes == {"UntapTargetEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"TapSourceCost"}
+            and "effect.settext( untap x target lands )" in normalized
+            and "xtargetscountadjuster" in normalized
+            and "manacostsimpl<>( {x} )" in normalized
+            and "this.power = new mageint(1)" in normalized
+            and "this.toughness = new mageint(2)" in normalized
+        )
+    ):
+        return {
+            "effect": "untap_land_engine",
+            "scope": "creature_x_tap_untap_x_lands_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 2,
+                "activated_untap_lands_for_mana_unlock": True,
+                "activation_requires_tap": True,
+                "activation_cost_generic_from_x": True,
+                "untap_target_land_count_from_x": True,
+                "untap_target_land_restriction": "land",
+            },
+            "reason": "XMage structure matches Magus of the Candelabra paying X and tapping to untap X target lands, modeled as a creature-based contextual land-untap mana engine.",
+            "signals": [
+                "UntapTargetEffect",
+                "TapSourceCost",
+                "XTargetsCountAdjuster",
+                "ManaCostsImpl({X})",
+                "power_1_toughness_2",
+            ],
+        }
+
+    if (
+        xmage_class_name == "OboroBreezecaller"
+        or (
+            card_types == {"CREATURE"}
+            and effect_classes == {"UntapTargetEffect"}
+            and {"FlyingAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"GenericManaCost", "ReturnToHandChosenControlledPermanentCost"}.issubset(cost_classes)
+            and "targetlandpermanent" in normalized
+        )
+    ):
+        return {
+            "effect": "untap_land_engine",
+            "scope": "pay_two_return_land_untap_target_land_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "flying": True,
+                "activated_untap_lands_for_mana_unlock": True,
+                "activation_cost_generic": 2,
+                "activation_returns_land_to_hand": True,
+                "untap_target_land_count": 1,
+                "untap_target_land_restriction": "land",
+            },
+            "reason": "XMage structure matches Oboro Breezecaller paying {2} and returning a land you control to untap target land, modeled as a contextual land-untap mana engine.",
+            "signals": [
+                "UntapTargetEffect",
+                "ReturnToHandChosenControlledPermanentCost",
+                "GenericManaCost(2)",
+                "FlyingAbility",
+                "TargetLandPermanent",
             ],
         }
 
@@ -1561,6 +2196,29 @@ def _build_simple_creature_mana_source_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        ability_classes == {"SimpleManaAbility"}
+        and 'this.power = new mageint(1)' in normalized
+        and 'this.toughness = new mageint(1)' in normalized
+        and "mana.blackmana(1)" in normalized
+        and "damagecontrollereffect(1)" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "one_mana_one_one_black_pain_mana_dork_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "B",
+                "damage_on_tap": 1,
+                "tap_damage_status": "annotation_only",
+            },
+            "reason": "XMage structure matches a 1/1 creature that taps for black mana and deals 1 damage to its controller.",
+            "signals": ["SimpleManaAbility", "DamageControllerEffect", "BlackMana(1)", "MageInt(1)", "mana_source"],
+        }
+
+    if (
         ability_classes == {"GreenManaAbility"}
         and 'this.power = new mageint(1)' in normalized
         and 'this.toughness = new mageint(1)' in normalized
@@ -1618,12 +2276,233 @@ def _build_simple_creature_mana_source_fields(
             "signals": ["AnyColorManaAbility", "FlyingAbility", "MageInt(0)", "MageInt(1)", "mana_source"],
         }
 
+    if (
+        ability_classes == {"BlueManaAbility", "ExaltedAbility", "GreenManaAbility", "WhiteManaAbility"}
+        and 'this.power = new mageint(0)' in normalized
+        and 'this.toughness = new mageint(1)' in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "one_mana_zero_one_exalted_tricolor_mana_dork_v1",
+            "fields": {
+                "power": 0,
+                "toughness": 1,
+                "exalted": True,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "GWU",
+            },
+            "reason": "XMage structure matches a 0/1 exalted creature that taps for one Bant-colored mana.",
+            "signals": [
+                "ExaltedAbility",
+                "GreenManaAbility",
+                "WhiteManaAbility",
+                "BlueManaAbility",
+                "MageInt(0)",
+                "MageInt(1)",
+                "mana_source",
+            ],
+        }
+
+    if (
+        ability_classes == {"BlackManaAbility", "ExaltedAbility", "GreenManaAbility", "RedManaAbility"}
+        and 'this.power = new mageint(0)' in normalized
+        and 'this.toughness = new mageint(1)' in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "one_mana_zero_one_exalted_tricolor_mana_dork_v1",
+            "fields": {
+                "power": 0,
+                "toughness": 1,
+                "exalted": True,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "BRG",
+            },
+            "reason": "XMage structure matches a 0/1 exalted creature that taps for one Jund-colored mana.",
+            "signals": [
+                "ExaltedAbility",
+                "BlackManaAbility",
+                "RedManaAbility",
+                "GreenManaAbility",
+                "MageInt(0)",
+                "MageInt(1)",
+                "mana_source",
+            ],
+        }
+
+    if (
+        ability_classes == {"AddEachControlledColorManaAbility"}
+        and 'this.power = new mageint(1)' in normalized
+        and 'this.toughness = new mageint(1)' in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "one_one_color_diversity_mana_dork_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced_from_colors_among_permanents": True,
+                "mana_colors_from_controlled_permanents": True,
+                "produces": "WUBRG",
+            },
+            "reason": "XMage structure matches a 1/1 creature that adds one mana of each color among permanents you control.",
+            "signals": [
+                "AddEachControlledColorManaAbility",
+                "MageInt(1)",
+                "MageInt(1)",
+                "controlled_colors",
+                "mana_source",
+            ],
+        }
+
+    if (
+        ability_classes == {"DynamicManaAbility"}
+        and 'this.power = new mageint(2)' in normalized
+        and 'this.toughness = new mageint(1)' in normalized
+        and (
+            "permanentsonbattlefieldcount(staticfilters.filter_controlled_creature)" in normalized
+            or "add {g} for each creature you control" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "two_one_green_per_creature_mana_dork_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced_from_controlled_creatures": True,
+                "produces": "G",
+            },
+            "reason": "XMage structure matches a 2/1 creature that adds one green mana for each creature you control.",
+            "signals": [
+                "DynamicManaAbility",
+                "FILTER_CONTROLLED_CREATURE",
+                "MageInt(2)",
+                "MageInt(1)",
+                "mana_source",
+            ],
+        }
+
+    return None
+
+
+def _build_basic_land_fields(
+    *,
+    index_entry: dict[str, Any],
+    effect_classes: set[str],
+    ability_classes: set[str],
+) -> dict[str, Any] | None:
+    card_types = _constructor_card_types(index_entry)
+    if card_types != {"LAND"} or effect_classes:
+        return None
+
+    if ability_classes == {"WhiteManaAbility"}:
+        return {
+            "effect": "land",
+            "scope": "basic_one_color_land_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "W",
+                "basic_land_types": ["Plains"],
+            },
+            "reason": "XMage structure matches a basic Plains that taps for one white mana.",
+            "signals": ["LAND", "WhiteManaAbility", "BasicLand"],
+        }
+
+    if ability_classes == {"RedManaAbility"}:
+        return {
+            "effect": "land",
+            "scope": "basic_one_color_land_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "R",
+                "basic_land_types": ["Mountain"],
+            },
+            "reason": "XMage structure matches a basic Mountain that taps for one red mana.",
+            "signals": ["LAND", "RedManaAbility", "BasicLand"],
+        }
+
+    return None
+
+
+def _build_dynamic_any_color_land_fields(
+    *,
+    index_entry: dict[str, Any],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    card_types = _constructor_card_types(index_entry)
+    if card_types != {"LAND"} or effect_classes:
+        return None
+    raw_excerpt = _normalized_rules_text(str(index_entry.get("raw_excerpt") or ""))
+    if ability_classes == {"AnyColorLandsProduceManaAbility"} and (
+        "anycolorlandsproducemanaability(targetcontroller.opponent)" in raw_excerpt
+        or str(index_entry.get("xmage_class_name") or index_entry.get("class_name") or "").strip() == "ExoticOrchard"
+        or _oracle_has(rules_text, "add one mana of any color that a land an opponent controls could produce")
+    ):
+        return {
+            "effect": "land",
+            "scope": "any_color_from_opponent_land_production_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "opponent_land_color_dependency": True,
+            },
+            "reason": "XMage structure matches a land that adds one mana of any color an opponent's land could produce.",
+            "signals": ["LAND", "AnyColorLandsProduceManaAbility", "opponent_land_colors"],
+        }
+    return None
+
+
+def _build_pain_land_fields(
+    *,
+    index_entry: dict[str, Any],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    card_types = _constructor_card_types(index_entry)
+    if card_types != {"LAND"}:
+        return None
+
+    raw_excerpt = _normalized_rules_text(str(index_entry.get("raw_excerpt") or ""))
+    xmage_class_name = str(index_entry.get("xmage_class_name") or index_entry.get("class_name") or "").strip()
+    if (
+        effect_classes == {"DamageControllerEffect"}
+        and ability_classes == {"AnyColorManaAbility", "SimpleManaAbility"}
+        and cost_classes == {"TapSourceCost"}
+        and (
+            "mana.colorlessmana(1)" in raw_excerpt
+            and "damagecontrollereffect(3)" in raw_excerpt
+            and "anycolormanaability" in raw_excerpt
+            or xmage_class_name == "TarnishedCitadel"
+        )
+    ):
+        return {
+            "effect": "land",
+            "scope": "colorless_or_any_color_pain_land_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "CWUBRG",
+                "life_for_colored_mana": 3,
+                "life_loss_on_colored_mana_status": "annotation_only",
+            },
+            "reason": "XMage structure matches a land that adds colorless freely or any color while dealing 3 damage to its controller.",
+            "signals": ["LAND", "SimpleManaAbility", "AnyColorManaAbility", "DamageControllerEffect", "ColorlessMana(1)"],
+        }
     return None
 
 
 def _build_simple_artifact_mana_source_fields(
     *,
     card_types: set[str],
+    effect_classes: set[str],
     ability_classes: set[str],
     cost_classes: set[str],
     rules_text: str,
@@ -1632,6 +2511,105 @@ def _build_simple_artifact_mana_source_fields(
         return None
 
     normalized = _normalized_rules_text(rules_text)
+    colored_abilities = [
+        ability
+        for ability in ability_classes
+        if ability in {
+            "WhiteManaAbility",
+            "BlueManaAbility",
+            "BlackManaAbility",
+            "RedManaAbility",
+            "GreenManaAbility",
+        }
+    ]
+    mana_ability_to_symbol = {
+        "WhiteManaAbility": "W",
+        "BlueManaAbility": "U",
+        "BlackManaAbility": "B",
+        "RedManaAbility": "R",
+        "GreenManaAbility": "G",
+    }
+    pair_order = "WUBRG"
+
+    if (
+        effect_classes == {"DamageControllerEffect"}
+        and "ColorlessManaAbility" in ability_classes
+        and len(colored_abilities) == 2
+    ):
+        colored_symbols = sorted(
+            (mana_ability_to_symbol[ability] for ability in colored_abilities),
+            key=pair_order.index,
+        )
+        return {
+            "effect": "ramp_permanent",
+            "scope": "pain_talisman_color_pair_partial_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "C" + "".join(colored_symbols),
+                "life_for_colored_mana": 1,
+            },
+            "reason": "XMage structure matches a Talisman-style artifact that adds colorless freely or one of two colors while dealing 1 damage to its controller.",
+            "signals": ["ColorlessManaAbility", *colored_abilities, "DamageControllerEffect", "pain_talisman"],
+        }
+
+    if (
+        ability_classes == {"AnyColorManaAbility"}
+        and (
+            "untapped creature you control" in normalized
+            or "filter_controlled_untapped_creature" in normalized
+            or "staticfilters.filter_controlled_untapped_creature" in normalized
+        )
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "creature_support_any_color_mana_rock_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "mana_source_requires_untapped_creature": True,
+            },
+            "reason": "XMage structure matches an artifact that needs an untapped creature you control to generate one mana of any color.",
+            "signals": ["AnyColorManaAbility", "TapTargetCost", "untapped_creature_support"],
+        }
+
+    if (
+        ability_classes == {"AnyColorManaAbility"}
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "one_any_color_mana_rock_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "WUBRG",
+            },
+            "reason": "XMage structure matches a simple artifact mana source that adds one mana of any color.",
+            "signals": ["AnyColorManaAbility", "any_color_mana_rock"],
+        }
+
+    if (
+        "ColorlessManaAbility" in ability_classes
+        and "TapTargetCost" in cost_classes
+        and (
+            "artifact or creature you control" in normalized
+            or "untapped artifact or creature you control" in normalized
+            or (
+                "targetcontrolledpermanent(filter)" in normalized
+                and "cardtype.artifact.getpredicate()" in normalized
+                and "cardtype.creature.getpredicate()" in normalized
+            )
+        )
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "artifact_or_creature_support_colorless_mana_rock_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "C",
+                "mana_source_requires_untapped_artifact_or_creature": True,
+            },
+            "reason": "XMage structure matches an artifact that needs an untapped artifact or creature you control to generate one colorless mana.",
+            "signals": ["SimpleManaAbility", "TapTargetCost", "artifact_or_creature_support", "ColorlessMana(1)"],
+        }
 
     if (
         ability_classes == {"SimpleManaAbility"}
@@ -1683,6 +2661,37 @@ def _build_simple_artifact_mana_source_fields(
             "signals": ["SimpleManaAbility", "GenericManaCost(1)", "TapSourceCost", "Mana(GU)"],
         }
 
+    return None
+
+
+def _build_hand_exile_mana_ritual_fields(
+    *,
+    index_entry: dict[str, Any],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    card_types = _constructor_card_types(index_entry)
+    normalized = _normalized_rules_text(rules_text)
+    if (
+        card_types == {"CREATURE"}
+        and not effect_classes
+        and ability_classes == {"SimpleManaAbility"}
+        and cost_classes == {"ExileSourceFromHandCost"}
+        and "mana.greenmana(1)" in normalized
+    ):
+        return {
+            "effect": "ramp_ritual",
+            "scope": "hand_exile_add_one_green_mana_ritual_v1",
+            "fields": {
+                "hand_exile_mana_ability": True,
+                "mana_produced": 1,
+                "produces": "G",
+            },
+            "reason": "XMage structure matches a hand-zone exile activation that adds one green mana.",
+            "signals": ["SimpleManaAbility", "ExileSourceFromHandCost", "GreenMana(1)", "Zone.HAND"],
+        }
     return None
 
 
@@ -2086,6 +3095,135 @@ def _build_tutor_to_hand_fields(
     return None
 
 
+def _build_tutor_to_battlefield_fields(
+    *,
+    xmage_class_name: str,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    normalized = _normalized_rules_text(rules_text)
+    is_instant = card_types == {"INSTANT"}
+
+    if (
+        card_types == {"INSTANT"}
+        and effect_classes == {"SearchLibraryWithLessCMCPutInPlayEffect"}
+        and "ConvokeAbility" in ability_classes
+        and (
+            xmage_class_name == "ChordOfCalling"
+            or "filter_card_creature" in normalized
+        )
+    ):
+        return {
+            "effect": "tutor",
+            "scope": "convoke_creature_tutor_to_battlefield_mana_value_x_or_less_v1",
+            "ability_kind": "one_shot",
+            "fields": {
+                "instant": True,
+                "target": "creature_to_battlefield",
+                "target_mana_value_max_from_x": True,
+                "convoke": True,
+            },
+            "reason": "XMage structure matches Chord of Calling tutoring a creature with mana value X or less directly onto the battlefield, with convoke as an additional cost mechanic.",
+            "signals": [
+                "SearchLibraryWithLessCMCPutInPlayEffect",
+                "ConvokeAbility",
+                "FILTER_CARD_CREATURE",
+            ],
+        }
+
+    if (
+        card_types == {"SORCERY"}
+        and {"SearchLibraryWithLessCMCPutInPlayEffect", "ShuffleSpellEffect"}.issubset(effect_classes)
+        and not ability_classes
+        and (
+            xmage_class_name == "GreenSunsZenith"
+            or (
+                "green creature card" in normalized
+                and "colorpredicate(objectcolor.green)" in normalized
+            )
+        )
+    ):
+        return {
+            "effect": "tutor",
+            "scope": "green_creature_tutor_to_battlefield_mana_value_x_or_less_then_shuffle_self_v1",
+            "ability_kind": "one_shot",
+            "fields": {
+                "instant": False,
+                "target": "green_creature_to_battlefield",
+                "target_mana_value_max_from_x": True,
+                "shuffle_self_into_library_on_resolution": True,
+            },
+            "reason": "XMage structure matches Green Sun's Zenith finding a green creature card with mana value X or less onto the battlefield and then shuffling itself into its owner's library.",
+            "signals": [
+                "SearchLibraryWithLessCMCPutInPlayEffect",
+                "ShuffleSpellEffect",
+                "green_creature_filter",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
+        and effect_classes == {"SearchLibraryWithLessCMCPutInPlayEffect"}
+        and "ImproviseAbility" in ability_classes
+        and (
+            xmage_class_name == "WhirOfInvention"
+            or "filter_card_artifact" in normalized
+        )
+    ):
+        return {
+            "effect": "tutor",
+            "scope": "improvise_artifact_tutor_to_battlefield_mana_value_x_or_less_v1",
+            "ability_kind": "one_shot",
+            "fields": {
+                "instant": True,
+                "target": "artifact_to_battlefield",
+                "target_mana_value_max_from_x": True,
+                "improvise": True,
+            },
+            "reason": "XMage structure matches Whir of Invention tutoring an artifact with mana value X or less directly onto the battlefield, with improvise as an additional cost mechanic.",
+            "signals": [
+                "SearchLibraryWithLessCMCPutInPlayEffect",
+                "ImproviseAbility",
+                "FILTER_CARD_ARTIFACT",
+            ],
+        }
+
+    if (
+        card_types == {"SORCERY"}
+        and effect_classes == {"SearchLibraryPutInPlayEffect"}
+        and "HarmonizeAbility" in ability_classes
+        and (
+            xmage_class_name == "NaturesRhythm"
+            or (
+                "creature card with mana value x or less" in normalized
+                and "getxvalue.instance.calculate" in normalized
+            )
+        )
+    ):
+        return {
+            "effect": "tutor",
+            "scope": "creature_tutor_to_battlefield_mana_value_x_or_less_harmonize_v1",
+            "ability_kind": "one_shot",
+            "fields": {
+                "instant": False,
+                "target": "creature_to_battlefield",
+                "target_mana_value_max_from_x": True,
+                "harmonize": True,
+            },
+            "reason": "XMage structure matches Nature's Rhythm tutoring a creature card with mana value X or less directly onto the battlefield, plus its harmonize ability annotation.",
+            "signals": [
+                "SearchLibraryPutInPlayEffect",
+                "HarmonizeAbility",
+                "GetXValue",
+                "creature_card_mana_value_x_or_less",
+            ],
+        }
+
+    return None
+
+
 def _build_extra_turn_fields(
     *,
     card_types: set[str],
@@ -2338,6 +3476,62 @@ def _build_rishkar_fields(
             "GreenManaAbility",
         ],
     }
+
+
+def _build_creatures_tap_any_color_static_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if "GainAbilityControlledEffect" not in effect_classes:
+        return None
+    normalized_text = _normalized_rules_text(rules_text)
+
+    shared_match = (
+        _oracle_has(rules_text, 'each creature you control has "{t}: add one mana of any color."')
+        or (
+            "gainabilitycontrolledeffect" in normalized_text
+            and "anycolormanaability" in normalized_text
+            and "filter_permanent_creatures" in normalized_text
+        )
+    )
+    if not shared_match:
+        return None
+
+    if card_types == {"ENCHANTMENT"} and ability_classes == {"AnyColorManaAbility", "SimpleStaticAbility"}:
+        return {
+            "effect": "passive",
+            "scope": "creatures_tap_any_color_static_enchantment_v1",
+            "fields": {
+                "creatures_tap_for_any_color": True,
+            },
+            "reason": "XMage structure matches a static enchantment that gives each creature you control a tap-for-any-color mana ability.",
+            "signals": ["GainAbilityControlledEffect", "AnyColorManaAbility", "SimpleStaticAbility", "FILTER_PERMANENT_CREATURES"],
+        }
+
+    if (
+        card_types == {"CREATURE", "ENCHANTMENT"}
+        and {"AnyColorManaAbility", "SimpleStaticAbility", "VigilanceAbility"}.issubset(ability_classes)
+        and 'this.power = new mageint(3)' in normalized_text
+        and 'this.toughness = new mageint(3)' in normalized_text
+    ):
+        return {
+            "effect": "creature",
+            "scope": "vigilance_three_three_creatures_tap_any_color_v1",
+            "fields": {
+                "power": 3,
+                "toughness": 3,
+                "vigilance": True,
+                "creatures_tap_for_any_color": True,
+                "death_return_status": "annotation_only",
+            },
+            "reason": "XMage structure matches a 3/3 vigilance enchantment creature that gives each creature you control a tap-for-any-color mana ability while keeping its extra death-return clause annotation-only.",
+            "signals": ["GainAbilityControlledEffect", "AnyColorManaAbility", "SimpleStaticAbility", "VigilanceAbility", "MageInt(3)"],
+        }
+
+    return None
 
 
 def _build_magda_fields(
@@ -2621,8 +3815,66 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             )
         )
 
+    basic_land_fields = _build_basic_land_fields(
+        index_entry=index_entry,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+    )
+    if basic_land_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(basic_land_fields["effect"]),
+                scope=str(basic_land_fields["scope"]),
+                reason=str(basic_land_fields["reason"]),
+                ability_kind="activated",
+                requires_runtime_executor=False,
+                extra_effect_fields=dict(basic_land_fields["fields"]),
+                matched_signals=list(basic_land_fields["signals"]),
+            )
+        )
+
+    dynamic_any_color_land_fields = _build_dynamic_any_color_land_fields(
+        index_entry=index_entry,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if dynamic_any_color_land_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(dynamic_any_color_land_fields["effect"]),
+                scope=str(dynamic_any_color_land_fields["scope"]),
+                reason=str(dynamic_any_color_land_fields["reason"]),
+                ability_kind="activated",
+                requires_runtime_executor=False,
+                extra_effect_fields=dict(dynamic_any_color_land_fields["fields"]),
+                matched_signals=list(dynamic_any_color_land_fields["signals"]),
+            )
+        )
+
+    pain_land_fields = _build_pain_land_fields(
+        index_entry=index_entry,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if pain_land_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(pain_land_fields["effect"]),
+                scope=str(pain_land_fields["scope"]),
+                reason=str(pain_land_fields["reason"]),
+                ability_kind="activated",
+                requires_runtime_executor=False,
+                extra_effect_fields=dict(pain_land_fields["fields"]),
+                matched_signals=list(pain_land_fields["signals"]),
+            )
+        )
+
     simple_artifact_mana_source_fields = _build_simple_artifact_mana_source_fields(
         card_types=card_types,
+        effect_classes=effect_classes,
         ability_classes=ability_classes,
         cost_classes=cost_classes,
         rules_text=rules_text,
@@ -2637,6 +3889,45 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(simple_artifact_mana_source_fields["fields"]),
                 matched_signals=list(simple_artifact_mana_source_fields["signals"]),
+            )
+        )
+
+    hand_exile_mana_ritual_fields = _build_hand_exile_mana_ritual_fields(
+        index_entry=index_entry,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if hand_exile_mana_ritual_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(hand_exile_mana_ritual_fields["effect"]),
+                scope=str(hand_exile_mana_ritual_fields["scope"]),
+                reason=str(hand_exile_mana_ritual_fields["reason"]),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(hand_exile_mana_ritual_fields["fields"]),
+                matched_signals=list(hand_exile_mana_ritual_fields["signals"]),
+            )
+        )
+
+    copy_permanent_etb_fields = _build_copy_permanent_etb_fields(
+        index_entry=index_entry,
+        rules_text=rules_text,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+    )
+    if copy_permanent_etb_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(copy_permanent_etb_fields["effect"]),
+                scope=str(copy_permanent_etb_fields["scope"]),
+                reason=str(copy_permanent_etb_fields["reason"]),
+                ability_kind="replacement",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(copy_permanent_etb_fields["fields"]),
+                matched_signals=list(copy_permanent_etb_fields["signals"]),
             )
         )
 
@@ -2698,6 +3989,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(tutor_to_hand_fields["fields"]),
                 matched_signals=list(tutor_to_hand_fields["signals"]),
+            )
+        )
+
+    tutor_to_battlefield_fields = _build_tutor_to_battlefield_fields(
+        xmage_class_name=xmage_class_name,
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if tutor_to_battlefield_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(tutor_to_battlefield_fields["effect"]),
+                scope=str(tutor_to_battlefield_fields["scope"]),
+                reason=str(tutor_to_battlefield_fields["reason"]),
+                ability_kind=str(tutor_to_battlefield_fields["ability_kind"]),
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(tutor_to_battlefield_fields["fields"]),
+                matched_signals=list(tutor_to_battlefield_fields["signals"]),
             )
         )
 
@@ -2881,6 +4192,25 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(rishkar_fields["fields"]),
                 matched_signals=list(rishkar_fields["signals"]),
+            )
+        )
+
+    creatures_tap_any_color_fields = _build_creatures_tap_any_color_static_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if creatures_tap_any_color_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(creatures_tap_any_color_fields["effect"]),
+                scope=str(creatures_tap_any_color_fields["scope"]),
+                reason=str(creatures_tap_any_color_fields["reason"]),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(creatures_tap_any_color_fields["fields"]),
+                matched_signals=list(creatures_tap_any_color_fields["signals"]),
             )
         )
 

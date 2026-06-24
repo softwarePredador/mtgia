@@ -738,6 +738,8 @@
     "instant": true,
     "target": "noncreature_spell",
     "target_controller_creates_treasure": 2,
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -2229,15 +2231,20 @@
     "battle_rule_oracle_hash": "5fb6e6a8fa62d2d0698978462ee5b295"
   },
   "Basalt Monolith": {
+    "ability_kind": "activated",
+    "activated_untap_cost_generic": 3,
+    "battle_model_scope": "three_colorless_monolith_mana_rock_v1",
+    "does_not_untap_in_untap_step": true,
     "effect": "ramp_permanent",
     "mana_produced": 3,
     "produces": "C",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3f989c33316a642a5dc230cb618161a4"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:13a254365e4f64a322c42899dd7e9ec1",
+    "battle_rule_oracle_hash": "7bfcb40a391bef0cb4c2f3a59c007bdc"
   },
   "Base Camp": {
     "effect": "land",
@@ -2441,15 +2448,21 @@
     "battle_rule_logical_key": "battle_rule_v1:332b66f2b05dab9cff48bfe602d740ae"
   },
   "Bedevil": {
-    "cmc": 3.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_destroy_variant_v1",
     "effect": "remove_permanent",
-    "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9d5afecce0b2500c1dff74bcd97e6eb4"
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ]
+    },
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:24839f966a77da6656c462aa885ccaa4",
+    "battle_rule_oracle_hash": "77dcf646b59f535df941f6716b802b26"
   },
   "Beledros Witherbloom": {
     "cmc": 7.0,
@@ -2601,11 +2614,11 @@
     "cmc": 1.0,
     "effect": "ramp_permanent",
     "battle_rule_source": "generated",
-    "battle_rule_review_status": "deprecated",
+    "battle_rule_review_status": "needs_review",
     "battle_rule_execution_status": "disabled",
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:345563db14bee1de3ce7d5adc6aee777"
+    "battle_rule_logical_key": "battle_rule_v1:0efab52e2fe6c51956a3d94ac671fd43"
   },
   "Birgi, God of Storytelling": {
     "effect": "ramp_engine",
@@ -3082,19 +3095,22 @@
     "battle_rule_logical_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67"
   },
   "Bloom Tender": {
+    "ability_kind": "activated",
+    "battle_model_scope": "one_one_color_diversity_mana_dork_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
     "is_mana_source": true,
-    "mana_produced": 2,
+    "mana_colors_from_controlled_permanents": true,
+    "mana_produced_from_colors_among_permanents": true,
     "power": 1,
     "produces": "WUBRG",
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4e8b9d30ea3027c3784897acdb758837"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8e94566195ab70c01276e70051623cb7",
+    "battle_rule_oracle_hash": "53c650c8e69bf2ce0d4cc005285b434d"
   },
   "Blooming Marsh": {
     "effect": "land",
@@ -3624,14 +3640,17 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Brass's Bounty": {
-    "effect": "token_maker",
-    "token_count": "lands",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "single_treasure_creation_v1",
+    "effect": "treasure_maker",
+    "treasure_count": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:00b58c1fb289e83cc5bb4c2abbb64f79"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b5dabaaaba6b2cd47cd998989c11a1fa",
+    "battle_rule_oracle_hash": "beb029ff5233032656034de922a112f0"
   },
   "Brass's Tunnel-Grinder // Tecutlan, the Searing Rift": {
     "cmc": 3.0,
@@ -4142,6 +4161,23 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:58cf40a9a929b66bca25048353cb1498"
   },
+  "Candelabra of Tawnos": {
+    "ability_kind": "activated",
+    "activated_untap_lands_for_mana_unlock": true,
+    "activation_cost_generic_from_x": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "x_tap_untap_x_lands_v1",
+    "effect": "untap_land_engine",
+    "untap_target_land_count_from_x": true,
+    "untap_target_land_restriction": "land",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:025b56533a93506e5517b27a42dcf059",
+    "battle_rule_oracle_hash": "6121bd69a2275cd8f8a88699fd819713"
+  },
   "Cankerbloom": {
     "cmc": 2.0,
     "effect": "remove_permanent",
@@ -4392,15 +4428,16 @@
     "battle_rule_logical_key": "battle_rule_v1:bdfc00d674cb68d8e2a12125213ab559"
   },
   "Cathartic Reunion": {
-    "cmc": 2.0,
-    "count": 3,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "source_controller_draw_variant_v1",
     "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:dd76b2ae056bcc705ac20bceca96c8bb"
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3af05007acd54aabd195ff390b8f082f",
+    "battle_rule_oracle_hash": "27da1fd996cc7f3a85a98aea3b6c030b"
   },
   "Cathedral of Serra": {
     "effect": "land",
@@ -4847,15 +4884,20 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Chord of Calling": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "convoke_creature_tutor_to_battlefield_mana_value_x_or_less_v1",
+    "convoke": true,
     "effect": "tutor",
     "instant": true,
     "target": "creature_to_battlefield",
+    "target_mana_value_max_from_x": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:64b6d751fb68e62ad36afdc30d57a355"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1250cdd03a9389a2fe31e53ac5766394",
+    "battle_rule_oracle_hash": "8399842a5c007c7f4b890bfdf3f84521"
   },
   "Choreographed Sparks": {
     "cmc": 0.0,
@@ -4981,19 +5023,21 @@
     "battle_rule_logical_key": "battle_rule_v1:50a5bd85d9fe8103ccd1f7ee2ad00ec8"
   },
   "Circle of Dreams Druid": {
+    "ability_kind": "activated",
+    "battle_model_scope": "two_one_green_per_creature_mana_dork_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
     "is_mana_source": true,
-    "mana_produced": 3,
+    "mana_produced_from_controlled_creatures": true,
     "power": 2,
     "produces": "G",
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:1cddd22a2a17dc787238635611f0912f"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1b04e8096e5702d2ba0f66645728f226",
+    "battle_rule_oracle_hash": "6d1aeff2f1a2c28c74054cde37cea58f"
   },
   "Circuit Mender": {
     "cmc": 3.0,
@@ -5131,6 +5175,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:783659b3bfa81cefcf77448a4d8a87b4"
+  },
+  "Clever Impersonator": {
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+    "copy_target_types": [
+      "nonland_permanent"
+    ],
+    "effect": "copy_permanent_etb",
+    "target_controller": "any",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:743bc58026f68050c6ef7c902ce85cde",
+    "battle_rule_oracle_hash": "b5a888ad1107dbe2b4d9be83113e83bb"
   },
   "Cliffgate": {
     "effect": "land",
@@ -5811,14 +5871,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
-  "Copy Enchantment": {
-    "effect": "passive",
+  "Copy Artifact": {
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+    "copy_additional_types": [
+      "enchantment"
+    ],
+    "copy_target_types": [
+      "artifact"
+    ],
+    "effect": "copy_permanent_etb",
+    "target_controller": "any",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d466142f168d3c2d58c0594eb14214c9",
+    "battle_rule_oracle_hash": "394ca9be04e11f918cac24d8cc648f1f"
+  },
+  "Copy Enchantment": {
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+    "copy_target_types": [
+      "enchantment"
+    ],
+    "effect": "copy_permanent_etb",
+    "target_controller": "any",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ca58149e510c6834c2ed6ae602074483",
+    "battle_rule_oracle_hash": "e1e0ee06fa971e9233368741b7478a7d"
   },
   "Coral Atoll": {
     "effect": "land",
@@ -5886,6 +5972,8 @@
     "target_constraints": {
       "zone": "stack"
     },
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
@@ -5945,15 +6033,19 @@
     "battle_rule_logical_key": "battle_rule_v1:bbe7f2ee03b52177a39e4f4eb4998043"
   },
   "Crackle with Power": {
-    "cmc": 2.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
+    "ability_kind": "one_shot",
+    "battle_model_scope": "targeted_damage_variant_v1",
+    "effect": "direct_damage",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a939ce51bf83fe086fc16a40d344752d",
+    "battle_rule_oracle_hash": "cf0db23411445756ee792506b48ae35d"
   },
   "Crackling Doom": {
     "cmc": 3.0,
@@ -6095,18 +6187,19 @@
     "battle_rule_logical_key": "battle_rule_v1:cf02bd166a0ffd1d5e60e5ffd1201c07"
   },
   "Crop Rotation": {
+    "battle_model_scope": "sacrifice_land_for_high_value_land_v1",
+    "cmc": 1.0,
     "effect": "land_ramp",
     "instant": true,
     "land_count": 1,
     "land_enters_tapped": false,
-    "land_target_kind": "any",
     "requires_sacrifice_land": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.97,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5515fa238b3e4279866e0fd54b2d14dd"
+    "battle_rule_logical_key": "battle_rule_v1:0cae4a7bd1e862a0063b9c606ff96e6c"
   },
   "Crosis's Catacombs": {
     "effect": "land",
@@ -6232,13 +6325,17 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Cryptolith Rite": {
-    "effect": "ramp_engine",
+    "ability_kind": "static",
+    "battle_model_scope": "creatures_tap_any_color_static_enchantment_v1",
+    "creatures_tap_for_any_color": true,
+    "effect": "passive",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3bb2acfbae9c082368cb5c4f55486990",
+    "battle_rule_oracle_hash": "53ef9c8794128fdba3d1b15c9dbc9f71"
   },
   "Crystal Ball": {
     "cmc": 3.0,
@@ -7813,13 +7910,22 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Double Vision": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "first_instant_sorcery_cast_each_turn_copy_own_spell_v1",
+    "choose_new_targets_status": "may",
     "effect": "copy_spell",
+    "may_choose_new_targets": true,
+    "target": "own_instant_or_sorcery_on_stack",
+    "trigger": "instant_sorcery_cast",
+    "trigger_effect": "copy_spell",
+    "trigger_first_instant_or_sorcery_each_turn": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0b61a431c21395aae201cec046f3a79a"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6b73ccf8b05f7853dcfeae1825b70708",
+    "battle_rule_oracle_hash": "1106bfd584470ed10401167bf452f0a4"
   },
   "Doubling Season": {
     "cmc": 5.0,
@@ -8362,6 +8468,23 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Earthcraft": {
+    "ability_kind": "activated",
+    "activated_untap_lands_for_mana_unlock": true,
+    "activation_taps_untapped_creature_you_control": true,
+    "battle_model_scope": "tap_untapped_creature_untap_target_basic_land_v1",
+    "effect": "untap_land_engine",
+    "untap_target_land_basic_only": true,
+    "untap_target_land_count": 1,
+    "untap_target_land_restriction": "land",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7b54c5adbb14d83b32b736efd1c694a2",
+    "battle_rule_oracle_hash": "f6496abac3c3abd4e9aceb27ba70f866"
+  },
   "Ebon Stronghold": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -8626,17 +8749,22 @@
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
   },
   "Electroduplicate": {
-    "battle_model_scope": "temporary_hasty_copy_token_v1",
-    "cmc": 3.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "copy_target_creature_you_control_haste_sacrifice_end_step_v1",
+    "copy_target_types": [
+      "creature"
+    ],
     "effect": "copy_creature_token",
     "sacrifice_token_at_end_step": true,
+    "target_controller": "own",
     "token_haste": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.91,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:908888276dcbc8c3db1126707691ae2c"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e62445a8a1b5b420bad5215efdc00137",
+    "battle_rule_oracle_hash": "336afa048144f8fb9a88dfc3b6588f4b"
   },
   "Electrostatic Field": {
     "cmc": 2.0,
@@ -8768,19 +8896,23 @@
     "battle_rule_logical_key": "battle_rule_v1:c96ebc7f986b443b6bcee18b892caf07"
   },
   "Elves of Deep Shadow": {
+    "ability_kind": "activated",
+    "battle_model_scope": "one_mana_one_one_black_pain_mana_dork_v1",
+    "damage_on_tap": 1,
     "effect": "creature",
-    "is_creature_permanent": true,
     "is_mana_source": true,
     "mana_produced": 1,
     "power": 1,
     "produces": "B",
+    "tap_damage_status": "annotation_only",
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c24f4320a73bc60a3da4f29fd2bf6d41"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1272fb910383d34360702e343ec16b37",
+    "battle_rule_oracle_hash": "5dd30cbea74064369bcba667795049e2"
   },
   "Elvish Archdruid": {
     "cmc": 3.0,
@@ -8810,29 +8942,42 @@
     "battle_rule_oracle_hash": "fa07d150550fe544837233efd56086ac"
   },
   "Elvish Reclaimer": {
+    "ability_kind": "activated",
+    "activation_cost_generic": 2,
+    "activation_requires_tap": true,
+    "battle_model_scope": "activated_land_tutor_with_land_sacrifice_and_graveyard_growth_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
+    "land_count": 1,
+    "land_enters_tapped": true,
     "land_tutor_activated": true,
+    "lands_to_battlefield": 1,
+    "plus_two_two_if_three_lands_in_your_graveyard": true,
     "power": 1,
+    "requires_sacrifice_land": true,
     "toughness": 2,
+    "tutor_target": "land",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:74ddd44d00ad978b5320720f63044eff"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a702be88d777164eaa496746ae78bae2",
+    "battle_rule_oracle_hash": "dfd0be9a38fadd0931f1c0f6f06aba74"
   },
   "Elvish Spirit Guide": {
+    "ability_kind": "activated",
+    "battle_model_scope": "hand_exile_add_one_green_mana_ritual_v1",
     "effect": "ramp_ritual",
-    "instant": true,
+    "hand_exile_mana_ability": true,
     "mana_produced": 1,
     "produces": "G",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d479660b09f4db0713f9bef670061b6f"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:89b51a84d293b0e0f3ed43c40aeee4d9",
+    "battle_rule_oracle_hash": "75a6071aad90d25b26b269458f953bb0"
   },
   "Elvish Visionary": {
     "cmc": 2.0,
@@ -9107,19 +9252,21 @@
     "battle_rule_logical_key": "battle_rule_v1:cf02bd166a0ffd1d5e60e5ffd1201c07"
   },
   "Enduring Vitality": {
+    "ability_kind": "static",
+    "battle_model_scope": "vigilance_three_three_creatures_tap_any_color_v1",
+    "creatures_tap_for_any_color": true,
+    "death_return_status": "annotation_only",
     "effect": "creature",
-    "is_creature_permanent": true,
-    "keywords": [
-      "vigilance"
-    ],
     "power": 3,
     "toughness": 3,
+    "vigilance": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8ef50c368534ec91af1e28c7e3079c2e"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0a678c0c9029d42a32bc3ab7bb5772ae",
+    "battle_rule_oracle_hash": "88af8c01f2653ce88bd330fb483c2417"
   },
   "Enlightened Tutor": {
     "battle_model_scope": "artifact_enchantment_tutor_to_library_top_v1",
@@ -9206,17 +9353,18 @@
     "battle_rule_logical_key": "battle_rule_v1:d61021fe4fa1357803be53fa0d1d915a"
   },
   "Ephemerate": {
-    "cmc": 1.0,
+    "_rule_logical_key": "battle_rule_v1:4e0a382ebe5adda98c1360cd44617ca3",
+    "battle_model_scope": "ephemerate_blink_as_protect_creature_waiver_v1",
+    "blink_approximation": true,
     "effect": "protect_creature",
     "instant": true,
     "target": "own_creature",
-    "blink_approximation": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6d605e71cab499f7d5f6da75903de044"
+    "battle_rule_logical_key": "battle_rule_v1:7f84cf0ed8a8a8605121b3146498bb82"
   },
   "Epicenter": {
     "cmc": 5.0,
@@ -9510,13 +9658,19 @@
     "battle_rule_logical_key": "battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954"
   },
   "Exotic Orchard": {
+    "ability_kind": "activated",
+    "battle_model_scope": "any_color_from_opponent_land_production_v1",
     "effect": "land",
+    "mana_produced": 1,
+    "opponent_land_color_dependency": true,
+    "produces": "WUBRG",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f07edd2f4f3e3c9897f03ec390a5cf44",
+    "battle_rule_oracle_hash": "d63befc8ac40d9a38732f9b5c1a7414a"
   },
   "Expedite": {
     "count": 1,
@@ -9777,14 +9931,18 @@
     "battle_rule_oracle_hash": "da85cd126972897c37373ad25ec5f867"
   },
   "Faeburrow Elder": {
-    "cmc": 3.0,
-    "effect": "ramp_ritual",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "_rule_logical_key": "battle_rule_v1:0bd74e210101219b206a12ecc0865eef",
+    "battle_model_scope": "faeburrow_elder_color_diversity_mana_creature_waiver_v1",
+    "effect": "creature",
+    "is_mana_source": true,
+    "mana_produced_from_colors_among_permanents": true,
+    "produces": "WUBRG",
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d56035ac6af9d51b9f671e582bb570cf"
+    "battle_rule_logical_key": "battle_rule_v1:e967972a3868e7adadcd394eb22076b2"
   },
   "Faerie Conclave": {
     "effect": "land",
@@ -9934,14 +10092,20 @@
     "battle_rule_logical_key": "battle_rule_v1:d4c4b6b24e887ee80aed27177ca506dc"
   },
   "Fate Unraveler": {
-    "cmc": 4.0,
-    "effect": "draw_engine",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_draws_card_damage_that_player_v1",
+    "effect": "creature",
+    "opponent_draw_damage_per_card": 1,
+    "power": 3,
+    "toughness": 4,
+    "trigger": "opponent_draw",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b7c666b69b93ec1c06833d417e6a9abb",
+    "battle_rule_oracle_hash": "00c95435fc1fca776d77acfae1c4f14a"
   },
   "Fated Clash": {
     "battle_model_scope": "own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1",
@@ -10003,6 +10167,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:758101e162d55b30cebd868b8669eaf5"
+  },
+  "Feast of Sanity": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "controller_discards_card_damage_any_target_and_gain_life_v1",
+    "cmc": 4.0,
+    "controller_discard_damage_any_target": 1,
+    "controller_discard_gain_life": 1,
+    "effect": "passive",
+    "trigger": "controller_discard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8783617a8d44c4f2e0242d17976f8828",
+    "battle_rule_oracle_hash": "9d3f44ba9a777ab7510132842a854475"
   },
   "Feed the Swarm": {
     "effect": "remove_creature",
@@ -10270,6 +10450,8 @@
     "target_constraints": {
       "zone": "stack"
     },
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
@@ -10656,6 +10838,23 @@
     "battle_rule_logical_key": "battle_rule_v1:73622071c1ad89267708f914a0729bf2",
     "battle_rule_oracle_hash": "fa955216fa827bf75c5b79dcbdb4b97e"
   },
+  "Flesh Duplicate": {
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+    "copy_grant_vanishing_if_missing": 3,
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_permanent_etb",
+    "target_controller": "any",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:03e13973df9fbbf9ad781f5ace004f05",
+    "battle_rule_oracle_hash": "93e6894ab82a238b50dcbbbd1a8d9e68"
+  },
   "Flicker of Fate": {
     "cmc": 2.0,
     "effect": "remove_creature",
@@ -10886,6 +11085,8 @@
     "target_constraints": {
       "zone": "stack"
     },
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
@@ -11674,16 +11875,21 @@
     "battle_rule_logical_key": "battle_rule_v1:d491eb5bd49e767cbb09724ec816c640"
   },
   "Geosurge": {
-    "cmc": 4.0,
+    "_rule_logical_key": "battle_rule_v1:f070dec42ddd08882a9c72a9475de818",
+    "battle_model_scope": "geosurge_red_creature_artifact_ritual_waiver_v1",
     "effect": "ramp_ritual",
-    "instant": true,
-    "mana_produced": 5,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "mana_produced": 7,
+    "produces": "R",
+    "restricted_to_spell_categories": [
+      "artifact_spell",
+      "creature_spell"
+    ],
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:363df01d68f8b7a5cc936e76d4304e38"
+    "battle_rule_logical_key": "battle_rule_v1:f4f9c85f14afcf64c05206115f3012ea"
   },
   "Geothermal Bog": {
     "effect": "land",
@@ -11719,6 +11925,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea",
     "battle_rule_oracle_hash": "6b6517e1b5b60db5cf6bbcd991dbc1ec"
+  },
+  "Geth's Grimoire": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_discards_card_may_draw_v1",
+    "cmc": 4.0,
+    "draw_on_enter": false,
+    "effect": "draw_engine",
+    "opponent_discard_draw_per_card": 1,
+    "trigger": "opponent_discard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:293ee48b9a46181e885a4e563ef5868c",
+    "battle_rule_oracle_hash": "6f91d335d1e146eb8f4f7e034130fa67"
   },
   "Ghalta and Mavren": {
     "cmc": 7.0,
@@ -12797,14 +13019,20 @@
     "battle_rule_logical_key": "battle_rule_v1:85d8c93e5ff3b531d4ab9217bd956948"
   },
   "Green Sun's Zenith": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "green_creature_tutor_to_battlefield_mana_value_x_or_less_then_shuffle_self_v1",
     "effect": "tutor",
+    "instant": false,
+    "shuffle_self_into_library_on_resolution": true,
     "target": "green_creature_to_battlefield",
+    "target_mana_value_max_from_x": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:dcd2fccb53628953104dd6a59b0b7f96"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c1c56ae7a9b9e0cae540e39cecb4f157",
+    "battle_rule_oracle_hash": "cfaabe0e9d9d20d134845c8f4b946e1e"
   },
   "Griffin Canyon": {
     "effect": "land",
@@ -12845,15 +13073,20 @@
     "battle_rule_logical_key": "battle_rule_v1:eaa27d98bb13d1caeabde36eb8fa8a0b"
   },
   "Grim Monolith": {
+    "ability_kind": "activated",
+    "activated_untap_cost_generic": 4,
+    "battle_model_scope": "three_colorless_monolith_mana_rock_v1",
+    "does_not_untap_in_untap_step": true,
     "effect": "ramp_permanent",
     "mana_produced": 3,
     "produces": "C",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3f989c33316a642a5dc230cb618161a4"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ac773d3e88bf38de11004c2943b4d871",
+    "battle_rule_oracle_hash": "2fcac973250226ee566f69491bff9de4"
   },
   "Grim Tutor": {
     "effect": "tutor",
@@ -14357,8 +14590,10 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Ignoble Hierarch": {
+    "ability_kind": "activated",
+    "battle_model_scope": "one_mana_zero_one_exalted_tricolor_mana_dork_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
+    "exalted": true,
     "is_mana_source": true,
     "mana_produced": 1,
     "power": 0,
@@ -14367,9 +14602,10 @@
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:27e9421996f9559168a2c83ff36c8801"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f0668b054043b3db07eeb57e4cbd876e",
+    "battle_rule_oracle_hash": "dce5f09110d0296c91f79dd364780729"
   },
   "Illegitimate Business": {
     "effect": "land",
@@ -14553,13 +14789,27 @@
     "battle_rule_logical_key": "battle_rule_v1:77269d9dcbc5e43d875e3cc1854cfcdf"
   },
   "Imposter Mech": {
-    "effect": "passive",
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+    "copy_overwrite_subtypes": [
+      "Vehicle"
+    ],
+    "copy_overwrite_types": [
+      "artifact"
+    ],
+    "copy_target_types": [
+      "creature"
+    ],
+    "copy_vehicle_crew_value": 3,
+    "effect": "copy_permanent_etb",
+    "target_controller": "opponent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4f317236846bce55c91965bb4605762f",
+    "battle_rule_oracle_hash": "35f38b34bb79ee6327a68ece8587f7a1"
   },
   "Imprisoned in the Moon": {
     "cmc": 3.0,
@@ -15092,15 +15342,22 @@
     "battle_rule_logical_key": "battle_rule_v1:f0503653f112a2e1138ae3a6fbe9f0ce"
   },
   "Invoke Justice": {
-    "cmc": 5.0,
-    "count": 2,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "graveyard_to_battlefield_variant_v1",
     "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b88baa723b80ab2a7462f905801ddf84"
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "zone": "graveyard"
+    },
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:13150949864474c123d5a02a7a007722",
+    "battle_rule_oracle_hash": "a98214114b5acd853842ac7590854785"
   },
   "Ipnu Rivulet": {
     "effect": "land",
@@ -15272,18 +15529,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Izzet Signet": {
+    "ability_kind": "activated",
     "activation_cost_generic": 1,
     "battle_model_scope": "signet_filter_mana_rock_v1",
-    "cmc": 2.0,
     "effect": "ramp_permanent",
     "mana_produced": 1,
     "produces": "UR",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.88,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a4b2c1fe2265135b1bf033d5a429d662",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0775d7b0089db2ee45cebb6804127f30",
     "battle_rule_oracle_hash": "7243690f1b89dbe49c9cdf029e9067ce"
   },
   "Jace's Archivist": {
@@ -15455,6 +15712,21 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e90b582e4b128b4c890db8959fb6005c"
+  },
+  "Jeweled Amulet": {
+    "_rule_logical_key": "battle_rule_v1:106938334eb211f976623e6921ddfeb7",
+    "battle_model_scope": "jeweled_amulet_charge_counter_mana_waiver_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_produced": 1,
+    "produces": "WUBRG",
+    "requires_charge_counter_before_mana": true,
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:abbeaea6d2deaf3d49d61506714ec5fd"
   },
   "Jhoira, Weatherlight Captain": {
     "cmc": 4.0,
@@ -17059,15 +17331,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Locket of Yesterdays": {
-    "cmc": 1.0,
-    "effect": "ramp_permanent",
-    "mana_produced": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:90345eb5573a6295450e7f625c28b943"
+    "ability_kind": "static",
+    "applies_to_controller": "source_controller",
+    "battle_model_scope": "static_cost_reduction_for_matching_spells_v1",
+    "cost_reduction_applies_to": "spells_you_cast",
+    "cost_reduction_generic": 1,
+    "effect": "static_cost_reduction",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:09662427b256781a39f50dd00ba9735b",
+    "battle_rule_oracle_hash": "556810471067d11936662c3406a207c8"
   },
   "Lonely Arroyo": {
     "effect": "land",
@@ -17608,6 +17884,25 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Magus of the Candelabra": {
+    "ability_kind": "activated",
+    "activated_untap_lands_for_mana_unlock": true,
+    "activation_cost_generic_from_x": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "creature_x_tap_untap_x_lands_v1",
+    "effect": "untap_land_engine",
+    "power": 1,
+    "toughness": 2,
+    "untap_target_land_count_from_x": true,
+    "untap_target_land_restriction": "land",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5ebc277a81704d086c4c9009ce3863dc",
+    "battle_rule_oracle_hash": "6121bd69a2275cd8f8a88699fd819713"
+  },
   "Magus of the Moat": {
     "attack_requires_keyword": "flying",
     "battle_model_scope": "magus_of_the_moat_global_flying_attack_filter_v2",
@@ -17739,6 +18034,8 @@
     "instant": true,
     "target": "spell",
     "unless_controller_pays_generic": 3,
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -17922,6 +18219,23 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a5067af5281522b7c87ecbb96f067c00"
+  },
+  "Mardu Devotee": {
+    "_rule_logical_key": "battle_rule_v1:f052c961703873e8bce9d44815a698a7",
+    "activation_cost_generic": 1,
+    "battle_model_scope": "mardu_devotee_scry_and_mana_filter_waiver_v1",
+    "effect": "creature",
+    "etb_scry_count": 2,
+    "mana_filter_once_per_turn": true,
+    "power": 1,
+    "produces": "RWB",
+    "toughness": 2,
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:000d81837717b2c74051ee03dcc5da11"
   },
   "Mari, the Killing Quill": {
     "cmc": 3.0,
@@ -18174,6 +18488,21 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Megrim": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_discards_card_damage_that_player_v1",
+    "cmc": 3.0,
+    "effect": "passive",
+    "opponent_discard_damage_per_card": 2,
+    "trigger": "opponent_discard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3c0ccb6b440a3128acdd19b58ace0b1e",
+    "battle_rule_oracle_hash": "2bb00f8626aef78bae0a72196673b7ec"
   },
   "Memorial to Folly": {
     "effect": "land",
@@ -18583,13 +18912,21 @@
     "battle_rule_logical_key": "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
   },
   "Mirrormade": {
-    "effect": "unknown",
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+    "copy_target_types": [
+      "artifact",
+      "enchantment"
+    ],
+    "effect": "copy_permanent_etb",
+    "target_controller": "any",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:bad1299c101ec5d598f2a53d637e99e5"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d267ffd54ecf9c5026b8aaf43076edc9",
+    "battle_rule_oracle_hash": "49a1b071e36257efbc6ddb75d03ac14a"
   },
   "Mirrorpool": {
     "effect": "land",
@@ -18607,6 +18944,8 @@
     "instant": true,
     "target": "instant_or_sorcery_spell",
     "unless_controller_pays_generic": 3,
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -18794,6 +19133,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Mockingbird": {
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+    "copy_additional_subtypes": [
+      "Bird"
+    ],
+    "copy_granted_keywords": [
+      "flying"
+    ],
+    "copy_target_mana_value_lte_source_mana_value": true,
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_permanent_etb",
+    "target_controller": "any",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:43e3543e0e752d74fab3cf0a170d081e",
+    "battle_rule_oracle_hash": "f3b499fed5cd401f51e14b49fc2c9edd"
   },
   "Mogg Hollows": {
     "effect": "land",
@@ -19031,6 +19393,21 @@
     "battle_rule_logical_key": "battle_rule_v1:720fa891c12918f180a36ff13efe7ef8",
     "battle_rule_oracle_hash": "dea539b1ab6b8022840db67f2bf0c2d6"
   },
+  "Moonsnare Prototype": {
+    "_rule_logical_key": "battle_rule_v1:07cfe7b5bd9e476b0eae39cb388d0ef0",
+    "activation_cost": "tap_artifact_or_creature",
+    "battle_model_scope": "moonsnare_prototype_mana_artifact_waiver_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_produced": 1,
+    "produces": "C",
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:183e82ce1a728fc78fea1fe7e5d0c654"
+  },
   "Moorland Haunt": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -19145,8 +19522,8 @@
   "Mountain": {
     "effect": "land",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
-    "battle_rule_execution_status": "auto",
+    "battle_rule_review_status": "deprecated",
+    "battle_rule_execution_status": "disabled",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
@@ -19519,14 +19896,20 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Mystic Remora": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_noncreature_spell_pay_four_draw_engine_with_cumulative_upkeep_v1",
+    "cumulative_upkeep_generic": 1,
+    "draw_on_enter": false,
     "effect": "draw_engine",
+    "tax": 4,
     "trigger": "opponent_noncreature_spell",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0204efdfeb4a669d10a35f1ae9ce3295"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:91908863a3c983e6d30a2ff99cf41fdb",
+    "battle_rule_oracle_hash": "05eb27f7618511c39512cf5a6d93231d"
   },
   "Mystic Sanctuary": {
     "effect": "land",
@@ -19654,14 +20037,20 @@
     "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
   },
   "Nature's Rhythm": {
-    "count": 1,
-    "effect": "recursion",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "creature_tutor_to_battlefield_mana_value_x_or_less_harmonize_v1",
+    "effect": "tutor",
+    "harmonize": true,
+    "instant": false,
+    "target": "creature_to_battlefield",
+    "target_mana_value_max_from_x": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:fac6bf2a168be222f29dff8b54459d88"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6763f8258c7027a341e182900af5e8fc",
+    "battle_rule_oracle_hash": "109e64b1ea27da04b6266d4e86b52aad"
   },
   "Naya Panorama": {
     "effect": "land",
@@ -19764,6 +20153,8 @@
     "target_constraints": {
       "zone": "stack"
     },
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
@@ -19795,15 +20186,20 @@
     "battle_rule_logical_key": "battle_rule_v1:e09fb5ff3a2468fd9036a38c37667d30"
   },
   "Neoform": {
-    "cmc": 2.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "_rule_logical_key": "battle_rule_v1:8f38651412c0d6366a81bd426e980cdf",
+    "battle_model_scope": "neoform_sacrifice_creature_tutor_waiver_v1",
+    "destination": "battlefield",
+    "effect": "tutor",
+    "enters_with_plus_one_counter": true,
+    "requires_sacrifice_creature": true,
+    "sacrificed_creature_mv_plus_one": true,
+    "target_type": "creature",
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
+    "battle_rule_logical_key": "battle_rule_v1:bf478984d9c5eb673613ac9d1d87a013"
   },
   "Nephalia Academy": {
     "effect": "land",
@@ -19989,8 +20385,10 @@
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
   },
   "Noble Hierarch": {
+    "ability_kind": "activated",
+    "battle_model_scope": "one_mana_zero_one_exalted_tricolor_mana_dork_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
+    "exalted": true,
     "is_mana_source": true,
     "mana_produced": 1,
     "power": 0,
@@ -19999,9 +20397,10 @@
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:da8fa2fc05b0e8c23e9b1c344e8227dd"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6039e5bf5989f3ab51feff2948bd0892",
+    "battle_rule_oracle_hash": "6e78cce29d72fd81331490b36689fd29"
   },
   "Nogi, Draco-Zealot": {
     "cmc": 3.0,
@@ -20219,6 +20618,26 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ed50c92b97bfabab48c78b9ce1f4f297"
+  },
+  "Oboro Breezecaller": {
+    "ability_kind": "activated",
+    "activated_untap_lands_for_mana_unlock": true,
+    "activation_cost_generic": 2,
+    "activation_returns_land_to_hand": true,
+    "battle_model_scope": "pay_two_return_land_untap_target_land_v1",
+    "effect": "untap_land_engine",
+    "flying": true,
+    "power": 1,
+    "toughness": 1,
+    "untap_target_land_count": 1,
+    "untap_target_land_restriction": "land",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:09d7cae21ee60dcada5b267602355036",
+    "battle_rule_oracle_hash": "51aa9c6083f41d49800b21ebe5bd49df"
   },
   "Oboro, Palace in the Clouds": {
     "effect": "land",
@@ -20601,6 +21020,23 @@
     "battle_rule_logical_key": "battle_rule_v1:be12835f3e35436f0165be1b72332b80",
     "battle_rule_oracle_hash": "d4bad6405b84c07af1e2cfc69adbb695"
   },
+  "Orcish Lumberjack": {
+    "_rule_logical_key": "battle_rule_v1:f82877528ecb7bd321fee8b0fd117909",
+    "battle_model_scope": "orcish_lumberjack_forest_sacrifice_mana_waiver_v1",
+    "effect": "creature",
+    "is_mana_source": true,
+    "mana_produced": 3,
+    "power": 1,
+    "produces": "RG",
+    "requires_sacrifice_forest_for_mana": true,
+    "toughness": 1,
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:f8395a9bfc8bf4052abf4ef9a62c11a2"
+  },
   "Orim's Chant": {
     "battle_model_scope": "orims_chant_kicker_attack_prevention_v1",
     "effect": "silence_spell",
@@ -20871,6 +21307,8 @@
     "instant": true,
     "lose_game_if_unpaid": true,
     "target": "spell",
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -21361,6 +21799,26 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Phantasmal Image": {
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+    "copy_additional_subtypes": [
+      "Illusion"
+    ],
+    "copy_sacrifice_when_targeted": true,
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_permanent_etb",
+    "target_controller": "any",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e2b5d8a5284d2c8a2b986ecc343702cd",
+    "battle_rule_oracle_hash": "d354295810b0219eb38e5137a0ba0e9f"
+  },
   "Phyrexia's Core": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -21389,6 +21847,26 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
+  },
+  "Phyrexian Metamorph": {
+    "ability_kind": "replacement",
+    "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+    "copy_additional_types": [
+      "artifact"
+    ],
+    "copy_target_types": [
+      "artifact",
+      "creature"
+    ],
+    "effect": "copy_permanent_etb",
+    "target_controller": "any",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1c9b7206e4e878ac743fc9186cdf5beb",
+    "battle_rule_oracle_hash": "f33412ad2deef26bceca34c6b467f890"
   },
   "Phyrexian Reclamation": {
     "cmc": 1.0,
@@ -21547,8 +22025,8 @@
   "Plains": {
     "effect": "land",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "verified",
-    "battle_rule_execution_status": "auto",
+    "battle_rule_review_status": "deprecated",
+    "battle_rule_execution_status": "disabled",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
@@ -21727,14 +22205,18 @@
     "battle_rule_logical_key": "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b"
   },
   "Ponder": {
-    "cmc": 1.0,
+    "_rule_logical_key": "battle_rule_v1:30d7761aceeee17e649d42d6e8690d39",
+    "battle_model_scope": "ponder_top_three_draw_waiver_v1",
+    "count": 1,
     "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "may_shuffle": true,
+    "topdeck_look_count": 3,
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:81f188e4e97035598c3746c5f81a02d8"
+    "battle_rule_logical_key": "battle_rule_v1:ec7a3fde759f5a7c2552335244e4771b"
   },
   "Pongify": {
     "cmc": 1.0,
@@ -22057,19 +22539,17 @@
     "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
   },
   "Prized Statue": {
-    "ability_kind": "triggered",
-    "battle_model_scope": "artifact_etb_or_dies_create_treasure_v1",
+    "_rule_logical_key": "battle_rule_v1:f12f6b0add30c98761744303a2cb2034",
+    "battle_model_scope": "prized_statue_treasure_artifact_waiver_v1",
     "dies_or_graveyard_from_battlefield_treasure": true,
     "effect": "ramp_permanent",
-    "enters_treasure": 1,
     "treasure_count": 1,
-    "battle_rule_source": "curated",
+    "battle_rule_source": "manual",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.94,
-    "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:5409aaaddafe0d4a8f2beef5869dccb1",
-    "battle_rule_oracle_hash": "f8c4faf999ea6d3721761c9c0e9b2d2f"
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:2863db84fc8c0de650f20f97705a2f31"
   },
   "Processing Plant": {
     "effect": "land",
@@ -22992,6 +23472,20 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d47cbde8d1dc5678060e25ea1b620a82"
   },
+  "Reckless Barbarian": {
+    "_rule_logical_key": "battle_rule_v1:25268b16cdb6a4a7f9467efd027d171b",
+    "battle_model_scope": "reckless_barbarian_creature_mana_source_waiver_v1",
+    "effect": "creature",
+    "is_mana_source": true,
+    "mana_produced": 2,
+    "produces": "R",
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:3e72ebe4ed73c982053d9e964bd59563"
+  },
   "Reckless Endeavor": {
     "average_damage": 6,
     "average_treasure_count": 6,
@@ -23181,6 +23675,8 @@
     "effect": "counter",
     "instant": true,
     "target": "spell",
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -23237,15 +23733,18 @@
     "battle_rule_logical_key": "battle_rule_v1:c245813052be97699b38eb8c2baad935"
   },
   "Relic of Legends": {
+    "ability_kind": "activated",
+    "battle_model_scope": "one_any_color_mana_rock_v1",
     "effect": "ramp_permanent",
     "mana_produced": 1,
-    "produces": "WUBRGC",
+    "produces": "WUBRG",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4f700f70db9f348cfc3c525b2c08e9d0",
+    "battle_rule_oracle_hash": "3b506c9dca803c9b34a7a1ed49000ab5"
   },
   "Relic of Sauron": {
     "effect": "ramp_permanent",
@@ -23746,14 +24245,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Rhystic Study": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_spell_pay_one_or_draw_engine_v1",
+    "draw_on_enter": false,
     "effect": "draw_engine",
+    "tax": 1,
     "trigger": "opponent_spell",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:79b27c9590580c68ac39779ee48644e9",
+    "battle_rule_oracle_hash": "f745d1b0ae8acc8c593efb5b3e36ae97"
   },
   "Rhythm of the Wild": {
     "cmc": 3.0,
@@ -24558,6 +25062,21 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Sacrifice": {
+    "_rule_logical_key": "battle_rule_v1:ae69d18a9fa1af0b152bcec147e3a910",
+    "battle_model_scope": "sacrifice_creature_cmc_black_ritual_waiver_v1",
+    "effect": "ramp_ritual",
+    "instant": true,
+    "mana_produced_from_sacrificed_cmc": true,
+    "produces": "B",
+    "requires_sacrifice_creature": true,
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:2f9fa503a105cf9105667d1c3f2933bb"
   },
   "Safe Haven": {
     "effect": "land",
@@ -27127,11 +27646,11 @@
     "cmc": 1.0,
     "effect": "ramp_permanent",
     "battle_rule_source": "generated",
-    "battle_rule_review_status": "deprecated",
+    "battle_rule_review_status": "needs_review",
     "battle_rule_execution_status": "disabled",
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:345563db14bee1de3ce7d5adc6aee777"
+    "battle_rule_logical_key": "battle_rule_v1:0efab52e2fe6c51956a3d94ac671fd43"
   },
   "Soldevi Excavations": {
     "effect": "land",
@@ -27421,6 +27940,8 @@
     "instant": true,
     "target": "noncreature_spell",
     "unless_controller_pays_generic": 2,
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -27743,15 +28264,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Springleaf Drum": {
+    "ability_kind": "activated",
+    "battle_model_scope": "creature_support_any_color_mana_rock_v1",
     "effect": "ramp_permanent",
     "mana_produced": 1,
-    "produces": "WUBRGC",
+    "mana_source_requires_untapped_creature": true,
+    "produces": "WUBRG",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b822326189437e5554828b3b6ff001c1",
+    "battle_rule_oracle_hash": "bc0d67ab4c23dc0ffed1100c30eac1d5"
   },
   "Spymaster's Vault": {
     "effect": "land",
@@ -27948,14 +28473,18 @@
     "battle_rule_logical_key": "battle_rule_v1:8e724d64deb66b7fbdf3b9a3f4dbe5f0"
   },
   "Steelshaper's Gift": {
-    "cmc": 1.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "any_tutor_to_hand_v1",
     "effect": "tutor",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:790bd6de72d8e0e2a1c6d7375582da5c"
+    "instant": false,
+    "target": "any_to_hand",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c7ff42f8ce9a2bca4470fba16cab034a",
+    "battle_rule_oracle_hash": "8f894c3b42872f60142063c115ef3c9a"
   },
   "Stensia Bloodhall": {
     "effect": "land",
@@ -28819,6 +29348,8 @@
       "power": 2,
       "toughness": 2
     },
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
@@ -28826,6 +29357,23 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:9e1a27e7c6c194ebfab6c500503665a6",
     "battle_rule_oracle_hash": "f31d32e77db92d33647a4424c52ade5d"
+  },
+  "Swarm Intelligence": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "instant_sorcery_cast_copy_own_spell_v1",
+    "choose_new_targets_status": "may",
+    "effect": "copy_spell",
+    "may_choose_new_targets": true,
+    "target": "own_instant_or_sorcery_on_stack",
+    "trigger": "instant_sorcery_cast",
+    "trigger_effect": "copy_spell",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9f1ee8ecd68dad5bf39139de17c013eb",
+    "battle_rule_oracle_hash": "1acd382841c8fabf16162bd47f9e4a03"
   },
   "Swarmyard": {
     "effect": "land",
@@ -29188,14 +29736,19 @@
     "battle_rule_logical_key": "battle_rule_v1:a2c903658f51cfe3e7836e43291d0562"
   },
   "Talisman of Curiosity": {
-    "cmc": 2.0,
+    "ability_kind": "activated",
+    "battle_model_scope": "pain_talisman_color_pair_partial_v1",
     "effect": "ramp_permanent",
+    "life_for_colored_mana": 1,
+    "mana_produced": 1,
+    "produces": "CUG",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c4df4800bcf67bfd2ded6ea1fc6a8efa",
+    "battle_rule_oracle_hash": "212d43a126a54d9aabbf1dec21b93acb"
   },
   "Talisman of Dominance": {
     "effect": "ramp_permanent",
@@ -29230,15 +29783,19 @@
     "battle_rule_logical_key": "battle_rule_v1:ae11cd37511b1e2264354acfd88d3aa5"
   },
   "Talisman of Indulgence": {
+    "ability_kind": "activated",
+    "battle_model_scope": "pain_talisman_color_pair_partial_v1",
     "effect": "ramp_permanent",
+    "life_for_colored_mana": 1,
     "mana_produced": 1,
-    "produces": "BRC",
+    "produces": "CBR",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:99d7e4123ab0366918ef286bd5b4d7d8"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:aafb809ee99cacf080c12f3c92c84e19",
+    "battle_rule_oracle_hash": "b6f7ff0127d1c9fd2c33d81fa54b64f6"
   },
   "Talisman of Progress": {
     "effect": "ramp_permanent",
@@ -29363,13 +29920,20 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Tarnished Citadel": {
+    "ability_kind": "activated",
+    "battle_model_scope": "colorless_or_any_color_pain_land_v1",
     "effect": "land",
+    "life_for_colored_mana": 3,
+    "life_loss_on_colored_mana_status": "annotation_only",
+    "mana_produced": 1,
+    "produces": "CWUBRG",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d5663032352408a845b7602f9cb5adf9",
+    "battle_rule_oracle_hash": "d8bdb24e586e16274f0bd42e40e2dc58"
   },
   "Tarrian's Soulcleaver": {
     "cmc": 1.0,
@@ -32407,14 +32971,18 @@
     "battle_rule_oracle_hash": "a98ca5777789e48c44daff97999f2beb"
   },
   "Underworld Dreams": {
-    "cmc": 3.0,
-    "effect": "draw_engine",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_draws_card_damage_that_player_v1",
+    "effect": "passive",
+    "opponent_draw_damage_per_card": 1,
+    "trigger": "opponent_draw",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:601180f3d9a50d4670765427bde20c84",
+    "battle_rule_oracle_hash": "ade82ae73b5e5030f19d03b541b04219"
   },
   "Undiscovered Paradise": {
     "effect": "land",
@@ -33427,14 +33995,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Vivi Ornitier": {
-    "cmc": 3.0,
-    "effect": "ramp_ritual",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
+    "_rule_logical_key": "battle_rule_v1:4a18e9fa65aebd3c4aad299121208eb2",
+    "battle_model_scope": "vivi_ornitier_creature_mana_trigger_waiver_v1",
+    "effect": "creature",
+    "is_mana_source": true,
+    "mana_produced_from_power": true,
+    "noncreature_spell_counter_and_ping": true,
+    "power": 0,
+    "produces": "UR",
+    "toughness": 3,
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d56035ac6af9d51b9f671e582bb570cf"
+    "battle_rule_logical_key": "battle_rule_v1:776484a65e548398af3a60629c895376"
   },
   "Vivid Crag": {
     "effect": "land",
@@ -34199,15 +34774,20 @@
     "battle_rule_logical_key": "battle_rule_v1:cbc31597c59b4deef51aec39e807d64d"
   },
   "Whir of Invention": {
-    "cmc": 3.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "improvise_artifact_tutor_to_battlefield_mana_value_x_or_less_v1",
     "effect": "tutor",
+    "improvise": true,
     "instant": true,
+    "target": "artifact_to_battlefield",
+    "target_mana_value_max_from_x": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:94895345af982f19f56d4e41daf52fda"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:719bc165cd6259a33d138d4fe2b1d2a2",
+    "battle_rule_oracle_hash": "47a15ce5ca279f509f387d3909695959"
   },
   "Whirler Rogue": {
     "cmc": 4.0,
@@ -34645,6 +35225,8 @@
     "effect": "counter",
     "instant": true,
     "target": "spell",
+    "_rule_oracle_normalized_effect_from": "counter_spell",
+    "_rule_oracle_normalized_effect_to": "counter",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",

@@ -1,0 +1,8 @@
+    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Flesh Duplicate  | flesh duplicate  | battle_rule_v1:03e13973df9fbbf9ad781f5ace004f05 |                  1 |                           1 |                         1 |           2
+ Imposter Mech    | imposter mech    | battle_rule_v1:4f317236846bce55c91965bb4605762f |                  1 |                           1 |                         1 |           2
+ Mockingbird      | mockingbird      | battle_rule_v1:43e3543e0e752d74fab3cf0a170d081e |                  1 |                           1 |                         1 |           2
+ Phantasmal Image | phantasmal image | battle_rule_v1:e2b5d8a5284d2c8a2b986ecc343702cd |                  1 |                           1 |                         1 |           2
+(4 rows)
+

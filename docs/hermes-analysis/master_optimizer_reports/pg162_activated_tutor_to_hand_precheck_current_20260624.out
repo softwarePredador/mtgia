@@ -1,0 +1,7 @@
+     card_name      |  normalized_name   |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+--------------------+--------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Expedition Map     | expedition map     | 03a510edd2cc7011492c1c7f4a73a0c8 | battle_rule_v1:e6e3f483c5eb366bcd6109b743518c40 |                1 | 6bfd199a-5b67-454e-8c8a-041fc52daafe |                  3 |                         1 |                           0
+ Moonsilver Key     | moonsilver key     | dea539b1ab6b8022840db67f2bf0c2d6 | battle_rule_v1:720fa891c12918f180a36ff13efe7ef8 |                1 | 437a8f88-a210-4b60-9afb-8a6118767435 |                  3 |                         1 |                           0
+ Weathered Wayfarer | weathered wayfarer | f69def908804331b655fcf9c8e19d67b | battle_rule_v1:7df98700ba8ee232d2a8b15f1296ef47 |                1 | 3d2d015b-1997-40e9-9d8b-6631c88c7da1 |                  3 |                         1 |                           0
+(3 rows)
+

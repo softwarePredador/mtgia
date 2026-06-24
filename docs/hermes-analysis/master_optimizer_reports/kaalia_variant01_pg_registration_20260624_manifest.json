@@ -1,0 +1,28 @@
+{
+  "archetype": "mardu-cheat-equipment-combo-variant",
+  "artifacts": {
+    "apply_sql": "docs/hermes-analysis/master_optimizer_reports/kaalia_variant01_pg_registration_20260624_apply.sql",
+    "postcheck_sql": "docs/hermes-analysis/master_optimizer_reports/kaalia_variant01_pg_registration_20260624_postcheck.sql",
+    "precheck_sql": "docs/hermes-analysis/master_optimizer_reports/kaalia_variant01_pg_registration_20260624_precheck.sql",
+    "resolution_json": "docs/hermes-analysis/master_optimizer_reports/kaalia_variant01_resolution_20260624.json",
+    "rollback_sql": "docs/hermes-analysis/master_optimizer_reports/kaalia_variant01_pg_registration_20260624_rollback.sql"
+  },
+  "catalog_backfill": "docs/hermes-analysis/master_optimizer_reports/kaalia_variant01_alicia_masters_card_backfill_20260624_summary.md",
+  "catalog_backfill_card": "Alicia Masters, Skilled Sculptor",
+  "catalog_backfill_scryfall_id": "3db94749-340c-4454-a15d-ba6353e0c4a4",
+  "commander": "Kaalia of the Vast",
+  "deck_hash": "b895928feb6f33ab62223690fff760f8eebe0a5c2c12c013be4e9ffe02d96656",
+  "generated_at": "2026-06-24",
+  "hermes_deck_id": 619,
+  "input_qty": 100,
+  "input_rows": 89,
+  "missing_rows": 0,
+  "pg_deck_id": "b629f227-b2b2-5e71-9854-99d345a8e01c",
+  "pg_learned_id": "cb2e2acf-933c-5a01-8fab-5bad84122211",
+  "resolved_rows": 89,
+  "scope": "non-Lorehold deck intake only; no deck swap; learned deck inactive",
+  "source_decklist": "docs/hermes-analysis/manaloom-knowledge/decks/kaalia-of-the-vast/2026-06-24-variant-01-user-decklist.md",
+  "source_ref": "kaalia_variant01_20260624_b895928feb6f",
+  "source_system": "manual_user_deck_registration",
+  "variant": "kaalia_variant01"
+}

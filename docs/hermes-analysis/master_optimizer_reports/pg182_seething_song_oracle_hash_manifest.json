@@ -1,0 +1,20 @@
+{
+  "apply_gate": "Approved in chat by Rafael with: sincronize, suba pg se for preciso, commite, faca tudo.",
+  "backup_table": "manaloom_deploy_audit.pg182_seething_song_oracle_hash_20260624",
+  "deploy_id": "PG182",
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg182_seething_song_oracle_hash_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg182_seething_song_oracle_hash_manifest.json",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg182_seething_song_oracle_hash_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg182_seething_song_oracle_hash_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg182_seething_song_oracle_hash_rollback.sql"
+  },
+  "generated_at": "2026-06-24T15:41:00+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Seething Song"
+  ],
+  "selected_count": 1,
+  "slug": "seething_song_oracle_hash",
+  "status": "prepared_pending_apply"
+}

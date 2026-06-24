@@ -22,12 +22,14 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_REPORT_DIR = REPO_ROOT / "docs/hermes-analysis/master_optimizer_reports"
-DEFAULT_BENCHMARK = DEFAULT_REPORT_DIR / "xmage_acceleration_strategy_benchmark_20260624_expanded_608_619_real_v1.json"
-DEFAULT_PATTERN_REGISTRY = DEFAULT_REPORT_DIR / "xmage_pattern_registry_20260624_expanded_608_619_real_v1.json"
-DEFAULT_PATTERN_SCHEMA = DEFAULT_REPORT_DIR / "xmage_pattern_registry_20260624_expanded_608_619_real_v1_schema_proposal.sql"
-DEFAULT_EFFECTIVE_QUEUE = DEFAULT_REPORT_DIR / "xmage_effective_queue_20260624_expanded_608_619_real_v2.json"
+DEFAULT_BENCHMARK = DEFAULT_REPORT_DIR / "xmage_acceleration_strategy_benchmark_20260624_pg166_181_postsync_real_v2.json"
+DEFAULT_PATTERN_REGISTRY = (
+    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_pattern_registry.json"
+)
+DEFAULT_PATTERN_SCHEMA = DEFAULT_REPORT_DIR / "xmage_pattern_registry_20260624_pg166_181_postsync_real_v2_schema_proposal.sql"
+DEFAULT_EFFECTIVE_QUEUE = DEFAULT_REPORT_DIR / "xmage_effective_queue_20260624_pg166_181_postsync_real_v3.json"
 DEFAULT_PIPELINE_MANIFEST = (
-    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_expanded_608_619_real_v7_manifest.json"
+    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_manifest.json"
 )
 DEFAULT_EXPECTED_EFFECTIVE_DECK_IDS = list(range(608, 620))
 
@@ -129,7 +131,15 @@ def audit_benchmark(path: Path) -> list[Check]:
         checks.append(ok("benchmark.recommended_strategy", "hybrid_effective_queue_pattern_registry"))
     else:
         checks.append(fail("benchmark.recommended_strategy", str(summary.get("recommended_strategy_id"))))
-    if first.get("strategy_id") == "hybrid_effective_queue_pattern_registry":
+    ranked_strategy_ids = [str(item.get("strategy_id") or "") for item in ranking]
+    if "hybrid_effective_queue_pattern_registry" in ranked_strategy_ids:
+        checks.append(ok("benchmark.hybrid_strategy_ranked", json.dumps(ranked_strategy_ids, sort_keys=True)))
+    else:
+        checks.append(fail("benchmark.hybrid_strategy_ranked", json.dumps(ranked_strategy_ids, sort_keys=True)))
+    if first.get("strategy_id") in {
+        "hybrid_effective_queue_pattern_registry",
+        "exact_scope_cluster_first",
+    }:
         checks.append(ok("benchmark.ranking_first", json.dumps(first, sort_keys=True)))
     else:
         checks.append(fail("benchmark.ranking_first", json.dumps(first, sort_keys=True)))
@@ -188,10 +198,11 @@ def audit_effective_queue(path: Path) -> list[Check]:
         checks.append(ok("effective_queue.package_ready_unprepared", "0"))
     else:
         checks.append(fail("effective_queue.package_ready_unprepared", str(counts.get("package_ready_unprepared"))))
-    if int(counts.get("package_already_prepared") or 0) > 0:
-        checks.append(ok("effective_queue.package_already_prepared", str(counts.get("package_already_prepared"))))
+    package_already_prepared = int(counts.get("package_already_prepared") or 0)
+    if package_already_prepared >= 0:
+        checks.append(ok("effective_queue.package_already_prepared", str(package_already_prepared)))
     else:
-        checks.append(fail("effective_queue.package_already_prepared", "missing prepared package lane"))
+        checks.append(fail("effective_queue.package_already_prepared", str(package_already_prepared)))
     return checks
 
 

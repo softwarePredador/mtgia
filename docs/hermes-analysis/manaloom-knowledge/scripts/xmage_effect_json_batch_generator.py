@@ -26,10 +26,13 @@ DECK_ROLE_BY_FAMILY: dict[str, dict[str, Any]] = {
     "static_cost_reducer": {"category": "support", "effect": "static_cost_reduction", "subtype": "cost_reducer", "timing": "static"},
     "other_turn_mana_rock": {"category": "ramp", "effect": "ramp_permanent", "subtype": "mana_rock", "timing": "activated"},
     "modal_mana_rock": {"category": "ramp", "effect": "ramp_permanent", "subtype": "modal_mana_rock", "timing": "activated"},
+    "ramp_ritual": {"category": "ramp", "effect": "ramp_ritual", "timing": "resolution_or_activation"},
     "ramp_engine": {"category": "ramp", "effect": "ramp_engine", "timing": "triggered"},
+    "land": {"category": "ramp", "effect": "land", "subtype": "mana_base", "timing": "battlefield"},
     "treasure_maker": {"category": "ramp", "effect": "treasure_maker", "subtype": "treasure_conversion", "timing": "activated_or_resolution"},
     "token_maker": {"category": "board_development", "effect": "token_maker", "timing": "resolution_or_trigger"},
     "copy_creature_token": {"category": "board_development", "effect": "copy_creature_token", "timing": "resolution"},
+    "copy_permanent_etb": {"category": "board_development", "effect": "copy_permanent_etb", "timing": "battlefield"},
     "board_wipe_choice": {"category": "interaction", "effect": "board_control", "subtype": "wipe_or_sacrifice", "timing": "resolution"},
     "discard_modal_trigger": {"category": "value_engine", "effect": "discard_trigger_modal", "timing": "triggered"},
     "modal_spell": {"category": "interaction", "effect": "modal_spell", "timing": "resolution"},
@@ -146,6 +149,14 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
     if effect:
         role.setdefault("effect", effect)
     effect_json = dict(card.get("effect_json") or {})
+    if effect == "creature" and (
+        effect_json.get("is_mana_source")
+        or effect_json.get("mana_produced_from_colors_among_permanents")
+        or effect_json.get("mana_produced_from_controlled_creatures")
+    ):
+        role["category"] = "ramp"
+        role["effect"] = "ramp_permanent"
+        role["subtype"] = "mana_creature"
     if effect == "ramp_permanent" and effect_json.get("activated_self_sacrifice_land_tutor"):
         role["category"] = "ramp"
         role["effect"] = "ramp_permanent"

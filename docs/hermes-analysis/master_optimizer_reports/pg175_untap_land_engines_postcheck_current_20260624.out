@@ -1,0 +1,8 @@
+        card_name        |     normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+-------------------------+-------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Candelabra of Tawnos    | candelabra of tawnos    | battle_rule_v1:025b56533a93506e5517b27a42dcf059 |                  1 |                           1 |                         1 |           0
+ Earthcraft              | earthcraft              | battle_rule_v1:7b54c5adbb14d83b32b736efd1c694a2 |                  1 |                           1 |                         1 |           0
+ Magus of the Candelabra | magus of the candelabra | battle_rule_v1:5ebc277a81704d086c4c9009ce3863dc |                  1 |                           1 |                         1 |           0
+ Oboro Breezecaller      | oboro breezecaller      | battle_rule_v1:09d7cae21ee60dcada5b267602355036 |                  1 |                           1 |                         1 |           0
+(4 rows)
+

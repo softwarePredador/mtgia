@@ -1,0 +1,21 @@
+Pager usage is off.
+         check_name         |               deck_id                |                            name                             |  format   |   archetype    | is_public | not_deleted 
+----------------------------+--------------------------------------+-------------------------------------------------------------+-----------+----------------+-----------+-------------
+ pg_lorehold_variant04_deck | 917674eb-6a3d-58de-acce-5a2a3ac9e497 | PG REGISTERED Lorehold Variant 04 - Rafael Paste 2026-06-24 | commander | battle-variant | f         | t
+(1 row)
+
+            check_name            | rows | qty | commander_qty | distinct_cards 
+----------------------------------+------+-----+---------------+----------------
+ pg_lorehold_variant04_deck_cards |   92 | 100 |             1 |             92
+(1 row)
+
+          check_name           |              learned_id              |     commander_name      |                   deck_name                   |         source_system         |                source_ref                | card_count |              legal_status               | is_active |                            deck_hash                             | hermes_deck_id |         metadata_pg_deck_id          
+-------------------------------+--------------------------------------+-------------------------+-----------------------------------------------+-------------------------------+------------------------------------------+------------+-----------------------------------------+-----------+------------------------------------------------------------------+----------------+--------------------------------------
+ pg_lorehold_variant04_learned | a4767730-e826-5c14-b716-c6906f3d44c3 | Lorehold, the Historian | Lorehold Variant 04 - Rafael Paste 2026-06-24 | manual_user_deck_registration | lorehold_variant04_20260624_ba7d06f86f23 |        100 | registered_pending_card_rule_validation | f         | ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68 | 609            | 917674eb-6a3d-58de-acce-5a2a3ac9e497
+(1 row)
+
+               check_name                | missing_card_rows 
+-----------------------------------------+-------------------
+ pg_lorehold_variant04_missing_card_rows |                 0
+(1 row)
+

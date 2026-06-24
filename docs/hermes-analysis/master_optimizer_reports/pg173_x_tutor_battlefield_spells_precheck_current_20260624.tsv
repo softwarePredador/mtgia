@@ -1,0 +1,5 @@
+card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
+Chord of Calling	chord of calling	8399842a5c007c7f4b890bfdf3f84521	battle_rule_v1:1250cdd03a9389a2fe31e53ac5766394	1	f161bb66-2744-48e5-ad47-2845c2972ca0	2	0	2
+Green Sun's Zenith	green sun's zenith	cfaabe0e9d9d20d134845c8f4b946e1e	battle_rule_v1:c1c56ae7a9b9e0cae540e39cecb4f157	1	1012af4f-6eff-44e5-98c1-2d38956df3d3	2	0	2
+Nature's Rhythm	nature's rhythm	109e64b1ea27da04b6266d4e86b52aad	battle_rule_v1:6763f8258c7027a341e182900af5e8fc	1	48271e62-41c0-4e80-a4c9-dc8c9df7e66d	2	0	2
+Whir of Invention	whir of invention	47a15ce5ca279f509f387d3909695959	battle_rule_v1:719bc165cd6259a33d138d4fe2b1d2a2	1	c5a6690e-80ff-4b6b-9aee-e6eb45394bf6	2	0	2

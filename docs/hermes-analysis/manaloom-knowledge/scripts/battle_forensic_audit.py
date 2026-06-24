@@ -43,6 +43,7 @@ SUPPORTED_EFFECTS = {
     "commander",
     "cannot_lose_turn",
     "copy_creature_token",
+    "copy_permanent_etb",
     "copy_spell",
     "counter",
     "create_treasure",

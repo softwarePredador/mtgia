@@ -1,0 +1,4 @@
+card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
+Elves of Deep Shadow	elves of deep shadow	5dd30cbea74064369bcba667795049e2	battle_rule_v1:1272fb910383d34360702e343ec16b37	1	c4d7ba1e-1408-4b10-ac5c-2bf7554ed535	2	0	2
+Talisman of Curiosity	talisman of curiosity	212d43a126a54d9aabbf1dec21b93acb	battle_rule_v1:c4df4800bcf67bfd2ded6ea1fc6a8efa	1	7adee94d-c317-475e-95ff-ff0450456771	2	0	2
+Tarnished Citadel	tarnished citadel	d8bdb24e586e16274f0bd42e40e2dc58	battle_rule_v1:d5663032352408a845b7602f9cb5adf9	1	a881423d-5eb6-4ba8-af76-18960d0a7e40	2	0	2

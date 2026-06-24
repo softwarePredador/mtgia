@@ -1,0 +1,8 @@
+   card_name    | normalized_name |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+----------------+-----------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Imperial Seal  | imperial seal   | 7418e11fcf0c0158d2b754402dfaac8e | battle_rule_v1:e8c744eeb299cbecc7234defb18d79ca |                1 | b7403e71-b588-4b65-8194-8e570f615e45 |                  3 |                         1 |                           0
+ Mystical Tutor | mystical tutor  | 6a72f3c0228efaa3bb3bb616122ed036 | battle_rule_v1:1252b9a6b4188206efa3cf5c921afaa3 |                1 | 401ee6a5-12b7-4ea5-8726-bc5fceac6739 |                  4 |                         1 |                           0
+ Vampiric Tutor | vampiric tutor  | 7418e11fcf0c0158d2b754402dfaac8e | battle_rule_v1:0d42202d79e9f7e0b0a65fe5848c9849 |                1 | 783ccf92-f6d0-4c8c-8b7b-3087d929a7a6 |                  3 |                         1 |                           0
+ Worldly Tutor  | worldly tutor   | 0d52403c7394f384077c7ddcfdd9fa12 | battle_rule_v1:ac383562ba9547c71a9bb6932cf907b8 |                1 | 3fdf40a7-e08e-4a23-aff1-5e196a969c74 |                  3 |                         1 |                           0
+(4 rows)
+

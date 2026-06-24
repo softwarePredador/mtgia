@@ -1,0 +1,2278 @@
+{
+  "generated_at": "2026-06-24T12:38:24Z",
+  "invalid_count": 0,
+  "reports": [
+    {
+      "archetype": "lifegain-storm-variant",
+      "cards": [
+        {
+          "battle_rule_count": 2,
+          "card_name": "Lorehold, the Historian",
+          "cmc": 5.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "engine",
+            "draw",
+            "passive"
+          ],
+          "input_name": "Lorehold, the Historian",
+          "is_basic_land": false,
+          "is_commander": true,
+          "issues": [],
+          "line_number": 6,
+          "normalized_name": "lorehold, the historian",
+          "oracle_hash": "d760beb4ad2d1f675acbe88d2d8d30a2fc3008c8b739e8cbe9fb77101e65241a",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Legendary Creature — Elder Dragon",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Aetherflux Reservoir",
+          "cmc": 4.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "wincon",
+            "aetherflux_reservoir"
+          ],
+          "input_name": "Aetherflux Reservoir",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 7,
+          "normalized_name": "aetherflux reservoir",
+          "oracle_hash": "6996d0321c7bb8300ae59a97ed0ce1ff431c35abb0d6aca1c667ada7713b8c73",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Akroma's Will",
+          "cmc": 4.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 2,
+          "functional_tags": [
+            "wincon",
+            "protection",
+            "pump_all"
+          ],
+          "input_name": "Akroma's Will",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 8,
+          "normalized_name": "akroma's will",
+          "oracle_hash": "1eb787e8c2a702839c043100bbb36c0b6bed58792de98d7e02512083de9166a8",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Ancient Den",
+          "cmc": 0.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 2,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Ancient Den",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 9,
+          "normalized_name": "ancient den",
+          "oracle_hash": "5a5120373dccdec1f0861ad6fa933be6acad9653729027f2eeb08977ffe97f57",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Ancient Tomb",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 2,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Ancient Tomb",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 10,
+          "normalized_name": "ancient tomb",
+          "oracle_hash": "419fc22353eb30e05bcd489d7abf3f1c85c7bbad39e513edad30d718060b90b5",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Approach of the Second Sun",
+          "cmc": 7.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "wincon",
+            "approach"
+          ],
+          "input_name": "Approach of the Second Sun",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 11,
+          "normalized_name": "approach of the second sun",
+          "oracle_hash": "984d8929e6d9e0abd44a4bbd202b04c26a0f2c216807bc8836ecbfb7e4ec71ab",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Arcane Signet",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Arcane Signet",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 12,
+          "normalized_name": "arcane signet",
+          "oracle_hash": "81ac69c10248f7ca671663ddfcd665d9537b4176d93a5288142b836afc3ecbb0",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Arid Mesa",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Arid Mesa",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 13,
+          "normalized_name": "arid mesa",
+          "oracle_hash": "7dd1229b4df1d32ea86854a4a3654dbd6b3b6d03ea84ccc2c3a4d15a6bf5d810",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Authority of the Consuls",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "draw"
+          ],
+          "input_name": "Authority of the Consuls",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 14,
+          "normalized_name": "authority of the consuls",
+          "oracle_hash": "e21f48f170976022be2d851e06a606c0cd79c8eaef2ea530c828e0be1063c296",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Enchantment",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Bender's Waterskin",
+          "cmc": 3.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Bender's Waterskin",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 15,
+          "normalized_name": "bender's waterskin",
+          "oracle_hash": "403dafb22f15231865fd0032b33a3a83384b9219b14eadfbcb8af0985a5202e4",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Big Score",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "treasure_maker"
+          ],
+          "input_name": "Big Score",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 16,
+          "normalized_name": "big score",
+          "oracle_hash": "19bffb1f96c2b60a1bb107a2f33a95e809e9849bef1c2a330b76a8d4315a5676",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Blasphemous Act",
+          "cmc": 9.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "board_wipe",
+            "damage_wipe",
+            "wipe"
+          ],
+          "input_name": "Blasphemous Act",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 17,
+          "normalized_name": "blasphemous act",
+          "oracle_hash": "2c20c027b9831421099ae2fc2648ba904bc21f8ebd7d544628c80b338c214624",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Bloodstained Mire",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Bloodstained Mire",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 18,
+          "normalized_name": "bloodstained mire",
+          "oracle_hash": "7ec00b59e041350ce65516890aea5b5f59ce22586d900827ee7caf7aa81fa5b3",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Bolt Bend",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "draw"
+          ],
+          "input_name": "Bolt Bend",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 19,
+          "normalized_name": "bolt bend",
+          "oracle_hash": "6ec0a16cded1cba1064a8f6590b746cd160ac73148c0eb058387adbd6af64ea4",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Boros Charm",
+          "cmc": 2.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "protection",
+            "modal_boros_charm"
+          ],
+          "input_name": "Boros Charm",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 20,
+          "normalized_name": "boros charm",
+          "oracle_hash": "60dcba144707770e68f22735c145c7c3f894b84a9ceb6e09d7ef18d789e38b76",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Brass's Bounty",
+          "cmc": 7.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "wincon",
+            "ramp",
+            "token_maker"
+          ],
+          "input_name": "Brass's Bounty",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 21,
+          "normalized_name": "brass's bounty",
+          "oracle_hash": "b33a0c2e8a6c31ec0015e8bff22574c262b7ed087f16c2be73d6783d04157653",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Caldera Pyremaw",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "wincon"
+          ],
+          "input_name": "Caldera Pyremaw",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 22,
+          "normalized_name": "caldera pyremaw",
+          "oracle_hash": "873c5fd172fe5d911ebd1be89bd7ec705d749f90da9b31b4e8a3ecfc8a242b1b",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Dragon",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Call Forth the Tempest",
+          "cmc": 8.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "board_wipe",
+            "damage_wipe",
+            "dynamic_damage_wipe",
+            "wipe"
+          ],
+          "input_name": "Call Forth the Tempest",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 23,
+          "normalized_name": "call forth the tempest",
+          "oracle_hash": "cffe8f5a8563271fed0ac768aa5e8541a97c9924a0bf54ca91ab8ffed1935ab8",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Cavern of Souls",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Cavern of Souls",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 24,
+          "normalized_name": "cavern of souls",
+          "oracle_hash": "7b8b9ea9f32d0c1cac44dc9ad963711f2f10ad1732e76ed612b20fed228b3afa",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Chrome Mox",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 2,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Chrome Mox",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 25,
+          "normalized_name": "chrome mox",
+          "oracle_hash": "c6cee302114d7d1c1d192c92548d55ab3ce404507999191733a2e44ec6f432fd",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Clifftop Retreat",
+          "cmc": 0.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Clifftop Retreat",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 26,
+          "normalized_name": "clifftop retreat",
+          "oracle_hash": "223d0c09db4ce877fc82634a55bab0ae46bbd299bdef548040f0ef47eac0b1a4",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Command Tower",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Command Tower",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 27,
+          "normalized_name": "command tower",
+          "oracle_hash": "0bbd84219753355cd3e45dd0d5f428bbb590a5fc473962e7034bd126c50080ba",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Conduit Pylons",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Conduit Pylons",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 28,
+          "normalized_name": "conduit pylons",
+          "oracle_hash": "764555201284e82e813da5b37a4cf999fcbfa5ddbfc76dcbbd69a141f6173fcb",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land — Desert",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Creative Technique",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "engine",
+            "draw",
+            "demonstrate_top_nonland_free_cast",
+            "exile_top_nonland_free_cast"
+          ],
+          "input_name": "Creative Technique",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 29,
+          "normalized_name": "creative technique",
+          "oracle_hash": "11ad623ab3901c42313067ff8be09d1bd4234c912f80247badd9653b25a8b482",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Currency Converter",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Currency Converter",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 30,
+          "normalized_name": "currency converter",
+          "oracle_hash": "dce8c8b1ba7207b141a86e299bf941288012957ad0499943fcac34d510d4c92c",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Dance with Calamity",
+          "cmc": 8.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "draw",
+            "exile_value",
+            "unknown"
+          ],
+          "input_name": "Dance with Calamity",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 31,
+          "normalized_name": "dance with calamity",
+          "oracle_hash": "dbb17ce177b8a271d7542dbf295f97aa9ff5606c2cd489fbec2c04371b60d815",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Deflecting Palm",
+          "cmc": 2.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "protection"
+          ],
+          "input_name": "Deflecting Palm",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 32,
+          "normalized_name": "deflecting palm",
+          "oracle_hash": "4d2fb658a44057e6869e7d884f54f47b60e8ffe151b730133c6d58dd573c122d",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Deflecting Swat",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "draw",
+            "protection",
+            "redirect_removal"
+          ],
+          "input_name": "Deflecting Swat",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 33,
+          "normalized_name": "deflecting swat",
+          "oracle_hash": "3c35731f873da8695b7fadfa5153e9186ea89e09085d4a67c0321364c7e07d17",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Desperate Ritual",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "manual_review"
+          ],
+          "input_name": "Desperate Ritual",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 34,
+          "normalized_name": "desperate ritual",
+          "oracle_hash": "cec5bb09cdce1f8176ecef98449ad83ddf08f9ef491daaa8d568798b43e3b30e",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant — Arcane",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Dragon's Rage Channeler",
+          "cmc": 1.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "draw",
+            "creature",
+            "unknown"
+          ],
+          "input_name": "Dragon's Rage Channeler",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 35,
+          "normalized_name": "dragon's rage channeler",
+          "oracle_hash": "91931512df934786b38482c0910f018a55c942ac3f73daa5fef607dd972a3737",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Human Shaman",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Elegant Parlor",
+          "cmc": 0.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Elegant Parlor",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 36,
+          "normalized_name": "elegant parlor",
+          "oracle_hash": "92463fb827f05d66ee1c0b60c2859676e38f0a730d88d72517076da7f947029b",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land — Mountain Plains",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "tutor"
+          ],
+          "input_name": "Enlightened Tutor",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 37,
+          "normalized_name": "enlightened tutor",
+          "oracle_hash": "0c3cf54bb8174dae5695cb92ca8c183c752db00a84f44af2597d3c3b5594f487",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Esper Sentinel",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "draw"
+          ],
+          "input_name": "Esper Sentinel",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 38,
+          "normalized_name": "esper sentinel",
+          "oracle_hash": "4e29a0ead3c42564a71fd4f11084947fb72199dde31e360653d27abea4861cea",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact Creature — Human Soldier",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Fated Clash",
+          "cmc": 5.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "board_wipe",
+            "fated_clash_protect_then_destroy",
+            "wipe"
+          ],
+          "input_name": "Fated Clash",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 39,
+          "normalized_name": "fated clash",
+          "oracle_hash": "4cff992a819f81534fd3b30070343ca1627b5ded65adf54dfb5e8e233f2b559a",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Flawless Maneuver",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "protection"
+          ],
+          "input_name": "Flawless Maneuver",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 40,
+          "normalized_name": "flawless maneuver",
+          "oracle_hash": "bb1ec46e019de3f86c0765225d1887c12087a31907de207fbc2526c5476de1c3",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Flooded Strand",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Flooded Strand",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 41,
+          "normalized_name": "flooded strand",
+          "oracle_hash": "201abfaa701cc60635eb914d4ac0741a2f50d3e00fad7bb79735c0d9d79e0021",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Galvanoth",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "draw"
+          ],
+          "input_name": "Galvanoth",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 42,
+          "normalized_name": "galvanoth",
+          "oracle_hash": "0f6c64a2d458c698fe92880229f31103aaa988ca8f1bbfe34aba38f5aea0618a",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Beast",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "tutor"
+          ],
+          "input_name": "Gamble",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 43,
+          "normalized_name": "gamble",
+          "oracle_hash": "002863f4fc446d45e373633e6076503a427d5fe49b149265b28bd4bdcd5c487c",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Generous Gift",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "removal"
+          ],
+          "input_name": "Generous Gift",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 44,
+          "normalized_name": "generous gift",
+          "oracle_hash": "02e12caaf03c19d10be78ca27ae70221f0b6c796504ab6e96e3219e39738c063",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Goldspan Dragon",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Goldspan Dragon",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 45,
+          "normalized_name": "goldspan dragon",
+          "oracle_hash": "12eb645f13905fc72674837c5ddb261bc8f9b9a4cacc2dd140812a8898010721",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Dragon",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 1,
+          "card_name": "Goliath Daydreamer",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "creature",
+            "unknown"
+          ],
+          "input_name": "Goliath Daydreamer",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 46,
+          "normalized_name": "goliath daydreamer",
+          "oracle_hash": "22c77f091cb972a3a875044b3292e851bf9959160eab7bf826fe200cb01864e9",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Giant Wizard",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Great Furnace",
+          "cmc": 0.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 2,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Great Furnace",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 47,
+          "normalized_name": "great furnace",
+          "oracle_hash": "ebb54f57bce98d8c1565d1ebb144c7972f5da7d6d3c87cafc4b9bdf961f74421",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Helm of Awakening",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Helm of Awakening",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 48,
+          "normalized_name": "helm of awakening",
+          "oracle_hash": "26384c5103a60f211ce156767ae832c9c32e1e4b2aec001c1035dc12ac06d7d6",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Heroes Remembered",
+          "cmc": 9.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "draw"
+          ],
+          "input_name": "Heroes Remembered",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 49,
+          "normalized_name": "heroes remembered",
+          "oracle_hash": "e000801eefb38c98eea14c79f792af0842206dfe608d4faf5208e48ed7fa2698",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Hexing Squelcher",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "protection",
+            "creature",
+            "unknown"
+          ],
+          "input_name": "Hexing Squelcher",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 50,
+          "normalized_name": "hexing squelcher",
+          "oracle_hash": "94196739467a87a80547095bf8802f58fda0adb393105dbac94d43b5c55b811a",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Goblin Sorcerer",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Insurrection",
+          "cmc": 8.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "wincon",
+            "steal_all_creatures"
+          ],
+          "input_name": "Insurrection",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 51,
+          "normalized_name": "insurrection",
+          "oracle_hash": "0b54a503a2a34f32ffb9959989c1eedf54050253e5d7c2300b8468c5cd7e7c4e",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Invincible Hymn",
+          "cmc": 8.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "wincon"
+          ],
+          "input_name": "Invincible Hymn",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 52,
+          "normalized_name": "invincible hymn",
+          "oracle_hash": "f9e6b857e25d00913fae04270e03eb4d416340e3e28f6107ae11f667ef0b74a3",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Invoke Calamity",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "engine"
+          ],
+          "input_name": "Invoke Calamity",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 53,
+          "normalized_name": "invoke calamity",
+          "oracle_hash": "ec3c5d43cae02a4d0983a3398eca721931547a89782c85bc796a3595aa59aec4",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Invoke Justice",
+          "cmc": 5.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "engine"
+          ],
+          "input_name": "Invoke Justice",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 54,
+          "normalized_name": "invoke justice",
+          "oracle_hash": "81b597c2861a6086d28fa7a220da49366fc813238dc29085efa72fdb5658c773",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Jeska's Will",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Jeska's Will",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 55,
+          "normalized_name": "jeska's will",
+          "oracle_hash": "af8653ec860c3cf2bf615394a803aaea77806ff9bc56fef30d99f789300676c7",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Land Tax",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "tutor",
+            "land_tax",
+            "mana_development"
+          ],
+          "input_name": "Land Tax",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 56,
+          "normalized_name": "land tax",
+          "oracle_hash": "c6b7f7fd1e7398aa111617921fabeeb02f78cd4aef3729059bdc86afc189a51d",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Enchantment",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Library of Leng",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "engine",
+            "ramp",
+            "passive"
+          ],
+          "input_name": "Library of Leng",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 57,
+          "normalized_name": "library of leng",
+          "oracle_hash": "fe0612f7de5813b6f9ff3114b464ec19d2778d7d097b0cce01cfa7d298450feb",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Mana Geyser",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Mana Geyser",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 58,
+          "normalized_name": "mana geyser",
+          "oracle_hash": "f8f98e1df5327b991a345dd0f2b724b334486f6e5be85a3922fc9d4869895058",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Marsh Flats",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Marsh Flats",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 59,
+          "normalized_name": "marsh flats",
+          "oracle_hash": "831424eaa7ce1f55ab6d7a86fde5436949841aa16c85d389a9940cd330174157",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Monument to Endurance",
+          "cmc": 3.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "card_advantage",
+            "discard_trigger_modal_draw_treasure_opponent_life_loss"
+          ],
+          "input_name": "Monument to Endurance",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 60,
+          "normalized_name": "monument to endurance",
+          "oracle_hash": "bb291f27f70e2044f4755c828d45941ce752f89cf499fab0656f28609b3165cd",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Mother of Runes",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "protection",
+            "creature"
+          ],
+          "input_name": "Mother of Runes",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 61,
+          "normalized_name": "mother of runes",
+          "oracle_hash": "585dc49ec1db8282bd63c0b53f346e9310b937960f75074cea3137b737d187df",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Human Cleric",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 1,
+          "card_name": "Mountain // Mountain",
+          "cmc": 0.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Mountain",
+          "is_basic_land": true,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 62,
+          "normalized_name": "mountain // mountain",
+          "oracle_hash": "555b579cfd22c789d9fae7aaa947a9847fd12de04da8362c0faea69e9c11894f",
+          "oracle_status": "matched",
+          "quantity": 3,
+          "type_line": "Basic Land — Mountain",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Olórin's Searing Light",
+          "cmc": 4.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "draw",
+            "removal"
+          ],
+          "input_name": "Olórin's Searing Light",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 63,
+          "normalized_name": "olórin's searing light",
+          "oracle_hash": "8a6d27d767244959c05cad2cdc8f89623a60c1bfb63cfd5b754ad9f5886ce3ed",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Pearl Medallion",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "static_cost_reduction",
+            "support"
+          ],
+          "input_name": "Pearl Medallion",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 64,
+          "normalized_name": "pearl medallion",
+          "oracle_hash": "857b7900a29be9522ee664de7d732e1ca214f2ddaae69ac292aab7df82a372fe",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Penance",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "draw"
+          ],
+          "input_name": "Penance",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 65,
+          "normalized_name": "penance",
+          "oracle_hash": "25388d464d8f9f1070866b18840e6a331cc9cbf7e15646c1013a11c214333b4a",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Enchantment",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Perch Protection",
+          "cmc": 6.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "wincon"
+          ],
+          "input_name": "Perch Protection",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 66,
+          "normalized_name": "perch protection",
+          "oracle_hash": "3917980cc993f9eb816085a6182e1220a5edb29186f5f5c8b525608235582255",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 1,
+          "card_name": "Plains // Plains",
+          "cmc": 0.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Plains",
+          "is_basic_land": true,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 67,
+          "normalized_name": "plains // plains",
+          "oracle_hash": "6e9e31d8ea6b4a2a7960aca9f48b3b2bbd7c0965e027391ede7ce054b0b5a060",
+          "oracle_status": "matched",
+          "quantity": 8,
+          "type_line": "Basic Land — Plains",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Plateau",
+          "cmc": 0.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Plateau",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 68,
+          "normalized_name": "plateau",
+          "oracle_hash": "0c462d9162e3dc7b8a1259b298176003aba5b01d977209e75ea273f921df2d76",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land — Mountain Plains",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Prismatic Vista",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Prismatic Vista",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 69,
+          "normalized_name": "prismatic vista",
+          "oracle_hash": "07ed199d8fc373c57f677f11b1147f015bf1654388d8ebf9833a08eeb5a191b8",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Pyretic Ritual",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "manual_review"
+          ],
+          "input_name": "Pyretic Ritual",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 70,
+          "normalized_name": "pyretic ritual",
+          "oracle_hash": "b6600740e2a3a47b611beb7560f4b66275afd69f400845a777ffe0fb646f6589",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Radiant Scrollwielder",
+          "cmc": 4.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "wincon",
+            "overload_recursion"
+          ],
+          "input_name": "Radiant Scrollwielder",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 71,
+          "normalized_name": "radiant scrollwielder",
+          "oracle_hash": "1c8bcca13ac6de6528134f77cc47d084dea2d4dec6bb766db36bd5d9a773eded",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Dwarf Cleric",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Reckless Handling",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "tutor"
+          ],
+          "input_name": "Reckless Handling",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 72,
+          "normalized_name": "reckless handling",
+          "oracle_hash": "287afe5702927bbff27fcf37e90fe813de8256c9a6795f9701b897482c9f4f3a",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Rise of the Eldrazi",
+          "cmc": 12.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "wincon",
+            "removal",
+            "composite_resolution"
+          ],
+          "input_name": "Rise of the Eldrazi",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 73,
+          "normalized_name": "rise of the eldrazi",
+          "oracle_hash": "c88e63e6658920e6614a46bd058d3b1aa477089fea0aa32603ffdb39068e8852",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Ruby Medallion",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "cost_reduction",
+            "passive"
+          ],
+          "input_name": "Ruby Medallion",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 74,
+          "normalized_name": "ruby medallion",
+          "oracle_hash": "59129a67c2601c68e34ee73840506358461f41fc406c92c91afdc9a6f0340bec",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Sacred Foundry",
+          "cmc": 0.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Sacred Foundry",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 75,
+          "normalized_name": "sacred foundry",
+          "oracle_hash": "903c8a14faf5d1707ba83b840ae993d1658d8d0758c68fc1d345fa36ece25fb7",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land — Mountain Plains",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Scalding Tarn",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Scalding Tarn",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 76,
+          "normalized_name": "scalding tarn",
+          "oracle_hash": "8ee024643835b325efa8420a3983e43980c62a914b343b03e742e8574dfd9b03",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Scroll Rack",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "draw",
+            "ramp"
+          ],
+          "input_name": "Scroll Rack",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 77,
+          "normalized_name": "scroll rack",
+          "oracle_hash": "1dfe2c91887abf04d07d71327a5a0ff7b9d0a06f59a7cc7afe51e64a00fa56fa",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Seething Song",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Seething Song",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 78,
+          "normalized_name": "seething song",
+          "oracle_hash": "9ea2132ad71b91364cefb058ab866020182a69a0e169e587951e07f137992887",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Sensei's Divining Top",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "draw"
+          ],
+          "input_name": "Sensei's Divining Top",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 79,
+          "normalized_name": "sensei's divining top",
+          "oracle_hash": "7c7ca81569ddcc8225a5fa6a45ed4ab89d96ce83482f72fde933c3ebd409d58b",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Silence",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "protection",
+            "interaction",
+            "silence_spell"
+          ],
+          "input_name": "Silence",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 80,
+          "normalized_name": "silence",
+          "oracle_hash": "e7445eda768b6169f5c9c842ce800527e77090c839b6a26b22b03b30af28f40a",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Smothering Tithe",
+          "cmc": 4.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp"
+          ],
+          "input_name": "Smothering Tithe",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 81,
+          "normalized_name": "smothering tithe",
+          "oracle_hash": "9ee0933bc48878f5ba6a7d787a8735a74a43c2d9a0b46580c4ec77584f449a87",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Enchantment",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Sol Ring",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "manual_review"
+          ],
+          "input_name": "Sol Ring",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 82,
+          "normalized_name": "sol ring",
+          "oracle_hash": "926d98fdb5a3565174ebe405cb3ee1227fc7200d9a5f2a707416cd90f7ca2a1c",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Artifact",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Soulfire Eruption",
+          "cmc": 9.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "draw",
+            "removal",
+            "deal_damage"
+          ],
+          "input_name": "Soulfire Eruption",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 83,
+          "normalized_name": "soulfire eruption",
+          "oracle_hash": "5f68b465da8b3db80ae07c4f4df33dd1c3bd84cfcce4ae9ca8bb6732ac31b445",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Spectator Seating",
+          "cmc": 0.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Spectator Seating",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 84,
+          "normalized_name": "spectator seating",
+          "oracle_hash": "79284280e6cf1402ed48418855c31a9304d2decea88b67473faf446280454f76",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Storm Herd",
+          "cmc": 10.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "wincon",
+            "token_maker"
+          ],
+          "input_name": "Storm Herd",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 85,
+          "normalized_name": "storm herd",
+          "oracle_hash": "a885f4e8503f337251fd4cd3a27fca12cadd2cd21688e7441c496bcae7b1d186",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Storm-Kiln Artist",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "creature"
+          ],
+          "input_name": "Storm-Kiln Artist",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 86,
+          "normalized_name": "storm-kiln artist",
+          "oracle_hash": "9f55370711fd4dabd2c2fbd1346396477c3b26a3367308f32db121d72ec1bec9",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Dwarf Shaman",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Sunbaked Canyon",
+          "cmc": 0.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 2,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Sunbaked Canyon",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 87,
+          "normalized_name": "sunbaked canyon",
+          "oracle_hash": "a58255221ec89645bd12e3eec78d72b80cfde00f7280c5bd28aa9a878f349106",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Sunbillow Verge",
+          "cmc": 0.0,
+          "color_identity": [
+            "R",
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Sunbillow Verge",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 88,
+          "normalized_name": "sunbillow verge",
+          "oracle_hash": "5c2855b94fcaec55278f0a0c15152476cfbe4e1db57840252b919d5137efc5f0",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Teferi's Protection",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "protection"
+          ],
+          "input_name": "Teferi's Protection",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 89,
+          "normalized_name": "teferi's protection",
+          "oracle_hash": "e8c595098090abd4a1007e051012f1b140b3821157d01567f8445e615bb75449",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Instant",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Treasonous Ogre",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "ramp",
+            "creature"
+          ],
+          "input_name": "Treasonous Ogre",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 90,
+          "normalized_name": "treasonous ogre",
+          "oracle_hash": "eea4bae4aff6907c753e3512c3dde59076e39d7dc1218eed66da24d8dbd1544f",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Creature — Ogre Shaman",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Trouble in Pairs",
+          "cmc": 4.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "draw"
+          ],
+          "input_name": "Trouble in Pairs",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 91,
+          "normalized_name": "trouble in pairs",
+          "oracle_hash": "c27d417f6179215f1509227792f3961c8d3ef2e5745b0b29e6de7f19ceffec2e",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Enchantment",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Ultima",
+          "cmc": 5.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 0,
+          "functional_tags": [
+            "board_wipe",
+            "wipe"
+          ],
+          "input_name": "Ultima",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 92,
+          "normalized_name": "ultima",
+          "oracle_hash": "10f4db8203b88e283eaf57dad8636af29364610d27a5ace54d1a32f974f48987",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": [
+            "no_verified_executable_battle_rule"
+          ]
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Urza's Saga",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 2,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Urza's Saga",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 93,
+          "normalized_name": "urza's saga",
+          "oracle_hash": "f1255cd7cce66aa34bcad689d17d5f235c905a7ada5e7843fa1852163cd1c784",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Enchantment Land — Urza's Saga",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 3,
+          "card_name": "Volcanic Vision",
+          "cmc": 7.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "engine"
+          ],
+          "input_name": "Volcanic Vision",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 94,
+          "normalized_name": "volcanic vision",
+          "oracle_hash": "5f72abaef941bc13f904ab6ccfafab8cf390bacfc861a0c637e8be24246ee234",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Sorcery",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Windswept Heath",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Windswept Heath",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 95,
+          "normalized_name": "windswept heath",
+          "oracle_hash": "f70e14bcc9e3754115da7bfc027af9cd64022788f005b45d0f162c42f5d816cb",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        },
+        {
+          "battle_rule_count": 2,
+          "card_name": "Wooded Foothills",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legal": true,
+          "executable_rule_count": 1,
+          "functional_tags": [
+            "land"
+          ],
+          "input_name": "Wooded Foothills",
+          "is_basic_land": false,
+          "is_commander": false,
+          "issues": [],
+          "line_number": 96,
+          "normalized_name": "wooded foothills",
+          "oracle_hash": "c9bafca1181b2485313e2ae94fd721b63ee734a37d9eb5f0e439fda14e353bd2",
+          "oracle_status": "matched",
+          "quantity": 1,
+          "type_line": "Land",
+          "warnings": []
+        }
+      ],
+      "commander": "Lorehold, the Historian",
+      "commander_quantity": 1,
+      "deck_hash": "9370b6170e00bc9fdcb33358ed7653f0c06a2d454871361dbef4fdc75560e6ee",
+      "deck_name": "Lorehold Variant 09 - Rafael Paste 2026-06-24",
+      "input_quantity": 100,
+      "issues": [],
+      "main_quantity": 99,
+      "raw_input_sha256": "1ab8349d4e107be3e2b1a9ab316ca6e5336f4e3cacb6bba625efac021e4b0fde",
+      "source": "user-paste",
+      "source_url": "",
+      "total_quantity": 100,
+      "unique_cards": 91,
+      "validation_status": "valid",
+      "warnings": [
+        "Authority of the Consuls:no_verified_executable_battle_rule",
+        "Bolt Bend:no_verified_executable_battle_rule",
+        "Caldera Pyremaw:no_verified_executable_battle_rule",
+        "Currency Converter:no_verified_executable_battle_rule",
+        "Deflecting Palm:no_verified_executable_battle_rule",
+        "Galvanoth:no_verified_executable_battle_rule",
+        "Goldspan Dragon:no_verified_executable_battle_rule",
+        "Goliath Daydreamer:no_verified_executable_battle_rule",
+        "Heroes Remembered:no_verified_executable_battle_rule",
+        "Invincible Hymn:no_verified_executable_battle_rule",
+        "Invoke Calamity:no_verified_executable_battle_rule",
+        "Invoke Justice:no_verified_executable_battle_rule",
+        "Penance:no_verified_executable_battle_rule",
+        "Perch Protection:no_verified_executable_battle_rule",
+        "Radiant Scrollwielder:no_verified_executable_battle_rule",
+        "Trouble in Pairs:no_verified_executable_battle_rule",
+        "Ultima:no_verified_executable_battle_rule"
+      ]
+    }
+  ],
+  "valid_count": 1,
+  "variant_count": 1
+}

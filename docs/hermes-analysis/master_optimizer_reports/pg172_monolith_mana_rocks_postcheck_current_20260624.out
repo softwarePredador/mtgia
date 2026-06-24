@@ -1,0 +1,6 @@
+    card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+-----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Basalt Monolith | basalt monolith | battle_rule_v1:13a254365e4f64a322c42899dd7e9ec1 |                  1 |                           1 |                         1 |           4
+ Grim Monolith   | grim monolith   | battle_rule_v1:ac773d3e88bf38de11004c2943b4d871 |                  1 |                           1 |                         1 |           4
+(2 rows)
+

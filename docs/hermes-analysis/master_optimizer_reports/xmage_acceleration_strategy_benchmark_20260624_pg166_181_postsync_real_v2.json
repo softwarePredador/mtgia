@@ -1,0 +1,400 @@
+{
+  "generated_at": "2026-06-24T15:32:36+00:00",
+  "mutations_performed": [],
+  "project_instruction_delta": [
+    {
+      "area": "queue_order",
+      "instruction": "Use effective-lane ordering before any card-by-card work.",
+      "proof": "Prepared package and exact-scope lanes close more cards per work unit than independent review."
+    },
+    {
+      "area": "pattern_registry",
+      "instruction": "Persist patterns as reviewable templates/observations; promote execution only through card_battle_rules gates.",
+      "proof": "Pattern registry has high reuse but unsafe if treated as executable without local tests."
+    },
+    {
+      "area": "runtime",
+      "instruction": "Open runtime only for homogeneous exact scopes with focused tests.",
+      "proof": "The largest raw runtime family can be fragmented and should not drive architecture by raw count."
+    },
+    {
+      "area": "validation",
+      "instruction": "Every promoted rule needs package/apply/sync/audit evidence; Hermes remains cache/lab evidence.",
+      "proof": "Project semantic layer and prior PG packages require source-of-truth separation."
+    }
+  ],
+  "sources": {
+    "effective_queue_report": "docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260624_pg166_181_postsync_real_v3.json",
+    "inventory_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/xmage_engine_absorption_inventory_20260623.json",
+    "proposal_report": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_proposals.json",
+    "test_miner_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/xmage_test_scenario_miner_targeted_damage_20260624.json"
+  },
+  "status": "ready",
+  "strategies": [
+    {
+      "evidence": {
+        "split_scope_backlog": 68,
+        "split_scope_unique_scope_count": 9,
+        "test_miner": {
+          "cards_with_test_reference": 7,
+          "reference_ratio": 0.3333,
+          "requested_card_count": 21,
+          "usable_ratio": 0.0952,
+          "usable_scenario_candidate_count": 2
+        },
+        "top_scope": {
+          "battle_model_scope": "targeted_damage_variant_v1",
+          "cards": [
+            "Balefire Liege",
+            "Boros Reckoner",
+            "Brash Taunter",
+            "Caldera Pyremaw",
+            "Cemetery Gatekeeper",
+            "Eiganjo, Seat of the Empire",
+            "Firesong and Sunspeaker",
+            "Gleeful Arsonist",
+            "Harsh Mentor",
+            "Kederekt Parasite",
+            "Lightning Helix",
+            "Mayhem Devil",
+            "Mogis, God of Slaughter",
+            "Niv-Mizzet, Parun",
+            "Rampaging Ferocidon",
+            "Razorgrass Ambush // Razorgrass Field",
+            "Repercussion",
+            "Spiteful Visions",
+            "Terror of the Peaks",
+            "The Lord of Pain",
+            "Toralf, God of Fury // Toralf's Hammer"
+          ],
+          "count": 21,
+          "effect": "direct_damage",
+          "family_id": "targeted_interaction"
+        }
+      },
+      "immediate_cards": 21,
+      "metrics": {
+        "cards_per_work_unit": 21.0,
+        "confidence_score": 74,
+        "decision_score": 73.21,
+        "immediate_queue_ratio": 0.0471,
+        "reuse_score": 82,
+        "risk_score": 42,
+        "speed_score": 81.92
+      },
+      "next_action": "Split the top scope into subpatterns before PG promotion; targeted_damage_variant_v1 is useful as a queue, not as one executable behavior.",
+      "strategy_id": "exact_scope_cluster_first",
+      "title": "Batch the largest exact split-scope clusters",
+      "verdict": "use_as_next_modeling_lane",
+      "work_units": 1
+    },
+    {
+      "evidence": {
+        "package_cards_removed_from_modeling": 0,
+        "test_miner": {
+          "cards_with_test_reference": 7,
+          "reference_ratio": 0.3333,
+          "requested_card_count": 21,
+          "usable_ratio": 0.0952,
+          "usable_scenario_candidate_count": 2
+        },
+        "top_runtime_scope_cards": 2,
+        "top_split_scope_cards": 21,
+        "why": "Combines immediate duplicate-work removal with reusable pattern creation and runtime gates."
+      },
+      "immediate_cards": 23,
+      "metrics": {
+        "cards_per_work_unit": 5.75,
+        "confidence_score": 84,
+        "decision_score": 67.91,
+        "immediate_queue_ratio": 0.0516,
+        "reuse_score": 90,
+        "risk_score": 34,
+        "speed_score": 51.39
+      },
+      "next_action": "Adopt as the project instruction: no broad card-by-card loop while package, exact-scope, or runtime-homogeneous lanes remain.",
+      "strategy_id": "hybrid_effective_queue_pattern_registry",
+      "title": "Hybrid: package gate, exact-scope clusters, test miner, and pattern registry",
+      "verdict": "recommended",
+      "work_units": 4
+    },
+    {
+      "evidence": {
+        "card_implementation_files": 31706,
+        "current_queue_cards": 446,
+        "java_files_total": 38739,
+        "source_basis": "local XMage inventory plus official XMage repository structure",
+        "work_multiplier_vs_current_queue": 71.09
+      },
+      "immediate_cards": 446,
+      "metrics": {
+        "cards_per_work_unit": 0.014,
+        "confidence_score": 62,
+        "decision_score": 45.58,
+        "immediate_queue_ratio": 1.0,
+        "reuse_score": 92,
+        "risk_score": 88,
+        "speed_score": 35.36
+      },
+      "next_action": "Use full inventory as reference only; do not block deck closure on global analysis.",
+      "strategy_id": "full_xmage_first",
+      "title": "Analyze/port the whole XMage corpus before queue work",
+      "verdict": "reject_as_primary",
+      "work_units": 31706
+    },
+    {
+      "evidence": {
+        "candidate_cards_for_pattern_learning": 92,
+        "database_boundary": "registry may persist templates/observations, but executable rules remain gated in card_battle_rules",
+        "effect_files": 802,
+        "manual_mapper_backlog": 352,
+        "test_files": 2009
+      },
+      "immediate_cards": 92,
+      "metrics": {
+        "cards_per_work_unit": 0.033,
+        "confidence_score": 70,
+        "decision_score": 44.36,
+        "immediate_queue_ratio": 0.2063,
+        "reuse_score": 96,
+        "risk_score": 58,
+        "speed_score": 8.06
+      },
+      "next_action": "Seed patterns incrementally from approved clusters; do not wait for a complete global registry.",
+      "strategy_id": "pattern_registry_first",
+      "title": "Create a persistent pattern registry before broad manual mapping",
+      "verdict": "use_as_shadow_infrastructure",
+      "work_units": 2811
+    },
+    {
+      "evidence": {
+        "fragmentation_warning": "largest raw runtime family is fragmented",
+        "largest_raw_runtime_family": {
+          "cards": [
+            "Aclazotz, Deepest Betrayal // Temple of the Dead",
+            "Adagia, Windswept Bastion",
+            "Biotransference",
+            "Black Market Connections",
+            "Blaze Commando",
+            "Bone Miser",
+            "Davros, Dalek Creator",
+            "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+            "Goldspan Dragon",
+            "Green Goblin, Nemesis",
+            "Maskwood Nexus",
+            "Monastery Mentor",
+            "Perch Protection",
+            "Sand Scout",
+            "Smuggler's Share",
+            "Surly Badgersaur",
+            "The Locust God",
+            "Utvara Hellkite",
+            "Waste Not",
+            "Young Pyromancer"
+          ],
+          "count": 20,
+          "effect": "token_maker",
+          "family_id": "token_maker",
+          "scope_count": 20,
+          "top_scopes": [
+            {
+              "battle_model_scope": "xmage_create_token_variant_perchprotection_v1",
+              "count": 1
+            },
+            {
+              "battle_model_scope": "xmage_create_token_variant_youngpyromancer_v1",
+              "count": 1
+            },
+            {
+              "battle_model_scope": "xmage_create_token_variant_bonemiser_v1",
+              "count": 1
+            },
+            {
+              "battle_model_scope": "xmage_create_token_variant_maskwoodnexus_v1",
+              "count": 1
+            },
+            {
+              "battle_model_scope": "xmage_create_token_variant_monasterymentor_v1",
+              "count": 1
+            },
+            {
+              "battle_model_scope": "xmage_create_token_variant_thelocustgod_v1",
+              "count": 1
+            },
+            {
+              "battle_model_scope": "xmage_create_token_variant_utvarahellkite_v1",
+              "count": 1
+            },
+            {
+              "battle_model_scope": "xmage_create_token_variant_wastenot_v1",
+              "count": 1
+            }
+          ]
+        },
+        "runtime_backlog": 24,
+        "runtime_unique_scope_count": 22,
+        "top_runtime_scope": {
+          "battle_model_scope": "destroy_all_permanents_or_creatures_variant_v1",
+          "cards": [
+            "Armageddon",
+            "Ultima"
+          ],
+          "count": 2,
+          "effect": "board_wipe",
+          "family_id": "board_wipe_choice"
+        }
+      },
+      "immediate_cards": 2,
+      "metrics": {
+        "cards_per_work_unit": 2.0,
+        "confidence_score": 78,
+        "decision_score": 44.21,
+        "immediate_queue_ratio": 0.0045,
+        "reuse_score": 65,
+        "risk_score": 70,
+        "speed_score": 28.69
+      },
+      "next_action": "Start with damage_all/destroy_all scopes; defer token_maker until taxonomy support exists.",
+      "strategy_id": "runtime_exact_scope_first",
+      "title": "Open runtime only for homogeneous exact scopes",
+      "verdict": "use_selectively",
+      "work_units": 1
+    },
+    {
+      "evidence": {
+        "package_already_prepared": 0,
+        "package_ready_unprepared": 0,
+        "pg_ready_total": 0,
+        "prepared_package_count": 0,
+        "required_gate": "precheck, approved apply, postcheck, PG->Hermes sync, focused audit"
+      },
+      "immediate_cards": 0,
+      "metrics": {
+        "cards_per_work_unit": 0.0,
+        "confidence_score": 86,
+        "decision_score": 42.57,
+        "immediate_queue_ratio": 0.0,
+        "reuse_score": 63,
+        "risk_score": 32,
+        "speed_score": 0.0
+      },
+      "next_action": "Do not remodel these cards; move them through the PostgreSQL governance gate when approved.",
+      "strategy_id": "package_manifest_first",
+      "title": "Stop rebuilding prepared PG packages and apply them through gates",
+      "verdict": "use_immediately_with_pg_approval",
+      "work_units": 1
+    },
+    {
+      "evidence": {
+        "current_queue_cards": 446,
+        "proposal_status_counts": {
+          "blocked_missing_xmage_source": 2,
+          "mapper_metadata_or_test_scenario_required": 352,
+          "runtime_family_implementation_required": 24,
+          "split_family_scope_review_required": 68
+        },
+        "reason": "Every card can eventually be handled, but each unit produces little reusable knowledge."
+      },
+      "immediate_cards": 446,
+      "metrics": {
+        "cards_per_work_unit": 1.0,
+        "confidence_score": 68,
+        "decision_score": 42.0,
+        "immediate_queue_ratio": 1.0,
+        "reuse_score": 18,
+        "risk_score": 55,
+        "speed_score": 53.0
+      },
+      "next_action": "Keep as fallback for exception cards only.",
+      "strategy_id": "card_by_card_queue",
+      "title": "Inspect each current proposal card independently",
+      "verdict": "reject_as_default",
+      "work_units": 446
+    },
+    {
+      "evidence": {
+        "interpretation": "test references are valuable, but sparse for the current top split-scope pilot",
+        "pilot_scope": "targeted_damage_variant_v1",
+        "test_miner": {
+          "cards_with_test_reference": 7,
+          "reference_ratio": 0.3333,
+          "requested_card_count": 21,
+          "usable_ratio": 0.0952,
+          "usable_scenario_candidate_count": 2
+        },
+        "xmage_test_files": 2009
+      },
+      "immediate_cards": 7,
+      "metrics": {
+        "cards_per_work_unit": 0.333,
+        "confidence_score": 72,
+        "decision_score": 36.59,
+        "immediate_queue_ratio": 0.0157,
+        "reuse_score": 54,
+        "risk_score": 47,
+        "speed_score": 8.02
+      },
+      "next_action": "Use test mining to design focused ManaLoom tests, not to decide the whole queue order alone.",
+      "strategy_id": "test_miner_first",
+      "title": "Mine XMage tests before writing local ManaLoom tests",
+      "verdict": "use_as_evidence_gate_not_primary_queue",
+      "work_units": 21
+    }
+  ],
+  "summary": {
+    "proposal_count": 446,
+    "ranking": [
+      {
+        "cards_per_work_unit": 21.0,
+        "decision_score": 73.21,
+        "strategy_id": "exact_scope_cluster_first",
+        "verdict": "use_as_next_modeling_lane"
+      },
+      {
+        "cards_per_work_unit": 5.75,
+        "decision_score": 67.91,
+        "strategy_id": "hybrid_effective_queue_pattern_registry",
+        "verdict": "recommended"
+      },
+      {
+        "cards_per_work_unit": 0.014,
+        "decision_score": 45.58,
+        "strategy_id": "full_xmage_first",
+        "verdict": "reject_as_primary"
+      },
+      {
+        "cards_per_work_unit": 0.033,
+        "decision_score": 44.36,
+        "strategy_id": "pattern_registry_first",
+        "verdict": "use_as_shadow_infrastructure"
+      },
+      {
+        "cards_per_work_unit": 2.0,
+        "decision_score": 44.21,
+        "strategy_id": "runtime_exact_scope_first",
+        "verdict": "use_selectively"
+      },
+      {
+        "cards_per_work_unit": 0.0,
+        "decision_score": 42.57,
+        "strategy_id": "package_manifest_first",
+        "verdict": "use_immediately_with_pg_approval"
+      },
+      {
+        "cards_per_work_unit": 1.0,
+        "decision_score": 42.0,
+        "strategy_id": "card_by_card_queue",
+        "verdict": "reject_as_default"
+      },
+      {
+        "cards_per_work_unit": 0.333,
+        "decision_score": 36.59,
+        "strategy_id": "test_miner_first",
+        "verdict": "use_as_evidence_gate_not_primary_queue"
+      }
+    ],
+    "recommended_decision_score": 67.91,
+    "recommended_strategy_id": "hybrid_effective_queue_pattern_registry",
+    "strategy_count": 8
+  }
+}

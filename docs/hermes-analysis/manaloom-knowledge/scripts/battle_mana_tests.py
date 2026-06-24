@@ -153,6 +153,110 @@ def register_tests(battle, player):
         assert active.available_mana() == 8
         assert active.mana_pool.wildcard == 3
 
+    def test_pain_mana_source_shapes_refresh_without_new_runtime_executor():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Elves of Deep Shadow",
+                "effect": "creature",
+                "type_line": "Creature — Elf Druid",
+                "power": 1,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "B",
+                "damage_on_tap": 1,
+                "tap_damage_status": "annotation_only",
+                "summoning_sick": False,
+            },
+            {
+                "name": "Talisman of Curiosity",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "mana_produced": 1,
+                "produces": "CUG",
+                "life_for_colored_mana": 1,
+                "battle_model_scope": "pain_talisman_color_pair_partial_v1",
+            },
+            {
+                "name": "Tarnished Citadel",
+                "effect": "land",
+                "type_line": "Land",
+                "mana_produced": 1,
+                "produces": "CWUBRG",
+                "life_for_colored_mana": 3,
+                "life_loss_on_colored_mana_status": "annotation_only",
+                "battle_model_scope": "colorless_or_any_color_pain_land_v1",
+            },
+        ]
+
+        active.refresh_mana_sources(turn=1)
+        assert active.available_mana() == 3
+        assert active.mana_pool.black == 1
+        assert active.mana_pool.wildcard == 2
+        assert active.life == 40
+
+    def test_global_creatures_tap_for_any_color_passive_turns_creatures_into_mana_sources():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Cryptolith Rite",
+                "effect": "passive",
+                "type_line": "Enchantment",
+                "creatures_tap_for_any_color": True,
+                "battle_model_scope": "creatures_tap_any_color_static_enchantment_v1",
+            },
+            {
+                "name": "Support Creature",
+                "effect": "creature",
+                "type_line": "Creature — Elf",
+                "power": 2,
+                "toughness": 2,
+                "summoning_sick": False,
+            },
+            {
+                "name": "Plant Token",
+                "effect": "creature",
+                "type_line": "Token Creature — Plant",
+                "power": 0,
+                "toughness": 1,
+                "is_token": True,
+                "summoning_sick": False,
+            },
+        ]
+
+        active.refresh_mana_sources(turn=2)
+        assert active.available_mana() == 2
+        assert active.mana_pool.wildcard == 2
+
+    def test_enduring_vitality_static_mana_grant_respects_summoning_sickness_on_self():
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Enduring Vitality",
+                "effect": "creature",
+                "type_line": "Enchantment Creature — Elk Glimmer",
+                "power": 3,
+                "toughness": 3,
+                "vigilance": True,
+                "creatures_tap_for_any_color": True,
+                "summoning_sick": True,
+                "battle_model_scope": "vigilance_three_three_creatures_tap_any_color_v1",
+            },
+            {
+                "name": "Old Mana Body",
+                "effect": "creature",
+                "type_line": "Creature — Elf",
+                "power": 1,
+                "toughness": 1,
+                "summoning_sick": False,
+            },
+        ]
+
+        active.refresh_mana_sources(turn=3)
+        assert active.available_mana() == 1
+        assert active.mana_pool.wildcard == 1
+
     def test_training_grounds_reduces_generic_creature_activation_cost_to_floor_one():
         active = player("Active")
         active.battlefield = [
@@ -346,6 +450,9 @@ def register_tests(battle, player):
         test_basic_lands_refresh_as_colored_sources,
         test_l1b_nonfetch_lands_refresh_as_flexible_mana_sources,
         test_l3a_artifact_mana_rocks_refresh_with_oracle_scopes,
+        test_pain_mana_source_shapes_refresh_without_new_runtime_executor,
+        test_global_creatures_tap_for_any_color_passive_turns_creatures_into_mana_sources,
+        test_enduring_vitality_static_mana_grant_respects_summoning_sickness_on_self,
         test_training_grounds_reduces_generic_creature_activation_cost_to_floor_one,
         test_training_grounds_does_not_reduce_artifact_activation_cost,
         test_hybrid_and_phyrexian_mana_use_legal_payment_options,

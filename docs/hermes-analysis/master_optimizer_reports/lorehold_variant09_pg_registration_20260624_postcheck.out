@@ -1,0 +1,21 @@
+Pager usage is off.
+         check_name         |               deck_id                |                            name                             |  format   |       archetype        | is_public | not_deleted 
+----------------------------+--------------------------------------+-------------------------------------------------------------+-----------+------------------------+-----------+-------------
+ pg_lorehold_variant09_deck | b51c8f24-fa8b-50ee-8200-d78fe9908ffa | PG REGISTERED Lorehold Variant 09 - Rafael Paste 2026-06-24 | commander | lifegain-storm-variant | f         | t
+(1 row)
+
+            check_name            | rows | qty | commander_qty | distinct_cards 
+----------------------------------+------+-----+---------------+----------------
+ pg_lorehold_variant09_deck_cards |   91 | 100 |             1 |             91
+(1 row)
+
+          check_name           |              learned_id              |     commander_name      |                   deck_name                   |         source_system         |                source_ref                | card_count |              legal_status               | is_active |                            deck_hash                             | hermes_deck_id |         metadata_pg_deck_id          
+-------------------------------+--------------------------------------+-------------------------+-----------------------------------------------+-------------------------------+------------------------------------------+------------+-----------------------------------------+-----------+------------------------------------------------------------------+----------------+--------------------------------------
+ pg_lorehold_variant09_learned | 806238bd-c707-5a9f-befc-56e00e93bb9c | Lorehold, the Historian | Lorehold Variant 09 - Rafael Paste 2026-06-24 | manual_user_deck_registration | lorehold_variant09_20260624_9370b6170e00 |        100 | registered_pending_card_rule_validation | f         | 9370b6170e00bc9fdcb33358ed7653f0c06a2d454871361dbef4fdc75560e6ee | 614            | b51c8f24-fa8b-50ee-8200-d78fe9908ffa
+(1 row)
+
+               check_name                | missing_card_rows 
+-----------------------------------------+-------------------
+ pg_lorehold_variant09_missing_card_rows |                 0
+(1 row)
+

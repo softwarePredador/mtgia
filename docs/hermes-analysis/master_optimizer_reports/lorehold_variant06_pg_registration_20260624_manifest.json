@@ -1,0 +1,20 @@
+{
+  "commander_learned_deck_id": "90b0fbe9-683b-53cf-9fc1-75699196f4aa",
+  "commander_quantity": 1,
+  "deck_hash": "a073b0fdc0db03c432651caa8f41d275faa6d67e5efb3865daee7ff4ca543298",
+  "files": {
+    "lorehold_variant06_pg_registration_20260624_apply.sql": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant06_pg_registration_20260624_apply.sql",
+    "lorehold_variant06_pg_registration_20260624_postcheck.sql": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant06_pg_registration_20260624_postcheck.sql",
+    "lorehold_variant06_pg_registration_20260624_precheck.sql": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant06_pg_registration_20260624_precheck.sql",
+    "lorehold_variant06_pg_registration_20260624_rollback.sql": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant06_pg_registration_20260624_rollback.sql"
+  },
+  "generated_at": "2026-06-24T12:21:27Z",
+  "hermes_deck_id": 611,
+  "input_quantity": 100,
+  "input_rows": 90,
+  "notes": "Apply is idempotent for fixed deck UUID and commander_learned_decks source tuple. Learned row is inactive.",
+  "pg_deck_id": "0936dae3-32c4-5fb8-9c6f-d986670de794",
+  "scope": "PostgreSQL registration for user-pasted Lorehold Variant 06",
+  "source_ref": "lorehold_variant06_20260624_a073b0fdc0db",
+  "source_system": "manual_user_deck_registration"
+}

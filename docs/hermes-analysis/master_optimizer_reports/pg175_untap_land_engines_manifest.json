@@ -1,0 +1,27 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg175_untap_land_engines_20260624_130140",
+  "deploy_id": "PG175",
+  "family_counts": {
+    "untap_land_engine": 4
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg175_untap_land_engines_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg175_untap_land_engines_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg175_untap_land_engines_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg175_untap_land_engines_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg175_untap_land_engines_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg175_untap_land_engines_rollback.sql"
+  },
+  "generated_at": "2026-06-24T13:01:40+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Candelabra of Tawnos",
+    "Earthcraft",
+    "Magus of the Candelabra",
+    "Oboro Breezecaller"
+  ],
+  "selected_count": 4,
+  "slug": "untap_land_engines",
+  "status": "prepared_read_only_pending_apply_approval"
+}

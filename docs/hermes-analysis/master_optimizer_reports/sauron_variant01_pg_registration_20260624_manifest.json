@@ -1,0 +1,25 @@
+{
+  "archetype": "grixis-reanimator-ring-control-variant",
+  "artifacts": {
+    "apply_sql": "docs/hermes-analysis/master_optimizer_reports/sauron_variant01_pg_registration_20260624_apply.sql",
+    "postcheck_sql": "docs/hermes-analysis/master_optimizer_reports/sauron_variant01_pg_registration_20260624_postcheck.sql",
+    "precheck_sql": "docs/hermes-analysis/master_optimizer_reports/sauron_variant01_pg_registration_20260624_precheck.sql",
+    "resolution_json": "docs/hermes-analysis/master_optimizer_reports/sauron_variant01_resolution_20260624.json",
+    "rollback_sql": "docs/hermes-analysis/master_optimizer_reports/sauron_variant01_pg_registration_20260624_rollback.sql"
+  },
+  "commander": "Sauron, the Dark Lord",
+  "deck_hash": "6aa4f012e11d7122d4652beead17c02c7e06e5e872de9932ab914f3b5556cadc",
+  "generated_at": "2026-06-24",
+  "hermes_deck_id": 620,
+  "input_qty": 100,
+  "input_rows": 89,
+  "missing_rows": 0,
+  "pg_deck_id": "c2230827-7963-52e4-a6ba-298d7be3478a",
+  "pg_learned_id": "28600f83-7925-5ce8-99ed-833d7c00febc",
+  "resolved_rows": 89,
+  "scope": "non-Lorehold deck intake only; no deck swap; learned deck inactive",
+  "source_decklist": "docs/hermes-analysis/manaloom-knowledge/decks/sauron-the-dark-lord/2026-06-24-variant-01-user-decklist.md",
+  "source_ref": "sauron_variant01_20260624_6aa4f012e11d",
+  "source_system": "manual_user_deck_registration",
+  "variant": "sauron_variant01"
+}

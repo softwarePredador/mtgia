@@ -435,6 +435,126 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "copy_creature_token")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_copy_permanent_etb_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Phyrexian Metamorph",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "PhyrexianMetamorph",
+                            "path": "/xmage/PhyrexianMetamorph.java",
+                            "types": ["ARTIFACT", "CREATURE"],
+                            "effect_classes": ["CopyPermanentEffect"],
+                            "ability_classes": ["EntersBattlefieldAbility"],
+                            "primary_effect": {
+                                "effect": "copy_permanent_etb",
+                                "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+                                "ability_kind": "replacement",
+                                "copy_target_types": ["artifact", "creature"],
+                                "copy_additional_types": ["artifact"],
+                                "target_controller": "any",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_permanent_etb")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        generator_report = generator.build_generator_report(
+            batch_audit={
+                "cards": [
+                    {
+                        "card_name": "Phyrexian Metamorph",
+                        "severity": "high",
+                        "oracle_hash": "metamorph-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "PhyrexianMetamorph",
+                            "path": "/xmage/PhyrexianMetamorph.java",
+                            "types": ["ARTIFACT", "CREATURE"],
+                            "effect_classes": ["CopyPermanentEffect"],
+                            "ability_classes": ["EntersBattlefieldAbility"],
+                            "primary_effect": {
+                                "effect": "copy_permanent_etb",
+                                "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
+                                "ability_kind": "replacement",
+                                "copy_target_types": ["artifact", "creature"],
+                                "copy_additional_types": ["artifact"],
+                                "target_controller": "any",
+                            },
+                        },
+                    }
+                ]
+            },
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Phyrexian Metamorph",
+                        "candidate_rule": {"oracle_hash": "metamorph-hash"},
+                        "external_references": {"scryfall": {"mana_cost": "{3}{U/P}"}},
+                    }
+                ]
+            },
+        )
+        proposal = generator_report["proposals"][0]
+        self.assertEqual(proposal["family_id"], "copy_permanent_etb")
+        self.assertEqual(proposal["deck_role_json"]["category"], "board_development")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "copy_permanent_etb")
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+
+    def test_classifier_marks_copy_permanent_modifier_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Mockingbird",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Mockingbird",
+                            "path": "/xmage/Mockingbird.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CopyPermanentEffect", "MockingbirdEffect", "OneShotEffect"],
+                            "ability_classes": ["EntersBattlefieldAbility", "FlyingAbility"],
+                            "primary_effect": {
+                                "effect": "copy_permanent_etb",
+                                "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+                                "ability_kind": "replacement",
+                                "copy_target_types": ["creature"],
+                                "target_controller": "any",
+                                "copy_additional_subtypes": ["Bird"],
+                                "copy_granted_keywords": ["flying"],
+                                "copy_target_mana_value_lte_source_mana_value": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_permanent_etb")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_clone_legion_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -1630,6 +1750,85 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "passive")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_cryptolith_rite_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Cryptolith Rite",
+                        "severity": "high",
+                        "oracle_hash": "cryptolithhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "CryptolithRite",
+                            "path": "/xmage/CryptolithRite.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["GainAbilityControlledEffect"],
+                            "ability_classes": ["AnyColorManaAbility", "SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "creatures_tap_any_color_static_enchantment_v1",
+                                "creatures_tap_for_any_color": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "passive")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_enduring_vitality_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Enduring Vitality",
+                        "severity": "high",
+                        "oracle_hash": "enduringhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "EnduringVitality",
+                            "path": "/xmage/EnduringVitality.java",
+                            "types": ["CREATURE", "ENCHANTMENT"],
+                            "effect_classes": ["GainAbilityControlledEffect"],
+                            "ability_classes": [
+                                "AnyColorManaAbility",
+                                "EnduringGlimmerTriggeredAbility",
+                                "SimpleStaticAbility",
+                                "VigilanceAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "vigilance_three_three_creatures_tap_any_color_v1",
+                                "power": 3,
+                                "toughness": 3,
+                                "vigilance": True,
+                                "creatures_tap_for_any_color": True,
+                                "death_return_status": "annotation_only",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "creature")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_magda_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -1868,6 +2067,185 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "toughness": 6,
                                 "flying": True,
                                 "opponent_draws_card_may_draw": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_fate_unraveler_opponent_draw_punisher_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Fate Unraveler",
+                        "severity": "high",
+                        "oracle_hash": "fatehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "FateUnraveler",
+                            "path": "/xmage/FateUnraveler.java",
+                            "types": ["CREATURE", "ENCHANTMENT"],
+                            "effect_classes": ["DamageTargetEffect"],
+                            "ability_classes": ["DrawCardOpponentTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "opponent_draws_card_damage_that_player_v1",
+                                "power": 3,
+                                "toughness": 4,
+                                "trigger": "opponent_draw",
+                                "opponent_draw_damage_per_card": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_underworld_dreams_opponent_draw_punisher_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Underworld Dreams",
+                        "severity": "high",
+                        "oracle_hash": "underworldhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "UnderworldDreams",
+                            "path": "/xmage/UnderworldDreams.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DamageTargetEffect"],
+                            "ability_classes": ["DrawCardOpponentTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "opponent_draws_card_damage_that_player_v1",
+                                "trigger": "opponent_draw",
+                                "opponent_draw_damage_per_card": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_geths_grimoire_opponent_discard_draw_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Geth's Grimoire",
+                        "severity": "high",
+                        "oracle_hash": "grimoirehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "GethsGrimoire",
+                            "path": "/xmage/GethsGrimoire.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["DrawCardSourceControllerEffect"],
+                            "ability_classes": ["DiscardsACardOpponentTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "draw_engine",
+                                "battle_model_scope": "opponent_discards_card_may_draw_v1",
+                                "draw_on_enter": False,
+                                "trigger": "opponent_discard",
+                                "opponent_discard_draw_per_card": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_megrim_opponent_discard_damage_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Megrim",
+                        "severity": "high",
+                        "oracle_hash": "megrimhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Megrim",
+                            "path": "/xmage/Megrim.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DamageTargetEffect"],
+                            "ability_classes": ["DiscardsACardOpponentTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "opponent_discards_card_damage_that_player_v1",
+                                "trigger": "opponent_discard",
+                                "opponent_discard_damage_per_card": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_feast_of_sanity_controller_discard_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Feast of Sanity",
+                        "severity": "high",
+                        "oracle_hash": "feasthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "FeastOfSanity",
+                            "path": "/xmage/FeastOfSanity.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DamageTargetEffect", "GainLifeEffect"],
+                            "ability_classes": ["DiscardCardControllerTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "controller_discards_card_damage_any_target_and_gain_life_v1",
+                                "trigger": "controller_discard",
+                                "controller_discard_damage_any_target": 1,
+                                "controller_discard_gain_life": 1,
                             },
                         },
                     }
@@ -2769,6 +3147,116 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_elvish_spirit_guide_hand_exile_ritual_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Elvish Spirit Guide",
+                        "severity": "high",
+                        "oracle_hash": "esghash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ElvishSpiritGuide",
+                            "path": "/xmage/ElvishSpiritGuide.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [],
+                            "ability_classes": ["SimpleManaAbility"],
+                            "cost_classes": ["ExileSourceFromHandCost"],
+                            "primary_effect": {
+                                "effect": "ramp_ritual",
+                                "battle_model_scope": "hand_exile_add_one_green_mana_ritual_v1",
+                                "hand_exile_mana_ability": True,
+                                "mana_produced": 1,
+                                "produces": "G",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["family_id"], "ramp_ritual")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_basic_one_color_land_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Mountain",
+                        "severity": "medium",
+                        "oracle_hash": "mountainhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Mountain",
+                            "path": "/xmage/Mountain.java",
+                            "types": ["LAND"],
+                            "effect_classes": [],
+                            "ability_classes": ["RedManaAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "land",
+                                "battle_model_scope": "basic_one_color_land_v1",
+                                "mana_produced": 1,
+                                "produces": "R",
+                                "basic_land_types": ["Mountain"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "land")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_exotic_orchard_land_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Exotic Orchard",
+                        "severity": "medium",
+                        "oracle_hash": "orchardhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ExoticOrchard",
+                            "path": "/xmage/ExoticOrchard.java",
+                            "types": ["LAND"],
+                            "effect_classes": [],
+                            "ability_classes": ["AnyColorLandsProduceManaAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "land",
+                                "battle_model_scope": "any_color_from_opponent_land_production_v1",
+                                "mana_produced": 1,
+                                "produces": "WUBRG",
+                                "opponent_land_color_dependency": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "land")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_fetch_land_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -3237,6 +3725,530 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_rhystic_study_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Rhystic Study",
+                        "severity": "high",
+                        "oracle_hash": "rhystichash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "RhysticStudy",
+                            "path": "/xmage/RhysticStudy.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["OneShotEffect", "RhysticStudyDrawEffect"],
+                            "ability_classes": ["SpellCastOpponentTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "draw_engine",
+                                "battle_model_scope": "opponent_spell_pay_one_or_draw_engine_v1",
+                                "trigger": "opponent_spell",
+                                "tax": 1,
+                                "draw_on_enter": False,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_mystic_remora_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Mystic Remora",
+                        "severity": "high",
+                        "oracle_hash": "remorahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "MysticRemora",
+                            "path": "/xmage/MysticRemora.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["MysticRemoraEffect", "OneShotEffect"],
+                            "ability_classes": ["CumulativeUpkeepAbility", "MysticRemoraTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "draw_engine",
+                                "battle_model_scope": "opponent_noncreature_spell_pay_four_draw_engine_with_cumulative_upkeep_v1",
+                                "trigger": "opponent_noncreature_spell",
+                                "tax": 4,
+                                "draw_on_enter": False,
+                                "cumulative_upkeep_generic": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_crop_rotation_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Crop Rotation",
+                        "severity": "high",
+                        "oracle_hash": "crophash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "CropRotation",
+                            "path": "/xmage/CropRotation.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                            "ability_classes": [],
+                            "cost_classes": ["SacrificeTargetCost"],
+                            "primary_effect": {
+                                "effect": "land_ramp",
+                                "battle_model_scope": "sacrifice_land_for_any_land_to_battlefield_untapped_v1",
+                                "instant": True,
+                                "requires_sacrifice_land": True,
+                                "land_count": 1,
+                                "lands_to_battlefield": 1,
+                                "land_enters_tapped": False,
+                                "tutor_target": "land",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_elvish_reclaimer_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Elvish Reclaimer",
+                        "severity": "high",
+                        "oracle_hash": "reclaimerhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ElvishReclaimer",
+                            "path": "/xmage/ElvishReclaimer.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["BoostSourceEffect", "ConditionalContinuousEffect", "SearchLibraryPutInPlayEffect"],
+                            "ability_classes": ["SimpleActivatedAbility", "SimpleStaticAbility"],
+                            "cost_classes": ["GenericManaCost", "SacrificeTargetCost", "TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "activated_land_tutor_with_land_sacrifice_and_graveyard_growth_v1",
+                                "power": 1,
+                                "toughness": 2,
+                                "land_tutor_activated": True,
+                                "activation_cost_generic": 2,
+                                "activation_requires_tap": True,
+                                "requires_sacrifice_land": True,
+                                "land_count": 1,
+                                "lands_to_battlefield": 1,
+                                "land_enters_tapped": True,
+                                "tutor_target": "land",
+                                "plus_two_two_if_three_lands_in_your_graveyard": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_chord_of_calling_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Chord of Calling",
+                        "severity": "high",
+                        "oracle_hash": "chordhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ChordOfCalling",
+                            "path": "/xmage/ChordOfCalling.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["SearchLibraryWithLessCMCPutInPlayEffect"],
+                            "ability_classes": ["ConvokeAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "tutor",
+                                "battle_model_scope": "convoke_creature_tutor_to_battlefield_mana_value_x_or_less_v1",
+                                "instant": True,
+                                "target": "creature_to_battlefield",
+                                "target_mana_value_max_from_x": True,
+                                "convoke": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_green_suns_zenith_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Green Sun's Zenith",
+                        "severity": "high",
+                        "oracle_hash": "gszhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "GreenSunsZenith",
+                            "path": "/xmage/GreenSunsZenith.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["SearchLibraryWithLessCMCPutInPlayEffect", "ShuffleSpellEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "tutor",
+                                "battle_model_scope": "green_creature_tutor_to_battlefield_mana_value_x_or_less_then_shuffle_self_v1",
+                                "instant": False,
+                                "target": "green_creature_to_battlefield",
+                                "target_mana_value_max_from_x": True,
+                                "shuffle_self_into_library_on_resolution": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_whir_of_invention_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Whir of Invention",
+                        "severity": "high",
+                        "oracle_hash": "whirhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "WhirOfInvention",
+                            "path": "/xmage/WhirOfInvention.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["SearchLibraryWithLessCMCPutInPlayEffect"],
+                            "ability_classes": ["ImproviseAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "tutor",
+                                "battle_model_scope": "improvise_artifact_tutor_to_battlefield_mana_value_x_or_less_v1",
+                                "instant": True,
+                                "target": "artifact_to_battlefield",
+                                "target_mana_value_max_from_x": True,
+                                "improvise": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_natures_rhythm_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Nature's Rhythm",
+                        "severity": "high",
+                        "oracle_hash": "rhythmhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "NaturesRhythm",
+                            "path": "/xmage/NaturesRhythm.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                            "ability_classes": ["HarmonizeAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "tutor",
+                                "battle_model_scope": "creature_tutor_to_battlefield_mana_value_x_or_less_harmonize_v1",
+                                "instant": False,
+                                "target": "creature_to_battlefield",
+                                "target_mana_value_max_from_x": True,
+                                "harmonize": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_double_vision_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Double Vision",
+                        "severity": "high",
+                        "oracle_hash": "doublevisionhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "DoubleVision",
+                            "path": "/xmage/DoubleVision.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["CopyTargetStackObjectEffect"],
+                            "ability_classes": ["DoubleVisionCopyTriggeredAbility", "SpellCastControllerTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "copy_spell",
+                                "battle_model_scope": "first_instant_sorcery_cast_each_turn_copy_own_spell_v1",
+                                "trigger": "instant_sorcery_cast",
+                                "trigger_effect": "copy_spell",
+                                "target": "own_instant_or_sorcery_on_stack",
+                                "may_choose_new_targets": True,
+                                "choose_new_targets_status": "may",
+                                "trigger_first_instant_or_sorcery_each_turn": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_swarm_intelligence_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Swarm Intelligence",
+                        "severity": "high",
+                        "oracle_hash": "swarmhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "SwarmIntelligence",
+                            "path": "/xmage/SwarmIntelligence.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["CopyTargetStackObjectEffect"],
+                            "ability_classes": ["SpellCastControllerTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "copy_spell",
+                                "battle_model_scope": "instant_sorcery_cast_copy_own_spell_v1",
+                                "trigger": "instant_sorcery_cast",
+                                "trigger_effect": "copy_spell",
+                                "target": "own_instant_or_sorcery_on_stack",
+                                "may_choose_new_targets": True,
+                                "choose_new_targets_status": "may",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_candelabra_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Candelabra of Tawnos",
+                        "severity": "high",
+                        "oracle_hash": "candelabrahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "CandelabraOfTawnos",
+                            "path": "/xmage/CandelabraOfTawnos.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["UntapTargetEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "untap_land_engine",
+                                "battle_model_scope": "x_tap_untap_x_lands_v1",
+                                "activated_untap_lands_for_mana_unlock": True,
+                                "activation_requires_tap": True,
+                                "activation_cost_generic_from_x": True,
+                                "untap_target_land_count_from_x": True,
+                                "untap_target_land_restriction": "land",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_earthcraft_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Earthcraft",
+                        "severity": "high",
+                        "oracle_hash": "earthcrafthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Earthcraft",
+                            "path": "/xmage/Earthcraft.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["UntapTargetEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["TapTargetCost"],
+                            "primary_effect": {
+                                "effect": "untap_land_engine",
+                                "battle_model_scope": "tap_untapped_creature_untap_target_basic_land_v1",
+                                "activated_untap_lands_for_mana_unlock": True,
+                                "activation_taps_untapped_creature_you_control": True,
+                                "untap_target_land_count": 1,
+                                "untap_target_land_restriction": "land",
+                                "untap_target_land_basic_only": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_magus_of_the_candelabra_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Magus of the Candelabra",
+                        "severity": "high",
+                        "oracle_hash": "magushash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "MagusOfTheCandelabra",
+                            "path": "/xmage/MagusOfTheCandelabra.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["UntapTargetEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "untap_land_engine",
+                                "battle_model_scope": "creature_x_tap_untap_x_lands_v1",
+                                "power": 1,
+                                "toughness": 2,
+                                "activated_untap_lands_for_mana_unlock": True,
+                                "activation_requires_tap": True,
+                                "activation_cost_generic_from_x": True,
+                                "untap_target_land_count_from_x": True,
+                                "untap_target_land_restriction": "land",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_oboro_breezecaller_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Oboro Breezecaller",
+                        "severity": "high",
+                        "oracle_hash": "oborohash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "OboroBreezecaller",
+                            "path": "/xmage/OboroBreezecaller.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["UntapTargetEffect"],
+                            "ability_classes": ["FlyingAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["GenericManaCost", "ReturnToHandChosenControlledPermanentCost"],
+                            "primary_effect": {
+                                "effect": "untap_land_engine",
+                                "battle_model_scope": "pay_two_return_land_untap_target_land_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "flying": True,
+                                "activated_untap_lands_for_mana_unlock": True,
+                                "activation_cost_generic": 2,
+                                "activation_returns_land_to_hand": True,
+                                "untap_target_land_count": 1,
+                                "untap_target_land_restriction": "land",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_final_fortune_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -3687,6 +4699,254 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_exalted_tricolor_mana_dork_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Noble Hierarch",
+                        "severity": "high",
+                        "oracle_hash": "noblehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "NobleHierarch",
+                            "path": "/xmage/NobleHierarch.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [],
+                            "ability_classes": ["BlueManaAbility", "ExaltedAbility", "GreenManaAbility", "WhiteManaAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "one_mana_zero_one_exalted_tricolor_mana_dork_v1",
+                                "power": 0,
+                                "toughness": 1,
+                                "exalted": True,
+                                "is_mana_source": True,
+                                "mana_produced": 1,
+                                "produces": "GWU",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_color_diversity_mana_dork_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Bloom Tender",
+                        "severity": "high",
+                        "oracle_hash": "bloomhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "BloomTender",
+                            "path": "/xmage/BloomTender.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [],
+                            "ability_classes": ["AddEachControlledColorManaAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "one_one_color_diversity_mana_dork_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "is_mana_source": True,
+                                "mana_produced_from_colors_among_permanents": True,
+                                "mana_colors_from_controlled_permanents": True,
+                                "produces": "WUBRG",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_any_color_rock_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Relic of Legends",
+                        "severity": "high",
+                        "oracle_hash": "relichash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "RelicOfLegends",
+                            "path": "/xmage/RelicOfLegends.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": [],
+                            "ability_classes": ["AnyColorManaAbility"],
+                            "cost_classes": ["TapTargetCost"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "one_any_color_mana_rock_v1",
+                                "mana_produced": 1,
+                                "produces": "WUBRG",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_support_any_color_rock_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Springleaf Drum",
+                        "severity": "high",
+                        "oracle_hash": "drumhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "SpringleafDrum",
+                            "path": "/xmage/SpringleafDrum.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": [],
+                            "ability_classes": ["AnyColorManaAbility"],
+                            "cost_classes": ["TapTargetCost"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "creature_support_any_color_mana_rock_v1",
+                                "mana_produced": 1,
+                                "produces": "WUBRG",
+                                "mana_source_requires_untapped_creature": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_talisman_pain_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Talisman of Curiosity",
+                        "severity": "high",
+                        "oracle_hash": "talismanhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "TalismanOfCuriosity",
+                            "path": "/xmage/TalismanOfCuriosity.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["DamageControllerEffect"],
+                            "ability_classes": ["BlueManaAbility", "ColorlessManaAbility", "GreenManaAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "pain_talisman_color_pair_partial_v1",
+                                "mana_produced": 1,
+                                "produces": "CUG",
+                                "life_for_colored_mana": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_black_pain_mana_dork_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Elves of Deep Shadow",
+                        "severity": "high",
+                        "oracle_hash": "elvesshadowhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ElvesOfDeepShadow",
+                            "path": "/xmage/ElvesOfDeepShadow.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DamageControllerEffect"],
+                            "ability_classes": ["SimpleManaAbility"],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "one_mana_one_one_black_pain_mana_dork_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "is_mana_source": True,
+                                "mana_produced": 1,
+                                "produces": "B",
+                                "damage_on_tap": 1,
+                                "tap_damage_status": "annotation_only",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_colorless_or_any_color_pain_land_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Tarnished Citadel",
+                        "severity": "high",
+                        "oracle_hash": "citadelhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "TarnishedCitadel",
+                            "path": "/xmage/TarnishedCitadel.java",
+                            "types": ["LAND"],
+                            "effect_classes": ["DamageControllerEffect"],
+                            "ability_classes": ["AnyColorManaAbility", "SimpleManaAbility"],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "land",
+                                "battle_model_scope": "colorless_or_any_color_pain_land_v1",
+                                "mana_produced": 1,
+                                "produces": "CWUBRG",
+                                "life_for_colored_mana": 3,
+                                "life_loss_on_colored_mana_status": "annotation_only",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_sol_ring_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -3719,6 +4979,136 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             }
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_grim_monolith_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Grim Monolith",
+                        "severity": "high",
+                        "oracle_hash": "grimhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "GrimMonolith",
+                            "path": "/xmage/GrimMonolith.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["DontUntapInControllersUntapStepSourceEffect", "UntapSourceEffect"],
+                            "ability_classes": ["SimpleActivatedAbility", "SimpleManaAbility", "SimpleStaticAbility"],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "three_colorless_monolith_mana_rock_v1",
+                                "mana_produced": 3,
+                                "produces": "C",
+                                "does_not_untap_in_untap_step": True,
+                                "activated_untap_cost_generic": 4,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_basalt_monolith_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Basalt Monolith",
+                        "severity": "high",
+                        "oracle_hash": "basalthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "BasaltMonolith",
+                            "path": "/xmage/BasaltMonolith.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["DontUntapInControllersUntapStepSourceEffect", "UntapSourceEffect"],
+                            "ability_classes": ["SimpleActivatedAbility", "SimpleManaAbility", "SimpleStaticAbility"],
+                            "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "three_colorless_monolith_mana_rock_v1",
+                                "mana_produced": 3,
+                                "produces": "C",
+                                "does_not_untap_in_untap_step": True,
+                                "activated_untap_cost_generic": 3,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_generator_marks_creature_mana_source_role_as_ramp(self) -> None:
+        report = generator.build_generator_report(
+            batch_audit={
+                "cards": [
+                    {
+                        "card_name": "Circle of Dreams Druid",
+                        "severity": "high",
+                        "oracle_hash": "circlehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "CircleOfDreamsDruid",
+                            "path": "/xmage/CircleOfDreamsDruid.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [],
+                            "ability_classes": ["DynamicManaAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "two_one_green_per_creature_mana_dork_v1",
+                                "power": 2,
+                                "toughness": 1,
+                                "is_mana_source": True,
+                                "mana_produced_from_controlled_creatures": True,
+                                "produces": "G",
+                            },
+                        },
+                    }
+                ]
+            },
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Circle of Dreams Druid",
+                        "candidate_rule": {
+                            "oracle_hash": "circlehash",
+                            "effect_json": {
+                                "effect": "creature",
+                                "battle_model_scope": "two_one_green_per_creature_mana_dork_v1",
+                                "power": 2,
+                                "toughness": 1,
+                                "is_mana_source": True,
+                                "mana_produced_from_controlled_creatures": True,
+                                "produces": "G",
+                            },
+                        },
+                        "external_references": {"scryfall": {"mana_cost": "{G}{G}{G}"}},
+                    }
+                ]
+            },
+        )
+
+        proposal = report["proposals"][0]
+        self.assertEqual(proposal["deck_role_json"]["category"], "ramp")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "ramp_permanent")
+        self.assertEqual(proposal["deck_role_json"]["subtype"], "mana_creature")
 
     def test_classifier_marks_signet_filter_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(

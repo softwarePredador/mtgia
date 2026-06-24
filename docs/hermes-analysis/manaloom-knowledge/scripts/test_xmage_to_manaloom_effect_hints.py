@@ -274,6 +274,276 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["mana_produced"], 1)
         self.assertEqual(primary["produces"], "WUBRG")
 
+    def test_noble_hierarch_maps_to_exalted_tricolor_mana_dork_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": [
+                    "BlueManaAbility",
+                    "ExaltedAbility",
+                    "GreenManaAbility",
+                    "WhiteManaAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{G}"); '
+                    "this.power = new MageInt(0); this.toughness = new MageInt(1); "
+                    "this.addAbility(new ExaltedAbility()); this.addAbility(new GreenManaAbility()); "
+                    "this.addAbility(new WhiteManaAbility()); this.addAbility(new BlueManaAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "one_mana_zero_one_exalted_tricolor_mana_dork_v1")
+        self.assertEqual(primary["produces"], "GWU")
+        self.assertTrue(primary["exalted"])
+        self.assertTrue(primary["is_mana_source"])
+
+    def test_bloom_tender_maps_to_color_diversity_mana_dork_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["AddEachControlledColorManaAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{1}{G}"); '
+                    "this.power = new MageInt(1); this.toughness = new MageInt(1); "
+                    "this.addAbility(new AddEachControlledColorManaAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "one_one_color_diversity_mana_dork_v1")
+        self.assertTrue(primary["mana_produced_from_colors_among_permanents"])
+        self.assertTrue(primary["mana_colors_from_controlled_permanents"])
+        self.assertEqual(primary["produces"], "WUBRG")
+
+    def test_circle_of_dreams_druid_maps_to_green_per_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["DynamicManaAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{G}{G}{G}"); '
+                    "this.power = new MageInt(2); this.toughness = new MageInt(1); "
+                    "new DynamicManaAbility(Mana.GreenMana(1), new PermanentsOnBattlefieldCount(StaticFilters.FILTER_CONTROLLED_CREATURE));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "two_one_green_per_creature_mana_dork_v1")
+        self.assertTrue(primary["mana_produced_from_controlled_creatures"])
+        self.assertEqual(primary["produces"], "G")
+
+    def test_mountain_maps_to_basic_one_color_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Mountain",
+                "ability_classes": ["RedManaAbility"],
+                "effect_classes": [],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["LAND"], "subtypes": ["MOUNTAIN"]},
+                "raw_excerpt": "super(ownerId, setInfo, new RedManaAbility());",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "land")
+        self.assertEqual(primary["battle_model_scope"], "basic_one_color_land_v1")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "R")
+        self.assertEqual(primary["basic_land_types"], ["Mountain"])
+
+    def test_elvish_spirit_guide_maps_to_hand_exile_green_ritual_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ElvishSpiritGuide",
+                "types": ["CREATURE"],
+                "ability_classes": ["SimpleManaAbility"],
+                "effect_classes": [],
+                "cost_classes": ["ExileSourceFromHandCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{2}{G}"); '
+                    "this.addAbility(new SimpleManaAbility(Zone.HAND, Mana.GreenMana(1), new ExileSourceFromHandCost()));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_ritual")
+        self.assertEqual(primary["battle_model_scope"], "hand_exile_add_one_green_mana_ritual_v1")
+        self.assertTrue(primary["hand_exile_mana_ability"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "G")
+
+    def test_exotic_orchard_maps_to_dynamic_any_color_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ExoticOrchard",
+                "types": ["LAND"],
+                "ability_classes": ["AnyColorLandsProduceManaAbility"],
+                "effect_classes": [],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["LAND"]},
+                "raw_excerpt": "this.addAbility(new AnyColorLandsProduceManaAbility(TargetController.OPPONENT));",
+            },
+            "Tap: Add one mana of any color that a land an opponent controls could produce.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "land")
+        self.assertEqual(primary["battle_model_scope"], "any_color_from_opponent_land_production_v1")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "WUBRG")
+        self.assertTrue(primary["opponent_land_color_dependency"])
+
+    def test_relic_of_legends_maps_to_any_color_mana_rock_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["AnyColorManaAbility"],
+                "cost_classes": ["TapTargetCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new AnyColorManaAbility()); "
+                    "this.addAbility(new AnyColorManaAbility(new TapTargetCost(new TargetControlledPermanent(filter))));"
+                ),
+            },
+            "Add one mana of any color. Tap an untapped legendary creature you control: Add one mana of any color.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "one_any_color_mana_rock_v1")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "WUBRG")
+
+    def test_springleaf_drum_maps_to_creature_support_any_color_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["AnyColorManaAbility"],
+                "cost_classes": ["TapTargetCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "Ability ability = new AnyColorManaAbility(); "
+                    "ability.addCost(new TapTargetCost(StaticFilters.FILTER_CONTROLLED_UNTAPPED_CREATURE));"
+                ),
+            },
+            "Tap an untapped creature you control: Add one mana of any color.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "creature_support_any_color_mana_rock_v1")
+        self.assertTrue(primary["mana_source_requires_untapped_creature"])
+        self.assertEqual(primary["produces"], "WUBRG")
+
+    def test_talisman_of_curiosity_maps_to_pain_talisman_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["BlueManaAbility", "ColorlessManaAbility", "GreenManaAbility"],
+                "effect_classes": ["DamageControllerEffect"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new ColorlessManaAbility()); "
+                    "Ability ability = new GreenManaAbility(); "
+                    "ability.addEffect(new DamageControllerEffect(1)); "
+                    "this.addAbility(ability); "
+                    "ability = new BlueManaAbility(); "
+                    "ability.addEffect(new DamageControllerEffect(1)); "
+                    "this.addAbility(ability);"
+                ),
+            },
+            "{T}: Add {C}. {T}: Add {G} or {U}. Talisman of Curiosity deals 1 damage to you.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "pain_talisman_color_pair_partial_v1")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "CUG")
+        self.assertEqual(primary["life_for_colored_mana"], 1)
+
+    def test_elves_of_deep_shadow_maps_to_black_pain_dork_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["SimpleManaAbility"],
+                "effect_classes": ["DamageControllerEffect"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{G}"); '
+                    "this.power = new MageInt(1); "
+                    "this.toughness = new MageInt(1); "
+                    "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, Mana.BlackMana(1), new TapSourceCost()); "
+                    "ability.addEffect(new DamageControllerEffect(1)); "
+                    "this.addAbility(ability);"
+                ),
+            },
+            "{T}: Add {B}. Elves of Deep Shadow deals 1 damage to you.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "one_mana_one_one_black_pain_mana_dork_v1")
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "B")
+        self.assertEqual(primary["damage_on_tap"], 1)
+        self.assertEqual(primary["tap_damage_status"], "annotation_only")
+
+    def test_tarnished_citadel_maps_to_colorless_or_any_color_pain_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["AnyColorManaAbility", "SimpleManaAbility"],
+                "effect_classes": ["DamageControllerEffect"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["LAND"]},
+                "raw_excerpt": (
+                    "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(1), new TapSourceCost())); "
+                    "ActivatedManaAbilityImpl ability = new AnyColorManaAbility(new TapSourceCost()); "
+                    "ability.addEffect(new DamageControllerEffect(3)); "
+                    "this.addAbility(ability);"
+                ),
+            },
+            "{T}: Add {C}. {T}: Add one mana of any color. Tarnished Citadel deals 3 damage to you.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "land")
+        self.assertEqual(primary["battle_model_scope"], "colorless_or_any_color_pain_land_v1")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "CWUBRG")
+        self.assertEqual(primary["life_for_colored_mana"], 3)
+        self.assertEqual(primary["life_loss_on_colored_mana_status"], "annotation_only")
+
+    def test_moonsnare_prototype_maps_to_artifact_or_creature_support_colorless_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["ChannelAbility", "ColorlessManaAbility"],
+                "effect_classes": ["PutOnTopOrBottomLibraryTargetEffect"],
+                "cost_classes": ["TapTargetCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "Ability ability = new ColorlessManaAbility(); "
+                    "ability.addCost(new TapTargetCost(new TargetControlledPermanent(filter))); "
+                    "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(), CardType.CREATURE.getPredicate())); "
+                    "this.addAbility(ability); "
+                    'ability = new ChannelAbility("{4}{U}", new PutOnTopOrBottomLibraryTargetEffect(true));'
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "artifact_or_creature_support_colorless_mana_rock_v1")
+        self.assertTrue(primary["mana_source_requires_untapped_artifact_or_creature"])
+        self.assertEqual(primary["produces"], "C")
+
     def test_sol_ring_maps_to_exact_two_colorless_mana_rock_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -292,6 +562,56 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["battle_model_scope"], "two_colorless_mana_rock_v1")
         self.assertEqual(primary["mana_produced"], 2)
         self.assertEqual(primary["produces"], "C")
+
+    def test_grim_monolith_maps_to_exact_monolith_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DontUntapInControllersUntapStepSourceEffect", "UntapSourceEffect"],
+                "ability_classes": ["SimpleActivatedAbility", "SimpleManaAbility", "SimpleStaticAbility"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "xmage_class_name": "GrimMonolith",
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{2}"); '
+                    "this.addAbility(new SimpleStaticAbility(new DontUntapInControllersUntapStepSourceEffect())); "
+                    "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(3), new TapSourceCost())); "
+                    'this.addAbility(new SimpleActivatedAbility(new UntapSourceEffect(), new ManaCostsImpl<>("{4}")));'
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "three_colorless_monolith_mana_rock_v1")
+        self.assertEqual(primary["mana_produced"], 3)
+        self.assertEqual(primary["produces"], "C")
+        self.assertTrue(primary["does_not_untap_in_untap_step"])
+        self.assertEqual(primary["activated_untap_cost_generic"], 4)
+
+    def test_basalt_monolith_maps_to_exact_monolith_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DontUntapInControllersUntapStepSourceEffect", "UntapSourceEffect"],
+                "ability_classes": ["SimpleActivatedAbility", "SimpleManaAbility", "SimpleStaticAbility"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "xmage_class_name": "BasaltMonolith",
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{3}"); '
+                    "this.addAbility(new SimpleStaticAbility(new DontUntapInControllersUntapStepSourceEffect())); "
+                    "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(3), new TapSourceCost())); "
+                    "this.addAbility(new SimpleActivatedAbility(new UntapSourceEffect(), new GenericManaCost(3)));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "three_colorless_monolith_mana_rock_v1")
+        self.assertEqual(primary["mana_produced"], 3)
+        self.assertEqual(primary["produces"], "C")
+        self.assertTrue(primary["does_not_untap_in_untap_step"])
+        self.assertEqual(primary["activated_untap_cost_generic"], 3)
 
     def test_izzet_signet_maps_to_exact_signet_filter_scope(self) -> None:
         result = hints.build_effect_hints(
@@ -634,6 +954,126 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["battle_model_scope"], "copy_target_permanent_v1")
         self.assertEqual(primary["copy_target_types"], ["permanent"])
         self.assertEqual(primary["target_controller"], "any")
+
+    def test_copy_enchantment_maps_to_permanent_copy_etb_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CopyEnchantment",
+                "effect_classes": ["CopyPermanentEffect"],
+                "ability_classes": ["EntersBattlefieldAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new EntersBattlefieldAbility("
+                    "new CopyPermanentEffect(StaticFilters.FILTER_PERMANENT_ENCHANTMENT), true));"
+                ),
+            },
+            "You may have this enchantment enter as a copy of an enchantment on the battlefield.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_permanent_etb")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_copy_target_permanent_with_optional_extra_type_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["enchantment"])
+        self.assertEqual(primary["target_controller"], "any")
+        self.assertNotIn("copy_additional_types", primary)
+
+    def test_phyrexian_metamorph_maps_to_permanent_copy_etb_scope_with_artifact_addition(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "PhyrexianMetamorph",
+                "effect_classes": ["CopyPermanentEffect"],
+                "ability_classes": ["EntersBattlefieldAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT", "CREATURE"]},
+                "raw_excerpt": (
+                    "new CopyPermanentEffect(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_CREATURE, applier)"
+                    " getText() { return \", except it's an artifact in addition to its other types\"; }"
+                ),
+            },
+            (
+                "You may have this creature enter as a copy of any artifact or creature on the battlefield, "
+                "except it's an artifact in addition to its other types."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_permanent_etb")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_copy_target_permanent_with_optional_extra_type_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["artifact", "creature"])
+        self.assertEqual(primary["copy_additional_types"], ["artifact"])
+        self.assertEqual(primary["target_controller"], "any")
+
+    def test_mockingbird_maps_to_copy_applier_modifier_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Mockingbird",
+                "effect_classes": ["CopyPermanentEffect", "MockingbirdEffect", "OneShotEffect"],
+                "ability_classes": ["EntersBattlefieldAbility", "FlyingAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "CopyPermanentEffect(filter, new CopyApplier() { "
+                    "blueprint.addSubType(SubType.BIRD); "
+                    "blueprint.getAbilities().add(FlyingAbility.getInstance());"
+                ),
+            },
+            (
+                "You may have Mockingbird enter the battlefield as a copy of any creature on the battlefield "
+                "with mana value less than or equal to the amount of mana spent to cast Mockingbird, "
+                "except it is a Bird in addition to its other types and has flying."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_permanent_etb")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["creature"])
+        self.assertEqual(primary["target_controller"], "any")
+        self.assertEqual(primary["copy_additional_subtypes"], ["Bird"])
+        self.assertEqual(primary["copy_granted_keywords"], ["flying"])
+        self.assertTrue(primary["copy_target_mana_value_lte_source_mana_value"])
+
+    def test_imposter_mech_maps_to_copy_applier_modifier_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ImposterMech",
+                "effect_classes": ["CopyPermanentEffect"],
+                "ability_classes": ["CrewAbility", "EntersBattlefieldAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "new CopyPermanentEffect(StaticFilters.FILTER_OPPONENTS_PERMANENT_A_CREATURE, applier) "
+                    "blueprint.removeAllCardTypes(); blueprint.addCardType(CardType.ARTIFACT); "
+                    "blueprint.addSubType(SubType.VEHICLE); blueprint.getAbilities().add(new CrewAbility(3));"
+                ),
+            },
+            (
+                "You may have Imposter Mech enter the battlefield as a copy of a creature an opponent controls, "
+                "except it's a Vehicle artifact with crew 3 and it loses all other card types."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_permanent_etb")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_copy_target_creature_with_copy_applier_modifiers_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["creature"])
+        self.assertEqual(primary["target_controller"], "opponent")
+        self.assertEqual(primary["copy_overwrite_types"], ["artifact"])
+        self.assertEqual(primary["copy_overwrite_subtypes"], ["Vehicle"])
+        self.assertEqual(primary["copy_vehicle_crew_value"], 3)
 
     def test_clone_legion_maps_to_copy_each_creature_target_player_controls(self) -> None:
         result = hints.build_effect_hints(
@@ -1071,6 +1511,58 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["token_power"], 0)
         self.assertEqual(primary["token_toughness"], 1)
         self.assertEqual(primary["token_colors"], ["G"])
+
+    def test_cryptolith_rite_maps_to_creatures_tap_any_color_static_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["GainAbilityControlledEffect"],
+                "ability_classes": ["AnyColorManaAbility", "SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new SimpleStaticAbility(new GainAbilityControlledEffect("
+                    "new AnyColorManaAbility(), Duration.WhileOnBattlefield, StaticFilters.FILTER_PERMANENT_CREATURES, false)));"
+                ),
+            },
+            'Each creature you control has "{T}: Add one mana of any color."',
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(primary["battle_model_scope"], "creatures_tap_any_color_static_enchantment_v1")
+        self.assertTrue(primary["creatures_tap_for_any_color"])
+
+    def test_enduring_vitality_maps_to_creature_tap_any_color_static_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["GainAbilityControlledEffect"],
+                "ability_classes": [
+                    "AnyColorManaAbility",
+                    "EnduringGlimmerTriggeredAbility",
+                    "SimpleStaticAbility",
+                    "VigilanceAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE", "ENCHANTMENT"]},
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT, CardType.CREATURE}, "{1}{G}{G}"); '
+                    "this.power = new MageInt(3); "
+                    "this.toughness = new MageInt(3); "
+                    "this.addAbility(VigilanceAbility.getInstance()); "
+                    "this.addAbility(new SimpleStaticAbility(new GainAbilityControlledEffect("
+                    "new AnyColorManaAbility(), Duration.WhileOnBattlefield, StaticFilters.FILTER_PERMANENT_CREATURES))); "
+                    "this.addAbility(new EnduringGlimmerTriggeredAbility());"
+                ),
+            },
+            'Vigilance. Each creature you control has "{T}: Add one mana of any color."',
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "vigilance_three_three_creatures_tap_any_color_v1")
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertTrue(primary["vigilance"])
+        self.assertTrue(primary["creatures_tap_for_any_color"])
+        self.assertEqual(primary["death_return_status"], "annotation_only")
 
     def test_magda_maps_to_exact_creature_scope(self) -> None:
         result = hints.build_effect_hints(
@@ -1644,6 +2136,383 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["activation_condition"], "opponent_controls_more_lands")
         self.assertEqual(primary["tutor_target"], "land")
 
+    def test_rhystic_study_maps_to_opponent_spell_tax_draw_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["OneShotEffect", "RhysticStudyDrawEffect"],
+                "ability_classes": ["SpellCastOpponentTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "xmage_class_name": "RhysticStudy",
+                "raw_excerpt": (
+                    "this.addAbility(new SpellCastOpponentTriggeredAbility("
+                    "Zone.BATTLEFIELD, new RhysticStudyDrawEffect(), StaticFilters.FILTER_SPELL_A, false, SetTargetPointer.PLAYER)); "
+                    'this.staticText = "you may draw a card unless that player pays {1}";'
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(primary["battle_model_scope"], "opponent_spell_pay_one_or_draw_engine_v1")
+        self.assertEqual(primary["trigger"], "opponent_spell")
+        self.assertEqual(primary["tax"], 1)
+        self.assertFalse(primary["draw_on_enter"])
+
+    def test_mystic_remora_maps_to_noncreature_tax_draw_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["MysticRemoraEffect", "OneShotEffect"],
+                "ability_classes": ["CumulativeUpkeepAbility", "MysticRemoraTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "xmage_class_name": "MysticRemora",
+                "raw_excerpt": (
+                    "this.addAbility(new CumulativeUpkeepAbility(new ManaCostsImpl<>(\"{1}\"))); "
+                    "Spell spell = game.getStack().getSpell(event.getTargetId()); "
+                    "if (spell != null && !spell.isCreature(game)) { "
+                    'this.staticText = "you may draw a card unless that player pays {4}"; }'
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponent_noncreature_spell_pay_four_draw_engine_with_cumulative_upkeep_v1",
+        )
+        self.assertEqual(primary["trigger"], "opponent_noncreature_spell")
+        self.assertEqual(primary["tax"], 4)
+        self.assertEqual(primary["cumulative_upkeep_generic"], 1)
+        self.assertFalse(primary["draw_on_enter"])
+
+    def test_crop_rotation_maps_to_sacrifice_land_ramp_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                "cost_classes": ["SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "xmage_class_name": "CropRotation",
+                "raw_excerpt": (
+                    "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_LAND)); "
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutInPlayEffect("
+                    "new TargetCardInLibrary(new FilterLandCard()), false, true));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "land_ramp")
+        self.assertEqual(primary["battle_model_scope"], "sacrifice_land_for_any_land_to_battlefield_untapped_v1")
+        self.assertTrue(primary["instant"])
+        self.assertTrue(primary["requires_sacrifice_land"])
+        self.assertFalse(primary["land_enters_tapped"])
+        self.assertEqual(primary["tutor_target"], "land")
+
+    def test_elvish_reclaimer_maps_to_land_tutor_growth_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["BoostSourceEffect", "ConditionalContinuousEffect", "SearchLibraryPutInPlayEffect"],
+                "ability_classes": ["SimpleActivatedAbility", "SimpleStaticAbility"],
+                "cost_classes": ["GenericManaCost", "SacrificeTargetCost", "TapSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "ElvishReclaimer",
+                "raw_excerpt": (
+                    "private static final Condition condition = new CardsInControllerGraveyardCondition(3, StaticFilters.FILTER_CARD_LAND); "
+                    "this.addAbility(new SimpleStaticAbility(new ConditionalContinuousEffect("
+                    "new BoostSourceEffect(2, 2, Duration.WhileOnBattlefield), condition, text))); "
+                    "Ability ability = new SimpleActivatedAbility(new SearchLibraryPutInPlayEffect("
+                    "new TargetCardInLibrary(StaticFilters.FILTER_CARD_LAND_A), true), new GenericManaCost(2)); "
+                    "ability.addCost(new TapSourceCost()); ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_LAND));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_land_tutor_with_land_sacrifice_and_graveyard_growth_v1",
+        )
+        self.assertTrue(primary["land_tutor_activated"])
+        self.assertEqual(primary["activation_cost_generic"], 2)
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertTrue(primary["requires_sacrifice_land"])
+        self.assertTrue(primary["land_enters_tapped"])
+        self.assertTrue(primary["plus_two_two_if_three_lands_in_your_graveyard"])
+
+    def test_chord_of_calling_maps_to_x_creature_tutor_to_battlefield_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryWithLessCMCPutInPlayEffect"],
+                "ability_classes": ["ConvokeAbility"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "xmage_class_name": "ChordOfCalling",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{X}{G}{G}{G}"); '
+                    "this.addAbility(new ConvokeAbility()); "
+                    "this.getSpellAbility().addEffect(new SearchLibraryWithLessCMCPutInPlayEffect(StaticFilters.FILTER_CARD_CREATURE));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "convoke_creature_tutor_to_battlefield_mana_value_x_or_less_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "creature_to_battlefield")
+        self.assertTrue(primary["target_mana_value_max_from_x"])
+        self.assertTrue(primary["convoke"])
+
+    def test_green_suns_zenith_maps_to_x_green_creature_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryWithLessCMCPutInPlayEffect", "ShuffleSpellEffect"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "xmage_class_name": "GreenSunsZenith",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{X}{G}"); '
+                    'private static final FilterCard filter = new FilterCard("green creature card"); '
+                    "filter.add(new ColorPredicate(ObjectColor.GREEN)); "
+                    "filter.add(CardType.CREATURE.getPredicate()); "
+                    "this.getSpellAbility().addEffect(new SearchLibraryWithLessCMCPutInPlayEffect(filter)); "
+                    "this.getSpellAbility().addEffect(ShuffleSpellEffect.getInstance());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "green_creature_tutor_to_battlefield_mana_value_x_or_less_then_shuffle_self_v1",
+        )
+        self.assertFalse(primary["instant"])
+        self.assertEqual(primary["target"], "green_creature_to_battlefield")
+        self.assertTrue(primary["target_mana_value_max_from_x"])
+        self.assertTrue(primary["shuffle_self_into_library_on_resolution"])
+
+    def test_whir_of_invention_maps_to_x_artifact_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryWithLessCMCPutInPlayEffect"],
+                "ability_classes": ["ImproviseAbility"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "xmage_class_name": "WhirOfInvention",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{X}{U}{U}{U}"); '
+                    "this.addAbility(new ImproviseAbility()); "
+                    "this.getSpellAbility().addEffect(new SearchLibraryWithLessCMCPutInPlayEffect(StaticFilters.FILTER_CARD_ARTIFACT));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "improvise_artifact_tutor_to_battlefield_mana_value_x_or_less_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "artifact_to_battlefield")
+        self.assertTrue(primary["target_mana_value_max_from_x"])
+        self.assertTrue(primary["improvise"])
+
+    def test_natures_rhythm_maps_to_x_creature_tutor_harmonize_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                "ability_classes": ["HarmonizeAbility"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "xmage_class_name": "NaturesRhythm",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{X}{G}{G}"); '
+                    'private static final FilterCard filter = new FilterCreatureCard("a creature card with mana value X or less"); '
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(filter))); "
+                    'this.addAbility(new HarmonizeAbility(this, "{X}{G}{G}{G}{G}")); '
+                    "return input.getObject().getManaValue() <= GetXValue.instance.calculate(game, input.getSource(), null);"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "creature_tutor_to_battlefield_mana_value_x_or_less_harmonize_v1",
+        )
+        self.assertFalse(primary["instant"])
+        self.assertEqual(primary["target"], "creature_to_battlefield")
+        self.assertTrue(primary["target_mana_value_max_from_x"])
+        self.assertTrue(primary["harmonize"])
+
+    def test_double_vision_maps_to_first_instant_sorcery_copy_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CopyTargetStackObjectEffect"],
+                "ability_classes": ["DoubleVisionCopyTriggeredAbility", "SpellCastControllerTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "xmage_class_name": "DoubleVision",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT}, "{3}{R}{R}"); '
+                    "this.addAbility(new DoubleVisionCopyTriggeredAbility()); "
+                    "new CopyTargetStackObjectEffect(true); "
+                    "isFirstInstantOrSorceryCastByPlayerOnTurn(spell, game);"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "copy_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "first_instant_sorcery_cast_each_turn_copy_own_spell_v1",
+        )
+        self.assertEqual(primary["trigger"], "instant_sorcery_cast")
+        self.assertEqual(primary["trigger_effect"], "copy_spell")
+        self.assertEqual(primary["target"], "own_instant_or_sorcery_on_stack")
+        self.assertTrue(primary["may_choose_new_targets"])
+        self.assertEqual(primary["choose_new_targets_status"], "may")
+        self.assertTrue(primary["trigger_first_instant_or_sorcery_each_turn"])
+
+    def test_swarm_intelligence_maps_to_instant_sorcery_copy_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CopyTargetStackObjectEffect"],
+                "ability_classes": ["SpellCastControllerTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "xmage_class_name": "SwarmIntelligence",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT}, "{6}{U}"); '
+                    "this.addAbility(new SpellCastControllerTriggeredAbility("
+                    "new CopyTargetStackObjectEffect(true).setText(\"you may copy that spell. You may choose new targets for the copy\"), "
+                    "new FilterInstantOrSorcerySpell(\"an instant or sorcery spell\"), true, SetTargetPointer.SPELL));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "copy_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "instant_sorcery_cast_copy_own_spell_v1",
+        )
+        self.assertEqual(primary["trigger"], "instant_sorcery_cast")
+        self.assertEqual(primary["trigger_effect"], "copy_spell")
+        self.assertEqual(primary["target"], "own_instant_or_sorcery_on_stack")
+        self.assertTrue(primary["may_choose_new_targets"])
+        self.assertEqual(primary["choose_new_targets_status"], "may")
+        self.assertFalse(primary.get("trigger_first_instant_or_sorcery_each_turn", False))
+
+    def test_candelabra_of_tawnos_maps_to_x_untap_lands_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["UntapTargetEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "xmage_class_name": "CandelabraOfTawnos",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{1}"); '
+                    'Effect effect = new UntapTargetEffect(); effect.setText("untap X target lands"); '
+                    'Ability ability = new SimpleActivatedAbility(effect, new ManaCostsImpl<>("{X}")); '
+                    "ability.addCost(new TapSourceCost()); ability.setTargetAdjuster(new XTargetsCountAdjuster());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "untap_land_engine")
+        self.assertEqual(primary["battle_model_scope"], "x_tap_untap_x_lands_v1")
+        self.assertTrue(primary["activated_untap_lands_for_mana_unlock"])
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertTrue(primary["activation_cost_generic_from_x"])
+        self.assertTrue(primary["untap_target_land_count_from_x"])
+        self.assertEqual(primary["untap_target_land_restriction"], "land")
+
+    def test_earthcraft_maps_to_tap_creature_untap_basic_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["UntapTargetEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["TapTargetCost"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "xmage_class_name": "Earthcraft",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT}, "{1}{G}"); '
+                    'new SimpleActivatedAbility(new UntapTargetEffect(), '
+                    'new TapTargetCost(new TargetControlledPermanent(StaticFilters.FILTER_CONTROLLED_UNTAPPED_CREATURE))); '
+                    'private static final FilterPermanent filterLand = new FilterLandPermanent("basic land");'
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "untap_land_engine")
+        self.assertEqual(primary["battle_model_scope"], "tap_untapped_creature_untap_target_basic_land_v1")
+        self.assertTrue(primary["activated_untap_lands_for_mana_unlock"])
+        self.assertTrue(primary["activation_taps_untapped_creature_you_control"])
+        self.assertEqual(primary["untap_target_land_count"], 1)
+        self.assertEqual(primary["untap_target_land_restriction"], "land")
+        self.assertTrue(primary["untap_target_land_basic_only"])
+
+    def test_magus_of_the_candelabra_maps_to_creature_x_untap_lands_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["UntapTargetEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "MagusOfTheCandelabra",
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{G}"); '
+                    "this.power = new MageInt(1); this.toughness = new MageInt(2); "
+                    'Effect effect = new UntapTargetEffect(); effect.setText("untap X target lands"); '
+                    'Ability ability = new SimpleActivatedAbility(effect, new ManaCostsImpl<>("{X}")); '
+                    "ability.addCost(new TapSourceCost()); ability.setTargetAdjuster(new XTargetsCountAdjuster());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "untap_land_engine")
+        self.assertEqual(primary["battle_model_scope"], "creature_x_tap_untap_x_lands_v1")
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 2)
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertTrue(primary["activation_cost_generic_from_x"])
+        self.assertTrue(primary["untap_target_land_count_from_x"])
+
+    def test_oboro_breezecaller_maps_to_return_land_untap_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["UntapTargetEffect"],
+                "ability_classes": ["FlyingAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["GenericManaCost", "ReturnToHandChosenControlledPermanentCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "OboroBreezecaller",
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{1}{U}"); '
+                    "this.addAbility(FlyingAbility.getInstance()); "
+                    "Ability ability = new SimpleActivatedAbility(new UntapTargetEffect(), new GenericManaCost(2)); "
+                    "ability.addCost(new ReturnToHandChosenControlledPermanentCost(new TargetControlledPermanent(filter))); "
+                    "ability.addTarget(new TargetLandPermanent());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "untap_land_engine")
+        self.assertEqual(primary["battle_model_scope"], "pay_two_return_land_untap_target_land_v1")
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["activation_cost_generic"], 2)
+        self.assertTrue(primary["activation_returns_land_to_hand"])
+        self.assertEqual(primary["untap_target_land_count"], 1)
+
     def test_final_fortune_maps_to_single_extra_turn_then_lose_game_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -2087,6 +2956,123 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["toughness"], 6)
         self.assertTrue(primary["flying"])
         self.assertEqual(primary["opponent_draws_card_may_draw"], 2)
+
+    def test_fate_unraveler_maps_to_exact_opponent_draw_punisher_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DamageTargetEffect"],
+                "ability_classes": ["DrawCardOpponentTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT", "CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(3); this.toughness = new MageInt(4); "
+                    "this.addAbility(new DrawCardOpponentTriggeredAbility(new DamageTargetEffect(1).withTargetDescription(\"that player\"), false, true));"
+                ),
+                "oracle_text": "Whenever an opponent draws a card, Fate Unraveler deals 1 damage to that player.",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponent_draws_card_damage_that_player_v1",
+        )
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertEqual(primary["trigger"], "opponent_draw")
+        self.assertEqual(primary["opponent_draw_damage_per_card"], 1)
+
+    def test_underworld_dreams_maps_to_exact_opponent_draw_punisher_passive_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DamageTargetEffect"],
+                "ability_classes": ["DrawCardOpponentTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new DrawCardOpponentTriggeredAbility(new DamageTargetEffect(1).withTargetDescription(\"that player\"), false, true));"
+                ),
+                "oracle_text": "Whenever an opponent draws a card, Underworld Dreams deals 1 damage to that player.",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponent_draws_card_damage_that_player_v1",
+        )
+        self.assertEqual(primary["trigger"], "opponent_draw")
+        self.assertEqual(primary["opponent_draw_damage_per_card"], 1)
+
+    def test_geths_grimoire_maps_to_exact_opponent_discard_draw_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "GethsGrimoire",
+                "effect_classes": ["DrawCardSourceControllerEffect"],
+                "ability_classes": ["DiscardsACardOpponentTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "Effect drawTrigger = new DrawCardSourceControllerEffect(1); "
+                    "drawTrigger.setText(\"you may draw a card.\"); "
+                    "this.addAbility(new DiscardsACardOpponentTriggeredAbility(drawTrigger, true));"
+                ),
+            },
+            "Whenever an opponent discards a card, you may draw a card.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(primary["battle_model_scope"], "opponent_discards_card_may_draw_v1")
+        self.assertEqual(primary["trigger"], "opponent_discard")
+        self.assertEqual(primary["opponent_discard_draw_per_card"], 1)
+        self.assertFalse(primary["draw_on_enter"])
+
+    def test_megrim_maps_to_exact_opponent_discard_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Megrim",
+                "effect_classes": ["DamageTargetEffect"],
+                "ability_classes": ["DiscardsACardOpponentTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new DiscardsACardOpponentTriggeredAbility("
+                    "new DamageTargetEffect(2).withTargetDescription(\"that player\"), false, SetTargetPointer.PLAYER));"
+                ),
+            },
+            "Whenever an opponent discards a card, Megrim deals 2 damage to that player.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(primary["battle_model_scope"], "opponent_discards_card_damage_that_player_v1")
+        self.assertEqual(primary["trigger"], "opponent_discard")
+        self.assertEqual(primary["opponent_discard_damage_per_card"], 2)
+
+    def test_feast_of_sanity_maps_to_exact_controller_discard_damage_and_lifegain_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "FeastOfSanity",
+                "effect_classes": ["DamageTargetEffect", "GainLifeEffect"],
+                "ability_classes": ["DiscardCardControllerTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "Ability ability = new DiscardCardControllerTriggeredAbility(new DamageTargetEffect(1), false); "
+                    "ability.addEffect(new GainLifeEffect(1).concatBy(\"and\")); "
+                    "ability.addTarget(new TargetAnyTarget());"
+                ),
+            },
+            "Whenever you discard a card, Feast of Sanity deals 1 damage to any target and you gain 1 life.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controller_discards_card_damage_any_target_and_gain_life_v1",
+        )
+        self.assertEqual(primary["trigger"], "controller_discard")
+        self.assertEqual(primary["controller_discard_damage_any_target"], 1)
+        self.assertEqual(primary["controller_discard_gain_life"], 1)
 
     def test_faerie_mastermind_maps_to_exact_draw_trigger_creature_scope(self) -> None:
         result = hints.build_effect_hints(

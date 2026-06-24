@@ -1,0 +1,16 @@
+Pager usage is off.
+             check_name             |                  id                  |                           name                            |              archetype              | deck_card_rows | deck_qty | commander_qty 
+------------------------------------+--------------------------------------+-----------------------------------------------------------+-------------------------------------+----------------+----------+---------------
+ pg_kaalia_variant01_postcheck_deck | b629f227-b2b2-5e71-9854-99d345a8e01c | PG REGISTERED Kaalia Variant 01 - Rafael Paste 2026-06-24 | mardu-cheat-equipment-combo-variant |             89 |      100 |             1
+(1 row)
+
+              check_name               |                  id                  |   commander_name   |         source_system         |               source_ref               | card_count |              legal_status               | is_active | promoted_at 
+---------------------------------------+--------------------------------------+--------------------+-------------------------------+----------------------------------------+------------+-----------------------------------------+-----------+-------------
+ pg_kaalia_variant01_postcheck_learned | cb2e2acf-933c-5a01-8fab-5bad84122211 | Kaalia of the Vast | manual_user_deck_registration | kaalia_variant01_20260624_b895928feb6f |        100 | registered_pending_card_rule_validation | f         | 
+(1 row)
+
+                    check_name                    | missing_rows 
+--------------------------------------------------+--------------
+ pg_kaalia_variant01_postcheck_missing_deck_cards |            0
+(1 row)
+

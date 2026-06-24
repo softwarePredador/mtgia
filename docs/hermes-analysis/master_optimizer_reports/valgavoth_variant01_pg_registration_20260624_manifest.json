@@ -1,0 +1,25 @@
+{
+  "archetype": "rakdos-pain-punisher-variant",
+  "artifacts": {
+    "apply_sql": "docs/hermes-analysis/master_optimizer_reports/valgavoth_variant01_pg_registration_20260624_apply.sql",
+    "postcheck_sql": "docs/hermes-analysis/master_optimizer_reports/valgavoth_variant01_pg_registration_20260624_postcheck.sql",
+    "precheck_sql": "docs/hermes-analysis/master_optimizer_reports/valgavoth_variant01_pg_registration_20260624_precheck.sql",
+    "resolution_json": "docs/hermes-analysis/master_optimizer_reports/valgavoth_variant01_resolution_20260624.json",
+    "rollback_sql": "docs/hermes-analysis/master_optimizer_reports/valgavoth_variant01_pg_registration_20260624_rollback.sql"
+  },
+  "commander": "Valgavoth, Harrower of Souls",
+  "deck_hash": "b037751a69fa297355b67d7d3efac90cbeb3117303e9d9af1cbe2945e53b205f",
+  "generated_at": "2026-06-24",
+  "hermes_deck_id": 618,
+  "input_qty": 100,
+  "input_rows": 87,
+  "missing_rows": 0,
+  "pg_deck_id": "c77cb83c-dd28-5d66-a0d8-799079a848bb",
+  "pg_learned_id": "acdbd53f-f1a9-5c78-823e-3127d92c8b02",
+  "resolved_rows": 87,
+  "scope": "non-Lorehold deck intake only; no deck swap; learned deck inactive",
+  "source_decklist": "docs/hermes-analysis/manaloom-knowledge/decks/valgavoth-harrower-of-souls/2026-06-24-variant-01-user-decklist.md",
+  "source_ref": "valgavoth_variant01_20260624_b037751a69fa",
+  "source_system": "manual_user_deck_registration",
+  "variant": "valgavoth_variant01"
+}

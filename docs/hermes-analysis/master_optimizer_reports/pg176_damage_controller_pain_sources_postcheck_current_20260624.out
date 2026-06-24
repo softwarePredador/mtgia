@@ -1,0 +1,7 @@
+       card_name       |    normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+-----------------------+-----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Elves of Deep Shadow  | elves of deep shadow  | battle_rule_v1:1272fb910383d34360702e343ec16b37 |                  1 |                           1 |                         1 |           6
+ Talisman of Curiosity | talisman of curiosity | battle_rule_v1:c4df4800bcf67bfd2ded6ea1fc6a8efa |                  1 |                           1 |                         1 |           6
+ Tarnished Citadel     | tarnished citadel     | battle_rule_v1:d5663032352408a845b7602f9cb5adf9 |                  1 |                           1 |                         1 |           6
+(3 rows)
+

@@ -44,6 +44,7 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "graveyard_flashback_grant" in audit.SUPPORTED_EFFECTS
     assert "hand_filter" in audit.SUPPORTED_EFFECTS
     assert "copy_creature_token" in audit.SUPPORTED_EFFECTS
+    assert "copy_permanent_etb" in audit.SUPPORTED_EFFECTS
     assert "create_treasure" in audit.SUPPORTED_EFFECTS
     assert "land_tax" in audit.SUPPORTED_EFFECTS
     assert "equipment_static_attachment" in audit.SUPPORTED_EFFECTS
@@ -143,24 +144,6 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     assert sacrifice["_rule_source"] == "manual_runtime_waiver"
     assert sacrifice["_rule_review_status"] == "verified"
     assert sacrifice["_rule_logical_key"].startswith("battle_rule_v1:")
-
-    infernal_plunge = battle.get_card_effect(
-        {
-            "name": "Infernal Plunge",
-            "type_line": "Sorcery",
-            "oracle_text": (
-                "As an additional cost to cast this spell, sacrifice a creature. "
-                "Add RRR."
-            ),
-            "functional_tags_json": '["ramp"]',
-        }
-    )
-    assert infernal_plunge["effect"] == "ramp_ritual"
-    assert infernal_plunge["requires_sacrifice_creature"] is True
-    assert infernal_plunge["mana_produced"] == 3
-    assert infernal_plunge["_rule_source"] == "manual_runtime_waiver"
-    assert infernal_plunge["_rule_review_status"] == "verified"
-    assert infernal_plunge["_rule_logical_key"].startswith("battle_rule_v1:")
 
     geosurge = battle.get_card_effect(
         {
@@ -287,6 +270,32 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     assert neoform["requires_sacrifice_creature"] is True
     assert neoform["destination"] == "battlefield"
     assert neoform["_rule_source"] == "manual_runtime_waiver"
+
+
+def test_promoted_infernal_plunge_uses_curated_pg_rule_not_functional_tags():
+    infernal_plunge = battle.get_card_effect(
+        {
+            "name": "Infernal Plunge",
+            "type_line": "Sorcery",
+            "oracle_text": (
+                "As an additional cost to cast this spell, sacrifice a creature. "
+                "Add RRR."
+            ),
+            "functional_tags_json": '["ramp"]',
+        }
+    )
+    assert infernal_plunge["effect"] == "ramp_ritual"
+    assert infernal_plunge["requires_sacrifice_creature"] is True
+    assert infernal_plunge["mana_produced"] == 3
+    assert infernal_plunge["battle_model_scope"] == "sacrifice_creature_add_three_red_mana_ritual_v1"
+    assert infernal_plunge["_rule_source"] == "curated"
+    assert infernal_plunge["_rule_review_status"] == "verified"
+    assert infernal_plunge["_rule_execution_status"] == "auto"
+    assert (
+        infernal_plunge["_rule_logical_key"]
+        == "battle_rule_v1:6c79ee0d7eda6f8a02666036cad990fa"
+    )
+    assert infernal_plunge["_rule_oracle_hash"] == "ffe4781c7469d289573ea15e0e5adbd1"
 
 
 def test_sacrifice_waiver_uses_sacrificed_creature_mana_value():
@@ -842,6 +851,7 @@ if __name__ == "__main__":
         test_supported_effects_cover_live_engine_handlers,
         test_rise_of_the_eldrazi_uses_composite_oracle_runtime,
         test_manual_runtime_waiver_cards_do_not_use_functional_tags,
+        test_promoted_infernal_plunge_uses_curated_pg_rule_not_functional_tags,
         test_sacrifice_waiver_uses_sacrificed_creature_mana_value,
         test_forensic_accepts_manual_runtime_waiver_over_stale_registry_rule,
         test_aura_of_silence_promoted_rule_has_identity_for_forensic,

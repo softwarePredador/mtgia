@@ -1,0 +1,8 @@
+    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+------------------+------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Crop Rotation    | crop rotation    | 67869230ccb8b4499893e14915ca8b14 | battle_rule_v1:bdce68609ebf3349f35a5e81b6bb2e22 |                1 | cc63576d-6d84-4933-95f4-bee29ac47835 |                  3 |                         0 |                           3
+ Elvish Reclaimer | elvish reclaimer | dfd0be9a38fadd0931f1c0f6f06aba74 | battle_rule_v1:a702be88d777164eaa496746ae78bae2 |                1 | a814c523-65f7-43a8-b793-7385cb6a0b7d |                  2 |                         0 |                           2
+ Mystic Remora    | mystic remora    | 05eb27f7618511c39512cf5a6d93231d | battle_rule_v1:91908863a3c983e6d30a2ff99cf41fdb |                1 | cb09f65c-445e-4757-a08a-5ff8d9435e01 |                  2 |                         0 |                           2
+ Rhystic Study    | rhystic study    | f745d1b0ae8acc8c593efb5b3e36ae97 | battle_rule_v1:79b27c9590580c68ac39779ee48644e9 |                1 | 22f842b3-b07a-43de-ab2e-38177f81c442 |                  2 |                         0 |                           2
+(4 rows)
+
