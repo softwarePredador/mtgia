@@ -6788,19 +6788,21 @@
     "battle_rule_logical_key": "battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954"
   },
   "Deathrite Shaman": {
+    "ability_kind": "activated",
+    "battle_model_scope": "graveyard_exile_mana_or_life_shaman_v1",
+    "black_tap_exile_instant_or_sorcery_from_graveyard_each_opponent_loses_life": 2,
     "effect": "creature",
-    "is_creature_permanent": true,
-    "is_mana_source": true,
-    "mana_produced": 1,
+    "green_tap_exile_creature_from_graveyard_gain_life": 2,
     "power": 1,
-    "produces": "WUBRG",
+    "tap_exile_land_from_graveyard_add_one_mana_any_color": true,
     "toughness": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6a8e3e2e2cf6972d52b2c736b35cb2fb"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8639d78d048c4d0e7764dde65cbeac26",
+    "battle_rule_oracle_hash": "cd21617578372b91f014529b4dc88d7d"
   },
   "Decanter of Endless Water": {
     "cmc": 3.0,
@@ -20247,19 +20249,21 @@
     "battle_rule_logical_key": "battle_rule_v1:40ba2c9d0af48e10e62fd480d18fdb43"
   },
   "Orcish Bowmasters": {
+    "ability_kind": "triggered",
+    "amass_orcs": 1,
+    "battle_model_scope": "flash_etb_or_opponent_extra_draw_damage_any_target_amass_orcs_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
-    "keywords": [
-      "flash"
-    ],
+    "etb_or_opponent_extra_draw_damage_any_target": 1,
+    "flash": true,
     "power": 1,
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:336760c00204aede5abe25c754145627"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:be12835f3e35436f0165be1b72332b80",
+    "battle_rule_oracle_hash": "d4bad6405b84c07af1e2cfc69adbb695"
   },
   "Orim's Chant": {
     "battle_model_scope": "orims_chant_kicker_attack_prevention_v1",

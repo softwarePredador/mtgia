@@ -561,6 +561,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("opponent_search_library_add_counter_and_draw"))
         )
 
+    if effect == "creature" and scope == "flash_etb_or_opponent_extra_draw_damage_any_target_amass_orcs_v1":
+        return (
+            types == {"CREATURE"}
+            and {"DamageTargetEffect", "AmassEffect"}.issubset(effect_classes)
+            and {"FlashAbility", "OrTriggeredAbility", "EntersBattlefieldTriggeredAbility", "OpponentDrawCardExceptFirstCardDrawStepTriggeredAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("flash"))
+            and int(effect_json.get("etb_or_opponent_extra_draw_damage_any_target") or 0) == 1
+            and int(effect_json.get("amass_orcs") or 0) == 1
+        )
+
     if effect == "creature" and scope == "flash_cant_be_countered_cast_spell_bounce_spell_or_nonland_v1":
         return (
             types == {"CREATURE"}
@@ -572,6 +584,19 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("cant_be_countered"))
             and bool(effect_json.get("cast_spell_trigger_bounce_spell_you_dont_control"))
             and bool(effect_json.get("cast_spell_trigger_bounce_nonland_permanent"))
+        )
+
+    if effect == "creature" and scope == "graveyard_exile_mana_or_life_shaman_v1":
+        return (
+            types == {"CREATURE"}
+            and {"ExileTargetEffect", "AddManaOfAnyColorEffect", "LoseLifeOpponentsEffect", "GainLifeEffect"}.issubset(effect_classes)
+            and ability_classes == {"SimpleActivatedAbility"}
+            and "TapSourceCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 2
+            and bool(effect_json.get("tap_exile_land_from_graveyard_add_one_mana_any_color"))
+            and int(effect_json.get("black_tap_exile_instant_or_sorcery_from_graveyard_each_opponent_loses_life") or 0) == 2
+            and int(effect_json.get("green_tap_exile_creature_from_graveyard_gain_life") or 0) == 2
         )
 
     if effect == "draw_cards" and scope == "draw_one_and_source_controller_spells_gain_flash_until_eot_v1":

@@ -846,6 +846,49 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_orcish_bowmasters_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Orcish Bowmasters",
+                        "severity": "high",
+                        "oracle_hash": "orcishhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "OrcishBowmasters",
+                            "path": "/xmage/OrcishBowmasters.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DamageTargetEffect", "AmassEffect"],
+                            "ability_classes": [
+                                "FlashAbility",
+                                "OrTriggeredAbility",
+                                "EntersBattlefieldTriggeredAbility",
+                                "OpponentDrawCardExceptFirstCardDrawStepTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "flash_etb_or_opponent_extra_draw_damage_any_target_amass_orcs_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "flash": True,
+                                "etb_or_opponent_extra_draw_damage_any_target": 1,
+                                "amass_orcs": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_hullbreaker_horror_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -879,6 +922,49 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "cant_be_countered": True,
                                 "cast_spell_trigger_bounce_spell_you_dont_control": True,
                                 "cast_spell_trigger_bounce_nonland_permanent": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_deathrite_shaman_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Deathrite Shaman",
+                        "severity": "high",
+                        "oracle_hash": "deathritehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "DeathriteShaman",
+                            "path": "/xmage/DeathriteShaman.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "ExileTargetEffect",
+                                "AddManaOfAnyColorEffect",
+                                "LoseLifeOpponentsEffect",
+                                "GainLifeEffect",
+                            ],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "graveyard_exile_mana_or_life_shaman_v1",
+                                "power": 1,
+                                "toughness": 2,
+                                "tap_exile_land_from_graveyard_add_one_mana_any_color": True,
+                                "black_tap_exile_instant_or_sorcery_from_graveyard_each_opponent_loses_life": 2,
+                                "green_tap_exile_creature_from_graveyard_gain_life": 2,
                             },
                         },
                     }

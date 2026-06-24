@@ -766,6 +766,30 @@ def _build_creature_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and {"DamageTargetEffect", "AmassEffect"}.issubset(effect_classes)
+        and {"FlashAbility", "OrTriggeredAbility", "EntersBattlefieldTriggeredAbility", "OpponentDrawCardExceptFirstCardDrawStepTriggeredAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "flash_etb_or_opponent_extra_draw_damage_any_target_amass_orcs_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "flash": True,
+                "etb_or_opponent_extra_draw_damage_any_target": 1,
+                "amass_orcs": 1,
+            },
+            "reason": "XMage structure matches Orcish Bowmasters flashing in and triggering on ETB or opponents' extra draws to deal 1 damage to any target and amass Orcs 1.",
+            "signals": [
+                "OrTriggeredAbility",
+                "OpponentDrawCardExceptFirstCardDrawStepTriggeredAbility",
+                "DamageTargetEffect",
+                "AmassEffect",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and effect_classes == {"ReturnToHandTargetEffect"}
         and {"CantBeCounteredSourceAbility", "FlashAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
     ):
@@ -785,6 +809,31 @@ def _build_creature_variant_fields(
                 "SpellCastControllerTriggeredAbility",
                 "ReturnToHandTargetEffect",
                 "CantBeCounteredSourceAbility",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and {"ExileTargetEffect", "AddManaOfAnyColorEffect", "LoseLifeOpponentsEffect", "GainLifeEffect"}.issubset(effect_classes)
+        and ability_classes == {"SimpleActivatedAbility"}
+        and "TapSourceCost" in cost_classes
+    ):
+        return {
+            "effect": "creature",
+            "scope": "graveyard_exile_mana_or_life_shaman_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 2,
+                "tap_exile_land_from_graveyard_add_one_mana_any_color": True,
+                "black_tap_exile_instant_or_sorcery_from_graveyard_each_opponent_loses_life": 2,
+                "green_tap_exile_creature_from_graveyard_gain_life": 2,
+            },
+            "reason": "XMage structure matches Deathrite Shaman's three graveyard-exile activated abilities for mana, opponent life loss, and life gain.",
+            "signals": [
+                "ExileTargetEffect",
+                "AddManaOfAnyColorEffect",
+                "LoseLifeOpponentsEffect",
+                "GainLifeEffect",
             ],
         }
 

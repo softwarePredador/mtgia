@@ -876,6 +876,40 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["etb_draw_half_x_rounded_down"])
         self.assertTrue(primary["opponent_search_library_add_counter_and_draw"])
 
+    def test_orcish_bowmasters_maps_to_exact_etb_or_extra_draw_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DamageTargetEffect", "AmassEffect"],
+                "ability_classes": [
+                    "FlashAbility",
+                    "OrTriggeredAbility",
+                    "EntersBattlefieldTriggeredAbility",
+                    "OpponentDrawCardExceptFirstCardDrawStepTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(1); this.toughness = new MageInt(1); "
+                    "this.addAbility(FlashAbility.getInstance()); "
+                    "new OrTriggeredAbility(Zone.BATTLEFIELD, new DamageTargetEffect(1, \"{this}\"), "
+                    "new EntersBattlefieldTriggeredAbility(null, false), "
+                    "new OpponentDrawCardExceptFirstCardDrawStepTriggeredAbility(Zone.BATTLEFIELD, null, false)); "
+                    "Effect amass = new AmassEffect(1, SubType.ORC);"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "flash_etb_or_opponent_extra_draw_damage_any_target_amass_orcs_v1",
+        )
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["flash"])
+        self.assertEqual(primary["etb_or_opponent_extra_draw_damage_any_target"], 1)
+        self.assertEqual(primary["amass_orcs"], 1)
+
     def test_hullbreaker_horror_maps_to_exact_cast_spell_bounce_creature_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -907,6 +941,40 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["cant_be_countered"])
         self.assertTrue(primary["cast_spell_trigger_bounce_spell_you_dont_control"])
         self.assertTrue(primary["cast_spell_trigger_bounce_nonland_permanent"])
+
+    def test_deathrite_shaman_maps_to_exact_graveyard_mode_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "ExileTargetEffect",
+                    "AddManaOfAnyColorEffect",
+                    "LoseLifeOpponentsEffect",
+                    "GainLifeEffect",
+                ],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(1); this.toughness = new MageInt(2); "
+                    "Ability ability = new SimpleActivatedAbility(new ExileTargetEffect(), new TapSourceCost()); "
+                    "ability.addEffect(new AddManaOfAnyColorEffect(1, new LimitedDynamicValue(1, new CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_LAND)), false)); "
+                    "ability = new SimpleActivatedAbility(new ExileTargetEffect(), new ManaCostsImpl<>(\"{B}\")); ability.addCost(new TapSourceCost()); ability.addEffect(new LoseLifeOpponentsEffect(2)); "
+                    "ability = new SimpleActivatedAbility(new ExileTargetEffect(), new ManaCostsImpl<>(\"{G}\")); ability.addCost(new TapSourceCost()); ability.addEffect(new GainLifeEffect(2));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "graveyard_exile_mana_or_life_shaman_v1",
+        )
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 2)
+        self.assertTrue(primary["tap_exile_land_from_graveyard_add_one_mana_any_color"])
+        self.assertEqual(primary["black_tap_exile_instant_or_sorcery_from_graveyard_each_opponent_loses_life"], 2)
+        self.assertEqual(primary["green_tap_exile_creature_from_graveyard_gain_life"], 2)
 
     def test_nezahal_maps_to_exact_static_draw_blink_creature_scope(self) -> None:
         result = hints.build_effect_hints(
