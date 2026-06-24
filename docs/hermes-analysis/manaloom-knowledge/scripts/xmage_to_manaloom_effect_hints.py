@@ -1502,6 +1502,63 @@ def _build_rishkar_fields(
     }
 
 
+def _build_insidious_roots_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"ENCHANTMENT"}:
+        return None
+    if not {
+        "AddCountersAllEffect",
+        "CreateTokenEffect",
+        "GainAbilityControlledEffect",
+    }.issubset(effect_classes):
+        return None
+    if not {"CardsLeaveGraveyardTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes):
+        return None
+    normalized_text = _normalized_rules_text(rules_text)
+    if not (
+        _oracle_has(
+            rules_text,
+            'creature tokens you control have "{t}: add one mana of any color."',
+            "whenever one or more creature cards leave your graveyard, create a 0/1 green plant creature token, then put a +1/+1 counter on each plant you control.",
+        )
+        or (
+            "anycolormanaability" in normalized_text
+            and "planttoken" in normalized_text
+            and "cardsleavegraveyardtriggeredability" in normalized_text
+        )
+    ):
+        return None
+    return {
+        "effect": "passive",
+        "scope": "creature_tokens_tap_any_color_creature_graveyard_plant_growth_v1",
+        "fields": {
+            "creature_tokens_tap_for_any_color": True,
+            "creature_cards_leave_your_graveyard_create_plant_token": True,
+            "plant_tokens_get_plus_one_counter_on_creature_graveyard_exit": True,
+            "trigger_once_each_graveyard_exit_event": True,
+            "token_name": "Plant Token",
+            "token_subtype": "Plant",
+            "token_power": 0,
+            "token_toughness": 1,
+            "token_colors": ["G"],
+        },
+        "reason": (
+            "XMage structure matches Insidious Roots granting creature tokens an any-color mana tap ability "
+            "plus the one-or-more creature cards leave your graveyard trigger that creates a Plant and grows all Plants."
+        ),
+        "signals": [
+            "AnyColorManaAbility",
+            "CardsLeaveGraveyardTriggeredAbility",
+            "PlantToken",
+        ],
+    }
+
+
 def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> dict[str, Any]:
     """Return conservative ManaLoom hints for one parsed XMage card entry."""
 
@@ -1714,6 +1771,25 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(rishkar_fields["fields"]),
                 matched_signals=list(rishkar_fields["signals"]),
+            )
+        )
+
+    insidious_roots_fields = _build_insidious_roots_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if insidious_roots_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(insidious_roots_fields["effect"]),
+                scope=str(insidious_roots_fields["scope"]),
+                reason=str(insidious_roots_fields["reason"]),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(insidious_roots_fields["fields"]),
+                matched_signals=list(insidious_roots_fields["signals"]),
             )
         )
 

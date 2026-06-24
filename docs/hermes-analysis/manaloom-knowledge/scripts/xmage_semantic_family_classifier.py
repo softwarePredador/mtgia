@@ -1043,6 +1043,22 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("creature_exile_reflexive_plus_one_counter"))
         )
 
+    if effect == "passive" and scope == "creature_tokens_tap_any_color_creature_graveyard_plant_growth_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {"AddCountersAllEffect", "CreateTokenEffect", "GainAbilityControlledEffect"}.issubset(effect_classes)
+            and {"CardsLeaveGraveyardTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and bool(effect_json.get("creature_tokens_tap_for_any_color"))
+            and bool(effect_json.get("creature_cards_leave_your_graveyard_create_plant_token"))
+            and bool(effect_json.get("plant_tokens_get_plus_one_counter_on_creature_graveyard_exit"))
+            and bool(effect_json.get("trigger_once_each_graveyard_exit_event"))
+            and effect_json.get("token_name") == "Plant Token"
+            and effect_json.get("token_subtype") == "Plant"
+            and int(effect_json.get("token_power") or 0) == 0
+            and int(effect_json.get("token_toughness") or 0) == 1
+            and effect_json.get("token_colors") == ["G"]
+        )
+
     if effect == "draw_engine" and scope == "skip_draw_discard_exile_pay_life_face_down_draw_next_end_step_v1":
         return (
             types == {"ENCHANTMENT"}

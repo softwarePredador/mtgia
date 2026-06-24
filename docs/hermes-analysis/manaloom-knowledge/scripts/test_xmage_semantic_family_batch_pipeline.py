@@ -1580,6 +1580,56 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_insidious_roots_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Insidious Roots",
+                        "severity": "high",
+                        "oracle_hash": "insidioushash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "InsidiousRoots",
+                            "path": "/xmage/InsidiousRoots.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": [
+                                "AddCountersAllEffect",
+                                "CreateTokenEffect",
+                                "GainAbilityControlledEffect",
+                            ],
+                            "ability_classes": [
+                                "CardsLeaveGraveyardTriggeredAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "creature_tokens_tap_any_color_creature_graveyard_plant_growth_v1",
+                                "creature_tokens_tap_for_any_color": True,
+                                "creature_cards_leave_your_graveyard_create_plant_token": True,
+                                "plant_tokens_get_plus_one_counter_on_creature_graveyard_exit": True,
+                                "trigger_once_each_graveyard_exit_event": True,
+                                "token_name": "Plant Token",
+                                "token_subtype": "Plant",
+                                "token_power": 0,
+                                "token_toughness": 1,
+                                "token_colors": ["G"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "passive")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_colossal_skyturtle_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

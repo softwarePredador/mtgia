@@ -14731,13 +14731,27 @@
     "battle_rule_logical_key": "battle_rule_v1:9e4cddb49b589bfb70207c13d1cf9a40"
   },
   "Insidious Roots": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "creature_tokens_tap_any_color_creature_graveyard_plant_growth_v1",
+    "creature_cards_leave_your_graveyard_create_plant_token": true,
+    "creature_tokens_tap_for_any_color": true,
     "effect": "passive",
+    "plant_tokens_get_plus_one_counter_on_creature_graveyard_exit": true,
+    "token_colors": [
+      "G"
+    ],
+    "token_name": "Plant Token",
+    "token_power": 0,
+    "token_subtype": "Plant",
+    "token_toughness": 1,
+    "trigger_once_each_graveyard_exit_event": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b1b7855a7ce144d00f051016c03a361",
+    "battle_rule_oracle_hash": "a21bec05e4d8f86d9179e3169c35f117"
   },
   "Insomnia, Crown City": {
     "effect": "land",

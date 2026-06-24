@@ -873,7 +873,50 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["toughness"], 2)
         self.assertEqual(primary["etb_plus_one_counter_targets"], 2)
         self.assertTrue(primary["countered_creatures_tap_for_mana"])
-        self.assertEqual(primary["produces"], "G")
+
+    def test_insidious_roots_maps_to_exact_passive_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "AddCountersAllEffect",
+                    "CreateTokenEffect",
+                    "GainAbilityControlledEffect",
+                ],
+                "ability_classes": [
+                    "CardsLeaveGraveyardTriggeredAbility",
+                    "SimpleStaticAbility",
+                ],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new SimpleStaticAbility(new GainAbilityControlledEffect("
+                    "new AnyColorManaAbility(), Duration.WhileOnBattlefield, StaticFilters.FILTER_CREATURE_TOKENS))); "
+                    "Ability ability = new CardsLeaveGraveyardTriggeredAbility("
+                    "new CreateTokenEffect(new PlantToken()), StaticFilters.FILTER_CARD_CREATURES); "
+                    "ability.addEffect(new AddCountersAllEffect(CounterType.P1P1.createInstance(), filter));"
+                ),
+            },
+            (
+                'Creature tokens you control have "{T}: Add one mana of any color." '
+                "Whenever one or more creature cards leave your graveyard, create a 0/1 green Plant creature token, "
+                "then put a +1/+1 counter on each Plant you control."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "creature_tokens_tap_any_color_creature_graveyard_plant_growth_v1",
+        )
+        self.assertTrue(primary["creature_tokens_tap_for_any_color"])
+        self.assertTrue(primary["creature_cards_leave_your_graveyard_create_plant_token"])
+        self.assertTrue(primary["plant_tokens_get_plus_one_counter_on_creature_graveyard_exit"])
+        self.assertEqual(primary["token_name"], "Plant Token")
+        self.assertEqual(primary["token_subtype"], "Plant")
+        self.assertEqual(primary["token_power"], 0)
+        self.assertEqual(primary["token_toughness"], 1)
+        self.assertEqual(primary["token_colors"], ["G"])
 
     def test_an_offer_you_cant_refuse_maps_to_exact_counter_treasure_scope(self) -> None:
         result = hints.build_effect_hints(

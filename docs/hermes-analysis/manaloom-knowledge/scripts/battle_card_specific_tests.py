@@ -9987,6 +9987,155 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg150_insidious_roots_creature_recursion_creates_buffed_plant_and_unlocks_token_mana():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.graveyard = [
+                {
+                    "name": "Recovered Creature",
+                    "type_line": "Creature — Spirit",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 1,
+                    "cmc": 2,
+                },
+                {
+                    "name": "Setup Spell",
+                    "type_line": "Sorcery",
+                    "effect": "draw_cards",
+                    "cmc": 2,
+                },
+            ]
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Insidious Roots", "type_line": "Enchantment", "cmc": 2},
+                turn=5,
+                rng=random.Random(9150),
+                effect_data_override={
+                    "effect": "passive",
+                    "battle_model_scope": "creature_tokens_tap_any_color_creature_graveyard_plant_growth_v1",
+                    "creature_tokens_tap_for_any_color": True,
+                    "creature_cards_leave_your_graveyard_create_plant_token": True,
+                    "plant_tokens_get_plus_one_counter_on_creature_graveyard_exit": True,
+                    "trigger_once_each_graveyard_exit_event": True,
+                    "token_name": "Plant Token",
+                    "token_subtype": "Plant",
+                    "token_power": 0,
+                    "token_toughness": 1,
+                    "token_colors": ["G"],
+                    "_rule_logical_key": "battle_rule_v1:insidious-roots-test",
+                    "_rule_oracle_hash": "insidious-roots-test-hash",
+                },
+            )
+
+            recovered = battle.resolve_etb_graveyard_recursion(
+                active,
+                {"name": "Recovery Witness", "type_line": "Creature", "cmc": 4},
+                {
+                    "etb_recursion_count": 2,
+                    "etb_recursion_target": "nonland",
+                    "etb_recursion_destination": "hand",
+                },
+                turn=5,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in recovered] == ["Recovered Creature", "Setup Spell"]
+        assert not active.graveyard
+        plants = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Plant Token"
+        ]
+        assert len(plants) == 1
+        plant = plants[0]
+        assert plant["power"] == 1
+        assert plant["toughness"] == 2
+        assert plant["plus_one_counters"] == 1
+
+        plant["summoning_sick"] = False
+        active.refresh_mana_sources(turn=6)
+        assert active.available_mana() == 1
+
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Insidious Roots"
+            and data.get("trigger") == "creature_cards_leave_graveyard"
+            and data.get("creature_cards_left_graveyard") == ["Recovered Creature"]
+            and data.get("rule_logical_key") == "battle_rule_v1:insidious-roots-test"
+            for event, data in events
+        )
+
+    def test_pg150_insidious_roots_ignores_noncreature_flashback_from_graveyard():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = ["land", "land"]
+            spell = {
+                "name": "Battle Cantrip",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "count": 1,
+                "cmc": 1,
+                "flashback_cost": "{1}",
+            }
+            active.graveyard = [spell]
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Insidious Roots", "type_line": "Enchantment", "cmc": 2},
+                turn=4,
+                rng=random.Random(9151),
+                effect_data_override={
+                    "effect": "passive",
+                    "battle_model_scope": "creature_tokens_tap_any_color_creature_graveyard_plant_growth_v1",
+                    "creature_tokens_tap_for_any_color": True,
+                    "creature_cards_leave_your_graveyard_create_plant_token": True,
+                    "plant_tokens_get_plus_one_counter_on_creature_graveyard_exit": True,
+                    "trigger_once_each_graveyard_exit_event": True,
+                    "token_name": "Plant Token",
+                    "token_subtype": "Plant",
+                    "token_power": 0,
+                    "token_toughness": 1,
+                    "token_colors": ["G"],
+                    "_rule_logical_key": "battle_rule_v1:insidious-roots-test",
+                    "_rule_oracle_hash": "insidious-roots-test-hash",
+                },
+            )
+            active.refresh_mana_sources(turn=4)
+
+            assert battle.cast_flashback_spell_from_graveyard(
+                active,
+                spell,
+                [opponent],
+                [active, opponent],
+                turn=4,
+                phase="precombat_main",
+                stack=battle.Stack(),
+                rng=random.Random(9152),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert not [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Plant Token"
+        ]
+        assert not [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Insidious Roots"
+            and data.get("trigger") == "creature_cards_leave_graveyard"
+        ]
+
     def test_pg081_redirect_lightning_redirects_single_target_stack_object():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -11349,6 +11498,8 @@ def register_tests(battle, player):
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,
+        test_pg150_insidious_roots_creature_recursion_creates_buffed_plant_and_unlocks_token_mana,
+        test_pg150_insidious_roots_ignores_noncreature_flashback_from_graveyard,
         test_pg081_redirect_lightning_redirects_single_target_stack_object,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,

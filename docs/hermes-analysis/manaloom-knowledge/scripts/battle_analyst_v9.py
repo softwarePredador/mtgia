@@ -2114,7 +2114,12 @@ def cast_flashback_spell_from_graveyard(player, card, opponents, all_players, tu
     )
     if not commit_cast_payment(ctx):
         return False
-    player.graveyard.remove(card)
+    remove_cards_from_graveyard(
+        player,
+        [card],
+        turn=turn,
+        source_event="flashback_cast",
+    )
     flashback_copy = copy.deepcopy(card)
     flashback_copy["_flashback_cast"] = True
     emit_replay_event(
@@ -2516,6 +2521,119 @@ def is_mana_source_permanent(source):
     return source.get("effect") == "ramp_engine" and source.get("mana_produced") is not None
 
 
+def _controls_creature_token_any_color_mana_passive(player):
+    if player is None:
+        return False
+    return any(
+        isinstance(permanent, dict)
+        and permanent.get("creature_tokens_tap_for_any_color")
+        for permanent in getattr(player, "battlefield", []) or []
+    )
+
+
+def _creature_token_has_any_color_mana_from_passive(player, source):
+    return (
+        isinstance(source, dict)
+        and is_battlefield_creature(source)
+        and is_token_permanent(source)
+        and _controls_creature_token_any_color_mana_passive(player)
+    )
+
+
+def player_mana_source_permanent(player, source):
+    return is_mana_source_permanent(source) or _creature_token_has_any_color_mana_from_passive(player, source)
+
+
+def mana_source_colors_for_state(player, source):
+    if _creature_token_has_any_color_mana_from_passive(player, source):
+        return ["wildcard"]
+    return source_colors(source)
+
+
+def add_plus_one_counters(permanent, count=1):
+    if not isinstance(permanent, dict):
+        return
+    added = max(0, int(count or 0))
+    if added <= 0:
+        return
+    permanent["plus_one_counters"] = int(permanent.get("plus_one_counters") or 0) + added
+    if is_battlefield_creature(permanent):
+        permanent["power"] = int(float(permanent.get("power") or 0)) + added
+        permanent["toughness"] = int(float(permanent.get("toughness") or 0)) + added
+
+
+def resolve_creature_cards_leave_graveyard_triggers(
+    player,
+    leaving_cards,
+    *,
+    turn,
+    source_event="graveyard_exit",
+):
+    active_permanents = [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if isinstance(permanent, dict)
+        and permanent.get("creature_cards_leave_your_graveyard_create_plant_token")
+    ]
+    creature_cards = [
+        card
+        for card in leaving_cards or []
+        if isinstance(card, dict) and is_creature_card(card)
+    ]
+    if not active_permanents or not creature_cards:
+        return []
+
+    triggered = []
+    for permanent in active_permanents:
+        token = create_creature_token(
+            player,
+            name=permanent.get("token_name") or "Plant Token",
+            power=int(permanent.get("token_power") or 0),
+            toughness=int(permanent.get("token_toughness") or 1),
+            subtype=permanent.get("token_subtype") or "Plant",
+            colors=list(permanent.get("token_colors") or ["G"]),
+        )
+        buffed = []
+        for plant in player.battlefield:
+            if not isinstance(plant, dict):
+                continue
+            if "plant" not in str(plant.get("type_line") or "").lower():
+                continue
+            add_plus_one_counters(plant, 1)
+            buffed.append(plant.get("name", "?"))
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="creature_cards_leave_graveyard",
+            source_event=source_event,
+            effect="create_plant_token_plus_counters",
+            creature_cards_left_graveyard=[card.get("name", "?") for card in creature_cards],
+            token_created=token.get("name", "?"),
+            plants_buffed=len(buffed),
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        triggered.append(token)
+    return triggered
+
+
+def remove_cards_from_graveyard(player, grave_cards, *, turn, source_event="graveyard_exit"):
+    removed = []
+    for grave_card in grave_cards or []:
+        if grave_card in getattr(player, "graveyard", []):
+            player.graveyard.remove(grave_card)
+            removed.append(grave_card)
+    if removed:
+        resolve_creature_cards_leave_graveyard_triggers(
+            player,
+            removed,
+            turn=turn,
+            source_event=source_event,
+        )
+    return removed
+
+
 def is_legendary_creature_or_planeswalker_permanent(card):
     if not isinstance(card, dict):
         return False
@@ -2530,6 +2648,8 @@ def mana_source_production_for_state(player, source):
         return 1
     if not isinstance(source, dict):
         return 0
+    if _creature_token_has_any_color_mana_from_passive(player, source):
+        return max(1, int(source.get("mana_produced") or 1))
     normalized_name = normalize_card_name(source.get("name", ""))
     if normalized_name == "mox amber":
         if not any(
@@ -4788,10 +4908,10 @@ class Player:
         sources = [
             source
             for source in self.battlefield
-            if is_mana_source_permanent(source)
+            if player_mana_source_permanent(self, source)
             and not (
                 is_battlefield_creature(source)
-                and source.get("is_mana_source")
+                and player_mana_source_permanent(self, source)
                 and source.get("summoning_sick")
             )
         ]
@@ -4800,7 +4920,7 @@ class Player:
             produced = mana_source_production_for_state(self, source)
             if produced <= 0:
                 continue
-            colors = source_colors(source)
+            colors = mana_source_colors_for_state(self, source)
             # A source with multiple options is treated as flexible generic unless
             # the imported data specifies one concrete produced color.
             color = colors[0] if len(colors) == 1 else "generic"
@@ -10768,8 +10888,12 @@ def resolve_starfall_invocation(player, opponents, card, effect_data, turn, rng)
     returned = None
     if gift_promised and own_destroyed_candidates:
         returned = choose_best_creature_target(own_destroyed_candidates)
-        if returned in player.graveyard:
-            player.graveyard.remove(returned)
+        remove_cards_from_graveyard(
+            player,
+            [returned],
+            turn=turn,
+            source_event="gift_destroy_all_creatures_return_own_destroyed_creature",
+        )
         returned["controller"] = player.name
         returned = prepare_entering_permanent(
             returned,
@@ -15587,7 +15711,7 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
                 )
                 continue
             other_mana_available = player.available_mana()
-            if is_mana_source_permanent(permanent):
+            if player_mana_source_permanent(player, permanent):
                 other_mana_available = max(0, other_mana_available - int(permanent.get("mana_produced") or 1))
             max_x = other_mana_available // 2
             if max_x <= 0:
@@ -15894,7 +16018,12 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
                     phase=phase,
                 )
                 continue
-            player.graveyard.remove(found)
+            remove_cards_from_graveyard(
+                player,
+                [found],
+                turn=turn,
+                source_event="recover_enchantment_to_library_top",
+            )
             player.library.insert(0, found)
             permanent["utility_land_used_this_turn"] = True
             emit_decision_trace(
@@ -16177,7 +16306,12 @@ def resolve_mizzix_mastery(player, opponents, card, effect_data, turn, rng, *, s
     for original in selected:
         if original not in player.graveyard:
             continue
-        player.graveyard.remove(original)
+        remove_cards_from_graveyard(
+            player,
+            [original],
+            turn=turn,
+            source_event="mizzix_mastery_target_exile",
+        )
         move_to_exile(player, original, reason="mizzix_mastery_target", turn=turn)
         exiled_originals.append(original)
 
@@ -16384,8 +16518,12 @@ def resolve_surge_to_victory(player, opponents, all_players, card, effect_data, 
         )
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return
-    if target_spell in player.graveyard:
-        player.graveyard.remove(target_spell)
+    remove_cards_from_graveyard(
+        player,
+        [target_spell],
+        turn=turn,
+        source_event="surge_to_victory_target_exile",
+    )
     move_to_exile(player, target_spell, reason="surge_to_victory_target", turn=turn)
     try:
         power_bonus = max(0, int(float(target_spell.get("cmc") or 0)))
@@ -17027,7 +17165,12 @@ def return_graveyard_lands_to_battlefield(player, card, turn, *, opponents=None,
     returned = []
     for grave_card in list(player.graveyard):
         if isinstance(grave_card, dict) and is_effective_land(grave_card):
-            player.graveyard.remove(grave_card)
+            remove_cards_from_graveyard(
+                player,
+                [grave_card],
+                turn=turn,
+                source_event=source_event,
+            )
             land = enrich_card({**grave_card, "effect": "land", "tapped": True})
             player.battlefield.append(land)
             trigger_landfall(player, land, turn, source_event, opponents=opponents)
@@ -17535,7 +17678,12 @@ def resolve_land_recursion_creature(player, card, effect_data, turn):
     returned = []
     for grave_card in list(player.graveyard):
         if isinstance(grave_card, dict) and is_effective_land(grave_card):
-            player.graveyard.remove(grave_card)
+            remove_cards_from_graveyard(
+                player,
+                [grave_card],
+                turn=turn,
+                source_event="land_recursion_creature",
+            )
             returned_land = enrich_card(grave_card)
             returned_land["effect"] = "land"
             returned_land["tapped"] = True
@@ -17691,10 +17839,12 @@ def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
         if graveyard_card_matches_recursion_target(grave_card, target_type)
     ]
     recovered = []
-    for recovered_card in candidates[:count]:
-        if recovered_card not in player.graveyard:
-            continue
-        player.graveyard.remove(recovered_card)
+    for recovered_card in remove_cards_from_graveyard(
+        player,
+        candidates[:count],
+        turn=turn,
+        source_event="etb_recursion",
+    ):
         recovered.append(recovered_card)
         if destination == "battlefield":
             permanent_effect = get_card_effect(recovered_card)
@@ -20276,8 +20426,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     if eff.get("requires_imprint_nonartifact_nonland"):
                         resolve_chrome_mox_imprint(player, permanent, c, turn=turn)
                     player.battlefield.append(permanent)
-                    if is_mana_source_permanent(permanent):
-                        colors = source_colors(permanent)
+                    if player_mana_source_permanent(player, permanent):
+                        colors = mana_source_colors_for_state(player, permanent)
                         produced = mana_source_production_for_state(player, permanent)
                         if produced > 0:
                             player.mana_pool.add(colors[0], produced)
@@ -22143,9 +22293,12 @@ def apply_effect_immediate(
         ]
         recovered = candidates[:count]
         destination = effect_data.get("destination", "hand")
-        for recovered_card in recovered:
-            if recovered_card in player.graveyard:
-                player.graveyard.remove(recovered_card)
+        for recovered_card in remove_cards_from_graveyard(
+            player,
+            recovered,
+            turn=turn,
+            source_event="recursion",
+        ):
                 if destination == "battlefield":
                     permanent_effect = get_card_effect(recovered_card)
                     permanent = enrich_card({**recovered_card, **permanent_effect})
@@ -22684,7 +22837,12 @@ def apply_effect_immediate(
             dragon_tutored = dragon_candidates[0]
             for grave_card in graveyard_copies[:5]:
                 if grave_card in player.graveyard:
-                    player.graveyard.remove(grave_card)
+                    remove_cards_from_graveyard(
+                        player,
+                        [grave_card],
+                        turn=turn,
+                        source_event="dragons_approach_graveyard_cost",
+                    )
                     move_to_exile(player, grave_card, reason="dragons_approach_graveyard_cost", turn=turn)
             if dragon_tutored in player.library:
                 player.library.remove(dragon_tutored)
@@ -22978,7 +23136,7 @@ def table_visible_board_power(player):
 
 def table_visible_threat_score(player):
     board_power = table_visible_board_power(player)
-    mana_sources = sum(1 for card in player.battlefield if is_mana_source_permanent(card))
+    mana_sources = sum(1 for card in player.battlefield if player_mana_source_permanent(player, card))
     hand_pressure = min(len(player.hand or []), 7) * 2
     approach_pressure = int(getattr(player, "approach_count", 0) or 0) * 35
     protection_pressure = 12 if (
