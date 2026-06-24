@@ -124,6 +124,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Abigale, Eloquent First-Year": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "etb_strip_other_creature_abilities_and_grant_keyword_counters_v1",
+    "effect": "creature",
+    "etb_grants_keyword_counters": [
+      "flying",
+      "first_strike",
+      "lifelink"
+    ],
+    "etb_other_target_creature_loses_all_abilities": true,
+    "first_strike": true,
+    "flying": true,
+    "lifelink": true,
+    "power": 1,
+    "toughness": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:212147ed06811dba5af5e2c58100c716",
+    "battle_rule_oracle_hash": "daac542cd4b7cf8f12bb55ffac868d1a"
+  },
   "Abrade": {
     "effect": "remove_artifact_or_3dmg",
     "instant": true,
@@ -5254,6 +5277,24 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
+  },
+  "Colossal Skyturtle": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "flying_ward_channel_regrowth_or_bounce_creature_v1",
+    "channel_return_graveyard_card_to_hand": "{2}{G}",
+    "channel_return_target_creature_to_hand": "{1}{U}",
+    "effect": "creature",
+    "flying": true,
+    "power": 6,
+    "toughness": 5,
+    "ward_cost": "{2}",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d4e643cbd0c20a5a58ca11b06c217a5e",
+    "battle_rule_oracle_hash": "05180c03fc1bcfd31ff9d6fc65edfaad"
   },
   "Colossus Hammer": {
     "cmc": 1.0,
@@ -11767,6 +11808,25 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Glen Elendra Archmage": {
+    "ability_kind": "activated",
+    "activated_counter_noncreature_spell_cost": "{U}",
+    "activation_cost": "sacrifice_self",
+    "battle_model_scope": "flying_persist_sacrifice_self_counter_noncreature_spell_v1",
+    "effect": "counter",
+    "flying": true,
+    "persist": true,
+    "power": 2,
+    "toughness": 2,
+    "instant": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:180387d5d5fc0c2417eb7372ed7a5909",
+    "battle_rule_oracle_hash": "f05e697db3bcfb65a827970c08d1446a"
   },
   "Glimmerpost": {
     "effect": "land",

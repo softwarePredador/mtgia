@@ -602,6 +602,97 @@ def _build_source_add_counters_creature_fields(
     return None
 
 
+def _build_creature_variant_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types == {"CREATURE", "ENCHANTMENT"} and {
+        "ReturnFromGraveyardToHandTargetEffect",
+        "ReturnToHandTargetEffect",
+    }.issubset(effect_classes) and "ChannelAbility" in ability_classes:
+        return {
+            "effect": "creature",
+            "scope": "flying_ward_channel_regrowth_or_bounce_creature_v1",
+            "fields": {
+                "power": 6,
+                "toughness": 5,
+                "flying": True,
+                "ward_cost": "{2}",
+                "channel_return_graveyard_card_to_hand": "{2}{G}",
+                "channel_return_target_creature_to_hand": "{1}{U}",
+            },
+            "reason": "XMage structure matches Colossal Skyturtle body plus two channel modes for regrowth and creature bounce.",
+            "signals": [
+                "ChannelAbility",
+                "ReturnFromGraveyardToHandTargetEffect",
+                "ReturnToHandTargetEffect",
+            ],
+        }
+
+    normalized = _normalized_rules_text(rules_text)
+    if (
+        card_types == {"CREATURE"}
+        and "LoseAllAbilitiesTargetEffect" in effect_classes
+        and "AddCountersTargetEffect" in effect_classes
+        and "EntersBattlefieldTriggeredAbility" in ability_classes
+        and "flying counter" in normalized
+        and "first strike counter" in normalized
+        and "lifelink counter" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "etb_strip_other_creature_abilities_and_grant_keyword_counters_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "flying": True,
+                "first_strike": True,
+                "lifelink": True,
+                "etb_other_target_creature_loses_all_abilities": True,
+                "etb_grants_keyword_counters": ["flying", "first_strike", "lifelink"],
+            },
+            "reason": "XMage structure matches Abigale ETB removing another creature's abilities and placing flying, first strike, and lifelink counters on it.",
+            "signals": [
+                "LoseAllAbilitiesTargetEffect",
+                "AddCountersTargetEffect",
+                "keyword_counters",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and "CounterTargetEffect" in effect_classes
+        and "SimpleActivatedAbility" in ability_classes
+        and "SacrificeSourceCost" in cost_classes
+        and "PersistAbility" in ability_classes
+        and "FlyingAbility" in ability_classes
+    ):
+        return {
+            "effect": "creature",
+            "scope": "flying_persist_sacrifice_self_counter_noncreature_spell_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 2,
+                "flying": True,
+                "persist": True,
+                "activated_counter_noncreature_spell_cost": "{U}",
+                "activation_cost": "sacrifice_self",
+            },
+            "reason": "XMage structure matches Glen Elendra Archmage flying/persist body with a blue plus sacrifice activated counter for noncreature spells.",
+            "signals": [
+                "CounterTargetEffect",
+                "SacrificeSourceCost",
+                "PersistAbility",
+            ],
+        }
+
+    return None
+
+
 def _build_rishkar_fields(
     *,
     card_types: set[str],
@@ -781,6 +872,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(source_add_counters_creature_fields["fields"]),
                 matched_signals=list(source_add_counters_creature_fields["signals"]),
+            )
+        )
+
+    creature_variant_fields = _build_creature_variant_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if creature_variant_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(creature_variant_fields["effect"]),
+                scope=str(creature_variant_fields["scope"]),
+                reason=str(creature_variant_fields["reason"]),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(creature_variant_fields["fields"]),
+                matched_signals=list(creature_variant_fields["signals"]),
             )
         )
 

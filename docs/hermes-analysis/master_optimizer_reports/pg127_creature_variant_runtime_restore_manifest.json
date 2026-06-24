@@ -1,0 +1,26 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg127_creature_variant_runtime_restore_20260624_001336",
+  "deploy_id": "PG127",
+  "family_counts": {
+    "manual_model": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg127_creature_variant_runtime_restore_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg127_creature_variant_runtime_restore_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg127_creature_variant_runtime_restore_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg127_creature_variant_runtime_restore_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg127_creature_variant_runtime_restore_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg127_creature_variant_runtime_restore_rollback.sql"
+  },
+  "generated_at": "2026-06-24T00:13:36+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Colossal Skyturtle",
+    "Abigale, Eloquent First-Year",
+    "Glen Elendra Archmage"
+  ],
+  "selected_count": 3,
+  "slug": "creature_variant_runtime_restore",
+  "status": "prepared_read_only_pending_apply_approval"
+}

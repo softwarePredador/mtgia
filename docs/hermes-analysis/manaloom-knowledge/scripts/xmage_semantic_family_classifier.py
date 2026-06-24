@@ -461,6 +461,52 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("another_nonhuman_etb_optional_pay_x_for_x_plus_one_counters_on_self"))
         )
 
+    if effect == "creature" and scope == "flying_ward_channel_regrowth_or_bounce_creature_v1":
+        return (
+            types == {"CREATURE", "ENCHANTMENT"}
+            and {"ReturnFromGraveyardToHandTargetEffect", "ReturnToHandTargetEffect"}.issubset(effect_classes)
+            and {"ChannelAbility", "FlyingAbility", "WardAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 6
+            and int(effect_json.get("toughness") or 0) == 5
+            and bool(effect_json.get("flying"))
+            and effect_json.get("ward_cost") == "{2}"
+            and effect_json.get("channel_return_graveyard_card_to_hand") == "{2}{G}"
+            and effect_json.get("channel_return_target_creature_to_hand") == "{1}{U}"
+        )
+
+    if effect == "creature" and scope == "etb_strip_other_creature_abilities_and_grant_keyword_counters_v1":
+        return (
+            types == {"CREATURE"}
+            and {"LoseAllAbilitiesTargetEffect", "AddCountersTargetEffect"}.issubset(effect_classes)
+            and {
+                "EntersBattlefieldTriggeredAbility",
+                "FlyingAbility",
+                "FirstStrikeAbility",
+                "LifelinkAbility",
+            }.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("first_strike"))
+            and bool(effect_json.get("lifelink"))
+            and bool(effect_json.get("etb_other_target_creature_loses_all_abilities"))
+            and effect_json.get("etb_grants_keyword_counters") == ["flying", "first_strike", "lifelink"]
+        )
+
+    if effect == "creature" and scope == "flying_persist_sacrifice_self_counter_noncreature_spell_v1":
+        return (
+            types == {"CREATURE"}
+            and "CounterTargetEffect" in effect_classes
+            and {"SimpleActivatedAbility", "FlyingAbility", "PersistAbility"}.issubset(ability_classes)
+            and "SacrificeSourceCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 2
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("persist"))
+            and effect_json.get("activated_counter_noncreature_spell_cost") == "{U}"
+            and effect_json.get("activation_cost") == "sacrifice_self"
+        )
+
     return False
 
 

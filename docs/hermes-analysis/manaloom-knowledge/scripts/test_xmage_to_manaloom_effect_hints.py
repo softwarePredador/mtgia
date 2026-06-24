@@ -656,6 +656,107 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["reach"])
         self.assertTrue(primary["another_nonhuman_etb_optional_pay_x_for_x_plus_one_counters_on_self"])
 
+    def test_colossal_skyturtle_maps_to_exact_channel_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "ReturnFromGraveyardToHandTargetEffect",
+                    "ReturnToHandTargetEffect",
+                ],
+                "ability_classes": ["ChannelAbility", "FlyingAbility", "WardAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT", "CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(6); this.toughness = new MageInt(5); "
+                    "this.addAbility(FlyingAbility.getInstance()); "
+                    "this.addAbility(new WardAbility(new ManaCostsImpl<>(\"{2}\"), false)); "
+                    "Ability ability = new ChannelAbility(\"{2}{G}\", new ReturnFromGraveyardToHandTargetEffect()); "
+                    "ability = new ChannelAbility(\"{1}{U}\", new ReturnToHandTargetEffect());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "flying_ward_channel_regrowth_or_bounce_creature_v1",
+        )
+        self.assertEqual(primary["power"], 6)
+        self.assertEqual(primary["toughness"], 5)
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["ward_cost"], "{2}")
+        self.assertEqual(primary["channel_return_graveyard_card_to_hand"], "{2}{G}")
+        self.assertEqual(primary["channel_return_target_creature_to_hand"], "{1}{U}")
+
+    def test_abigale_maps_to_exact_keyword_counter_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["LoseAllAbilitiesTargetEffect", "AddCountersTargetEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldTriggeredAbility",
+                    "FlyingAbility",
+                    "FirstStrikeAbility",
+                    "LifelinkAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(1); this.toughness = new MageInt(1); "
+                    "this.addAbility(FlyingAbility.getInstance()); "
+                    "this.addAbility(FirstStrikeAbility.getInstance()); "
+                    "this.addAbility(LifelinkAbility.getInstance()); "
+                    "new LoseAllAbilitiesTargetEffect(Duration.Custom).setText(\"up to one other target creature loses all abilities\"); "
+                    "Put a flying counter, a first strike counter, and a lifelink counter on that creature"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_strip_other_creature_abilities_and_grant_keyword_counters_v1",
+        )
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["flying"])
+        self.assertTrue(primary["first_strike"])
+        self.assertTrue(primary["lifelink"])
+        self.assertTrue(primary["etb_other_target_creature_loses_all_abilities"])
+        self.assertEqual(
+            primary["etb_grants_keyword_counters"],
+            ["flying", "first_strike", "lifelink"],
+        )
+
+    def test_glen_elendra_archmage_maps_to_exact_counter_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterTargetEffect"],
+                "ability_classes": ["SimpleActivatedAbility", "FlyingAbility", "PersistAbility"],
+                "cost_classes": ["SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(2); this.toughness = new MageInt(2); "
+                    "this.addAbility(FlyingAbility.getInstance()); "
+                    "Ability ability = new SimpleActivatedAbility(new CounterTargetEffect(), new ManaCostsImpl<>(\"{U}\")); "
+                    "ability.addCost(new SacrificeSourceCost()); "
+                    "this.addAbility(new PersistAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "flying_persist_sacrifice_self_counter_noncreature_spell_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 2)
+        self.assertTrue(primary["flying"])
+        self.assertTrue(primary["persist"])
+        self.assertEqual(primary["activated_counter_noncreature_spell_cost"], "{U}")
+        self.assertEqual(primary["activation_cost"], "sacrifice_self")
+
 
 if __name__ == "__main__":
     unittest.main()
