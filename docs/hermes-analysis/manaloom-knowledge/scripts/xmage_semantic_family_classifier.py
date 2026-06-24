@@ -118,6 +118,20 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "implement_family_before_metadata_batch",
     },
+    "extra_turn_spell": {
+        "effects": {"extra_turn"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "extra turn scheduling and delayed lose-the-game bookkeeping",
+        "family_tests": ["test_final_fortune_extra_turn_causes_loss_after_taken_turn"],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
+    "dig_spell": {
+        "effects": {"dig_to_hand"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "top-of-library selection to hand with remainder-to-graveyard zone movement",
+        "family_tests": ["test_scattered_thoughts_selects_two_from_top_four_and_bins_the_rest"],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "draw_engine": {
         "effects": {"draw_engine"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -697,6 +711,33 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("activation_condition") == "opponent_controls_more_lands"
             and effect_json.get("tutor_target") == "land"
             and effect_json.get("tutor_destination") == "hand"
+        )
+
+    if effect == "extra_turn" and scope == "single_extra_turn_then_lose_game_v1":
+        return (
+            types in ({"INSTANT"}, {"SORCERY"})
+            and effect_classes == {"AddExtraTurnControllerEffect"}
+            and not ability_classes
+            and not cost_classes
+            and bool(effect_json.get("instant")) == (types == {"INSTANT"})
+            and int(effect_json.get("turns") or 0) == 1
+            and bool(effect_json.get("lose_after_extra_turn"))
+        )
+
+    if effect == "dig_to_hand" and scope == "look_top_n_pick_m_to_hand_rest_graveyard_v1":
+        look_count = int(effect_json.get("look_count") or 0)
+        pick_count = int(effect_json.get("pick_count") or 0)
+        return (
+            types in ({"INSTANT"}, {"SORCERY"})
+            and effect_classes == {"LookLibraryAndPickControllerEffect"}
+            and not ability_classes
+            and not cost_classes
+            and bool(effect_json.get("instant")) == (types == {"INSTANT"})
+            and look_count > 0
+            and pick_count > 0
+            and pick_count <= look_count
+            and effect_json.get("selection_destination") == "hand"
+            and effect_json.get("remainder_destination") == "graveyard"
         )
 
     if effect == "treasure_maker" and scope == "single_treasure_creation_v1":

@@ -3237,6 +3237,158 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_final_fortune_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Final Fortune",
+                        "severity": "high",
+                        "oracle_hash": "finalfortunehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "FinalFortune",
+                            "path": "/xmage/FinalFortune.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["AddExtraTurnControllerEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "extra_turn",
+                                "battle_model_scope": "single_extra_turn_then_lose_game_v1",
+                                "instant": True,
+                                "turns": 1,
+                                "lose_after_extra_turn": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "extra_turn_spell")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_last_chance_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Last Chance",
+                        "severity": "high",
+                        "oracle_hash": "lastchancehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "LastChance",
+                            "path": "/xmage/LastChance.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["AddExtraTurnControllerEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "extra_turn",
+                                "battle_model_scope": "single_extra_turn_then_lose_game_v1",
+                                "instant": False,
+                                "turns": 1,
+                                "lose_after_extra_turn": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "extra_turn_spell")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_ancestral_memories_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Ancestral Memories",
+                        "severity": "high",
+                        "oracle_hash": "ancestralmemorieshash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "AncestralMemories",
+                            "path": "/xmage/AncestralMemories.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["LookLibraryAndPickControllerEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "dig_to_hand",
+                                "battle_model_scope": "look_top_n_pick_m_to_hand_rest_graveyard_v1",
+                                "instant": False,
+                                "look_count": 7,
+                                "pick_count": 2,
+                                "selection_destination": "hand",
+                                "remainder_destination": "graveyard",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "dig_spell")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_scattered_thoughts_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Scattered Thoughts",
+                        "severity": "high",
+                        "oracle_hash": "scatteredthoughtshash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "ScatteredThoughts",
+                            "path": "/xmage/ScatteredThoughts.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["LookLibraryAndPickControllerEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "dig_to_hand",
+                                "battle_model_scope": "look_top_n_pick_m_to_hand_rest_graveyard_v1",
+                                "instant": True,
+                                "look_count": 4,
+                                "pick_count": 2,
+                                "selection_destination": "hand",
+                                "remainder_destination": "graveyard",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "dig_spell")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_spellseeker_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

@@ -1644,6 +1644,84 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["activation_condition"], "opponent_controls_more_lands")
         self.assertEqual(primary["tutor_target"], "land")
 
+    def test_final_fortune_maps_to_single_extra_turn_then_lose_game_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddExtraTurnControllerEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new AddExtraTurnControllerEffect(true)); "
+                    "Take an extra turn after this one. At the beginning of that turn's end step, you lose the game."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "extra_turn")
+        self.assertEqual(primary["battle_model_scope"], "single_extra_turn_then_lose_game_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["turns"], 1)
+        self.assertTrue(primary["lose_after_extra_turn"])
+
+    def test_last_chance_maps_to_single_extra_turn_then_lose_game_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddExtraTurnControllerEffect"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new AddExtraTurnControllerEffect(true)); "
+                    "Take an extra turn after this one. At the beginning of that turn's end step, you lose the game."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "extra_turn")
+        self.assertEqual(primary["battle_model_scope"], "single_extra_turn_then_lose_game_v1")
+        self.assertFalse(primary["instant"])
+        self.assertEqual(primary["turns"], 1)
+        self.assertTrue(primary["lose_after_extra_turn"])
+
+    def test_ancestral_memories_maps_to_top_dig_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "AncestralMemories",
+                "effect_classes": ["LookLibraryAndPickControllerEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": "this.getSpellAbility().addEffect(new LookLibraryAndPickControllerEffect(7, 2, PutCards.HAND, PutCards.GRAVEYARD));",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "dig_to_hand")
+        self.assertEqual(primary["battle_model_scope"], "look_top_n_pick_m_to_hand_rest_graveyard_v1")
+        self.assertFalse(primary["instant"])
+        self.assertEqual(primary["look_count"], 7)
+        self.assertEqual(primary["pick_count"], 2)
+        self.assertEqual(primary["selection_destination"], "hand")
+        self.assertEqual(primary["remainder_destination"], "graveyard")
+
+    def test_scattered_thoughts_maps_to_top_dig_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ScatteredThoughts",
+                "effect_classes": ["LookLibraryAndPickControllerEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": "this.getSpellAbility().addEffect(new LookLibraryAndPickControllerEffect(4, 2, PutCards.HAND, PutCards.GRAVEYARD));",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "dig_to_hand")
+        self.assertEqual(primary["battle_model_scope"], "look_top_n_pick_m_to_hand_rest_graveyard_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["look_count"], 4)
+        self.assertEqual(primary["pick_count"], 2)
+        self.assertEqual(primary["selection_destination"], "hand")
+        self.assertEqual(primary["remainder_destination"], "graveyard")
+
     def test_spellseeker_maps_to_etb_cheap_instant_or_sorcery_tutor_scope(self) -> None:
         result = hints.build_effect_hints(
             {

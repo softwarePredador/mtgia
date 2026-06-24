@@ -237,6 +237,85 @@ def register_tests(battle, player, card):
         assert [event for event, _ in events].count("turn_start") == 2
         assert any(event == "extra_turn_taken" for event, _ in events)
 
+    def test_final_fortune_extra_turn_causes_loss_after_taken_turn():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active", [card("Draw 1"), card("Draw 2"), card("Draw 3"), card("Draw 4")])
+        defender = player("Defender", [card("Opp Draw 1"), card("Opp Draw 2")])
+
+        battle.apply_effect_immediate(
+            active,
+            [defender],
+            {"name": "Final Fortune", "cmc": 2, "type_line": "Instant"},
+            turn=4,
+            rng=random.Random(4601),
+            effect_data_override={
+                "effect": "extra_turn",
+                "instant": True,
+                "turns": 1,
+                "lose_after_extra_turn": True,
+                "battle_model_scope": "single_extra_turn_then_lose_game_v1",
+            },
+        )
+
+        assert active.extra_turns == 1
+        assert active.extra_turn_loss_pending == 1
+
+        battle.play_turn_sequence_v8(
+            active,
+            [defender],
+            [active, defender],
+            turn=4,
+            rng=random.Random(4602),
+            stack=battle.Stack(),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.eliminated is True
+        assert active.extra_turns == 0
+        assert active.extra_turn_loss_pending == 0
+        assert any(event == "extra_turn_scheduled" for event, _ in events)
+        assert any(
+            event == "player_eliminated"
+            and data.get("reason") == "delayed_extra_turn_loss"
+            for event, data in events
+        )
+
+    def test_scattered_thoughts_selects_two_from_top_four_and_bins_the_rest():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.library = [
+            {"name": "Land Slot", "type_line": "Land"},
+            {"name": "Counter Slot", "cmc": 2, "type_line": "Instant", "effect": "counter"},
+            {"name": "Refill Slot", "cmc": 4, "type_line": "Sorcery", "effect": "draw_cards", "count": 2},
+            {"name": "Big Creature", "cmc": 7, "type_line": "Creature", "effect": "creature"},
+            {"name": "Bottom Card", "cmc": 1, "type_line": "Sorcery", "effect": "draw_cards", "count": 1},
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Scattered Thoughts", "cmc": 4, "type_line": "Instant"},
+            turn=4,
+            rng=random.Random(4603),
+            effect_data_override={
+                "effect": "dig_to_hand",
+                "instant": True,
+                "look_count": 4,
+                "pick_count": 2,
+                "selection_destination": "hand",
+                "remainder_destination": "graveyard",
+                "battle_model_scope": "look_top_n_pick_m_to_hand_rest_graveyard_v1",
+            },
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert {card["name"] for card in active.hand} == {"Counter Slot", "Refill Slot"}
+        assert {card["name"] for card in active.graveyard} == {"Land Slot", "Big Creature"}
+        assert [card["name"] for card in active.library] == ["Bottom Card"]
+        assert any(event == "dig_to_hand_resolved" for event, _ in events)
+
     def test_extra_combat_effect_schedules_and_untaps_creatures():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))

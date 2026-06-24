@@ -18834,6 +18834,65 @@ def resolve_hand_filter(player, card, effect_data, turn, rng):
     finish_resolved_spell(player, card, turn=turn)
 
 
+def resolve_dig_to_hand(player, card, effect_data, turn):
+    look_count = int(effect_data.get("look_count") or 0)
+    pick_count = int(effect_data.get("pick_count") or 0)
+    if look_count <= 0 or pick_count <= 0:
+        emit_replay_event(
+            "dig_to_hand_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            looked_count=0,
+            picked_count=0,
+            picked=[],
+            moved_to_graveyard=[],
+            library_remaining=len(player.library),
+            hand_size=len(player.hand),
+            graveyard_size=len(player.graveyard),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        return
+
+    looked = []
+    for _ in range(min(look_count, len(player.library))):
+        looked.append(player.library.pop(0))
+
+    ranked = sorted(
+        [candidate for candidate in looked if isinstance(candidate, dict)],
+        key=lambda candidate: (
+            -discard_replacement_priority(candidate, player),
+            -int(_opening_hand_card_cmc(candidate) or 0),
+            candidate.get("name", "?"),
+        ),
+    )
+    picked = ranked[: min(pick_count, len(ranked))]
+    picked_ids = {id(candidate) for candidate in picked}
+    moved_to_graveyard = [candidate for candidate in looked if id(candidate) not in picked_ids]
+
+    player.hand.extend(picked)
+    player.graveyard.extend(moved_to_graveyard)
+
+    emit_replay_event(
+        "dig_to_hand_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        looked_count=len(looked),
+        picked_count=len(picked),
+        picked=[candidate.get("name", "?") for candidate in picked if isinstance(candidate, dict)],
+        moved_to_graveyard=[
+            candidate.get("name", "?")
+            for candidate in moved_to_graveyard
+            if isinstance(candidate, dict)
+        ],
+        library_remaining=len(player.library),
+        hand_size=len(player.hand),
+        graveyard_size=len(player.graveyard),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+
+
 def _copy_token_target_types(effect_data):
     raw_types = (
         effect_data.get("copy_target_types")
@@ -22260,6 +22319,12 @@ def apply_effect_immediate(
             finish_resolved_spell(player, card, turn=turn)
             return
         resolve_hand_filter(player, card, effect_data, turn, rng)
+    elif effect == "dig_to_hand":
+        if not pay_additional_card_costs(player, card, effect_data, turn=turn):
+            finish_resolved_spell(player, card, turn=turn)
+            return
+        resolve_dig_to_hand(player, card, effect_data, turn)
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "treasure_maker":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)

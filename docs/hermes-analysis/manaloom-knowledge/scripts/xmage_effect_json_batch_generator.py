@@ -34,6 +34,8 @@ DECK_ROLE_BY_FAMILY: dict[str, dict[str, Any]] = {
     "discard_modal_trigger": {"category": "value_engine", "effect": "discard_trigger_modal", "timing": "triggered"},
     "modal_spell": {"category": "interaction", "effect": "modal_spell", "timing": "resolution"},
     "graveyard_spell_copy_cast": {"category": "combo_value", "effect": "graveyard_spell_copy_cast", "timing": "delayed_trigger"},
+    "extra_turn_spell": {"category": "combo_value", "effect": "extra_turn", "subtype": "extra_turn", "timing": "resolution"},
+    "dig_spell": {"category": "draw", "effect": "dig_to_hand", "subtype": "library_selection", "timing": "resolution"},
     "draw_engine": {"category": "draw", "effect": "draw_engine", "timing": "static_or_activated"},
     "creature": {"category": "board_presence", "effect": "creature", "timing": "battlefield"},
     "passive": {"category": "support", "effect": "passive", "timing": "static"},

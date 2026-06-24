@@ -198,6 +198,14 @@ def _scenario_names(effect: str, scope: str = "") -> list[str]:
             "tap for colorless mana",
             "pay, tap, sacrifice to draw one card",
         ],
+        "extra_turn": [
+            "schedule one extra turn for the controller",
+            "controller loses the game after taking that extra turn when the rule says so",
+        ],
+        "dig_to_hand": [
+            "look at the requested number of top library cards and put the best subset into hand",
+            "move the remaining looked-at cards to the expected graveyard destination",
+        ],
     }
     return mapping.get(effect, [f"focused behavior scenario for {effect}"])
 
@@ -2074,6 +2082,91 @@ def _build_tutor_to_hand_fields(
     return None
 
 
+def _build_extra_turn_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types not in ({"INSTANT"}, {"SORCERY"}):
+        return None
+    if effect_classes != {"AddExtraTurnControllerEffect"} or ability_classes or cost_classes:
+        return None
+    normalized = _normalized_rules_text(rules_text)
+    if not (
+        "addextraturncontrollereffect(true)" in normalized
+        or (
+            "lose the game" in normalized
+            and (
+                "extra turn after this one" in normalized
+                or "take an extra turn after this one" in normalized
+            )
+        )
+    ):
+        return None
+    return {
+        "effect": "extra_turn",
+        "scope": "single_extra_turn_then_lose_game_v1",
+        "fields": {
+            "instant": card_types == {"INSTANT"},
+            "turns": 1,
+            "lose_after_extra_turn": True,
+        },
+        "reason": "XMage structure matches a spell that grants one extra turn and causes its controller to lose the game at that turn's end step.",
+        "signals": [
+            "AddExtraTurnControllerEffect",
+            "lose_the_game_after_extra_turn",
+        ],
+    }
+
+
+def _build_dig_to_hand_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    raw_excerpt: str,
+) -> dict[str, Any] | None:
+    if card_types not in ({"INSTANT"}, {"SORCERY"}):
+        return None
+    if effect_classes != {"LookLibraryAndPickControllerEffect"} or ability_classes or cost_classes:
+        return None
+
+    match = re.search(
+        r"LookLibraryAndPickControllerEffect\(\s*(\d+)\s*,\s*(\d+)\s*,\s*PutCards\.HAND\s*,\s*PutCards\.GRAVEYARD\s*\)",
+        str(raw_excerpt or ""),
+    )
+    if not match:
+        return None
+
+    look_count = int(match.group(1))
+    pick_count = int(match.group(2))
+    if look_count <= 0 or pick_count <= 0 or pick_count > look_count:
+        return None
+
+    return {
+        "effect": "dig_to_hand",
+        "scope": "look_top_n_pick_m_to_hand_rest_graveyard_v1",
+        "fields": {
+            "instant": card_types == {"INSTANT"},
+            "look_count": look_count,
+            "pick_count": pick_count,
+            "selection_destination": "hand",
+            "remainder_destination": "graveyard",
+        },
+        "reason": "XMage structure matches a top-of-library dig spell that puts a chosen subset into hand and sends the rest to the graveyard.",
+        "signals": [
+            "LookLibraryAndPickControllerEffect",
+            f"look_{look_count}",
+            f"pick_{pick_count}",
+            "hand_then_graveyard",
+        ],
+    }
+
+
 def _build_basic_ritual_fields(
     *,
     card_types: set[str],
@@ -2563,6 +2656,46 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(topdeck_tutor_fields["fields"]),
                 matched_signals=list(topdeck_tutor_fields["signals"]),
+            )
+        )
+
+    extra_turn_fields = _build_extra_turn_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if extra_turn_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(extra_turn_fields["effect"]),
+                scope=str(extra_turn_fields["scope"]),
+                reason=str(extra_turn_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=False,
+                extra_effect_fields=dict(extra_turn_fields["fields"]),
+                matched_signals=list(extra_turn_fields["signals"]),
+            )
+        )
+
+    dig_to_hand_fields = _build_dig_to_hand_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        raw_excerpt=str(index_entry.get("raw_excerpt") or ""),
+    )
+    if dig_to_hand_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(dig_to_hand_fields["effect"]),
+                scope=str(dig_to_hand_fields["scope"]),
+                reason=str(dig_to_hand_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(dig_to_hand_fields["fields"]),
+                matched_signals=list(dig_to_hand_fields["signals"]),
             )
         )
 

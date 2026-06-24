@@ -775,6 +775,23 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
   },
+  "Ancestral Memories": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "look_top_n_pick_m_to_hand_rest_graveyard_v1",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "look_count": 7,
+    "pick_count": 2,
+    "remainder_destination": "graveyard",
+    "selection_destination": "hand",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b3cae6304fa06122bbe9e880e6b425c1",
+    "battle_rule_oracle_hash": "3aa69ed94731337917538028728d9f35"
+  },
   "Ancestral Tribute": {
     "cmc": 7.0,
     "count": 1,
@@ -10326,15 +10343,19 @@
     "battle_rule_logical_key": "battle_rule_v1:758101e162d55b30cebd868b8669eaf5"
   },
   "Final Fortune": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "single_extra_turn_then_lose_game_v1",
     "effect": "extra_turn",
+    "instant": true,
     "lose_after_extra_turn": true,
     "turns": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0d097116ffdddc15b478a8f5225edf31"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:10a7179930eacb06c18e6734c0e93add",
+    "battle_rule_oracle_hash": "059f0f01430a2d44ac0d143bf8e40ed6"
   },
   "Final Showdown": {
     "cmc": 1.0,
@@ -16400,15 +16421,19 @@
     "battle_rule_logical_key": "battle_rule_v1:58cf40a9a929b66bca25048353cb1498"
   },
   "Last Chance": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "single_extra_turn_then_lose_game_v1",
     "effect": "extra_turn",
+    "instant": false,
     "lose_after_extra_turn": true,
     "turns": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0d097116ffdddc15b478a8f5225edf31"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9f5103721cb05db1501499eb5f49de56",
+    "battle_rule_oracle_hash": "059f0f01430a2d44ac0d143bf8e40ed6"
   },
   "Last March of the Ents": {
     "cmc": 8.0,
@@ -24899,6 +24924,23 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Scattered Thoughts": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "look_top_n_pick_m_to_hand_rest_graveyard_v1",
+    "effect": "dig_to_hand",
+    "instant": true,
+    "look_count": 4,
+    "pick_count": 2,
+    "remainder_destination": "graveyard",
+    "selection_destination": "hand",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8ca48cc5b636696b151dce8af41e6de3",
+    "battle_rule_oracle_hash": "7f20a11914b46f22bdaab8546b22b5b6"
   },
   "Scavenger Grounds": {
     "effect": "land",
