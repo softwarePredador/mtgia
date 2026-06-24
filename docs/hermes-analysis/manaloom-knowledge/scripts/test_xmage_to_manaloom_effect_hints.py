@@ -275,6 +275,30 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["treasure_count"], 2)
         self.assertTrue(primary["requires_discard_card"])
 
+    def test_treasure_vault_maps_to_exact_x_treasure_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["ColorlessManaAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["TapSourceCost", "SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT", "LAND"]},
+                "raw_excerpt": "new CreateTokenEffect(new TreasureToken(), GetXValue.instance); new ManaCostsImpl<>(\"{X}{X}\")",
+            },
+            "{X}{X}, {T}, Sacrifice Treasure Vault: Create X Treasure tokens.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "treasure_maker")
+        self.assertEqual(primary["battle_model_scope"], "activated_xx_tap_sacrifice_create_x_treasures_v1")
+        self.assertEqual(primary["produces"], "C")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertTrue(primary["activation_requires_sacrifice"])
+        self.assertTrue(primary["activation_cost_generic_is_x_twice"])
+        self.assertEqual(primary["treasure_count_source"], "x_value")
+        self.assertEqual(primary["treasure_count_per_x"], 1)
+
     def test_electroduplicate_maps_to_copy_creature_token(self) -> None:
         result = hints.build_effect_hints(
             {

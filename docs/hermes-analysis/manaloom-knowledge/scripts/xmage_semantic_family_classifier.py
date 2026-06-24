@@ -376,6 +376,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
     types = xmage_types(card)
     ability_classes = xmage_ability_classes(card)
     effect_classes = xmage_effect_classes(card)
+    cost_classes = xmage_cost_classes(card)
 
     if effect == "draw_cards" and scope == "veil_of_summer_draw_and_protection_waiver_v1":
         return (
@@ -472,6 +473,19 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("treasure_count") or 0) == 2
             and int(effect_json.get("draw_count") or 0) == 2
             and bool(effect_json.get("requires_discard_card"))
+        )
+
+    if effect == "treasure_maker" and scope == "activated_xx_tap_sacrifice_create_x_treasures_v1":
+        return (
+            types == {"ARTIFACT", "LAND"}
+            and "CreateTokenEffect" in effect_classes
+            and {"ColorlessManaAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("activation_requires_sacrifice"))
+            and bool(effect_json.get("activation_cost_generic_is_x_twice"))
+            and effect_json.get("treasure_count_source") == "x_value"
+            and int(effect_json.get("treasure_count_per_x") or 0) == 1
         )
 
     if effect == "copy_creature_token" and scope == "copy_target_creature_you_control_haste_sacrifice_end_step_v1":

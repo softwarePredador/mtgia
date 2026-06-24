@@ -2146,6 +2146,41 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 )
             )
         elif (
+            card_types == {"ARTIFACT", "LAND"}
+            and "CreateTokenEffect" in effect_classes
+            and {"ColorlessManaAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
+            and (
+                ("create x treasure tokens" in normalized_text and "{x}{x}" in str(rules_text or "").lower())
+                or ("getxvalue.instance" in normalized_text and "manacostsimpl" in normalized_text)
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="treasure_maker",
+                    scope="activated_xx_tap_sacrifice_create_x_treasures_v1",
+                    reason="Oracle and XMage structure match an activated artifact land that pays {X}{X}, taps, and sacrifices itself to create X Treasures.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "produces": "C",
+                        "mana_produced": 1,
+                        "activation_requires_tap": True,
+                        "activation_requires_sacrifice": True,
+                        "activation_cost_generic_is_x_twice": True,
+                        "treasure_count_source": "x_value",
+                        "treasure_count_per_x": 1,
+                    },
+                    matched_signals=[
+                        "CreateTokenEffect",
+                        "SimpleActivatedAbility",
+                        "TapSourceCost",
+                        "SacrificeSourceCost",
+                        "x_treasure_land",
+                    ],
+                )
+            )
+        elif (
             "treasuretoken" in normalized_text
             and "drawcardsourcecontrollereffect" not in normalized_text
             and card_types == {"SORCERY"}

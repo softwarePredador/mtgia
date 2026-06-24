@@ -7027,6 +7027,86 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_treasure_vault_cashes_in_expendable_land_for_x_treasures():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.hand = [{"name": "Keep Spell", "cmc": 2, "type_line": "Sorcery"}]
+        active.battlefield = [
+            {
+                "name": "Treasure Vault",
+                "effect": "treasure_maker",
+                "type_line": "Artifact Land",
+                "produces": "C",
+                "mana_produced": 1,
+                "activation_requires_tap": True,
+                "activation_requires_sacrifice": True,
+                "activation_cost_generic_is_x_twice": True,
+                "treasure_count_source": "x_value",
+                "treasure_count_per_x": 1,
+                "battle_model_scope": "activated_xx_tap_sacrifice_create_x_treasures_v1",
+            },
+            {"name": "Ancient Tomb", "effect": "land", "type_line": "Land", "produces": "C", "mana_produced": 2},
+            {"name": "Temple of the False God", "effect": "land", "type_line": "Land", "produces": "C", "mana_produced": 2},
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+        ]
+        active.refresh_mana_sources(turn=4)
+
+        activations = battle.activate_utility_lands(active, 4, random.Random(103))
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert activations == 1
+        assert active.treasures == 3
+        assert any(card.get("name") == "Treasure Vault" for card in active.graveyard)
+        assert not any(card.get("name") == "Treasure Vault" for card in active.battlefield)
+        assert any(
+            event == "utility_land_activated"
+            and data.get("card") == "Treasure Vault"
+            and data.get("activation_kind") == "treasure_conversion"
+            and data.get("x_value") == 3
+            and data.get("treasures_created") == 3
+            and data.get("mana_paid") == 6
+            for event, data in events
+        )
+
+    def test_treasure_vault_skips_when_land_base_is_too_shallow():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.hand = [{"name": "Keep Spell", "cmc": 2, "type_line": "Sorcery"}]
+        active.battlefield = [
+            {
+                "name": "Treasure Vault",
+                "effect": "treasure_maker",
+                "type_line": "Artifact Land",
+                "produces": "C",
+                "mana_produced": 1,
+                "activation_requires_tap": True,
+                "activation_requires_sacrifice": True,
+                "activation_cost_generic_is_x_twice": True,
+                "treasure_count_source": "x_value",
+                "treasure_count_per_x": 1,
+                "battle_model_scope": "activated_xx_tap_sacrifice_create_x_treasures_v1",
+            },
+            {"name": "Ancient Tomb", "effect": "land", "type_line": "Land", "produces": "C", "mana_produced": 2},
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+        ]
+        active.refresh_mana_sources(turn=4)
+
+        activations = battle.activate_utility_lands(active, 4, random.Random(104))
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert activations == 0
+        assert not any(card.get("name") == "Treasure Vault" for card in active.graveyard)
+        assert any(
+            event == "activated_ability_skipped"
+            and data.get("card") == "Treasure Vault"
+            and data.get("strategic_guardrail_reason") == "too_few_lands_to_cash_in_treasure_vault"
+            for event, data in events
+        )
+
     def test_inventors_fair_gains_life_on_upkeep_with_three_artifacts():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -10916,6 +10996,8 @@ def register_tests(battle, player):
         test_sunbaked_canyon_turns_expendable_land_into_card,
         test_sunbaked_canyon_requires_extra_mana_beyond_its_own_tap_proxy,
         test_sunbaked_canyon_skips_when_it_would_cut_too_deep_on_lands,
+        test_treasure_vault_cashes_in_expendable_land_for_x_treasures,
+        test_treasure_vault_skips_when_land_base_is_too_shallow,
         test_inventors_fair_gains_life_on_upkeep_with_three_artifacts,
         test_inventors_fair_tutors_artifact_when_threshold_and_mana_exist,
         test_inventors_fair_skips_without_artifact_threshold,

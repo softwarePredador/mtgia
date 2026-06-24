@@ -15071,6 +15071,7 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
         "urza's saga",
         "war room",
         "sunbaked canyon",
+        "treasure vault",
         "inventors' fair",
         "hall of heliod's generosity",
     ]
@@ -15384,6 +15385,108 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
                 hand_before=hand_size,
                 hand_after=len(player.hand),
                 lands_after=controlled_land_count(player),
+                phase=phase,
+                turn=turn,
+            )
+            activations += 1
+            break
+
+        if normalized_name == "treasure vault":
+            if hand_size > 2:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "hand_not_low_enough_for_treasure_vault_activation",
+                    phase=phase,
+                )
+                continue
+            if land_count <= 4:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "too_few_lands_to_cash_in_treasure_vault",
+                    phase=phase,
+                    risk_flags=["spending_last_safe_land_slot"],
+                )
+                continue
+            other_mana_available = player.available_mana()
+            if is_mana_source_permanent(permanent):
+                other_mana_available = max(0, other_mana_available - int(permanent.get("mana_produced") or 1))
+            max_x = other_mana_available // 2
+            if max_x <= 0:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_treasure_vault_activation",
+                    phase=phase,
+                )
+                continue
+            chosen_x = max(1, min(3, max_x))
+            generic_cost = chosen_x * 2
+            if not player.spend_mana(generic_cost):
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_generic_cost",
+                    phase=phase,
+                )
+                continue
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.graveyard.append(permanent)
+            player.treasures += chosen_x
+            activation_score = 22 + chosen_x * 4
+            emit_decision_trace(
+                decision_type="utility_land_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="activate_treasure_conversion",
+                        score=activation_score,
+                        effect="treasure_maker",
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="activate_treasure_conversion",
+                    score=activation_score,
+                    effect="treasure_maker",
+                ),
+                score_components={
+                    "hand_low_bonus": 16,
+                    "flood_relief_bonus": 10 if land_count >= 6 else 6,
+                    "treasure_creation_bonus": chosen_x * 6,
+                    "mana_spend_penalty": -generic_cost,
+                    "land_loss_penalty": -10,
+                },
+                rule_source="utility_land_activation_v1",
+                rule_status="verified",
+                confidence="medium",
+                expected_benefit_score=activation_score,
+                reason="convert_expendable_land_into_treasure_buffer",
+                strategic_principle="cash_in_flooded_utility_land_for_future_mana_flexibility",
+                resource_delta={"treasures": chosen_x, "mana": -generic_cost, "lands": -1},
+                risk_flags=["sacrifice_land"],
+            )
+            emit_replay_event(
+                "utility_land_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="treasure_conversion",
+                x_value=chosen_x,
+                treasures_created=chosen_x,
+                mana_paid=generic_cost,
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                lands_after=controlled_land_count(player),
+                treasures_after=player.treasures,
                 phase=phase,
                 turn=turn,
             )

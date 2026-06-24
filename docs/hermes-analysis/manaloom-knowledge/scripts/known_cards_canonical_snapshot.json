@@ -31435,13 +31435,23 @@
     "battle_rule_logical_key": "battle_rule_v1:ff89a51e0cee45b7bd2228c3d9f978e1"
   },
   "Treasure Vault": {
+    "ability_kind": "activated",
+    "activation_cost_generic_is_x_twice": true,
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "activated_xx_tap_sacrifice_create_x_treasures_v1",
     "effect": "land",
+    "mana_produced": 1,
+    "produces": "C",
+    "treasure_count_per_x": 1,
+    "treasure_count_source": "x_value",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:67aa4bb13af58f2ee2cd320a52d37de6",
+    "battle_rule_oracle_hash": "8b779ddf95f004e28c281873c3a2a091"
   },
   "Tree of Tales": {
     "effect": "land",

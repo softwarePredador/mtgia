@@ -222,6 +222,107 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "treasure_maker")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_treasure_vault_x_treasure_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Treasure Vault",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TreasureVault",
+                            "path": "/xmage/TreasureVault.java",
+                            "types": ["ARTIFACT", "LAND"],
+                            "effect_classes": ["CreateTokenEffect"],
+                            "ability_classes": ["ColorlessManaAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["TapSourceCost", "SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "treasure_maker",
+                                "battle_model_scope": "activated_xx_tap_sacrifice_create_x_treasures_v1",
+                                "ability_kind": "activated",
+                                "produces": "C",
+                                "mana_produced": 1,
+                                "activation_requires_tap": True,
+                                "activation_requires_sacrifice": True,
+                                "activation_cost_generic_is_x_twice": True,
+                                "treasure_count_source": "x_value",
+                                "treasure_count_per_x": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "treasure_maker")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_generator_uses_treasure_role_for_treasure_vault_batch_candidate(self) -> None:
+        report = generator.build_generator_report(
+            batch_audit={
+                "generated_at": "2026-06-24T00:00:00+00:00",
+                "status": "ready",
+                "source": {"deck_id": 116},
+                "summary": {},
+                "cards": [
+                    {
+                        "card_name": "Treasure Vault",
+                        "severity": "high",
+                        "oracle_hash": "22f7f449ee56143d6b63814fecd37176",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TreasureVault",
+                            "path": "/xmage/TreasureVault.java",
+                            "types": ["ARTIFACT", "LAND"],
+                            "effect_classes": ["CreateTokenEffect"],
+                            "ability_classes": ["ColorlessManaAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["TapSourceCost", "SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "treasure_maker",
+                                "battle_model_scope": "activated_xx_tap_sacrifice_create_x_treasures_v1",
+                                "ability_kind": "activated",
+                                "produces": "C",
+                                "mana_produced": 1,
+                                "activation_requires_tap": True,
+                                "activation_requires_sacrifice": True,
+                                "activation_cost_generic_is_x_twice": True,
+                                "treasure_count_source": "x_value",
+                                "treasure_count_per_x": 1,
+                            },
+                        },
+                    }
+                ],
+            },
+            external_harvest={
+                "status": "ready_for_manual_review",
+                "cards": [
+                    {
+                        "card_name": "Treasure Vault",
+                        "candidate_rule": {
+                            "oracle_hash": "22f7f449ee56143d6b63814fecd37176",
+                        },
+                        "external_references": {"scryfall": {"mana_cost": ""}},
+                    }
+                ],
+            },
+        )
+
+        proposal = report["proposals"][0]
+        self.assertEqual(proposal["family_id"], "treasure_maker")
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+        self.assertEqual(proposal["deck_role_json"]["category"], "ramp")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "treasure_maker")
+
     def test_classifier_marks_simple_copy_creature_token_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
