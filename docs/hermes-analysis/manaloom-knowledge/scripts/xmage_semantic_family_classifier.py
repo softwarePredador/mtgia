@@ -546,6 +546,34 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("activated_discard_cards_to_exile_and_return_tapped_count") or 0) == 3
         )
 
+    if effect == "creature" and scope == "flash_flying_vigilance_etb_x_counters_draw_half_x_opponent_search_growth_v1":
+        return (
+            types == {"CREATURE"}
+            and {"AddCountersSourceEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldTriggeredAbility", "FlashAbility", "FlyingAbility", "VigilanceAbility", "WanShiTongLibrarianTriggeredAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("flash"))
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("vigilance"))
+            and bool(effect_json.get("etb_add_x_plus_one_counters"))
+            and bool(effect_json.get("etb_draw_half_x_rounded_down"))
+            and bool(effect_json.get("opponent_search_library_add_counter_and_draw"))
+        )
+
+    if effect == "creature" and scope == "flash_cant_be_countered_cast_spell_bounce_spell_or_nonland_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"ReturnToHandTargetEffect"}
+            and {"CantBeCounteredSourceAbility", "FlashAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 7
+            and int(effect_json.get("toughness") or 0) == 8
+            and bool(effect_json.get("flash"))
+            and bool(effect_json.get("cant_be_countered"))
+            and bool(effect_json.get("cast_spell_trigger_bounce_spell_you_dont_control"))
+            and bool(effect_json.get("cast_spell_trigger_bounce_nonland_permanent"))
+        )
+
     if effect == "draw_cards" and scope == "draw_one_and_source_controller_spells_gain_flash_until_eot_v1":
         return (
             types == {"INSTANT"}
@@ -585,6 +613,17 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and {"GenericManaCost", "TapSourceCost", "SacrificeSourceCost"}.issubset(xmage_cost_classes(card))
             and bool(effect_json.get("trigger_counter_spell_if_no_mana_was_spent"))
             and int(effect_json.get("activated_generic_one_tap_sacrifice_draw") or 0) == 1
+        )
+
+    if effect == "planeswalker" and scope == "opponents_sorcery_speed_only_plus1_sorcery_flash_minus3_bounce_draw_v1":
+        return (
+            types == {"PLANESWALKER"}
+            and {"DrawCardSourceControllerEffect", "ReturnToHandTargetEffect", "CastAsThoughItHadFlashAllEffect", "TeferiTimeRavelerReplacementEffect"}.issubset(effect_classes)
+            and {"LoyaltyAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and int(effect_json.get("starting_loyalty") or 0) == 4
+            and bool(effect_json.get("opponents_can_cast_only_as_sorcery"))
+            and bool(effect_json.get("plus_one_sorceries_have_flash_until_your_next_turn"))
+            and int(effect_json.get("minus_three_bounce_up_to_one_artifact_creature_or_enchantment_draw") or 0) == 1
         )
 
     if effect == "bounce" and scope == "return_target_nonland_permanent_you_dont_control_or_overload_all_opponents_nonlands_v1":

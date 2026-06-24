@@ -839,6 +839,75 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["activated_each_player_draw_cost"], "{3}{U}")
         self.assertEqual(primary["activated_each_player_draw_count"], 1)
 
+    def test_wan_shi_tong_maps_to_exact_x_growth_draw_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersSourceEffect", "DrawCardSourceControllerEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldTriggeredAbility",
+                    "FlashAbility",
+                    "FlyingAbility",
+                    "VigilanceAbility",
+                    "WanShiTongLibrarianTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(1); this.toughness = new MageInt(1); "
+                    "this.addAbility(FlashAbility.getInstance()); this.addAbility(FlyingAbility.getInstance()); this.addAbility(VigilanceAbility.getInstance()); "
+                    "new EntersBattlefieldTriggeredAbility(new AddCountersSourceEffect(CounterType.P1P1.createInstance(), GetXValue.instance)); "
+                    "ability.addEffect(new DrawCardSourceControllerEffect(xValue)); "
+                    "this.addAbility(new WanShiTongLibrarianTriggeredAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "flash_flying_vigilance_etb_x_counters_draw_half_x_opponent_search_growth_v1",
+        )
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["flash"])
+        self.assertTrue(primary["flying"])
+        self.assertTrue(primary["vigilance"])
+        self.assertTrue(primary["etb_add_x_plus_one_counters"])
+        self.assertTrue(primary["etb_draw_half_x_rounded_down"])
+        self.assertTrue(primary["opponent_search_library_add_counter_and_draw"])
+
+    def test_hullbreaker_horror_maps_to_exact_cast_spell_bounce_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["ReturnToHandTargetEffect"],
+                "ability_classes": [
+                    "CantBeCounteredSourceAbility",
+                    "FlashAbility",
+                    "SpellCastControllerTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(7); this.toughness = new MageInt(8); "
+                    "this.addAbility(FlashAbility.getInstance()); this.addAbility(new CantBeCounteredSourceAbility()); "
+                    "Ability ability = new SpellCastControllerTriggeredAbility(new ReturnToHandTargetEffect(), false); "
+                    "ability.addTarget(new TargetSpell(filter)); Mode mode = new Mode(new ReturnToHandTargetEffect()); mode.addTarget(new TargetNonlandPermanent());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "flash_cant_be_countered_cast_spell_bounce_spell_or_nonland_v1",
+        )
+        self.assertEqual(primary["power"], 7)
+        self.assertEqual(primary["toughness"], 8)
+        self.assertTrue(primary["flash"])
+        self.assertTrue(primary["cant_be_countered"])
+        self.assertTrue(primary["cast_spell_trigger_bounce_spell_you_dont_control"])
+        self.assertTrue(primary["cast_spell_trigger_bounce_nonland_permanent"])
+
     def test_nezahal_maps_to_exact_static_draw_blink_creature_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -877,6 +946,36 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["no_maximum_hand_size"])
         self.assertEqual(primary["opponent_casts_noncreature_draw"], 1)
         self.assertEqual(primary["activated_discard_cards_to_exile_and_return_tapped_count"], 3)
+
+    def test_teferi_time_raveler_maps_to_exact_planeswalker_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "CastAsThoughItHadFlashAllEffect",
+                    "DrawCardSourceControllerEffect",
+                    "ReturnToHandTargetEffect",
+                    "TeferiTimeRavelerReplacementEffect",
+                ],
+                "ability_classes": ["LoyaltyAbility", "SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["PLANESWALKER"]},
+                "raw_excerpt": (
+                    "this.setStartingLoyalty(4); Each opponent can cast spells only any time they could cast a sorcery. "
+                    "Until your next turn, you may cast sorcery spells as though they had flash. "
+                    "Return up to one target artifact, creature, or enchantment to its owner's hand. Draw a card."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "planeswalker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponents_sorcery_speed_only_plus1_sorcery_flash_minus3_bounce_draw_v1",
+        )
+        self.assertEqual(primary["starting_loyalty"], 4)
+        self.assertTrue(primary["opponents_can_cast_only_as_sorcery"])
+        self.assertTrue(primary["plus_one_sorceries_have_flash_until_your_next_turn"])
+        self.assertEqual(primary["minus_three_bounce_up_to_one_artifact_creature_or_enchantment_draw"], 1)
 
     def test_goblin_bombardment_maps_to_exact_sacrifice_damage_scope(self) -> None:
         result = hints.build_effect_hints(

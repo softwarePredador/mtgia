@@ -13925,14 +13925,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Hullbreaker Horror": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "flash_cant_be_countered_cast_spell_bounce_spell_or_nonland_v1",
+    "cant_be_countered": true,
+    "cast_spell_trigger_bounce_nonland_permanent": true,
+    "cast_spell_trigger_bounce_spell_you_dont_control": true,
     "effect": "counter",
+    "flash": true,
+    "power": 7,
+    "toughness": 8,
     "instant": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b392cae2697bc7991f57a76039df9471"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e27cba51b13efd4db7efaebf7878b572",
+    "battle_rule_oracle_hash": "8339fa3591d36c5d0460156fbf96d8fe"
   },
   "Humble Defector": {
     "cmc": 2.0,
@@ -29086,13 +29095,20 @@
     "battle_rule_logical_key": "battle_rule_v1:64716c962d5034c527ca85ea45fa8ba1"
   },
   "Teferi, Time Raveler": {
-    "effect": "passive",
+    "ability_kind": "static",
+    "battle_model_scope": "opponents_sorcery_speed_only_plus1_sorcery_flash_minus3_bounce_draw_v1",
+    "effect": "planeswalker",
+    "minus_three_bounce_up_to_one_artifact_creature_or_enchantment_draw": 1,
+    "opponents_can_cast_only_as_sorcery": true,
+    "plus_one_sorceries_have_flash_until_your_next_turn": true,
+    "starting_loyalty": 4,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:35ae547c02c12ce35e09945d4791f7ad",
+    "battle_rule_oracle_hash": "7c2d3586e1633bcaf4f26d7b01a6c266"
   },
   "Teleportation Circle": {
     "cmc": 4.0,
@@ -33162,14 +33178,24 @@
     "battle_rule_logical_key": "battle_rule_v1:0a2417b19a8ac741807c96458fe11c30"
   },
   "Wan Shi Tong, Librarian": {
-    "effect": "draw_engine",
-    "trigger": "historic_spell",
+    "ability_kind": "triggered",
+    "battle_model_scope": "flash_flying_vigilance_etb_x_counters_draw_half_x_opponent_search_growth_v1",
+    "effect": "creature",
+    "etb_add_x_plus_one_counters": true,
+    "etb_draw_half_x_rounded_down": true,
+    "flash": true,
+    "flying": true,
+    "opponent_search_library_add_counter_and_draw": true,
+    "power": 1,
+    "toughness": 1,
+    "vigilance": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:70834ed31349e783de2c2270fec2b478"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c18481f9ac5f3681e11384c838d732c9",
+    "battle_rule_oracle_hash": "cec9147cf2498a1c06969597acfea508"
   },
   "Wandering Fumarole": {
     "effect": "land",

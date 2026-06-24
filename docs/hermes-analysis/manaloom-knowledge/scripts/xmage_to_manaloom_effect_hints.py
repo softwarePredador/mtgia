@@ -740,6 +740,56 @@ def _build_creature_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and {"AddCountersSourceEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+        and {"EntersBattlefieldTriggeredAbility", "FlashAbility", "FlyingAbility", "VigilanceAbility", "WanShiTongLibrarianTriggeredAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "flash_flying_vigilance_etb_x_counters_draw_half_x_opponent_search_growth_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "flash": True,
+                "flying": True,
+                "vigilance": True,
+                "etb_add_x_plus_one_counters": True,
+                "etb_draw_half_x_rounded_down": True,
+                "opponent_search_library_add_counter_and_draw": True,
+            },
+            "reason": "XMage structure matches Wan Shi Tong flash/flying/vigilance body, ETB X-counter plus half-X draw, and opponent-library-search growth trigger.",
+            "signals": [
+                "WanShiTongLibrarianTriggeredAbility",
+                "AddCountersSourceEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and effect_classes == {"ReturnToHandTargetEffect"}
+        and {"CantBeCounteredSourceAbility", "FlashAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "flash_cant_be_countered_cast_spell_bounce_spell_or_nonland_v1",
+            "fields": {
+                "power": 7,
+                "toughness": 8,
+                "flash": True,
+                "cant_be_countered": True,
+                "cast_spell_trigger_bounce_spell_you_dont_control": True,
+                "cast_spell_trigger_bounce_nonland_permanent": True,
+            },
+            "reason": "XMage structure matches Hullbreaker Horror flash body, anti-counter static, and cast-a-spell trigger bouncing a spell you do not control or a nonland permanent.",
+            "signals": [
+                "SpellCastControllerTriggeredAbility",
+                "ReturnToHandTargetEffect",
+                "CantBeCounteredSourceAbility",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and {"DrawCardSourceControllerEffect", "ExileReturnBattlefieldOwnerNextEndStepSourceEffect", "MaximumHandSizeControllerEffect"}.issubset(effect_classes)
         and {"CantBeCounteredSourceAbility", "SimpleActivatedAbility", "SimpleStaticAbility", "SpellCastOpponentTriggeredAbility"}.issubset(ability_classes)
         and "DiscardTargetCost" in cost_classes
@@ -905,6 +955,30 @@ def _build_exact_runtime_variant_fields(
                 "CounterTargetEffect",
                 "DestroyTargetEffect",
                 "blue_spell_or_permanent",
+            ],
+        }
+
+    if (
+        card_types == {"PLANESWALKER"}
+        and {"DrawCardSourceControllerEffect", "ReturnToHandTargetEffect", "CastAsThoughItHadFlashAllEffect", "TeferiTimeRavelerReplacementEffect"}.issubset(effect_classes)
+        and {"LoyaltyAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+        and "sorcery spells" in normalized
+        and "artifact, creature, or enchantment" in normalized
+    ):
+        return {
+            "effect": "planeswalker",
+            "scope": "opponents_sorcery_speed_only_plus1_sorcery_flash_minus3_bounce_draw_v1",
+            "fields": {
+                "starting_loyalty": 4,
+                "opponents_can_cast_only_as_sorcery": True,
+                "plus_one_sorceries_have_flash_until_your_next_turn": True,
+                "minus_three_bounce_up_to_one_artifact_creature_or_enchantment_draw": 1,
+            },
+            "reason": "XMage structure matches Teferi, Time Raveler static timing lock, plus-one sorcery flash permission, and minus-three bounce-plus-draw mode.",
+            "signals": [
+                "ContinuousRuleModifyingEffectImpl",
+                "CastAsThoughItHadFlashAllEffect",
+                "ReturnToHandTargetEffect",
             ],
         }
 

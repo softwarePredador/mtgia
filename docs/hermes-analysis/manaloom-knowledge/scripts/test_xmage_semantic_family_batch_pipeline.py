@@ -799,6 +799,96 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_wan_shi_tong_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Wan Shi Tong, Librarian",
+                        "severity": "high",
+                        "oracle_hash": "wanshihash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "WanShiTongLibrarian",
+                            "path": "/xmage/WanShiTongLibrarian.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["AddCountersSourceEffect", "DrawCardSourceControllerEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldTriggeredAbility",
+                                "FlashAbility",
+                                "FlyingAbility",
+                                "VigilanceAbility",
+                                "WanShiTongLibrarianTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "flash_flying_vigilance_etb_x_counters_draw_half_x_opponent_search_growth_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "flash": True,
+                                "flying": True,
+                                "vigilance": True,
+                                "etb_add_x_plus_one_counters": True,
+                                "etb_draw_half_x_rounded_down": True,
+                                "opponent_search_library_add_counter_and_draw": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_hullbreaker_horror_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Hullbreaker Horror",
+                        "severity": "high",
+                        "oracle_hash": "hullhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "HullbreakerHorror",
+                            "path": "/xmage/HullbreakerHorror.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["ReturnToHandTargetEffect"],
+                            "ability_classes": [
+                                "CantBeCounteredSourceAbility",
+                                "FlashAbility",
+                                "SpellCastControllerTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "flash_cant_be_countered_cast_spell_bounce_spell_or_nonland_v1",
+                                "power": 7,
+                                "toughness": 8,
+                                "flash": True,
+                                "cant_be_countered": True,
+                                "cast_spell_trigger_bounce_spell_you_dont_control": True,
+                                "cast_spell_trigger_bounce_nonland_permanent": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_nezahal_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -837,6 +927,48 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "no_maximum_hand_size": True,
                                 "opponent_casts_noncreature_draw": 1,
                                 "activated_discard_cards_to_exile_and_return_tapped_count": 3,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_teferi_time_raveler_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Teferi, Time Raveler",
+                        "severity": "high",
+                        "oracle_hash": "teferihash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TeferiTimeRaveler",
+                            "path": "/xmage/TeferiTimeRaveler.java",
+                            "types": ["PLANESWALKER"],
+                            "effect_classes": [
+                                "CastAsThoughItHadFlashAllEffect",
+                                "DrawCardSourceControllerEffect",
+                                "ReturnToHandTargetEffect",
+                                "TeferiTimeRavelerReplacementEffect",
+                            ],
+                            "ability_classes": ["LoyaltyAbility", "SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "planeswalker",
+                                "battle_model_scope": "opponents_sorcery_speed_only_plus1_sorcery_flash_minus3_bounce_draw_v1",
+                                "starting_loyalty": 4,
+                                "opponents_can_cast_only_as_sorcery": True,
+                                "plus_one_sorceries_have_flash_until_your_next_turn": True,
+                                "minus_three_bounce_up_to_one_artifact_creature_or_enchantment_draw": 1,
                             },
                         },
                     }
