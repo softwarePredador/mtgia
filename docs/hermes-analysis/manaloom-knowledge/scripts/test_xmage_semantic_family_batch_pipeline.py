@@ -258,6 +258,76 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "copy_creature_token")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_copy_target_permanent_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Flash Photography",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "FlashPhotography",
+                            "path": "/xmage/FlashPhotography.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["CreateTokenCopyTargetEffect"],
+                            "primary_effect": {
+                                "effect": "copy_creature_token",
+                                "battle_model_scope": "copy_target_permanent_v1",
+                                "ability_kind": "one_shot",
+                                "copy_target_types": ["permanent"],
+                                "target_controller": "any",
+                                "token_haste": False,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_creature_token")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_clone_legion_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Clone Legion",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "CloneLegion",
+                            "path": "/xmage/CloneLegion.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["CreateTokenCopyTargetEffect"],
+                            "primary_effect": {
+                                "effect": "copy_creature_token",
+                                "battle_model_scope": "copy_each_creature_target_player_controls_v1",
+                                "ability_kind": "one_shot",
+                                "copy_target_types": ["creature"],
+                                "target_controller": "opponent",
+                                "copy_all_matching_targets": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "copy_creature_token")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_lotho_treasure_engine_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -297,6 +367,87 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         card = report["cards"][0]
         self.assertEqual(card["family_id"], "ramp_engine")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_impulsive_pilferer_death_treasure_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Impulsive Pilferer",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "ImpulsivePilferer",
+                            "path": "/xmage/ImpulsivePilferer.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenEffect"],
+                            "ability_classes": ["DiesSourceTriggeredAbility", "EncoreAbility"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "dies_create_treasure_encore_v1",
+                                "ability_kind": "triggered",
+                                "power": 1,
+                                "toughness": 1,
+                                "dies_or_graveyard_from_battlefield_treasure": True,
+                                "treasure_count": 1,
+                                "encore_cost": "{3}{R}",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "creature")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_astral_dragon_creature_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Astral Dragon",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "AstralDragon",
+                            "path": "/xmage/AstralDragon.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenCopyTargetEffect"],
+                            "ability_classes": ["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "etb_copy_target_noncreature_permanent_twice_as_3_3_flying_dragon_v1",
+                                "ability_kind": "triggered",
+                                "power": 4,
+                                "toughness": 4,
+                                "flying": True,
+                                "etb_copy_target_types": ["noncreature_permanent"],
+                                "etb_copy_token_count": 2,
+                                "etb_copy_force_creature": True,
+                                "etb_copy_token_power": 3,
+                                "etb_copy_token_toughness": 3,
+                                "etb_copy_token_flying": True,
+                                "etb_copy_token_subtype": "Dragon",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "creature")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
     def test_classifier_marks_prized_statue_scope_as_batch_safe(self) -> None:

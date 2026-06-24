@@ -298,6 +298,63 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["token_haste"])
         self.assertTrue(primary["sacrifice_token_at_end_step"])
 
+    def test_flash_photography_maps_to_copy_target_permanent(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "FlashPhotography",
+                "effect_classes": ["CreateTokenCopyTargetEffect"],
+                "ability_classes": ["CastAsThoughItHadFlashIfConditionAbility", "FlashbackAbility"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+            },
+            "Create a token that's a copy of target permanent.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_creature_token")
+        self.assertEqual(primary["battle_model_scope"], "copy_target_permanent_v1")
+        self.assertEqual(primary["copy_target_types"], ["permanent"])
+        self.assertEqual(primary["target_controller"], "any")
+        self.assertFalse(primary["token_haste"])
+
+    def test_flash_photography_maps_to_copy_target_permanent_from_xmage_structure_only(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "FlashPhotography",
+                "effect_classes": ["CreateTokenCopyTargetEffect"],
+                "ability_classes": ["CastAsThoughItHadFlashIfConditionAbility", "FlashbackAbility"],
+                "condition_classes": ["SourceTargetsPermanentCondition"],
+                "target_classes": ["TargetPermanent"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_creature_token")
+        self.assertEqual(primary["battle_model_scope"], "copy_target_permanent_v1")
+        self.assertEqual(primary["copy_target_types"], ["permanent"])
+        self.assertEqual(primary["target_controller"], "any")
+
+    def test_clone_legion_maps_to_copy_each_creature_target_player_controls(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CloneLegion",
+                "effect_classes": ["CreateTokenCopyTargetEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+            },
+            "For each creature target player controls, create a token that's a copy of that creature.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_creature_token")
+        self.assertEqual(primary["battle_model_scope"], "copy_each_creature_target_player_controls_v1")
+        self.assertEqual(primary["copy_target_types"], ["creature"])
+        self.assertEqual(primary["target_controller"], "opponent")
+        self.assertTrue(primary["copy_all_matching_targets"])
+
     def test_lotho_maps_to_second_spell_treasure_engine(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -319,6 +376,55 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["opponent_second_spell_each_turn"])
         self.assertEqual(primary["treasure_count"], 1)
         self.assertEqual(primary["controller_loses_life_on_trigger"], 1)
+
+    def test_impulsive_pilferer_maps_to_death_treasure_creature(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["DiesSourceTriggeredAbility", "EncoreAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            "When Impulsive Pilferer dies, create a Treasure token. Encore {3}{R}.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "dies_create_treasure_encore_v1")
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["dies_or_graveyard_from_battlefield_treasure"])
+        self.assertEqual(primary["treasure_count"], 1)
+        self.assertEqual(primary["encore_cost"], "{3}{R}")
+
+    def test_astral_dragon_maps_to_creature_etb_copy_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "AstralDragon",
+                "effect_classes": ["CreateTokenCopyTargetEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            "Flying. When Astral Dragon enters the battlefield, create two tokens that are copies of target noncreature permanent, except they're 3/3 Dragon creatures in addition to their other types, and they have flying.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_copy_target_noncreature_permanent_twice_as_3_3_flying_dragon_v1",
+        )
+        self.assertEqual(primary["power"], 4)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["etb_copy_target_types"], ["noncreature_permanent"])
+        self.assertEqual(primary["etb_copy_token_count"], 2)
+        self.assertTrue(primary["etb_copy_force_creature"])
+        self.assertEqual(primary["etb_copy_token_power"], 3)
+        self.assertEqual(primary["etb_copy_token_toughness"], 3)
+        self.assertTrue(primary["etb_copy_token_flying"])
+        self.assertEqual(primary["etb_copy_token_subtype"], "Dragon")
 
     def test_prized_statue_maps_to_etb_or_dies_treasure_artifact(self) -> None:
         result = hints.build_effect_hints(

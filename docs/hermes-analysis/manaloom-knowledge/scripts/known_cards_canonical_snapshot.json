@@ -1590,6 +1590,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b95c4690c2d65b87c2a11a1c659cd624"
   },
+  "Astral Dragon": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "etb_copy_target_noncreature_permanent_twice_as_3_3_flying_dragon_v1",
+    "effect": "creature",
+    "etb_copy_force_creature": true,
+    "etb_copy_target_types": [
+      "noncreature_permanent"
+    ],
+    "etb_copy_token_count": 2,
+    "etb_copy_token_flying": true,
+    "etb_copy_token_power": 3,
+    "etb_copy_token_subtype": "Dragon",
+    "etb_copy_token_toughness": 3,
+    "flying": true,
+    "power": 4,
+    "toughness": 4,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f8364137188a184510b1cfc4ebeac33",
+    "battle_rule_oracle_hash": "5efa9ecc8bca6d341f1dc4dea3e51c49"
+  },
   "Astral Drift": {
     "cmc": 3.0,
     "effect": "remove_creature",
@@ -5126,6 +5150,23 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:0b0a23d2aae071106674f3f58ad437e4"
+  },
+  "Clone Legion": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "copy_each_creature_target_player_controls_v1",
+    "copy_all_matching_targets": true,
+    "copy_target_types": [
+      "creature"
+    ],
+    "effect": "copy_creature_token",
+    "target_controller": "opponent",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:391956936dfadf0b7bd0f0123226279f",
+    "battle_rule_oracle_hash": "d5300831d3df4276f01145ddeca85521"
   },
   "Cloud Key": {
     "cmc": 3.0,
@@ -10477,6 +10518,23 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e21a09af20904932ce575966774b7905"
   },
+  "Flash Photography": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "copy_target_permanent_v1",
+    "copy_target_types": [
+      "permanent"
+    ],
+    "effect": "copy_creature_token",
+    "target_controller": "any",
+    "token_haste": false,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e5ea20bd49a563c1256183af42e86c71",
+    "battle_rule_oracle_hash": "c3fb29c6ec7bd40a4d59959e9abe9ee8"
+  },
   "Flashback": {
     "count": 1,
     "effect": "recursion",
@@ -14431,16 +14489,21 @@
     "battle_rule_oracle_hash": "211282705b9124c8f737b1eb351e13f0"
   },
   "Impulsive Pilferer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "dies_create_treasure_encore_v1",
+    "dies_or_graveyard_from_battlefield_treasure": true,
     "effect": "creature",
-    "is_creature_permanent": true,
+    "encore_cost": "{3}{R}",
     "power": 1,
     "toughness": 1,
+    "treasure_count": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:85d8c93e5ff3b531d4ab9217bd956948"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dee9ffe02f85f08536dbd78b3ed9217c",
+    "battle_rule_oracle_hash": "cce3d44a3b00f6bb006f928f6cb36659"
   },
   "Impulsivity": {
     "cmc": 7.0,
@@ -21740,17 +21803,19 @@
     "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
   },
   "Prized Statue": {
-    "_rule_logical_key": "battle_rule_v1:f12f6b0add30c98761744303a2cb2034",
-    "battle_model_scope": "prized_statue_treasure_artifact_waiver_v1",
+    "ability_kind": "triggered",
+    "battle_model_scope": "artifact_etb_or_dies_create_treasure_v1",
     "dies_or_graveyard_from_battlefield_treasure": true,
     "effect": "ramp_permanent",
+    "enters_treasure": 1,
     "treasure_count": 1,
-    "battle_rule_source": "manual",
+    "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2863db84fc8c0de650f20f97705a2f31"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5409aaaddafe0d4a8f2beef5869dccb1",
+    "battle_rule_oracle_hash": "f8c4faf999ea6d3721761c9c0e9b2d2f"
   },
   "Processing Plant": {
     "effect": "land",

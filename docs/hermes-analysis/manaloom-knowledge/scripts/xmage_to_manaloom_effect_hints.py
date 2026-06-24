@@ -665,6 +665,40 @@ def _build_creature_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and effect_classes == {"CreateTokenCopyTargetEffect"}
+        and "EntersBattlefieldTriggeredAbility" in ability_classes
+        and _oracle_has(
+            rules_text,
+            "create two tokens that are copies of target noncreature permanent",
+            "they're 3/3 dragon creatures",
+            "they have flying",
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "etb_copy_target_noncreature_permanent_twice_as_3_3_flying_dragon_v1",
+            "fields": {
+                "power": 4,
+                "toughness": 4,
+                "flying": True,
+                "etb_copy_target_types": ["noncreature_permanent"],
+                "etb_copy_token_count": 2,
+                "etb_copy_force_creature": True,
+                "etb_copy_token_power": 3,
+                "etb_copy_token_toughness": 3,
+                "etb_copy_token_flying": True,
+                "etb_copy_token_subtype": "Dragon",
+            },
+            "reason": "XMage structure matches Astral Dragon ETB creating two 3/3 flying Dragon copies of a target noncreature permanent.",
+            "signals": [
+                "CreateTokenCopyTargetEffect",
+                "EntersBattlefieldTriggeredAbility",
+                "copy_noncreature_permanent_twice",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and "CounterTargetEffect" in effect_classes
         and "SimpleActivatedAbility" in ability_classes
         and "SacrificeSourceCost" in cost_classes
@@ -1752,6 +1786,59 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     matched_signals=["CreateTokenCopyTargetEffect", "copy_creature_you_control", "sacrifice_end_step"],
                 )
             )
+        elif (
+            card_types == {"SORCERY"}
+            and (
+                _oracle_has(rules_text, "create a token that's a copy of target permanent")
+                or (
+                    "TargetPermanent" in target_classes
+                    and "SourceTargetsPermanentCondition" in condition_classes
+                    and "CastAsThoughItHadFlashIfConditionAbility" in ability_classes
+                    and "FlashbackAbility" in ability_classes
+                )
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="copy_creature_token",
+                    scope="copy_target_permanent_v1",
+                    reason="Oracle and XMage structure match a one-shot permanent copy token without temporary cleanup clauses.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "copy_target_types": ["permanent"],
+                        "target_controller": "any",
+                        "token_haste": False,
+                    },
+                    matched_signals=["CreateTokenCopyTargetEffect", "copy_target_permanent"],
+                )
+            )
+        elif (
+            card_types == {"SORCERY"}
+            and _oracle_has(
+                rules_text,
+                "for each creature target player controls",
+                "create a token that's a copy of that creature",
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="copy_creature_token",
+                    scope="copy_each_creature_target_player_controls_v1",
+                    reason="Oracle and XMage structure match creating one copy for each creature a targeted player controls.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "copy_target_types": ["creature"],
+                        "target_controller": "opponent",
+                        "copy_all_matching_targets": True,
+                    },
+                    matched_signals=[
+                        "CreateTokenCopyTargetEffect",
+                        "copy_all_creatures_target_player_controls",
+                    ],
+                )
+            )
 
     card_types = {
         str(value or "").upper()
@@ -1780,6 +1867,33 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                         "CreateTokenEffect",
                         "EntersBattlefieldOrDiesSourceTriggeredAbility",
                         "etb_or_dies_treasure",
+                    ],
+                )
+            )
+        elif (
+            card_types == {"CREATURE"}
+            and effect_classes == {"CreateTokenEffect"}
+            and {"DiesSourceTriggeredAbility", "EncoreAbility"}.issubset(ability_classes)
+        ):
+            candidates.append(
+                _candidate(
+                    effect="creature",
+                    scope="dies_create_treasure_encore_v1",
+                    reason="Oracle and XMage structure match a 1/1 creature that creates a Treasure when it dies and carries encore.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "power": 1,
+                        "toughness": 1,
+                        "dies_or_graveyard_from_battlefield_treasure": True,
+                        "treasure_count": 1,
+                        "encore_cost": "{3}{R}",
+                    },
+                    matched_signals=[
+                        "CreateTokenEffect",
+                        "DiesSourceTriggeredAbility",
+                        "EncoreAbility",
+                        "dies_treasure",
                     ],
                 )
             )

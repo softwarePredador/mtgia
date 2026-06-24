@@ -118,6 +118,13 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
+    "creature": {
+        "effects": {"creature"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "creature permanents with exact-scope ETB, death, combat, and activated behavior",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
     "passive": {
         "effects": {"passive"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -477,6 +484,26 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("sacrifice_token_at_end_step"))
         )
 
+    if effect == "copy_creature_token" and scope == "copy_target_permanent_v1":
+        return (
+            types == {"SORCERY"}
+            and "CreateTokenCopyTargetEffect" in effect_classes
+            and effect_json.get("copy_target_types") == ["permanent"]
+            and effect_json.get("target_controller") == "any"
+            and not bool(effect_json.get("token_haste"))
+            and not bool(effect_json.get("sacrifice_token_at_end_step"))
+            and not bool(effect_json.get("exile_token_at_end_step"))
+        )
+
+    if effect == "copy_creature_token" and scope == "copy_each_creature_target_player_controls_v1":
+        return (
+            types == {"SORCERY"}
+            and "CreateTokenCopyTargetEffect" in effect_classes
+            and effect_json.get("copy_target_types") == ["creature"]
+            and effect_json.get("target_controller") == "opponent"
+            and bool(effect_json.get("copy_all_matching_targets"))
+        )
+
     if effect == "ramp_permanent" and scope == "artifact_etb_or_dies_create_treasure_v1":
         return (
             types == {"ARTIFACT"}
@@ -485,6 +512,35 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("treasure_count") or 0) == 1
             and int(effect_json.get("enters_treasure") or 0) == 1
             and bool(effect_json.get("dies_or_graveyard_from_battlefield_treasure"))
+        )
+
+    if effect == "creature" and scope == "dies_create_treasure_encore_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"CreateTokenEffect"}
+            and {"DiesSourceTriggeredAbility", "EncoreAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("dies_or_graveyard_from_battlefield_treasure"))
+            and int(effect_json.get("treasure_count") or 0) == 1
+            and effect_json.get("encore_cost") == "{3}{R}"
+        )
+
+    if effect == "creature" and scope == "etb_copy_target_noncreature_permanent_twice_as_3_3_flying_dragon_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"CreateTokenCopyTargetEffect"}
+            and "EntersBattlefieldTriggeredAbility" in ability_classes
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("flying"))
+            and effect_json.get("etb_copy_target_types") == ["noncreature_permanent"]
+            and int(effect_json.get("etb_copy_token_count") or 0) == 2
+            and bool(effect_json.get("etb_copy_force_creature"))
+            and int(effect_json.get("etb_copy_token_power") or 0) == 3
+            and int(effect_json.get("etb_copy_token_toughness") or 0) == 3
+            and bool(effect_json.get("etb_copy_token_flying"))
+            and effect_json.get("etb_copy_token_subtype") == "Dragon"
         )
 
     if effect == "ramp_engine" and scope == "opponent_second_spell_each_turn_create_treasure_life_loss_v1":

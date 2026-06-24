@@ -5874,6 +5874,54 @@ def register_tests(battle, player):
         assert dies_event["treasures_created"] == 1
         assert dies_event["destination"] == "graveyard"
 
+    def test_impulsive_pilferer_dies_create_treasure():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            pilferer = {"name": "Impulsive Pilferer", "cmc": 1, "type_line": "Creature — Goblin Pirate"}
+            effect_data = {
+                "effect": "creature",
+                "battle_model_scope": "dies_create_treasure_encore_v1",
+                "power": 1,
+                "toughness": 1,
+                "treasure_count": 1,
+                "dies_or_graveyard_from_battlefield_treasure": True,
+                "encore_cost": "{3}{R}",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                pilferer,
+                5,
+                random.Random(12031),
+                effect_data_override=effect_data,
+            )
+
+            creature = next(card for card in active.battlefield if card.get("name") == "Impulsive Pilferer")
+            destination = battle.move_permanent_from_battlefield(
+                active,
+                creature,
+                reason="combat_damage_lethal",
+                source={"name": "Test Combat"},
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert destination == "graveyard"
+        assert active.treasures == 1
+        dies_event = next(
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Impulsive Pilferer"
+            and data.get("trigger") == "dies_or_graveyard_from_battlefield"
+        )
+        assert dies_event["treasures_created"] == 1
+        assert dies_event["destination"] == "graveyard"
+
     def test_reckless_endeavor_damage_wipe_creates_treasures():
         active = player("Active")
         opponent = player("Opponent")
@@ -6148,6 +6196,128 @@ def register_tests(battle, player):
         assert created["rule_logical_key"] == "battle_rule_v1:e154b34c0deaa861094d5870f4c0ad69"
         assert created["rule_oracle_hash"] == "7c24d56660499c0af4db967925de1573"
         assert any(event == "end_step_token_sacrificed" for event, _ in events)
+
+    def test_flash_photography_copies_target_permanent_without_temporary_cleanup():
+        active = player("Active")
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Mana Vault",
+                "effect": "ramp_permanent",
+                "type_line": "Artifact",
+                "mana_produced": 3,
+            }
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Flash Photography", "cmc": 4, "type_line": "Sorcery"},
+            5,
+            random.Random(684),
+            effect_data_override={
+                "effect": "copy_creature_token",
+                "copy_target_types": ["permanent"],
+                "target_controller": "any",
+                "token_haste": False,
+                "battle_model_scope": "copy_target_permanent_v1",
+                "_rule_logical_key": "battle_rule_v1:4c6937147f6f4af4eb8b3e2d3e0f1349",
+                "_rule_oracle_hash": "c3fb29c6ec7bd40a4d59959e9abe9ee8",
+            },
+        )
+
+        token = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("copy_of") == "Mana Vault"
+        )
+        assert token["effect"] == "ramp_permanent"
+        assert token["haste"] is False
+        assert token.get("sacrifice_at_end_step") is not True
+        assert token.get("exile_at_end_step") is not True
+        assert "artifact" in token.get("type_line", "").lower()
+
+    def test_clone_legion_copies_each_creature_controlled_by_target_player():
+        active = player("Active")
+        opponent_a = player("Opponent A")
+        opponent_b = player("Opponent B")
+        opponent_a.battlefield = [
+            {"name": "A Threat", "effect": "creature", "type_line": "Creature", "power": 5, "toughness": 5},
+            {"name": "A Utility", "effect": "creature", "type_line": "Creature", "power": 2, "toughness": 2},
+        ]
+        opponent_b.battlefield = [
+            {"name": "B Threat", "effect": "creature", "type_line": "Creature", "power": 1, "toughness": 1}
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent_a, opponent_b],
+            {"name": "Clone Legion", "cmc": 9, "type_line": "Sorcery"},
+            6,
+            random.Random(685),
+            effect_data_override={
+                "effect": "copy_creature_token",
+                "copy_target_types": ["creature"],
+                "target_controller": "opponent",
+                "copy_all_matching_targets": True,
+                "battle_model_scope": "copy_each_creature_target_player_controls_v1",
+                "_rule_logical_key": "battle_rule_v1:b8e88d7633d81dbdf0185cf2bcfd1dbc",
+                "_rule_oracle_hash": "d5300831d3df4276f01145ddeca85521",
+            },
+        )
+
+        copied = sorted(
+            permanent.get("copy_of")
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("token")
+        )
+        assert copied == ["A Threat", "A Utility"]
+
+    def test_astral_dragon_etb_creates_two_dragon_copies_of_noncreature_permanent():
+        active = player("Active")
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Smothering Tithe",
+                "effect": "draw_engine",
+                "type_line": "Enchantment",
+            }
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Astral Dragon", "cmc": 8, "type_line": "Creature — Dragon"},
+            6,
+            random.Random(686),
+            effect_data_override={
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "flying": True,
+                "etb_copy_target_types": ["noncreature_permanent"],
+                "etb_copy_token_count": 2,
+                "etb_copy_force_creature": True,
+                "etb_copy_token_power": 3,
+                "etb_copy_token_toughness": 3,
+                "etb_copy_token_flying": True,
+                "etb_copy_token_subtype": "Dragon",
+                "battle_model_scope": "etb_copy_target_noncreature_permanent_twice_as_3_3_flying_dragon_v1",
+                "_rule_logical_key": "battle_rule_v1:cb774fbd1b2a4fc4f8c6cba85d0db512",
+                "_rule_oracle_hash": "5efa9ecc8bca6d341f1dc4dea3e51c49",
+            },
+        )
+
+        dragon_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("copy_of") == "Smothering Tithe"
+        ]
+        assert len(dragon_tokens) == 2
+        assert all(token.get("power") == 3 for token in dragon_tokens)
+        assert all(token.get("toughness") == 3 for token in dragon_tokens)
+        assert all(token.get("flying") is True for token in dragon_tokens)
+        assert all("dragon" in token.get("type_line", "").lower() for token in dragon_tokens)
 
     def test_valakut_awakening_filters_hand_and_draws_plus_one():
         events = []
@@ -10365,10 +10535,16 @@ def register_tests(battle, player):
         test_reckless_endeavor_damage_wipe_creates_treasures,
         test_reverse_the_sands_swaps_with_highest_life_opponent,
         test_birgi_adds_red_mana_when_controller_casts_spell,
+        test_lotho_second_spell_trigger_creates_treasure_and_loses_life,
+        test_prized_statue_enters_and_dies_create_treasures,
+        test_impulsive_pilferer_dies_create_treasure,
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,
         test_heat_shimmer_copies_any_creature_and_exiles_token_at_end_step,
         test_twinflame_copies_own_creature_only_and_exiles_token_at_end_step,
         test_molten_duplication_copies_own_artifact_as_artifact_and_sacrifices_token,
+        test_flash_photography_copies_target_permanent_without_temporary_cleanup,
+        test_clone_legion_copies_each_creature_controlled_by_target_player,
+        test_astral_dragon_etb_creates_two_dragon_copies_of_noncreature_permanent,
         test_valakut_awakening_filters_hand_and_draws_plus_one,
         test_valakut_awakening_preserves_approach_as_win_condition,
         test_valakut_awakening_split_name_emits_pg042_rule_provenance,
