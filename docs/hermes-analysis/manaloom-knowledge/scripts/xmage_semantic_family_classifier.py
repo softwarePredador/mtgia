@@ -573,6 +573,34 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and len(land_subtypes_any) == 2
         )
 
+    if effect == "tutor" and scope == "instant_or_sorcery_tutor_to_top_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"SearchLibraryPutOnLibraryEffect"}
+            and not ability_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "instant_or_sorcery_to_top"
+        )
+
+    if effect == "tutor" and scope == "creature_tutor_to_top_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"SearchLibraryPutOnLibraryEffect"}
+            and not ability_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "creature_to_top"
+        )
+
+    if effect == "tutor" and scope == "any_tutor_to_top_lose_two_life_v1":
+        return (
+            types in ({"INSTANT"}, {"SORCERY"})
+            and effect_classes == {"LoseLifeSourceControllerEffect", "SearchLibraryPutOnLibraryEffect"}
+            and not ability_classes
+            and bool(effect_json.get("instant")) == (types == {"INSTANT"})
+            and effect_json.get("target") == "any_to_top"
+            and int(effect_json.get("controller_loses_life_after_tutor") or 0) == 2
+        )
+
     if effect == "treasure_maker" and scope == "single_treasure_creation_v1":
         return (
             types == {"SORCERY"}

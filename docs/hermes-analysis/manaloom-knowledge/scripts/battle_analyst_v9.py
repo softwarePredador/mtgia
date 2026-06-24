@@ -16466,6 +16466,10 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
 
 def library_tutor_candidates(player, target_type):
     target_type = str(target_type or "any").lower()
+    for suffix in ("_to_top", "_to_hand", "_to_battlefield", "_to_graveyard"):
+        if target_type.endswith(suffix):
+            target_type = target_type[: -len(suffix)] or "any"
+            break
     candidates = []
     for candidate in getattr(player, "library", []) or []:
         if not isinstance(candidate, dict):
@@ -22941,6 +22945,20 @@ def apply_effect_immediate(
             turn=turn,
             **fields,
         )
+        life_loss_after_tutor = int(effect_data.get("controller_loses_life_after_tutor") or 0)
+        if life_loss_after_tutor > 0:
+            life_before = player.life
+            change_life(player, -life_loss_after_tutor)
+            emit_replay_event(
+                "tutor_life_loss_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                life_loss=life_loss_after_tutor,
+                life_before=life_before,
+                life_after=player.life,
+                turn=turn,
+                **fields,
+            )
         if effect_data.get("discard_after_tutor_random"):
             discarded_card = None
             discard_resolution = {

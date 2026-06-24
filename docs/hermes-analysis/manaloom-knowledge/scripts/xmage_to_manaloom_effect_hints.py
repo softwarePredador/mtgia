@@ -1771,6 +1771,84 @@ def _build_creature_sacrifice_ritual_fields(
     return None
 
 
+def _build_topdeck_tutor_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types not in ({"INSTANT"}, {"SORCERY"}):
+        return None
+    if ability_classes or cost_classes:
+        return None
+    if "SearchLibraryPutOnLibraryEffect" not in effect_classes:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+    is_instant = card_types == {"INSTANT"}
+
+    if effect_classes == {"SearchLibraryPutOnLibraryEffect"}:
+        if (
+            "cardtype.instant.getpredicate()" in normalized
+            and "cardtype.sorcery.getpredicate()" in normalized
+        ) or "instant or sorcery card" in normalized:
+            return {
+                "effect": "tutor",
+                "scope": "instant_or_sorcery_tutor_to_top_v1",
+                "fields": {
+                    "instant": is_instant,
+                    "target": "instant_or_sorcery_to_top",
+                },
+                "reason": "XMage structure matches a tutor that finds an instant or sorcery and places it on top of the library.",
+                "signals": [
+                    "SearchLibraryPutOnLibraryEffect",
+                    "CardType.INSTANT",
+                    "CardType.SORCERY",
+                ],
+            }
+
+        if "filter_card_creature" in normalized or "staticfilters.filter_card_creature" in normalized:
+            return {
+                "effect": "tutor",
+                "scope": "creature_tutor_to_top_v1",
+                "fields": {
+                    "instant": is_instant,
+                    "target": "creature_to_top",
+                },
+                "reason": "XMage structure matches a tutor that finds a creature card and places it on top of the library.",
+                "signals": [
+                    "SearchLibraryPutOnLibraryEffect",
+                    "FILTER_CARD_CREATURE",
+                ],
+            }
+
+    if effect_classes == {"LoseLifeSourceControllerEffect", "SearchLibraryPutOnLibraryEffect"}:
+        life_loss = None
+        if "loselifesourcecontrollereffect(2)" in normalized:
+            life_loss = 2
+        if life_loss is None and "lose 2 life" in normalized:
+            life_loss = 2
+        if life_loss == 2:
+            return {
+                "effect": "tutor",
+                "scope": "any_tutor_to_top_lose_two_life_v1",
+                "fields": {
+                    "instant": is_instant,
+                    "target": "any_to_top",
+                    "controller_loses_life_after_tutor": 2,
+                },
+                "reason": "XMage structure matches a tutor that places any card on top of the library and then causes its controller to lose 2 life.",
+                "signals": [
+                    "SearchLibraryPutOnLibraryEffect",
+                    "LoseLifeSourceControllerEffect(2)",
+                ],
+            }
+
+    return None
+
+
 def _build_basic_ritual_fields(
     *,
     card_types: set[str],
@@ -2219,6 +2297,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(creature_sacrifice_ritual_fields["fields"]),
                 matched_signals=list(creature_sacrifice_ritual_fields["signals"]),
+            )
+        )
+
+    topdeck_tutor_fields = _build_topdeck_tutor_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if topdeck_tutor_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(topdeck_tutor_fields["effect"]),
+                scope=str(topdeck_tutor_fields["scope"]),
+                reason=str(topdeck_tutor_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(topdeck_tutor_fields["fields"]),
+                matched_signals=list(topdeck_tutor_fields["signals"]),
             )
         )
 

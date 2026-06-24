@@ -14473,14 +14473,19 @@
     "battle_rule_oracle_hash": "8ed92583adcde1d5b9d01b21a2415fb0"
   },
   "Imperial Seal": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "any_tutor_to_top_lose_two_life_v1",
+    "controller_loses_life_after_tutor": 2,
     "effect": "tutor",
-    "target": "any",
+    "instant": false,
+    "target": "any_to_top",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:807cdb2c6bd08602999fa89c4b4b712a"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e8c744eeb299cbecc7234defb18d79ca",
+    "battle_rule_oracle_hash": "7418e11fcf0c0158d2b754402dfaac8e"
   },
   "Imperious Perfect": {
     "cmc": 3.0,
@@ -19479,15 +19484,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Mystical Tutor": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "instant_or_sorcery_tutor_to_top_v1",
     "effect": "tutor",
     "instant": true,
-    "target": "instant_or_sorcery",
+    "target": "instant_or_sorcery_to_top",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3499e9383db9ef72521ae851c55b0482"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1252b9a6b4188206efa3cf5c921afaa3",
+    "battle_rule_oracle_hash": "6a72f3c0228efaa3bb3bb616122ed036"
   },
   "Mystifying Maze": {
     "effect": "land",
@@ -32900,15 +32908,19 @@
     "battle_rule_logical_key": "battle_rule_v1:81f188e4e97035598c3746c5f81a02d8"
   },
   "Vampiric Tutor": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "any_tutor_to_top_lose_two_life_v1",
+    "controller_loses_life_after_tutor": 2,
     "effect": "tutor",
     "instant": true,
-    "target": "any",
+    "target": "any_to_top",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:fac5f8624ed06d963c77b5e56bd95d3b"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0d42202d79e9f7e0b0a65fe5848c9849",
+    "battle_rule_oracle_hash": "7418e11fcf0c0158d2b754402dfaac8e"
   },
   "Vandalblast": {
     "effect": "remove_permanent",
@@ -34654,15 +34666,18 @@
     "battle_rule_logical_key": "battle_rule_v1:f56f3819b7773777b293a363b5cf432a"
   },
   "Worldly Tutor": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "creature_tutor_to_top_v1",
     "effect": "tutor",
     "instant": true,
-    "target": "creature",
+    "target": "creature_to_top",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:fcf52746cc6117a7796e356ecc8db085"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ac383562ba9547c71a9bb6932cf907b8",
+    "battle_rule_oracle_hash": "0d52403c7394f384077c7ddcfdd9fa12"
   },
   "Worn Powerstone": {
     "effect": "ramp_permanent",

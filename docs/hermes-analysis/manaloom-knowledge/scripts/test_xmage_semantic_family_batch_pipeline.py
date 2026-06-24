@@ -2881,6 +2881,144 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_mystical_tutor_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Mystical Tutor",
+                        "severity": "high",
+                        "oracle_hash": "mysticalhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "MysticalTutor",
+                            "path": "/xmage/MysticalTutor.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["SearchLibraryPutOnLibraryEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "tutor",
+                                "battle_model_scope": "instant_or_sorcery_tutor_to_top_v1",
+                                "instant": True,
+                                "target": "instant_or_sorcery_to_top",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_worldly_tutor_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Worldly Tutor",
+                        "severity": "high",
+                        "oracle_hash": "worldlyhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "WorldlyTutor",
+                            "path": "/xmage/WorldlyTutor.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["SearchLibraryPutOnLibraryEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "tutor",
+                                "battle_model_scope": "creature_tutor_to_top_v1",
+                                "instant": True,
+                                "target": "creature_to_top",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_vampiric_tutor_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Vampiric Tutor",
+                        "severity": "high",
+                        "oracle_hash": "vampirichash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "VampiricTutor",
+                            "path": "/xmage/VampiricTutor.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["LoseLifeSourceControllerEffect", "SearchLibraryPutOnLibraryEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "tutor",
+                                "battle_model_scope": "any_tutor_to_top_lose_two_life_v1",
+                                "instant": True,
+                                "target": "any_to_top",
+                                "controller_loses_life_after_tutor": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_imperial_seal_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Imperial Seal",
+                        "severity": "high",
+                        "oracle_hash": "imperialhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ImperialSeal",
+                            "path": "/xmage/ImperialSeal.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["LoseLifeSourceControllerEffect", "SearchLibraryPutOnLibraryEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "tutor",
+                                "battle_model_scope": "any_tutor_to_top_lose_two_life_v1",
+                                "instant": False,
+                                "target": "any_to_top",
+                                "controller_loses_life_after_tutor": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_carrion_feeder_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

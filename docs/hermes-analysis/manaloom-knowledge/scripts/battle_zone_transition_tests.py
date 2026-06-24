@@ -373,12 +373,109 @@ def register_tests(battle, player, card):
         active.library = [creature, instant, sorcery]
         mystical = {"name": "Mystical Tutor", "cmc": 1, "type_line": "Instant"}
 
-        battle.apply_effect_immediate(active, [], mystical, turn=10, rng=random.Random(77))
+        battle.apply_effect_immediate(
+            active,
+            [],
+            mystical,
+            turn=10,
+            rng=random.Random(77),
+            effect_data_override={
+                "effect": "tutor",
+                "instant": True,
+                "target": "instant_or_sorcery_to_top",
+                "battle_model_scope": "instant_or_sorcery_tutor_to_top_v1",
+            },
+        )
 
         assert creature in active.library
-        assert sorcery not in active.library
-        assert sorcery in active.hand
+        assert active.library[0]["name"] == "Target Sorcery"
+        assert sorcery in active.library
+        assert sorcery not in active.hand
         assert mystical in active.graveyard
+
+    def test_worldly_tutor_puts_creature_on_library_top(self):
+        active = player("Active")
+        removal = {"name": "Removal Spell", "cmc": 2, "type_line": "Instant", "effect": "removal_destroy"}
+        creature = {"name": "Target Creature", "cmc": 5, "type_line": "Creature", "effect": "creature"}
+        active.library = [removal, creature]
+        worldly = {"name": "Worldly Tutor", "cmc": 1, "type_line": "Instant"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            worldly,
+            turn=10,
+            rng=random.Random(78),
+            effect_data_override={
+                "effect": "tutor",
+                "instant": True,
+                "target": "creature_to_top",
+                "battle_model_scope": "creature_tutor_to_top_v1",
+            },
+        )
+
+        assert active.library[0]["name"] == "Target Creature"
+        assert creature in active.library
+        assert creature not in active.hand
+        assert worldly in active.graveyard
+
+    def test_vampiric_tutor_puts_best_card_on_library_top_and_loses_two_life(self):
+        active = player("Active")
+        active.life = 20
+        land = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+        engine = {"name": "Rhystic Study", "cmc": 3, "type_line": "Enchantment", "effect": "draw_engine"}
+        active.library = [land, engine]
+        spell = {"name": "Vampiric Tutor", "cmc": 1, "type_line": "Instant"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            spell,
+            turn=10,
+            rng=random.Random(79),
+            effect_data_override={
+                "effect": "tutor",
+                "instant": True,
+                "target": "any_to_top",
+                "controller_loses_life_after_tutor": 2,
+                "battle_model_scope": "any_tutor_to_top_lose_two_life_v1",
+            },
+        )
+
+        assert active.library[0]["name"] == "Rhystic Study"
+        assert engine in active.library
+        assert engine not in active.hand
+        assert active.life == 18
+        assert spell in active.graveyard
+
+    def test_imperial_seal_puts_best_card_on_library_top_and_loses_two_life(self):
+        active = player("Active")
+        active.life = 18
+        land = {"name": "Swamp", "cmc": 0, "type_line": "Land", "effect": "land"}
+        engine = {"name": "Necropotence", "cmc": 3, "type_line": "Enchantment", "effect": "draw_engine"}
+        active.library = [land, engine]
+        spell = {"name": "Imperial Seal", "cmc": 1, "type_line": "Sorcery"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            spell,
+            turn=10,
+            rng=random.Random(80),
+            effect_data_override={
+                "effect": "tutor",
+                "instant": False,
+                "target": "any_to_top",
+                "controller_loses_life_after_tutor": 2,
+                "battle_model_scope": "any_tutor_to_top_lose_two_life_v1",
+            },
+        )
+
+        assert active.library[0]["name"] == "Necropotence"
+        assert engine in active.library
+        assert engine not in active.hand
+        assert active.life == 16
+        assert spell in active.graveyard
 
     def test_tutor_trace_uses_contextual_target_scoring():
         decisions = []

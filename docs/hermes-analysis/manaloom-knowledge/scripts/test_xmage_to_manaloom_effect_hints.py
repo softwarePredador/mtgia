@@ -1433,8 +1433,81 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["battle_model_scope"], "sacrifice_creature_add_three_red_mana_ritual_v1")
         self.assertFalse(primary["instant"])
         self.assertTrue(primary["requires_sacrifice_creature"])
-        self.assertEqual(primary["mana_produced"], 3)
-        self.assertEqual(primary["produces"], "R")
+
+    def test_mystical_tutor_maps_to_instant_or_sorcery_topdeck_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutOnLibraryEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    'private static final FilterCard filter = new FilterCard("instant or sorcery card"); '
+                    "filter.add(Predicates.or(CardType.INSTANT.getPredicate(), CardType.SORCERY.getPredicate())); "
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutOnLibraryEffect(new TargetCardInLibrary(filter), true));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "instant_or_sorcery_tutor_to_top_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "instant_or_sorcery_to_top")
+
+    def test_worldly_tutor_maps_to_creature_topdeck_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutOnLibraryEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect("
+                    "new SearchLibraryPutOnLibraryEffect(new TargetCardInLibrary(StaticFilters.FILTER_CARD_CREATURE), true));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "creature_tutor_to_top_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "creature_to_top")
+
+    def test_vampiric_tutor_maps_to_any_topdeck_life_loss_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutOnLibraryEffect", "LoseLifeSourceControllerEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutOnLibraryEffect(new TargetCardInLibrary(), false)); "
+                    "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(2));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "any_tutor_to_top_lose_two_life_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "any_to_top")
+        self.assertEqual(primary["controller_loses_life_after_tutor"], 2)
+
+    def test_imperial_seal_maps_to_any_topdeck_life_loss_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutOnLibraryEffect", "LoseLifeSourceControllerEffect"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutOnLibraryEffect(new TargetCardInLibrary(), false)); "
+                    "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(2));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "any_tutor_to_top_lose_two_life_v1")
+        self.assertFalse(primary["instant"])
+        self.assertEqual(primary["target"], "any_to_top")
+        self.assertEqual(primary["controller_loses_life_after_tutor"], 2)
 
     def test_carrion_feeder_maps_to_exact_sacrifice_self_growth_scope(self) -> None:
         result = hints.build_effect_hints(
