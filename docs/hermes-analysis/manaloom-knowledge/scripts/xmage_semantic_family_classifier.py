@@ -132,6 +132,16 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": ["test_scattered_thoughts_selects_two_from_top_four_and_bins_the_rest"],
         "batch_strategy": "metadata_batch_after_pg_precheck",
     },
+    "pile_selection_spell": {
+        "effects": {"pile_selection_draw"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "top-of-library reveal, two-pile minimax partitioning, and hand-versus-graveyard zone movement",
+        "family_tests": [
+            "test_fact_or_fiction_minimizes_best_available_pile",
+            "test_steam_augury_maximizes_worst_available_pile",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "draw_engine": {
         "effects": {"draw_engine"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -736,6 +746,22 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and look_count > 0
             and pick_count > 0
             and pick_count <= look_count
+            and effect_json.get("selection_destination") == "hand"
+            and effect_json.get("remainder_destination") == "graveyard"
+        )
+
+    if effect == "pile_selection_draw" and scope == "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1":
+        look_count = int(effect_json.get("look_count") or 0)
+        return (
+            types in ({"INSTANT"}, {"SORCERY"})
+            and effect_classes == {"RevealAndSeparatePilesEffect"}
+            and not ability_classes
+            and not cost_classes
+            and bool(effect_json.get("instant")) == (types == {"INSTANT"})
+            and look_count > 0
+            and int(effect_json.get("pile_count") or 0) == 2
+            and effect_json.get("splitter") in {"controller", "opponent"}
+            and effect_json.get("chooser") in {"controller", "opponent"}
             and effect_json.get("selection_destination") == "hand"
             and effect_json.get("remainder_destination") == "graveyard"
         )

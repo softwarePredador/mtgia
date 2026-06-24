@@ -206,6 +206,10 @@ def _scenario_names(effect: str, scope: str = "") -> list[str]:
             "look at the requested number of top library cards and put the best subset into hand",
             "move the remaining looked-at cards to the expected graveyard destination",
         ],
+        "pile_selection_draw": [
+            "reveal the requested top cards and split them into two piles according to the card role",
+            "choose the resulting hand pile and move the remaining cards to the graveyard",
+        ],
     }
     return mapping.get(effect, [f"focused behavior scenario for {effect}"])
 
@@ -2167,6 +2171,64 @@ def _build_dig_to_hand_fields(
     }
 
 
+def _build_pile_selection_draw_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    raw_excerpt: str,
+) -> dict[str, Any] | None:
+    if card_types not in ({"INSTANT"}, {"SORCERY"}):
+        return None
+    if effect_classes != {"RevealAndSeparatePilesEffect"} or ability_classes or cost_classes:
+        return None
+
+    match = re.search(
+        r"RevealAndSeparatePilesEffect\(\s*(\d+)\s*,\s*TargetController\.(\w+)\s*,\s*TargetController\.(\w+)\s*,\s*Zone\.(\w+)\s*\)",
+        str(raw_excerpt or ""),
+        re.S,
+    )
+    if not match:
+        return None
+
+    look_count = int(match.group(1))
+    splitter_raw = str(match.group(2) or "").upper()
+    chooser_raw = str(match.group(3) or "").upper()
+    remainder_zone_raw = str(match.group(4) or "").upper()
+
+    role_map = {
+        "YOU": "controller",
+        "OPPONENT": "opponent",
+    }
+    splitter = role_map.get(splitter_raw)
+    chooser = role_map.get(chooser_raw)
+    if look_count <= 0 or splitter is None or chooser is None or remainder_zone_raw != "GRAVEYARD":
+        return None
+
+    return {
+        "effect": "pile_selection_draw",
+        "scope": "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+        "fields": {
+            "instant": card_types == {"INSTANT"},
+            "look_count": look_count,
+            "splitter": splitter,
+            "chooser": chooser,
+            "selection_destination": "hand",
+            "remainder_destination": "graveyard",
+            "pile_count": 2,
+        },
+        "reason": "XMage structure matches a reveal-top-cards spell that separates them into two piles and moves the chosen pile to hand with the rest to the graveyard.",
+        "signals": [
+            "RevealAndSeparatePilesEffect",
+            f"look_{look_count}",
+            f"splitter_{splitter}",
+            f"chooser_{chooser}",
+            "hand_rest_graveyard",
+        ],
+    }
+
+
 def _build_basic_ritual_fields(
     *,
     card_types: set[str],
@@ -2696,6 +2758,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(dig_to_hand_fields["fields"]),
                 matched_signals=list(dig_to_hand_fields["signals"]),
+            )
+        )
+
+    pile_selection_draw_fields = _build_pile_selection_draw_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        raw_excerpt=str(index_entry.get("raw_excerpt") or ""),
+    )
+    if pile_selection_draw_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(pile_selection_draw_fields["effect"]),
+                scope=str(pile_selection_draw_fields["scope"]),
+                reason=str(pile_selection_draw_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(pile_selection_draw_fields["fields"]),
+                matched_signals=list(pile_selection_draw_fields["signals"]),
             )
         )
 

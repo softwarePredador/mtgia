@@ -316,6 +316,94 @@ def register_tests(battle, player, card):
         assert [card["name"] for card in active.library] == ["Bottom Card"]
         assert any(event == "dig_to_hand_resolved" for event, _ in events)
 
+    def test_fact_or_fiction_minimizes_best_available_pile():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.battlefield = [
+            {"name": "Land A", "effect": "land"},
+            {"name": "Land B", "effect": "land"},
+            {"name": "Land C", "effect": "land"},
+            {"name": "Land D", "effect": "land"},
+        ]
+        active.library = [
+            {"name": "Tutor Slot", "cmc": 3, "type_line": "Sorcery", "effect": "tutor"},
+            {"name": "Counter Slot", "cmc": 2, "type_line": "Instant", "effect": "counter"},
+            {"name": "Refill Slot", "cmc": 4, "type_line": "Sorcery", "effect": "draw_cards", "count": 2},
+            {"name": "Big Creature", "cmc": 7, "type_line": "Creature", "effect": "creature"},
+            {"name": "Land Slot", "type_line": "Land"},
+            {"name": "Bottom Card", "cmc": 1, "type_line": "Sorcery", "effect": "draw_cards", "count": 1},
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Fact or Fiction", "cmc": 4, "type_line": "Instant"},
+            turn=4,
+            rng=random.Random(4604),
+            effect_data_override={
+                "effect": "pile_selection_draw",
+                "instant": True,
+                "look_count": 5,
+                "splitter": "opponent",
+                "chooser": "controller",
+                "selection_destination": "hand",
+                "remainder_destination": "graveyard",
+                "pile_count": 2,
+                "battle_model_scope": "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+            },
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert {card["name"] for card in active.hand} == {"Counter Slot", "Refill Slot"}
+        assert {card["name"] for card in active.graveyard} == {"Tutor Slot", "Big Creature", "Land Slot"}
+        assert [card["name"] for card in active.library] == ["Bottom Card"]
+        assert any(event == "pile_selection_draw_resolved" for event, _ in events)
+
+    def test_steam_augury_maximizes_worst_available_pile():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.battlefield = [
+            {"name": "Land A", "effect": "land"},
+            {"name": "Land B", "effect": "land"},
+            {"name": "Land C", "effect": "land"},
+            {"name": "Land D", "effect": "land"},
+        ]
+        active.library = [
+            {"name": "Tutor Slot", "cmc": 3, "type_line": "Sorcery", "effect": "tutor"},
+            {"name": "Counter Slot", "cmc": 2, "type_line": "Instant", "effect": "counter"},
+            {"name": "Refill Slot", "cmc": 4, "type_line": "Sorcery", "effect": "draw_cards", "count": 2},
+            {"name": "Big Creature", "cmc": 7, "type_line": "Creature", "effect": "creature"},
+            {"name": "Land Slot", "type_line": "Land"},
+            {"name": "Bottom Card", "cmc": 1, "type_line": "Sorcery", "effect": "draw_cards", "count": 1},
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Steam Augury", "cmc": 4, "type_line": "Instant"},
+            turn=4,
+            rng=random.Random(4605),
+            effect_data_override={
+                "effect": "pile_selection_draw",
+                "instant": True,
+                "look_count": 5,
+                "splitter": "controller",
+                "chooser": "opponent",
+                "selection_destination": "hand",
+                "remainder_destination": "graveyard",
+                "pile_count": 2,
+                "battle_model_scope": "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+            },
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert {card["name"] for card in active.hand} == {"Tutor Slot", "Big Creature", "Land Slot"}
+        assert {card["name"] for card in active.graveyard} == {"Counter Slot", "Refill Slot"}
+        assert [card["name"] for card in active.library] == ["Bottom Card"]
+        assert any(event == "pile_selection_draw_resolved" for event, _ in events)
+
     def test_extra_combat_effect_schedules_and_untaps_creatures():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))

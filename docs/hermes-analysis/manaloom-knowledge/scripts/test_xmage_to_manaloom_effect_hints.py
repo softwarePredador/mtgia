@@ -1722,6 +1722,62 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["selection_destination"], "hand")
         self.assertEqual(primary["remainder_destination"], "graveyard")
 
+    def test_fact_or_fiction_maps_to_two_pile_reveal_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "FactOrFiction",
+                "effect_classes": ["RevealAndSeparatePilesEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new RevealAndSeparatePilesEffect("
+                    "5, TargetController.OPPONENT, TargetController.YOU, Zone.GRAVEYARD));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "pile_selection_draw")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["look_count"], 5)
+        self.assertEqual(primary["splitter"], "opponent")
+        self.assertEqual(primary["chooser"], "controller")
+        self.assertEqual(primary["selection_destination"], "hand")
+        self.assertEqual(primary["remainder_destination"], "graveyard")
+        self.assertEqual(primary["pile_count"], 2)
+
+    def test_steam_augury_maps_to_two_pile_reveal_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "SteamAugury",
+                "effect_classes": ["RevealAndSeparatePilesEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new RevealAndSeparatePilesEffect("
+                    "5, TargetController.YOU, TargetController.OPPONENT, Zone.GRAVEYARD));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "pile_selection_draw")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["look_count"], 5)
+        self.assertEqual(primary["splitter"], "controller")
+        self.assertEqual(primary["chooser"], "opponent")
+        self.assertEqual(primary["selection_destination"], "hand")
+        self.assertEqual(primary["remainder_destination"], "graveyard")
+        self.assertEqual(primary["pile_count"], 2)
+
     def test_spellseeker_maps_to_etb_cheap_instant_or_sorcery_tutor_scope(self) -> None:
         result = hints.build_effect_hints(
             {

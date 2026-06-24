@@ -3389,6 +3389,88 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "dig_spell")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_fact_or_fiction_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Fact or Fiction",
+                        "severity": "high",
+                        "oracle_hash": "factorfictionhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "FactOrFiction",
+                            "path": "/xmage/FactOrFiction.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["RevealAndSeparatePilesEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "pile_selection_draw",
+                                "battle_model_scope": "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+                                "instant": True,
+                                "look_count": 5,
+                                "splitter": "opponent",
+                                "chooser": "controller",
+                                "selection_destination": "hand",
+                                "remainder_destination": "graveyard",
+                                "pile_count": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "pile_selection_spell")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_steam_augury_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Steam Augury",
+                        "severity": "high",
+                        "oracle_hash": "steamauguryhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SteamAugury",
+                            "path": "/xmage/SteamAugury.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["RevealAndSeparatePilesEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "pile_selection_draw",
+                                "battle_model_scope": "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+                                "instant": True,
+                                "look_count": 5,
+                                "splitter": "controller",
+                                "chooser": "opponent",
+                                "selection_destination": "hand",
+                                "remainder_destination": "graveyard",
+                                "pile_count": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "pile_selection_spell")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_spellseeker_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

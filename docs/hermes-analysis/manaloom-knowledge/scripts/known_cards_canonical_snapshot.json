@@ -9758,15 +9758,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Fact or Fiction": {
-    "count": 3,
-    "effect": "draw_cards",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+    "chooser": "controller",
+    "effect": "pile_selection_draw",
     "instant": true,
+    "look_count": 5,
+    "pile_count": 2,
+    "remainder_destination": "graveyard",
+    "selection_destination": "hand",
+    "splitter": "opponent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5549f2ea01c510172c088992e870d93a"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b5c5def7cc8d30af6e2c293ea0854a5c",
+    "battle_rule_oracle_hash": "da85cd126972897c37373ad25ec5f867"
   },
   "Faeburrow Elder": {
     "cmc": 3.0,
@@ -27899,6 +27907,25 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f9ae6ee172a2b1e12c6e691af9658512"
+  },
+  "Steam Augury": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "reveal_top_n_split_two_piles_choose_one_hand_rest_graveyard_v1",
+    "chooser": "opponent",
+    "effect": "pile_selection_draw",
+    "instant": true,
+    "look_count": 5,
+    "pile_count": 2,
+    "remainder_destination": "graveyard",
+    "selection_destination": "hand",
+    "splitter": "controller",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e076e7cef34d9f0593c00df3e15059a7",
+    "battle_rule_oracle_hash": "9be664a6ecce936cc53df5993a90cdcb"
   },
   "Steam Vents // Steam Vents": {
     "effect": "land",

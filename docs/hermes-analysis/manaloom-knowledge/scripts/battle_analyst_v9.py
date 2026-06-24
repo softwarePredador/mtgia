@@ -18893,6 +18893,112 @@ def resolve_dig_to_hand(player, card, effect_data, turn):
     )
 
 
+def _pile_selection_card_value(card, player):
+    if not isinstance(card, dict):
+        return 0
+    return discard_replacement_priority(card, player)
+
+
+def _pile_selection_value(pile, player):
+    cards = [card for card in pile if isinstance(card, dict)]
+    return (
+        sum(_pile_selection_card_value(card, player) for card in cards),
+        len(cards),
+        tuple(card.get("name", "?") for card in cards),
+    )
+
+
+def _choose_better_pile_for_controller(pile_a, pile_b, player):
+    return pile_a if _pile_selection_value(pile_a, player) >= _pile_selection_value(pile_b, player) else pile_b
+
+
+def _choose_worse_pile_for_controller(pile_a, pile_b, player):
+    return pile_a if _pile_selection_value(pile_a, player) <= _pile_selection_value(pile_b, player) else pile_b
+
+
+def _best_two_pile_partition(cards, player, splitter):
+    if len(cards) <= 1:
+        return cards, [], cards
+
+    indexed = list(range(len(cards)))
+    best_partition = None
+    best_outcome = None
+    for size in range(1, len(cards)):
+        for extra_indices in combinations(indexed[1:], size - 1):
+            pile_a_indices = {0, *extra_indices}
+            pile_a = [cards[i] for i in indexed if i in pile_a_indices]
+            pile_b = [cards[i] for i in indexed if i not in pile_a_indices]
+            if not pile_a or not pile_b:
+                continue
+
+            if splitter == "opponent":
+                chosen_pile = _choose_better_pile_for_controller(pile_a, pile_b, player)
+                outcome = _pile_selection_value(chosen_pile, player)
+                if best_outcome is None or outcome < best_outcome:
+                    best_partition = (pile_a, pile_b, chosen_pile)
+                    best_outcome = outcome
+            else:
+                chosen_pile = _choose_worse_pile_for_controller(pile_a, pile_b, player)
+                outcome = _pile_selection_value(chosen_pile, player)
+                if best_outcome is None or outcome > best_outcome:
+                    best_partition = (pile_a, pile_b, chosen_pile)
+                    best_outcome = outcome
+
+    if best_partition is None:
+        fallback = [cards[0]], cards[1:], cards[1:] if splitter == "opponent" else [cards[0]]
+        return fallback
+    return best_partition
+
+
+def resolve_pile_selection_draw(player, card, effect_data, turn):
+    look_count = int(effect_data.get("look_count") or 0)
+    if look_count <= 0:
+        emit_replay_event(
+            "pile_selection_draw_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            looked_count=0,
+            chosen_cards=[],
+            moved_to_graveyard=[],
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        return
+
+    looked = []
+    for _ in range(min(look_count, len(player.library))):
+        looked.append(player.library.pop(0))
+
+    splitter = str(effect_data.get("splitter") or "opponent")
+    chooser = str(effect_data.get("chooser") or "controller")
+    pile_a, pile_b, chosen_pile = _best_two_pile_partition(looked, player, splitter)
+    chosen_ids = {id(card_obj) for card_obj in chosen_pile}
+    moved_to_graveyard = [card_obj for card_obj in looked if id(card_obj) not in chosen_ids]
+    chosen_label = "a" if len(chosen_pile) == len(pile_a) and all(id(a) == id(b) for a, b in zip(chosen_pile, pile_a)) else "b"
+
+    player.hand.extend(chosen_pile)
+    player.graveyard.extend(moved_to_graveyard)
+
+    emit_replay_event(
+        "pile_selection_draw_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        looked_count=len(looked),
+        splitter=splitter,
+        chooser=chooser,
+        pile_a=[card_obj.get("name", "?") for card_obj in pile_a if isinstance(card_obj, dict)],
+        pile_b=[card_obj.get("name", "?") for card_obj in pile_b if isinstance(card_obj, dict)],
+        chosen_pile=chosen_label,
+        chosen_cards=[card_obj.get("name", "?") for card_obj in chosen_pile if isinstance(card_obj, dict)],
+        moved_to_graveyard=[card_obj.get("name", "?") for card_obj in moved_to_graveyard if isinstance(card_obj, dict)],
+        hand_size=len(player.hand),
+        graveyard_size=len(player.graveyard),
+        library_remaining=len(player.library),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+
+
 def _copy_token_target_types(effect_data):
     raw_types = (
         effect_data.get("copy_target_types")
@@ -22324,6 +22430,12 @@ def apply_effect_immediate(
             finish_resolved_spell(player, card, turn=turn)
             return
         resolve_dig_to_hand(player, card, effect_data, turn)
+        finish_resolved_spell(player, card, turn=turn)
+    elif effect == "pile_selection_draw":
+        if not pay_additional_card_costs(player, card, effect_data, turn=turn):
+            finish_resolved_spell(player, card, turn=turn)
+            return
+        resolve_pile_selection_draw(player, card, effect_data, turn)
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "treasure_maker":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
