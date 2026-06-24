@@ -3122,6 +3122,121 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_expedition_map_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Expedition Map",
+                        "severity": "high",
+                        "oracle_hash": "maphash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ExpeditionMap",
+                            "path": "/xmage/ExpeditionMap.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["SearchLibraryPutInHandEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "activated_self_sacrifice_land_tutor_to_hand_artifact_v1",
+                                "activated_self_sacrifice_tutor_to_hand": True,
+                                "activation_cost_generic": 2,
+                                "activation_requires_tap": True,
+                                "tutor_target": "land",
+                                "tutor_destination": "hand",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_moonsilver_key_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Moonsilver Key",
+                        "severity": "high",
+                        "oracle_hash": "moonhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "MoonsilverKey",
+                            "path": "/xmage/MoonsilverKey.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["SearchLibraryPutInHandEffect"],
+                            "ability_classes": ["ManaAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "activated_self_sacrifice_artifact_mana_ability_or_basic_land_tutor_to_hand_v1",
+                                "activated_self_sacrifice_tutor_to_hand": True,
+                                "activation_cost_generic": 1,
+                                "activation_requires_tap": True,
+                                "tutor_target": "artifact_mana_ability_or_basic_land",
+                                "tutor_destination": "hand",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_weathered_wayfarer_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Weathered Wayfarer",
+                        "severity": "high",
+                        "oracle_hash": "wayfarerhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "WeatheredWayfarer",
+                            "path": "/xmage/WeatheredWayfarer.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["SearchLibraryPutInHandEffect"],
+                            "ability_classes": ["ActivateIfConditionActivatedAbility"],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "activated_opponent_more_lands_land_tutor_to_hand_creature_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "land_tutor_to_hand_activated": True,
+                                "activation_cost_generic": 0,
+                                "activation_cost_colors": ["W"],
+                                "activation_requires_tap": True,
+                                "activation_condition": "opponent_controls_more_lands",
+                                "tutor_target": "land",
+                                "tutor_destination": "hand",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_spellseeker_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

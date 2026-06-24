@@ -1860,6 +1860,68 @@ def _build_tutor_to_hand_fields(
 ) -> dict[str, Any] | None:
     normalized = _normalized_rules_text(rules_text)
 
+    if (
+        card_types == {"ARTIFACT"}
+        and effect_classes == {"SearchLibraryPutInHandEffect"}
+        and "TapSourceCost" in cost_classes
+        and "SacrificeSourceCost" in cost_classes
+        and "SimpleActivatedAbility" in ability_classes
+    ):
+        activation_cost_generic = _first_int(r"GenericManaCost\((\d+)\)", rules_text)
+        if (
+            xmage_class_name == "MoonsilverKey"
+            or "artifact card with a mana ability or a basic land card" in normalized
+            or ("input.island(game)" in normalized and "input.isbasic(game)" in normalized)
+            or "anymatch(manaability.class::isinstance)" in normalized
+        ):
+            return {
+                "effect": "ramp_permanent",
+                "scope": "activated_self_sacrifice_artifact_mana_ability_or_basic_land_tutor_to_hand_v1",
+                "ability_kind": "activated",
+                "fields": {
+                    "activated_self_sacrifice_tutor_to_hand": True,
+                    "activation_cost_generic": activation_cost_generic if activation_cost_generic is not None else 1,
+                    "activation_requires_tap": True,
+                    "tutor_target": "artifact_mana_ability_or_basic_land",
+                    "tutor_destination": "hand",
+                },
+                "reason": "XMage structure matches an activated artifact that pays mana, taps, sacrifices itself, and tutors either a mana-ability artifact or a basic land into hand.",
+                "signals": [
+                    "SimpleActivatedAbility",
+                    "SearchLibraryPutInHandEffect",
+                    "TapSourceCost",
+                    "SacrificeSourceCost",
+                    "ManaAbility",
+                    "basic_land_or_mana_artifact_filter",
+                ],
+            }
+
+        if (
+            xmage_class_name == "ExpeditionMap"
+            or "filterlandcard" in normalized
+            or "land card" in normalized
+        ):
+            return {
+                "effect": "ramp_permanent",
+                "scope": "activated_self_sacrifice_land_tutor_to_hand_artifact_v1",
+                "ability_kind": "activated",
+                "fields": {
+                    "activated_self_sacrifice_tutor_to_hand": True,
+                    "activation_cost_generic": activation_cost_generic if activation_cost_generic is not None else 2,
+                    "activation_requires_tap": True,
+                    "tutor_target": "land",
+                    "tutor_destination": "hand",
+                },
+                "reason": "XMage structure matches an activated artifact that pays mana, taps, sacrifices itself, and tutors a land card into hand.",
+                "signals": [
+                    "SimpleActivatedAbility",
+                    "SearchLibraryPutInHandEffect",
+                    "TapSourceCost",
+                    "SacrificeSourceCost",
+                    "FilterLandCard",
+                ],
+            }
+
     if card_types in ({"INSTANT"}, {"SORCERY"}):
         is_instant = card_types == {"INSTANT"}
 
@@ -1914,6 +1976,44 @@ def _build_tutor_to_hand_fields(
 
     if card_types != {"CREATURE"} or effect_classes != {"SearchLibraryPutInHandEffect"}:
         return None
+
+    if (
+        "ActivateIfConditionActivatedAbility" in ability_classes
+        and "TapSourceCost" in cost_classes
+        and (
+            xmage_class_name == "WeatheredWayfarer"
+            or (
+                "opponentcontrolsmorecondition" in normalized
+                and "filter_card_land_a" in normalized
+            )
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "activated_opponent_more_lands_land_tutor_to_hand_creature_v1",
+            "ability_kind": "activated",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "land_tutor_to_hand_activated": True,
+                "activation_cost_generic": 0,
+                "activation_cost_colors": ["W"],
+                "activation_requires_tap": True,
+                "activation_condition": "opponent_controls_more_lands",
+                "tutor_target": "land",
+                "tutor_destination": "hand",
+            },
+            "reason": "XMage structure matches Weathered Wayfarer's activated land tutor to hand that requires an opponent to control more lands.",
+            "signals": [
+                "ActivateIfConditionActivatedAbility",
+                "OpponentControlsMoreCondition",
+                "SearchLibraryPutInHandEffect",
+                "FILTER_CARD_LAND_A",
+                "TapSourceCost",
+                "ManaCostsImpl({W})",
+            ],
+        }
+
     if ability_classes != {"EntersBattlefieldTriggeredAbility"} or cost_classes:
         return None
 

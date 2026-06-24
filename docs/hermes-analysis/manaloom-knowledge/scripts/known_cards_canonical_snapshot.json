@@ -9512,14 +9512,21 @@
     "battle_rule_logical_key": "battle_rule_v1:021c1007409d808aeb5ade04d6976acb"
   },
   "Expedition Map": {
-    "effect": "tutor",
-    "target": "land",
+    "ability_kind": "activated",
+    "activated_self_sacrifice_tutor_to_hand": true,
+    "activation_cost_generic": 2,
+    "activation_requires_tap": true,
+    "battle_model_scope": "activated_self_sacrifice_land_tutor_to_hand_artifact_v1",
+    "effect": "ramp_permanent",
+    "tutor_destination": "hand",
+    "tutor_target": "land",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2c9500a06e3b1ace28acad47010e1e21"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e6e3f483c5eb366bcd6109b743518c40",
+    "battle_rule_oracle_hash": "03a510edd2cc7011492c1c7f4a73a0c8"
   },
   "Experimental Augury": {
     "cmc": 2.0,
@@ -18975,15 +18982,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Moonsilver Key": {
-    "cmc": 2.0,
-    "effect": "tutor",
-    "target": "artifact_or_enchantment",
+    "ability_kind": "activated",
+    "activated_self_sacrifice_tutor_to_hand": true,
+    "activation_cost_generic": 1,
+    "activation_requires_tap": true,
+    "battle_model_scope": "activated_self_sacrifice_artifact_mana_ability_or_basic_land_tutor_to_hand_v1",
+    "effect": "ramp_permanent",
+    "tutor_destination": "hand",
+    "tutor_target": "artifact_mana_ability_or_basic_land",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ce997493d4bf96067185fae484a4ecf7"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:720fa891c12918f180a36ff13efe7ef8",
+    "battle_rule_oracle_hash": "dea539b1ab6b8022840db67f2bf0c2d6"
   },
   "Moorland Haunt": {
     "effect": "land",
@@ -33964,16 +33977,27 @@
     "battle_rule_oracle_hash": "bccbbc9c0ebfc638e73f0ee82a7d72d3"
   },
   "Weathered Wayfarer": {
+    "ability_kind": "activated",
+    "activation_condition": "opponent_controls_more_lands",
+    "activation_cost_colors": [
+      "W"
+    ],
+    "activation_cost_generic": 0,
+    "activation_requires_tap": true,
+    "battle_model_scope": "activated_opponent_more_lands_land_tutor_to_hand_creature_v1",
     "effect": "creature",
-    "is_creature_permanent": true,
+    "land_tutor_to_hand_activated": true,
     "power": 1,
     "toughness": 1,
+    "tutor_destination": "hand",
+    "tutor_target": "land",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:85d8c93e5ff3b531d4ab9217bd956948"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7df98700ba8ee232d2a8b15f1296ef47",
+    "battle_rule_oracle_hash": "f69def908804331b655fcf9c8e19d67b"
   },
   "Weaver of Harmony": {
     "cmc": 2.0,

@@ -564,6 +564,140 @@ def register_tests(battle, player, card):
         assert spell_card in active.library
         assert spell in active.graveyard
 
+    def test_expedition_map_activated_tutor_puts_land_into_hand(self):
+        active = player("Active")
+        active.mana_pool.add_generic(2)
+        map_permanent = battle.enrich_card(
+            {
+                "name": "Expedition Map",
+                "cmc": 1,
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "activated_self_sacrifice_tutor_to_hand": True,
+                "activation_cost_generic": 2,
+                "activation_requires_tap": True,
+                "tutor_target": "land",
+                "tutor_destination": "hand",
+            }
+        )
+        land = {"name": "Ancient Tomb", "cmc": 0, "type_line": "Land", "effect": "land"}
+        spell_card = {"name": "Wrath of God", "cmc": 4, "type_line": "Sorcery", "effect": "board_wipe"}
+        active.battlefield = [map_permanent]
+        active.library = [spell_card, land]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(831),
+            phase="precombat_main",
+        )
+
+        assert activations == 1
+        assert map_permanent in active.graveyard
+        assert land in active.hand
+        assert land not in active.library
+        assert spell_card in active.library
+
+    def test_moonsilver_key_activated_tutor_prefers_mana_artifact_target(self):
+        active = player("Active")
+        active.mana_pool.add_generic(1)
+        key_permanent = battle.enrich_card(
+            {
+                "name": "Moonsilver Key",
+                "cmc": 2,
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "activated_self_sacrifice_tutor_to_hand": True,
+                "activation_cost_generic": 1,
+                "activation_requires_tap": True,
+                "tutor_target": "artifact_mana_ability_or_basic_land",
+                "tutor_destination": "hand",
+            }
+        )
+        active.battlefield = [
+            key_permanent,
+            {"name": "Plains", "type_line": "Basic Land — Plains", "effect": "land"},
+            {"name": "Island", "type_line": "Basic Land — Island", "effect": "land"},
+            {"name": "Mountain", "type_line": "Basic Land — Mountain", "effect": "land"},
+            {"name": "Swamp", "type_line": "Basic Land — Swamp", "effect": "land"},
+        ]
+        mana_artifact = {
+            "name": "Mind Stone",
+            "cmc": 2,
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "C",
+        }
+        non_target_artifact = {
+            "name": "Darksteel Plate",
+            "cmc": 3,
+            "type_line": "Artifact",
+            "effect": "passive",
+        }
+        active.library = [non_target_artifact, mana_artifact]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(832),
+            phase="precombat_main",
+        )
+
+        assert activations == 1
+        assert key_permanent in active.graveyard
+        assert mana_artifact in active.hand
+        assert mana_artifact not in active.library
+        assert non_target_artifact in active.library
+
+    def test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands(self):
+        active = player("Active")
+        opponent = player("Opponent")
+        active.mana_pool.add("white", 1)
+        wayfarer = battle.enrich_card(
+            {
+                "name": "Weathered Wayfarer",
+                "cmc": 1,
+                "type_line": "Creature — Human Nomad Cleric",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "summoning_sick": False,
+                "land_tutor_to_hand_activated": True,
+                "activation_cost_generic": 0,
+                "activation_cost_colors": ["W"],
+                "activation_requires_tap": True,
+                "activation_condition": "opponent_controls_more_lands",
+                "tutor_target": "land",
+                "tutor_destination": "hand",
+            }
+        )
+        active.battlefield = [
+            wayfarer,
+            {"name": "Plains", "type_line": "Basic Land — Plains", "effect": "land"},
+            {"name": "Mountain", "type_line": "Basic Land — Mountain", "effect": "land"},
+        ]
+        opponent.battlefield = [
+            {"name": "Island", "type_line": "Basic Land — Island", "effect": "land"},
+            {"name": "Swamp", "type_line": "Basic Land — Swamp", "effect": "land"},
+            {"name": "Forest", "type_line": "Basic Land — Forest", "effect": "land"},
+        ]
+        land = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+        spell_card = {"name": "Farewell", "cmc": 6, "type_line": "Sorcery", "effect": "board_wipe"}
+        active.library = [spell_card, land]
+
+        battle.activate_land_tutor_creatures(active, turn=10, opponents=[opponent])
+
+        assert wayfarer.get("tapped") is True
+        assert land in active.hand
+        assert land not in active.library
+        assert spell_card in active.library
+
     def test_spellseeker_etb_finds_cheap_instant_or_sorcery_only(self):
         active = player("Active")
         removal = {"name": "Swords to Plowshares", "cmc": 1, "type_line": "Instant", "effect": "remove_creature"}

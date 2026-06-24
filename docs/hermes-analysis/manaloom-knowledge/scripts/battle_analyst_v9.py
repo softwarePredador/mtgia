@@ -13942,6 +13942,157 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         for permanent in utility_artifacts
     }
 
+    tutor_to_hand_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("activated_self_sacrifice_tutor_to_hand")
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase == "precombat_main":
+        for permanent in tutor_to_hand_artifacts:
+            activation_cost = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(permanent.get("activation_cost_generic") or 0),
+            )
+            activation_cost_text = "{%d}" % activation_cost
+            if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "artifact_already_tapped_for_tutor_activation",
+                    phase=phase,
+                )
+                continue
+            if activation_cost > 0 and player.available_mana() < activation_cost:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_tutor_activation",
+                    phase=phase,
+                )
+                continue
+            target_type = str(permanent.get("tutor_target") or permanent.get("target") or "any")
+            candidates = library_tutor_candidates(player, target_type)
+            if not candidates:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_valid_tutor_target",
+                    phase=phase,
+                    risk_flags=["no_tutor_target"],
+                )
+                continue
+            scored_candidates = [
+                (
+                    candidate,
+                    *tutor_candidate_score(candidate, target_type, player, opponents, turn),
+                )
+                for candidate in candidates
+            ]
+            scored_candidates.sort(
+                key=lambda item: (-item[1], -int(float(item[0].get("cmc") or 0)), item[0].get("name", ""))
+            )
+            found, found_score, found_reason = scored_candidates[0]
+            if activation_cost > 0 and not player.spend_mana(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_activation_cost",
+                    phase=phase,
+                )
+                continue
+            if permanent.get("activation_requires_tap"):
+                permanent["tapped"] = True
+            permanent["utility_artifact_used_this_turn"] = True
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.graveyard.append(permanent)
+            moved_cards, destination = move_library_tutor_selection(player, [found], f"{target_type}_to_hand")
+            chosen = moved_cards[0] if moved_cards else found
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        candidate,
+                        get_card_effect(candidate),
+                        score=score,
+                        action="activate_tutor_artifact",
+                        target_type=target_type,
+                        destination="hand",
+                        reason=reason,
+                    )
+                    for candidate, score, reason in scored_candidates[:8]
+                ],
+                chosen_option=decision_card_option(
+                    chosen,
+                    get_card_effect(chosen) if chosen else None,
+                    score=found_score,
+                    action="activate_tutor_artifact",
+                    target_type=target_type,
+                    destination="hand",
+                    reason=found_reason,
+                ),
+                rejected_options=[
+                    decision_card_option(
+                        candidate,
+                        get_card_effect(candidate),
+                        score=score,
+                        action="defer_tutor_artifact",
+                        target_type=target_type,
+                        destination="hand",
+                        reason=reason,
+                    )
+                    for candidate, score, reason in scored_candidates[1:8]
+                ],
+                score_components={
+                    "activation_cost_generic": activation_cost,
+                    "target_type": target_type,
+                    "candidate_count": len(scored_candidates),
+                    "selected_card": chosen.get("name", "?") if chosen else None,
+                },
+                rule_source="utility_artifact_activation_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=found_score,
+                reason="cash_in_tutor_artifact_for_best_structural_target",
+                strategic_principle="convert tutor artifact into the highest-value land or mana source before main actions",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "cards": len(moved_cards),
+                    "mana": -activation_cost,
+                    "artifacts": -1,
+                    "graveyard": 1,
+                    "selected": chosen.get("name", "?") if chosen else None,
+                    "destination": destination,
+                },
+                risk_flags=["sacrifice_artifact", "tutor"],
+                rejected_reason="lower_contextual_tutor_score",
+            )
+            emit_replay_event(
+                "utility_artifact_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="self_sacrifice_tutor_to_hand",
+                mana_paid=activation_cost,
+                target_type=target_type,
+                found=chosen.get("name", "?") if chosen else None,
+                found_cards=[item.get("name", "?") for item in moved_cards],
+                destination=destination,
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            return 1
+
     for normalized_name in preferred_order:
         permanent = permanents_by_name.get(normalized_name)
         if permanent is None:
@@ -16464,6 +16615,22 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
     return activations
 
 
+def _is_artifact_with_mana_ability_card(candidate):
+    if not isinstance(candidate, dict):
+        return False
+    type_line = str(candidate.get("type_line") or "").lower()
+    if "artifact" not in type_line:
+        return False
+    effect_data = get_card_effect(candidate)
+    merged = {**effect_data, **candidate}
+    return bool(
+        merged.get("activated_mana_ability")
+        or merged.get("is_mana_source")
+        or merged.get("mana_produced") is not None
+        or merged.get("produces")
+    )
+
+
 def library_tutor_candidates(player, target_type):
     target_type = str(target_type or "any").lower()
     for suffix in ("_to_top", "_to_hand", "_to_battlefield", "_to_graveyard"):
@@ -16573,6 +16740,12 @@ def library_tutor_candidates(player, target_type):
                 and candidate_cmc is not None
                 and candidate_cmc == 3
             ):
+                candidates.append(candidate)
+        elif target_type in (
+            "artifact_mana_ability_or_basic_land",
+            "artifact_with_mana_ability_or_basic_land",
+        ):
+            if (is_effective_land(candidate) and "basic" in type_line) or _is_artifact_with_mana_ability_card(candidate):
                 candidates.append(candidate)
         elif target_type in ("green_creature", "green_creature_to_battlefield"):
             if is_creature_card(candidate) and card_has_color(candidate, "G"):
@@ -17709,17 +17882,19 @@ def trigger_opponent_land_play_engines(
         )
 
 
-def activate_land_tutor_creatures(player, turn):
+def activate_land_tutor_creatures(player, turn, opponents=None):
+    opponents = list(opponents or [])
     for permanent in list(player.battlefield):
         if not isinstance(permanent, dict):
             continue
         land_tutor_creature = bool(permanent.get("land_tutor_activated"))
         self_sacrifice_land_tutor = bool(permanent.get("activated_self_sacrifice_land_tutor"))
-        if not land_tutor_creature and not self_sacrifice_land_tutor:
+        land_tutor_to_hand_creature = bool(permanent.get("land_tutor_to_hand_activated"))
+        if not land_tutor_creature and not self_sacrifice_land_tutor and not land_tutor_to_hand_creature:
             continue
         if permanent.get("tapped"):
             continue
-        if land_tutor_creature and permanent.get("summoning_sick"):
+        if (land_tutor_creature or land_tutor_to_hand_creature) and permanent.get("summoning_sick"):
             continue
         activation_cost_raw = permanent.get("activation_cost_generic")
         activation_cost = adjusted_activated_ability_generic_cost(
@@ -17875,6 +18050,181 @@ def activate_land_tutor_creatures(player, turn):
                 life_before=life_before,
                 life_after=player.life,
                 turn=turn,
+            )
+            return
+
+        if land_tutor_to_hand_creature:
+            player_land_count = controlled_land_count(player)
+            opponent_land_counts = [
+                {
+                    "player": getattr(opponent, "name", "Opponent"),
+                    "lands": controlled_land_count(opponent),
+                }
+                for opponent in opponents
+                if opponent is not None and opponent.is_alive()
+            ]
+            max_opponent_land_count = max(
+                (entry["lands"] for entry in opponent_land_counts),
+                default=0,
+            )
+            if (
+                permanent.get("activation_condition") == "opponent_controls_more_lands"
+                and max_opponent_land_count <= player_land_count
+            ):
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="land_tutor",
+                    reason="opponent_does_not_control_more_lands",
+                    player_land_count=player_land_count,
+                    opponent_land_counts=opponent_land_counts,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+            activation_colors = list(permanent.get("activation_cost_colors") or [])
+            activation_cost_generic = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(permanent.get("activation_cost_generic") or 0),
+                activation_colors=activation_colors,
+            )
+            activation_cost_text = ""
+            if activation_cost_generic > 0:
+                activation_cost_text += "{%d}" % activation_cost_generic
+            activation_cost_text += "".join("{%s}" % color for color in activation_colors)
+            if not activation_cost_text:
+                activation_cost_text = "{0}"
+            target_type = str(permanent.get("tutor_target") or permanent.get("target") or "land")
+            scored_candidates = [
+                (
+                    candidate,
+                    *tutor_candidate_score(candidate, target_type, player, opponents, turn),
+                )
+                for candidate in library_tutor_candidates(player, target_type)
+            ]
+            scored_candidates.sort(
+                key=lambda item: (-item[1], -int(float(item[0].get("cmc") or 0)), item[0].get("name", ""))
+            )
+            if not scored_candidates:
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="land_tutor",
+                    reason="no_valid_tutor_target",
+                    activation_cost=activation_cost_text,
+                    player_land_count=player_land_count,
+                    opponent_land_counts=opponent_land_counts,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+            if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="land_tutor",
+                    reason="failed_to_pay_activation_cost",
+                    activation_cost=activation_cost_text,
+                    player_land_count=player_land_count,
+                    opponent_land_counts=opponent_land_counts,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+            if permanent.get("activation_requires_tap", True):
+                permanent["tapped"] = True
+                resolve_controlled_dwarf_tap_treasure_triggers(
+                    player,
+                    permanent,
+                    turn,
+                    phase="precombat_main",
+                )
+            found, found_score, found_reason = scored_candidates[0]
+            moved_cards, destination = move_library_tutor_selection(
+                player,
+                [found],
+                f"{target_type}_to_hand",
+            )
+            found = moved_cards[0] if moved_cards else found
+            emit_decision_trace(
+                decision_type="utility_creature_activation",
+                player=player,
+                turn=turn,
+                phase="precombat_main",
+                available_options=[
+                    decision_card_option(
+                        candidate,
+                        get_card_effect(candidate),
+                        score=score,
+                        action="activate_land_tutor_to_hand",
+                        target_type=target_type,
+                        destination="hand",
+                        reason=reason,
+                    )
+                    for candidate, score, reason in scored_candidates[:8]
+                ],
+                chosen_option=decision_card_option(
+                    found,
+                    get_card_effect(found) if found else None,
+                    score=found_score,
+                    action="activate_land_tutor_to_hand",
+                    target_type=target_type,
+                    destination="hand",
+                    reason=found_reason,
+                ),
+                rejected_options=[
+                    decision_card_option(
+                        candidate,
+                        get_card_effect(candidate),
+                        score=score,
+                        action="defer_land_tutor_to_hand",
+                        target_type=target_type,
+                        destination="hand",
+                        reason=reason,
+                    )
+                    for candidate, score, reason in scored_candidates[1:8]
+                ],
+                score_components={
+                    "activation_cost_generic": activation_cost_generic,
+                    "activation_cost_colors": activation_colors,
+                    "player_land_count": player_land_count,
+                    "opponent_land_counts": opponent_land_counts,
+                    "selected_card": found.get("name", "?") if found else None,
+                },
+                rule_source="utility_creature_activation_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=found_score,
+                reason="opponent_controls_more_lands",
+                strategic_principle="convert land deficit into the best land card before combat",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "cards": len(moved_cards),
+                    "mana": -(activation_cost_generic + len(activation_colors)),
+                    "selected": found.get("name", "?") if found else None,
+                    "destination": destination,
+                },
+                risk_flags=["tutor", "tap_creature"],
+                rejected_reason="lower_contextual_tutor_score",
+            )
+            emit_replay_event(
+                "activated_ability",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="land_tutor",
+                activation_kind="conditional_tap_land_tutor_to_hand_creature",
+                activation_cost=activation_cost_text,
+                player_land_count=player_land_count,
+                opponent_land_counts=opponent_land_counts,
+                found=found.get("name", "?") if found else None,
+                found_cards=[item.get("name", "?") for item in moved_cards],
+                destination=destination,
+                turn=turn,
+                **replay_rule_fields(permanent),
             )
             return
 
@@ -25148,7 +25498,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         )
         while not stack.empty() or _pending_triggers:
             priority_round(player, all_players, stack, turn, rng)
-    activate_land_tutor_creatures(player, turn)
+    activate_land_tutor_creatures(player, turn, opponents)
     activate_treasure_tutor_creatures(
         player,
         opponents,

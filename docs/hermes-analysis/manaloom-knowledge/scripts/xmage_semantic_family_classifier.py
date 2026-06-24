@@ -632,6 +632,32 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target") == "land_to_hand"
         )
 
+    if effect == "ramp_permanent" and scope == "activated_self_sacrifice_land_tutor_to_hand_artifact_v1":
+        return (
+            types == {"ARTIFACT"}
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and "SimpleActivatedAbility" in ability_classes
+            and {"GenericManaCost", "TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
+            and bool(effect_json.get("activated_self_sacrifice_tutor_to_hand"))
+            and int(effect_json.get("activation_cost_generic") or 0) == 2
+            and bool(effect_json.get("activation_requires_tap"))
+            and effect_json.get("tutor_target") == "land"
+            and effect_json.get("tutor_destination") == "hand"
+        )
+
+    if effect == "ramp_permanent" and scope == "activated_self_sacrifice_artifact_mana_ability_or_basic_land_tutor_to_hand_v1":
+        return (
+            types == {"ARTIFACT"}
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and "SimpleActivatedAbility" in ability_classes
+            and {"GenericManaCost", "TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
+            and bool(effect_json.get("activated_self_sacrifice_tutor_to_hand"))
+            and int(effect_json.get("activation_cost_generic") or 0) == 1
+            and bool(effect_json.get("activation_requires_tap"))
+            and effect_json.get("tutor_target") == "artifact_mana_ability_or_basic_land"
+            and effect_json.get("tutor_destination") == "hand"
+        )
+
     if effect == "creature" and scope == "spellseeker_etb_instant_or_sorcery_mana_value_2_or_less_to_hand_v1":
         return (
             types == {"CREATURE"}
@@ -654,6 +680,23 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("toughness") or 0) == 2
             and effect_json.get("etb_tutor_target") == "artifact_mana_value_3"
             and effect_json.get("etb_tutor_status") == "runtime_library_to_hand"
+        )
+
+    if effect == "creature" and scope == "activated_opponent_more_lands_land_tutor_to_hand_creature_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and "ActivateIfConditionActivatedAbility" in ability_classes
+            and "TapSourceCost" in cost_classes
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("land_tutor_to_hand_activated"))
+            and int(effect_json.get("activation_cost_generic") or 0) == 0
+            and effect_json.get("activation_cost_colors") == ["W"]
+            and bool(effect_json.get("activation_requires_tap"))
+            and effect_json.get("activation_condition") == "opponent_controls_more_lands"
+            and effect_json.get("tutor_target") == "land"
+            and effect_json.get("tutor_destination") == "hand"
         )
 
     if effect == "treasure_maker" and scope == "single_treasure_creation_v1":

@@ -1563,6 +1563,87 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["battle_model_scope"], "land_tutor_to_hand_v1")
         self.assertEqual(primary["target"], "land_to_hand")
 
+    def test_expedition_map_maps_to_activated_land_tutor_to_hand_artifact_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "xmage_class_name": "ExpeditionMap",
+                "raw_excerpt": (
+                    'TargetCardInLibrary target = new TargetCardInLibrary(new FilterLandCard()); '
+                    "SimpleActivatedAbility ability = new SimpleActivatedAbility("
+                    "new SearchLibraryPutInHandEffect(target, true), new GenericManaCost(2)); "
+                    "ability.addCost(new TapSourceCost()); ability.addCost(new SacrificeSourceCost());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "activated_self_sacrifice_land_tutor_to_hand_artifact_v1")
+        self.assertTrue(primary["activated_self_sacrifice_tutor_to_hand"])
+        self.assertEqual(primary["activation_cost_generic"], 2)
+        self.assertEqual(primary["tutor_target"], "land")
+        self.assertEqual(primary["tutor_destination"], "hand")
+
+    def test_moonsilver_key_maps_to_activated_mana_artifact_or_basic_land_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "ability_classes": ["ManaAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost", "SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "xmage_class_name": "MoonsilverKey",
+                "raw_excerpt": (
+                    'private static final FilterCard filter = new FilterCard("an artifact card with a mana ability or a basic land card"); '
+                    "Ability ability = new SimpleActivatedAbility(new SearchLibraryPutInHandEffect("
+                    "new TargetCardInLibrary(filter), true), new GenericManaCost(1)); "
+                    "ability.addCost(new TapSourceCost()); ability.addCost(new SacrificeSourceCost()); "
+                    "return input.isArtifact(game) && input.getAbilities(game).stream().anyMatch(ManaAbility.class::isInstance);"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_self_sacrifice_artifact_mana_ability_or_basic_land_tutor_to_hand_v1",
+        )
+        self.assertEqual(primary["activation_cost_generic"], 1)
+        self.assertEqual(primary["tutor_target"], "artifact_mana_ability_or_basic_land")
+        self.assertEqual(primary["tutor_destination"], "hand")
+
+    def test_weathered_wayfarer_maps_to_conditional_land_tutor_to_hand_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "ability_classes": ["ActivateIfConditionActivatedAbility"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "WeatheredWayfarer",
+                "raw_excerpt": (
+                    "private static final Condition condition = new OpponentControlsMoreCondition(StaticFilters.FILTER_LANDS); "
+                    "Ability ability = new ActivateIfConditionActivatedAbility("
+                    "new SearchLibraryPutInHandEffect(new TargetCardInLibrary(StaticFilters.FILTER_CARD_LAND_A), true), "
+                    'new ManaCostsImpl<>("{W}"), condition); ability.addCost(new TapSourceCost());'
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_opponent_more_lands_land_tutor_to_hand_creature_v1",
+        )
+        self.assertTrue(primary["land_tutor_to_hand_activated"])
+        self.assertEqual(primary["activation_cost_colors"], ["W"])
+        self.assertEqual(primary["activation_condition"], "opponent_controls_more_lands")
+        self.assertEqual(primary["tutor_target"], "land")
+
     def test_spellseeker_maps_to_etb_cheap_instant_or_sorcery_tutor_scope(self) -> None:
         result = hints.build_effect_hints(
             {
