@@ -10210,3 +10210,79 @@ Register decision:
   replay-audited.
 - Do not reuse PG114.
 - Next package number is PG115.
+
+## PG185 - Fury Storm exact stack-copy rule
+
+Timestamp: 2026-06-24 17:22 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes one Lorehold variant card used by deck `612`: `Fury Storm`.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Fury Storm`:
+  `battle_rule_v1:1c5fc8fcfccde45171603a1ff05f4f05`,
+  `oracle_hash=5a7a4b3e044452c015ecd91bc9897680`,
+  `effect=copy_spell`,
+  `battle_model_scope=copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps `CopyTargetStackObjectEffect` plus `TargetSpell` to the exact
+  stack-copy scope without requiring a new runtime executor.
+- Semantic classifier promotes only the exact `INSTANT` +
+  `CommanderStormAbility` + `CopyTargetStackObjectEffect` signature.
+- Batch generator assigns `copy_spell_engine` to `combo_value/copy_spell`
+  instead of manual review.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg185_fury_storm_copy_spell_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg185_fury_storm_copy_spell_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg185_fury_storm_copy_spell_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg185_fury_storm_copy_spell_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg185_fury_storm_copy_spell_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=0`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=0`.
+- Apply:
+  backup rows `0`, `deprecated_shadow_rows=0`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=0`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg185_fury_storm_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=1`, `canonical_snapshot_rows_exported=3239`.
+- SQLite verification:
+  local `battle_card_rules` row is `verified/auto` with
+  `copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_copy_spell_postsync_v3.json`;
+  `battle_ready=269`, `needs_rule_before_strategy=126`,
+  `split_scope=25`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_lorehold_copy_spell_postsync_v3.json`;
+  `18/18` pass.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck612_battle_rule_coherence_pg185_postsync_20260624.json`;
+  deck `612` has `high=28`, `medium=7`, `pass=65`.
+
+Register decision:
+
+- PG185 is closed as applied, postchecked, synced, and strategy-audited.
+- Do not reuse PG185.
+- Continue next with the remaining Lorehold `split_scope` and `runtime_needed`
+  families, starting from the post-sync matrix.

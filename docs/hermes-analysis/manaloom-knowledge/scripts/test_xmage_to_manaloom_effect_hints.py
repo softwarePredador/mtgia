@@ -2069,6 +2069,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1",
         )
         self.assertTrue(primary["commander_storm"])
+        self.assertFalse(result["primary_candidate"]["requires_runtime_executor"])
 
     def test_mystical_tutor_maps_to_instant_or_sorcery_topdeck_tutor_scope(self) -> None:
         result = hints.build_effect_hints(

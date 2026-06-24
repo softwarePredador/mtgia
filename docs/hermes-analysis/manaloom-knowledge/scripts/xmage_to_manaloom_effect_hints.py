@@ -4234,7 +4234,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 scope=str(copy_stack_spell_fields["scope"]),
                 reason=str(copy_stack_spell_fields["reason"]),
                 ability_kind="one_shot",
-                requires_runtime_executor=True,
+                requires_runtime_executor=False,
                 extra_effect_fields=dict(copy_stack_spell_fields["fields"]),
                 matched_signals=list(copy_stack_spell_fields["signals"]),
             )

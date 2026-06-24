@@ -27,8 +27,12 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_ideal_deck_cand
 
 Current generated evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.json`
-- `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.md`
+- initial matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_v1.json`
+- current post-PG185 matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_copy_spell_postsync_v3.json`
+- current post-PG185 strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_lorehold_copy_spell_postsync_v3.json`
 
 The script reads:
 
@@ -36,14 +40,14 @@ The script reads:
 - prior Lorehold variants `606` and `607`;
 - new Lorehold variants `608` through `616`;
 - current XMage proposal report
-  `xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_proposals.json`;
+  `xmage_current_replay_batch_pipeline_20260624_lorehold_copy_spell_postsync_v3_proposals.json`;
 - Hermes SQLite battle-rule cache for rule readiness.
 
 It does not mutate deck rows, SQLite, or PostgreSQL.
 
 ## Current Matrix Result
 
-Generated on 2026-06-24:
+Initial matrix generated on 2026-06-24:
 
 - total Lorehold-touching cards in matrix: `395`;
 - `core_keep`: `87`;
@@ -62,6 +66,38 @@ Rule-readiness split:
 - `runtime_needed`: `11`;
 - `no_rule_signal`: `2`.
 
+Post-PG185 matrix generated on 2026-06-24 after closing `Fury Storm`:
+
+- total Lorehold-touching cards in matrix: `395`;
+- `core_keep`: `87`;
+- `priority_benchmark_candidate`: `36`;
+- `watchlist_candidate`: `88`;
+- `needs_rule_before_strategy`: `126`;
+- `active_low_confidence_review`: `13`;
+- `low_priority`: `43`;
+- `policy_blocked`: `2`.
+
+Post-PG185 rule-readiness split:
+
+- `battle_ready`: `269`;
+- `mapper_manual`: `88`;
+- `split_scope`: `25`;
+- `runtime_needed`: `11`;
+- `blocked_missing_xmage_source`: `2`.
+
+PG185 closure evidence:
+
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/pg185_fury_storm_copy_spell_package.md`;
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg185_fury_storm_20260624.json`;
+- affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck612_battle_rule_coherence_pg185_postsync_20260624.json`;
+- final pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_lorehold_copy_spell_postsync_v3_manifest.json`;
+- strategy consistency:
+  `18/18` pass.
+
 Operational interpretation:
 
 - The `127` `needs_rule_before_strategy` cards must not drive deck swaps yet.
@@ -79,13 +115,22 @@ Lorehold card rules from the matrix.
 Start with:
 
 - split-scope cards that are strategically relevant, such as
-  `Pyromancer Ascension`, `Fury Storm`, `Cool but Rude`,
-  `Profound Journey`, `Sun Titan`, `Glint-Horn Buccaneer`,
+  `Pyromancer Ascension`, `Cool but Rude`, `Profound Journey`,
+  `Sun Titan`, `Glint-Horn Buccaneer`,
   `Taii Wakeen, Perfect Shot`, `Primal Amulet // Primal Wellspring`,
   `Starfield Shepherd`, `Erode`, and `Lightning Helix`;
 - runtime-needed token or damage families only when the exact scope is
   reusable and has focused test coverage;
 - manual mapper cards last unless they are blocking a top Lorehold role gap.
+
+`Fury Storm` is the first completed proof of the flow:
+
+1. XMage local source matched exact stack-copy signature.
+2. The hint/classifier promoted only the safe exact scope.
+3. PG185 precheck/apply/postcheck promoted one verified auto rule.
+4. PG -> Hermes sync inserted/updated one local battle rule.
+5. Matrix moved the card to `battle_ready` and
+   `priority_benchmark_candidate`.
 
 ## Current Benchmark Candidate Lane
 
@@ -104,6 +149,7 @@ Current top candidates include:
 - `Flashback`;
 - `Improvisation Capstone`;
 - `Pinnacle Monk // Mystic Peak`;
+- `Fury Storm`;
 - `Return the Favor`;
 - `Monument to Endurance`;
 - `Dawn's Truce`;

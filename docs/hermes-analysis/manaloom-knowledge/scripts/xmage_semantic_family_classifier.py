@@ -935,6 +935,19 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and not bool(effect_json.get("trigger_first_instant_or_sorcery_each_turn"))
         )
 
+    if effect == "copy_spell" and scope == "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"CopyTargetStackObjectEffect"}
+            and ability_classes == {"CommanderStormAbility"}
+            and not cost_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "instant_or_sorcery_spell"
+            and bool(effect_json.get("may_choose_new_targets"))
+            and effect_json.get("choose_new_targets_status") == "may"
+            and bool(effect_json.get("commander_storm"))
+        )
+
     if effect == "untap_land_engine" and scope == "x_tap_untap_x_lands_v1":
         return (
             types == {"ARTIFACT"}

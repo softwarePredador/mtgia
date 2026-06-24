@@ -4164,6 +4164,49 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_and_generator_mark_fury_storm_copy_stack_scope_as_batch_safe(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Fury Storm",
+                    "severity": "high",
+                    "oracle_hash": "furyhash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["no_active_battle_rule"],
+                    "checks": {"focused_test_scenario_count": 1},
+                    "xmage": {
+                        "class_name": "FuryStorm",
+                        "path": "/xmage/FuryStorm.java",
+                        "types": ["INSTANT"],
+                        "effect_classes": ["CopyTargetStackObjectEffect"],
+                        "ability_classes": ["CommanderStormAbility"],
+                        "cost_classes": [],
+                        "primary_effect": {
+                            "effect": "copy_spell",
+                            "battle_model_scope": "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1",
+                            "instant": True,
+                            "target": "instant_or_sorcery_spell",
+                            "may_choose_new_targets": True,
+                            "choose_new_targets_status": "may",
+                            "commander_storm": True,
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        self.assertEqual(family_report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        generator_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+        self.assertEqual(proposal["deck_role_json"]["category"], "combo_value")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "copy_spell")
+
     def test_classifier_marks_candelabra_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
