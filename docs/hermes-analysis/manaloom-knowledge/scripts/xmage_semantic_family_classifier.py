@@ -470,6 +470,56 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("cost_reduction_generic_if_control_wizard") or 0) == 1
         )
 
+    if effect == "counter_spell" and scope == "counter_spell_unless_controller_pays_three_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"CounterUnlessPaysEffect"}
+            and not ability_classes
+            and effect_json.get("target") == "spell"
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("unless_controller_pays_generic") or 0) == 3
+        )
+
+    if effect == "counter_spell" and scope == "counter_instant_or_sorcery_unless_controller_pays_three_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"CounterUnlessPaysEffect"}
+            and not ability_classes
+            and effect_json.get("target") == "instant_or_sorcery_spell"
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("unless_controller_pays_generic") or 0) == 3
+        )
+
+    if effect == "counter_spell" and scope == "counter_noncreature_spell_unless_controller_pays_two_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"CounterUnlessPaysEffect"}
+            and not ability_classes
+            and effect_json.get("target") == "noncreature_spell"
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("unless_controller_pays_generic") or 0) == 2
+        )
+
+    if effect == "ramp_ritual" and scope == "three_black_mana_ritual_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"BasicManaEffect"}
+            and not ability_classes
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("mana_produced") or 0) == 3
+            and effect_json.get("produces") == "B"
+        )
+
+    if effect == "ramp_ritual" and scope == "three_red_mana_ritual_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"BasicManaEffect"}
+            and not ability_classes
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("mana_produced") or 0) == 3
+            and effect_json.get("produces") == "R"
+        )
+
     if effect == "treasure_maker" and scope == "single_treasure_creation_v1":
         return (
             types == {"SORCERY"}

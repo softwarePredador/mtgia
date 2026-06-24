@@ -6590,14 +6590,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Dark Ritual": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "three_black_mana_ritual_v1",
     "effect": "ramp_ritual",
+    "instant": true,
     "mana_produced": 3,
+    "produces": "B",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:69a79cc3b7a3409d74c03674dfdd3e05"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ad607c99185b8f57b168e12e24117777",
+    "battle_rule_oracle_hash": "4e7345b04e31c3ecf89825fefd2f983a"
   },
   "Darkbore Pathway // Slitherbore Pathway": {
     "effect": "land",
@@ -17650,14 +17655,19 @@
     "battle_rule_logical_key": "battle_rule_v1:2c6cc881c92be4d266a230b2ef32c639"
   },
   "Mana Leak": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_spell_unless_controller_pays_three_v1",
     "effect": "counter",
     "instant": true,
+    "target": "spell",
+    "unless_controller_pays_generic": 3,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:931721bf8cd596a9aa7616f828ce8f2f",
+    "battle_rule_oracle_hash": "aa3909e9100ef2fcd477df4032dc46f1"
   },
   "Mana Reflection": {
     "cmc": 6.0,
@@ -18513,16 +18523,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Miscast": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_instant_or_sorcery_unless_controller_pays_three_v1",
     "effect": "counter",
     "instant": true,
-    "target": "instant_or_sorcery",
-    "tax": 3,
+    "target": "instant_or_sorcery_spell",
+    "unless_controller_pays_generic": 3,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:fa5a0d9591038e16bf53776ed71da147"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3c9a71293fcab9fdbd66cd5099141f41",
+    "battle_rule_oracle_hash": "dff145f1eaaa76d6f9e44e688bb29726"
   },
   "Misdirection": {
     "effect": "redirect_removal",
@@ -22186,15 +22199,19 @@
     "battle_rule_logical_key": "battle_rule_v1:9d5afecce0b2500c1dff74bcd97e6eb4"
   },
   "Pyretic Ritual": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "three_red_mana_ritual_v1",
     "effect": "ramp_ritual",
     "instant": true,
     "mana_produced": 3,
+    "produces": "R",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:071d9c92eecbefcd8762c29fdadf79cb"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2acc5c7999e61e47ba13d37a57c9f9f5",
+    "battle_rule_oracle_hash": "4e4e3035c7643f310b64d47a97336ff0"
   },
   "Pyroblast": {
     "available_modes": [
@@ -27266,14 +27283,19 @@
     "battle_rule_logical_key": "battle_rule_v1:81f188e4e97035598c3746c5f81a02d8"
   },
   "Spell Pierce": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "counter_noncreature_spell_unless_controller_pays_two_v1",
     "effect": "counter",
     "instant": true,
+    "target": "noncreature_spell",
+    "unless_controller_pays_generic": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4c4f4dc3409b8b13423f2939f1a2c488",
+    "battle_rule_oracle_hash": "f657ad73b97962b41b932ebf17bb6e47"
   },
   "Spellbook": {
     "cmc": 0.0,

@@ -1236,6 +1236,107 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
         self.assertEqual(primary["cost_reduction_generic_if_control_wizard"], 1)
 
+    def test_mana_leak_maps_to_exact_soft_counter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterUnlessPaysEffect"],
+                "cost_classes": ["GenericManaCost"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addTarget(new TargetSpell()); "
+                    "this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(new GenericManaCost(3)));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(primary["battle_model_scope"], "counter_spell_unless_controller_pays_three_v1")
+        self.assertEqual(primary["target"], "spell")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["unless_controller_pays_generic"], 3)
+
+    def test_miscast_maps_to_exact_soft_instant_or_sorcery_counter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterUnlessPaysEffect"],
+                "cost_classes": ["GenericManaCost"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(new GenericManaCost(3))); "
+                    "this.getSpellAbility().addTarget(new TargetSpell(StaticFilters.FILTER_SPELL_INSTANT_OR_SORCERY));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "counter_instant_or_sorcery_unless_controller_pays_three_v1",
+        )
+        self.assertEqual(primary["target"], "instant_or_sorcery_spell")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["unless_controller_pays_generic"], 3)
+
+    def test_spell_pierce_maps_to_exact_soft_noncreature_counter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CounterUnlessPaysEffect"],
+                "cost_classes": ["GenericManaCost"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addTarget(new TargetSpell(StaticFilters.FILTER_SPELL_NON_CREATURE)); "
+                    "this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(new GenericManaCost(2)));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "counter_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "counter_noncreature_spell_unless_controller_pays_two_v1",
+        )
+        self.assertEqual(primary["target"], "noncreature_spell")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["unless_controller_pays_generic"], 2)
+
+    def test_dark_ritual_maps_to_exact_black_ritual_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["BasicManaEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": "this.getSpellAbility().addEffect(new BasicManaEffect(Mana.BlackMana(3)));",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_ritual")
+        self.assertEqual(primary["battle_model_scope"], "three_black_mana_ritual_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["mana_produced"], 3)
+        self.assertEqual(primary["produces"], "B")
+
+    def test_pyretic_ritual_maps_to_exact_red_ritual_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["BasicManaEffect"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": "this.getSpellAbility().addEffect(new BasicManaEffect(Mana.RedMana(3)));",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_ritual")
+        self.assertEqual(primary["battle_model_scope"], "three_red_mana_ritual_v1")
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["mana_produced"], 3)
+        self.assertEqual(primary["produces"], "R")
+
     def test_carrion_feeder_maps_to_exact_sacrifice_self_growth_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -377,10 +377,71 @@ def _build_counter_variant_fields(
     cost_classes: set[str],
     rules_text: str,
 ) -> dict[str, Any] | None:
-    if card_types != {"INSTANT"} or "CounterTargetEffect" not in effect_classes:
+    if card_types != {"INSTANT"}:
         return None
 
     normalized = _normalized_rules_text(rules_text)
+
+    if "CounterUnlessPaysEffect" in effect_classes:
+        if "counterunlesspayseffect(new genericmanacost(3))" in normalized:
+            if "filter_spell_instant_or_sorcery" in normalized:
+                return {
+                    "effect": "counter_spell",
+                    "scope": "counter_instant_or_sorcery_unless_controller_pays_three_v1",
+                    "fields": {
+                        "target": "instant_or_sorcery_spell",
+                        "instant": True,
+                        "unless_controller_pays_generic": 3,
+                    },
+                    "reason": (
+                        "XMage structure matches a soft counter against an instant or sorcery unless its controller pays 3."
+                    ),
+                    "signals": [
+                        "CounterUnlessPaysEffect",
+                        "GenericManaCost(3)",
+                        "FILTER_SPELL_INSTANT_OR_SORCERY",
+                    ],
+                }
+            return {
+                "effect": "counter_spell",
+                "scope": "counter_spell_unless_controller_pays_three_v1",
+                "fields": {
+                    "target": "spell",
+                    "instant": True,
+                    "unless_controller_pays_generic": 3,
+                },
+                "reason": (
+                    "XMage structure matches a soft counter against any spell unless its controller pays 3."
+                ),
+                "signals": [
+                    "CounterUnlessPaysEffect",
+                    "GenericManaCost(3)",
+                ],
+            }
+        if (
+            "counterunlesspayseffect(new genericmanacost(2))" in normalized
+            and "filter_spell_non_creature" in normalized
+        ):
+            return {
+                "effect": "counter_spell",
+                "scope": "counter_noncreature_spell_unless_controller_pays_two_v1",
+                "fields": {
+                    "target": "noncreature_spell",
+                    "instant": True,
+                    "unless_controller_pays_generic": 2,
+                },
+                "reason": (
+                    "XMage structure matches a soft counter against a noncreature spell unless its controller pays 2."
+                ),
+                "signals": [
+                    "CounterUnlessPaysEffect",
+                    "GenericManaCost(2)",
+                    "FILTER_SPELL_NON_CREATURE",
+                ],
+            }
+
+    if "CounterTargetEffect" not in effect_classes:
+        return None
 
     if "CreateDelayedTriggeredAbilityEffect" in effect_classes and "PactDelayedTriggeredAbility" in ability_classes:
         return {
@@ -1613,6 +1674,46 @@ def _build_simple_artifact_mana_source_fields(
     return None
 
 
+def _build_basic_ritual_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"INSTANT"} or effect_classes != {"BasicManaEffect"}:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+
+    if "mana.blackmana(3)" in normalized:
+        return {
+            "effect": "ramp_ritual",
+            "scope": "three_black_mana_ritual_v1",
+            "fields": {
+                "instant": True,
+                "mana_produced": 3,
+                "produces": "B",
+            },
+            "reason": "XMage structure matches a one-shot ritual that adds three black mana.",
+            "signals": ["BasicManaEffect", "BlackMana(3)"],
+        }
+
+    if "mana.redmana(3)" in normalized:
+        return {
+            "effect": "ramp_ritual",
+            "scope": "three_red_mana_ritual_v1",
+            "fields": {
+                "instant": True,
+                "mana_produced": 3,
+                "produces": "R",
+            },
+            "reason": "XMage structure matches a one-shot ritual that adds three red mana.",
+            "signals": ["BasicManaEffect", "RedMana(3)"],
+        }
+
+    return None
+
+
 def _build_rishkar_fields(
     *,
     card_types: set[str],
@@ -1957,6 +2058,24 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(simple_artifact_mana_source_fields["fields"]),
                 matched_signals=list(simple_artifact_mana_source_fields["signals"]),
+            )
+        )
+
+    basic_ritual_fields = _build_basic_ritual_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        rules_text=rules_text,
+    )
+    if basic_ritual_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(basic_ritual_fields["effect"]),
+                scope=str(basic_ritual_fields["scope"]),
+                reason=str(basic_ritual_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(basic_ritual_fields["fields"]),
+                matched_signals=list(basic_ritual_fields["signals"]),
             )
         )
 

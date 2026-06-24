@@ -2557,6 +2557,181 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_mana_leak_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Mana Leak",
+                        "severity": "high",
+                        "oracle_hash": "manaleakhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ManaLeak",
+                            "path": "/xmage/ManaLeak.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterUnlessPaysEffect"],
+                            "ability_classes": [],
+                            "cost_classes": ["GenericManaCost"],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_spell_unless_controller_pays_three_v1",
+                                "target": "spell",
+                                "instant": True,
+                                "unless_controller_pays_generic": 3,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_miscast_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Miscast",
+                        "severity": "high",
+                        "oracle_hash": "miscasthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Miscast",
+                            "path": "/xmage/Miscast.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterUnlessPaysEffect"],
+                            "ability_classes": [],
+                            "cost_classes": ["GenericManaCost"],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_instant_or_sorcery_unless_controller_pays_three_v1",
+                                "target": "instant_or_sorcery_spell",
+                                "instant": True,
+                                "unless_controller_pays_generic": 3,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_spell_pierce_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Spell Pierce",
+                        "severity": "high",
+                        "oracle_hash": "spellpiercehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "SpellPierce",
+                            "path": "/xmage/SpellPierce.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["CounterUnlessPaysEffect"],
+                            "ability_classes": [],
+                            "cost_classes": ["GenericManaCost"],
+                            "primary_effect": {
+                                "effect": "counter_spell",
+                                "battle_model_scope": "counter_noncreature_spell_unless_controller_pays_two_v1",
+                                "target": "noncreature_spell",
+                                "instant": True,
+                                "unless_controller_pays_generic": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_dark_ritual_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Dark Ritual",
+                        "severity": "high",
+                        "oracle_hash": "darkritualhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "DarkRitual",
+                            "path": "/xmage/DarkRitual.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["BasicManaEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "ramp_ritual",
+                                "battle_model_scope": "three_black_mana_ritual_v1",
+                                "instant": True,
+                                "mana_produced": 3,
+                                "produces": "B",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_pyretic_ritual_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Pyretic Ritual",
+                        "severity": "high",
+                        "oracle_hash": "pyretichash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "PyreticRitual",
+                            "path": "/xmage/PyreticRitual.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["BasicManaEffect"],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "ramp_ritual",
+                                "battle_model_scope": "three_red_mana_ritual_v1",
+                                "instant": True,
+                                "mana_produced": 3,
+                                "produces": "R",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_carrion_feeder_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
