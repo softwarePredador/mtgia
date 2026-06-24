@@ -142,6 +142,49 @@ def insert_rule(
 
 
 class DeckCardBattleRuleCoherenceAuditTest(unittest.TestCase):
+    def test_mdfc_front_face_uses_oracle_cache_and_rule_aliases(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(db) as conn:
+                conn.row_factory = sqlite3.Row
+                create_schema(conn)
+                insert_deck_card(
+                    conn,
+                    "Sink into Stupor",
+                    oracle_text="Return target spell or nonland permanent an opponent controls to its owner's hand.",
+                    type_line="Instant",
+                )
+                conn.execute("DELETE FROM card_oracle_cache WHERE normalized_name = ?", ("sink into stupor",))
+                conn.execute(
+                    """
+                    INSERT INTO card_oracle_cache (
+                        normalized_name, name, type_line, oracle_text, updated_at
+                    ) VALUES (?, ?, ?, ?, '2026-06-22T00:00:00Z')
+                    """,
+                    (
+                        "sink into stupor // soporific springs",
+                        "Sink into Stupor // Soporific Springs",
+                        "Instant // Land",
+                        "Return target spell or nonland permanent an opponent controls to its owner's hand.",
+                    ),
+                )
+                insert_rule(
+                    conn,
+                    "Sink into Stupor // Soporific Springs",
+                    {
+                        "effect": "bounce",
+                        "battle_model_scope": "return_target_spell_or_opponent_nonland_permanent_or_tapped_blue_land_v1",
+                    },
+                )
+
+                oracle_cache = audit.load_oracle_cache(conn)
+                battle_rules = audit.load_battle_rules(conn)
+                report = audit.build_report(conn)
+
+        self.assertIn("sink into stupor", oracle_cache)
+        self.assertIn("sink into stupor", battle_rules)
+        self.assertEqual(report["cards"][0]["severity"], "pass")
+
     def test_exact_scoped_rule_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             db = Path(tmpdir) / "knowledge.db"

@@ -1,0 +1,30 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg134_current_replay_exact_scope_batch_two_20260624_0113",
+  "deploy_id": "PG134",
+  "family_counts": {
+    "manual_model": 5,
+    "targeted_interaction": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg134_current_replay_exact_scope_batch_two_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg134_current_replay_exact_scope_batch_two_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg134_current_replay_exact_scope_batch_two_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg134_current_replay_exact_scope_batch_two_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg134_current_replay_exact_scope_batch_two_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg134_current_replay_exact_scope_batch_two_rollback.sql"
+  },
+  "generated_at": "2026-06-24T01:14:53+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Archdruid's Charm",
+    "Sink into Stupor",
+    "Ruthless Technomancer",
+    "Emperor of Bones",
+    "Disciple of Freyalise",
+    "Vibrance"
+  ],
+  "selected_count": 6,
+  "slug": "current_replay_exact_scope_batch_two",
+  "status": "prepared_read_only_pending_apply_approval"
+}

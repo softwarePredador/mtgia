@@ -256,6 +256,53 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             self.assertIn("pg999_existing_backup_table", rollback_sql)
             self.assertIn("pg999_existing_backup_table", postcheck_sql)
 
+    def test_package_builder_matches_mdfc_left_face_against_full_card_name(self) -> None:
+        proposal_report = {
+            "generated_at": "2026-06-24T00:00:00+00:00",
+            "proposals": [
+                {
+                    "card_name": "Sink into Stupor",
+                    "normalized_name": "sink into stupor",
+                    "oracle_hash": "sinkhash",
+                    "logical_rule_key": "battle_rule_v1:sinkhash",
+                    "effect_json": {
+                        "effect": "bounce",
+                        "battle_model_scope": "return_target_spell_or_opponent_nonland_permanent_or_tapped_blue_land_v1",
+                    },
+                    "deck_role_json": {"category": "interaction"},
+                    "source": "curated",
+                    "confidence": 0.94,
+                    "review_status": "verified",
+                    "execution_status": "auto",
+                    "notes": "mdfc coverage",
+                    "safe_for_batch_pg_package": True,
+                    "family_id": "targeted_interaction",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            output_prefix = Path(tmp_dir) / "pg998_mdfc_batch"
+            manifest = package_builder.build_package(
+                proposal_report,
+                deploy_id="PG998",
+                slug="mdfc_batch",
+                output_prefix=output_prefix,
+                include_family=set(),
+                include_card={"Sink into Stupor"},
+                exclude_card=set(),
+                max_cards=None,
+            )
+
+            precheck_sql = Path(manifest["files"]["precheck"]).read_text(encoding="utf-8")
+            apply_sql = Path(manifest["files"]["apply"]).read_text(encoding="utf-8")
+            rollback_sql = Path(manifest["files"]["rollback"]).read_text(encoding="utf-8")
+            self.assertIn("split_part(lower(c.name), ' // ', 1) = p.normalized_name", precheck_sql)
+            self.assertIn("normalized_name LIKE p.normalized_name || ' // %'", precheck_sql)
+            self.assertIn("split_part(lower(c.name), ' // ', 1) = p.normalized_name", apply_sql)
+            self.assertIn("normalized_name LIKE 'sink into stupor // %'", apply_sql)
+            self.assertIn("normalized_name LIKE 'sink into stupor // %'", rollback_sql)
+
     def test_classifier_marks_spell_scope_runtime_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -399,6 +446,108 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
 
         card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_agathas_soul_cauldron_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Agatha's Soul Cauldron",
+                        "severity": "high",
+                        "oracle_hash": "agatha-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "AgathasSoulCauldron",
+                            "path": "/xmage/AgathasSoulCauldron.java",
+                            "types": ["ARTIFACT"],
+                            "ability_classes": [
+                                "AddAbility",
+                                "ReflexiveTriggeredAbility",
+                                "SimpleActivatedAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "effect_classes": [
+                                "AddCountersTargetEffect",
+                                "AgathasSoulCauldronAbilityEffect",
+                                "AgathasSoulCauldronExileEffect",
+                                "AgathasSoulCauldronManaEffect",
+                                "AsThoughManaEffect",
+                                "OneShotEffect",
+                            ],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "graveyard_exile_counter_and_ability_grant_artifact_v1",
+                                "ability_kind": "activated",
+                                "mana_as_any_color_for_creature_activations": True,
+                                "plus_one_counter_creatures_gain_activated_abilities_of_exiled_creatures": True,
+                                "activated_tap_exile_target_card_from_graveyard": True,
+                                "creature_exile_reflexive_plus_one_counter": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "passive")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_necropotence_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Necropotence",
+                        "severity": "high",
+                        "oracle_hash": "necro-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Necropotence",
+                            "path": "/xmage/Necropotence.java",
+                            "types": ["ENCHANTMENT"],
+                            "ability_classes": [
+                                "AtTheBeginOfNextEndStepDelayedTriggeredAbility",
+                                "NecropotenceTriggeredAbility",
+                                "SimpleActivatedAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "effect_classes": [
+                                "ExileTargetEffect",
+                                "NecropotenceEffect",
+                                "OneShotEffect",
+                                "ReturnToHandTargetEffect",
+                                "SkipDrawStepEffect",
+                            ],
+                            "cost_classes": ["PayLifeCost"],
+                            "primary_effect": {
+                                "effect": "draw_engine",
+                                "battle_model_scope": "skip_draw_discard_exile_pay_life_face_down_draw_next_end_step_v1",
+                                "ability_kind": "activated",
+                                "skip_draw_step": True,
+                                "discard_trigger_exiles_discarded_card_from_graveyard": True,
+                                "activated_pay_life": 1,
+                                "activated_exile_top_card_face_down": True,
+                                "activated_put_exiled_card_into_hand_next_end_step": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "draw_engine")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
     def test_classifier_marks_seal_of_primordium_exact_scope_as_batch_safe(self) -> None:
@@ -1840,6 +1989,247 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "multikicker_cost": "{2}",
                                 "etb_charge_counters_per_kick": True,
                                 "tap_add_colorless_per_charge_counter": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_sink_into_stupor_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Sink into Stupor",
+                        "severity": "high",
+                        "oracle_hash": "sinkhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SinkIntoStupor",
+                            "path": "/xmage/SinkIntoStupor.java",
+                            "types": ["INSTANT", "LAND"],
+                            "effect_classes": ["ReturnToHandTargetEffect", "TapSourceUnlessPaysEffect"],
+                            "ability_classes": ["AsEntersBattlefieldAbility", "BlueManaAbility"],
+                            "cost_classes": ["PayLifeCost"],
+                            "primary_effect": {
+                                "effect": "bounce",
+                                "battle_model_scope": "return_target_spell_or_opponent_nonland_permanent_or_tapped_blue_land_v1",
+                                "instant": True,
+                                "target": "spell_or_opponent_nonland_permanent",
+                                "land_side_pay_three_life_else_tapped": True,
+                                "land_side_add_mana": "U",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_disciple_of_freyalise_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Disciple of Freyalise",
+                        "severity": "high",
+                        "oracle_hash": "disciplehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "DiscipleOfFreyalise",
+                            "path": "/xmage/DiscipleOfFreyalise.java",
+                            "types": ["CREATURE", "LAND"],
+                            "effect_classes": [
+                                "DiscipleOfFreyaliseEffect",
+                                "DrawCardSourceControllerEffect",
+                                "GainLifeEffect",
+                                "OneShotEffect",
+                                "TapSourceUnlessPaysEffect",
+                            ],
+                            "ability_classes": ["AsEntersBattlefieldAbility", "EntersBattlefieldTriggeredAbility", "GreenManaAbility"],
+                            "cost_classes": ["PayLifeCost", "SacrificeTargetCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "etb_sacrifice_another_creature_gain_draw_power_or_tapped_green_land_v1",
+                                "power": 3,
+                                "toughness": 3,
+                                "etb_may_sacrifice_another_creature_gain_life_and_draw_equal_power": True,
+                                "land_side_pay_three_life_else_tapped": True,
+                                "land_side_add_mana": "G",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_vibrance_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Vibrance",
+                        "severity": "high",
+                        "oracle_hash": "vibrancehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Vibrance",
+                            "path": "/xmage/Vibrance.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DamageTargetEffect", "GainLifeEffect", "SearchLibraryPutInHandEffect"],
+                            "ability_classes": ["EntersBattlefieldTriggeredAbility", "EvokeAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "evoke_etb_red_damage_or_green_land_tutor_lifegain_v1",
+                                "power": 4,
+                                "toughness": 4,
+                                "evoke_cost": "{R/G}{R/G}",
+                                "etb_if_red_red_spent_damage_any_target": 3,
+                                "etb_if_green_green_spent_search_land_to_hand": True,
+                                "etb_if_green_green_spent_gain_life": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_archdruids_charm_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Archdruid's Charm",
+                        "severity": "high",
+                        "oracle_hash": "archhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "ArchdruidsCharm",
+                            "path": "/xmage/ArchdruidsCharm.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "AddCountersTargetEffect",
+                                "DamageWithPowerFromOneToAnotherTargetEffect",
+                                "ExileTargetEffect",
+                                "SearchEffect",
+                                "SearchLibraryPutInHandOrOnBattlefieldEffect",
+                            ],
+                            "ability_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "modal_spell",
+                                "battle_model_scope": "search_creature_or_land_or_counter_fight_or_exile_artifact_enchantment_v1",
+                                "instant": True,
+                                "mode_search_creature_or_land_reveal_put_land_battlefield_tapped_else_hand": True,
+                                "mode_put_plus_one_counter_on_controlled_creature_then_fight": True,
+                                "mode_exile_target_artifact_or_enchantment": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_ruthless_technomancer_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Ruthless Technomancer",
+                        "severity": "high",
+                        "oracle_hash": "technomancerhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "RuthlessTechnomancer",
+                            "path": "/xmage/RuthlessTechnomancer.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "OneShotEffect",
+                                "ReturnFromGraveyardToBattlefieldTargetEffect",
+                                "RuthlessTechnomancerEffect",
+                            ],
+                            "ability_classes": ["EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["SacrificeXTargetCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "etb_sacrifice_another_creature_create_treasures_and_x_artifact_reanimate_v1",
+                                "power": 2,
+                                "toughness": 4,
+                                "etb_may_sacrifice_another_creature_create_treasures_equal_power": True,
+                                "activated_cost": "{2}{B}",
+                                "activated_sacrifice_x_artifacts_return_creature_with_power_x_or_less": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_emperor_of_bones_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Emperor of Bones",
+                        "severity": "high",
+                        "oracle_hash": "emperorhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "EmperorOfBones",
+                            "path": "/xmage/EmperorOfBones.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "EmperorOfBonesEffect",
+                                "ExileTargetEffect",
+                                "GainAbilityTargetEffect",
+                                "SacrificeTargetEffect",
+                            ],
+                            "ability_classes": [
+                                "AdaptAbility",
+                                "BeginningOfCombatTriggeredAbility",
+                                "OneOrMoreCountersAddedTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "combat_exile_adapt_finality_reanimate_v1",
+                                "power": 2,
+                                "toughness": 2,
+                                "beginning_of_combat_exile_up_to_one_card_from_graveyard": True,
+                                "adapt_cost": "{1}{B}",
+                                "adapt_counters": 2,
+                                "counters_trigger_reanimate_exiled_creature_with_finality_haste_and_sacrifice_eot": True,
                             },
                         },
                     }

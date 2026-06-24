@@ -264,6 +264,78 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target_controller_gains_life"], 4)
         self.assertTrue(primary["instant"])
 
+    def test_agathas_soul_cauldron_maps_to_exact_passive_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "AddCountersTargetEffect",
+                    "AgathasSoulCauldronAbilityEffect",
+                    "AgathasSoulCauldronExileEffect",
+                    "AgathasSoulCauldronManaEffect",
+                    "AsThoughManaEffect",
+                    "OneShotEffect",
+                ],
+                "ability_classes": [
+                    "AddAbility",
+                    "ReflexiveTriggeredAbility",
+                    "SimpleActivatedAbility",
+                    "SimpleStaticAbility",
+                ],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            },
+            (
+                "You may spend mana as though it were mana of any color to activate abilities of creatures you control. "
+                "Creatures you control with +1/+1 counters on them have all activated abilities of all creature cards exiled with Agatha's Soul Cauldron. "
+                "{T}: Exile target card from a graveyard. When a creature card is exiled this way, put a +1/+1 counter on target creature you control."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "graveyard_exile_counter_and_ability_grant_artifact_v1",
+        )
+        self.assertTrue(primary["mana_as_any_color_for_creature_activations"])
+        self.assertTrue(primary["plus_one_counter_creatures_gain_activated_abilities_of_exiled_creatures"])
+
+    def test_necropotence_maps_to_exact_draw_engine_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "ExileTargetEffect",
+                    "NecropotenceEffect",
+                    "OneShotEffect",
+                    "ReturnToHandTargetEffect",
+                    "SkipDrawStepEffect",
+                ],
+                "ability_classes": [
+                    "AtTheBeginOfNextEndStepDelayedTriggeredAbility",
+                    "NecropotenceTriggeredAbility",
+                    "SimpleActivatedAbility",
+                    "SimpleStaticAbility",
+                ],
+                "cost_classes": ["PayLifeCost"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+            },
+            (
+                "Skip your draw step. Whenever you discard a card, exile that card from your graveyard. "
+                "Pay 1 life: Exile the top card of your library face down. Put that card into your hand at the beginning of your next end step."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "skip_draw_discard_exile_pay_life_face_down_draw_next_end_step_v1",
+        )
+        self.assertTrue(primary["skip_draw_step"])
+        self.assertEqual(primary["activated_pay_life"], 1)
+
     def test_seal_of_primordium_maps_to_sacrifice_self_artifact_or_enchantment_removal(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -1276,6 +1348,152 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["multikicker_cost"], "{2}")
         self.assertTrue(primary["etb_charge_counters_per_kick"])
         self.assertTrue(primary["tap_add_colorless_per_charge_counter"])
+
+    def test_sink_into_stupor_maps_to_exact_spell_or_nonland_bounce_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["ReturnToHandTargetEffect", "TapSourceUnlessPaysEffect"],
+                "ability_classes": ["AsEntersBattlefieldAbility", "BlueManaAbility"],
+                "cost_classes": ["PayLifeCost"],
+                "constructor_metadata": {"card_types": ["INSTANT", "LAND"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "bounce")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_target_spell_or_opponent_nonland_permanent_or_tapped_blue_land_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "spell_or_opponent_nonland_permanent")
+        self.assertTrue(primary["land_side_pay_three_life_else_tapped"])
+        self.assertEqual(primary["land_side_add_mana"], "U")
+
+    def test_disciple_of_freyalise_maps_to_exact_etb_sacrifice_and_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "DiscipleOfFreyaliseEffect",
+                    "DrawCardSourceControllerEffect",
+                    "GainLifeEffect",
+                    "OneShotEffect",
+                    "TapSourceUnlessPaysEffect",
+                ],
+                "ability_classes": ["AsEntersBattlefieldAbility", "EntersBattlefieldTriggeredAbility", "GreenManaAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE", "LAND"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_sacrifice_another_creature_gain_draw_power_or_tapped_green_land_v1",
+        )
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertTrue(primary["etb_may_sacrifice_another_creature_gain_life_and_draw_equal_power"])
+        self.assertTrue(primary["land_side_pay_three_life_else_tapped"])
+        self.assertEqual(primary["land_side_add_mana"], "G")
+
+    def test_vibrance_maps_to_exact_evoke_dual_etb_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DamageTargetEffect", "GainLifeEffect", "SearchLibraryPutInHandEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "EvokeAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "evoke_etb_red_damage_or_green_land_tutor_lifegain_v1")
+        self.assertEqual(primary["power"], 4)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertEqual(primary["evoke_cost"], "{R/G}{R/G}")
+        self.assertEqual(primary["etb_if_red_red_spent_damage_any_target"], 3)
+        self.assertTrue(primary["etb_if_green_green_spent_search_land_to_hand"])
+        self.assertEqual(primary["etb_if_green_green_spent_gain_life"], 2)
+
+    def test_archdruids_charm_maps_to_exact_modal_three_mode_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "AddCountersTargetEffect",
+                    "DamageWithPowerFromOneToAnotherTargetEffect",
+                    "ExileTargetEffect",
+                    "SearchEffect",
+                    "SearchLibraryPutInHandOrOnBattlefieldEffect",
+                ],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "modal_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "search_creature_or_land_or_counter_fight_or_exile_artifact_enchantment_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertTrue(primary["mode_search_creature_or_land_reveal_put_land_battlefield_tapped_else_hand"])
+        self.assertTrue(primary["mode_put_plus_one_counter_on_controlled_creature_then_fight"])
+        self.assertTrue(primary["mode_exile_target_artifact_or_enchantment"])
+
+    def test_ruthless_technomancer_maps_to_exact_treasure_and_reanimate_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "OneShotEffect",
+                    "ReturnFromGraveyardToBattlefieldTargetEffect",
+                    "RuthlessTechnomancerEffect",
+                ],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["SacrificeXTargetCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_sacrifice_another_creature_create_treasures_and_x_artifact_reanimate_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertTrue(primary["etb_may_sacrifice_another_creature_create_treasures_equal_power"])
+        self.assertEqual(primary["activated_cost"], "{2}{B}")
+        self.assertTrue(primary["activated_sacrifice_x_artifacts_return_creature_with_power_x_or_less"])
+
+    def test_emperor_of_bones_maps_to_exact_exile_adapt_reanimate_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "EmperorOfBonesEffect",
+                    "ExileTargetEffect",
+                    "GainAbilityTargetEffect",
+                    "SacrificeTargetEffect",
+                ],
+                "ability_classes": [
+                    "AdaptAbility",
+                    "BeginningOfCombatTriggeredAbility",
+                    "OneOrMoreCountersAddedTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "combat_exile_adapt_finality_reanimate_v1")
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 2)
+        self.assertTrue(primary["beginning_of_combat_exile_up_to_one_card_from_graveyard"])
+        self.assertEqual(primary["adapt_cost"], "{1}{B}")
+        self.assertEqual(primary["adapt_counters"], 2)
+        self.assertTrue(primary["counters_trigger_reanimate_exiled_creature_with_finality_haste_and_sacrifice_eot"])
 
 
 if __name__ == "__main__":

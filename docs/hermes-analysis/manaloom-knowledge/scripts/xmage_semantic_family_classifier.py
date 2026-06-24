@@ -83,6 +83,20 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "implement_family_before_metadata_batch",
     },
+    "draw_engine": {
+        "effects": {"draw_engine"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "static and activated draw-engine bookkeeping with delayed card movement",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "passive": {
+        "effects": {"passive"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "static battlefield annotation and passive support execution",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
     "targeted_interaction": {
         "effects": {
             "removal_destroy",
@@ -599,6 +613,19 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("green_tap_exile_creature_from_graveyard_gain_life") or 0) == 2
         )
 
+    if effect == "creature" and scope == "evoke_etb_red_damage_or_green_land_tutor_lifegain_v1":
+        return (
+            types == {"CREATURE"}
+            and {"DamageTargetEffect", "GainLifeEffect", "SearchLibraryPutInHandEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldTriggeredAbility", "EvokeAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 4
+            and effect_json.get("evoke_cost") == "{R/G}{R/G}"
+            and int(effect_json.get("etb_if_red_red_spent_damage_any_target") or 0) == 3
+            and bool(effect_json.get("etb_if_green_green_spent_search_land_to_hand"))
+            and int(effect_json.get("etb_if_green_green_spent_gain_life") or 0) == 2
+        )
+
     if effect == "creature" and scope == "defender_sacrifice_for_rr_or_blocking_damage_v1":
         return (
             types == {"CREATURE"}
@@ -610,6 +637,44 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("defender"))
             and int(effect_json.get("sacrifice_for_red_mana") or 0) == 2
             and int(effect_json.get("red_sacrifice_damage_blocking_creature") or 0) == 2
+        )
+
+    if effect == "creature" and scope == "etb_sacrifice_another_creature_create_treasures_and_x_artifact_reanimate_v1":
+        return (
+            types == {"CREATURE"}
+            and {"OneShotEffect", "ReturnFromGraveyardToBattlefieldTargetEffect", "RuthlessTechnomancerEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and "SacrificeXTargetCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("etb_may_sacrifice_another_creature_create_treasures_equal_power"))
+            and effect_json.get("activated_cost") == "{2}{B}"
+            and bool(effect_json.get("activated_sacrifice_x_artifacts_return_creature_with_power_x_or_less"))
+        )
+
+    if effect == "creature" and scope == "combat_exile_adapt_finality_reanimate_v1":
+        return (
+            types == {"CREATURE"}
+            and {"EmperorOfBonesEffect", "ExileTargetEffect", "GainAbilityTargetEffect", "SacrificeTargetEffect"}.issubset(effect_classes)
+            and {"AdaptAbility", "BeginningOfCombatTriggeredAbility", "OneOrMoreCountersAddedTriggeredAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 2
+            and bool(effect_json.get("beginning_of_combat_exile_up_to_one_card_from_graveyard"))
+            and effect_json.get("adapt_cost") == "{1}{B}"
+            and int(effect_json.get("adapt_counters") or 0) == 2
+            and bool(effect_json.get("counters_trigger_reanimate_exiled_creature_with_finality_haste_and_sacrifice_eot"))
+        )
+
+    if effect == "creature" and scope == "etb_sacrifice_another_creature_gain_draw_power_or_tapped_green_land_v1":
+        return (
+            types == {"CREATURE", "LAND"}
+            and {"DiscipleOfFreyaliseEffect", "DrawCardSourceControllerEffect", "GainLifeEffect", "OneShotEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)
+            and {"AsEntersBattlefieldAbility", "EntersBattlefieldTriggeredAbility", "GreenManaAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 3
+            and bool(effect_json.get("etb_may_sacrifice_another_creature_gain_life_and_draw_equal_power"))
+            and bool(effect_json.get("land_side_pay_three_life_else_tapped"))
+            and effect_json.get("land_side_add_mana") == "G"
         )
 
     if effect == "creature" and scope == "x_etb_counters_add_counter_or_remove_counter_ping_v1":
@@ -676,6 +741,49 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("activated_generic_one_tap_sacrifice_draw") or 0) == 1
         )
 
+    if effect == "passive" and scope == "graveyard_exile_counter_and_ability_grant_artifact_v1":
+        return (
+            types == {"ARTIFACT"}
+            and {
+                "AddCountersTargetEffect",
+                "AgathasSoulCauldronAbilityEffect",
+                "AgathasSoulCauldronExileEffect",
+                "AgathasSoulCauldronManaEffect",
+                "AsThoughManaEffect",
+                "OneShotEffect",
+            }.issubset(effect_classes)
+            and {"SimpleActivatedAbility", "SimpleStaticAbility", "ReflexiveTriggeredAbility"}.issubset(ability_classes)
+            and "TapSourceCost" in xmage_cost_classes(card)
+            and bool(effect_json.get("mana_as_any_color_for_creature_activations"))
+            and bool(effect_json.get("plus_one_counter_creatures_gain_activated_abilities_of_exiled_creatures"))
+            and bool(effect_json.get("activated_tap_exile_target_card_from_graveyard"))
+            and bool(effect_json.get("creature_exile_reflexive_plus_one_counter"))
+        )
+
+    if effect == "draw_engine" and scope == "skip_draw_discard_exile_pay_life_face_down_draw_next_end_step_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {
+                "ExileTargetEffect",
+                "NecropotenceEffect",
+                "OneShotEffect",
+                "ReturnToHandTargetEffect",
+                "SkipDrawStepEffect",
+            }.issubset(effect_classes)
+            and {
+                "AtTheBeginOfNextEndStepDelayedTriggeredAbility",
+                "NecropotenceTriggeredAbility",
+                "SimpleActivatedAbility",
+                "SimpleStaticAbility",
+            }.issubset(ability_classes)
+            and "PayLifeCost" in xmage_cost_classes(card)
+            and bool(effect_json.get("skip_draw_step"))
+            and bool(effect_json.get("discard_trigger_exiles_discarded_card_from_graveyard"))
+            and int(effect_json.get("activated_pay_life") or 0) == 1
+            and bool(effect_json.get("activated_exile_top_card_face_down"))
+            and bool(effect_json.get("activated_put_exiled_card_into_hand_next_end_step"))
+        )
+
     if effect == "artifact" and scope == "multikicker_charge_counter_mana_rock_v1":
         return (
             types == {"ARTIFACT"}
@@ -684,6 +792,17 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("multikicker_cost") == "{2}"
             and bool(effect_json.get("etb_charge_counters_per_kick"))
             and bool(effect_json.get("tap_add_colorless_per_charge_counter"))
+        )
+
+    if effect == "modal_spell" and scope == "search_creature_or_land_or_counter_fight_or_exile_artifact_enchantment_v1":
+        return (
+            types == {"INSTANT"}
+            and {"AddCountersTargetEffect", "DamageWithPowerFromOneToAnotherTargetEffect", "ExileTargetEffect", "SearchEffect", "SearchLibraryPutInHandOrOnBattlefieldEffect"}.issubset(effect_classes)
+            and not ability_classes
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("mode_search_creature_or_land_reveal_put_land_battlefield_tapped_else_hand"))
+            and bool(effect_json.get("mode_put_plus_one_counter_on_controlled_creature_then_fight"))
+            and bool(effect_json.get("mode_exile_target_artifact_or_enchantment"))
         )
 
     if effect == "planeswalker" and scope == "opponents_sorcery_speed_only_plus1_sorcery_flash_minus3_bounce_draw_v1":
@@ -737,6 +856,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("instant"))
             and effect_json.get("target") == "creature"
             and int(effect_json.get("untap_lands_count") or 0) == 2
+        )
+
+    if effect == "bounce" and scope == "return_target_spell_or_opponent_nonland_permanent_or_tapped_blue_land_v1":
+        return (
+            types == {"INSTANT", "LAND"}
+            and {"ReturnToHandTargetEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)
+            and {"AsEntersBattlefieldAbility", "BlueManaAbility"}.issubset(ability_classes)
+            and "PayLifeCost" in xmage_cost_classes(card)
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "spell_or_opponent_nonland_permanent"
+            and bool(effect_json.get("land_side_pay_three_life_else_tapped"))
+            and effect_json.get("land_side_add_mana") == "U"
         )
 
     return False

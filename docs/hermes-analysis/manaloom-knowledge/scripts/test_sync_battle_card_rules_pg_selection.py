@@ -61,6 +61,23 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         filtered = sync_pg.filter_rows_by_card_names(rows, ["lightning greaves"])
         self.assertEqual(filtered, [{"card_name": "Lightning Greaves"}])
 
+    def test_filter_rows_by_card_names_matches_mdfc_front_face(self) -> None:
+        rows = [
+            {
+                "card_name": "Sink into Stupor // Soporific Springs",
+                "normalized_name": "sink into stupor // soporific springs",
+            },
+            {
+                "card_name": "Disciple of Freyalise // Garden of Freyalise",
+                "normalized_name": "disciple of freyalise // garden of freyalise",
+            },
+        ]
+        filtered = sync_pg.filter_rows_by_card_names(
+            rows,
+            ["Sink into Stupor", "Disciple of Freyalise"],
+        )
+        self.assertEqual(filtered, rows)
+
     def test_export_canonical_snapshot_writes_metadata_rich_payload(self) -> None:
         rows = [
             {

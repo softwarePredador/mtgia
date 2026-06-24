@@ -236,7 +236,16 @@ def filter_rows_by_card_names(rows: list[dict[str, Any]], card_names: list[str])
     return [
         row
         for row in rows
-        if normalize_card_name(str(row.get("card_name") or "")) in allowed
+        if (
+            normalize_card_name(str(row.get("card_name") or "")) in allowed
+            or normalize_card_name(
+                str(row.get("card_name") or "").split(" // ", 1)[0]
+            ) in allowed
+            or normalize_card_name(str(row.get("normalized_name") or "")) in allowed
+            or normalize_card_name(
+                str(row.get("normalized_name") or "").split(" // ", 1)[0]
+            ) in allowed
+        )
     ]
 
 

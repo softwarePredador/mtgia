@@ -865,6 +865,31 @@ def _build_creature_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and {"DamageTargetEffect", "GainLifeEffect", "SearchLibraryPutInHandEffect"}.issubset(effect_classes)
+        and {"EntersBattlefieldTriggeredAbility", "EvokeAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "evoke_etb_red_damage_or_green_land_tutor_lifegain_v1",
+            "fields": {
+                "power": 4,
+                "toughness": 4,
+                "evoke_cost": "{R/G}{R/G}",
+                "etb_if_red_red_spent_damage_any_target": 3,
+                "etb_if_green_green_spent_search_land_to_hand": True,
+                "etb_if_green_green_spent_gain_life": 2,
+            },
+            "reason": "XMage structure matches Vibrance's 4/4 body, evoke cost, red-spent ETB damage mode, and green-spent ETB land-tutor plus lifegain mode.",
+            "signals": [
+                "EvokeAbility",
+                "DamageTargetEffect",
+                "SearchLibraryPutInHandEffect",
+                "GainLifeEffect",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and effect_classes == {"DamageTargetEffect"}
         and {"DefenderAbility", "SimpleActivatedAbility", "SimpleManaAbility"}.issubset(ability_classes)
         and "SacrificeSourceCost" in cost_classes
@@ -885,6 +910,79 @@ def _build_creature_variant_fields(
                 "SimpleManaAbility",
                 "DamageTargetEffect",
                 "BlockingOrBlockedBySourcePredicate",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and {"OneShotEffect", "ReturnFromGraveyardToBattlefieldTargetEffect", "RuthlessTechnomancerEffect"}.issubset(effect_classes)
+        and {"EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+        and "SacrificeXTargetCost" in cost_classes
+    ):
+        return {
+            "effect": "creature",
+            "scope": "etb_sacrifice_another_creature_create_treasures_and_x_artifact_reanimate_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 4,
+                "etb_may_sacrifice_another_creature_create_treasures_equal_power": True,
+                "activated_cost": "{2}{B}",
+                "activated_sacrifice_x_artifacts_return_creature_with_power_x_or_less": True,
+            },
+            "reason": "XMage structure matches Ruthless Technomancer's ETB sacrifice-for-Treasures mode and the activated X-artifact recursion ability.",
+            "signals": [
+                "RuthlessTechnomancerEffect",
+                "ReturnFromGraveyardToBattlefieldTargetEffect",
+                "SacrificeXTargetCost",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and {"EmperorOfBonesEffect", "ExileTargetEffect", "GainAbilityTargetEffect", "SacrificeTargetEffect"}.issubset(effect_classes)
+        and {"AdaptAbility", "BeginningOfCombatTriggeredAbility", "OneOrMoreCountersAddedTriggeredAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "combat_exile_adapt_finality_reanimate_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 2,
+                "beginning_of_combat_exile_up_to_one_card_from_graveyard": True,
+                "adapt_cost": "{1}{B}",
+                "adapt_counters": 2,
+                "counters_trigger_reanimate_exiled_creature_with_finality_haste_and_sacrifice_eot": True,
+            },
+            "reason": "XMage structure matches Emperor of Bones exiling a graveyard card at combat, adapting for two counters, and reanimating an exiled creature with finality, haste, and an end-step sacrifice trigger.",
+            "signals": [
+                "BeginningOfCombatTriggeredAbility",
+                "AdaptAbility",
+                "OneOrMoreCountersAddedTriggeredAbility",
+                "EmperorOfBonesEffect",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE", "LAND"}
+        and {"DiscipleOfFreyaliseEffect", "DrawCardSourceControllerEffect", "GainLifeEffect", "OneShotEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)
+        and {"AsEntersBattlefieldAbility", "EntersBattlefieldTriggeredAbility", "GreenManaAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "etb_sacrifice_another_creature_gain_draw_power_or_tapped_green_land_v1",
+            "fields": {
+                "power": 3,
+                "toughness": 3,
+                "etb_may_sacrifice_another_creature_gain_life_and_draw_equal_power": True,
+                "land_side_pay_three_life_else_tapped": True,
+                "land_side_add_mana": "G",
+            },
+            "reason": "XMage structure matches Disciple of Freyalise's ETB sacrifice-for-life-and-cards mode plus the green land back face that can enter tapped unless you pay 3 life.",
+            "signals": [
+                "DiscipleOfFreyaliseEffect",
+                "DrawCardSourceControllerEffect",
+                "GainLifeEffect",
+                "GreenManaAbility",
             ],
         }
 
@@ -969,6 +1067,73 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"ARTIFACT"}
+        and {
+            "AddCountersTargetEffect",
+            "AgathasSoulCauldronAbilityEffect",
+            "AgathasSoulCauldronExileEffect",
+            "AgathasSoulCauldronManaEffect",
+            "AsThoughManaEffect",
+            "OneShotEffect",
+        }.issubset(effect_classes)
+        and {"SimpleActivatedAbility", "SimpleStaticAbility", "ReflexiveTriggeredAbility"}.issubset(ability_classes)
+        and "TapSourceCost" in cost_classes
+    ):
+        return {
+            "effect": "passive",
+            "scope": "graveyard_exile_counter_and_ability_grant_artifact_v1",
+            "fields": {
+                "mana_as_any_color_for_creature_activations": True,
+                "plus_one_counter_creatures_gain_activated_abilities_of_exiled_creatures": True,
+                "activated_tap_exile_target_card_from_graveyard": True,
+                "creature_exile_reflexive_plus_one_counter": True,
+            },
+            "reason": "XMage structure matches Agatha's Soul Cauldron mana-as-any-color activation support, the static activated-ability grant from exiled creatures, and the tap exile plus +1/+1 counter reflexive mode.",
+            "signals": [
+                "AgathasSoulCauldronManaEffect",
+                "AgathasSoulCauldronAbilityEffect",
+                "AgathasSoulCauldronExileEffect",
+                "AddCountersTargetEffect",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and {
+            "ExileTargetEffect",
+            "NecropotenceEffect",
+            "OneShotEffect",
+            "ReturnToHandTargetEffect",
+            "SkipDrawStepEffect",
+        }.issubset(effect_classes)
+        and {
+            "AtTheBeginOfNextEndStepDelayedTriggeredAbility",
+            "NecropotenceTriggeredAbility",
+            "SimpleActivatedAbility",
+            "SimpleStaticAbility",
+        }.issubset(ability_classes)
+        and "PayLifeCost" in cost_classes
+    ):
+        return {
+            "effect": "draw_engine",
+            "scope": "skip_draw_discard_exile_pay_life_face_down_draw_next_end_step_v1",
+            "fields": {
+                "skip_draw_step": True,
+                "discard_trigger_exiles_discarded_card_from_graveyard": True,
+                "activated_pay_life": 1,
+                "activated_exile_top_card_face_down": True,
+                "activated_put_exiled_card_into_hand_next_end_step": True,
+            },
+            "reason": "XMage structure matches Necropotence's skipped draw step, discard-to-exile trigger, and the pay-1-life face-down exile line that returns the card at the next end step.",
+            "signals": [
+                "SkipDrawStepEffect",
+                "NecropotenceTriggeredAbility",
+                "NecropotenceEffect",
+                "ReturnToHandTargetEffect",
+            ],
+        }
+
+    if (
+        card_types == {"ARTIFACT"}
         and {"ExileTargetEffect", "DrawCardSourceControllerEffect", "OneShotEffect"}.issubset(effect_classes)
         and {"EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
         and {"TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
@@ -1014,6 +1179,28 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"INSTANT"}
+        and {"AddCountersTargetEffect", "DamageWithPowerFromOneToAnotherTargetEffect", "ExileTargetEffect", "SearchEffect", "SearchLibraryPutInHandOrOnBattlefieldEffect"}.issubset(effect_classes)
+        and not ability_classes
+    ):
+        return {
+            "effect": "modal_spell",
+            "scope": "search_creature_or_land_or_counter_fight_or_exile_artifact_enchantment_v1",
+            "fields": {
+                "instant": True,
+                "mode_search_creature_or_land_reveal_put_land_battlefield_tapped_else_hand": True,
+                "mode_put_plus_one_counter_on_controlled_creature_then_fight": True,
+                "mode_exile_target_artifact_or_enchantment": True,
+            },
+            "reason": "XMage structure matches Archdruid's Charm choosing between creature-or-land search, a +1/+1 counter plus fight mode, or exiling an artifact or enchantment.",
+            "signals": [
+                "SearchLibraryPutInHandOrOnBattlefieldEffect",
+                "DamageWithPowerFromOneToAnotherTargetEffect",
+                "ExileTargetEffect",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
         and effect_classes == {"ReturnToHandTargetEffect"}
         and ability_classes == {"OverloadAbility"}
         and "targetcontroller.not_you" in normalized
@@ -1032,6 +1219,30 @@ def _build_exact_runtime_variant_fields(
                 "ReturnToHandTargetEffect",
                 "OverloadAbility",
                 "TargetController.NOT_YOU",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT", "LAND"}
+        and {"ReturnToHandTargetEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)
+        and {"AsEntersBattlefieldAbility", "BlueManaAbility"}.issubset(ability_classes)
+        and "PayLifeCost" in cost_classes
+    ):
+        return {
+            "effect": "bounce",
+            "scope": "return_target_spell_or_opponent_nonland_permanent_or_tapped_blue_land_v1",
+            "fields": {
+                "instant": True,
+                "target": "spell_or_opponent_nonland_permanent",
+                "land_side_pay_three_life_else_tapped": True,
+                "land_side_add_mana": "U",
+            },
+            "reason": "XMage structure matches Sink into Stupor returning a target spell or opposing nonland permanent and the blue land back face that can enter tapped unless you pay 3 life.",
+            "signals": [
+                "ReturnToHandTargetEffect",
+                "TapSourceUnlessPaysEffect",
+                "BlueManaAbility",
+                "PayLifeCost",
             ],
         }
 

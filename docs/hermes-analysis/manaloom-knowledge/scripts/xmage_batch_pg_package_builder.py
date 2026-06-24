@@ -99,6 +99,15 @@ def proposed_cte(proposals: list[dict[str, Any]]) -> str:
     )
 
 
+def alias_where_clause(column: str, proposals: list[dict[str, Any]]) -> str:
+    names = [str(proposal["normalized_name"]) for proposal in proposals]
+    exact = f"{column} IN ({', '.join(sql_literal(name) for name in names)})"
+    alias_parts = [f"{column} LIKE {sql_literal(name + ' // %')}" for name in names]
+    if not alias_parts:
+        return exact
+    return exact + "\n   OR " + "\n   OR ".join(alias_parts)
+
+
 def build_precheck_sql(proposals: list[dict[str, Any]]) -> str:
     return f"""WITH {proposed_cte(proposals)},
 matched_cards AS (
@@ -110,7 +119,10 @@ matched_cards AS (
     c.name AS db_card_name
   FROM proposed p
   LEFT JOIN public.cards c
-    ON lower(c.name) = p.normalized_name
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
    AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
 ),
 target_cards AS (
@@ -128,14 +140,20 @@ rule_rows AS (
   SELECT p.normalized_name, count(r.*) AS existing_rule_rows
   FROM proposed p
   LEFT JOIN public.card_battle_rules r
-    ON r.normalized_name = p.normalized_name
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
   GROUP BY p.normalized_name
 ),
 expected_rows AS (
   SELECT p.normalized_name, count(r.*) AS expected_rule_rows_before
   FROM proposed p
   LEFT JOIN public.card_battle_rules r
-    ON r.normalized_name = p.normalized_name
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
    AND r.logical_rule_key = p.logical_rule_key
   GROUP BY p.normalized_name
 ),
@@ -143,7 +161,10 @@ shadow_rows AS (
   SELECT p.normalized_name, count(r.*) AS would_deprecate_shadow_rows
   FROM proposed p
   LEFT JOIN public.card_battle_rules r
-    ON r.normalized_name = p.normalized_name
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
    AND r.logical_rule_key <> p.logical_rule_key
    AND r.review_status NOT IN ('deprecated', 'rejected')
    AND r.execution_status <> 'disabled'
@@ -169,7 +190,7 @@ ORDER BY p.card_name;
 
 
 def build_apply_sql(proposals: list[dict[str, Any]], backup_table: str) -> str:
-    names = ", ".join(sql_literal(proposal["normalized_name"]) for proposal in proposals)
+    backup_where = alias_where_clause("normalized_name", proposals)
     return f"""BEGIN;
 
 CREATE SCHEMA IF NOT EXISTS manaloom_deploy_audit;
@@ -177,7 +198,7 @@ CREATE SCHEMA IF NOT EXISTS manaloom_deploy_audit;
 CREATE TABLE manaloom_deploy_audit.{backup_table} AS
 SELECT *
 FROM public.card_battle_rules
-WHERE normalized_name IN ({names});
+WHERE {backup_where};
 
 DO $$
 DECLARE
@@ -193,7 +214,10 @@ BEGIN
       min(c.id::text)::uuid AS canonical_card_id
     FROM proposed p
     LEFT JOIN public.cards c
-      ON lower(c.name) = p.normalized_name
+      ON (
+           lower(c.name) = p.normalized_name
+           OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+         )
      AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
     GROUP BY p.card_name, p.normalized_name, p.oracle_hash
   )
@@ -216,7 +240,10 @@ deprecated AS (
     updated_at = now(),
     notes = concat_ws(E'\\n', nullif(r.notes, ''), 'XMage batch package: deprecated stale shadow before curated batch rule upsert.')
   FROM proposed p
-  WHERE r.normalized_name = p.normalized_name
+  WHERE (
+        r.normalized_name = p.normalized_name
+        OR r.normalized_name LIKE p.normalized_name || ' // %'
+      )
     AND r.logical_rule_key <> p.logical_rule_key
   RETURNING r.*
 )
@@ -232,7 +259,10 @@ matched_cards AS (
     c.name AS db_card_name
   FROM proposed p
   JOIN public.cards c
-    ON lower(c.name) = p.normalized_name
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
    AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
 ),
 canonical_target_cards AS (
@@ -323,11 +353,11 @@ COMMIT;
 
 
 def build_rollback_sql(proposals: list[dict[str, Any]], backup_table: str) -> str:
-    names = ", ".join(sql_literal(proposal["normalized_name"]) for proposal in proposals)
+    delete_where = alias_where_clause("normalized_name", proposals)
     return f"""BEGIN;
 
 DELETE FROM public.card_battle_rules
-WHERE normalized_name IN ({names});
+WHERE {delete_where};
 
 INSERT INTO public.card_battle_rules
 SELECT *
@@ -348,7 +378,10 @@ rule_rows AS (
     r.execution_status
   FROM proposed p
   LEFT JOIN public.card_battle_rules r
-    ON r.normalized_name = p.normalized_name
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
    AND r.logical_rule_key = p.logical_rule_key
 )
 SELECT

@@ -203,7 +203,14 @@ def load_oracle_cache(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
         FROM card_oracle_cache
         """
     ).fetchall()
-    return {normalize_name(row["normalized_name"]): dict(row) for row in rows}
+    cache: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        payload = dict(row)
+        normalized = normalize_name(row["normalized_name"])
+        cache[normalized] = payload
+        front_face = normalize_name(str(row["name"] or "").split(" // ", 1)[0])
+        cache.setdefault(front_face, payload)
+    return cache
 
 
 def load_battle_rules(conn: sqlite3.Connection) -> dict[str, list[dict[str, Any]]]:
@@ -223,7 +230,11 @@ def load_battle_rules(conn: sqlite3.Connection) -> dict[str, list[dict[str, Any]
         payload = dict(row)
         payload["effect_json"] = safe_json_loads(row["effect_json"], {})
         payload["deck_role_json"] = safe_json_loads(row["deck_role_json"], {})
-        grouped[normalize_name(row["normalized_name"])].append(payload)
+        normalized = normalize_name(row["normalized_name"])
+        grouped[normalized].append(payload)
+        front_face = normalize_name(str(row["card_name"] or "").split(" // ", 1)[0])
+        if front_face != normalized:
+            grouped[front_face].append(payload)
     return grouped
 
 
