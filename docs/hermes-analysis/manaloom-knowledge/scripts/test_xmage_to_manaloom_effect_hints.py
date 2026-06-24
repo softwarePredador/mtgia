@@ -298,6 +298,46 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["token_haste"])
         self.assertTrue(primary["sacrifice_token_at_end_step"])
 
+    def test_lotho_maps_to_second_spell_treasure_engine(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect", "LoseLifeSourceControllerEffect"],
+                "ability_classes": ["CastSecondSpellTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            "Whenever a player casts their second spell each turn, you lose 1 life and create a Treasure token.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "ramp_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponent_second_spell_each_turn_create_treasure_life_loss_v1",
+        )
+        self.assertEqual(primary["trigger"], "opponent_spell")
+        self.assertTrue(primary["opponent_second_spell_each_turn"])
+        self.assertEqual(primary["treasure_count"], 1)
+        self.assertEqual(primary["controller_loses_life_on_trigger"], 1)
+
+    def test_prized_statue_maps_to_etb_or_dies_treasure_artifact(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["EntersBattlefieldOrDiesSourceTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            },
+            "When this artifact enters or is put into a graveyard from the battlefield, create a Treasure token.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "artifact_etb_or_dies_create_treasure_v1")
+        self.assertEqual(primary["treasure_count"], 1)
+        self.assertEqual(primary["enters_treasure"], 1)
+        self.assertTrue(primary["dies_or_graveyard_from_battlefield_treasure"])
+
     def test_natures_claim_maps_to_artifact_or_enchantment_lifegain_removal(self) -> None:
         result = hints.build_effect_hints(
             {

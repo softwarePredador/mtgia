@@ -258,6 +258,83 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "copy_creature_token")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_lotho_treasure_engine_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Lotho, Corrupt Shirriff",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "LothoCorruptShirriff",
+                            "path": "/xmage/LothoCorruptShirriff.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenEffect", "LoseLifeSourceControllerEffect"],
+                            "ability_classes": ["CastSecondSpellTriggeredAbility"],
+                            "primary_effect": {
+                                "effect": "ramp_engine",
+                                "battle_model_scope": "opponent_second_spell_each_turn_create_treasure_life_loss_v1",
+                                "ability_kind": "triggered",
+                                "is_creature_permanent": True,
+                                "power": 2,
+                                "toughness": 1,
+                                "trigger": "opponent_spell",
+                                "opponent_second_spell_each_turn": True,
+                                "treasure_count": 1,
+                                "controller_loses_life_on_trigger": 1,
+                                "draw_on_enter": False,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "ramp_engine")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_prized_statue_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Prized Statue",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "PrizedStatue",
+                            "path": "/xmage/PrizedStatue.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["CreateTokenEffect"],
+                            "ability_classes": ["EntersBattlefieldOrDiesSourceTriggeredAbility"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "artifact_etb_or_dies_create_treasure_v1",
+                                "ability_kind": "triggered",
+                                "treasure_count": 1,
+                                "enters_treasure": 1,
+                                "dies_or_graveyard_from_battlefield_treasure": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "ramp_permanent")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_package_builder_writes_review_only_sql_package_for_safe_proposals(self) -> None:
         proposal_report = generator.build_generator_report(
             batch_audit=sample_batch_audit(),

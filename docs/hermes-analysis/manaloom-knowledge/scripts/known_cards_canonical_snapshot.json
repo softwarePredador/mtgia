@@ -16991,16 +16991,24 @@
     "battle_rule_logical_key": "battle_rule_v1:f5bb5190b2e292d8b33faeaf1639088c"
   },
   "Lotho, Corrupt Shirriff": {
-    "effect": "creature",
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_second_spell_each_turn_create_treasure_life_loss_v1",
+    "controller_loses_life_on_trigger": 1,
+    "draw_on_enter": false,
+    "effect": "ramp_engine",
     "is_creature_permanent": true,
+    "opponent_second_spell_each_turn": true,
     "power": 2,
     "toughness": 1,
+    "treasure_count": 1,
+    "trigger": "opponent_spell",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:26190cd09ff09f21859165388f24587b"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c5987c2df49d9fa483a1cc9a5ac26fbb",
+    "battle_rule_oracle_hash": "44735ae3d1d2459d0d25c8023930b6a1"
   },
   "Lotus Bloom": {
     "cmc": 0.0,
@@ -21730,6 +21738,19 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
+  },
+  "Prized Statue": {
+    "_rule_logical_key": "battle_rule_v1:f12f6b0add30c98761744303a2cb2034",
+    "battle_model_scope": "prized_statue_treasure_artifact_waiver_v1",
+    "dies_or_graveyard_from_battlefield_treasure": true,
+    "effect": "ramp_permanent",
+    "treasure_count": 1,
+    "battle_rule_source": "manual",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 1.0,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:2863db84fc8c0de650f20f97705a2f31"
   },
   "Processing Plant": {
     "effect": "land",

@@ -1761,6 +1761,59 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
 
     if "CreateTokenEffect" in effect_classes:
         if (
+            card_types == {"ARTIFACT"}
+            and "EntersBattlefieldOrDiesSourceTriggeredAbility" in ability_classes
+        ):
+            candidates.append(
+                _candidate(
+                    effect="ramp_permanent",
+                    scope="artifact_etb_or_dies_create_treasure_v1",
+                    reason="Oracle and XMage structure match an artifact that creates a Treasure when it enters and when it dies.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "treasure_count": 1,
+                        "enters_treasure": 1,
+                        "dies_or_graveyard_from_battlefield_treasure": True,
+                    },
+                    matched_signals=[
+                        "CreateTokenEffect",
+                        "EntersBattlefieldOrDiesSourceTriggeredAbility",
+                        "etb_or_dies_treasure",
+                    ],
+                )
+            )
+        elif (
+            card_types == {"CREATURE"}
+            and {"CreateTokenEffect", "LoseLifeSourceControllerEffect"}.issubset(effect_classes)
+            and "CastSecondSpellTriggeredAbility" in ability_classes
+        ):
+            candidates.append(
+                _candidate(
+                    effect="ramp_engine",
+                    scope="opponent_second_spell_each_turn_create_treasure_life_loss_v1",
+                    reason="Oracle and XMage structure match a creature that loses 1 life and creates a Treasure whenever a player casts their second spell each turn.",
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "is_creature_permanent": True,
+                        "power": 2,
+                        "toughness": 1,
+                        "trigger": "opponent_spell",
+                        "opponent_second_spell_each_turn": True,
+                        "treasure_count": 1,
+                        "controller_loses_life_on_trigger": 1,
+                        "draw_on_enter": False,
+                    },
+                    matched_signals=[
+                        "CreateTokenEffect",
+                        "LoseLifeSourceControllerEffect",
+                        "CastSecondSpellTriggeredAbility",
+                        "second_spell_treasure",
+                    ],
+                )
+            )
+        elif (
             "treasuretoken" in normalized_text
             and "drawcardsourcecontrollereffect(2)" in normalized_text
             and "discardcardcost" in normalized_text

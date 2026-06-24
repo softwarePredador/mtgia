@@ -5756,6 +5756,124 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_lotho_second_spell_trigger_creates_treasure_and_loses_life():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Lotho Controller")
+            controller.life = 30
+            controller.battlefield = [
+                {
+                    "name": "Lotho, Corrupt Shirriff",
+                    "cmc": 2,
+                    "type_line": "Legendary Creature — Halfling Rogue",
+                    "effect": "ramp_engine",
+                    "is_creature_permanent": True,
+                    "power": 2,
+                    "toughness": 1,
+                    "trigger": "opponent_spell",
+                    "opponent_second_spell_each_turn": True,
+                    "treasure_count": 1,
+                    "controller_loses_life_on_trigger": 1,
+                    "battle_model_scope": "opponent_second_spell_each_turn_create_treasure_life_loss_v1",
+                }
+            ]
+            caster = player("Caster")
+            spell = {"name": "Ponder", "type_line": "Sorcery", "cmc": 1}
+
+            caster.record_spell_cast(5)
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [controller],
+                spell,
+                5,
+                "precombat_main",
+                random.Random(1202),
+            )
+            assert controller.treasures == 0
+            assert controller.life == 30
+
+            caster.record_spell_cast(5)
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [controller],
+                spell,
+                5,
+                "precombat_main",
+                random.Random(1202),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert controller.treasures == 1
+        assert controller.life == 29
+        trigger_event = next(
+            data
+            for event, data in events
+            if event == "trigger_resolved" and data.get("card") == "Lotho, Corrupt Shirriff"
+        )
+        assert trigger_event["treasures_created"] == 1
+        assert trigger_event["life_lost"] == 1
+        assert trigger_event["life_before"] == 30
+        assert trigger_event["life_after"] == 29
+        assert trigger_event["opponent_spell_count"] == 2
+
+    def test_prized_statue_enters_and_dies_create_treasures():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            prized = {"name": "Prized Statue", "cmc": 4, "type_line": "Artifact"}
+            effect_data = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": "artifact_etb_or_dies_create_treasure_v1",
+                "treasure_count": 1,
+                "enters_treasure": 1,
+                "dies_or_graveyard_from_battlefield_treasure": True,
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                prized,
+                5,
+                random.Random(1203),
+                effect_data_override=effect_data,
+            )
+
+            assert active.treasures == 1
+            statue = next(card for card in active.battlefield if card.get("name") == "Prized Statue")
+            destination = battle.move_permanent_from_battlefield(
+                active,
+                statue,
+                reason="sacrifice_test",
+                source={"name": "Test Source"},
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert destination == "graveyard"
+        assert active.treasures == 2
+        enter_event = next(
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Prized Statue"
+            and data.get("trigger") == "enters_battlefield"
+        )
+        assert enter_event["treasures_created"] == 1
+        dies_event = next(
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Prized Statue"
+            and data.get("trigger") == "dies_or_graveyard_from_battlefield"
+        )
+        assert dies_event["treasures_created"] == 1
+        assert dies_event["destination"] == "graveyard"
+
     def test_reckless_endeavor_damage_wipe_creates_treasures():
         active = player("Active")
         opponent = player("Opponent")

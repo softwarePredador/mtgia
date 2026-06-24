@@ -49,6 +49,20 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "implement_family_before_metadata_batch",
     },
+    "ramp_permanent": {
+        "effects": {"ramp_permanent"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "battlefield mana artifacts and triggered resource permanents",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "ramp_engine": {
+        "effects": {"ramp_engine"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "triggered battlefield resource engines and resource-event bookkeeping",
+        "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
     "treasure_maker": {
         "effects": {"treasure_maker"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -461,6 +475,31 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target_controller") == "own"
             and bool(effect_json.get("token_haste"))
             and bool(effect_json.get("sacrifice_token_at_end_step"))
+        )
+
+    if effect == "ramp_permanent" and scope == "artifact_etb_or_dies_create_treasure_v1":
+        return (
+            types == {"ARTIFACT"}
+            and effect_classes == {"CreateTokenEffect"}
+            and ability_classes == {"EntersBattlefieldOrDiesSourceTriggeredAbility"}
+            and int(effect_json.get("treasure_count") or 0) == 1
+            and int(effect_json.get("enters_treasure") or 0) == 1
+            and bool(effect_json.get("dies_or_graveyard_from_battlefield_treasure"))
+        )
+
+    if effect == "ramp_engine" and scope == "opponent_second_spell_each_turn_create_treasure_life_loss_v1":
+        return (
+            types == {"CREATURE"}
+            and {"CreateTokenEffect", "LoseLifeSourceControllerEffect"}.issubset(effect_classes)
+            and ability_classes == {"CastSecondSpellTriggeredAbility"}
+            and bool(effect_json.get("is_creature_permanent"))
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 1
+            and effect_json.get("trigger") == "opponent_spell"
+            and bool(effect_json.get("opponent_second_spell_each_turn"))
+            and int(effect_json.get("treasure_count") or 0) == 1
+            and int(effect_json.get("controller_loses_life_on_trigger") or 0) == 1
+            and not bool(effect_json.get("draw_on_enter"))
         )
 
     if effect == "creature" and scope == "sacrifice_creature_put_plus_one_counter_on_self_cant_block_v1":

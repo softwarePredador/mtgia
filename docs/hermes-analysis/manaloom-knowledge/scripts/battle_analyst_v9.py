@@ -8558,6 +8558,13 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         replacement_registry=ReplacementRegistry,
         replacement_event_cls=ReplacementEvent,
     )
+    resolve_leave_battlefield_treasure_trigger(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
     if "sacrifice" in str(reason or "").lower():
         owner.record_permanent_sacrificed(creature, CURRENT_REPLAY_TURN)
     return destination
@@ -8573,9 +8580,47 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         replacement_registry=ReplacementRegistry,
         replacement_event_cls=ReplacementEvent,
     )
+    resolve_leave_battlefield_treasure_trigger(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
     if "sacrifice" in str(reason or "").lower():
         owner.record_permanent_sacrificed(permanent, CURRENT_REPLAY_TURN)
     return destination
+
+
+def resolve_leave_battlefield_treasure_trigger(owner, permanent, *, destination, reason=None, source=None):
+    if not isinstance(permanent, dict):
+        return
+    if not permanent.get("dies_or_graveyard_from_battlefield_treasure"):
+        return
+    treasure_count = int(
+        permanent.get("dies_treasure_count")
+        or permanent.get("treasure_count")
+        or 1
+    )
+    if treasure_count <= 0:
+        return
+    treasures_before = owner.treasures
+    owner.treasures += treasure_count
+    emit_replay_event(
+        "trigger_resolved",
+        player=owner.name,
+        card=permanent.get("name", "?"),
+        trigger="dies_or_graveyard_from_battlefield",
+        effect="create_treasure",
+        treasures_created=treasure_count,
+        treasures_before=treasures_before,
+        treasures_after=owner.treasures,
+        destination=destination,
+        reason=reason,
+        source_card=source.get("name", "?") if isinstance(source, dict) else None,
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(permanent),
+    )
 
 
 def is_artifact_permanent(card):
@@ -18279,6 +18324,10 @@ def trigger_opponent_spell_draw_engines(
                     trigger=trigger,
                     treasure_count=treasure_count,
                 ):
+                    life_loss = int(permanent.get("controller_loses_life_on_trigger") or 0)
+                    life_before = opponent.life
+                    if life_loss > 0:
+                        change_life(opponent, -life_loss)
                     treasures_before = opponent.treasures
                     opponent.treasures += treasure_count
                     emit_replay_event(
@@ -18291,6 +18340,9 @@ def trigger_opponent_spell_draw_engines(
                         treasures_created=treasure_count,
                         treasures_before=treasures_before,
                         treasures_after=opponent.treasures,
+                        life_lost=life_loss,
+                        life_before=life_before,
+                        life_after=opponent.life,
                         opponent_second_spell_each_turn=bool(
                             permanent.get("opponent_second_spell_each_turn")
                         ),
@@ -20208,6 +20260,30 @@ def apply_effect_immediate(
             return
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         player.battlefield.append(permanent)
+        enters_treasure = int(
+            effect_data.get("enters_treasure")
+            or (
+                effect_data.get("treasure_count")
+                if effect_data.get("dies_or_graveyard_from_battlefield_treasure")
+                else 0
+            )
+            or 0
+        )
+        if enters_treasure > 0:
+            treasures_before = player.treasures
+            player.treasures += enters_treasure
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="create_treasure",
+                treasures_created=enters_treasure,
+                treasures_before=treasures_before,
+                treasures_after=player.treasures,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
     elif effect == "ramp_ritual":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
