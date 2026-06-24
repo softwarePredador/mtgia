@@ -1360,6 +1360,82 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["subtype_arcane"])
         self.assertEqual(primary["splice_arcane_cost"], "{1}{R}")
 
+    def test_misty_rainforest_maps_to_fetch_land_exact_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["FetchLandActivatedAbility"],
+                "constructor_metadata": {"card_types": ["LAND"]},
+                "raw_excerpt": "this.addAbility(new FetchLandActivatedAbility(SubType.FOREST, SubType.ISLAND));",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "self_sacrifice_fetch_land_two_land_subtypes_v1")
+        self.assertTrue(primary["activated_self_sacrifice_land_tutor"])
+        self.assertEqual(primary["activation_cost_generic"], 0)
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertEqual(primary["activated_pay_life"], 1)
+        self.assertEqual(primary["land_count"], 1)
+        self.assertEqual(primary["lands_to_battlefield"], 1)
+        self.assertFalse(primary["land_enters_tapped"])
+        self.assertEqual(primary["land_subtypes_any"], ["Forest", "Island"])
+
+    def test_polluted_delta_maps_to_fetch_land_exact_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["FetchLandActivatedAbility"],
+                "constructor_metadata": {"card_types": ["LAND"]},
+                "raw_excerpt": "this.addAbility(new FetchLandActivatedAbility(SubType.ISLAND, SubType.SWAMP));",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["battle_model_scope"], "self_sacrifice_fetch_land_two_land_subtypes_v1")
+        self.assertEqual(primary["land_subtypes_any"], ["Island", "Swamp"])
+
+    def test_culling_the_weak_maps_to_creature_sacrifice_black_ritual_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["BasicManaEffect"],
+                "cost_classes": ["SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE)); "
+                    "this.getSpellAbility().addEffect(new BasicManaEffect(Mana.BlackMana(4)));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_ritual")
+        self.assertEqual(primary["battle_model_scope"], "sacrifice_creature_add_four_black_mana_ritual_v1")
+        self.assertTrue(primary["instant"])
+        self.assertTrue(primary["requires_sacrifice_creature"])
+        self.assertEqual(primary["mana_produced"], 4)
+        self.assertEqual(primary["produces"], "B")
+
+    def test_infernal_plunge_maps_to_creature_sacrifice_red_ritual_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["BasicManaEffect"],
+                "cost_classes": ["SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE)); "
+                    "this.getSpellAbility().addEffect(new BasicManaEffect(Mana.RedMana(3)));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_ritual")
+        self.assertEqual(primary["battle_model_scope"], "sacrifice_creature_add_three_red_mana_ritual_v1")
+        self.assertFalse(primary["instant"])
+        self.assertTrue(primary["requires_sacrifice_creature"])
+        self.assertEqual(primary["mana_produced"], 3)
+        self.assertEqual(primary["produces"], "R")
+
     def test_carrion_feeder_maps_to_exact_sacrifice_self_growth_scope(self) -> None:
         result = hints.build_effect_hints(
             {

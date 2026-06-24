@@ -1,0 +1,25 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg159_creature_sac_rituals_20260624_090942",
+  "deploy_id": "PG159",
+  "family_counts": {
+    "manual_model": 2
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg159_creature_sac_rituals_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg159_creature_sac_rituals_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg159_creature_sac_rituals_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg159_creature_sac_rituals_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg159_creature_sac_rituals_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg159_creature_sac_rituals_rollback.sql"
+  },
+  "generated_at": "2026-06-24T09:09:42+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Culling the Weak",
+    "Infernal Plunge"
+  ],
+  "selected_count": 2,
+  "slug": "creature-sac-rituals",
+  "status": "prepared_read_only_pending_apply_approval"
+}

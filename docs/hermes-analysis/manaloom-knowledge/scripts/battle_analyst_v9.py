@@ -3028,15 +3028,6 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "battle_model_scope": "sacrifice_creature_cmc_black_ritual_waiver_v1",
         }
     ),
-    "Infernal Plunge": handcrafted_runtime_rule(
-        {
-            "effect": "ramp_ritual",
-            "requires_sacrifice_creature": True,
-            "mana_produced": 3,
-            "produces": "R",
-            "battle_model_scope": "infernal_plunge_creature_sacrifice_red_ritual_waiver_v1",
-        }
-    ),
     "Geosurge": handcrafted_runtime_rule(
         {
             "effect": "ramp_ritual",
@@ -9242,11 +9233,22 @@ def land_ramp_target_option(land, effect_data, player):
 
 
 def choose_land_ramp_targets(player, effect_data, count):
+    land_subtypes_any = [
+        str(value or "").strip().lower()
+        for value in (effect_data.get("land_subtypes_any") or [])
+        if str(value or "").strip()
+    ]
     candidates = []
     for candidate in list(player.library):
         if not isinstance(candidate, dict) or not is_effective_land(candidate):
             continue
         if effect_data.get("basic_only") and "basic" not in str(candidate.get("type_line") or "").lower():
+            continue
+        candidate_type_line = str(candidate.get("type_line") or "").lower()
+        if land_subtypes_any and not any(
+            re.search(rf"(^|[^a-z]){re.escape(subtype)}([^a-z]|$)", candidate_type_line)
+            for subtype in land_subtypes_any
+        ):
             continue
         candidates.append(candidate)
     options = [
@@ -17693,10 +17695,11 @@ def activate_land_tutor_creatures(player, turn):
             continue
         if land_tutor_creature and permanent.get("summoning_sick"):
             continue
+        activation_cost_raw = permanent.get("activation_cost_generic")
         activation_cost = adjusted_activated_ability_generic_cost(
             player,
             permanent,
-            int(permanent.get("activation_cost_generic") or 2),
+            2 if activation_cost_raw is None else int(activation_cost_raw),
         )
         if player.available_mana() < activation_cost:
             continue
@@ -17717,6 +17720,7 @@ def activate_land_tutor_creatures(player, turn):
                 player,
                 target_options,
             )
+            life_cost = int(permanent.get("activated_pay_life") or 0)
             if not chosen_targets or not allowed:
                 emit_replay_event(
                     "activated_ability_skipped",
@@ -17729,6 +17733,21 @@ def activate_land_tutor_creatures(player, turn):
                     turn=turn,
                 )
                 continue
+            if life_cost > 0 and (player.life_cant_change or player.life <= life_cost):
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="land_tutor",
+                    reason="insufficient_life_for_activation_cost",
+                    land_ramp_target_options=target_options,
+                    strategic_guardrail_reason=benefit_reason,
+                    life_cost=life_cost,
+                    life_total=player.life,
+                    turn=turn,
+                )
+                continue
+            life_before = player.life
             land_to_find = chosen_targets[0]
             if not player.spend_mana(activation_cost):
                 emit_replay_event(
@@ -17742,6 +17761,8 @@ def activate_land_tutor_creatures(player, turn):
                     turn=turn,
                 )
                 continue
+            if life_cost > 0:
+                player.life -= life_cost
             if permanent.get("activation_requires_tap"):
                 permanent["tapped"] = True
             if permanent in player.battlefield:
@@ -17796,6 +17817,7 @@ def activate_land_tutor_creatures(player, turn):
                     "activation_cost_generic": activation_cost,
                     "found_land": land_to_find.get("name", "?"),
                     "current_lands": current_lands,
+                    "life_cost": life_cost,
                 },
                 rule_source="utility_artifact_activation_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
@@ -17810,8 +17832,9 @@ def activate_land_tutor_creatures(player, turn):
                     "graveyard": 1,
                     "lands": 1,
                     "found_land": land_to_find.get("name", "?"),
+                    "life": -life_cost,
                 },
-                risk_flags=["sacrifice_artifact", "land_tutor"],
+                risk_flags=["sacrifice_artifact", "land_tutor", *([] if life_cost <= 0 else ["life_payment"])],
             )
             emit_replay_event(
                 "activated_ability",
@@ -17822,6 +17845,9 @@ def activate_land_tutor_creatures(player, turn):
                 found=found_land.get("name", "?"),
                 land_ramp_target_options=target_options,
                 strategic_benefit_reason=benefit_reason,
+                life_paid=life_cost,
+                life_before=life_before,
+                life_after=player.life,
                 turn=turn,
             )
             return

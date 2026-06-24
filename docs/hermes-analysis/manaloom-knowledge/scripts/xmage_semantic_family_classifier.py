@@ -532,6 +532,47 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("splice_arcane_cost") == "{1}{R}"
         )
 
+    if effect == "ramp_ritual" and scope == "sacrifice_creature_add_four_black_mana_ritual_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"BasicManaEffect"}
+            and not ability_classes
+            and "SacrificeTargetCost" in cost_classes
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("requires_sacrifice_creature"))
+            and int(effect_json.get("mana_produced") or 0) == 4
+            and effect_json.get("produces") == "B"
+        )
+
+    if effect == "ramp_ritual" and scope == "sacrifice_creature_add_three_red_mana_ritual_v1":
+        return (
+            types == {"SORCERY"}
+            and effect_classes == {"BasicManaEffect"}
+            and not ability_classes
+            and "SacrificeTargetCost" in cost_classes
+            and not bool(effect_json.get("instant"))
+            and bool(effect_json.get("requires_sacrifice_creature"))
+            and int(effect_json.get("mana_produced") or 0) == 3
+            and effect_json.get("produces") == "R"
+        )
+
+    if effect == "ramp_permanent" and scope == "self_sacrifice_fetch_land_two_land_subtypes_v1":
+        land_subtypes_any = effect_json.get("land_subtypes_any") or []
+        return (
+            types == {"LAND"}
+            and not effect_classes
+            and ability_classes == {"FetchLandActivatedAbility"}
+            and int(effect_json.get("activation_cost_generic") or 0) == 0
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("activated_self_sacrifice_land_tutor"))
+            and int(effect_json.get("activated_pay_life") or 0) == 1
+            and int(effect_json.get("land_count") or 0) == 1
+            and int(effect_json.get("lands_to_battlefield") or 0) == 1
+            and not bool(effect_json.get("land_enters_tapped"))
+            and isinstance(land_subtypes_any, list)
+            and len(land_subtypes_any) == 2
+        )
+
     if effect == "treasure_maker" and scope == "single_treasure_creation_v1":
         return (
             types == {"SORCERY"}

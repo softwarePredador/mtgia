@@ -7660,6 +7660,95 @@ def register_tests(battle, player):
         assert trace["score_gap_vs_best_rejected"] is not None
         assert trace["rejected_option_scores"]
 
+    def test_fetch_land_activation_filters_targets_by_subtype_and_pays_life():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Temur")
+            active.life = 40
+            active.battlefield = [
+                {
+                    "name": "Misty Rainforest",
+                    "type_line": "Land",
+                    "effect": "ramp_permanent",
+                    "activated_self_sacrifice_land_tutor": True,
+                    "activation_cost_generic": 0,
+                    "activation_requires_tap": True,
+                    "activated_pay_life": 1,
+                    "land_count": 1,
+                    "lands_to_battlefield": 1,
+                    "land_enters_tapped": False,
+                    "land_subtypes_any": ["Forest", "Island"],
+                },
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land - Mountain"},
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land - Mountain"},
+            ]
+            active.library = [
+                {"name": "Swamp", "cmc": 0, "type_line": "Basic Land - Swamp"},
+                {"name": "Island", "cmc": 0, "type_line": "Basic Land - Island"},
+            ]
+
+            battle.activate_land_tutor_creatures(active, turn=2)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.life == 39
+        assert any(card.get("name") == "Misty Rainforest" for card in active.graveyard if isinstance(card, dict))
+        assert any(card.get("name") == "Island" for card in active.battlefield if isinstance(card, dict))
+        assert not any(card.get("name") == "Swamp" for card in active.battlefield if isinstance(card, dict))
+        activation = next(
+            data
+            for event, data in events
+            if event == "activated_ability" and data.get("card") == "Misty Rainforest"
+        )
+        assert activation["life_paid"] == 1
+        assert activation["life_before"] == 40
+        assert activation["life_after"] == 39
+        assert activation["found"] == "Island"
+
+    def test_fetch_land_skips_when_life_payment_would_be_lethal():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Sultai")
+            active.life = 1
+            active.battlefield = [
+                {
+                    "name": "Polluted Delta",
+                    "type_line": "Land",
+                    "effect": "ramp_permanent",
+                    "activated_self_sacrifice_land_tutor": True,
+                    "activation_cost_generic": 0,
+                    "activation_requires_tap": True,
+                    "activated_pay_life": 1,
+                    "land_count": 1,
+                    "lands_to_battlefield": 1,
+                    "land_enters_tapped": False,
+                    "land_subtypes_any": ["Island", "Swamp"],
+                },
+                {"name": "Island", "effect": "land", "type_line": "Basic Land - Island"},
+            ]
+            active.library = [
+                {"name": "Underground Sea", "cmc": 0, "type_line": "Land - Island Swamp"},
+            ]
+
+            battle.activate_land_tutor_creatures(active, turn=2)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.life == 1
+        assert any(card.get("name") == "Polluted Delta" for card in active.battlefield if isinstance(card, dict))
+        assert not any(card.get("name") == "Underground Sea" for card in active.battlefield if isinstance(card, dict))
+        skipped = next(
+            data
+            for event, data in events
+            if event == "activated_ability_skipped" and data.get("card") == "Polluted Delta"
+        )
+        assert skipped["reason"] == "insufficient_life_for_activation_cost"
+        assert skipped["life_cost"] == 1
+
     def test_angels_grace_prevents_lethal_damage_and_life_zero_loss_this_turn():
         active = player("Protected")
         active.life = 3
@@ -11668,6 +11757,8 @@ def register_tests(battle, player):
         test_urzas_saga_creates_construct_on_chapter_two,
         test_urzas_saga_tutors_safe_artifact_then_sacrifices,
         test_land_tutor_artifact_trace_scores_rejected_options,
+        test_fetch_land_activation_filters_targets_by_subtype_and_pays_life,
+        test_fetch_land_skips_when_life_payment_would_be_lethal,
         test_angels_grace_prevents_lethal_damage_and_life_zero_loss_this_turn,
         test_angels_grace_blocks_opponent_approach_win_this_turn,
         test_senseis_top_sets_up_lorehold_approach_second_cast,

@@ -1674,6 +1674,103 @@ def _build_simple_artifact_mana_source_fields(
     return None
 
 
+def _fetch_land_subtypes_from_rules_text(rules_text: str) -> list[str]:
+    normalized = _normalized_rules_text(rules_text)
+    match = re.search(
+        r"fetchlandactivatedability\s*\(\s*subtype\.([a-z]+)\s*,\s*subtype\.([a-z]+)\s*\)",
+        normalized,
+    )
+    if not match:
+        return []
+    return [match.group(1).capitalize(), match.group(2).capitalize()]
+
+
+def _build_fetch_land_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"LAND"}:
+        return None
+    if effect_classes or cost_classes:
+        return None
+    if ability_classes != {"FetchLandActivatedAbility"}:
+        return None
+
+    land_subtypes_any = _fetch_land_subtypes_from_rules_text(rules_text)
+    if len(land_subtypes_any) != 2:
+        return None
+
+    return {
+        "effect": "ramp_permanent",
+        "scope": "self_sacrifice_fetch_land_two_land_subtypes_v1",
+        "fields": {
+            "activated_self_sacrifice_land_tutor": True,
+            "activation_cost_generic": 0,
+            "activation_requires_tap": True,
+            "activated_pay_life": 1,
+            "land_count": 1,
+            "lands_to_battlefield": 1,
+            "land_enters_tapped": False,
+            "land_subtypes_any": land_subtypes_any,
+        },
+        "reason": "XMage structure matches a fetchland that taps, pays 1 life, sacrifices itself, and finds a land with either of two listed basic land subtypes.",
+        "signals": ["FetchLandActivatedAbility", *[f"SubType.{subtype.upper()}" for subtype in land_subtypes_any]],
+    }
+
+
+def _build_creature_sacrifice_ritual_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types not in ({"INSTANT"}, {"SORCERY"}):
+        return None
+    if effect_classes != {"BasicManaEffect"}:
+        return None
+    if ability_classes or cost_classes != {"SacrificeTargetCost"}:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+    is_instant = card_types == {"INSTANT"}
+
+    if "mana.blackmana(4)" in normalized:
+        return {
+            "effect": "ramp_ritual",
+            "scope": "sacrifice_creature_add_four_black_mana_ritual_v1",
+            "fields": {
+                "instant": is_instant,
+                "requires_sacrifice_creature": True,
+                "mana_produced": 4,
+                "produces": "B",
+            },
+            "reason": "XMage structure matches a ritual that sacrifices a creature as an additional cost to add four black mana.",
+            "signals": ["SacrificeTargetCost", "BasicManaEffect", "BlackMana(4)"],
+        }
+
+    if "mana.redmana(3)" in normalized:
+        return {
+            "effect": "ramp_ritual",
+            "scope": "sacrifice_creature_add_three_red_mana_ritual_v1",
+            "fields": {
+                "instant": is_instant,
+                "requires_sacrifice_creature": True,
+                "mana_produced": 3,
+                "produces": "R",
+            },
+            "reason": "XMage structure matches a ritual that sacrifices a creature as an additional cost to add three red mana.",
+            "signals": ["SacrificeTargetCost", "BasicManaEffect", "RedMana(3)"],
+        }
+
+    return None
+
+
 def _build_basic_ritual_fields(
     *,
     card_types: set[str],
@@ -2082,6 +2179,46 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(simple_artifact_mana_source_fields["fields"]),
                 matched_signals=list(simple_artifact_mana_source_fields["signals"]),
+            )
+        )
+
+    fetch_land_fields = _build_fetch_land_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if fetch_land_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(fetch_land_fields["effect"]),
+                scope=str(fetch_land_fields["scope"]),
+                reason=str(fetch_land_fields["reason"]),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(fetch_land_fields["fields"]),
+                matched_signals=list(fetch_land_fields["signals"]),
+            )
+        )
+
+    creature_sacrifice_ritual_fields = _build_creature_sacrifice_ritual_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if creature_sacrifice_ritual_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(creature_sacrifice_ritual_fields["effect"]),
+                scope=str(creature_sacrifice_ritual_fields["scope"]),
+                reason=str(creature_sacrifice_ritual_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(creature_sacrifice_ritual_fields["fields"]),
+                matched_signals=list(creature_sacrifice_ritual_fields["signals"]),
             )
         )
 

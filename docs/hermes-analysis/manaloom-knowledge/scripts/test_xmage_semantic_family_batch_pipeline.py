@@ -2769,6 +2769,118 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_fetch_land_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Misty Rainforest",
+                        "severity": "medium",
+                        "oracle_hash": "mistyhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "MistyRainforest",
+                            "path": "/xmage/MistyRainforest.java",
+                            "types": ["LAND"],
+                            "effect_classes": [],
+                            "ability_classes": ["FetchLandActivatedAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "self_sacrifice_fetch_land_two_land_subtypes_v1",
+                                "activated_self_sacrifice_land_tutor": True,
+                                "activation_cost_generic": 0,
+                                "activation_requires_tap": True,
+                                "activated_pay_life": 1,
+                                "land_count": 1,
+                                "lands_to_battlefield": 1,
+                                "land_enters_tapped": False,
+                                "land_subtypes_any": ["Forest", "Island"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_culling_the_weak_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Culling the Weak",
+                        "severity": "high",
+                        "oracle_hash": "cullinghash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "CullingTheWeak",
+                            "path": "/xmage/CullingTheWeak.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["BasicManaEffect"],
+                            "ability_classes": [],
+                            "cost_classes": ["SacrificeTargetCost"],
+                            "primary_effect": {
+                                "effect": "ramp_ritual",
+                                "battle_model_scope": "sacrifice_creature_add_four_black_mana_ritual_v1",
+                                "instant": True,
+                                "requires_sacrifice_creature": True,
+                                "mana_produced": 4,
+                                "produces": "B",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_infernal_plunge_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Infernal Plunge",
+                        "severity": "high",
+                        "oracle_hash": "infernalhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "InfernalPlunge",
+                            "path": "/xmage/InfernalPlunge.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["BasicManaEffect"],
+                            "ability_classes": [],
+                            "cost_classes": ["SacrificeTargetCost"],
+                            "primary_effect": {
+                                "effect": "ramp_ritual",
+                                "battle_model_scope": "sacrifice_creature_add_three_red_mana_ritual_v1",
+                                "instant": False,
+                                "requires_sacrifice_creature": True,
+                                "mana_produced": 3,
+                                "produces": "R",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_carrion_feeder_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

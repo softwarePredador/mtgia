@@ -142,6 +142,11 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
     effect = card.get("effect")
     if effect:
         role.setdefault("effect", effect)
+    effect_json = dict(card.get("effect_json") or {})
+    if effect == "ramp_permanent" and effect_json.get("activated_self_sacrifice_land_tutor"):
+        role["category"] = "ramp"
+        role["effect"] = "ramp_permanent"
+        role["subtype"] = "utility_land"
     return role
 
 

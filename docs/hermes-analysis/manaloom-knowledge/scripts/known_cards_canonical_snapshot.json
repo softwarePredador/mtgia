@@ -6292,6 +6292,8 @@
     "battle_rule_logical_key": "battle_rule_v1:b2bb8591aa2182804ee5681b63682870"
   },
   "Culling the Weak": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "sacrifice_creature_add_four_black_mana_ritual_v1",
     "effect": "ramp_ritual",
     "instant": true,
     "mana_produced": 4,
@@ -6300,9 +6302,10 @@
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:746b7943d1632164bc47606e5d7c442a"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:251a36ce251e58e59c75224f84568765",
+    "battle_rule_oracle_hash": "94e09cb834f3730999bab3bb621006fc"
   },
   "Cultivate": {
     "basic_only": true,
@@ -14686,6 +14689,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
   },
+  "Infernal Plunge": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "sacrifice_creature_add_three_red_mana_ritual_v1",
+    "effect": "ramp_ritual",
+    "instant": false,
+    "mana_produced": 3,
+    "produces": "R",
+    "requires_sacrifice_creature": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6c79ee0d7eda6f8a02666036cad990fa",
+    "battle_rule_oracle_hash": "ffe4781c7469d289573ea15e0e5adbd1"
+  },
   "Inferno": {
     "cmc": 7.0,
     "effect": "damage_wipe",
@@ -18647,13 +18666,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Misty Rainforest": {
+    "ability_kind": "activated",
+    "activated_pay_life": 1,
+    "activated_self_sacrifice_land_tutor": true,
+    "activation_cost_generic": 0,
+    "activation_requires_tap": true,
+    "battle_model_scope": "self_sacrifice_fetch_land_two_land_subtypes_v1",
     "effect": "land",
+    "land_count": 1,
+    "land_enters_tapped": false,
+    "land_subtypes_any": [
+      "Forest",
+      "Island"
+    ],
+    "lands_to_battlefield": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:220e22b189d9e2d92aa34d6beaab0a0a",
+    "battle_rule_oracle_hash": "35f4b0c638d068b62e520306c16eceb5"
   },
   "Mithril Coat": {
     "auto_attach_legendary_creature": true,
@@ -21590,13 +21623,27 @@
     "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
   },
   "Polluted Delta": {
+    "ability_kind": "activated",
+    "activated_pay_life": 1,
+    "activated_self_sacrifice_land_tutor": true,
+    "activation_cost_generic": 0,
+    "activation_requires_tap": true,
+    "battle_model_scope": "self_sacrifice_fetch_land_two_land_subtypes_v1",
     "effect": "land",
+    "land_count": 1,
+    "land_enters_tapped": false,
+    "land_subtypes_any": [
+      "Island",
+      "Swamp"
+    ],
+    "lands_to_battlefield": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f2d4cbe84d49d11a20aa13e9f9db53a9",
+    "battle_rule_oracle_hash": "cf9dde68ad2b7b6927a835c842659b2e"
   },
   "Polluted Mire": {
     "effect": "land",
@@ -33010,13 +33057,27 @@
     "battle_rule_logical_key": "battle_rule_v1:d491eb5bd49e767cbb09724ec816c640"
   },
   "Verdant Catacombs": {
+    "ability_kind": "activated",
+    "activated_pay_life": 1,
+    "activated_self_sacrifice_land_tutor": true,
+    "activation_cost_generic": 0,
+    "activation_requires_tap": true,
+    "battle_model_scope": "self_sacrifice_fetch_land_two_land_subtypes_v1",
     "effect": "land",
+    "land_count": 1,
+    "land_enters_tapped": false,
+    "land_subtypes_any": [
+      "Swamp",
+      "Forest"
+    ],
+    "lands_to_battlefield": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cb164541fa6dd03555a433a0dce3a127",
+    "battle_rule_oracle_hash": "9b658868f3d3ae8543afd7dab44e2c25"
   },
   "Verduran Enchantress": {
     "cmc": 3.0,

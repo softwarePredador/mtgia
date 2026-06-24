@@ -1,0 +1,29 @@
+{
+  "apply_pg": false,
+  "apply_sqlite_from_pg": true,
+  "canonical_snapshot_rows_exported": 3220,
+  "curated_rows": 0,
+  "database_target": "143.198.230.247:5433/halder",
+  "export_canonical_fallback_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "generated_at": "2026-06-24T09:11:01.919756+00:00",
+  "generated_rows": 1,
+  "include_generated": true,
+  "include_needs_review": true,
+  "input_rows": 2,
+  "manual_rows": 1,
+  "only_classification": [],
+  "only_recommended_action": [],
+  "only_summary_json": null,
+  "oracle_normalized_rows": 0,
+  "pg_inserted_or_updated": 0,
+  "pg_rows_loaded": 4,
+  "pg_skipped_lower_priority": 0,
+  "reviewed_rules_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.json",
+  "selected_card_count": 2,
+  "selected_cards": [
+    "Culling the Weak",
+    "Infernal Plunge"
+  ],
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "sqlite_inserted_or_updated": 5
+}
