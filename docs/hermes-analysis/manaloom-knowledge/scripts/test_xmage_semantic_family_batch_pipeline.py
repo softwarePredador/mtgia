@@ -591,6 +591,56 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "copy_creature_token")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_springheart_landfall_copy_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Springheart Nantuko",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SpringheartNantuko",
+                            "path": "/xmage/SpringheartNantuko.java",
+                            "types": ["CREATURE", "ENCHANTMENT"],
+                            "effect_classes": [
+                                "CreateTokenCopyTargetEffect",
+                                "CreateTokenEffect",
+                                "BoostEnchantedEffect",
+                            ],
+                            "ability_classes": ["BestowAbility", "LandfallAbility", "SimpleStaticAbility"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "landfall_optional_pay_copy_attached_creature_else_insect_v1",
+                                "ability_kind": "triggered",
+                                "is_creature_permanent": True,
+                                "power": 1,
+                                "toughness": 1,
+                                "landfall_optional_pay_copy_attached_creature_else_insect": True,
+                                "landfall_copy_cost": "{1}{G}",
+                                "bestow_cost": "{1}{G}",
+                                "bestow_attached_creature_power_bonus": 1,
+                                "bestow_attached_creature_toughness_bonus": 1,
+                                "token_name": "Insect Token",
+                                "token_subtype": "Insect",
+                                "token_colors": ["G"],
+                                "token_power": 1,
+                                "token_toughness": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "creature")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_lotho_treasure_engine_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

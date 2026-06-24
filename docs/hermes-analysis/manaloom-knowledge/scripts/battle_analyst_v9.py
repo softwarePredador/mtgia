@@ -16757,7 +16757,8 @@ def trigger_landfall(
         for permanent in player.battlefield
         if isinstance(permanent, dict)
         and (
-            permanent.get("landfall_token_maker")
+            permanent.get("landfall_optional_pay_copy_attached_creature_else_insect")
+            or permanent.get("landfall_token_maker")
             or permanent.get("landfall_damage_each_opponent")
         )
     ]
@@ -16773,35 +16774,102 @@ def trigger_landfall(
 
     def resolve_landfall():
         created = []
+        generic_created = []
         for permanent in list(player.battlefield):
-            if not isinstance(permanent, dict) or not permanent.get("landfall_token_maker"):
+            if not isinstance(permanent, dict):
                 continue
-            created.append(
-                create_creature_token(
-                    player,
-                    name="Insect Token",
-                    power=int(permanent.get("token_power") or 1),
-                    toughness=int(permanent.get("token_toughness") or 1),
+            if permanent.get("landfall_optional_pay_copy_attached_creature_else_insect"):
+                attached_name = str(permanent.get("attached_to") or "").strip()
+                attached_creature = next(
+                    (
+                        candidate
+                        for candidate in player.battlefield
+                        if (
+                            isinstance(candidate, dict)
+                            and candidate is not permanent
+                            and candidate.get("name") == attached_name
+                            and is_battlefield_creature(candidate)
+                        )
+                    ),
+                    None,
                 )
+                paid_copy_cost = False
+                copied_target = None
+                if attached_creature is not None:
+                    copy_cost = str(permanent.get("landfall_copy_cost") or "{1}{G}")
+                    if player.can_pay(copy_cost):
+                        paid_copy_cost = player.spend_mana(copy_cost)
+                        if paid_copy_cost:
+                            token = copy.deepcopy(attached_creature)
+                            token["copy_of"] = attached_creature.get("name", "?")
+                            _apply_copy_token_modifiers(token, {})
+                            player.battlefield.append(token)
+                            created.append(token)
+                            copied_target = attached_creature.get("name", "?")
+                            emit_replay_event(
+                                "copy_creature_token_created",
+                                player=player.name,
+                                card=permanent.get("name", "?"),
+                                target=attached_creature.get("name", "?"),
+                                target_controller=player.name,
+                                token=token.get("name", "?"),
+                                copy_target_types=["creature"],
+                                haste=token.get("haste"),
+                                flying=bool(token.get("flying")),
+                                artifact_in_addition=False,
+                                token_power=token.get("power"),
+                                token_toughness=token.get("toughness"),
+                                sacrifice_at_end_step=bool(token.get("sacrifice_at_end_step")),
+                                exile_at_end_step=bool(token.get("exile_at_end_step")),
+                                turn=turn,
+                                **replay_rule_fields(permanent),
+                            )
+                if copied_target is None:
+                    token = create_creature_token(
+                        player,
+                        name=str(permanent.get("token_name") or "Insect Token"),
+                        subtype=permanent.get("token_subtype") or "Insect",
+                        colors=permanent.get("token_colors") or ["G"],
+                        power=int(permanent.get("token_power") or 1),
+                        toughness=int(permanent.get("token_toughness") or 1),
+                    )
+                    created.append(token)
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="landfall",
+                    trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
+                    source_event=source_event,
+                    effect="copy_attached_creature_or_insect",
+                    tokens_created=1,
+                    paid_copy_cost=paid_copy_cost,
+                    copied_target=copied_target,
+                    attached_to=attached_name or None,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+            if not permanent.get("landfall_token_maker"):
+                continue
+            generic_created.append(permanent.get("name", "?"))
+            token = create_creature_token(
+                player,
+                name="Insect Token",
+                power=int(permanent.get("token_power") or 1),
+                toughness=int(permanent.get("token_toughness") or 1),
             )
-        if created:
+            created.append(token)
+        if generic_created:
             emit_replay_event(
                 "trigger_resolved",
                 player=player.name,
-                card="; ".join(
-                    sorted(
-                        {
-                            permanent.get("name", "?")
-                            for permanent in player.battlefield
-                            if isinstance(permanent, dict) and permanent.get("landfall_token_maker")
-                        }
-                    )
-                ),
+                card="; ".join(sorted(set(generic_created))),
                 trigger="landfall",
                 trigger_land=land_permanent.get("name", "?") if isinstance(land_permanent, dict) else "Land",
                 source_event=source_event,
                 effect="token_maker",
-                tokens_created=len(created),
+                tokens_created=len(generic_created),
                 turn=turn,
             )
         trigger_opponents = opponents or []

@@ -572,6 +572,26 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("sacrifice_token_at_end_step"))
         )
 
+    if effect == "creature" and scope == "landfall_optional_pay_copy_attached_creature_else_insect_v1":
+        return (
+            types == {"CREATURE", "ENCHANTMENT"}
+            and {"CreateTokenCopyTargetEffect", "CreateTokenEffect", "BoostEnchantedEffect"}.issubset(effect_classes)
+            and {"BestowAbility", "LandfallAbility"}.issubset(ability_classes)
+            and bool(effect_json.get("is_creature_permanent"))
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("landfall_optional_pay_copy_attached_creature_else_insect"))
+            and effect_json.get("landfall_copy_cost") == "{1}{G}"
+            and effect_json.get("bestow_cost") == "{1}{G}"
+            and int(effect_json.get("bestow_attached_creature_power_bonus") or 0) == 1
+            and int(effect_json.get("bestow_attached_creature_toughness_bonus") or 0) == 1
+            and effect_json.get("token_name") == "Insect Token"
+            and effect_json.get("token_subtype") == "Insect"
+            and effect_json.get("token_colors") == ["G"]
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+        )
+
     if effect == "ramp_permanent" and scope == "artifact_etb_or_dies_create_treasure_v1":
         return (
             types == {"ARTIFACT"}

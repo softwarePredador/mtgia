@@ -242,9 +242,14 @@ def register_tests(battle, player, card):
                 "type_line": "Enchantment Creature — Insect Monk",
                 "power": 1,
                 "toughness": 1,
-                "landfall_token_maker": True,
+                "landfall_optional_pay_copy_attached_creature_else_insect": True,
+                "landfall_copy_cost": "{1}{G}",
+                "token_name": "Insect Token",
+                "token_subtype": "Insect",
+                "token_colors": ["G"],
                 "token_power": 1,
                 "token_toughness": 1,
+                "battle_model_scope": "landfall_optional_pay_copy_attached_creature_else_insect_v1",
             }
         )
         land = {"name": "Forest", "effect": "land", "type_line": "Basic Land — Forest"}
@@ -259,6 +264,63 @@ def register_tests(battle, player, card):
         trigger = next(data for event, data in events if event == "trigger_resolved")
         assert trigger["trigger"] == "landfall"
         assert trigger["tokens_created"] == 1
+
+    def test_springheart_landfall_pays_to_copy_attached_creature():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        target = battle.enrich_card(
+            {
+                "name": "Seasoned Dungeoneer",
+                "effect": "creature",
+                "type_line": "Creature — Human Warrior",
+                "power": 3,
+                "toughness": 4,
+            }
+        )
+        nantuko = battle.enrich_card(
+            {
+                "name": "Springheart Nantuko",
+                "effect": "creature",
+                "type_line": "Enchantment Creature — Insect Monk",
+                "power": 1,
+                "toughness": 1,
+                "landfall_optional_pay_copy_attached_creature_else_insect": True,
+                "landfall_copy_cost": "{1}{G}",
+                "attached_to": "Seasoned Dungeoneer",
+                "token_name": "Insect Token",
+                "token_subtype": "Insect",
+                "token_colors": ["G"],
+                "token_power": 1,
+                "token_toughness": 1,
+                "battle_model_scope": "landfall_optional_pay_copy_attached_creature_else_insect_v1",
+            }
+        )
+        land_one = {"name": "Forest", "effect": "land", "type_line": "Basic Land — Forest"}
+        land_two = {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"}
+        active.battlefield = [target, nantuko, land_one, land_two]
+        active.refresh_mana_sources(turn=4)
+
+        battle.trigger_landfall(active, land_two, turn=4, source_event="test_land_played")
+
+        copies = [card for card in active.battlefield if card.get("copy_of") == "Seasoned Dungeoneer"]
+        insects = [card for card in active.battlefield if card.get("name") == "Insect Token"]
+        assert len(copies) == 1
+        assert not insects
+        assert copies[0]["power"] == 3
+        assert copies[0]["toughness"] == 4
+        assert copies[0]["summoning_sick"] is True
+        copy_event = next(data for event, data in events if event == "copy_creature_token_created")
+        assert copy_event["target"] == "Seasoned Dungeoneer"
+        trigger = next(
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Springheart Nantuko"
+            and data.get("effect") == "copy_attached_creature_or_insect"
+        )
+        assert trigger["paid_copy_cost"] is True
+        assert trigger["copied_target"] == "Seasoned Dungeoneer"
 
     def test_creature_mana_source_has_summoning_sickness_then_refreshes_mana():
         active = player("Active")

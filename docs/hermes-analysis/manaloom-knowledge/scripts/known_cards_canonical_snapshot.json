@@ -27495,19 +27495,31 @@
     "battle_rule_logical_key": "battle_rule_v1:9a690ded0a25c85680b017dc4e81054a"
   },
   "Springheart Nantuko": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "landfall_optional_pay_copy_attached_creature_else_insect_v1",
+    "bestow_attached_creature_power_bonus": 1,
+    "bestow_attached_creature_toughness_bonus": 1,
+    "bestow_cost": "{1}{G}",
     "effect": "creature",
     "is_creature_permanent": true,
-    "landfall_token_maker": true,
+    "landfall_copy_cost": "{1}{G}",
+    "landfall_optional_pay_copy_attached_creature_else_insect": true,
     "power": 1,
+    "token_colors": [
+      "G"
+    ],
+    "token_name": "Insect Token",
     "token_power": 1,
+    "token_subtype": "Insect",
     "token_toughness": 1,
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:bfdd79b429a180d44480fbd19fb83528"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bdb24c77e6b6dff83b1cdd01dbe09ba6",
+    "battle_rule_oracle_hash": "e0fb2f2b4e774063b3f8f8ee12f180da"
   },
   "Springjack Pasture": {
     "effect": "land",

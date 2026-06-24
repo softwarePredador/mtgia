@@ -337,6 +337,38 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["token_power"], 1)
         self.assertEqual(primary["token_toughness"], 1)
 
+    def test_springheart_nantuko_maps_to_exact_landfall_copy_or_insect_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "SpringheartNantuko",
+                "effect_classes": ["CreateTokenCopyTargetEffect", "CreateTokenEffect", "BoostEnchantedEffect"],
+                "ability_classes": ["BestowAbility", "LandfallAbility", "SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT", "CREATURE"]},
+            },
+            "Bestow {1}{G}. Enchanted creature gets +1/+1. Landfall — Whenever a land you control enters, you may pay {1}{G} if Springheart Nantuko is attached to a creature you control. If you do, create a token that's a copy of that creature. If you didn't create a token this way, create a 1/1 green Insect creature token.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "landfall_optional_pay_copy_attached_creature_else_insect_v1",
+        )
+        self.assertTrue(primary["is_creature_permanent"])
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["landfall_optional_pay_copy_attached_creature_else_insect"])
+        self.assertEqual(primary["landfall_copy_cost"], "{1}{G}")
+        self.assertEqual(primary["bestow_cost"], "{1}{G}")
+        self.assertEqual(primary["bestow_attached_creature_power_bonus"], 1)
+        self.assertEqual(primary["bestow_attached_creature_toughness_bonus"], 1)
+        self.assertEqual(primary["token_name"], "Insect Token")
+        self.assertEqual(primary["token_subtype"], "Insect")
+        self.assertEqual(primary["token_colors"], ["G"])
+        self.assertEqual(primary["token_power"], 1)
+        self.assertEqual(primary["token_toughness"], 1)
+
     def test_electroduplicate_maps_to_copy_creature_token(self) -> None:
         result = hints.build_effect_hints(
             {

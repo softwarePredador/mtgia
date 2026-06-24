@@ -1807,6 +1807,58 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
 
     if "CreateTokenCopyTargetEffect" in effect_classes:
         if (
+            xmage_class_name == "SpringheartNantuko"
+            or (
+                "LandfallAbility" in ability_classes
+                and "CreateTokenEffect" in effect_classes
+                and "BoostEnchantedEffect" in effect_classes
+                and {
+                    str(value or "").upper()
+                    for value in ((index_entry.get("constructor_metadata") or {}).get("card_types") or [])
+                    if value
+                }
+                == {"CREATURE", "ENCHANTMENT"}
+                and _oracle_has(
+                    rules_text,
+                    "whenever a land you control enters",
+                    "create a token that's a copy of that creature",
+                    "create a 1/1 green insect creature token",
+                )
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="creature",
+                    scope="landfall_optional_pay_copy_attached_creature_else_insect_v1",
+                    reason="XMage models a Bestow creature with enchanted-creature +1/+1 and a landfall trigger that either pays {1}{G} to copy the attached creature or creates a 1/1 green Insect token.",
+                    ability_kind="triggered",
+                    requires_runtime_executor=True,
+                    extra_effect_fields={
+                        "is_creature_permanent": True,
+                        "power": 1,
+                        "toughness": 1,
+                        "landfall_optional_pay_copy_attached_creature_else_insect": True,
+                        "landfall_copy_cost": "{1}{G}",
+                        "bestow_cost": "{1}{G}",
+                        "bestow_attached_creature_power_bonus": 1,
+                        "bestow_attached_creature_toughness_bonus": 1,
+                        "token_name": "Insect Token",
+                        "token_subtype": "Insect",
+                        "token_colors": ["G"],
+                        "token_power": 1,
+                        "token_toughness": 1,
+                    },
+                    matched_signals=[
+                        "CreateTokenCopyTargetEffect",
+                        "CreateTokenEffect",
+                        "LandfallAbility",
+                        "BestowAbility",
+                        "BoostEnchantedEffect",
+                        "springheart_landfall_copy_or_insect",
+                    ],
+                )
+            )
+        elif (
             xmage_class_name == "JaxisTheTroublemaker"
             or (
                 _oracle_has(
