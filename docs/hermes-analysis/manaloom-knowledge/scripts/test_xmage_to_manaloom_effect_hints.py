@@ -213,6 +213,128 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             "mana_rock_with_sacrifice_draw",
         )
 
+    def test_llanowar_elves_maps_to_exact_green_mana_dork_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["GreenManaAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{G}"); '
+                    "this.power = new MageInt(1); this.toughness = new MageInt(1); "
+                    "this.addAbility(new GreenManaAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "one_mana_one_one_green_mana_dork_v1")
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "G")
+
+    def test_avacyns_pilgrim_maps_to_exact_white_mana_dork_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["WhiteManaAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{G}"); '
+                    "this.power = new MageInt(1); this.toughness = new MageInt(1); "
+                    "this.addAbility(new WhiteManaAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "one_mana_one_one_white_mana_dork_v1")
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "W")
+
+    def test_birds_of_paradise_maps_to_exact_any_color_flying_mana_dork_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["AnyColorManaAbility", "FlyingAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{G}"); '
+                    "this.power = new MageInt(0); this.toughness = new MageInt(1); "
+                    "this.addAbility(FlyingAbility.getInstance()); this.addAbility(new AnyColorManaAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "one_mana_zero_one_flying_any_color_mana_dork_v1")
+        self.assertTrue(primary["flying"])
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "WUBRG")
+
+    def test_sol_ring_maps_to_exact_two_colorless_mana_rock_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["SimpleManaAbility"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{1}"); '
+                    "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(2), new TapSourceCost()));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "two_colorless_mana_rock_v1")
+        self.assertEqual(primary["mana_produced"], 2)
+        self.assertEqual(primary["produces"], "C")
+
+    def test_izzet_signet_maps_to_exact_signet_filter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["SimpleManaAbility"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{2}"); '
+                    "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, new Mana(0, 1, 0, 1, 0, 0, 0, 0), new GenericManaCost(1)); "
+                    "ability.addCost(new TapSourceCost()); this.addAbility(ability);"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "signet_filter_mana_rock_v1")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "UR")
+        self.assertEqual(primary["activation_cost_generic"], 1)
+
+    def test_simic_signet_maps_to_exact_signet_filter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "ability_classes": ["SimpleManaAbility"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{2}"); '
+                    "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, new Mana(0, 1, 0, 0, 1, 0, 0, 0), new GenericManaCost(1)); "
+                    "ability.addCost(new TapSourceCost()); this.addAbility(ability);"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "signet_filter_mana_rock_v1")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "GU")
+        self.assertEqual(primary["activation_cost_generic"], 1)
+
     def test_monument_to_endurance_modal_discard_hint_precedes_generic_token(self) -> None:
         result = hints.build_effect_hints(
             {

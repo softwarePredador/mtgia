@@ -1476,6 +1476,143 @@ def _build_exact_runtime_variant_fields(
     return None
 
 
+def _build_simple_creature_mana_source_fields(
+    *,
+    card_types: set[str],
+    ability_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"CREATURE"}:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+
+    if (
+        ability_classes == {"GreenManaAbility"}
+        and 'this.power = new mageint(1)' in normalized
+        and 'this.toughness = new mageint(1)' in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "one_mana_one_one_green_mana_dork_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "G",
+            },
+            "reason": "XMage structure matches a 1/1 creature with a single green tap-for-mana ability.",
+            "signals": ["GreenManaAbility", "MageInt(1)", "mana_source"],
+        }
+
+    if (
+        ability_classes == {"WhiteManaAbility"}
+        and 'this.power = new mageint(1)' in normalized
+        and 'this.toughness = new mageint(1)' in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "one_mana_one_one_white_mana_dork_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "W",
+            },
+            "reason": "XMage structure matches a 1/1 creature with a single white tap-for-mana ability.",
+            "signals": ["WhiteManaAbility", "MageInt(1)", "mana_source"],
+        }
+
+    if (
+        ability_classes == {"AnyColorManaAbility", "FlyingAbility"}
+        and 'this.power = new mageint(0)' in normalized
+        and 'this.toughness = new mageint(1)' in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "one_mana_zero_one_flying_any_color_mana_dork_v1",
+            "fields": {
+                "power": 0,
+                "toughness": 1,
+                "flying": True,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+            },
+            "reason": "XMage structure matches a 0/1 flyer with a single any-color tap-for-mana ability.",
+            "signals": ["AnyColorManaAbility", "FlyingAbility", "MageInt(0)", "MageInt(1)", "mana_source"],
+        }
+
+    return None
+
+
+def _build_simple_artifact_mana_source_fields(
+    *,
+    card_types: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"ARTIFACT"}:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+
+    if (
+        ability_classes == {"SimpleManaAbility"}
+        and cost_classes == {"TapSourceCost"}
+        and "mana.colorlessmana(2)" in normalized
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "two_colorless_mana_rock_v1",
+            "fields": {
+                "mana_produced": 2,
+                "produces": "C",
+            },
+            "reason": "XMage structure matches a simple artifact tap ability that adds two colorless mana.",
+            "signals": ["SimpleManaAbility", "TapSourceCost", "ColorlessMana(2)"],
+        }
+
+    if (
+        ability_classes == {"SimpleManaAbility"}
+        and cost_classes == {"GenericManaCost", "TapSourceCost"}
+        and "new mana(0, 1, 0, 1, 0, 0, 0, 0)" in normalized
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "signet_filter_mana_rock_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "UR",
+                "activation_cost_generic": 1,
+            },
+            "reason": "XMage structure matches a Signet-style artifact filter that pays 1 and taps to add {U}{R}.",
+            "signals": ["SimpleManaAbility", "GenericManaCost(1)", "TapSourceCost", "Mana(UR)"],
+        }
+
+    if (
+        ability_classes == {"SimpleManaAbility"}
+        and cost_classes == {"GenericManaCost", "TapSourceCost"}
+        and "new mana(0, 1, 0, 0, 1, 0, 0, 0)" in normalized
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "signet_filter_mana_rock_v1",
+            "fields": {
+                "mana_produced": 1,
+                "produces": "GU",
+                "activation_cost_generic": 1,
+            },
+            "reason": "XMage structure matches a Signet-style artifact filter that pays 1 and taps to add {G}{U}.",
+            "signals": ["SimpleManaAbility", "GenericManaCost(1)", "TapSourceCost", "Mana(GU)"],
+        }
+
+    return None
+
+
 def _build_rishkar_fields(
     *,
     card_types: set[str],
@@ -1783,6 +1920,43 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(source_add_counters_creature_fields["fields"]),
                 matched_signals=list(source_add_counters_creature_fields["signals"]),
+            )
+        )
+
+    simple_creature_mana_source_fields = _build_simple_creature_mana_source_fields(
+        card_types=card_types,
+        ability_classes=ability_classes,
+        rules_text=rules_text,
+    )
+    if simple_creature_mana_source_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(simple_creature_mana_source_fields["effect"]),
+                scope=str(simple_creature_mana_source_fields["scope"]),
+                reason=str(simple_creature_mana_source_fields["reason"]),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(simple_creature_mana_source_fields["fields"]),
+                matched_signals=list(simple_creature_mana_source_fields["signals"]),
+            )
+        )
+
+    simple_artifact_mana_source_fields = _build_simple_artifact_mana_source_fields(
+        card_types=card_types,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if simple_artifact_mana_source_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(simple_artifact_mana_source_fields["effect"]),
+                scope=str(simple_artifact_mana_source_fields["scope"]),
+                reason=str(simple_artifact_mana_source_fields["reason"]),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(simple_artifact_mana_source_fields["fields"]),
+                matched_signals=list(simple_artifact_mana_source_fields["signals"]),
             )
         )
 

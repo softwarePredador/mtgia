@@ -731,6 +731,64 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("self_add_plus_one_counter") or 0) == 1
         )
 
+    if effect == "creature" and scope == "one_mana_one_one_green_mana_dork_v1":
+        return (
+            types == {"CREATURE"}
+            and ability_classes == {"GreenManaAbility"}
+            and not effect_classes
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("is_mana_source"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "G"
+        )
+
+    if effect == "creature" and scope == "one_mana_one_one_white_mana_dork_v1":
+        return (
+            types == {"CREATURE"}
+            and ability_classes == {"WhiteManaAbility"}
+            and not effect_classes
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("is_mana_source"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "W"
+        )
+
+    if effect == "creature" and scope == "one_mana_zero_one_flying_any_color_mana_dork_v1":
+        return (
+            types == {"CREATURE"}
+            and ability_classes == {"AnyColorManaAbility", "FlyingAbility"}
+            and not effect_classes
+            and int(effect_json.get("power") or 0) == 0
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("is_mana_source"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "WUBRG"
+        )
+
+    if effect == "ramp_permanent" and scope == "two_colorless_mana_rock_v1":
+        return (
+            types == {"ARTIFACT"}
+            and ability_classes == {"SimpleManaAbility"}
+            and not effect_classes
+            and xmage_cost_classes(card) == {"TapSourceCost"}
+            and int(effect_json.get("mana_produced") or 0) == 2
+            and effect_json.get("produces") == "C"
+        )
+
+    if effect == "ramp_permanent" and scope == "signet_filter_mana_rock_v1":
+        return (
+            types == {"ARTIFACT"}
+            and ability_classes == {"SimpleManaAbility"}
+            and not effect_classes
+            and xmage_cost_classes(card) == {"GenericManaCost", "TapSourceCost"}
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") in {"UR", "GU"}
+            and int(effect_json.get("activation_cost_generic") or 0) == 1
+        )
+
     if effect == "creature" and scope == "credit_counter_upkeep_growth_sacrifice_for_life_v1":
         return (
             types == {"CREATURE"}

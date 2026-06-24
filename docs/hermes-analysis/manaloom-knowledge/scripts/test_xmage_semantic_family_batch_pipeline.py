@@ -2628,6 +2628,146 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_green_mana_dork_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Llanowar Elves",
+                        "severity": "high",
+                        "oracle_hash": "llanowarhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "LlanowarElves",
+                            "path": "/xmage/LlanowarElves.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [],
+                            "ability_classes": ["GreenManaAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "one_mana_one_one_green_mana_dork_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "is_mana_source": True,
+                                "mana_produced": 1,
+                                "produces": "G",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_birds_of_paradise_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Birds of Paradise",
+                        "severity": "high",
+                        "oracle_hash": "birdshash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "BirdsOfParadise",
+                            "path": "/xmage/BirdsOfParadise.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [],
+                            "ability_classes": ["AnyColorManaAbility", "FlyingAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "one_mana_zero_one_flying_any_color_mana_dork_v1",
+                                "power": 0,
+                                "toughness": 1,
+                                "flying": True,
+                                "is_mana_source": True,
+                                "mana_produced": 1,
+                                "produces": "WUBRG",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_sol_ring_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Sol Ring",
+                        "severity": "high",
+                        "oracle_hash": "solringhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "SolRing",
+                            "path": "/xmage/SolRing.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": [],
+                            "ability_classes": ["SimpleManaAbility"],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "two_colorless_mana_rock_v1",
+                                "mana_produced": 2,
+                                "produces": "C",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_signet_filter_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Izzet Signet",
+                        "severity": "high",
+                        "oracle_hash": "izzethash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "IzzetSignet",
+                            "path": "/xmage/IzzetSignet.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": [],
+                            "ability_classes": ["SimpleManaAbility"],
+                            "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "signet_filter_mana_rock_v1",
+                                "mana_produced": 1,
+                                "produces": "UR",
+                                "activation_cost_generic": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_icatian_moneychanger_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
