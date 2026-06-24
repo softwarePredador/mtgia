@@ -492,6 +492,116 @@ def _build_counter_variant_fields(
     return None
 
 
+def _build_source_add_counters_creature_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if card_types != {"CREATURE"} or "AddCountersSourceEffect" not in effect_classes:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+
+    if "cantblockability" in normalized and "sacrificetargetcost" in normalized:
+        return {
+            "effect": "creature",
+            "scope": "sacrifice_creature_put_plus_one_counter_on_self_cant_block_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "cant_block": True,
+                "activation_cost": "sacrifice_creature",
+                "self_add_plus_one_counter": 1,
+            },
+            "reason": "XMage structure matches Carrion Feeder sacrifice-a-creature to put a +1/+1 counter on itself plus can't block.",
+            "signals": [
+                "CantBlockAbility",
+                "SacrificeTargetCost",
+                "AddCountersSourceEffect",
+            ],
+        }
+
+    if (
+        "credit.createinstance(3)" in normalized
+        and "damagecontrollereffect(3" in normalized
+        and "beginningofupkeeptriggeredability" in normalized
+        and "sacrificesourcecost" in normalized
+        and "gainlifeeffect(new counterssourcecount(countertype.credit))" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "credit_counter_upkeep_growth_sacrifice_for_life_v1",
+            "fields": {
+                "power": 0,
+                "toughness": 2,
+                "enters_with_credit_counters": 3,
+                "etb_damage_controller": 3,
+                "upkeep_add_credit_counter": 1,
+                "activation_cost": "sacrifice_self",
+                "gain_life_per_credit_counter": True,
+                "activation_only_your_upkeep": True,
+            },
+            "reason": "XMage structure matches Icatian Moneychanger credit-counter lifecycle and upkeep-only sacrifice-for-life activation.",
+            "signals": [
+                "AddCountersSourceEffect",
+                "DamageControllerEffect",
+                "GainLifeEffect",
+                "credit_counter",
+            ],
+        }
+
+    if (
+        "beginningofendsteptriggeredability" in normalized
+        and "wardenofthegroveeffect" in normalized
+        and "endures x" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "end_step_plus_one_counter_and_other_nontoken_creature_endures_x_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 2,
+                "end_step_add_plus_one_counter": 1,
+                "other_nontoken_creature_endures_equal_to_source_counters": True,
+            },
+            "reason": "XMage structure matches Warden of the Grove end-step growth and the endure-X trigger for another nontoken creature you control.",
+            "signals": [
+                "BeginningOfEndStepTriggeredAbility",
+                "WardenOfTheGroveEffect",
+                "EndureSourceEffect",
+            ],
+        }
+
+    if (
+        "wildbornpreservercreatereflexivetriggereffect" in normalized
+        and "another non-human creature" in normalized
+        and {"FlashAbility", "ReachAbility", "EntersBattlefieldControlledTriggeredAbility", "ReflexiveTriggeredAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "flash_reach_nonhuman_etb_pay_x_put_x_plus_one_counters_on_self_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 2,
+                "flash": True,
+                "reach": True,
+                "another_nonhuman_etb_optional_pay_x_for_x_plus_one_counters_on_self": True,
+            },
+            "reason": "XMage structure matches Wildborn Preserver flash/reach body and the optional pay-X reflexive trigger to add X +1/+1 counters to itself.",
+            "signals": [
+                "FlashAbility",
+                "ReachAbility",
+                "ReflexiveTriggeredAbility",
+                "AddCountersSourceEffect",
+            ],
+        }
+
+    return None
+
+
 def _build_rishkar_fields(
     *,
     card_types: set[str],
@@ -651,6 +761,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(counter_variant_fields["fields"]),
                 matched_signals=list(counter_variant_fields["signals"]),
+            )
+        )
+
+    source_add_counters_creature_fields = _build_source_add_counters_creature_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if source_add_counters_creature_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(source_add_counters_creature_fields["effect"]),
+                scope=str(source_add_counters_creature_fields["scope"]),
+                reason=str(source_add_counters_creature_fields["reason"]),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(source_add_counters_creature_fields["fields"]),
+                matched_signals=list(source_add_counters_creature_fields["signals"]),
             )
         )
 

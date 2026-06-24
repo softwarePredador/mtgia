@@ -543,6 +543,119 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
         self.assertEqual(primary["cost_reduction_generic_if_control_wizard"], 1)
 
+    def test_carrion_feeder_maps_to_exact_sacrifice_self_growth_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersSourceEffect"],
+                "ability_classes": ["CantBlockAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["SacrificeTargetCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.addAbility(new CantBlockAbility()); "
+                    "this.addAbility(new SimpleActivatedAbility("
+                    "new AddCountersSourceEffect(CounterType.P1P1.createInstance()), "
+                    "new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE)));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "sacrifice_creature_put_plus_one_counter_on_self_cant_block_v1",
+        )
+        self.assertTrue(primary["cant_block"])
+        self.assertEqual(primary["activation_cost"], "sacrifice_creature")
+        self.assertEqual(primary["self_add_plus_one_counter"], 1)
+
+    def test_icatian_moneychanger_maps_to_exact_credit_counter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersSourceEffect", "DamageControllerEffect", "GainLifeEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldAbility",
+                    "EntersBattlefieldTriggeredAbility",
+                    "BeginningOfUpkeepTriggeredAbility",
+                    "ActivateIfConditionActivatedAbility",
+                ],
+                "cost_classes": ["SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new AddCountersSourceEffect(CounterType.CREDIT.createInstance(3)) "
+                    "new EntersBattlefieldTriggeredAbility(new DamageControllerEffect(3, \"it\")); "
+                    "new BeginningOfUpkeepTriggeredAbility(new AddCountersSourceEffect(CounterType.CREDIT.createInstance())); "
+                    "new ActivateIfConditionActivatedAbility(new GainLifeEffect(new CountersSourceCount(CounterType.CREDIT)), new SacrificeSourceCost(), IsStepCondition.getMyUpkeep())"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "credit_counter_upkeep_growth_sacrifice_for_life_v1",
+        )
+        self.assertEqual(primary["enters_with_credit_counters"], 3)
+        self.assertEqual(primary["etb_damage_controller"], 3)
+        self.assertEqual(primary["upkeep_add_credit_counter"], 1)
+        self.assertTrue(primary["gain_life_per_credit_counter"])
+
+    def test_warden_of_the_grove_maps_to_exact_endure_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersSourceEffect", "EndureSourceEffect", "OneShotEffect", "WardenOfTheGroveEffect"],
+                "ability_classes": ["BeginningOfEndStepTriggeredAbility", "EntersBattlefieldAllTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.addAbility(new BeginningOfEndStepTriggeredAbility(new AddCountersSourceEffect(CounterType.P1P1.createInstance()))); "
+                    "this.addAbility(new EntersBattlefieldAllTriggeredAbility(Zone.BATTLEFIELD, new WardenOfTheGroveEffect(), filter, false, SetTargetPointer.PERMANENT)); "
+                    "staticText = \"it endures X, where X is the number of counters on {this}\";"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "end_step_plus_one_counter_and_other_nontoken_creature_endures_x_v1",
+        )
+        self.assertEqual(primary["end_step_add_plus_one_counter"], 1)
+        self.assertTrue(primary["other_nontoken_creature_endures_equal_to_source_counters"])
+
+    def test_wildborn_preserver_maps_to_exact_pay_x_counter_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["AddCountersSourceEffect"],
+                "ability_classes": [
+                    "FlashAbility",
+                    "ReachAbility",
+                    "EntersBattlefieldControlledTriggeredAbility",
+                    "ReflexiveTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.addAbility(FlashAbility.getInstance()); "
+                    "this.addAbility(ReachAbility.getInstance()); "
+                    "this.addAbility(new EntersBattlefieldControlledTriggeredAbility(new WildbornPreserverCreateReflexiveTriggerEffect(), filter)); "
+                    "filter = new FilterCreaturePermanent(\"another non-Human creature\"); "
+                    "cost.add(new GenericManaCost(costX)); "
+                    "game.fireReflexiveTriggeredAbility(new ReflexiveTriggeredAbility(new AddCountersSourceEffect(CounterType.P1P1.createInstance(costX)), false, \"put X +1/+1 counters on {this}\"), source);"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "flash_reach_nonhuman_etb_pay_x_put_x_plus_one_counters_on_self_v1",
+        )
+        self.assertTrue(primary["flash"])
+        self.assertTrue(primary["reach"])
+        self.assertTrue(primary["another_nonhuman_etb_optional_pay_x_for_x_plus_one_counters_on_self"])
+
 
 if __name__ == "__main__":
     unittest.main()

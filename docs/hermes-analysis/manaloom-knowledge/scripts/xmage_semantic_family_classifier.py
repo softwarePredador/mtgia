@@ -409,6 +409,58 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("cost_reduction_generic_if_control_wizard") or 0) == 1
         )
 
+    if effect == "creature" and scope == "sacrifice_creature_put_plus_one_counter_on_self_cant_block_v1":
+        return (
+            types == {"CREATURE"}
+            and "AddCountersSourceEffect" in effect_classes
+            and {"CantBlockAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and "SacrificeTargetCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("cant_block"))
+            and effect_json.get("activation_cost") == "sacrifice_creature"
+            and int(effect_json.get("self_add_plus_one_counter") or 0) == 1
+        )
+
+    if effect == "creature" and scope == "credit_counter_upkeep_growth_sacrifice_for_life_v1":
+        return (
+            types == {"CREATURE"}
+            and "AddCountersSourceEffect" in effect_classes
+            and {"EntersBattlefieldAbility", "EntersBattlefieldTriggeredAbility", "BeginningOfUpkeepTriggeredAbility", "ActivateIfConditionActivatedAbility"}.issubset(ability_classes)
+            and "SacrificeSourceCost" in xmage_cost_classes(card)
+            and int(effect_json.get("power") or 0) == 0
+            and int(effect_json.get("toughness") or 0) == 2
+            and int(effect_json.get("enters_with_credit_counters") or 0) == 3
+            and int(effect_json.get("etb_damage_controller") or 0) == 3
+            and int(effect_json.get("upkeep_add_credit_counter") or 0) == 1
+            and effect_json.get("activation_cost") == "sacrifice_self"
+            and bool(effect_json.get("gain_life_per_credit_counter"))
+            and bool(effect_json.get("activation_only_your_upkeep"))
+        )
+
+    if effect == "creature" and scope == "end_step_plus_one_counter_and_other_nontoken_creature_endures_x_v1":
+        return (
+            types == {"CREATURE"}
+            and "AddCountersSourceEffect" in effect_classes
+            and {"BeginningOfEndStepTriggeredAbility", "EntersBattlefieldAllTriggeredAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 2
+            and int(effect_json.get("end_step_add_plus_one_counter") or 0) == 1
+            and bool(effect_json.get("other_nontoken_creature_endures_equal_to_source_counters"))
+        )
+
+    if effect == "creature" and scope == "flash_reach_nonhuman_etb_pay_x_put_x_plus_one_counters_on_self_v1":
+        return (
+            types == {"CREATURE"}
+            and "AddCountersSourceEffect" in effect_classes
+            and {"FlashAbility", "ReachAbility", "EntersBattlefieldControlledTriggeredAbility", "ReflexiveTriggeredAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 2
+            and bool(effect_json.get("flash"))
+            and bool(effect_json.get("reach"))
+            and bool(effect_json.get("another_nonhuman_etb_optional_pay_x_for_x_plus_one_counters_on_self"))
+        )
+
     return False
 
 

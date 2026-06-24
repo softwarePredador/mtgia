@@ -27,13 +27,16 @@ sync_pg = load_module(SYNC_PG_PATH, "sync_pg_for_pg_fallback_test")
 
 ADDITIONAL_CANONICAL_NAMES = {
     "Aether Spellbomb",
+    "An Offer You Can't Refuse",
     "Aura of Silence",
+    "Carrion Feeder",
     "Crop Rotation",
     "Eldrazi Confluence",
     "Emerald Charm",
     "Feed the Swarm",
     "Harrow",
     "Hullbreaker Horror",
+    "Icatian Moneychanger",
     "Momentary Blink",
     "Mox Diamond",
     "Mental Misstep",
@@ -52,8 +55,9 @@ ADDITIONAL_CANONICAL_NAMES = {
     "Swan Song",
     "Turn to Mist",
     "Veil of Summer",
+    "Warden of the Grove",
+    "Wildborn Preserver",
     "Wizard's Retort",
-    "An Offer You Can't Refuse",
 }
 PROMOTED_CANONICAL_NAMES = sorted(
     set(audit.TEMPORARY_HOTFIX_NAMES) | ADDITIONAL_CANONICAL_NAMES

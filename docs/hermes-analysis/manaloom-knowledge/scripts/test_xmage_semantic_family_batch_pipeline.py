@@ -738,6 +738,162 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_carrion_feeder_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Carrion Feeder",
+                        "severity": "high",
+                        "oracle_hash": "feederhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "CarrionFeeder",
+                            "path": "/xmage/CarrionFeeder.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["AddCountersSourceEffect"],
+                            "ability_classes": ["CantBlockAbility", "SimpleActivatedAbility"],
+                            "cost_classes": ["SacrificeTargetCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "sacrifice_creature_put_plus_one_counter_on_self_cant_block_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "cant_block": True,
+                                "activation_cost": "sacrifice_creature",
+                                "self_add_plus_one_counter": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_icatian_moneychanger_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Icatian Moneychanger",
+                        "severity": "high",
+                        "oracle_hash": "moneyhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "IcatianMoneychanger",
+                            "path": "/xmage/IcatianMoneychanger.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["AddCountersSourceEffect", "DamageControllerEffect", "GainLifeEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldAbility",
+                                "EntersBattlefieldTriggeredAbility",
+                                "BeginningOfUpkeepTriggeredAbility",
+                                "ActivateIfConditionActivatedAbility",
+                            ],
+                            "cost_classes": ["SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "credit_counter_upkeep_growth_sacrifice_for_life_v1",
+                                "power": 0,
+                                "toughness": 2,
+                                "enters_with_credit_counters": 3,
+                                "etb_damage_controller": 3,
+                                "upkeep_add_credit_counter": 1,
+                                "activation_cost": "sacrifice_self",
+                                "gain_life_per_credit_counter": True,
+                                "activation_only_your_upkeep": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_warden_of_the_grove_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Warden of the Grove",
+                        "severity": "high",
+                        "oracle_hash": "wardenhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "WardenOfTheGrove",
+                            "path": "/xmage/WardenOfTheGrove.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["AddCountersSourceEffect", "EndureSourceEffect", "OneShotEffect", "WardenOfTheGroveEffect"],
+                            "ability_classes": ["BeginningOfEndStepTriggeredAbility", "EntersBattlefieldAllTriggeredAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "end_step_plus_one_counter_and_other_nontoken_creature_endures_x_v1",
+                                "power": 2,
+                                "toughness": 2,
+                                "end_step_add_plus_one_counter": 1,
+                                "other_nontoken_creature_endures_equal_to_source_counters": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_wildborn_preserver_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Wildborn Preserver",
+                        "severity": "high",
+                        "oracle_hash": "wildhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "WildbornPreserver",
+                            "path": "/xmage/WildbornPreserver.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["AddCountersSourceEffect"],
+                            "ability_classes": [
+                                "FlashAbility",
+                                "ReachAbility",
+                                "EntersBattlefieldControlledTriggeredAbility",
+                                "ReflexiveTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "flash_reach_nonhuman_etb_pay_x_put_x_plus_one_counters_on_self_v1",
+                                "power": 2,
+                                "toughness": 2,
+                                "flash": True,
+                                "reach": True,
+                                "another_nonhuman_etb_optional_pay_x_for_x_plus_one_counters_on_self": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_generator_normalizes_modal_mana_rock_to_runtime_ramp_effect(self) -> None:
         report = generator.build_generator_report(
             batch_audit={
