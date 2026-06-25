@@ -238,6 +238,16 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "batch_strategy": "metadata_batch_after_pg_precheck",
     },
+    "controlled_creature_etb_damage_engine": {
+        "effects": {"creature", "passive"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "battlefield trigger when a creature controlled by the source controller enters and damages each live opponent",
+        "family_tests": [
+            "test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering",
+            "test_pg207_impact_tremors_damages_each_opponent_when_token_enters",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "targeted_protection": {
         "effects": {"grant_protection_from_chosen_color"},
         "support_status": "runtime_supported_family",
@@ -358,9 +368,21 @@ def xmage_condition_classes(card: dict[str, Any]) -> set[str]:
 def family_for_effect(effect: str | None) -> str:
     effect = str(effect or "external_reference_required_manual_model")
     for family_id, definition in FAMILY_DEFINITIONS.items():
+        if family_id == "controlled_creature_etb_damage_engine":
+            continue
         if effect in definition["effects"]:
             return family_id
     return "manual_model"
+
+
+def family_for_effect_json(effect_json: dict[str, Any]) -> str:
+    if (
+        str(effect_json.get("battle_model_scope") or "") == "controlled_creature_enters_damage_each_opponent_v1"
+        and effect_json.get("trigger") == "creature_you_control_enters"
+        and effect_json.get("trigger_effect") == "damage_each_opponent"
+    ):
+        return "controlled_creature_etb_damage_engine"
+    return family_for_effect(effect_json.get("effect"))
 
 
 def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
@@ -757,6 +779,24 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target_controller") == "opponents"
             and bool(effect_json.get("instant")) == ("INSTANT" in types)
             and bool(effect_json.get("sorcery")) == ("SORCERY" in types)
+        )
+
+    if effect in {"creature", "passive"} and scope == "controlled_creature_enters_damage_each_opponent_v1":
+        allowed_abilities = {
+            "EntersBattlefieldControlledTriggeredAbility",
+            "OffspringAbility",
+            "UnearthAbility",
+        }
+        return (
+            types in ({"CREATURE"}, {"ENCHANTMENT"}, {"ARTIFACT", "CREATURE"})
+            and effect_classes == {"DamagePlayersEffect"}
+            and "EntersBattlefieldControlledTriggeredAbility" in ability_classes
+            and ability_classes.issubset(allowed_abilities)
+            and int(effect_json.get("trigger_damage_each_opponent") or effect_json.get("damage") or 0) > 0
+            and effect_json.get("trigger") == "creature_you_control_enters"
+            and effect_json.get("trigger_effect") == "damage_each_opponent"
+            and effect_json.get("target_controller") == "opponents"
+            and not cost_classes.difference({"ManaCostsImpl", "ManaCost", "GenericManaCost"})
         )
 
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
@@ -2641,6 +2681,11 @@ def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
     support_status = str(family.get("support_status") or "")
     if family.get("effects") == {"static_cost_reduction"} and not static_cost_reducer_batch_safe(card):
         return "split_family_scope_review_required"
+    if (
+        family.get("implementation_unit")
+        == "battlefield trigger when a creature controlled by the source controller enters and damages each live opponent"
+    ):
+        return "split_family_scope_review_required"
     if support_status in {"runtime_supported_family", "runtime_supported_by_local_artifact"}:
         return "batch_metadata_candidate_requires_pg_precheck"
     if support_status == "runtime_family_required":
@@ -2652,7 +2697,7 @@ def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
 
 def classify_card(card: dict[str, Any]) -> dict[str, Any]:
     effect_json = primary_effect(card)
-    family_id = family_for_effect(effect_json.get("effect"))
+    family_id = family_for_effect_json(effect_json)
     family = FAMILY_DEFINITIONS[family_id]
     lane = promotion_lane(card, family)
     return {

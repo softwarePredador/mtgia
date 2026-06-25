@@ -45,6 +45,7 @@ DECK_ROLE_BY_FAMILY: dict[str, dict[str, Any]] = {
     "pile_selection_spell": {"category": "draw", "effect": "pile_selection_draw", "subtype": "two_pile_reveal", "timing": "resolution"},
     "draw_engine": {"category": "draw", "effect": "draw_engine", "timing": "static_or_activated"},
     "opponent_damage_spell": {"category": "burn", "effect": "damage_each_opponent", "subtype": "opponent_damage", "timing": "resolution"},
+    "controlled_creature_etb_damage_engine": {"category": "burn_engine", "effect": "damage_each_opponent", "subtype": "creature_enter_trigger", "timing": "triggered"},
     "targeted_protection": {"category": "protection", "effect": "grant_protection", "timing": "resolution"},
     "phase_out_protection": {"category": "protection", "effect": "phase_out", "subtype": "phase_out", "timing": "resolution"},
     "creature": {"category": "board_presence", "effect": "creature", "timing": "battlefield"},

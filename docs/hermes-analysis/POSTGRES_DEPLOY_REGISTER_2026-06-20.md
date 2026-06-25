@@ -12558,3 +12558,92 @@ Register decision:
 - Continue Lorehold-first rule closure on the remaining `209`
   `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
 - Next package number is PG207.
+
+### PG207 - controlled creature enters damage engine
+
+Status: applied, postchecked, synced to Hermes, tested, and strategy-audited.
+
+Scope:
+
+- Promoted XMage-backed `controlled_creature_enters_damage_each_opponent_v1`
+  rules for:
+  - `Agate Instigator`;
+  - `Impact Tremors`;
+  - `Molten Gatekeeper`.
+- Deliberately excluded `Purphoros, God of the Forge` and `Warleader's Call`
+  from the package because they add devotion/static/boost behavior beyond the
+  simple ETB damage trigger.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg207_creature_etb_damage_package_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg207_creature_etb_damage_package_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg207_creature_etb_damage_package_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg207_creature_etb_damage_package_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg207_creature_etb_damage_package_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  all three cards had `target_card_rows=1`, `expected_rule_rows_before=0`,
+  and `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `6`, `deprecated_shadow_rows=6`, `upserted_rows=3`, `COMMIT`.
+- Postcheck:
+  each promoted card had `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, `promoted_oracle_hash_rows=1`, and
+  `backup_rows=6`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg207_creature_etb_damage_20260625_0716.json`;
+  `selected_card_count=3`, `pg_rows_loaded=3`,
+  `sqlite_inserted_or_updated=9`, `canonical_snapshot_rows_exported=3242`,
+  `generated_rows=3`.
+- Runtime cache spot-check:
+  all three cards resolve from local cache with
+  `battle_model_scope=controlled_creature_enters_damage_each_opponent_v1`,
+  `trigger=creature_you_control_enters`,
+  `trigger_effect=damage_each_opponent`,
+  `trigger_damage_each_opponent=1`, and `_rule_execution_status=auto`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg207_creature_etb_damage_postsync_v1_manifest.json`;
+  expanded scope moved to `high=386`, `medium=63`, `pass=513`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg207_creature_etb_damage_postsync_v1.json`;
+  scoped rows `580`, `battle_ready=374`,
+  `needs_rule_before_strategy=206`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg207_creature_etb_damage_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=20`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg207_creature_etb_damage_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  focused mapper/classifier tests passed through `unittest`;
+  focused runtime regressions
+  `test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering`
+  and `test_pg207_impact_tremors_damages_each_opponent_when_token_enters`
+  passed through the battle harness.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_071326/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `test_results_status_counts={"pass":18}`, and `test_results_total=18`.
+
+Register decision:
+
+- PG207 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG207.
+- Continue Lorehold-first rule closure on the remaining `206`
+  `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
+- Next package number is PG208.

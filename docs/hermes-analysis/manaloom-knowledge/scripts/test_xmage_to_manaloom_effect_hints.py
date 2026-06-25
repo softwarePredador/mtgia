@@ -3539,6 +3539,65 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertFalse(primary["instant"])
         self.assertTrue(primary["sorcery"])
 
+    def test_agate_instigator_maps_to_another_creature_enter_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "AgateInstigator",
+                "effect_classes": ["DamagePlayersEffect"],
+                "ability_classes": ["EntersBattlefieldControlledTriggeredAbility", "OffspringAbility"],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(1); this.toughness = new MageInt(3); "
+                    "this.addAbility(new EntersBattlefieldControlledTriggeredAbility("
+                    "new DamagePlayersEffect(1, TargetController.OPPONENT), "
+                    "StaticFilters.FILTER_ANOTHER_CREATURE));"
+                ),
+            },
+            "Whenever another creature you control enters, this creature deals 1 damage to each opponent.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controlled_creature_enters_damage_each_opponent_v1",
+        )
+        self.assertEqual(primary["trigger"], "creature_you_control_enters")
+        self.assertEqual(primary["trigger_effect"], "damage_each_opponent")
+        self.assertEqual(primary["trigger_damage_each_opponent"], 1)
+        self.assertTrue(primary["trigger_another_creature_you_control_enters"])
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 3)
+
+    def test_impact_tremors_maps_to_creature_enter_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ImpactTremors",
+                "effect_classes": ["DamagePlayersEffect"],
+                "ability_classes": ["EntersBattlefieldControlledTriggeredAbility"],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new EntersBattlefieldControlledTriggeredAbility("
+                    "Zone.BATTLEFIELD, new DamagePlayersEffect(Outcome.Damage, "
+                    "StaticValue.get(1), TargetController.OPPONENT), "
+                    "StaticFilters.FILTER_PERMANENT_A_CREATURE, false)"
+                ),
+            },
+            "Whenever a creature you control enters, Impact Tremors deals 1 damage to each opponent.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controlled_creature_enters_damage_each_opponent_v1",
+        )
+        self.assertTrue(primary["trigger_creature_you_control_enters"])
+        self.assertFalse(primary["trigger_another_creature_you_control_enters"])
+        self.assertEqual(primary["target_controller"], "opponents")
+
     def test_young_pyromancer_maps_to_exact_spell_cast_elemental_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -832,6 +832,38 @@ the current Lorehold/opponent matrix:
    `event_contract_static_status=event_contract_static_ready`, and
    `test_results_status_counts={"pass":18}`.
 
+`Agate Instigator`, `Impact Tremors`, and `Molten Gatekeeper` are the
+twenty-second completed proof group and close the simple controlled-creature
+ETB damage engine from the current Lorehold/opponent matrix:
+
+1. XMage local sources matched
+   `EntersBattlefieldControlledTriggeredAbility` plus `DamagePlayersEffect`
+   targeting `TargetController.OPPONENT`.
+2. The mapper/classifier now promotes the exact
+   `controlled_creature_enters_damage_each_opponent_v1` scope as
+   `controlled_creature_etb_damage_engine`, while leaving mixed cards such as
+   `Purphoros, God of the Forge` and `Warleader's Call` in split-scope review.
+3. Battle runtime now resolves `creature_you_control_enters` triggers from
+   existing permanents and token creation paths, emits `trigger_resolved`, and
+   preserves the `another creature` exclusion for the source entering itself.
+4. PG207 precheck/apply/postcheck promoted three verified auto rules and
+   deprecated six stale generated shadows.
+5. PG -> Hermes sync made those three cards report as `battle_ready`; the
+   matrix moved them out of `needs_rule_before_strategy`.
+6. The PG207 matrix now reports `206` total `needs_rule_before_strategy` rows
+   and `374` `battle_ready` rows. The effective queue now has
+   `333` mapper backlog, `74` split-scope backlog, `20` runtime-family
+   backlog, and `4` blocked missing XMage source rows, with no unprepared
+   package-ready rows.
+7. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_071326/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+   `mandatory_gate_divergences=[]`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `event_contract_static_status=event_contract_static_ready`, and
+   `test_results_status_counts={"pass":18}`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

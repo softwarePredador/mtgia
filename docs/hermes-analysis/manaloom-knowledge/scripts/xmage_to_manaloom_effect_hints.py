@@ -276,6 +276,77 @@ def _constructor_card_types(index_entry: dict[str, Any]) -> set[str]:
     }
 
 
+def _constructor_power_toughness_fields(index_entry: dict[str, Any], rules_text: str) -> dict[str, Any]:
+    fields: dict[str, Any] = {}
+    power = _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text)
+    toughness = _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text)
+    if power is not None:
+        fields["power"] = power
+    if toughness is not None:
+        fields["toughness"] = toughness
+    return fields
+
+
+def _build_controlled_creature_enters_damage_each_opponent_fields(
+    *,
+    index_entry: dict[str, Any],
+    rules_text: str,
+    effect_classes: set[str],
+    ability_classes: set[str],
+) -> dict[str, Any] | None:
+    card_types = _constructor_card_types(index_entry)
+    if "DamagePlayersEffect" not in effect_classes:
+        return None
+    if "EntersBattlefieldControlledTriggeredAbility" not in ability_classes:
+        return None
+    if "targetcontroller.opponent" not in _normalized_rules_text(rules_text) and "each opponent" not in _normalized_rules_text(rules_text):
+        return None
+    if not card_types.intersection({"CREATURE", "ENCHANTMENT", "ARTIFACT"}):
+        return None
+
+    amount = _first_int(r"damageplayerseffect\((\d+)", _normalized_rules_text(rules_text))
+    if amount is None:
+        amount = _first_int(r"staticvalue\.get\((\d+)\)", _normalized_rules_text(rules_text))
+    if amount is None:
+        amount = _first_int(r"deals\s+(\d+)\s+damage\s+to\s+each\s+opponent", _normalized_rules_text(rules_text))
+    if amount is None:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+    another_only = (
+        "filter_another_creature" in normalized
+        or "another creature you control enters" in normalized
+    )
+    effect = "creature" if "CREATURE" in card_types else "passive"
+    fields: dict[str, Any] = {
+        "trigger": "creature_you_control_enters",
+        "trigger_effect": "damage_each_opponent",
+        "trigger_damage_each_opponent": amount,
+        "damage": amount,
+        "target_controller": "opponents",
+        "trigger_creature_you_control_enters": True,
+        "trigger_another_creature_you_control_enters": bool(another_only),
+        "is_creature_permanent": "CREATURE" in card_types,
+    }
+    if effect == "creature":
+        fields.update(_constructor_power_toughness_fields(index_entry, rules_text))
+    return {
+        "effect": effect,
+        "scope": "controlled_creature_enters_damage_each_opponent_v1",
+        "fields": fields,
+        "reason": (
+            "XMage uses EntersBattlefieldControlledTriggeredAbility with DamagePlayersEffect "
+            "targeting opponents; ManaLoom can model this as a battlefield trigger when a "
+            "creature controlled by the source controller enters."
+        ),
+        "signals": [
+            "EntersBattlefieldControlledTriggeredAbility",
+            "DamagePlayersEffect",
+            "TargetController.OPPONENT",
+        ],
+    }
+
+
 def _build_copy_permanent_etb_fields(
     *,
     index_entry: dict[str, Any],
@@ -6135,6 +6206,25 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 ability_kind=ability_kind,
                 requires_runtime_executor=True,
                 matched_signals=["token"],
+            )
+        )
+
+    controlled_creature_enters_damage_fields = _build_controlled_creature_enters_damage_each_opponent_fields(
+        index_entry=index_entry,
+        rules_text=rules_text,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+    )
+    if controlled_creature_enters_damage_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(controlled_creature_enters_damage_fields["effect"]),
+                scope=str(controlled_creature_enters_damage_fields["scope"]),
+                reason=str(controlled_creature_enters_damage_fields["reason"]),
+                ability_kind="triggered",
+                requires_runtime_executor=False,
+                extra_effect_fields=dict(controlled_creature_enters_damage_fields["fields"]),
+                matched_signals=list(controlled_creature_enters_damage_fields["signals"]),
             )
         )
 

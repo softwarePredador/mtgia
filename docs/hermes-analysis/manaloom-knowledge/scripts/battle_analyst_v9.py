@@ -9435,6 +9435,9 @@ def resolve_generic_permanent_etb(player, opponents, permanent, effect_data, tur
                     or 1
                 ),
                 artifact=bool(effect_data.get("etb_artifact_tokens")),
+                opponents=opponents,
+                turn=turn,
+                source_event="etb_token_created",
             )
     if effect_data.get("etb_recursion_count"):
         resolve_etb_graveyard_recursion(player, permanent, effect_data, turn)
@@ -9596,6 +9599,11 @@ def resolve_eldrazi_confluence(player, opponents, card, effect_data, turn, rng, 
             toughness=int(effect_data.get("token_toughness") or 1),
             subtype=effect_data.get("token_subtype", "Eldrazi Scion"),
             colors=list(effect_data.get("token_colors") or []),
+            opponents=opponents,
+            turn=turn,
+            source_event="eldrazi_confluence_token",
+            active_player=player,
+            all_players=all_players,
         )
         scion["sacrifice_for_colorless_mana"] = bool(effect_data.get("token_sacrifice_for_colorless_mana"))
         selected_modes.append(
@@ -19644,6 +19652,73 @@ def process_combat_damage_resource_triggers(
     return resolved
 
 
+def process_controlled_creature_enters_triggers(
+    player,
+    opponents,
+    entering_permanent,
+    turn,
+    *,
+    source_event="creature_enters_battlefield",
+    stack=None,
+    active_player=None,
+    all_players=None,
+):
+    if not isinstance(entering_permanent, dict) or not is_battlefield_creature(entering_permanent):
+        return 0
+    trigger_sources = [
+        permanent
+        for permanent in list(getattr(player, "battlefield", []) or [])
+        if isinstance(permanent, dict)
+        and permanent.get("trigger") == "creature_you_control_enters"
+        and permanent.get("trigger_effect") == "damage_each_opponent"
+    ]
+    resolved = 0
+    for permanent in trigger_sources:
+        if (
+            permanent is entering_permanent
+            and permanent.get("trigger_another_creature_you_control_enters")
+        ):
+            continue
+        amount = int(permanent.get("trigger_damage_each_opponent") or permanent.get("damage") or 1)
+        if amount <= 0:
+            continue
+
+        def resolve_creature_enters_damage_trigger(permanent=permanent, amount=amount):
+            damaged = []
+            for opponent in opponents or []:
+                if getattr(opponent, "is_alive", lambda: True)() and deal_damage(opponent, amount):
+                    damaged.append({"player": opponent.name, "life_after": opponent.life})
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="creature_you_control_enters",
+                entering_creature=entering_permanent.get("name", "?"),
+                source_event=source_event,
+                effect="damage_each_opponent",
+                amount=amount,
+                damaged=damaged,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+
+        resolve_or_enqueue_trigger(
+            player,
+            permanent,
+            "creature_you_control_enters",
+            resolve_creature_enters_damage_trigger,
+            stack=stack,
+            active_player=active_player,
+            all_players=all_players,
+            data={
+                "entering_creature": entering_permanent.get("name", "?"),
+                "source_event": source_event,
+            },
+        )
+        resolved += 1
+    return resolved
+
+
 def create_creature_token(
     player,
     *,
@@ -19655,6 +19730,12 @@ def create_creature_token(
     artifact=False,
     subtype=None,
     colors=None,
+    opponents=None,
+    turn=None,
+    source_event="token_created",
+    stack=None,
+    active_player=None,
+    all_players=None,
 ):
     base_type_line = "Artifact Creature Token" if artifact else "Creature Token"
     if subtype:
@@ -19678,6 +19759,17 @@ def create_creature_token(
         token["flying"] = True
         token["keywords"] = ["flying"]
     player.battlefield.append(token)
+    if opponents is not None and turn is not None:
+        process_controlled_creature_enters_triggers(
+            player,
+            opponents,
+            token,
+            turn,
+            source_event=source_event,
+            stack=stack,
+            active_player=active_player,
+            all_players=all_players,
+        )
 
     if artifact:
         replacement_engines = [
@@ -19686,21 +19778,31 @@ def create_creature_token(
             if isinstance(permanent, dict) and permanent.get("artifact_token_replacement")
         ]
         for _ in replacement_engines:
-            player.battlefield.append(
-                {
-                    "name": "Thopter Token",
-                    "cmc": 0,
-                    "tag": "token",
-                    "effect": "creature",
-                    "type_line": "Artifact Creature Token — Thopter",
-                    "power": 1,
-                    "toughness": 1,
-                    "flying": True,
-                    "keywords": ["flying"],
-                    "summoning_sick": True,
-                    "tapped": False,
-                }
-            )
+            thopter = {
+                "name": "Thopter Token",
+                "cmc": 0,
+                "tag": "token",
+                "effect": "creature",
+                "type_line": "Artifact Creature Token — Thopter",
+                "power": 1,
+                "toughness": 1,
+                "flying": True,
+                "keywords": ["flying"],
+                "summoning_sick": True,
+                "tapped": False,
+            }
+            player.battlefield.append(thopter)
+            if opponents is not None and turn is not None:
+                process_controlled_creature_enters_triggers(
+                    player,
+                    opponents,
+                    thopter,
+                    turn,
+                    source_event="artifact_token_replacement",
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
+                )
     return token
 
 
@@ -19728,7 +19830,18 @@ def token_count_for_effect(player, effect_data, default=5, opponents=None):
     return int(token_count)
 
 
-def create_creature_tokens_from_effect(player, effect_data, *, count=None, opponents=None):
+def create_creature_tokens_from_effect(
+    player,
+    effect_data,
+    *,
+    count=None,
+    opponents=None,
+    turn=None,
+    source_event="token_created",
+    stack=None,
+    active_player=None,
+    all_players=None,
+):
     token_count = (
         token_count_for_effect(player, effect_data, opponents=opponents)
         if count is None
@@ -19753,6 +19866,12 @@ def create_creature_tokens_from_effect(player, effect_data, *, count=None, oppon
             artifact=artifact_tokens,
             subtype=token_subtype,
             colors=token_colors,
+            opponents=opponents,
+            turn=turn,
+            source_event=source_event,
+            stack=stack,
+            active_player=active_player,
+            all_players=all_players,
         )
     return token_count
 
@@ -19931,6 +20050,12 @@ def trigger_landfall(
                         colors=permanent.get("token_colors") or ["G"],
                         power=int(permanent.get("token_power") or 1),
                         toughness=int(permanent.get("token_toughness") or 1),
+                        opponents=opponents,
+                        turn=turn,
+                        source_event="landfall_copy_or_token",
+                        stack=stack,
+                        active_player=active_player,
+                        all_players=all_players,
                     )
                     created.append(token)
                 emit_replay_event(
@@ -19957,6 +20082,12 @@ def trigger_landfall(
                 name="Insect Token",
                 power=int(permanent.get("token_power") or 1),
                 toughness=int(permanent.get("token_toughness") or 1),
+                opponents=opponents,
+                turn=turn,
+                source_event="landfall_token_maker",
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
             )
             created.append(token)
         if generic_created:
@@ -20806,6 +20937,8 @@ def activate_postcombat_token_creatures(player, opponents, turn, *, phase="postc
             permanent,
             count=int(permanent.get("token_count") or 1),
             opponents=opponents,
+            turn=turn,
+            source_event="activated_token_maker",
         )
         activations += 1
         emit_decision_trace(
@@ -23008,6 +23141,12 @@ def trigger_spell_cast_engines(
                     power=token_size,
                     toughness=token_size,
                     flying=bool(permanent.get("spell_cast_token_flying")),
+                    opponents=opponents,
+                    turn=turn,
+                    source_event="instant_sorcery_cast_sized_token",
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
                 )
                 emit_replay_event(
                     "trigger_resolved",
@@ -23302,6 +23441,12 @@ def trigger_spell_cast_engines(
                     player,
                     permanent,
                     count=token_count,
+                    opponents=opponents,
+                    turn=turn,
+                    source_event="instant_sorcery_cast_token_maker",
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
                 )
                 emit_replay_event(
                     "trigger_resolved",
@@ -25414,7 +25559,13 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 "cards_drawn": draw_count,
             })
         elif component_effect == "token_maker":
-            token_count = create_creature_tokens_from_effect(player, component, opponents=opponents)
+            token_count = create_creature_tokens_from_effect(
+                player,
+                component,
+                opponents=opponents,
+                turn=turn,
+                source_event="composite_token_maker",
+            )
             outcome = "tokens_created"
             applied.append({"effect": component_effect, "tokens_created": token_count})
         elif component_effect == "phase_out":
@@ -25702,6 +25853,16 @@ def apply_effect_immediate(
         permanent["effect"] = "creature"
         player.battlefield.append(permanent)
         resolve_generic_permanent_etb(player, opponents, permanent, effect_data, turn, rng)
+        process_controlled_creature_enters_triggers(
+            player,
+            opponents,
+            permanent,
+            turn,
+            source_event="creature_spell_resolved",
+            stack=stack,
+            active_player=player,
+            all_players=[player, *(opponents or [])],
+        )
         emit_replay_event(
             "creature_to_battlefield",
             player=player.name,
@@ -25717,6 +25878,16 @@ def apply_effect_immediate(
         player.battlefield.append(permanent)
         resolve_generic_permanent_etb(player, opponents, permanent, permanent, turn, rng)
         if is_battlefield_creature(permanent):
+            process_controlled_creature_enters_triggers(
+                player,
+                opponents,
+                permanent,
+                turn,
+                source_event="copy_permanent_etb",
+                stack=stack,
+                active_player=player,
+                all_players=[player, *(opponents or [])],
+            )
             emit_replay_event(
                 "creature_to_battlefield",
                 player=player.name,
@@ -26917,7 +27088,16 @@ def apply_effect_immediate(
             permanent["effect"] = "token_maker"
             player.battlefield.append(permanent)
         else:
-            requested_tokens = create_creature_tokens_from_effect(player, effect_data, opponents=opponents)
+            requested_tokens = create_creature_tokens_from_effect(
+                player,
+                effect_data,
+                opponents=opponents,
+                turn=turn,
+                source_event="spell_token_maker",
+                stack=stack,
+                active_player=player,
+                all_players=[player, *(opponents or [])],
+            )
             protected_until_next_turn = []
             if effect_data.get("grant_non_angel_creatures_indestructible_until_next_turn"):
                 protected_until_next_turn = grant_non_angel_creatures_indestructible_until_next_turn(

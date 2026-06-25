@@ -15119,6 +15119,109 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            agate = {"name": "Agate Instigator", "type_line": "Creature", "cmc": 2}
+            agate_effect = {
+                "effect": "creature",
+                "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                "power": 1,
+                "toughness": 3,
+                "trigger": "creature_you_control_enters",
+                "trigger_effect": "damage_each_opponent",
+                "trigger_damage_each_opponent": 1,
+                "damage": 1,
+                "target_controller": "opponents",
+                "trigger_another_creature_you_control_enters": True,
+                "_rule_logical_key": "battle_rule_v1:pg207_agate_test",
+                "_rule_oracle_hash": "pg207_agate_hash",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                agate,
+                5,
+                random.Random(207),
+                effect_data_override=agate_effect,
+            )
+            assert opponent.life == 40
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Lorehold Token Carrier", "type_line": "Creature", "cmc": 2},
+                5,
+                random.Random(208),
+                effect_data_override={"effect": "creature", "power": 2, "toughness": 2},
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert opponent.life == 39
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Agate Instigator"
+            and data.get("trigger") == "creature_you_control_enters"
+            and data.get("entering_creature") == "Lorehold Token Carrier"
+            and data.get("amount") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:pg207_agate_test"
+            for event, data in events
+        )
+
+    def test_pg207_impact_tremors_damages_each_opponent_when_token_enters():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            active.battlefield = [
+                {
+                    "name": "Impact Tremors",
+                    "effect": "passive",
+                    "type_line": "Enchantment",
+                    "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                    "trigger": "creature_you_control_enters",
+                    "trigger_effect": "damage_each_opponent",
+                    "trigger_damage_each_opponent": 1,
+                    "damage": 1,
+                    "target_controller": "opponents",
+                    "trigger_another_creature_you_control_enters": False,
+                    "_rule_logical_key": "battle_rule_v1:pg207_impact_tremors_test",
+                    "_rule_oracle_hash": "pg207_impact_hash",
+                }
+            ]
+
+            battle.create_creature_token(
+                active,
+                name="Elemental Token",
+                power=1,
+                toughness=1,
+                opponents=[opponent_a, opponent_b],
+                turn=6,
+                source_event="test_token_created",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert opponent_a.life == 39
+        assert opponent_b.life == 39
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Impact Tremors"
+            and data.get("entering_creature") == "Elemental Token"
+            and data.get("amount") == 1
+            and data.get("rule_oracle_hash") == "pg207_impact_hash"
+            for event, data in events
+        )
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -15366,6 +15469,8 @@ def register_tests(battle, player):
         test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them,
         test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit,
         test_pg206_boltwave_damages_each_opponent,
+        test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering,
+        test_pg207_impact_tremors_damages_each_opponent_when_token_enters,
         test_everything_comes_to_dust_oracle_normalizes_to_convoke_exile_wipe,
         test_everything_comes_to_dust_exiles_artifacts_enchantments_and_nonshared_creatures,
         test_fated_clash_oracle_normalizes_to_protect_then_destroy_wipe,

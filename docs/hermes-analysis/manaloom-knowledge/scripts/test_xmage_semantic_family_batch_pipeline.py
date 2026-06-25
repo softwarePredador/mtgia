@@ -6273,6 +6273,94 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "opponent_damage_spell")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_controlled_creature_etb_damage_family_is_batch_safe_for_simple_xmage_sources(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Agate Instigator",
+                        "severity": "high",
+                        "oracle_hash": "agatehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "AgateInstigator",
+                            "path": "/xmage/AgateInstigator.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DamagePlayersEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldControlledTriggeredAbility",
+                                "OffspringAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                                "trigger": "creature_you_control_enters",
+                                "trigger_effect": "damage_each_opponent",
+                                "trigger_damage_each_opponent": 1,
+                                "damage": 1,
+                                "target_controller": "opponents",
+                                "trigger_creature_you_control_enters": True,
+                                "trigger_another_creature_you_control_enters": True,
+                                "power": 1,
+                                "toughness": 3,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["family_id"], "controlled_creature_etb_damage_engine")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_controlled_creature_etb_damage_family_rejects_cards_with_extra_static_effects(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Warleader's Call",
+                        "severity": "high",
+                        "oracle_hash": "warleaderscallhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "WarleadersCall",
+                            "path": "/xmage/WarleadersCall.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DamagePlayersEffect", "BoostControlledEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldControlledTriggeredAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                                "trigger": "creature_you_control_enters",
+                                "trigger_effect": "damage_each_opponent",
+                                "trigger_damage_each_opponent": 1,
+                                "damage": 1,
+                                "target_controller": "opponents",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["family_id"], "controlled_creature_etb_damage_engine")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "split_family_scope_review_required")
+
     def test_classifier_marks_young_pyromancer_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
