@@ -333,6 +333,88 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "recursion")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_brilliant_restoration_recursion_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Brilliant Restoration",
+                        "severity": "high",
+                        "oracle_hash": "brilliant-restoration-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "BrilliantRestoration",
+                            "path": "/xmage/BrilliantRestoration.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["ReturnFromYourGraveyardToBattlefieldAllEffect"],
+                            "ability_classes": [],
+                            "filter_classes": ["FilterArtifactOrEnchantmentCard", "FilterCard"],
+                            "primary_effect": {
+                                "effect": "recursion",
+                                "battle_model_scope": "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1",
+                                "ability_kind": "one_shot",
+                                "target": "artifact_or_enchantment",
+                                "target_zone": "graveyard",
+                                "target_controller": "self",
+                                "destination": "battlefield",
+                                "return_all_matching": True,
+                                "target_card_types": ["artifact", "enchantment"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "recursion")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_wake_the_past_recursion_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Wake the Past",
+                        "severity": "high",
+                        "oracle_hash": "wake-the-past-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "WakeThePast",
+                            "path": "/xmage/WakeThePast.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["WakeThePastEffect", "GainAbilityTargetEffect"],
+                            "ability_classes": [],
+                            "primary_effect": {
+                                "effect": "recursion",
+                                "battle_model_scope": "return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1",
+                                "ability_kind": "one_shot",
+                                "target": "artifact",
+                                "target_zone": "graveyard",
+                                "target_controller": "self",
+                                "destination": "battlefield",
+                                "return_all_matching": True,
+                                "target_card_types": ["artifact"],
+                                "grants_haste_until_eot": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "recursion")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_generator_uses_recursion_role_for_redress_fate_batch_candidate(self) -> None:
         report = generator.build_generator_report(
             batch_audit={

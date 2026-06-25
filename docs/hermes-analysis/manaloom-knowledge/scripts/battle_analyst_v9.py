@@ -26910,6 +26910,8 @@ def apply_effect_immediate(
                         all_players=[player] + list(opponents or []),
                         turn=turn,
                     )
+                    if effect_data.get("grants_haste_until_eot"):
+                        set_until_eot(permanent, "haste", True)
                     if is_creature_card(recovered_card):
                         permanent["effect"] = "creature"
                         permanent["haste"] = has_haste(permanent)
@@ -26928,6 +26930,7 @@ def apply_effect_immediate(
             destination=destination,
             mana_value_max=mana_value_max,
             return_all_matching=return_all_matching,
+            grants_haste_until_eot=bool(effect_data.get("grants_haste_until_eot")),
             turn=turn,
             **replay_rule_fields(effect_data),
         )
@@ -27608,7 +27611,19 @@ def cant_attack_alone(creature):
     )
 
 
+def can_attack_this_combat(creature):
+    if not isinstance(creature, dict):
+        return False
+    if creature.get("tapped"):
+        return False
+    if creature.get("summoning_sick") and not has_haste(creature):
+        return False
+    return True
+
+
 def should_attack_with_creature(creature):
+    if not can_attack_this_combat(creature):
+        return False
     try:
         attack_power = int(creature.get("power", 0) or 0)
     except (TypeError, ValueError):

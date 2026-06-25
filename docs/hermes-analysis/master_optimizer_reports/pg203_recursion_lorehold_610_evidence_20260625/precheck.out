@@ -1,0 +1,5 @@
+       card_name       |    normalized_name    |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+-----------------------+-----------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Brilliant Restoration | brilliant restoration | 011870a867ab737e17010e1be798f66e | battle_rule_v1:3e7a0ab3e5871010c9751a9090adbaaf |                1 | 76302087-c489-458c-97a6-e7888db5420e |                  2 |                         0 |                           2
+ Wake the Past         | wake the past         | a87b4ec70e2653c38cea3b3176068457 | battle_rule_v1:d7e0d3daac42a4774a437fce19f6a2bc |                1 | 24fe83d2-afe5-42bb-9850-5f23d402eed5 |                  2 |                         0 |                           2
+(2 rows)

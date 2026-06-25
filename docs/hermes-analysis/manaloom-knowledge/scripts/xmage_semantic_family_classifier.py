@@ -382,6 +382,8 @@ GENERIC_BATCH_SAFE_SCOPES = {
     ("recursion", "graveyard_to_battlefield_variant_v1"),
     ("recursion", "return_target_permanent_from_graveyard_to_battlefield_rebound_v1"),
     ("recursion", "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1"),
+    ("recursion", "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1"),
+    ("recursion", "return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1"),
     ("sweeper_damage", "damage_all_variant_v1"),
 }
 MANA_ROCK_BATCH_SAFE_SCOPE = (
@@ -482,6 +484,25 @@ def generic_runtime_batch_safe(card: dict[str, Any]) -> bool:
                 and effect_json.get("target_card_types") == ["artifact", "enchantment"]
                 and bool(effect_json.get("miracle"))
                 and effect_json.get("miracle_cost") == "{3}{W}"
+            )
+        if scope == "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1":
+            return (
+                types == {"SORCERY"}
+                and effect_classes == {"ReturnFromYourGraveyardToBattlefieldAllEffect"}
+                and not ability_classes
+                and str(effect_json.get("target") or "") == "artifact_or_enchantment"
+                and str(effect_json.get("destination") or "") == "battlefield"
+                and bool(effect_json.get("return_all_matching"))
+                and effect_json.get("target_card_types") == ["artifact", "enchantment"]
+            )
+        if scope == "return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1":
+            return (
+                types == {"SORCERY"}
+                and effect_json.get("target_card_types") == ["artifact"]
+                and str(effect_json.get("target") or "") == "artifact"
+                and str(effect_json.get("destination") or "") == "battlefield"
+                and bool(effect_json.get("return_all_matching"))
+                and bool(effect_json.get("grants_haste_until_eot"))
             )
         if "ReturnFromGraveyardToBattlefieldTargetEffect" not in effect_classes:
             return False

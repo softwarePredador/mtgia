@@ -7733,6 +7733,45 @@ def register_tests(battle, player):
         )
         assert copied == ["A Threat", "A Utility"]
 
+    def test_clone_legion_tokens_without_haste_cannot_attack_same_turn():
+        active = player("Active")
+        defender = player("Defender")
+        defender.life = 4
+        sick_token = {
+            "name": "Lorehold, the Historian token",
+            "effect": "creature",
+            "type_line": "Legendary Creature - Elder Dragon",
+            "power": 5,
+            "toughness": 5,
+            "token": True,
+            "haste": False,
+            "summoning_sick": True,
+            "tapped": False,
+        }
+        legal_creature = {
+            "name": "Old Attacker",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 2,
+            "toughness": 2,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+        active.battlefield = [sick_token, legal_creature]
+
+        declared = battle.declare_attackers_step(
+            active,
+            [defender],
+            [active, defender],
+            turn=9,
+        )
+
+        assert declared is not None
+        attackers, _, _, _, _ = declared
+        assert attackers == [legal_creature]
+        assert sick_token["tapped"] is False
+        assert legal_creature["tapped"] is True
+
     def test_phyrexian_metamorph_enters_as_copy_of_best_creature_and_keeps_artifact_type():
         active = player("Active")
         active.library = [
@@ -11529,6 +11568,172 @@ def register_tests(battle, player):
         assert effect_data["_rule_review_status"] == "verified"
         assert effect_data["_rule_execution_status"] == "auto"
 
+    def test_pg203_brilliant_restoration_returns_all_artifact_enchantment_cards():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            effect_data = {
+                "effect": "recursion",
+                "target": "artifact_or_enchantment",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact", "enchantment"],
+                "battle_model_scope": "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1",
+                "_rule_logical_key": "battle_rule_v1:brilliant-restoration-test",
+                "_rule_oracle_hash": "brilliant-restoration-test-hash",
+            }
+            spell = {
+                "name": "Brilliant Restoration",
+                "cmc": 7,
+                "type_line": "Sorcery",
+                **effect_data,
+            }
+            active.graveyard = [
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Smothering Tithe", "cmc": 4, "type_line": "Enchantment", "effect": "ramp_engine"},
+                {"name": "Esper Sentinel", "cmc": 1, "type_line": "Creature", "effect": "creature"},
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land - Mountain", "effect": "land"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=5,
+                rng=random.Random(203),
+                effect_data_override=dict(effect_data),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in active.battlefield] == ["Sol Ring", "Smothering Tithe"]
+        assert [card.get("name") for card in active.graveyard] == ["Esper Sentinel", "Mountain", "Brilliant Restoration"]
+        assert any(
+            event == "recursion_resolved"
+            and data.get("card") == "Brilliant Restoration"
+            and data.get("recovered") == ["Sol Ring", "Smothering Tithe"]
+            and data.get("recovered_count") == 2
+            and data.get("target_type") == "artifact_or_enchantment"
+            and data.get("destination") == "battlefield"
+            and data.get("return_all_matching") is True
+            and data.get("grants_haste_until_eot") is False
+            and data.get("rule_logical_key") == "battle_rule_v1:brilliant-restoration-test"
+            and data.get("rule_oracle_hash") == "brilliant-restoration-test-hash"
+            for event, data in events
+        )
+
+    def test_pg203_wake_the_past_returns_artifacts_and_grants_haste_until_eot():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            effect_data = {
+                "effect": "recursion",
+                "target": "artifact",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact"],
+                "grants_haste_until_eot": True,
+                "battle_model_scope": "return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1",
+                "_rule_logical_key": "battle_rule_v1:wake-the-past-test",
+                "_rule_oracle_hash": "wake-the-past-test-hash",
+            }
+            spell = {
+                "name": "Wake the Past",
+                "cmc": 7,
+                "type_line": "Sorcery",
+                **effect_data,
+            }
+            active.graveyard = [
+                {
+                    "name": "Solemn Simulacrum",
+                    "cmc": 4,
+                    "type_line": "Artifact Creature - Golem",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                {"name": "Smothering Tithe", "cmc": 4, "type_line": "Enchantment", "effect": "ramp_engine"},
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=5,
+                rng=random.Random(204),
+                effect_data_override=dict(effect_data),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        battlefield_by_name = {card.get("name"): card for card in active.battlefield}
+        assert set(battlefield_by_name) == {"Solemn Simulacrum", "Sol Ring"}
+        assert [card.get("name") for card in active.graveyard] == ["Smothering Tithe", "Wake the Past"]
+        assert battlefield_by_name["Solemn Simulacrum"].get("haste") is True
+        assert battlefield_by_name["Solemn Simulacrum"].get("summoning_sick") is False
+        assert battlefield_by_name["Sol Ring"].get("haste") is True
+
+        battle.clear_until_eot(active)
+        assert battlefield_by_name["Solemn Simulacrum"].get("haste") is False
+        assert not battlefield_by_name["Sol Ring"].get("haste")
+
+        assert any(
+            event == "recursion_resolved"
+            and data.get("card") == "Wake the Past"
+            and data.get("recovered") == ["Solemn Simulacrum", "Sol Ring"]
+            and data.get("recovered_count") == 2
+            and data.get("target_type") == "artifact"
+            and data.get("destination") == "battlefield"
+            and data.get("return_all_matching") is True
+            and data.get("grants_haste_until_eot") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:wake-the-past-test"
+            and data.get("rule_oracle_hash") == "wake-the-past-test-hash"
+            for event, data in events
+        )
+
+    def test_pg203_recursion_rules_resolve_from_sqlite_cache():
+        brilliant = battle.get_card_effect({"name": "Brilliant Restoration", "type_line": "Sorcery", "cmc": 7})
+        assert brilliant["effect"] == "recursion"
+        assert (
+            brilliant["battle_model_scope"]
+            == "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1"
+        )
+        assert brilliant["target"] == "artifact_or_enchantment"
+        assert brilliant["destination"] == "battlefield"
+        assert brilliant["return_all_matching"] is True
+        assert brilliant["target_card_types"] == ["artifact", "enchantment"]
+        assert brilliant["_rule_logical_key"] == "battle_rule_v1:3e7a0ab3e5871010c9751a9090adbaaf"
+        assert brilliant["_rule_oracle_hash"] == "011870a867ab737e17010e1be798f66e"
+        assert brilliant["_rule_review_status"] == "verified"
+        assert brilliant["_rule_execution_status"] == "auto"
+
+        wake = battle.get_card_effect({"name": "Wake the Past", "type_line": "Sorcery", "cmc": 7})
+        assert wake["effect"] == "recursion"
+        assert (
+            wake["battle_model_scope"]
+            == "return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1"
+        )
+        assert wake["target"] == "artifact"
+        assert wake["destination"] == "battlefield"
+        assert wake["return_all_matching"] is True
+        assert wake["target_card_types"] == ["artifact"]
+        assert wake["grants_haste_until_eot"] is True
+        assert wake["_rule_logical_key"] == "battle_rule_v1:d7e0d3daac42a4774a437fce19f6a2bc"
+        assert wake["_rule_oracle_hash"] == "a87b4ec70e2653c38cea3b3176068457"
+        assert wake["_rule_review_status"] == "verified"
+        assert wake["_rule_execution_status"] == "auto"
+
     def test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -14778,6 +14983,7 @@ def register_tests(battle, player):
         test_molten_duplication_copies_own_artifact_as_artifact_and_sacrifices_token,
         test_flash_photography_copies_target_permanent_without_temporary_cleanup,
         test_clone_legion_copies_each_creature_controlled_by_target_player,
+        test_clone_legion_tokens_without_haste_cannot_attack_same_turn,
         test_phyrexian_metamorph_enters_as_copy_of_best_creature_and_keeps_artifact_type,
         test_copy_enchantment_without_target_enters_as_self,
         test_mockingbird_copies_only_creature_within_source_mana_value_and_keeps_bird_flying,
@@ -14891,6 +15097,9 @@ def register_tests(battle, player):
         test_profound_journey_rebounds_and_returns_permanents_to_battlefield,
         test_pg202_redress_fate_returns_all_artifact_enchantment_cards,
         test_pg202_redress_fate_rule_resolves_from_sqlite_cache,
+        test_pg203_brilliant_restoration_returns_all_artifact_enchantment_cards,
+        test_pg203_wake_the_past_returns_artifacts_and_grants_haste_until_eot,
+        test_pg203_recursion_rules_resolve_from_sqlite_cache,
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
         test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep,
         test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures,

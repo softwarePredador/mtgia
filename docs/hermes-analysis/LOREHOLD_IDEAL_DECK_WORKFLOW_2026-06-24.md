@@ -682,14 +682,50 @@ Lorehold/opponent matrix:
 5. PG -> Hermes sync made deck `610` report `Redress Fate` as `pass`; the
    matrix moved it to `battle_ready` / `priority_benchmark_candidate` with
    score `50.0`.
-6. The PG202 matrix shows decks `608` through `616` have `0` remaining
-   `needs_rule_before_strategy` rows; remaining rule work is now outside that
-   Lorehold block.
+6. Later structured matrix analysis corrected the earlier deck-block reading:
+   PG202 still had `106` Lorehold-touching `needs_rule_before_strategy` rows
+   across decks `608` through `616` when using each row's structured
+   `deck_ids` field.
 7. Full gate
    `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_042201/summary.json`
    reports `battle_replay_final_status=trusted_for_strategy_learning`,
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
+`Brilliant Restoration` and `Wake the Past` are the eighteenth completed proof
+group and finish the next deck-610 all-matching recursion pair from the current
+Lorehold/opponent matrix:
+
+1. XMage local sources matched `BrilliantRestoration` through
+   `ReturnFromYourGraveyardToBattlefieldAllEffect` plus
+   `FilterArtifactOrEnchantmentCard`, and `WakeThePast` through its custom
+   all-artifact graveyard return effect plus haste-until-end-of-turn grant.
+2. The mapper/classifier promoted only the exact
+   `return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1`
+   and
+   `return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1`
+   scopes.
+3. Battle runtime now applies `grants_haste_until_eot` for recursion returns,
+   and combat legality now blocks summoning-sick attackers without haste before
+   strategy scoring or attack-limit filtering.
+4. PG203 precheck/apply/postcheck promoted two verified auto rules and
+   deprecated four stale generated shadows.
+5. PG -> Hermes sync made deck `610` report both cards as `pass`; the matrix
+   moved both to `battle_ready` / `priority_benchmark_candidate` with score
+   `48.5`.
+6. The PG203 matrix now reports `213` total `needs_rule_before_strategy` rows
+   and `104` Lorehold-touching rows across decks `608` through `616`:
+   `82` mapper manual, `16` split-scope, and `6` runtime-needed. This is the
+   current Lorehold-first queue before broad benchmark/deck swaps.
+7. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_045925/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+   `decision_audit_statuses={"turn_invariants_clean":16}`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `action_findings=0`, `event_contract_static_status=event_contract_static_ready`,
+   `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+   `effect_coverage_residual_status=effect_coverage_residual_accepted`.
 
 ## Current Benchmark Candidate Lane
 

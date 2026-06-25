@@ -551,6 +551,63 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["miracle"])
         self.assertEqual(primary["miracle_cost"], "{3}{W}")
 
+    def test_brilliant_restoration_maps_to_all_artifact_enchantment_recursion_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BrilliantRestoration",
+                "effect_classes": ["ReturnFromYourGraveyardToBattlefieldAllEffect"],
+                "ability_classes": [],
+                "filter_classes": ["FilterArtifactOrEnchantmentCard", "FilterCard"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{3}{W}{W}{W}{W}"); '
+                    "new ReturnFromYourGraveyardToBattlefieldAllEffect(filter);"
+                ),
+            },
+            "Return all artifact and enchantment cards from your graveyard to the battlefield.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "recursion")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1",
+        )
+        self.assertEqual(primary["target"], "artifact_or_enchantment")
+        self.assertEqual(primary["destination"], "battlefield")
+        self.assertTrue(primary["return_all_matching"])
+        self.assertEqual(primary["target_card_types"], ["artifact", "enchantment"])
+        self.assertNotIn("miracle", primary)
+
+    def test_wake_the_past_maps_to_all_artifact_recursion_haste_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "WakeThePast",
+                "effect_classes": ["WakeThePastEffect", "GainAbilityTargetEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{5}{R}{W}"); '
+                    "Cards cards = new CardsImpl(player.getGraveyard().getCards(StaticFilters.FILTER_CARD_ARTIFACT, game)); "
+                    "player.moveCards(cards, Zone.BATTLEFIELD, source, game); "
+                    "game.addEffect(new GainAbilityTargetEffect(HasteAbility.getInstance(), Duration.EndOfTurn));"
+                ),
+            },
+            "Return all artifact cards from your graveyard to the battlefield. They gain haste until end of turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "recursion")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1",
+        )
+        self.assertEqual(primary["target"], "artifact")
+        self.assertEqual(primary["destination"], "battlefield")
+        self.assertTrue(primary["return_all_matching"])
+        self.assertEqual(primary["target_card_types"], ["artifact"])
+        self.assertTrue(primary["grants_haste_until_eot"])
+
     def test_moonsnare_prototype_maps_to_artifact_or_creature_support_colorless_scope(self) -> None:
         result = hints.build_effect_hints(
             {

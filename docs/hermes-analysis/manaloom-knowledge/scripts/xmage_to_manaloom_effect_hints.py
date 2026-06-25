@@ -1499,6 +1499,7 @@ def _build_exact_runtime_variant_fields(
     effect_classes: set[str],
     ability_classes: set[str],
     target_classes: set[str],
+    filter_classes: set[str],
     cost_classes: set[str],
     xmage_class_name: str,
     rules_text: str,
@@ -2511,6 +2512,55 @@ def _build_exact_runtime_variant_fields(
                 "ReturnFromYourGraveyardToBattlefieldAllEffect",
                 "FilterArtifactOrEnchantmentCard",
                 "MiracleAbility",
+            ],
+        }
+
+    if (
+        xmage_class_name == "BrilliantRestoration"
+        or (
+            card_types == {"SORCERY"}
+            and effect_classes == {"ReturnFromYourGraveyardToBattlefieldAllEffect"}
+            and not ability_classes
+            and "FilterArtifactOrEnchantmentCard" in filter_classes
+        )
+    ):
+        return {
+            "effect": "recursion",
+            "scope": "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1",
+            "fields": {
+                "target": "artifact_or_enchantment",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact", "enchantment"],
+            },
+            "reason": "XMage structure matches Brilliant Restoration returning all artifact and enchantment cards from your graveyard to the battlefield.",
+            "signals": [
+                "ReturnFromYourGraveyardToBattlefieldAllEffect",
+                "FilterArtifactOrEnchantmentCard",
+            ],
+        }
+
+    if xmage_class_name == "WakeThePast":
+        return {
+            "effect": "recursion",
+            "scope": "return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1",
+            "fields": {
+                "target": "artifact",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact"],
+                "grants_haste_until_eot": True,
+            },
+            "reason": "XMage structure matches Wake the Past returning all artifact cards from your graveyard to the battlefield and granting them haste until end of turn.",
+            "signals": [
+                "WakeThePastEffect",
+                "StaticFilters.FILTER_CARD_ARTIFACT",
+                "GainAbilityTargetEffect",
+                "HasteAbility",
             ],
         }
 
@@ -5311,6 +5361,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         effect_classes=effect_classes,
         ability_classes=ability_classes,
         target_classes=target_classes,
+        filter_classes=filter_classes,
         cost_classes=cost_classes,
         xmage_class_name=xmage_class_name,
         rules_text=rules_text,

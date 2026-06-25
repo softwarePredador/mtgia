@@ -11997,7 +11997,8 @@ Register decision:
   `Deathbellow War Cry`, `Millikin`, `Starfield Shepherd`, and
   `Bedlam Reveler`.
 - PG202 consumed the `Redress Fate` recursion scope below.
-- Next package number after PG202 is PG203.
+- PG203 later consumed the remaining deck-610 recursion pair below.
+- Next package number after PG203 is PG204.
 
 ## PG202 - Redress Fate
 
@@ -12080,8 +12081,10 @@ Evidence:
   `needs_rule_before_strategy=215`, and `Redress Fate` moved to
   `priority_benchmark_candidate` with score `50.0`.
 - Lorehold deck block:
-  decks `608` through `616` have `0` remaining
-  `needs_rule_before_strategy` rows in the PG202 matrix.
+  later structured matrix analysis corrected the earlier deck-block reading:
+  PG202 still had `106` Lorehold-touching `needs_rule_before_strategy` rows
+  across decks `608` through `616` when using each row's structured `deck_ids`
+  field.
 - Affected deck audit:
   `docs/hermes-analysis/master_optimizer_reports/deck610_battle_rule_coherence_pg202_redress_fate_postsync_v1.json`;
   `Redress Fate` reports `pass/coherent_for_current_gate`.
@@ -12111,4 +12114,129 @@ Register decision:
 - Continue with `priority_benchmark_candidate` testing for the now battle-ready
   Lorehold candidates, then handle non-Lorehold residual
   `needs_rule_before_strategy` lanes by split-scope/runtime/manual families.
-- Next package number is PG203.
+- PG203 below continues the Lorehold-touching recursion closure.
+
+## PG203 - Brilliant Restoration and Wake the Past
+
+Status: applied to PostgreSQL, synced into Hermes SQLite, validated in deck
+610, and accepted by the battle strategy gate.
+
+Scope:
+
+- Cards: `Brilliant Restoration`, `Wake the Past`.
+- Deck touched by current Lorehold/opponent matrix: `610`.
+- XMage sources:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BrilliantRestoration.java`
+  and
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WakeThePast.java`.
+- Exact XMage mappings:
+  `Brilliant Restoration` uses
+  `ReturnFromYourGraveyardToBattlefieldAllEffect(FilterArtifactOrEnchantmentCard)`
+  for all artifact and enchantment cards from controller graveyard to
+  battlefield. `Wake the Past` uses a custom `WakeThePastEffect` to return all
+  artifact cards from controller graveyard to battlefield and grants those
+  artifacts haste until end of turn.
+- ManaLoom battle model scopes:
+  `return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1` and
+  `return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1`.
+- Logical rule keys:
+  `battle_rule_v1:3e7a0ab3e5871010c9751a9090adbaaf` and
+  `battle_rule_v1:d7e0d3daac42a4774a437fce19f6a2bc`.
+- Oracle hashes:
+  `011870a867ab737e17010e1be798f66e` and
+  `a87b4ec70e2653c38cea3b3176068457`.
+
+Implementation:
+
+- XMage hint maps both exact recursion classes and fixed the exact-runtime
+  variant builder so non-Redress recursion cards do not short-circuit with an
+  undefined `filter_classes` reference.
+- Semantic classifier marks only these two exact recursion scopes as batch-safe.
+- Battle runtime supports `grants_haste_until_eot` on all-matching recursion
+  returns and records `grants_haste_until_eot` in the `recursion_resolved`
+  event.
+- Combat legality now rejects summoning-sick attackers without haste before
+  strategy scoring or attack-limit filtering. This fixed the gate blocker where
+  a same-turn `Clone Legion` copy token could attack illegally.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg203_recursion_lorehold_610_package_20260625_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg203_recursion_lorehold_610_package_20260625_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg203_recursion_lorehold_610_package_20260625_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg203_recursion_lorehold_610_package_20260625_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg203_recursion_lorehold_610_package_20260625_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  both cards had `target_card_rows=1`, `expected_rule_rows_before=0`, and
+  `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `4`, `deprecated_shadow_rows=4`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  each card has `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=4`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg203_recursion_lorehold_610_20260625.json`;
+  `selected_card_count=2`, `pg_rows_loaded=6`,
+  `sqlite_inserted_or_updated=6`, `canonical_snapshot_rows_exported=3242`,
+  `generated_rows=2`.
+- Runtime cache:
+  `battle_analyst_v9.get_card_effect("Brilliant Restoration")` resolves as
+  all artifact/enchantment graveyard recursion; `get_card_effect("Wake the Past")`
+  resolves as all artifact graveyard recursion with
+  `grants_haste_until_eot=True`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg203_recursion_postsync_v1_manifest.json`;
+  expanded scope moved to `high=393`, `medium=63`, `pass=506`, with no
+  remaining `batch_pg_candidate_after_precheck` proposals.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg203_recursion_postsync_v1.json`;
+  scoped rows `567`, `battle_ready=354`,
+  `needs_rule_before_strategy=213`, and both cards moved to
+  `priority_benchmark_candidate` with score `48.5`.
+- Lorehold deck block:
+  decks `608` through `616` now have `104` remaining
+  `needs_rule_before_strategy` rows by structured `deck_ids`
+  (`82` mapper manual, `16` split-scope, `6` runtime-needed).
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg203_recursion_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=342`,
+  `split_scope_backlog=72`, `runtime_family_backlog=20`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck610_battle_rule_coherence_pg203_recursion_postsync_v1.json`;
+  both cards report `pass`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg203_recursion_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  mapper tests ran `184` tests OK; classifier/generator tests ran `171` tests
+  OK; `battle_card_specific_tests.py` and `test_battle_analyst_v10_3.py`
+  passed with the new same-turn copy-token attack legality regression.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_045925/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `decision_audit_statuses={"turn_invariants_clean":16}`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `decision_audit_turn_findings=0`, `action_findings=0`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`,
+  `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+  `seeds_completed=16`, `seeds_requested=16`.
+
+Register decision:
+
+- PG203 is applied, postchecked, synced, locally tested, deck-coherence
+  validated for deck `610`, and strategy-audited.
+- Do not reuse PG203.
+- Continue Lorehold-first rule closure on the remaining `104` Lorehold-touching
+  `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
+- Next package number is PG204.
