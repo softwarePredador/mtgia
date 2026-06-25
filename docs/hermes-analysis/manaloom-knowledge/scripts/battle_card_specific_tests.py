@@ -11452,6 +11452,84 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            goldspan = {
+                "name": "Goldspan Dragon",
+                "cmc": 5,
+                "type_line": "Creature — Dragon",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "flying": True,
+                "haste": True,
+                "attack_or_becomes_target_create_treasure": True,
+                "attack_trigger_create_treasure": True,
+                "becomes_spell_target_create_treasure": True,
+                "treasure_count": 1,
+                "treasure_mana_value": 2,
+                "controlled_treasures_add_two_mana": True,
+                "battle_model_scope": "goldspan_dragon_attack_or_target_treasure_double_mana_v1",
+                "_rule_logical_key": "battle_rule_v1:goldspan-test",
+                "_rule_oracle_hash": "goldspan-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            permanent = battle.prepare_entering_permanent(
+                goldspan,
+                controller=active,
+                all_players=[active, opponent],
+                turn=5,
+            )
+            active.battlefield = [permanent]
+
+            created_by_attack = battle.resolve_attack_treasure_triggers(
+                active,
+                [permanent],
+                turn=5,
+            )
+            assert created_by_attack == 1
+            assert active.treasures == 1
+            assert active.treasure_mana_value() == 2
+            assert active.available_mana() == 2
+            assert active.can_pay("{2}") is True
+            assert active.spend_mana("{2}") is True
+            assert active.treasures == 0
+
+            created_by_target = battle.resolve_spell_target_treasure_trigger(
+                active,
+                permanent,
+                {"name": "Test Removal", "type_line": "Instant"},
+                turn=5,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert created_by_target == 1
+        assert active.treasures == 1
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Goldspan Dragon"
+            and data.get("trigger") == "attack"
+            and data.get("effect") == "create_treasure"
+            and data.get("treasure_mana_value") == 2
+            and data.get("rule_logical_key") == "battle_rule_v1:goldspan-test"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Goldspan Dragon"
+            and data.get("trigger") == "becomes_target_of_spell"
+            and data.get("source_spell") == "Test Removal"
+            and data.get("treasures_created") == 1
+            and data.get("rule_oracle_hash") == "goldspan-test-hash"
+            for event, data in events
+        )
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -14056,6 +14134,7 @@ def register_tests(battle, player):
         test_profound_journey_rebounds_and_returns_permanents_to_battlefield,
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
         test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep,
+        test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,

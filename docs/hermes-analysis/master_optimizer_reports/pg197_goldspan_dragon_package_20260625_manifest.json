@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg197_goldspan_dragon_20260625_013356",
+  "deploy_id": "pg197",
+  "family_counts": {
+    "creature": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_rollback.sql"
+  },
+  "generated_at": "2026-06-25T01:33:56+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Goldspan Dragon"
+  ],
+  "selected_count": 1,
+  "slug": "goldspan_dragon",
+  "status": "prepared_read_only_pending_apply_approval"
+}

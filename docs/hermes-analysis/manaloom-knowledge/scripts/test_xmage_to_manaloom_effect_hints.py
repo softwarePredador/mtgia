@@ -4507,6 +4507,51 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["graveyard_upkeep_trigger_zone"], "graveyard")
         self.assertEqual(primary["graveyard_upkeep_trigger_controller"], "source_controller")
 
+    def test_goldspan_dragon_maps_to_exact_attack_or_target_treasure_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "GoldspanDragon",
+                "effect_classes": ["CreateTokenEffect", "GainAbilityControlledEffect"],
+                "ability_classes": [
+                    "FlyingAbility",
+                    "HasteAbility",
+                    "OrTriggeredAbility",
+                    "AttacksTriggeredAbility",
+                    "BecomesTargetSourceTriggeredAbility",
+                    "SimpleStaticAbility",
+                    "SimpleManaAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new OrTriggeredAbility(Zone.BATTLEFIELD, "
+                    "new CreateTokenEffect(new TreasureToken()), false, "
+                    "new AttacksTriggeredAbility(null), "
+                    "new BecomesTargetSourceTriggeredAbility(null, StaticFilters.FILTER_SPELL_A)); "
+                    "new GainAbilityControlledEffect(ability, Duration.WhileOnBattlefield, filter); "
+                    "new AddManaOfAnyColorEffect(2)"
+                ),
+            },
+            "Whenever Goldspan Dragon attacks or becomes the target of a spell, create a Treasure token. "
+            "Treasures you control have \"{T}, Sacrifice this artifact: Add two mana of any one color.\"",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "goldspan_dragon_attack_or_target_treasure_double_mana_v1",
+        )
+        self.assertEqual(primary["power"], 4)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertTrue(primary["flying"])
+        self.assertTrue(primary["haste"])
+        self.assertTrue(primary["attack_or_becomes_target_create_treasure"])
+        self.assertTrue(primary["attack_trigger_create_treasure"])
+        self.assertTrue(primary["becomes_spell_target_create_treasure"])
+        self.assertEqual(primary["treasure_count"], 1)
+        self.assertEqual(primary["treasure_mana_value"], 2)
+        self.assertTrue(primary["controlled_treasures_add_two_mana"])
+
 
 if __name__ == "__main__":
     unittest.main()

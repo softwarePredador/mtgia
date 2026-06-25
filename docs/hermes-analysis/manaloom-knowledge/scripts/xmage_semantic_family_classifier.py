@@ -580,6 +580,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("graveyard_upkeep_trigger_controller") == "source_controller"
         )
 
+    if effect == "creature" and scope == "goldspan_dragon_attack_or_target_treasure_double_mana_v1":
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenEffect" in effect_classes
+            and "GainAbilityControlledEffect" in effect_classes
+            and {"AttacksTriggeredAbility", "BecomesTargetSourceTriggeredAbility", "OrTriggeredAbility"}.issubset(ability_classes)
+            and {"FlyingAbility", "HasteAbility", "SimpleStaticAbility", "SimpleManaAbility"}.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("haste"))
+            and bool(effect_json.get("attack_or_becomes_target_create_treasure"))
+            and bool(effect_json.get("attack_trigger_create_treasure"))
+            and bool(effect_json.get("becomes_spell_target_create_treasure"))
+            and int(effect_json.get("treasure_count") or 0) == 1
+            and int(effect_json.get("treasure_mana_value") or 0) == 2
+            and bool(effect_json.get("controlled_treasures_add_two_mana"))
+        )
+
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
         return (
             types == {"CREATURE"}

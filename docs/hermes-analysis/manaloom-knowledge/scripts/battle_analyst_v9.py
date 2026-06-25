@@ -5026,6 +5026,20 @@ class ManaPool:
     def empty(self):
         self.generic = self.white = self.blue = self.black = self.red = self.green = self.colorless = self.wildcard = 0
 
+
+def treasure_mana_value_for_player(player):
+    value = 1
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("controlled_treasures_add_two_mana"):
+            value = max(value, int(permanent.get("treasure_mana_value") or 2))
+            continue
+        if int(permanent.get("treasure_mana_value") or 0) > value:
+            value = max(value, int(permanent.get("treasure_mana_value") or 1))
+    return max(1, value)
+
+
 class Player:
     def shuffle(self, rng): rng.shuffle(self.library)
 
@@ -5177,8 +5191,11 @@ class Player:
             turn=turn,
         )
 
+    def treasure_mana_value(self):
+        return treasure_mana_value_for_player(self)
+
     def available_mana(self):
-        return self.mana_pool.total() + self.treasures
+        return self.mana_pool.total() + (self.treasures * self.treasure_mana_value())
 
     def add_restricted_mana(self, amount, restriction, color="wildcard"):
         restriction = str(restriction or "").strip().lower()
@@ -5199,7 +5216,8 @@ class Player:
             restriction: defaultdict(int, dict(colors))
             for restriction, colors in self.restricted_mana.items()
         }
-        treasures = self.treasures
+        treasure_unit_value = max(1, int(self.treasure_mana_value() or 1))
+        treasure_mana = self.treasures * treasure_unit_value
         life_payment = 0
         spend_tags = set(parsed.get("spend_tags", []))
         restriction_aliases = {
@@ -5282,7 +5300,7 @@ class Player:
             return spent
 
         def spend_generic(amount):
-            nonlocal treasures
+            nonlocal treasure_mana
             generic_missing = int(amount or 0)
             for color in (
                 "generic",
@@ -5301,14 +5319,14 @@ class Player:
                     return True
             restricted_available = restricted_generic_available()
             if restricted_available:
-                if restricted_available + treasures < generic_missing:
+                if restricted_available + treasure_mana < generic_missing:
                     return False
                 generic_missing -= spend_restricted_generic_up_to(generic_missing)
                 if generic_missing == 0:
                     return True
-            if generic_missing > treasures:
+            if generic_missing > treasure_mana:
                 return False
-            treasures -= generic_missing
+            treasure_mana -= generic_missing
             return True
 
         for color, required in parsed["colored"].items():
@@ -5320,12 +5338,12 @@ class Player:
             missing -= wildcard_paid
             restricted_available = restricted_color_available(color)
             if missing and restricted_available:
-                if restricted_available + treasures < missing:
+                if restricted_available + treasure_mana < missing:
                     return None
                 missing -= spend_restricted_color_up_to(color, missing)
-            if missing > treasures:
+            if missing > treasure_mana:
                 return None
-            treasures -= missing
+            treasure_mana -= missing
 
         for color in parsed.get("phyrexian", []):
             if pool[color] > 0:
@@ -5334,8 +5352,8 @@ class Player:
                 pool["wildcard"] -= 1
             elif spend_restricted_color_up_to(color):
                 pass
-            elif treasures > 0:
-                treasures -= 1
+            elif treasure_mana > 0:
+                treasure_mana -= 1
             elif self.life - life_payment >= 2:
                 life_payment += 2
             else:
@@ -5349,8 +5367,8 @@ class Player:
                 pool["wildcard"] -= 1
             elif any(spend_restricted_color_up_to(color) for color in options):
                 pass
-            elif treasures > 0:
-                treasures -= 1
+            elif treasure_mana > 0:
+                treasure_mana -= 1
             elif self.life - life_payment >= 2:
                 life_payment += 2
             else:
@@ -5364,8 +5382,8 @@ class Player:
                 pool["wildcard"] -= 1
             elif any(spend_restricted_color_up_to(color) for color in options):
                 pass
-            elif treasures > 0:
-                treasures -= 1
+            elif treasure_mana > 0:
+                treasure_mana -= 1
             else:
                 return None
 
@@ -5378,14 +5396,14 @@ class Player:
                 pool["wildcard"] -= 1
             elif color and spend_restricted_color_up_to(color):
                 pass
-            elif treasures > 0:
-                treasures -= 1
+            elif treasure_mana > 0:
+                treasure_mana -= 1
             elif not spend_generic(generic_amount):
                 return None
 
         if not spend_generic(parsed["generic"]):
             return None
-        return pool, treasures, life_payment, restricted_pool
+        return pool, treasure_mana // treasure_unit_value, life_payment, restricted_pool
 
     def can_pay(self, cost):
         return self._payment_plan(cost) is not None
@@ -7037,6 +7055,13 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
         if not decision["target_legal"] or not target_still_present:
             illegal.append(decision["target_name"])
             continue
+        resolve_spell_target_treasure_trigger(
+            target_controller,
+            target,
+            card,
+            turn,
+            phase="resolution",
+        )
         if check_ward(target, card, player, rng):
             ward_countered.append(decision["target_name"])
             continue
@@ -7112,6 +7137,14 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
             **decision,
         )
         return True
+
+    resolve_spell_target_treasure_trigger(
+        target_controller,
+        target,
+        card,
+        turn,
+        phase="resolution",
+    )
 
     if check_ward(target, card, player, rng):
         emit_replay_event(
@@ -15045,6 +15078,67 @@ def resolve_attack_artifact_tutor_trigger(player, source, opponents, all_players
         "artifact_sacrificed": sacrificed_name,
         "found": target.get("name", "?"),
     }
+
+
+def resolve_goldspan_treasure_trigger(controller, source, turn, *, trigger, phase="combat", spell=None):
+    if not (
+        isinstance(source, dict)
+        and source.get("attack_or_becomes_target_create_treasure")
+        and int(source.get("treasure_count") or 0) > 0
+    ):
+        return 0
+    if trigger == "attack" and not source.get("attack_trigger_create_treasure"):
+        return 0
+    if trigger == "becomes_target_of_spell" and not source.get("becomes_spell_target_create_treasure"):
+        return 0
+    treasure_count = max(1, int(source.get("treasure_count") or 1))
+    treasures_before = int(controller.treasures or 0)
+    controller.treasures += treasure_count
+    emit_replay_event(
+        "trigger_resolved",
+        player=controller.name,
+        card=source.get("name", "?"),
+        trigger=trigger,
+        effect="create_treasure",
+        source_spell=spell.get("name", "?") if isinstance(spell, dict) else None,
+        treasures_created=treasure_count,
+        treasures_before=treasures_before,
+        treasures_after=controller.treasures,
+        treasure_mana_value=treasure_mana_value_for_player(controller),
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(source),
+    )
+    return treasure_count
+
+
+def resolve_attack_treasure_triggers(player, attackers, turn, *, phase="combat"):
+    created = 0
+    for source in list(attackers or []):
+        if source not in getattr(player, "battlefield", []):
+            continue
+        created += resolve_goldspan_treasure_trigger(
+            player,
+            source,
+            turn,
+            trigger="attack",
+            phase=phase,
+        )
+    return created
+
+
+def resolve_spell_target_treasure_trigger(target_controller, target, source_spell, turn, *, phase="resolution"):
+    live_target = battlefield_object_for_target(target_controller, target)
+    if live_target is None:
+        return 0
+    return resolve_goldspan_treasure_trigger(
+        target_controller,
+        live_target,
+        turn,
+        trigger="becomes_target_of_spell",
+        phase=phase,
+        spell=source_spell,
+    )
 
 
 def activate_treasure_tutor_creatures(player, opponents, all_players, turn, *, phase="precombat_main"):
@@ -28183,6 +28277,12 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     if not declared:
         return
     attackers, alive_defenders, target, target_reason, attack_groups = declared
+    resolve_attack_treasure_triggers(
+        attacker,
+        attackers,
+        turn,
+        phase="combat",
+    )
     for attacking_creature in list(attackers):
         resolve_attack_artifact_tutor_trigger(
             attacker,

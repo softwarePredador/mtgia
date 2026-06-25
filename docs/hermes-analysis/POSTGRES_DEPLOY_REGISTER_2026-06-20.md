@@ -11448,3 +11448,110 @@ Register decision:
   `Deflecting Palm`, `Primal Amulet // Primal Wellspring`, and
   `Goldspan Dragon`.
 - Next package number is PG197.
+
+## PG197 - Goldspan Dragon
+
+Status: applied to PostgreSQL, synced into Hermes SQLite, validated in deck
+audits, and accepted by the battle strategy gate.
+
+Scope:
+
+- Card: `Goldspan Dragon`.
+- Decks touched by current Lorehold matrix: `608`, `611`, `614`, `615`.
+- XMage source:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GoldspanDragon.java`.
+- Exact XMage mapping:
+  `OrTriggeredAbility` with `AttacksTriggeredAbility` and
+  `BecomesTargetSourceTriggeredAbility`, creating `TreasureToken`, plus a
+  static controlled-Treasure mana ability using `AddManaOfAnyColorEffect(2)`.
+- ManaLoom battle model scope:
+  `goldspan_dragon_attack_or_target_treasure_double_mana_v1`.
+- Logical rule key:
+  `battle_rule_v1:dfaa0b9820c90a7835fb1fcb506ae9f3`.
+- Oracle hash:
+  `09b0aa8dc38ce303b42a28e2aece420e`.
+
+Implementation:
+
+- XMage hint maps `GoldspanDragon` from the exact trigger/effect classes and
+  raw `AddManaOfAnyColorEffect(2)` source signal.
+- Semantic classifier marks only the exact Goldspan scope as batch-safe.
+- Battle runtime now processes attack and spell-target Treasure triggers and
+  accounts for Goldspan's controlled-Treasure double-mana static effect in
+  `available_mana`, `can_pay`, and `spend_mana`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg197_goldspan_dragon_package_20260625_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, canonical card id
+  `2581a523-f87a-4237-8029-20088a10ab98`,
+  `existing_rule_rows=2`, `expected_rule_rows_before=0`,
+  `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg197_goldspan_dragon_20260625.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3240`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg197_goldspan_postsync_v1_manifest.json`;
+  expanded scope moved to `high=400`, `medium=63`, `pass=499`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg197_goldspan_postsync_v1.json`;
+  scoped rows `567`, `battle_ready=347`,
+  `needs_rule_before_strategy=220`, `runtime_needed=17`,
+  `mapper_manual=144`, `split_scope=55`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg197_goldspan_postsync_v1.json`;
+  `18/18` checks passed.
+- Affected deck audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_battle_rule_coherence_pg197_goldspan_postsync_v1.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck611_battle_rule_coherence_pg197_goldspan_postsync_v1.json`,
+  `docs/hermes-analysis/master_optimizer_reports/deck614_battle_rule_coherence_pg197_goldspan_postsync_v1.json`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck615_battle_rule_coherence_pg197_goldspan_postsync_v1.json`;
+  decks `608`, `611`, `614`, and `615` report `Goldspan Dragon` as
+  `pass/coherent_for_current_gate`.
+- Tests:
+  mapper tests ran `177` tests OK; classifier tests ran `163` tests OK;
+  `battle_card_specific_tests.py`, `test_battle_analyst_v10_3.py`,
+  `test_battle_event_contract_static_audit.py`, and
+  `test_battle_forensic_audit_supported_effects.py` passed.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_013633/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`,
+  `test_results_status_counts={"pass":18}`.
+
+Register decision:
+
+- PG197 is applied, postchecked, synced, locally tested, deck-coherence
+  validated for decks `608`, `611`, `614`, and `615`, and strategy-audited.
+- Do not reuse PG197.
+- Continue next with the remaining Lorehold-touching
+  `needs_rule_before_strategy` cards. Current top items after PG197 are
+  `Surly Badgersaur`, `Taii Wakeen, Perfect Shot`, `Trouble in Pairs`,
+  `Deflecting Palm`, and `Primal Amulet // Primal Wellspring`.
+- Next package number is PG198.

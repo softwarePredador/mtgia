@@ -540,6 +540,32 @@ graveyard-upkeep self-return scope promoted from the current Lorehold matrix:
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
 
+`Goldspan Dragon` is the twelfth completed proof and the first exact
+attack-or-spell-target Treasure trigger plus Treasure double-mana scope promoted
+from the current Lorehold matrix:
+
+1. XMage local source matched `GoldspanDragon` directly through
+   `OrTriggeredAbility`, `AttacksTriggeredAbility`,
+   `BecomesTargetSourceTriggeredAbility`, `CreateTokenEffect(new
+   TreasureToken())`, and `GainAbilityControlledEffect` granting
+   `AddManaOfAnyColorEffect(2)` to controlled Treasures.
+2. The mapper/classifier promoted only the exact
+   `goldspan_dragon_attack_or_target_treasure_double_mana_v1` scope.
+3. Battle runtime now creates one Treasure when Goldspan attacks, creates one
+   Treasure when it becomes the target of a spell, treats controlled Treasures
+   as two-mana sources while Goldspan is on the battlefield, and emits
+   `trigger_resolved` with rule provenance.
+4. PG197 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made decks `608`, `611`, `614`, and `615` report
+   `Goldspan Dragon` as `pass`; the matrix moved it to `battle_ready` /
+   `priority_benchmark_candidate`.
+6. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_013633/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+   `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

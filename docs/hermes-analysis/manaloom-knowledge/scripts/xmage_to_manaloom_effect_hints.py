@@ -1547,6 +1547,43 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and xmage_class_name == "GoldspanDragon"
+        and "CreateTokenEffect" in effect_classes
+        and "GainAbilityControlledEffect" in effect_classes
+        and {"AttacksTriggeredAbility", "BecomesTargetSourceTriggeredAbility", "OrTriggeredAbility"}.issubset(ability_classes)
+        and {"FlyingAbility", "HasteAbility", "SimpleStaticAbility", "SimpleManaAbility"}.issubset(ability_classes)
+        and "TreasureToken" in rules_text
+        and "AddManaOfAnyColorEffect(2)" in rules_text
+    ):
+        return {
+            "effect": "creature",
+            "scope": "goldspan_dragon_attack_or_target_treasure_double_mana_v1",
+            "fields": {
+                "power": 4,
+                "toughness": 4,
+                "flying": True,
+                "haste": True,
+                "attack_or_becomes_target_create_treasure": True,
+                "attack_trigger_create_treasure": True,
+                "becomes_spell_target_create_treasure": True,
+                "treasure_count": 1,
+                "treasure_mana_value": 2,
+                "controlled_treasures_add_two_mana": True,
+            },
+            "reason": "XMage structure matches Goldspan Dragon: a 4/4 flying haste creature whose attack-or-spell-target trigger creates one Treasure and whose static ability makes controlled Treasures add two mana.",
+            "signals": [
+                "FlyingAbility",
+                "HasteAbility",
+                "OrTriggeredAbility",
+                "AttacksTriggeredAbility",
+                "BecomesTargetSourceTriggeredAbility",
+                "CreateTokenEffect(TreasureToken)",
+                "GainAbilityControlledEffect(SimpleManaAbility(AddManaOfAnyColorEffect(2)))",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and xmage_class_name == "SqueeGoblinNabob"
         and "ReturnSourceFromGraveyardToHandEffect" in effect_classes
         and "BeginningOfUpkeepTriggeredAbility" in ability_classes
