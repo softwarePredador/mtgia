@@ -11973,6 +11973,71 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            active.mana_pool.add("red", 1)
+            active.mana_pool.add_generic(1)
+            active.hand = [{"name": "Dead Eight Drop", "cmc": 8, "type_line": "Sorcery"}]
+            active.library = [{"name": "Fresh Draw", "cmc": 2, "type_line": "Instant"}]
+            glint_horn = {
+                "name": "Glint-Horn Buccaneer",
+                "type_line": "Creature - Minotaur Pirate",
+                "effect": "creature",
+                "battle_model_scope": "glint_horn_buccaneer_discard_damage_attack_loot_v1",
+                "power": 2,
+                "toughness": 4,
+                "haste": True,
+                "trigger": "controller_discard",
+                "controller_discard_damage_each_opponent": 1,
+                "attacking_activated_discard_draw": True,
+                "attacking_activated_discard_draw_cost": "{1}{R}",
+                "attacking_activated_discard_count": 1,
+                "attacking_activated_draw_count": 1,
+                "_rule_logical_key": "battle_rule_v1:glint-horn-test",
+                "_rule_oracle_hash": "glint-horn-test-hash",
+            }
+            active.battlefield = [glint_horn]
+            battle.resolve_attacking_discard_draw_activations(
+                active,
+                [glint_horn],
+                [opponent_a, opponent_b],
+                [active, opponent_a, opponent_b],
+                turn=5,
+                rng=random.Random(194),
+                phase="combat",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.available_mana() == 0
+        assert [card.get("name") for card in active.hand] == ["Fresh Draw"]
+        assert [card.get("name") for card in active.graveyard] == ["Dead Eight Drop"]
+        assert opponent_a.life == 39
+        assert opponent_b.life == 39
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Glint-Horn Buccaneer"
+            and data.get("activation_kind") == "attacking_discard_draw"
+            and data.get("cost") == "{1}{R}"
+            and data.get("discarded") == "Dead Eight Drop"
+            and data.get("drawn") == ["Fresh Draw"]
+            and data.get("rule_logical_key") == "battle_rule_v1:glint-horn-test"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Glint-Horn Buccaneer"
+            and data.get("trigger") == "controller_discard"
+            and data.get("damage_each_opponent") == 1
+            and len(data.get("damaged_opponents") or []) == 2
+            for event, data in events
+        )
+
     def test_cool_but_rude_level_three_tutors_then_randomly_discards():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -13879,6 +13944,7 @@ def register_tests(battle, player):
         test_swarm_intelligence_copies_second_instant_or_sorcery_spell_too,
         test_profound_journey_rebounds_and_returns_permanents_to_battlefield,
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
+        test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,

@@ -463,6 +463,33 @@ ETB-or-attack recursion scope:
    `mandatory_gate_divergences=[]`, `forensic_rule_findings=0`, and
    `decision_audit_decision_findings=0`.
 
+`Glint-Horn Buccaneer` is the ninth completed proof and the first attack-only
+activated discard-draw creature scope:
+
+1. XMage local source matched `GlintHornBuccaneer` directly through
+   `HasteAbility`, `DamagePlayersEffect(1, TargetController.OPPONENT)`,
+   `GameEvent.EventType.DISCARDED_CARD`, `ActivateIfConditionActivatedAbility`,
+   `SourceAttackingCondition`, and `DiscardCardCost`.
+2. The mapper/classifier promoted only the exact
+   `glint_horn_buccaneer_discard_damage_attack_loot_v1` scope.
+3. Battle runtime now supports declared-attacker discard-draw activations:
+   pay `{1}{R}`, discard through the shared discard trigger path, damage each
+   opponent from the controller-discard trigger, then draw.
+4. PG194 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made deck `613` report `Glint-Horn Buccaneer` as `pass`;
+   the matrix moved it to `battle_ready` / `watchlist_candidate` for decks
+   `613` and `617`.
+6. The first gate attempt exposed an event-contract regression from newly named
+   activation events; the runtime was corrected to emit existing canonical
+   `activated_ability` / `activated_ability_skipped` events with
+   `activation_kind=attacking_discard_draw`.
+7. Final full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_235850/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+   `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

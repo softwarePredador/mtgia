@@ -567,6 +567,23 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("attack_recursion_mana_value_max") or 0) == 3
         )
 
+    if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
+        return (
+            types == {"CREATURE"}
+            and {"DamagePlayersEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and "ActivateIfConditionActivatedAbility" in ability_classes
+            and "DiscardCardCost" in cost_classes
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("haste"))
+            and effect_json.get("trigger") == "controller_discard"
+            and int(effect_json.get("controller_discard_damage_each_opponent") or 0) == 1
+            and bool(effect_json.get("attacking_activated_discard_draw"))
+            and effect_json.get("attacking_activated_discard_draw_cost") == "{1}{R}"
+            and int(effect_json.get("attacking_activated_discard_count") or 0) == 1
+            and int(effect_json.get("attacking_activated_draw_count") or 0) == 1
+        )
+
     if effect == "counter_spell" and scope == "pact_of_negation_delayed_upkeep_counter_v1":
         return (
             types == {"INSTANT"}

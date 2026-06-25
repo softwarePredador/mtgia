@@ -1,0 +1,4 @@
+      card_name       |   normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+----------------------+----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Glint-Horn Buccaneer | glint-horn buccaneer | battle_rule_v1:ebffa5caeecaa96b52e0d4b5307874fe |                  1 |                           1 |                         1 |           2
+(1 row)

@@ -18560,6 +18560,114 @@ def resolve_attack_class_rummage_triggers(player, opponents, all_players, turn, 
     return trigger_events
 
 
+def resolve_attacking_discard_draw_activations(player, attackers, opponents, all_players, turn, rng, *, phase="combat"):
+    activations = []
+    attacking_ids = {id(attacker) for attacker in attackers if isinstance(attacker, dict)}
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if id(permanent) not in attacking_ids:
+            continue
+        if not permanent.get("attacking_activated_discard_draw"):
+            continue
+        cost = permanent.get("attacking_activated_discard_draw_cost") or "{1}{R}"
+        if not player.can_pay(cost):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="attacking_discard_draw",
+                reason="insufficient_mana",
+                cost=cost,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        discard_card, discard_reason, risk_flags, use_top_replacement, _scored_options = (
+            choose_lorehold_rummage_discard(player)
+        )
+        if discard_card is None:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="attacking_discard_draw",
+                reason="no_discard_candidate",
+                cost=cost,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if discard_card not in player.hand:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="attacking_discard_draw",
+                reason="discard_candidate_missing_on_resolution",
+                cost=cost,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        mana_pool_before = player.mana_pool.snapshot()
+        mana_before = player.available_mana()
+        if not player.spend_mana(cost):
+            continue
+        player.hand.remove(discard_card)
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            [discard_card],
+            top_limit=1 if use_top_replacement else 0,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+        draw_count = int(permanent.get("attacking_activated_draw_count") or 1)
+        drawn = player.draw(draw_count, rng)
+        process_player_draw_triggers(
+            player,
+            len(drawn),
+            turn,
+            phase,
+            all_players,
+            turn_player=player,
+        )
+        event_payload = {
+            "player": player.name,
+            "card": permanent.get("name", "?"),
+            "activation_kind": "attacking_discard_draw",
+            "cost": cost,
+            "mana_before": mana_before,
+            "mana_after": player.available_mana(),
+            "mana_pool_before": mana_pool_before,
+            "mana_pool_after": player.mana_pool.snapshot(),
+            "discarded": discard_card.get("name", "?"),
+            "discard_reason": discard_reason,
+            "discarded_to_top": [
+                card.get("name", "?")
+                for card in discard_resolution.get("to_top", [])
+            ],
+            "discarded_to_graveyard": [
+                card.get("name", "?")
+                for card in discard_resolution.get("to_graveyard", [])
+            ],
+            "cards_drawn": len(drawn),
+            "drawn": [card.get("name", "?") for card in drawn],
+            "risk_flags": risk_flags,
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(permanent),
+        }
+        emit_replay_event("activated_ability", **event_payload)
+        activations.append(event_payload)
+    return activations
+
+
 def activate_class_level_abilities(player, opponents, all_players, turn, rng, *, phase="precombat_main"):
     activations = 0
     for permanent in list(getattr(player, "battlefield", []) or []):
@@ -28030,6 +28138,15 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     )
     resolve_attack_class_rummage_triggers(
         attacker,
+        alive_defenders,
+        all_players,
+        turn,
+        rng,
+        phase="combat",
+    )
+    resolve_attacking_discard_draw_activations(
+        attacker,
+        attackers,
         alive_defenders,
         all_players,
         turn,

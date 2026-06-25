@@ -3379,6 +3379,54 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["controller_discard_damage_any_target"], 1)
         self.assertEqual(primary["controller_discard_gain_life"], 1)
 
+    def test_glint_horn_buccaneer_maps_to_exact_attack_loot_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "GlintHornBuccaneer",
+                "effect_classes": [
+                    "DamagePlayersEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                "ability_classes": [
+                    "ActivateIfConditionActivatedAbility",
+                    "HasteAbility",
+                    "TriggeredAbilityImpl",
+                ],
+                "cost_classes": ["DiscardCardCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.addAbility(HasteAbility.getInstance()); "
+                    "new DamagePlayersEffect(1, TargetController.OPPONENT); "
+                    "event.getType() == GameEvent.EventType.DISCARDED_CARD; "
+                    "isControlledBy(event.getPlayerId()); "
+                    "new ActivateIfConditionActivatedAbility(new DrawCardSourceControllerEffect(1), "
+                    "new ManaCostsImpl<>(\"{1}{R}\"), SourceAttackingCondition.instance); "
+                    "ability.addCost(new DiscardCardCost());"
+                ),
+            },
+            (
+                "Haste. Whenever you discard a card, Glint-Horn Buccaneer deals 1 damage "
+                "to each opponent. {1}{R}, Discard a card: Draw a card. Activate only if "
+                "Glint-Horn Buccaneer is attacking."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "glint_horn_buccaneer_discard_damage_attack_loot_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertTrue(primary["haste"])
+        self.assertEqual(primary["trigger"], "controller_discard")
+        self.assertEqual(primary["controller_discard_damage_each_opponent"], 1)
+        self.assertTrue(primary["attacking_activated_discard_draw"])
+        self.assertEqual(primary["attacking_activated_discard_draw_cost"], "{1}{R}")
+        self.assertEqual(primary["attacking_activated_discard_count"], 1)
+        self.assertEqual(primary["attacking_activated_draw_count"], 1)
+
     def test_cool_but_rude_maps_to_exact_class_attack_rummage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

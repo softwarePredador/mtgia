@@ -11135,3 +11135,104 @@ Register decision:
   `Taii Wakeen, Perfect Shot`, `Deflecting Palm`,
   `Primal Amulet // Primal Wellspring`, and `Squee, Goblin Nabob`.
 - Next package number is PG194.
+
+## PG194 - Glint-Horn Buccaneer attack loot and discard damage
+
+Timestamp: 2026-06-24 20:58 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes `Glint-Horn Buccaneer` from the Lorehold deck `613`/`617` backlog.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Glint-Horn Buccaneer`:
+  `battle_rule_v1:ebffa5caeecaa96b52e0d4b5307874fe`,
+  `oracle_hash=8b64e70b97f5871e2203d6cabed377b4`,
+  `effect=creature`,
+  `battle_model_scope=glint_horn_buccaneer_discard_damage_attack_loot_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps `GlintHornBuccaneer` from `HasteAbility`,
+  `DamagePlayersEffect(1, TargetController.OPPONENT)`,
+  `GameEvent.EventType.DISCARDED_CARD`,
+  `ActivateIfConditionActivatedAbility`, `SourceAttackingCondition`, and
+  `DiscardCardCost`.
+- Battle runtime now supports attack-only activated discard-draw abilities for
+  declared attackers, paying the activation cost, discarding through the shared
+  discard trigger resolver, then drawing.
+- The new runtime emits existing canonical events, `activated_ability` and
+  `activated_ability_skipped`, with `activation_kind=attacking_discard_draw`;
+  the first gate attempt exposed this contract issue and it was corrected
+  before the final trusted gate.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg194_glint_horn_buccaneer_package_20260624_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg194_glint_horn_buccaneer_package_20260624_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg194_glint_horn_buccaneer_package_20260624_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg194_glint_horn_buccaneer_package_20260624_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg194_glint_horn_buccaneer_package_20260624_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg194_glint_horn_20260624.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3240`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg194_glint_horn_postsync_v1_manifest.json`;
+  expanded scope moved to `high=403`, `medium=63`, `pass=496`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260624_pg194_glint_horn_postsync_v1.json`;
+  scoped rows `580`, `battle_ready=357`,
+  `needs_rule_before_strategy=223`, `runtime_needed=19`,
+  `mapper_manual=145`, `split_scope=55`.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck613_pg194_glint_horn_20260624.json`;
+  deck `613` reports `Glint-Horn Buccaneer` as
+  `pass/coherent_for_current_gate` and deck totals `high=17`,
+  `medium=6`, `pass=68`.
+- Tests:
+  mapper tests ran `174` tests OK; classifier tests ran `160` tests OK;
+  `battle_card_specific_tests.py`, `battle_decision_trace_tests.py`,
+  event-contract static tests, decision-trace taxonomy tests, forensic
+  supported-effects tests, and sync PG selection tests passed.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260624_235850/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `test_results_status_counts={"pass":18}`.
+
+Register decision:
+
+- PG194 is applied, postchecked, synced, locally tested, deck-coherence
+  validated for deck `613`, and strategy-audited.
+- Do not reuse PG194.
+- Continue next with the remaining Lorehold `needs_rule_before_strategy`
+  cards. Current top items after PG194 are `Taii Wakeen, Perfect Shot`,
+  `Deflecting Palm`, `Primal Amulet // Primal Wellspring`, and
+  `Squee, Goblin Nabob`.
+- Next package number is PG195.

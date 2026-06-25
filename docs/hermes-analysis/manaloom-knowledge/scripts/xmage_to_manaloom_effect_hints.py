@@ -1546,6 +1546,51 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        card_types == {"CREATURE"}
+        and xmage_class_name == "GlintHornBuccaneer"
+        and {"DamagePlayersEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+        and "ActivateIfConditionActivatedAbility" in ability_classes
+        and "DiscardCardCost" in cost_classes
+        and (
+            "SourceAttackingCondition" in rules_text
+            or "sourceattackingcondition" in normalized
+            or _oracle_has(rules_text, "activate only if", "attacking")
+        )
+        and (
+            _oracle_has(rules_text, "whenever you discard a card", "deals 1 damage to each opponent")
+            or (
+                re.search(r"damageplayerseffect\(1,\s*targetcontroller\.opponent\)", normalized)
+                and "gameevent.eventtype.discarded_card" in normalized
+            )
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "glint_horn_buccaneer_discard_damage_attack_loot_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 4,
+                "haste": True,
+                "trigger": "controller_discard",
+                "controller_discard_damage_each_opponent": 1,
+                "attacking_activated_discard_draw": True,
+                "attacking_activated_discard_draw_cost": "{1}{R}",
+                "attacking_activated_discard_count": 1,
+                "attacking_activated_draw_count": 1,
+            },
+            "reason": "XMage structure matches Glint-Horn Buccaneer: a 2/4 haste creature with a controller-discard damage trigger and an attack-only {1}{R}, discard-a-card draw activation.",
+            "signals": [
+                "HasteAbility",
+                "DamagePlayersEffect(TargetController.OPPONENT)",
+                "DISCARDED_CARD controller trigger",
+                "ActivateIfConditionActivatedAbility",
+                "SourceAttackingCondition",
+                "DiscardCardCost",
+                "DrawCardSourceControllerEffect(1)",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and xmage_class_name == "InvokeCalamity"
         and {
