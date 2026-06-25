@@ -763,6 +763,45 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("opponent_discard_noncreature_nonland_draw_cards") or 0) == 1
         )
 
+    if effect == "creature" and scope == "controller_discards_nonland_counter_land_treasure_v1":
+        return (
+            types == {"CREATURE"}
+            and {"AddCountersTargetEffect", "CreateTokenEffect"}.issubset(effect_classes)
+            and "DiscardCardControllerTriggeredAbility" in ability_classes
+            and "TargetPermanent" in target_classes
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 3
+            and bool(effect_json.get("flying"))
+            and effect_json.get("trigger") == "controller_discard"
+            and bool(effect_json.get("controller_discard_nonland_add_plus_one_counter_to_controlled_subtype"))
+            and effect_json.get("controller_discard_counter_target_subtype") == "Goblin"
+            and effect_json.get("controller_discard_counter_type") == "+1/+1"
+            and int(effect_json.get("controller_discard_counter_count") or 0) == 1
+            and bool(effect_json.get("controller_discard_land_create_treasure"))
+            and int(effect_json.get("controller_discard_treasure_count") or 0) == 1
+            and bool(effect_json.get("controller_discard_treasure_tapped"))
+        )
+
+    if effect == "creature" and scope == "opponent_discards_land_create_bat_token_v1":
+        return (
+            "CREATURE" in types
+            and "AclazotzDeepestBetrayalTriggeredAbility" in ability_classes
+            and "CreateTokenEffect" in effect_classes
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("lifelink"))
+            and effect_json.get("trigger") == "opponent_discard"
+            and bool(effect_json.get("opponent_discard_land_create_token"))
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_name") == "Bat Token"
+            and effect_json.get("token_subtype") == "Bat"
+            and effect_json.get("token_colors") == ["B"]
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+            and bool(effect_json.get("token_flying"))
+        )
+
     if effect == "creature" and scope == "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1":
         return (
             types == {"CREATURE"}

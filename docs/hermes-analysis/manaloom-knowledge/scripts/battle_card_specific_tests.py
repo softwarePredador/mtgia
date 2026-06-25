@@ -15575,6 +15575,144 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg215_green_goblin_discard_nonland_counter_and_land_treasure():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Green Goblin Controller")
+            green_goblin = {
+                "name": "Green Goblin, Nemesis",
+                "effect": "creature",
+                "battle_model_scope": "controller_discards_nonland_counter_land_treasure_v1",
+                "type_line": "Legendary Creature - Goblin Human Villain",
+                "power": 3,
+                "toughness": 3,
+                "flying": True,
+                "trigger": "controller_discard",
+                "controller_discard_nonland_add_plus_one_counter_to_controlled_subtype": True,
+                "controller_discard_counter_target_subtype": "Goblin",
+                "controller_discard_counter_type": "+1/+1",
+                "controller_discard_counter_count": 1,
+                "controller_discard_land_create_treasure": True,
+                "controller_discard_treasure_count": 1,
+                "controller_discard_treasure_tapped": True,
+                "_rule_logical_key": "battle_rule_v1:pg215_green_goblin_test",
+                "_rule_oracle_hash": "pg215-green-goblin-test-hash",
+            }
+            target_goblin = {
+                "name": "Goblin Recruit",
+                "effect": "creature",
+                "type_line": "Creature - Goblin",
+                "power": 5,
+                "toughness": 5,
+            }
+            active.battlefield = [green_goblin, target_goblin]
+
+            battle.process_player_discard_triggers(
+                active,
+                [
+                    {"name": "Discarded Nonland", "type_line": "Sorcery", "cmc": 2},
+                    {"name": "Discarded Land", "type_line": "Land", "cmc": 0},
+                ],
+                opponents=[],
+                turn=5,
+                phase="main",
+                rng=random.Random(215),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target_goblin["power"] == 6
+        assert target_goblin["toughness"] == 6
+        assert active.treasures == 1
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Green Goblin, Nemesis"
+            and data.get("trigger") == "controller_discard"
+            and data.get("discarded_card_type") == "nonland"
+            and data.get("effect") == "add_counter"
+            and data.get("target") == "Goblin Recruit"
+            and data.get("rule_logical_key") == "battle_rule_v1:pg215_green_goblin_test"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Green Goblin, Nemesis"
+            and data.get("discarded_card_type") == "land"
+            and data.get("effect") == "create_treasure"
+            and data.get("treasures_created") == 1
+            and data.get("treasure_tokens_tapped") is True
+            for event, data in events
+        )
+
+    def test_pg215_aclazotz_opponent_discard_land_creates_flying_bat():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Aclazotz Controller")
+            opponent = player("Discarding Opponent")
+            active.battlefield = [
+                {
+                    "name": "Aclazotz, Deepest Betrayal",
+                    "effect": "creature",
+                    "battle_model_scope": "opponent_discards_land_create_bat_token_v1",
+                    "type_line": "Legendary Creature - Bat God",
+                    "power": 4,
+                    "toughness": 4,
+                    "flying": True,
+                    "lifelink": True,
+                    "trigger": "opponent_discard",
+                    "opponent_discard_land_create_token": True,
+                    "token_count": 1,
+                    "token_name": "Bat Token",
+                    "token_subtype": "Bat",
+                    "token_colors": ["B"],
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_flying": True,
+                    "_rule_logical_key": "battle_rule_v1:pg215_aclazotz_test",
+                    "_rule_oracle_hash": "pg215-aclazotz-test-hash",
+                }
+            ]
+
+            battle.process_player_discard_triggers(
+                opponent,
+                [
+                    {"name": "Discarded Land", "type_line": "Land", "cmc": 0},
+                    {"name": "Discarded Spell", "type_line": "Instant", "cmc": 1},
+                ],
+                opponents=[active],
+                turn=5,
+                phase="combat",
+                rng=random.Random(215),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        bat_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Bat Token"
+        ]
+        assert len(bat_tokens) == 1
+        assert bat_tokens[0]["power"] == 1
+        assert bat_tokens[0]["toughness"] == 1
+        assert bat_tokens[0].get("colors") == ["B"]
+        assert bat_tokens[0].get("flying") is True
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Aclazotz, Deepest Betrayal"
+            and data.get("trigger") == "opponent_discard"
+            and data.get("discarding_player") == "Discarding Opponent"
+            and data.get("discarded_card_type") == "land"
+            and data.get("effect") == "token_maker"
+            and data.get("tokens_created") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:pg215_aclazotz_test"
+            for event, data in events
+        )
+
     def test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -16188,6 +16326,8 @@ def register_tests(battle, player):
         test_pg213_soul_immolation_pays_blight_x_and_damages_opponents_and_their_creatures,
         test_pg214_waste_not_opponent_discard_card_type_triggers_create_mana_and_draw,
         test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw,
+        test_pg215_green_goblin_discard_nonland_counter_and_land_treasure,
+        test_pg215_aclazotz_opponent_discard_land_creates_flying_bat,
         test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage,
         test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering,
         test_pg207_impact_tremors_damages_each_opponent_when_token_enters,

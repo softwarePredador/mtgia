@@ -5132,6 +5132,90 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["opponent_discard_land_add_mana_amount"], 2)
         self.assertEqual(primary["opponent_discard_noncreature_nonland_draw_cards"], 1)
 
+    def test_green_goblin_nemesis_maps_to_exact_discard_nonland_counter_land_treasure_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "GreenGoblinNemesis",
+                "effect_classes": [
+                    "AddCountersTargetEffect",
+                    "CreateTokenEffect",
+                ],
+                "ability_classes": ["DiscardCardControllerTriggeredAbility"],
+                "target_classes": ["TargetPermanent"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(3); this.toughness = new MageInt(3); "
+                    "this.addAbility(FlyingAbility.getInstance()); "
+                    "new DiscardCardControllerTriggeredAbility(new AddCountersTargetEffect("
+                    "CounterType.P1P1.createInstance()), false, StaticFilters.FILTER_CARD_A_NON_LAND); "
+                    "new FilterControlledPermanent(SubType.GOBLIN); new TargetPermanent(filter); "
+                    "new DiscardCardControllerTriggeredAbility(new CreateTokenEffect(new TreasureToken(), 1, true), "
+                    "false, StaticFilters.FILTER_CARD_LAND_A)"
+                ),
+            },
+            "Flying. Whenever you discard a nonland card, put a +1/+1 counter on target Goblin you control. "
+            "Whenever you discard a land card, create a tapped Treasure token.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controller_discards_nonland_counter_land_treasure_v1",
+        )
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["trigger"], "controller_discard")
+        self.assertTrue(primary["controller_discard_nonland_add_plus_one_counter_to_controlled_subtype"])
+        self.assertEqual(primary["controller_discard_counter_target_subtype"], "Goblin")
+        self.assertTrue(primary["controller_discard_land_create_treasure"])
+        self.assertTrue(primary["controller_discard_treasure_tapped"])
+
+    def test_aclazotz_maps_to_exact_opponent_discard_land_bat_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "AclazotzDeepestBetrayal",
+                "effect_classes": [
+                    "AclazotzDeepestBetrayalEffect",
+                    "AclazotzDeepestBetrayalTransformEffect",
+                    "CreateTokenEffect",
+                ],
+                "ability_classes": [
+                    "AttacksTriggeredAbility",
+                    "AclazotzDeepestBetrayalTriggeredAbility",
+                    "DiesSourceTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.getLeftHalfCard().setPT(4, 4); "
+                    "this.getLeftHalfCard().addAbility(FlyingAbility.getInstance()); "
+                    "this.getLeftHalfCard().addAbility(LifelinkAbility.getInstance()); "
+                    "event.getType() == GameEvent.EventType.DISCARDED_CARD; "
+                    "game.getOpponents(this.getControllerId()).contains(event.getPlayerId()); "
+                    "discarded != null && discarded.isLand(game); "
+                    "new CreateTokenEffect(new BatToken())"
+                ),
+            },
+            "Flying, lifelink. Whenever an opponent discards a land card, create a 1/1 black Bat creature token with flying.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponent_discards_land_create_bat_token_v1",
+        )
+        self.assertEqual(primary["power"], 4)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertTrue(primary["flying"])
+        self.assertTrue(primary["lifelink"])
+        self.assertEqual(primary["trigger"], "opponent_discard")
+        self.assertTrue(primary["opponent_discard_land_create_token"])
+        self.assertEqual(primary["token_name"], "Bat Token")
+        self.assertEqual(primary["token_colors"], ["B"])
+        self.assertTrue(primary["token_flying"])
+
     def test_taii_wakeen_maps_to_exact_noncombat_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

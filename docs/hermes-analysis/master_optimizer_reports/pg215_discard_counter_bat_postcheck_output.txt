@@ -1,0 +1,5 @@
+                    card_name                     |                 normalized_name                  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+--------------------------------------------------+--------------------------------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Aclazotz, Deepest Betrayal // Temple of the Dead | aclazotz, deepest betrayal // temple of the dead | battle_rule_v1:a29015235c68332879e75484e8b92857 |                  1 |                           1 |                         1 |           0
+ Green Goblin, Nemesis                            | green goblin, nemesis                            | battle_rule_v1:c02ded294d7d8154fcfccc25dd1f629a |                  1 |                           1 |                         1 |           0
+(2 rows)

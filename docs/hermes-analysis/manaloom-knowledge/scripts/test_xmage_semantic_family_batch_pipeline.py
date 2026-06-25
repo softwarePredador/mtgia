@@ -7392,6 +7392,105 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_green_goblin_nemesis_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Green Goblin, Nemesis",
+                        "severity": "high",
+                        "oracle_hash": "greengoblinhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "GreenGoblinNemesis",
+                            "path": "/xmage/GreenGoblinNemesis.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "AddCountersTargetEffect",
+                                "CreateTokenEffect",
+                            ],
+                            "ability_classes": ["DiscardCardControllerTriggeredAbility"],
+                            "target_classes": ["TargetPermanent"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controller_discards_nonland_counter_land_treasure_v1",
+                                "power": 3,
+                                "toughness": 3,
+                                "flying": True,
+                                "trigger": "controller_discard",
+                                "controller_discard_nonland_add_plus_one_counter_to_controlled_subtype": True,
+                                "controller_discard_counter_target_subtype": "Goblin",
+                                "controller_discard_counter_type": "+1/+1",
+                                "controller_discard_counter_count": 1,
+                                "controller_discard_land_create_treasure": True,
+                                "controller_discard_treasure_count": 1,
+                                "controller_discard_treasure_tapped": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_aclazotz_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Aclazotz, Deepest Betrayal // Temple of the Dead",
+                        "severity": "high",
+                        "oracle_hash": "aclazotzhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "AclazotzDeepestBetrayal",
+                            "path": "/xmage/AclazotzDeepestBetrayal.java",
+                            "types": ["CREATURE", "LAND"],
+                            "effect_classes": [
+                                "AclazotzDeepestBetrayalEffect",
+                                "AclazotzDeepestBetrayalTransformEffect",
+                                "CreateTokenEffect",
+                            ],
+                            "ability_classes": [
+                                "AttacksTriggeredAbility",
+                                "AclazotzDeepestBetrayalTriggeredAbility",
+                                "DiesSourceTriggeredAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "opponent_discards_land_create_bat_token_v1",
+                                "power": 4,
+                                "toughness": 4,
+                                "flying": True,
+                                "lifelink": True,
+                                "trigger": "opponent_discard",
+                                "opponent_discard_land_create_token": True,
+                                "token_count": 1,
+                                "token_name": "Bat Token",
+                                "token_subtype": "Bat",
+                                "token_colors": ["B"],
+                                "token_power": 1,
+                                "token_toughness": 1,
+                                "token_flying": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_taii_wakeen_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

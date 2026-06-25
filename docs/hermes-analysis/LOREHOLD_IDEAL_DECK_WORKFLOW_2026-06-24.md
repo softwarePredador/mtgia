@@ -1164,6 +1164,72 @@ Next operational order:
 3. Resume benchmark candidates only after the remaining runtime rows are closed
    or explicitly waived by matrix evidence.
 
+## PG215 Runtime Checkpoint - Discard Nonland Counter / Land Bat Token
+
+PG215 closes the next discard-trigger subfamily without manual per-card
+modeling: `Green Goblin, Nemesis` and
+`Aclazotz, Deepest Betrayal // Temple of the Dead`.
+
+What changed:
+
+1. XMage sources:
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GreenGoblinNemesis.java`
+   and
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AclazotzDeepestBetrayal.java`.
+2. Runtime scopes:
+   `controller_discards_nonland_counter_land_treasure_v1` for
+   `Green Goblin, Nemesis` and
+   `opponent_discards_land_create_bat_token_v1` for
+   `Aclazotz, Deepest Betrayal // Temple of the Dead`.
+3. The battle runtime now resolves the Green Goblin branch as:
+   controller discard nonland -> +1/+1 counter on a controlled Goblin;
+   controller discard land -> tapped Treasure.
+4. The battle runtime now resolves the Aclazotz branch as:
+   opponent discard land -> create a 1/1 black Bat creature token with flying.
+5. PG215 precheck/apply/postcheck promoted one verified auto rule for each
+   card, had no shadow rows to deprecate, and kept rollback SQL in
+   `docs/hermes-analysis/master_optimizer_reports/pg215_discard_counter_bat_rollback.sql`.
+6. PG -> Hermes sync report
+   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg215_discard_counter_bat_20260625.json`
+   selected `2` cards, loaded `2` PG rows, upserted `2` SQLite rows, and
+   exported `3246` canonical snapshot rows.
+7. The PG215 expanded matrix for decks `6,606-619` reports `580` rows,
+   `battle_ready=384`, `runtime_needed=6`, `mapper_manual=131`,
+   `split_scope=55`, and `blocked_missing_xmage_source=4`.
+8. Effective queue
+   `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg215_discard_counter_bat_postsync_v1.json`
+   reports no package-ready unprepared rows; remaining operational lanes are
+   `manual_mapper_backlog=333`, `split_scope_backlog=74`,
+   `runtime_family_backlog=10`, and `blocked_missing_xmage_source=4`.
+9. Strategy consistency audit
+   `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg215_discard_counter_bat_postsync_v1.json`
+   passed `18/18`.
+10. Full gate
+    `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_102105/summary.json`
+    reports `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+    `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+    `target_pressure_statuses={"pass":16}`,
+    `table_intent_statuses={"pass":16}`,
+    `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+    `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+    `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Next operational order:
+
+1. Continue the remaining runtime rows in score order:
+   `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
+   `Black Market Connections`, `Smuggler's Share`, `Davros, Dalek Creator`,
+   `The Locust God`, and `Biotransference`.
+2. Prefer batching compatible watcher engines next:
+   `Black Market Connections`, `Smuggler's Share`, and `Davros, Dalek Creator`
+   share beginning/end-step style state checks more than the Saga/copy-token
+   case does.
+3. Keep `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki` first in
+   strategy score, but treat it as a separate Saga/transform/copy-token
+   implementation lane.
+4. Resume benchmark candidates only after the remaining runtime rows are closed
+   or explicitly waived by matrix evidence.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

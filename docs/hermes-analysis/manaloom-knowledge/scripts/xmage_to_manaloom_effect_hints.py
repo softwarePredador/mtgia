@@ -1847,6 +1847,87 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and xmage_class_name == "GreenGoblinNemesis"
+        and {"AddCountersTargetEffect", "CreateTokenEffect"}.issubset(effect_classes)
+        and "DiscardCardControllerTriggeredAbility" in ability_classes
+        and "TargetPermanent" in target_classes
+        and "TreasureToken" in rules_text
+        and (
+            "FILTER_CARD_A_NON_LAND" in rules_text
+            or "discard a nonland card" in normalized
+        )
+        and (
+            "FILTER_CARD_LAND_A" in rules_text
+            or "discard a land card" in normalized
+        )
+        and (
+            "FilterControlledPermanent(SubType.GOBLIN)" in rules_text
+            or "target Goblin you control" in rules_text
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "controller_discards_nonland_counter_land_treasure_v1",
+            "fields": {
+                "power": 3,
+                "toughness": 3,
+                "flying": True,
+                "trigger": "controller_discard",
+                "controller_discard_nonland_add_plus_one_counter_to_controlled_subtype": True,
+                "controller_discard_counter_target_subtype": "Goblin",
+                "controller_discard_counter_type": "+1/+1",
+                "controller_discard_counter_count": 1,
+                "controller_discard_land_create_treasure": True,
+                "controller_discard_treasure_count": 1,
+                "controller_discard_treasure_tapped": True,
+            },
+            "reason": "XMage structure matches Green Goblin, Nemesis: a 3/3 flying Goblin with controller-discard triggers for nonland +1/+1 counters on a controlled Goblin and land-to-tapped-Treasure.",
+            "signals": [
+                "DiscardCardControllerTriggeredAbility(nonland card)",
+                "AddCountersTargetEffect(+1/+1)",
+                "TargetPermanent(controlled Goblin)",
+                "DiscardCardControllerTriggeredAbility(land card)",
+                "CreateTokenEffect(TreasureToken tapped)",
+            ],
+        }
+
+    if (
+        "CREATURE" in card_types
+        and xmage_class_name == "AclazotzDeepestBetrayal"
+        and "AclazotzDeepestBetrayalTriggeredAbility" in ability_classes
+        and "CreateTokenEffect" in effect_classes
+        and ("LifelinkAbility" in ability_classes or "LifelinkAbility.getInstance" in rules_text)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "opponent_discards_land_create_bat_token_v1",
+            "fields": {
+                "power": 4,
+                "toughness": 4,
+                "flying": True,
+                "lifelink": True,
+                "trigger": "opponent_discard",
+                "opponent_discard_land_create_token": True,
+                "token_count": 1,
+                "token_name": "Bat Token",
+                "token_subtype": "Bat",
+                "token_colors": ["B"],
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_flying": True,
+            },
+            "reason": "XMage structure matches Aclazotz's land-discard token trigger: whenever an opponent discards a land card, create a 1/1 black Bat creature token with flying.",
+            "signals": [
+                "AclazotzDeepestBetrayalTriggeredAbility",
+                "GameEvent.EventType.DISCARDED_CARD",
+                "game.getOpponents(controller).contains(event.player)",
+                "discarded.isLand(game)",
+                "CreateTokenEffect(BatToken)",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and xmage_class_name == "TaiiWakeenPerfectShot"
         and "DrawCardSourceControllerEffect" in effect_classes
         and "TaiiWakeenPerfectShotEffect" in effect_classes

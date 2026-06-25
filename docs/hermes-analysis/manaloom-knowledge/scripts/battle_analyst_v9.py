@@ -9134,6 +9134,7 @@ def resolve_surly_badgersaur_discard_trigger(
             "discarded_card_type": "land",
             "effect": "create_treasure",
             "treasures_created": treasure_count,
+            "treasure_tokens_tapped": bool(source.get("controller_discard_treasure_tapped")),
             "treasures_before": before,
             "treasures_after": player.treasures,
             "turn": turn,
@@ -9288,6 +9289,34 @@ def _resolve_discard_card_type_resource_trigger(
         return events
 
     if (
+        source.get(f"{prefix}_land_create_token")
+        and _discarded_card_is_land(discarded_card)
+    ):
+        count = max(1, int(source.get("token_count") or source.get(f"{prefix}_token_count") or 1))
+        before = len(getattr(controller, "battlefield", []) or [])
+        tokens_created = create_creature_tokens_from_effect(
+            controller,
+            source,
+            count=count,
+            opponents=opponents_for_controller,
+            turn=turn,
+            source_event="discard_land_token_created",
+            all_players=all_players,
+        )
+        event_payload = {
+            **base_payload,
+            "discarded_card_type": "land",
+            "effect": "token_maker",
+            "token_name": source.get("token_name") or "Token",
+            "tokens_created": tokens_created,
+            "battlefield_before": before,
+            "battlefield_after": len(getattr(controller, "battlefield", []) or []),
+        }
+        emit_replay_event("trigger_resolved", **event_payload)
+        events.append(event_payload)
+        return events
+
+    if (
         source.get(f"{prefix}_land_add_mana_amount") is not None
         and _discarded_card_is_land(discarded_card)
     ):
@@ -9340,6 +9369,92 @@ def _resolve_discard_card_type_resource_trigger(
     return events
 
 
+def _choose_controlled_subtype_counter_target(player, source, subtype):
+    subtype_norm = str(subtype or "").lower()
+    candidates = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        type_text = str(permanent.get("type_line") or permanent.get("subtype") or "").lower()
+        if subtype_norm and subtype_norm not in type_text:
+            continue
+        if not is_battlefield_creature(permanent):
+            continue
+        score = (
+            card_power_value(permanent, default=int(permanent.get("power") or 0)) * 3
+            + int(permanent.get("toughness") or permanent.get("power") or 0)
+            + (5 if permanent is source else 0)
+        )
+        candidates.append((score, permanent))
+    if not candidates:
+        return None
+    return max(candidates, key=lambda item: item[0])[1]
+
+
+def resolve_controller_discard_nonland_counter_trigger(
+    player,
+    source,
+    discarded_card,
+    *,
+    turn=None,
+    phase=None,
+):
+    if not (
+        isinstance(source, dict)
+        and source in getattr(player, "battlefield", [])
+        and source.get("trigger") == "controller_discard"
+        and source.get("controller_discard_nonland_add_plus_one_counter_to_controlled_subtype")
+        and isinstance(discarded_card, dict)
+        and not _discarded_card_is_land(discarded_card)
+    ):
+        return []
+    subtype = source.get("controller_discard_counter_target_subtype") or source.get("counter_target_subtype")
+    target = _choose_controlled_subtype_counter_target(player, source, subtype)
+    if target is None:
+        event_payload = {
+            "player": player.name,
+            "card": source.get("name", "?"),
+            "trigger": "controller_discard",
+            "discarded_card": discarded_card.get("name", "?"),
+            "discarded_card_type": "nonland",
+            "effect": "add_counter",
+            "counter_type": source.get("controller_discard_counter_type", "+1/+1"),
+            "result": "no_valid_counter_target",
+            "counter_target_subtype": subtype,
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(source),
+        }
+        emit_replay_event("trigger_resolved", **event_payload)
+        return [event_payload]
+
+    counter_count = max(1, int(source.get("controller_discard_counter_count") or 1))
+    power_before = card_power_value(target, default=int(target.get("power") or 0))
+    toughness_before = int(target.get("toughness") or target.get("power") or power_before)
+    add_plus_one_counters(target, counter_count)
+    event_payload = {
+        "player": player.name,
+        "card": source.get("name", "?"),
+        "trigger": "controller_discard",
+        "discarded_card": discarded_card.get("name", "?"),
+        "discarded_card_type": "nonland",
+        "effect": "add_counter",
+        "target": target.get("name", "?"),
+        "counter_target_subtype": subtype,
+        "counter_type": source.get("controller_discard_counter_type", "+1/+1"),
+        "counters_added": counter_count,
+        "power_before": power_before,
+        "power_after": target.get("power"),
+        "toughness_before": toughness_before,
+        "toughness_after": target.get("toughness"),
+        "turn": turn,
+        "phase": phase,
+        **replay_rule_fields(source),
+    }
+    emit_replay_event("trigger_resolved", **event_payload)
+    return [event_payload]
+
+
 def process_player_discard_triggers(
     player,
     discarded_cards,
@@ -9369,6 +9484,7 @@ def process_player_discard_triggers(
                 continue
             if (
                 effect_data.get("opponent_discard_creature_create_token")
+                or effect_data.get("opponent_discard_land_create_token")
                 or effect_data.get("opponent_discard_land_add_mana_amount") is not None
                 or effect_data.get("opponent_discard_noncreature_nonland_draw_cards")
             ):
@@ -9463,8 +9579,20 @@ def process_player_discard_triggers(
                         phase=phase,
                     )
                 )
+        if effect_data.get("controller_discard_nonland_add_plus_one_counter_to_controlled_subtype"):
+            for discarded_card in discarded:
+                trigger_events.extend(
+                    resolve_controller_discard_nonland_counter_trigger(
+                        player,
+                        effect_data,
+                        discarded_card,
+                        turn=turn,
+                        phase=phase,
+                    )
+                )
         if (
             effect_data.get("controller_discard_creature_create_token")
+            or effect_data.get("controller_discard_land_create_token")
             or effect_data.get("controller_discard_land_add_mana_amount") is not None
             or effect_data.get("controller_discard_noncreature_nonland_draw_cards")
         ):

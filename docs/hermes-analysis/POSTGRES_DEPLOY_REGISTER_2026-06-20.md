@@ -13348,3 +13348,124 @@ Register decision:
   `Green Goblin, Nemesis`, `Aclazotz, Deepest Betrayal // Temple of the Dead`,
   `The Locust God`, and `Biotransference`.
 - Next package number is PG215.
+
+## PG215 - Discard nonland counter / land Bat-token XMage batch
+
+Status: applied, postchecked, synced, tested, strategy-audited.
+
+Scope:
+
+- Cards: `Green Goblin, Nemesis`,
+  `Aclazotz, Deepest Betrayal // Temple of the Dead`.
+- Families: `creature`, `token_maker`.
+- XMage sources:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GreenGoblinNemesis.java`
+  and
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AclazotzDeepestBetrayal.java`.
+- ManaLoom runtime scopes:
+  `controller_discards_nonland_counter_land_treasure_v1` and
+  `opponent_discards_land_create_bat_token_v1`.
+- Logical rule keys:
+  `battle_rule_v1:c02ded294d7d8154fcfccc25dd1f629a` for
+  `Green Goblin, Nemesis`;
+  `battle_rule_v1:a29015235c68332879e75484e8b92857` for
+  `Aclazotz, Deepest Betrayal // Temple of the Dead`.
+- Oracle hashes:
+  `4ca8185ef506fd0f03bb0c3969d7aa82` for `Green Goblin, Nemesis`;
+  `b1357b55b4ee3216faca778b2259e04a` for
+  `Aclazotz, Deepest Betrayal // Temple of the Dead`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg215_discard_counter_bat_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg215_discard_counter_bat_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg215_discard_counter_bat_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg215_discard_counter_bat_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg215_discard_counter_bat_rollback.sql`.
+
+Evidence:
+
+- External hash harvest:
+  `docs/hermes-analysis/master_optimizer_reports/pg215_discard_counter_bat_external_harvest.json`
+  supplied the exact Oracle hashes required by the package builder.
+- Precheck:
+  each card matched exactly one canonical card row; `existing_rule_rows=0`,
+  `expected_rule_rows_before=0`, and `would_deprecate_shadow_rows=0` for each
+  card.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  each card has `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`;
+  backup rows total `0`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg215_discard_counter_bat_20260625.json`;
+  `selected_card_count=2`, `pg_rows_loaded=2`,
+  `sqlite_inserted_or_updated=2`, and
+  `canonical_snapshot_rows_exported=3246`.
+- Runtime cache spot-check:
+  local SQLite resolves `green goblin, nemesis` as
+  `battle_model_scope=controller_discards_nonland_counter_land_treasure_v1`
+  and `aclazotz, deepest betrayal // temple of the dead` as
+  `battle_model_scope=opponent_discards_land_create_bat_token_v1`, both
+  `review_status=verified`, `execution_status=auto`, with the expected Oracle
+  hashes.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg215_discard_counter_bat_postsync_v1_manifest.json`;
+  expanded scope moved to `high=376`, `medium=63`, `pass=523`, with
+  `runtime_family_implementation_required=10`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg215_discard_counter_bat_postsync_v1.json`;
+  expanded decks `6,606-619` matrix has `580` rows, `battle_ready=384`,
+  `runtime_needed=6`, `mapper_manual=131`, `split_scope=55`, and
+  `blocked_missing_xmage_source=4`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg215_discard_counter_bat_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=10`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg215_discard_counter_bat_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  mapper tests passed `200/200`, classifier tests passed `185/185`, and the
+  battle harness passed including
+  `test_pg215_green_goblin_discard_nonland_counter_and_land_treasure` and
+  `test_pg215_aclazotz_opponent_discard_land_creates_flying_bat`.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_102105/summary.json`;
+  `run_scope=recurring_full`, `start_seed=63261372`,
+  `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `target_pressure_statuses={"pass":16}`,
+  `table_intent_statuses={"pass":16}`,
+  `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Runtime changes:
+
+- `process_player_discard_triggers` now supports
+  `controller_discard_nonland_add_plus_one_counter_to_controlled_subtype`.
+- The runtime selects a controlled subtype creature for the +1/+1 counter,
+  matching `Green Goblin, Nemesis`'s Goblin counter branch.
+- The discard resource resolver now supports land-discard token creation for
+  opponent discard triggers, matching `Aclazotz, Deepest Betrayal`.
+- Treasure creation from land discard now emits `treasure_tokens_tapped` when
+  the model marks the token tapped.
+
+Register decision:
+
+- PG215 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG215.
+- Continue Lorehold-first closure on the remaining runtime rows:
+  `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
+  `Black Market Connections`, `Smuggler's Share`, `Davros, Dalek Creator`,
+  `The Locust God`, and `Biotransference`.
+- Next package number is PG216.

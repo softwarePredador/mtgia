@@ -1,0 +1,29 @@
+{
+    "cards": [
+        {
+            "card_name": "Aclazotz, Deepest Betrayal // Temple of the Dead",
+            "external_references": {
+                "scryfall": {
+                    "mana_cost": "{3}{B}{B}",
+                    "type_line": "Legendary Creature \u2014 Bat God",
+                    "oracle_text": "Flying, lifelink\nWhenever Aclazotz attacks, each opponent discards a card. For each opponent who can't, you draw a card.\nWhenever an opponent discards a land card, create a 1/1 black Bat creature token with flying.\nWhen Aclazotz dies, return it to the battlefield tapped and transformed under its owner's control.",
+                    "oracle_hash_md5_raw": "b1357b55b4ee3216faca778b2259e04a"
+                }
+            }
+        },
+        {
+            "card_name": "Green Goblin, Nemesis",
+            "external_references": {
+                "scryfall": {
+                    "mana_cost": "{2}{B}{R}",
+                    "type_line": "Legendary Creature \u2014 Goblin Human Villain",
+                    "oracle_text": "Flying\nWhenever you discard a nonland card, put a +1/+1 counter on target Goblin you control.\nWhenever you discard a land card, create a tapped Treasure token.",
+                    "oracle_hash_md5_raw": "4ca8185ef506fd0f03bb0c3969d7aa82"
+                }
+            }
+        }
+    ],
+    "source": "postgres.cards oracle hash harvest for PG215",
+    "status": "ready",
+    "generated_at": "2026-06-25T10:19:07.602432+00:00"
+}
