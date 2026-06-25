@@ -566,6 +566,29 @@ from the current Lorehold matrix:
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
 
+`Surly Badgersaur` is the thirteenth completed proof and the first exact
+discarded-card-type trigger scope promoted from the current Lorehold matrix:
+
+1. XMage local source matched `SurlyBadgersaur` directly through
+   `DiscardCardControllerTriggeredAbility` variants using creature, land, and
+   noncreature/nonland discarded-card filters.
+2. The mapper/classifier promoted only the exact
+   `surly_badgersaur_discard_card_type_triggers_v1` scope.
+3. Battle runtime now adds a +1/+1 counter when the controller discards a
+   creature card, creates one Treasure when the controller discards a land card,
+   and resolves an optional fight against a beneficial opponent creature when
+   the controller discards a noncreature, nonland card.
+4. PG198 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made decks `608` and `617` report
+   `Surly Badgersaur` as `pass`; the matrix moved it to `battle_ready` /
+   `priority_benchmark_candidate`.
+6. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_015839/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+   `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

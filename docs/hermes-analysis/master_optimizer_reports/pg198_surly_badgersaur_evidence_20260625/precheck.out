@@ -1,0 +1,5 @@
+    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+------------------+------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Surly Badgersaur | surly badgersaur | 14e07cfa7107a44732b5631f2136be3e | battle_rule_v1:a4b42e4cef8bbab31819346e7b68a263 |                1 | efe36db9-c638-4388-905f-e4d2ddf93065 |                  2 |                         0 |                           2
+(1 row)
+

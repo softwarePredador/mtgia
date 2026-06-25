@@ -1584,6 +1584,54 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and xmage_class_name == "SurlyBadgersaur"
+        and {"AddCountersSourceEffect", "CreateTokenEffect", "FightTargetSourceEffect"}.issubset(effect_classes)
+        and "DiscardCardControllerTriggeredAbility" in ability_classes
+        and "TargetPermanent" in target_classes
+        and "TreasureToken" in rules_text
+        and (
+            "FILTER_CARD_CREATURE_A" in rules_text
+            or "filter_card_creature_a" in normalized
+        )
+        and (
+            "FILTER_CARD_LAND_A" in rules_text
+            or "filter_card_land_a" in normalized
+        )
+        and (
+            "FilterNonlandCard" in rules_text
+            or "noncreature, nonland card" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "surly_badgersaur_discard_card_type_triggers_v1",
+            "fields": {
+                "power": 3,
+                "toughness": 3,
+                "trigger": "controller_discard",
+                "controller_discard_creature_add_plus_one_counter": True,
+                "controller_discard_counter_type": "+1/+1",
+                "controller_discard_counter_count": 1,
+                "controller_discard_land_create_treasure": True,
+                "controller_discard_treasure_count": 1,
+                "controller_discard_noncreature_nonland_fight": True,
+                "controller_discard_fight_target": "up_to_one_creature_you_dont_control",
+                "controller_discard_fight_optional": True,
+            },
+            "reason": "XMage structure matches Surly Badgersaur: a 3/3 creature with controller-discard triggers split by discarded card type for +1/+1 counter, Treasure, or optional fight.",
+            "signals": [
+                "DiscardCardControllerTriggeredAbility(creature card)",
+                "AddCountersSourceEffect(+1/+1)",
+                "DiscardCardControllerTriggeredAbility(land card)",
+                "CreateTokenEffect(TreasureToken)",
+                "DiscardCardControllerTriggeredAbility(noncreature nonland card)",
+                "FightTargetSourceEffect",
+                "TargetPermanent(up to one creature you don't control)",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and xmage_class_name == "SqueeGoblinNabob"
         and "ReturnSourceFromGraveyardToHandEffect" in effect_classes
         and "BeginningOfUpkeepTriggeredAbility" in ability_classes

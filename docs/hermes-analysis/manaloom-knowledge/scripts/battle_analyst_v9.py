@@ -8881,6 +8881,204 @@ def process_discard_modal_triggers(
     return trigger_events
 
 
+def _discarded_card_is_creature(card):
+    if not isinstance(card, dict):
+        return False
+    return bool(is_creature_card(card) or "creature" in str(card.get("type_line") or "").lower())
+
+
+def _discarded_card_is_land(card):
+    if not isinstance(card, dict):
+        return False
+    return bool(is_effective_land(card) or "land" in str(card.get("type_line") or "").lower())
+
+
+def _surly_fight_stat(card, key, default=0):
+    try:
+        return int(float(card.get(key) or default))
+    except Exception:
+        return int(default or 0)
+
+
+def _choose_surly_badgersaur_fight_target(player, opponents, source):
+    source_power = _surly_fight_stat(source, "power", 3)
+    source_toughness = _surly_fight_stat(source, "toughness", 3)
+    candidates = []
+    for opponent in opponents or []:
+        if not opponent.is_alive():
+            continue
+        for candidate in removal_target_candidates(opponent, controller=player, source=source):
+            if not is_battlefield_creature(candidate):
+                continue
+            target_toughness = _surly_fight_stat(candidate, "toughness", candidate.get("power", 2))
+            target_power = _surly_fight_stat(candidate, "power", 2)
+            if source_power < target_toughness:
+                continue
+            source_survives = source_toughness > target_power
+            score = (
+                int(candidate.get("cmc") or 0) * 3
+                + target_power * 2
+                + target_toughness
+                + (25 if source_survives else -20)
+            )
+            candidates.append((score, opponent, candidate))
+    if not candidates:
+        return None, None
+    _, opponent, target = max(candidates, key=lambda entry: entry[0])
+    return opponent, target
+
+
+def resolve_surly_badgersaur_discard_trigger(
+    player,
+    opponents,
+    source,
+    discarded_card,
+    *,
+    turn=None,
+    phase=None,
+):
+    if not (
+        isinstance(source, dict)
+        and source in getattr(player, "battlefield", [])
+        and source.get("trigger") == "controller_discard"
+    ):
+        return []
+    if not isinstance(discarded_card, dict):
+        return []
+
+    events = []
+    discarded_name = discarded_card.get("name", "?")
+    if (
+        source.get("controller_discard_creature_add_plus_one_counter")
+        and _discarded_card_is_creature(discarded_card)
+    ):
+        counter_count = max(1, int(source.get("controller_discard_counter_count") or 1))
+        power_before = _surly_fight_stat(source, "power", 3)
+        toughness_before = _surly_fight_stat(source, "toughness", 3)
+        add_plus_one_counters(source, counter_count)
+        event_payload = {
+            "player": player.name,
+            "card": source.get("name", "?"),
+            "trigger": "controller_discard",
+            "discarded_card": discarded_name,
+            "discarded_card_type": "creature",
+            "effect": "add_counter",
+            "counter_type": source.get("controller_discard_counter_type", "+1/+1"),
+            "counters_added": counter_count,
+            "power_before": power_before,
+            "power_after": source.get("power"),
+            "toughness_before": toughness_before,
+            "toughness_after": source.get("toughness"),
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(source),
+        }
+        emit_replay_event("trigger_resolved", **event_payload)
+        events.append(event_payload)
+        return events
+
+    if (
+        source.get("controller_discard_land_create_treasure")
+        and _discarded_card_is_land(discarded_card)
+    ):
+        treasure_count = max(1, int(source.get("controller_discard_treasure_count") or 1))
+        before = int(player.treasures or 0)
+        player.treasures += treasure_count
+        event_payload = {
+            "player": player.name,
+            "card": source.get("name", "?"),
+            "trigger": "controller_discard",
+            "discarded_card": discarded_name,
+            "discarded_card_type": "land",
+            "effect": "create_treasure",
+            "treasures_created": treasure_count,
+            "treasures_before": before,
+            "treasures_after": player.treasures,
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(source),
+        }
+        emit_replay_event("trigger_resolved", **event_payload)
+        events.append(event_payload)
+        return events
+
+    if (
+        source.get("controller_discard_noncreature_nonland_fight")
+        and not _discarded_card_is_creature(discarded_card)
+        and not _discarded_card_is_land(discarded_card)
+    ):
+        target_controller, target = _choose_surly_badgersaur_fight_target(player, opponents, source)
+        if target is None:
+            event_payload = {
+                "player": player.name,
+                "card": source.get("name", "?"),
+                "trigger": "controller_discard",
+                "discarded_card": discarded_name,
+                "discarded_card_type": "noncreature_nonland",
+                "effect": "fight",
+                "result": "no_beneficial_target",
+                "turn": turn,
+                "phase": phase,
+                **replay_rule_fields(source),
+            }
+            emit_replay_event("trigger_resolved", **event_payload)
+            events.append(event_payload)
+            return events
+
+        source_power = _surly_fight_stat(source, "power", 3)
+        source_toughness = _surly_fight_stat(source, "toughness", 3)
+        target_power = _surly_fight_stat(target, "power", 2)
+        target_toughness = _surly_fight_stat(target, "toughness", target_power)
+        target_removed = False
+        source_removed = False
+        target_destination = None
+        source_destination = None
+        if source_power >= target_toughness and target in target_controller.battlefield:
+            target_destination = move_creature_from_battlefield(
+                target_controller,
+                target,
+                reason="fight_damage",
+                source=source,
+                all_players=[player, *opponents],
+            )
+            target_removed = True
+        if target_power >= source_toughness and source in player.battlefield:
+            source_destination = move_creature_from_battlefield(
+                player,
+                source,
+                reason="fight_damage",
+                source=target,
+                all_players=[player, *opponents],
+            )
+            source_removed = True
+        check_sbas_until_stable([player, *opponents])
+        event_payload = {
+            "player": player.name,
+            "card": source.get("name", "?"),
+            "trigger": "controller_discard",
+            "discarded_card": discarded_name,
+            "discarded_card_type": "noncreature_nonland",
+            "effect": "fight",
+            "target_player": target_controller.name,
+            "target": target.get("name", "?"),
+            "source_power": source_power,
+            "source_toughness": source_toughness,
+            "target_power": target_power,
+            "target_toughness": target_toughness,
+            "target_removed": target_removed,
+            "target_destination": target_destination,
+            "source_removed": source_removed,
+            "source_destination": source_destination,
+            "result": "fight_resolved",
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(source),
+        }
+        emit_replay_event("trigger_resolved", **event_payload)
+        events.append(event_payload)
+    return events
+
+
 def process_player_discard_triggers(
     player,
     discarded_cards,
@@ -8968,6 +9166,22 @@ def process_player_discard_triggers(
         effect_data = permanent
         if effect_data.get("trigger") != "controller_discard":
             continue
+        if (
+            effect_data.get("controller_discard_creature_add_plus_one_counter")
+            or effect_data.get("controller_discard_land_create_treasure")
+            or effect_data.get("controller_discard_noncreature_nonland_fight")
+        ):
+            for discarded_card in discarded:
+                trigger_events.extend(
+                    resolve_surly_badgersaur_discard_trigger(
+                        player,
+                        opponents,
+                        effect_data,
+                        discarded_card,
+                        turn=turn,
+                        phase=phase,
+                    )
+                )
         damage_each_opponent = int(effect_data.get("controller_discard_damage_each_opponent") or 0)
         level_min = int(effect_data.get("controller_discard_damage_each_opponent_level_min") or 0)
         class_level = int(effect_data.get("class_level") or effect_data.get("class_level_start") or 1)

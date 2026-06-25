@@ -6588,6 +6588,53 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_surly_badgersaur_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Surly Badgersaur",
+                        "severity": "high",
+                        "oracle_hash": "surlyhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SurlyBadgersaur",
+                            "path": "/xmage/SurlyBadgersaur.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "AddCountersSourceEffect",
+                                "CreateTokenEffect",
+                                "FightTargetSourceEffect",
+                            ],
+                            "ability_classes": ["DiscardCardControllerTriggeredAbility"],
+                            "target_classes": ["TargetPermanent"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "surly_badgersaur_discard_card_type_triggers_v1",
+                                "power": 3,
+                                "toughness": 3,
+                                "trigger": "controller_discard",
+                                "controller_discard_creature_add_plus_one_counter": True,
+                                "controller_discard_counter_type": "+1/+1",
+                                "controller_discard_counter_count": 1,
+                                "controller_discard_land_create_treasure": True,
+                                "controller_discard_treasure_count": 1,
+                                "controller_discard_noncreature_nonland_fight": True,
+                                "controller_discard_fight_target": "up_to_one_creature_you_dont_control",
+                                "controller_discard_fight_optional": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
 
 if __name__ == "__main__":
     unittest.main()

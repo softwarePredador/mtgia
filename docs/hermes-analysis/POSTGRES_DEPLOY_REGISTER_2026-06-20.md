@@ -11555,3 +11555,109 @@ Register decision:
   `Surly Badgersaur`, `Taii Wakeen, Perfect Shot`, `Trouble in Pairs`,
   `Deflecting Palm`, and `Primal Amulet // Primal Wellspring`.
 - Next package number is PG198.
+
+## PG198 - Surly Badgersaur
+
+Status: applied to PostgreSQL, synced into Hermes SQLite, validated in deck
+audits, and accepted by the battle strategy gate.
+
+Scope:
+
+- Card: `Surly Badgersaur`.
+- Decks touched by current Lorehold matrix: `608`, `617`.
+- XMage source:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SurlyBadgersaur.java`.
+- Exact XMage mapping:
+  `DiscardCardControllerTriggeredAbility` with three discarded-card filters:
+  creature card -> `AddCountersSourceEffect(+1/+1)`, land card ->
+  `CreateTokenEffect(TreasureToken)`, and noncreature/nonland card ->
+  optional `FightTargetSourceEffect` targeting up to one opposing creature.
+- ManaLoom battle model scope:
+  `surly_badgersaur_discard_card_type_triggers_v1`.
+- Logical rule key:
+  `battle_rule_v1:a4b42e4cef8bbab31819346e7b68a263`.
+- Oracle hash:
+  `14e07cfa7107a44732b5631f2136be3e`.
+
+Implementation:
+
+- XMage hint maps `SurlyBadgersaur` from the exact trigger/effect classes,
+  `TargetPermanent`, and the creature/land/noncreature-nonland filters.
+- Semantic classifier marks only the exact Surly scope as batch-safe.
+- Battle runtime now processes controller-discard type branches:
+  +1/+1 counter for discarded creature cards, Treasure for discarded land
+  cards, and optional beneficial fight for discarded noncreature/nonland cards.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg198_surly_badgersaur_package_20260625_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg198_surly_badgersaur_package_20260625_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg198_surly_badgersaur_package_20260625_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg198_surly_badgersaur_package_20260625_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg198_surly_badgersaur_package_20260625_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, canonical card id
+  `efe36db9-c638-4388-905f-e4d2ddf93065`,
+  `existing_rule_rows=2`, `expected_rule_rows_before=0`,
+  `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg198_surly_badgersaur_20260625.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3240`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg198_surly_badgersaur_postsync_v1_manifest.json`;
+  expanded scope moved to `high=399`, `medium=63`, `pass=500`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg198_surly_badgersaur_postsync_v1.json`;
+  scoped rows `567`, `battle_ready=348`,
+  `needs_rule_before_strategy=219`, `runtime_needed=16`,
+  `mapper_manual=144`, `split_scope=55`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg198_surly_badgersaur_postsync_v1.json`;
+  `18/18` checks passed.
+- Affected deck audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck608_battle_rule_coherence_pg198_surly_badgersaur_postsync_v1.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck617_battle_rule_coherence_pg198_surly_badgersaur_postsync_v1.json`;
+  decks `608` and `617` report `Surly Badgersaur` as
+  `pass/coherent_for_current_gate`.
+- Tests:
+  mapper tests ran `178` tests OK; classifier tests ran `164` tests OK;
+  `battle_card_specific_tests.py`, `test_battle_analyst_v10_3.py`,
+  `test_battle_event_contract_static_audit.py`, and
+  `test_battle_forensic_audit_supported_effects.py` passed.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_015839/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`,
+  `test_results_status_counts={"pass":18}`.
+
+Register decision:
+
+- PG198 is applied, postchecked, synced, locally tested, deck-coherence
+  validated for decks `608` and `617`, and strategy-audited.
+- Do not reuse PG198.
+- Continue next with the remaining Lorehold-touching
+  `needs_rule_before_strategy` cards. Current top items after PG198 are
+  `Taii Wakeen, Perfect Shot`, `Trouble in Pairs`, `Deflecting Palm`,
+  `Primal Amulet // Primal Wellspring`, and `Redress Fate`.
+- Next package number is PG199.

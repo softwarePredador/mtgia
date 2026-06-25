@@ -11530,6 +11530,106 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg198_surly_badgersaur_discard_card_type_triggers_counter_treasure_and_fight():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            surly = {
+                "name": "Surly Badgersaur",
+                "cmc": 4,
+                "type_line": "Creature — Badger Dinosaur",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "trigger": "controller_discard",
+                "controller_discard_creature_add_plus_one_counter": True,
+                "controller_discard_counter_type": "+1/+1",
+                "controller_discard_counter_count": 1,
+                "controller_discard_land_create_treasure": True,
+                "controller_discard_treasure_count": 1,
+                "controller_discard_noncreature_nonland_fight": True,
+                "controller_discard_fight_target": "up_to_one_creature_you_dont_control",
+                "controller_discard_fight_optional": True,
+                "battle_model_scope": "surly_badgersaur_discard_card_type_triggers_v1",
+                "_rule_logical_key": "battle_rule_v1:surly-test",
+                "_rule_oracle_hash": "surly-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            active.battlefield = [surly]
+            opponent_creature = {
+                "name": "Opponent Bear",
+                "cmc": 2,
+                "type_line": "Creature — Bear",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            opponent.battlefield = [opponent_creature]
+
+            battle.resolve_effect_discard_cards(
+                active,
+                [{"name": "Discarded Creature", "type_line": "Creature — Warrior", "effect": "creature"}],
+                opponents=[opponent],
+                turn=6,
+                phase="main",
+                rng=random.Random(1981),
+            )
+            battle.resolve_effect_discard_cards(
+                active,
+                [{"name": "Discarded Mountain", "type_line": "Basic Land — Mountain", "effect": "land"}],
+                opponents=[opponent],
+                turn=6,
+                phase="main",
+                rng=random.Random(1982),
+            )
+            battle.resolve_effect_discard_cards(
+                active,
+                [{"name": "Discarded Spell", "type_line": "Sorcery", "effect": "draw_cards"}],
+                opponents=[opponent],
+                turn=6,
+                phase="main",
+                rng=random.Random(1983),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert surly in active.battlefield
+        assert surly["power"] == 4
+        assert surly["toughness"] == 4
+        assert active.treasures == 1
+        assert opponent_creature not in opponent.battlefield
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Surly Badgersaur"
+            and data.get("discarded_card_type") == "creature"
+            and data.get("effect") == "add_counter"
+            and data.get("counters_added") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:surly-test"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Surly Badgersaur"
+            and data.get("discarded_card_type") == "land"
+            and data.get("effect") == "create_treasure"
+            and data.get("treasures_created") == 1
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Surly Badgersaur"
+            and data.get("discarded_card_type") == "noncreature_nonland"
+            and data.get("effect") == "fight"
+            and data.get("target") == "Opponent Bear"
+            and data.get("target_removed") is True
+            and data.get("source_removed") is False
+            and data.get("rule_oracle_hash") == "surly-test-hash"
+            for event, data in events
+        )
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -14135,6 +14235,7 @@ def register_tests(battle, player):
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
         test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep,
         test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures,
+        test_pg198_surly_badgersaur_discard_card_type_triggers_counter_treasure_and_fight,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,

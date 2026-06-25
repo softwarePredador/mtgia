@@ -599,6 +599,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("controlled_treasures_add_two_mana"))
         )
 
+    if effect == "creature" and scope == "surly_badgersaur_discard_card_type_triggers_v1":
+        return (
+            types == {"CREATURE"}
+            and {"AddCountersSourceEffect", "CreateTokenEffect", "FightTargetSourceEffect"}.issubset(effect_classes)
+            and "DiscardCardControllerTriggeredAbility" in ability_classes
+            and "TargetPermanent" in target_classes
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 3
+            and effect_json.get("trigger") == "controller_discard"
+            and bool(effect_json.get("controller_discard_creature_add_plus_one_counter"))
+            and effect_json.get("controller_discard_counter_type") == "+1/+1"
+            and int(effect_json.get("controller_discard_counter_count") or 0) == 1
+            and bool(effect_json.get("controller_discard_land_create_treasure"))
+            and int(effect_json.get("controller_discard_treasure_count") or 0) == 1
+            and bool(effect_json.get("controller_discard_noncreature_nonland_fight"))
+            and effect_json.get("controller_discard_fight_target") == "up_to_one_creature_you_dont_control"
+            and bool(effect_json.get("controller_discard_fight_optional"))
+        )
+
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
         return (
             types == {"CREATURE"}

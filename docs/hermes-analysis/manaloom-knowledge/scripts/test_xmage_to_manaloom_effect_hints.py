@@ -4552,6 +4552,55 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["treasure_mana_value"], 2)
         self.assertTrue(primary["controlled_treasures_add_two_mana"])
 
+    def test_surly_badgersaur_maps_to_exact_discard_card_type_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "SurlyBadgersaur",
+                "effect_classes": [
+                    "AddCountersSourceEffect",
+                    "CreateTokenEffect",
+                    "FightTargetSourceEffect",
+                ],
+                "ability_classes": ["DiscardCardControllerTriggeredAbility"],
+                "target_classes": ["TargetPermanent"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new DiscardCardControllerTriggeredAbility(new AddCountersSourceEffect("
+                    "CounterType.P1P1.createInstance()), false, StaticFilters.FILTER_CARD_CREATURE_A); "
+                    "new DiscardCardControllerTriggeredAbility(new CreateTokenEffect(new TreasureToken()), "
+                    "false, StaticFilters.FILTER_CARD_LAND_A); "
+                    "FilterCard filter = new FilterNonlandCard(\"a noncreature, nonland card\"); "
+                    "filter.add(Predicates.not(CardType.CREATURE.getPredicate())); "
+                    "new FightTargetSourceEffect(); new TargetPermanent(0, 1, "
+                    "StaticFilters.FILTER_CREATURE_YOU_DONT_CONTROL, false)"
+                ),
+            },
+            "Whenever you discard a creature card, put a +1/+1 counter on Surly Badgersaur. "
+            "Whenever you discard a land card, create a Treasure token. Whenever you discard a "
+            "noncreature, nonland card, Surly Badgersaur fights up to one target creature you don't control.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "surly_badgersaur_discard_card_type_triggers_v1",
+        )
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertEqual(primary["trigger"], "controller_discard")
+        self.assertTrue(primary["controller_discard_creature_add_plus_one_counter"])
+        self.assertEqual(primary["controller_discard_counter_type"], "+1/+1")
+        self.assertEqual(primary["controller_discard_counter_count"], 1)
+        self.assertTrue(primary["controller_discard_land_create_treasure"])
+        self.assertEqual(primary["controller_discard_treasure_count"], 1)
+        self.assertTrue(primary["controller_discard_noncreature_nonland_fight"])
+        self.assertEqual(
+            primary["controller_discard_fight_target"],
+            "up_to_one_creature_you_dont_control",
+        )
+        self.assertTrue(primary["controller_discard_fight_optional"])
+
 
 if __name__ == "__main__":
     unittest.main()
