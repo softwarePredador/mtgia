@@ -721,6 +721,48 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("controller_discard_fight_optional"))
         )
 
+    if effect == "creature" and scope == "controller_discards_card_type_token_mana_draw_v1":
+        return (
+            types == {"CREATURE"}
+            and {"BasicManaEffect", "CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and ability_classes == {"DiscardCardControllerTriggeredAbility"}
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 4
+            and effect_json.get("trigger") == "controller_discard"
+            and bool(effect_json.get("controller_discard_creature_create_token"))
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_name") == "Zombie Token"
+            and effect_json.get("token_subtype") == "Zombie"
+            and effect_json.get("token_colors") == ["B"]
+            and int(effect_json.get("token_power") or 0) == 2
+            and int(effect_json.get("token_toughness") or 0) == 2
+            and effect_json.get("controller_discard_land_add_mana_color") == "black"
+            and int(effect_json.get("controller_discard_land_add_mana_amount") or 0) == 2
+            and int(effect_json.get("controller_discard_noncreature_nonland_draw_cards") or 0) == 1
+        )
+
+    if effect == "token_maker" and scope == "opponent_discards_card_type_token_mana_draw_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {"BasicManaEffect", "CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and {
+                "WasteNotCreatureTriggeredAbility",
+                "WasteNotLandTriggeredAbility",
+                "WasteNotOtherTriggeredAbility",
+            }.issubset(ability_classes)
+            and effect_json.get("trigger") == "opponent_discard"
+            and bool(effect_json.get("opponent_discard_creature_create_token"))
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_name") == "Zombie Token"
+            and effect_json.get("token_subtype") == "Zombie"
+            and effect_json.get("token_colors") == ["B"]
+            and int(effect_json.get("token_power") or 0) == 2
+            and int(effect_json.get("token_toughness") or 0) == 2
+            and effect_json.get("opponent_discard_land_add_mana_color") == "black"
+            and int(effect_json.get("opponent_discard_land_add_mana_amount") or 0) == 2
+            and int(effect_json.get("opponent_discard_noncreature_nonland_draw_cards") or 0) == 1
+        )
+
     if effect == "creature" and scope == "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1":
         return (
             types == {"CREATURE"}

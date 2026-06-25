@@ -1,0 +1,5 @@
+ card_name  | normalized_name |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+------------+-----------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Bone Miser | bone miser      | fd488c9f31f4c6a6a0f6343ff12ed46b | battle_rule_v1:470c595610435ab6794ef9ec95c7636f |                1 | e590d32d-e7c5-4050-8828-a2847488ef5b |                  2 |                         0 |                           2
+ Waste Not  | waste not       | 895721527ac6fe6536d86e71be74e74d | battle_rule_v1:6e985605c5bb457da0b684ed919d469e |                1 | f9df9c7c-3b25-4498-9fda-7afe5dac6b5b |                  2 |                         0 |                           2
+(2 rows)

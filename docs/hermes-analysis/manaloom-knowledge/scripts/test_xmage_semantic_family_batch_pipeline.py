@@ -7292,6 +7292,106 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_bone_miser_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Bone Miser",
+                        "severity": "high",
+                        "oracle_hash": "bonemiserhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "BoneMiser",
+                            "path": "/xmage/BoneMiser.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "BasicManaEffect",
+                                "CreateTokenEffect",
+                                "DrawCardSourceControllerEffect",
+                            ],
+                            "ability_classes": ["DiscardCardControllerTriggeredAbility"],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controller_discards_card_type_token_mana_draw_v1",
+                                "power": 4,
+                                "toughness": 4,
+                                "trigger": "controller_discard",
+                                "controller_discard_creature_create_token": True,
+                                "token_count": 1,
+                                "token_name": "Zombie Token",
+                                "token_subtype": "Zombie",
+                                "token_colors": ["B"],
+                                "token_power": 2,
+                                "token_toughness": 2,
+                                "controller_discard_land_add_mana_color": "black",
+                                "controller_discard_land_add_mana_amount": 2,
+                                "controller_discard_noncreature_nonland_draw_cards": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_waste_not_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Waste Not",
+                        "severity": "high",
+                        "oracle_hash": "wastenothash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "WasteNot",
+                            "path": "/xmage/WasteNot.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": [
+                                "BasicManaEffect",
+                                "CreateTokenEffect",
+                                "DrawCardSourceControllerEffect",
+                            ],
+                            "ability_classes": [
+                                "WasteNotCreatureTriggeredAbility",
+                                "WasteNotLandTriggeredAbility",
+                                "WasteNotOtherTriggeredAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "token_maker",
+                                "battle_model_scope": "opponent_discards_card_type_token_mana_draw_v1",
+                                "trigger": "opponent_discard",
+                                "opponent_discard_creature_create_token": True,
+                                "token_count": 1,
+                                "token_name": "Zombie Token",
+                                "token_subtype": "Zombie",
+                                "token_colors": ["B"],
+                                "token_power": 2,
+                                "token_toughness": 2,
+                                "opponent_discard_land_add_mana_color": "black",
+                                "opponent_discard_land_add_mana_amount": 2,
+                                "opponent_discard_noncreature_nonland_draw_cards": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_taii_wakeen_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

@@ -1106,6 +1106,64 @@ Next operational order:
 3. Only after those runtime lanes shrink, resume benchmark candidates with the
    baseline/hash/slot-optimizer gate.
 
+## PG214 Runtime Checkpoint - Discard Card-Type Token/Mana/Draw
+
+PG214 handles the first high-leverage token-maker subfamily from decks
+`617/619`: discard-card-type triggers that create a Zombie token, add black
+mana, or draw a card.
+
+What changed:
+
+1. XMage sources:
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BoneMiser.java`
+   and
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WasteNot.java`.
+2. Runtime scopes:
+   `controller_discards_card_type_token_mana_draw_v1` for `Bone Miser` and
+   `opponent_discards_card_type_token_mana_draw_v1` for `Waste Not`.
+3. The battle runtime now resolves each discarded card by type:
+   creature creates the configured Zombie token, land adds configured black
+   mana, and noncreature/nonland draws the configured number of cards.
+4. PG214 precheck/apply/postcheck promoted one verified auto rule for each
+   card, deprecated four old shadow rows, and kept rollback SQL in
+   `docs/hermes-analysis/master_optimizer_reports/pg214_discard_token_mana_draw_rollback.sql`.
+5. PG -> Hermes sync report
+   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg214_discard_token_mana_draw_20260625.json`
+   selected `2` cards, loaded `6` PG rows, upserted `6` SQLite rows, and
+   exported `3244` canonical snapshot rows.
+6. The PG214 expanded matrix for decks `6,606-619` reports `580` rows,
+   `battle_ready=382`, `runtime_needed=8`, `mapper_manual=131`,
+   `split_scope=55`, and `blocked_missing_xmage_source=4`.
+7. Effective queue
+   `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg214_discard_token_mana_draw_postsync_v1.json`
+   reports no package-ready unprepared rows; remaining operational lanes are
+   `manual_mapper_backlog=333`, `split_scope_backlog=74`,
+   `runtime_family_backlog=12`, and `blocked_missing_xmage_source=4`.
+8. Strategy consistency audit
+   `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg214_discard_token_mana_draw_postsync_v1.json`
+   passed `18/18`.
+9. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_095546/summary.json`
+   reports `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `target_pressure_statuses={"pass":16}`,
+   `table_intent_statuses={"pass":16}`,
+   `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+   `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+   `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Next operational order:
+
+1. Continue the remaining `token_maker` runtime rows in score order:
+   `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
+   `Black Market Connections`, `Smuggler's Share`, `Davros, Dalek Creator`,
+   `Green Goblin, Nemesis`, `Aclazotz, Deepest Betrayal // Temple of the Dead`,
+   `The Locust God`, and `Biotransference`.
+2. Treat copy-token/Saga/watchers as separate subfamilies; do not force them
+   into the discard-card-type runtime added by PG214.
+3. Resume benchmark candidates only after the remaining runtime rows are closed
+   or explicitly waived by matrix evidence.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

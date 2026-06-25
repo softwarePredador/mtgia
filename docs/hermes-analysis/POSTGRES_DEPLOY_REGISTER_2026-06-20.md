@@ -13233,3 +13233,118 @@ Register decision:
 - Continue Lorehold-first closure on the token-maker runtime family from newly
   included decks `617/619`.
 - Next package number is PG214.
+
+## PG214 - Discard card-type token/mana/draw XMage batch
+
+Status: applied, postchecked, synced, tested, strategy-audited.
+
+Scope:
+
+- Cards: `Bone Miser`, `Waste Not`.
+- Families: `creature`, `token_maker`.
+- XMage sources:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BoneMiser.java`
+  and
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WasteNot.java`.
+- ManaLoom runtime scopes:
+  `controller_discards_card_type_token_mana_draw_v1` and
+  `opponent_discards_card_type_token_mana_draw_v1`.
+- Logical rule keys:
+  `battle_rule_v1:470c595610435ab6794ef9ec95c7636f` for `Bone Miser`;
+  `battle_rule_v1:6e985605c5bb457da0b684ed919d469e` for `Waste Not`.
+- Oracle hashes:
+  `fd488c9f31f4c6a6a0f6343ff12ed46b` for `Bone Miser`;
+  `895721527ac6fe6536d86e71be74e74d` for `Waste Not`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg214_discard_token_mana_draw_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg214_discard_token_mana_draw_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg214_discard_token_mana_draw_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg214_discard_token_mana_draw_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg214_discard_token_mana_draw_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  each card matched exactly one canonical card row; `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, and `would_deprecate_shadow_rows=2` for each
+  card.
+- Apply:
+  backup rows `4`, `deprecated_shadow_rows=4`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  each card has `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`;
+  backup rows total `4`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg214_discard_token_mana_draw_20260625.json`;
+  `selected_card_count=2`, `pg_rows_loaded=6`,
+  `sqlite_inserted_or_updated=6`, and
+  `canonical_snapshot_rows_exported=3244`.
+- Runtime cache spot-check:
+  local SQLite resolves `bone miser` as
+  `battle_model_scope=controller_discards_card_type_token_mana_draw_v1` and
+  `waste not` as
+  `battle_model_scope=opponent_discards_card_type_token_mana_draw_v1`, both
+  `review_status=verified`, `execution_status=auto`, with the expected Oracle
+  hashes; each card's two older rule rows are `deprecated/disabled`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg214_discard_token_mana_draw_postsync_v1_manifest.json`;
+  expanded scope moved to `high=378`, `medium=63`, `pass=521`, with
+  `runtime_family_implementation_required=12`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg214_discard_token_mana_draw_postsync_v2.json`;
+  expanded decks `6,606-619` matrix has `580` rows, `battle_ready=382`,
+  `runtime_needed=8`, `mapper_manual=131`, `split_scope=55`, and
+  `blocked_missing_xmage_source=4`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg214_discard_token_mana_draw_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=12`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg214_discard_token_mana_draw_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  mapper tests passed `198/198`, classifier tests passed `183/183`, and the
+  battle harness passed including
+  `test_pg214_waste_not_opponent_discard_card_type_triggers_create_mana_and_draw`
+  and
+  `test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw`.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_095546/summary.json`;
+  `run_scope=recurring_full`, `start_seed=63261356`,
+  `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `target_pressure_statuses={"pass":16}`,
+  `table_intent_statuses={"pass":16}`,
+  `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Runtime changes:
+
+- `process_player_discard_triggers` now supports discard-card-type resource
+  triggers for controller and opponent discard events.
+- The runtime creates the configured creature token when the discarded card is a
+  creature, adds configured mana when it is a land, and draws configured cards
+  when it is noncreature/nonland.
+- Token creation is routed through the existing `create_creature_tokens_from_effect`
+  helper, preserving token lifecycle and enter-the-battlefield trigger behavior.
+
+Register decision:
+
+- PG214 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG214.
+- Continue Lorehold-first closure on the remaining token-maker runtime rows:
+  `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
+  `Black Market Connections`, `Smuggler's Share`, `Davros, Dalek Creator`,
+  `Green Goblin, Nemesis`, `Aclazotz, Deepest Betrayal // Temple of the Dead`,
+  `The Locust God`, and `Biotransference`.
+- Next package number is PG215.

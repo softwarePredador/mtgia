@@ -5053,6 +5053,85 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
         self.assertTrue(primary["controller_discard_fight_optional"])
 
+    def test_bone_miser_maps_to_exact_discard_card_type_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BoneMiser",
+                "effect_classes": [
+                    "BasicManaEffect",
+                    "CreateTokenEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                "ability_classes": ["DiscardCardControllerTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new DiscardCardControllerTriggeredAbility(new CreateTokenEffect(new ZombieToken()), "
+                    "false, StaticFilters.FILTER_CARD_CREATURE_A); "
+                    "new DiscardCardControllerTriggeredAbility(new BasicManaEffect(Mana.BlackMana(2)), "
+                    "false, StaticFilters.FILTER_CARD_LAND_A); "
+                    "FilterCard filter = new FilterNonlandCard(\"a noncreature, nonland card\"); "
+                    "new DiscardCardControllerTriggeredAbility(new DrawCardSourceControllerEffect(1), false, filter)"
+                ),
+            },
+            "Whenever you discard a creature card, create a 2/2 black Zombie creature token. "
+            "Whenever you discard a land card, add {B}{B}. Whenever you discard a noncreature, "
+            "nonland card, draw a card.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controller_discards_card_type_token_mana_draw_v1",
+        )
+        self.assertEqual(primary["trigger"], "controller_discard")
+        self.assertTrue(primary["controller_discard_creature_create_token"])
+        self.assertEqual(primary["token_name"], "Zombie Token")
+        self.assertEqual(primary["token_colors"], ["B"])
+        self.assertEqual(primary["controller_discard_land_add_mana_color"], "black")
+        self.assertEqual(primary["controller_discard_land_add_mana_amount"], 2)
+        self.assertEqual(primary["controller_discard_noncreature_nonland_draw_cards"], 1)
+
+    def test_waste_not_maps_to_exact_opponent_discard_card_type_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "WasteNot",
+                "effect_classes": [
+                    "BasicManaEffect",
+                    "CreateTokenEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                "ability_classes": [
+                    "WasteNotCreatureTriggeredAbility",
+                    "WasteNotLandTriggeredAbility",
+                    "WasteNotOtherTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new CreateTokenEffect(new ZombieToken()); "
+                    "new BasicManaEffect(Mana.BlackMana(2)); "
+                    "new DrawCardSourceControllerEffect(1)"
+                ),
+            },
+            "Whenever an opponent discards a creature card, create a 2/2 black Zombie creature token. "
+            "Whenever an opponent discards a land card, add {B}{B}. Whenever an opponent discards a "
+            "noncreature, nonland card, draw a card.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponent_discards_card_type_token_mana_draw_v1",
+        )
+        self.assertEqual(primary["trigger"], "opponent_discard")
+        self.assertTrue(primary["opponent_discard_creature_create_token"])
+        self.assertEqual(primary["token_name"], "Zombie Token")
+        self.assertEqual(primary["token_colors"], ["B"])
+        self.assertEqual(primary["opponent_discard_land_add_mana_color"], "black")
+        self.assertEqual(primary["opponent_discard_land_add_mana_amount"], 2)
+        self.assertEqual(primary["opponent_discard_noncreature_nonland_draw_cards"], 1)
+
     def test_taii_wakeen_maps_to_exact_noncombat_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

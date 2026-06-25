@@ -3300,14 +3300,31 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Bone Miser": {
-    "cmc": 5.0,
-    "effect": "token_maker",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f1a99e76647a37f9bc0f202822a2c126"
+    "ability_kind": "triggered",
+    "battle_model_scope": "controller_discards_card_type_token_mana_draw_v1",
+    "controller_discard_creature_create_token": true,
+    "controller_discard_land_add_mana_amount": 2,
+    "controller_discard_land_add_mana_color": "black",
+    "controller_discard_noncreature_nonland_draw_cards": 1,
+    "effect": "creature",
+    "power": 4,
+    "token_colors": [
+      "B"
+    ],
+    "token_count": 1,
+    "token_name": "Zombie Token",
+    "token_power": 2,
+    "token_subtype": "Zombie",
+    "token_toughness": 2,
+    "toughness": 4,
+    "trigger": "controller_discard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:470c595610435ab6794ef9ec95c7636f",
+    "battle_rule_oracle_hash": "fd488c9f31f4c6a6a0f6343ff12ed46b"
   },
   "Bonehoard Dracosaur": {
     "cmc": 5.0,
@@ -34833,14 +34850,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Waste Not": {
-    "cmc": 2.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_discards_card_type_token_mana_draw_v1",
     "effect": "token_maker",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
+    "opponent_discard_creature_create_token": true,
+    "opponent_discard_land_add_mana_amount": 2,
+    "opponent_discard_land_add_mana_color": "black",
+    "opponent_discard_noncreature_nonland_draw_cards": 1,
+    "token_colors": [
+      "B"
+    ],
+    "token_count": 1,
+    "token_name": "Zombie Token",
+    "token_power": 2,
+    "token_subtype": "Zombie",
+    "token_toughness": 2,
+    "trigger": "opponent_discard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6e985605c5bb457da0b684ed919d469e",
+    "battle_rule_oracle_hash": "895721527ac6fe6536d86e71be74e74d"
   },
   "Wasteland": {
     "effect": "land",

@@ -1757,6 +1757,96 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and xmage_class_name == "BoneMiser"
+        and {"BasicManaEffect", "CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+        and ability_classes == {"DiscardCardControllerTriggeredAbility"}
+        and "ZombieToken" in rules_text
+        and "Mana.BlackMana(2)" in rules_text
+        and (
+            "FILTER_CARD_CREATURE_A" in rules_text
+            or "filter_card_creature_a" in normalized
+        )
+        and (
+            "FILTER_CARD_LAND_A" in rules_text
+            or "filter_card_land_a" in normalized
+        )
+        and (
+            "FilterNonlandCard" in rules_text
+            or "noncreature, nonland card" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "controller_discards_card_type_token_mana_draw_v1",
+            "fields": {
+                "power": 4,
+                "toughness": 4,
+                "trigger": "controller_discard",
+                "controller_discard_creature_create_token": True,
+                "token_count": 1,
+                "token_name": "Zombie Token",
+                "token_subtype": "Zombie",
+                "token_colors": ["B"],
+                "token_power": 2,
+                "token_toughness": 2,
+                "controller_discard_land_add_mana_color": "black",
+                "controller_discard_land_add_mana_amount": 2,
+                "controller_discard_noncreature_nonland_draw_cards": 1,
+            },
+            "reason": "XMage structure matches Bone Miser: a 4/4 creature with controller-discard triggers split by discarded card type for Zombie token, {B}{B}, or card draw.",
+            "signals": [
+                "DiscardCardControllerTriggeredAbility(creature card)",
+                "CreateTokenEffect(ZombieToken)",
+                "DiscardCardControllerTriggeredAbility(land card)",
+                "BasicManaEffect(Mana.BlackMana(2))",
+                "DiscardCardControllerTriggeredAbility(noncreature nonland card)",
+                "DrawCardSourceControllerEffect(1)",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "WasteNot"
+        and {"BasicManaEffect", "CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+        and {
+            "WasteNotCreatureTriggeredAbility",
+            "WasteNotLandTriggeredAbility",
+            "WasteNotOtherTriggeredAbility",
+        }.issubset(ability_classes)
+        and (
+            "ZombieToken" in rules_text
+            or "CreateTokenEffect" in effect_classes
+        )
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "opponent_discards_card_type_token_mana_draw_v1",
+            "fields": {
+                "trigger": "opponent_discard",
+                "opponent_discard_creature_create_token": True,
+                "token_count": 1,
+                "token_name": "Zombie Token",
+                "token_subtype": "Zombie",
+                "token_colors": ["B"],
+                "token_power": 2,
+                "token_toughness": 2,
+                "opponent_discard_land_add_mana_color": "black",
+                "opponent_discard_land_add_mana_amount": 2,
+                "opponent_discard_noncreature_nonland_draw_cards": 1,
+            },
+            "reason": "XMage structure matches Waste Not: opponent-discard triggers split by discarded card type for Zombie token, {B}{B}, or card draw.",
+            "signals": [
+                "WasteNotCreatureTriggeredAbility",
+                "CreateTokenEffect(ZombieToken)",
+                "WasteNotLandTriggeredAbility",
+                "BasicManaEffect(Mana.BlackMana(2))",
+                "WasteNotOtherTriggeredAbility",
+                "DrawCardSourceControllerEffect(1)",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and xmage_class_name == "TaiiWakeenPerfectShot"
         and "DrawCardSourceControllerEffect" in effect_classes
         and "TaiiWakeenPerfectShotEffect" in effect_classes

@@ -1,0 +1,5 @@
+ card_name  | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Bone Miser | bone miser      | battle_rule_v1:470c595610435ab6794ef9ec95c7636f |                  1 |                           1 |                         1 |           4
+ Waste Not  | waste not       | battle_rule_v1:6e985605c5bb457da0b684ed919d469e |                  1 |                           1 |                         1 |           4
+(2 rows)

@@ -15414,6 +15414,167 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg214_waste_not_opponent_discard_card_type_triggers_create_mana_and_draw():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Waste Not Controller")
+            opponent = player("Discarding Opponent")
+            active.library = [{"name": "Drawn Card", "type_line": "Instant", "cmc": 1}]
+            active.battlefield = [
+                {
+                    "name": "Waste Not",
+                    "effect": "token_maker",
+                    "battle_model_scope": "opponent_discards_card_type_token_mana_draw_v1",
+                    "trigger": "opponent_discard",
+                    "opponent_discard_creature_create_token": True,
+                    "token_count": 1,
+                    "token_name": "Zombie Token",
+                    "token_subtype": "Zombie",
+                    "token_colors": ["B"],
+                    "token_power": 2,
+                    "token_toughness": 2,
+                    "opponent_discard_land_add_mana_color": "black",
+                    "opponent_discard_land_add_mana_amount": 2,
+                    "opponent_discard_noncreature_nonland_draw_cards": 1,
+                    "_rule_logical_key": "battle_rule_v1:pg214_waste_not_test",
+                    "_rule_oracle_hash": "pg214-waste-not-test-hash",
+                }
+            ]
+
+            battle.process_player_discard_triggers(
+                opponent,
+                [
+                    {"name": "Discarded Creature", "type_line": "Creature - Rat", "cmc": 2},
+                    {"name": "Discarded Land", "type_line": "Land", "cmc": 0},
+                    {"name": "Discarded Spell", "type_line": "Sorcery", "cmc": 3},
+                ],
+                opponents=[active],
+                turn=4,
+                phase="main",
+                rng=random.Random(214),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        zombie_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Zombie Token"
+        ]
+        assert len(zombie_tokens) == 1
+        assert zombie_tokens[0]["power"] == 2
+        assert zombie_tokens[0]["toughness"] == 2
+        assert zombie_tokens[0].get("colors") == ["B"]
+        assert active.mana_pool.black == 2
+        assert [card.get("name") for card in active.hand] == ["Drawn Card"]
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Waste Not"
+            and data.get("trigger") == "opponent_discard"
+            and data.get("discarding_player") == "Discarding Opponent"
+            and data.get("discarded_card_type") == "creature"
+            and data.get("tokens_created") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:pg214_waste_not_test"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Waste Not"
+            and data.get("discarded_card_type") == "land"
+            and data.get("effect") == "add_mana"
+            and data.get("mana_amount") == 2
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Waste Not"
+            and data.get("discarded_card_type") == "noncreature_nonland"
+            and data.get("effect") == "draw_cards"
+            and data.get("cards_drawn") == 1
+            for event, data in events
+        )
+
+    def test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Bone Miser Controller")
+            opponent = player("Opponent")
+            active.library = [{"name": "Bone Miser Draw", "type_line": "Instant", "cmc": 1}]
+            active.battlefield = [
+                {
+                    "name": "Bone Miser",
+                    "effect": "creature",
+                    "battle_model_scope": "controller_discards_card_type_token_mana_draw_v1",
+                    "type_line": "Creature - Zombie Wizard",
+                    "power": 4,
+                    "toughness": 4,
+                    "trigger": "controller_discard",
+                    "controller_discard_creature_create_token": True,
+                    "token_count": 1,
+                    "token_name": "Zombie Token",
+                    "token_subtype": "Zombie",
+                    "token_colors": ["B"],
+                    "token_power": 2,
+                    "token_toughness": 2,
+                    "controller_discard_land_add_mana_color": "black",
+                    "controller_discard_land_add_mana_amount": 2,
+                    "controller_discard_noncreature_nonland_draw_cards": 1,
+                    "_rule_logical_key": "battle_rule_v1:pg214_bone_miser_test",
+                    "_rule_oracle_hash": "pg214-bone-miser-test-hash",
+                }
+            ]
+
+            battle.process_player_discard_triggers(
+                active,
+                [
+                    {"name": "Discarded Creature", "type_line": "Creature - Zombie", "cmc": 2},
+                    {"name": "Discarded Land", "type_line": "Land", "cmc": 0},
+                    {"name": "Discarded Spell", "type_line": "Enchantment", "cmc": 3},
+                ],
+                opponents=[opponent],
+                turn=4,
+                phase="main",
+                rng=random.Random(214),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        zombie_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Zombie Token"
+        ]
+        assert len(zombie_tokens) == 1
+        assert active.mana_pool.black == 2
+        assert [card.get("name") for card in active.hand] == ["Bone Miser Draw"]
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Bone Miser"
+            and data.get("trigger") == "controller_discard"
+            and data.get("discarded_card_type") == "creature"
+            and data.get("tokens_created") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:pg214_bone_miser_test"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Bone Miser"
+            and data.get("discarded_card_type") == "land"
+            and data.get("mana_amount") == 2
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Bone Miser"
+            and data.get("discarded_card_type") == "noncreature_nonland"
+            and data.get("cards_drawn") == 1
+            for event, data in events
+        )
+
     def test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -16025,6 +16186,8 @@ def register_tests(battle, player):
         test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit,
         test_pg206_boltwave_damages_each_opponent,
         test_pg213_soul_immolation_pays_blight_x_and_damages_opponents_and_their_creatures,
+        test_pg214_waste_not_opponent_discard_card_type_triggers_create_mana_and_draw,
+        test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw,
         test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage,
         test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering,
         test_pg207_impact_tremors_damages_each_opponent_when_token_enters,
