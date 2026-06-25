@@ -3560,6 +3560,39 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["destination"], "graveyard")
         self.assertTrue(primary["sorcery"])
 
+    def test_ultima_maps_to_artifact_creature_wipe_then_end_turn_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Ultima",
+                "effect_classes": ["DestroyAllEffect", "EndTurnEffect"],
+                "ability_classes": [],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    'FilterPermanent filter = new FilterPermanent("artifacts and creatures"); '
+                    "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(), "
+                    "CardType.CREATURE.getPredicate())); "
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter)); "
+                    "this.getSpellAbility().addEffect(new EndTurnEffect());"
+                ),
+            },
+            "Destroy all artifacts and creatures. End the turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "board_wipe")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "destroy_all_artifacts_and_creatures_end_turn_v1",
+        )
+        self.assertEqual(primary["destroy_card_types"], ["artifact", "creature"])
+        self.assertTrue(primary["destroy_all_artifacts"])
+        self.assertTrue(primary["destroy_all_creatures"])
+        self.assertTrue(primary["end_the_turn"])
+        self.assertEqual(primary["turn_end_scope"], "current_turn_after_resolution")
+        self.assertEqual(primary["destination"], "graveyard")
+        self.assertTrue(primary["sorcery"])
+
     def test_agate_instigator_maps_to_another_creature_enter_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

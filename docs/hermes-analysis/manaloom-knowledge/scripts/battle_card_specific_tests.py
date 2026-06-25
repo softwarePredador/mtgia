@@ -15568,6 +15568,89 @@ def register_tests(battle, player):
         assert wipe_event["creatures_seen"] == 0
         assert wipe_event["rule_logical_key"].startswith("battle_rule_v1:")
 
+    def test_pg212_ultima_destroys_artifacts_creatures_and_requests_turn_end():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {"name": "Boros Signet", "effect": "ramp_permanent", "type_line": "Artifact"},
+                {"name": "Lorehold Guardian", "effect": "creature", "type_line": "Creature", "power": 2, "toughness": 2},
+                {"name": "Sigil of the Empty Throne", "effect": "passive", "type_line": "Enchantment"},
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+            ]
+            opponent.battlefield = [
+                {"name": "Sol Ring", "effect": "ramp_permanent", "type_line": "Artifact"},
+                {"name": "Opponent Creature", "effect": "creature", "type_line": "Creature", "power": 3, "toughness": 3},
+                {"name": "Opponent Enchantment", "effect": "passive", "type_line": "Enchantment"},
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+            ]
+            card = {"name": "Ultima", "type_line": "Sorcery", "cmc": 5}
+            effect_data = {
+                "effect": "board_wipe",
+                "battle_model_scope": "destroy_all_artifacts_and_creatures_end_turn_v1",
+                "destroy_card_types": ["artifact", "creature"],
+                "destroy_all_artifacts": True,
+                "destroy_all_creatures": True,
+                "destination": "graveyard",
+                "end_the_turn": True,
+                "turn_end_scope": "current_turn_after_resolution",
+                "sorcery": True,
+                "_rule_logical_key": "battle_rule_v1:pg212_ultima_test",
+                "_rule_oracle_hash": "pg212_ultima_hash",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                9,
+                random.Random(212),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert {c.get("name") for c in active.battlefield if isinstance(c, dict)} == {
+            "Sigil of the Empty Throne",
+            "Plains",
+        }
+        assert {c.get("name") for c in opponent.battlefield if isinstance(c, dict)} == {
+            "Opponent Enchantment",
+            "Mountain",
+        }
+        assert {c.get("name") for c in active.graveyard if isinstance(c, dict)} >= {
+            "Boros Signet",
+            "Lorehold Guardian",
+            "Ultima",
+        }
+        assert {c.get("name") for c in opponent.graveyard if isinstance(c, dict)} >= {
+            "Sol Ring",
+            "Opponent Creature",
+        }
+        wipe_event = next(
+            data
+            for event, data in events
+            if event == "board_wipe_resolved" and data.get("card") == "Ultima"
+        )
+        assert wipe_event["destroy_card_types"] == ["artifact", "creature"]
+        assert wipe_event["destroyed"] == 4
+        assert wipe_event["artifacts_destroyed"] == 2
+        assert wipe_event["own_creatures_destroyed"] == 1
+        assert wipe_event["opponent_creatures_destroyed"] == 1
+        assert wipe_event["lands_destroyed"] == 0
+        assert wipe_event["enchantments_destroyed"] == 0
+        end_turn_event = next(
+            data
+            for event, data in events
+            if event == "end_turn_effect_resolved" and data.get("card") == "Ultima"
+        )
+        assert end_turn_event["end_the_turn"] is True
+        assert end_turn_event["turn_end_scope"] == "current_turn_after_resolution"
+        assert active.turn_end_requested is True
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (

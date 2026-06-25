@@ -13033,4 +13033,99 @@ Register decision:
 - Do not reuse PG211.
 - Continue Lorehold-first rule closure on the remaining `95`
   `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
-- Next package number is PG212.
+
+## PG212 - Ultima artifact/creature wipe plus end-turn runtime
+
+Status: applied, postchecked, synced to Hermes, and strategy-audited.
+
+Scope:
+
+- Exact XMage class `Ultima`: `DestroyAllEffect` over a
+  `FilterPermanent("artifacts and creatures")` built from
+  `CardType.ARTIFACT` or `CardType.CREATURE`, followed by `EndTurnEffect`.
+- Promoted card:
+  - `Ultima`.
+- Deliberately left `Soul Immolation` in runtime backlog because it needs
+  separate variable-X/Blight cost and opponent-creature damage modeling.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg212_ultima_package_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg212_ultima_package_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg212_ultima_package_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg212_ultima_package_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg212_ultima_package_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `Ultima` had `target_card_rows=1`, canonical card id
+  `b8bf266f-be99-4781-92e1-54dcdbb4ecb8`,
+  `expected_rule_rows_before=0`, and `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg212_ultima_20260625.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, and
+  `canonical_snapshot_rows_exported=3243`.
+- Runtime cache spot-check:
+  local SQLite resolves `ultima` as `effect=board_wipe`,
+  `battle_model_scope=destroy_all_artifacts_and_creatures_end_turn_v1`,
+  `end_the_turn=1`, and `destroy_card_types=["artifact","creature"]`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg212_ultima_postsync_v1_manifest.json`;
+  expanded scope moved to `high=381`, `medium=63`, `pass=518`, with no
+  package-ready unprepared proposal remaining.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg212_ultima_postsync_v1.json`;
+  expanded decks `6,606-619` matrix has `580` rows, `battle_ready=379`,
+  `runtime_needed=11`, and the only remaining `board_wipe_choice`
+  runtime-needed row is `Soul Immolation`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg212_ultima_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=15`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg212_ultima_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  focused mapper/classifier tests passed through `unittest`, and the battle
+  harness passed including
+  `test_pg212_ultima_destroys_artifacts_creatures_and_requests_turn_end`.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_090245/summary.json`;
+  `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `forensic_lineage_status=complete`, `target_pressure_statuses={"pass":16}`,
+  `table_intent_statuses={"pass":16}`,
+  `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Runtime changes:
+
+- The generic `board_wipe` executor now honors `destroy_card_types` for
+  artifact/creature wipes and can request current-turn termination when
+  `end_the_turn=true`.
+- The main priority/turn loop now stops subsequent phases/actions when a
+  resolving effect requests end of turn.
+
+Register decision:
+
+- PG212 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG212.
+- Continue Lorehold-first closure on `Soul Immolation` for the remaining
+  `board_wipe_choice` runtime card, then the token-maker runtime family from
+  newly included decks `617/619`.
+- Next package number is PG213.

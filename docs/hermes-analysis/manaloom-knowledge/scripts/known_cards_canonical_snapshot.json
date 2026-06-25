@@ -33107,14 +33107,26 @@
     "battle_rule_logical_key": "battle_rule_v1:bc66532029010cf16891d5c64b970f33"
   },
   "Ultima": {
-    "cmc": 5.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "destroy_all_artifacts_and_creatures_end_turn_v1",
+    "destination": "graveyard",
+    "destroy_all_artifacts": true,
+    "destroy_all_creatures": true,
+    "destroy_card_types": [
+      "artifact",
+      "creature"
+    ],
     "effect": "board_wipe",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8d54214335142fbda9e139f79184cd30"
+    "end_the_turn": true,
+    "sorcery": true,
+    "turn_end_scope": "current_turn_after_resolution",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:00d07c4c4ae799feb2d1542562221339",
+    "battle_rule_oracle_hash": "2b6ebea707b8aaf76a72a2a5ded6daf3"
   },
   "Ultimate Magic: Holy": {
     "cmc": 3.0,

@@ -4978,7 +4978,9 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     ability_kind = _ability_kind(ability_classes)
     target_constraints = _target_constraints(target_classes, filter_classes)
     card_types = _constructor_card_types(index_entry)
-    xmage_class_name = str(index_entry.get("xmage_class_name") or "").strip()
+    xmage_class_name = str(
+        index_entry.get("xmage_class_name") or index_entry.get("class_name") or ""
+    ).strip()
     normalized_text = _normalized_rules_text(rules_text)
     normalized_imports = _normalized_rules_text(" ".join(str(value or "") for value in index_entry.get("imports") or []))
     candidates: list[dict[str, Any]] = []
@@ -6493,6 +6495,49 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     ],
                 )
             )
+
+    if (
+        "DestroyAllEffect" in effect_classes
+        and card_types == {"SORCERY"}
+        and not ability_classes
+        and xmage_class_name == "Ultima"
+        and "EndTurnEffect" in effect_classes
+        and (
+            "cardtype.artifact.getpredicate" in normalized_text
+            or "artifacts and creatures" in normalized_text
+        )
+        and (
+            "cardtype.creature.getpredicate" in normalized_text
+            or "artifacts and creatures" in normalized_text
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="board_wipe",
+                scope="destroy_all_artifacts_and_creatures_end_turn_v1",
+                reason=(
+                    "XMage Ultima resolves DestroyAllEffect over artifacts and creatures, then EndTurnEffect; "
+                    "ManaLoom can model this as an artifact/creature board wipe that requests current-turn termination."
+                ),
+                ability_kind="one_shot",
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "destroy_card_types": ["artifact", "creature"],
+                    "destroy_all_artifacts": True,
+                    "destroy_all_creatures": True,
+                    "destination": "graveyard",
+                    "end_the_turn": True,
+                    "turn_end_scope": "current_turn_after_resolution",
+                    "sorcery": True,
+                },
+                matched_signals=[
+                    "DestroyAllEffect",
+                    "EndTurnEffect",
+                    "CardType.ARTIFACT",
+                    "CardType.CREATURE",
+                ],
+            )
+        )
 
     if (
         "DestroyAllEffect" in effect_classes

@@ -1001,6 +1001,62 @@ Lorehold/opponent matrix:
    runtime, decision-trace, forensic, target-pressure, table-intent, or effect
    coverage failures.
 
+## PG212 Runtime Checkpoint - Ultima
+
+`Ultima` is the twenty-seventh completed proof group. It closes the exact
+XMage pattern `DestroyAllEffect(artifacts or creatures) + EndTurnEffect` for
+the Lorehold/new-deck matrix without broadening the mapper to every
+end-the-turn card.
+
+What changed:
+
+1. XMage mapper now recognizes `Ultima` only when the class has
+   `DestroyAllEffect`, `EndTurnEffect`, sorcery type, and the artifact/creature
+   permanent filter.
+2. ManaLoom effect scope is
+   `destroy_all_artifacts_and_creatures_end_turn_v1` with
+   `destroy_card_types=["artifact","creature"]`, `destination=graveyard`, and
+   `end_the_turn=true`.
+3. Battle runtime now emits `end_turn_effect_resolved` and stops later
+   priority/phase actions when a resolving effect requests current-turn end.
+4. PG212 precheck/apply/postcheck promoted one verified auto rule for
+   `Ultima`, backed up/deprecated two stale shadow rows, and did not mutate
+   decks.
+5. PG -> Hermes sync made `Ultima` report as `battle_ready`; the local cache
+   spot-check resolves `effect=board_wipe`,
+   `battle_model_scope=destroy_all_artifacts_and_creatures_end_turn_v1`,
+   `end_the_turn=1`, and `destroy_card_types=["artifact","creature"]`.
+6. The PG212 expanded matrix for decks `6,606-619` reports `580` rows,
+   `battle_ready=379`, `runtime_needed=11`, and only one remaining
+   `board_wipe_choice` runtime card: `Soul Immolation`.
+7. Effective queue
+   `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg212_ultima_postsync_v1.json`
+   reports no package-ready unprepared rows; remaining operational lanes are
+   `manual_mapper_backlog=333`, `split_scope_backlog=74`,
+   `runtime_family_backlog=15`, and `blocked_missing_xmage_source=4`.
+8. Strategy consistency audit
+   `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg212_ultima_postsync_v1.json`
+   passed `18/18`.
+9. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_090245/summary.json`
+   reports `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `forensic_lineage_status=complete`,
+   `target_pressure_statuses={"pass":16}`,
+   `table_intent_statuses={"pass":16}`,
+   `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+   `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+   `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Next operational order:
+
+1. Close `Soul Immolation` separately, because it needs variable-X/Blight cost
+   and damage-to-each-opponent/every-opponent-creature modeling.
+2. Then handle the token-maker runtime family surfaced by newly included decks
+   `617/619`.
+3. Only after those runtime lanes shrink, resume benchmark candidates with the
+   baseline/hash/slot-optimizer gate.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

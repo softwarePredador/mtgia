@@ -6311,6 +6311,47 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "board_wipe_choice")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_ultima_artifact_creature_wipe_end_turn_scope_is_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Ultima",
+                        "severity": "high",
+                        "oracle_hash": "ultimahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Ultima",
+                            "path": "/xmage/Ultima.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["DestroyAllEffect", "EndTurnEffect"],
+                            "ability_classes": [],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "board_wipe",
+                                "battle_model_scope": "destroy_all_artifacts_and_creatures_end_turn_v1",
+                                "destroy_card_types": ["artifact", "creature"],
+                                "destroy_all_artifacts": True,
+                                "destroy_all_creatures": True,
+                                "destination": "graveyard",
+                                "end_the_turn": True,
+                                "turn_end_scope": "current_turn_after_resolution",
+                                "sorcery": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["family_id"], "board_wipe_choice")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_controlled_creature_etb_damage_family_is_batch_safe_for_simple_xmage_sources(self) -> None:
         report = classifier.build_family_report(
             {

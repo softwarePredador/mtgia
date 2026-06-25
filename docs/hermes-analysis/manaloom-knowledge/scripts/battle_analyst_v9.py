@@ -5184,6 +5184,8 @@ class Player:
         self._noncreature_spells_cast_turn_marker = None
         self.surge_to_victory_delayed_triggers = []
         self.failed_draw_from_empty_library = False
+        self.turn_end_requested = False
+        self.turn_end_source = None
 
     def refresh_mana_sources(self, turn=None):
         """Untap mana sources once for this player's turn."""
@@ -8597,6 +8599,8 @@ def run_priority_loop(active_player, all_players, stack, turn, phase, rng, max_e
     empty_actions = 0
 
     while True:
+        if turn_ended_by_effect(active_player):
+            return acted
         if game_winner(all_players):
             return acted
         if stack.empty() and not _pending_triggers:
@@ -8610,6 +8614,8 @@ def run_priority_loop(active_player, all_players, stack, turn, phase, rng, max_e
 
         if priority_round(active_player, all_players, stack, turn, rng):
             acted = True
+            if turn_ended_by_effect(active_player):
+                return acted
             continue
         return acted
 
@@ -12015,6 +12021,25 @@ def _permanent_matches_destroy_card_types(permanent, destroy_card_types):
     if "permanent" in requested and is_permanent_card(permanent):
         return True
     return False
+
+
+def turn_ended_by_effect(player):
+    return bool(getattr(player, "turn_end_requested", False))
+
+
+def request_turn_end_by_effect(player, card, effect_data, turn, *, phase="resolution"):
+    player.turn_end_requested = True
+    player.turn_end_source = card.get("name", "?") if isinstance(card, dict) else str(card)
+    emit_replay_event(
+        "end_turn_effect_resolved",
+        player=player.name,
+        card=player.turn_end_source,
+        turn=turn,
+        phase=phase,
+        end_the_turn=True,
+        turn_end_scope=effect_data.get("turn_end_scope", "current_turn_after_resolution"),
+        **replay_rule_fields(effect_data),
+    )
 
 
 def _destroyed_permanent_type_flags(permanent):
@@ -27017,6 +27042,8 @@ def apply_effect_immediate(
             turn=turn,
         )
         finish_resolved_spell(player, card, turn=turn)
+        if effect_data.get("end_the_turn"):
+            request_turn_end_by_effect(player, card, effect_data, turn, phase="resolution")
     elif effect == "worldfire_reset":
         context = worldfire_decision_context(player, opponents)
         risk_flags = []
@@ -29958,6 +29985,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     clear_expired_non_hand_cast_locks(player, all_players, turn)
     decay_table_intent_memory(player)
     player.lands_played_this_turn = 0
+    player.turn_end_requested = False
+    player.turn_end_source = None
     player.cards_drawn_this_turn = 0
     player.surge_to_victory_delayed_triggers = []
     clear_until_eot(player)
@@ -30040,6 +30069,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     )
     while not stack.empty() or _pending_triggers:
         priority_round(player, all_players, stack, turn, rng, phase="draw_step")
+        if turn_ended_by_effect(player):
+            return
 
     # ── PRECOMBAT MAIN ──
     total_mana = player.available_mana()
@@ -30089,6 +30120,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         )
         while not stack.empty() or _pending_triggers:
             priority_round(player, all_players, stack, turn, rng)
+            if turn_ended_by_effect(player):
+                return
     activate_land_tutor_creatures(player, turn, opponents)
     activate_treasure_tutor_creatures(
         player,
@@ -30149,6 +30182,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         phase="precombat_main",
     )
     run_priority_loop(player, all_players, stack, turn, "precombat_main", rng)
+    if turn_ended_by_effect(player):
+        return
     if game_winner(all_players):
         return
     if check_sbas(all_players): return
@@ -30156,6 +30191,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     # ── COMBAT ──
     if turn > 1:
         combat_phase_v8(player, opponents, all_players, turn, rng, stack)
+        if turn_ended_by_effect(player):
+            return
         if game_winner(all_players):
             return
         if check_sbas(all_players): return
@@ -30176,6 +30213,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
                 remaining_extra_combats=player.extra_combats,
             )
             combat_phase_v8(player, opponents, all_players, turn, rng, stack)
+            if turn_ended_by_effect(player):
+                return
             if game_winner(all_players):
                 return
             if check_sbas(all_players): return
@@ -30191,6 +30230,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     # ── POSTCOMBAT MAIN ──
     total_mana = player.available_mana()
     run_priority_loop(player, all_players, stack, turn, "postcombat_main", rng)
+    if turn_ended_by_effect(player):
+        return
     activate_utility_artifacts(
         player,
         opponents,
