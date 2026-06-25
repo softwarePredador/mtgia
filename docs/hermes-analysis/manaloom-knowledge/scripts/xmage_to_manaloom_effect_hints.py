@@ -1986,6 +1986,44 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        card_types == {"CREATURE"}
+        and xmage_class_name == "BlazeCommando"
+        and "CreateTokenEffect" in effect_classes
+        and "SpellControlledDealsDamageTriggeredAbility" in ability_classes
+        and (
+            "SoldierHasteToken" in rules_text
+            or "soldierhastetoken" in normalized
+            or _oracle_has(rules_text, "instant or sorcery spell you control deals damage", "two 1/1", "red and white soldier", "haste")
+        )
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "instant_sorcery_spell_damage_create_two_1_1_red_white_soldier_haste_v1",
+            "fields": {
+                "power": 5,
+                "toughness": 3,
+                "trigger": "instant_sorcery_spell_you_control_deals_damage",
+                "trigger_effect": "token_maker",
+                "trigger_token_count": 2,
+                "token_count": 2,
+                "token_name": "Soldier Token",
+                "token_subtype": "Soldier",
+                "token_colors": ["R", "W"],
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_haste": True,
+                "token_keywords": ["haste"],
+            },
+            "reason": "XMage structure matches Blaze Commando: a 5/3 creature whose controller creates two 1/1 red and white hasty Soldier tokens whenever an instant or sorcery spell they control deals damage.",
+            "signals": [
+                "SpellControlledDealsDamageTriggeredAbility",
+                "CreateTokenEffect",
+                "SoldierHasteToken",
+                "FILTER_SPELL_INSTANT_OR_SORCERY",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and xmage_class_name == "InvokeCalamity"
         and {

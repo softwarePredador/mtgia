@@ -47,6 +47,7 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "copy_creature_token" in audit.SUPPORTED_EFFECTS
     assert "copy_attached_creature_or_insect" in audit.SUPPORTED_EFFECTS
     assert "copy_permanent_etb" in audit.SUPPORTED_EFFECTS
+    assert "create_plant_token_plus_counters" in audit.SUPPORTED_EFFECTS
     assert "create_treasure" in audit.SUPPORTED_EFFECTS
     assert "dig_to_hand" in audit.SUPPORTED_EFFECTS
     assert "direct_damage" in audit.SUPPORTED_EFFECTS

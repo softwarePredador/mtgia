@@ -12931,3 +12931,106 @@ Register decision:
 - Continue Lorehold-first rule closure on the remaining `96`
   `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
 - Next package number is PG211.
+
+## PG211 - Blaze Commando instant/sorcery damage token trigger
+
+Status: applied, postchecked, synced to Hermes, and strategy-audited.
+
+Scope:
+
+- Exact XMage family:
+  `SpellControlledDealsDamageTriggeredAbility` with `CreateTokenEffect(new
+  SoldierHasteToken(), 2)` and
+  `StaticFilters.FILTER_SPELL_INSTANT_OR_SORCERY`.
+- Promoted card:
+  - `Blaze Commando`.
+- Deliberately left `Ultima` and `Soul Immolation` in Lorehold runtime backlog
+  because they require separate board-wipe/end-turn and variable-X damage
+  modeling.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg211_blaze_commando_package_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg211_blaze_commando_package_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg211_blaze_commando_package_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg211_blaze_commando_package_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg211_blaze_commando_package_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `Blaze Commando` had `target_card_rows=1`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=0`, and
+  canonical card id `48530c4d-0ec3-43a5-b618-4d41f455f56f`.
+- Apply:
+  backup rows `0`, `deprecated_shadow_rows=0`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `backup_rows=0`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg211_blaze_commando_20260625_053130.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=1`, and
+  `canonical_snapshot_rows_exported=3243`.
+- Runtime cache spot-check:
+  `Blaze Commando` resolves from local cache with
+  `effect=token_maker`,
+  `trigger=instant_sorcery_spell_you_control_deals_damage`,
+  `trigger_effect=token_maker`, `token_count=2`,
+  `token_name=Soldier Token`, and `token_haste=true`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg211_blaze_commando_postsync_v1_manifest.json`;
+  expanded scope moved to `high=382`, `medium=63`, `pass=517`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg211_blaze_commando_postsync_v1.json`;
+  scoped rows `395`, `battle_ready=300`,
+  `needs_rule_before_strategy=95`, and Lorehold runtime-needed rows now `2`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg211_blaze_commando_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=16`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg211_blaze_commando_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  focused mapper/classifier tests passed through `unittest`;
+  focused runtime regression
+  `test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage`
+  passed through the battle harness; ward-cost normalization and forensic
+  supported-effect drift regressions also passed.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_084446/summary.json`;
+  `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `forensic_audit.status=pass`, `target_pressure.status=pass`,
+  `table_intent.status=pass`, `effect_coverage.status=pass`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+  Final status remains `review_required` only because the static event
+  contract still has one review-required fixture waiver.
+
+Runtime and audit changes:
+
+- Battle runtime now resolves
+  `instant_sorcery_spell_you_control_deals_damage` token engines after
+  successful instant/sorcery `damage_each_opponent` events.
+- Ward cost handling now normalizes textual generic values such as `"2"` and
+  emits `ward_cost_unmodeled` for non-mana ward text instead of crashing the
+  replay.
+- The forensic audit supported-effect registry now recognizes the existing
+  Insidious Roots runtime effect `create_plant_token_plus_counters`.
+
+Register decision:
+
+- PG211 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG211.
+- Continue Lorehold-first rule closure on the remaining `95`
+  `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
+- Next package number is PG212.

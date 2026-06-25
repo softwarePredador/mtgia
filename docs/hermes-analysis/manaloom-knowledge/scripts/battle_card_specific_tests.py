@@ -15288,6 +15288,122 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            blaze = {
+                "name": "Blaze Commando",
+                "cmc": 5,
+                "type_line": "Creature - Minotaur Soldier",
+                "effect": "token_maker",
+                "battle_model_scope": "instant_sorcery_spell_damage_create_two_1_1_red_white_soldier_haste_v1",
+                "power": 5,
+                "toughness": 3,
+                "trigger": "instant_sorcery_spell_you_control_deals_damage",
+                "trigger_effect": "token_maker",
+                "trigger_token_count": 2,
+                "token_count": 2,
+                "token_name": "Soldier Token",
+                "token_subtype": "Soldier",
+                "token_colors": ["R", "W"],
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_haste": True,
+                "token_keywords": ["haste"],
+                "_rule_logical_key": "battle_rule_v1:pg211_blaze_commando_test",
+                "_rule_oracle_hash": "pg211-blaze-commando-test-hash",
+            }
+            active.battlefield = [blaze]
+            card = {"name": "Boltwave", "type_line": "Sorcery", "cmc": 1}
+            effect_data = {
+                "effect": "damage_each_opponent",
+                "battle_model_scope": "spell_damage_each_opponent_v1",
+                "amount": 3,
+                "damage": 3,
+                "target_controller": "opponents",
+                "sorcery": True,
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent_a, opponent_b],
+                card,
+                4,
+                random.Random(211),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        soldier_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Soldier Token"
+        ]
+        assert opponent_a.life == 37
+        assert opponent_b.life == 37
+        assert len(soldier_tokens) == 2
+        assert all(token.get("power") == 1 for token in soldier_tokens)
+        assert all(token.get("toughness") == 1 for token in soldier_tokens)
+        assert all(token.get("type_line") == "Creature Token — Soldier" for token in soldier_tokens)
+        assert all(token.get("colors") == ["R", "W"] for token in soldier_tokens)
+        assert all(token.get("haste") is True for token in soldier_tokens)
+        assert all(token.get("summoning_sick") is False for token in soldier_tokens)
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Blaze Commando"
+            and data.get("trigger") == "instant_sorcery_spell_you_control_deals_damage"
+            and data.get("source_spell") == "Boltwave"
+            and data.get("damage_event") == "damage_each_opponent"
+            and data.get("tokens_created") == 2
+            and data.get("token_name") == "Soldier Token"
+            and data.get("token_haste") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:pg211_blaze_commando_test"
+            for event, data in events
+        )
+
+    def test_ward_cost_text_normalizes_for_runtime_replay():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.mana_pool.generic = 2
+            target = {"name": "Ward Creature", "ward_cost": "2"}
+            spell = {"name": "Test Removal"}
+
+            countered = battle.check_ward(target, spell, active, random.Random(1))
+
+            assert countered is False
+            assert active.available_mana() == 0
+            assert any(
+                event == "ward_paid"
+                and data.get("target") == "Ward Creature"
+                and data.get("spell") == "Test Removal"
+                and data.get("ward_cost") == 2
+                and data.get("ward_mana_value") == 2
+                for event, data in events
+            )
+
+            events.clear()
+            unsupported_target = {"name": "Life Ward Creature", "ward_cost": "pay 3 life"}
+            countered = battle.check_ward(unsupported_target, spell, active, random.Random(1))
+
+            assert countered is False
+            assert any(
+                event == "ward_cost_unmodeled"
+                and data.get("target") == "Life Ward Creature"
+                and data.get("ward_cost") == "pay 3 life"
+                for event, data in events
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
     def test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -15699,6 +15815,7 @@ def register_tests(battle, player):
         test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them,
         test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit,
         test_pg206_boltwave_damages_each_opponent,
+        test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage,
         test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering,
         test_pg207_impact_tremors_damages_each_opponent_when_token_enters,
         test_pg208_armageddon_destroys_all_lands_only,
@@ -15750,6 +15867,7 @@ def register_tests(battle, player):
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg209_monastery_mentor_creates_monk_on_noncreature_spell_only,
         test_pg210_utvara_hellkite_creates_dragon_token_when_dragons_attack,
+        test_ward_cost_text_normalizes_for_runtime_replay,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,

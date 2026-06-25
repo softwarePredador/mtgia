@@ -952,10 +952,54 @@ matrix:
    `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
    `event_contract_static_status=event_contract_static_ready`, and
    `mandatory_gate_divergences=["strategy_audit=review_required"]`. The final
-   status remains `review_required` only because the strategy audit found one
-   review-required and one low-confidence strategy item, not because of
-   runtime, event-contract, decision-trace, forensic, target-pressure, or
-   table-intent failures.
+  status remains `review_required` only because the strategy audit found one
+  review-required and one low-confidence strategy item, not because of
+  runtime, event-contract, decision-trace, forensic, target-pressure, or
+  table-intent failures.
+
+`Blaze Commando` is the twenty-sixth completed proof group and closes the
+exact instant/sorcery spell damage token trigger for the current
+Lorehold/opponent matrix:
+
+1. XMage local source matched `SpellControlledDealsDamageTriggeredAbility`
+   with `CreateTokenEffect(new SoldierHasteToken(), 2)` and an instant/sorcery
+   spell filter.
+2. The mapper/classifier now promotes
+   `instant_sorcery_spell_damage_create_two_1_1_red_white_soldier_haste_v1`
+   as `token_maker`, while leaving `Ultima` and `Soul Immolation` in runtime
+   review because they need separate board-wipe/end-turn and variable-X
+   damage modeling.
+3. Battle runtime now resolves
+   `instant_sorcery_spell_you_control_deals_damage` token engines after
+   successful instant/sorcery `damage_each_opponent` events, creating two
+   1/1 red and white Soldier tokens with haste for Blaze Commando.
+4. PG211 precheck/apply/postcheck promoted one verified auto rule and did not
+   need to deprecate stale shadow rows.
+5. PG -> Hermes sync made `Blaze Commando` report as `battle_ready`; the
+   matrix moved it out of `needs_rule_before_strategy`.
+6. The PG211 matrix now reports `95` total Lorehold-scoped
+   `needs_rule_before_strategy` rows and `300` `battle_ready` rows. The
+   Lorehold runtime-needed block across decks `608` through `616` is now `2`
+   rows: `Ultima` and `Soul Immolation`. The effective queue still has `333`
+   mapper backlog, `74` split-scope backlog, `16` runtime-family backlog, and
+   `4` blocked missing XMage source rows, with no unprepared package-ready
+   rows.
+7. Gate repair notes: the PG211 gate surfaced two runtime/audit blockers that
+   were not Blaze-specific but blocked complete validation. `ward_cost` now
+   normalizes textual generic costs such as `"2"` instead of crashing replays,
+   and forensic support now recognizes the already implemented Insidious Roots
+   effect `create_plant_token_plus_counters`.
+8. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_084446/summary.json`
+   reports `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `forensic_audit.status=pass`, `target_pressure.status=pass`,
+   `table_intent.status=pass`, `effect_coverage.status=pass`, and
+   `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+   The final status remains `review_required` only because the static event
+   contract still has one review-required fixture waiver, not because of
+   runtime, decision-trace, forensic, target-pressure, table-intent, or effect
+   coverage failures.
 
 ## Current Benchmark Candidate Lane
 

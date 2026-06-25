@@ -889,6 +889,29 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("token_keywords") == ["flying"]
         )
 
+    if (
+        effect == "token_maker"
+        and scope == "instant_sorcery_spell_damage_create_two_1_1_red_white_soldier_haste_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenEffect" in effect_classes
+            and "SpellControlledDealsDamageTriggeredAbility" in ability_classes
+            and int(effect_json.get("power") or 0) == 5
+            and int(effect_json.get("toughness") or 0) == 3
+            and effect_json.get("trigger") == "instant_sorcery_spell_you_control_deals_damage"
+            and effect_json.get("trigger_effect") == "token_maker"
+            and int(effect_json.get("trigger_token_count") or 0) == 2
+            and int(effect_json.get("token_count") or 0) == 2
+            and effect_json.get("token_name") == "Soldier Token"
+            and effect_json.get("token_subtype") == "Soldier"
+            and effect_json.get("token_colors") == ["R", "W"]
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+            and bool(effect_json.get("token_haste"))
+            and effect_json.get("token_keywords") == ["haste"]
+        )
+
     if effect == "counter_spell" and scope == "pact_of_negation_delayed_upkeep_counter_v1":
         return (
             types == {"INSTANT"}

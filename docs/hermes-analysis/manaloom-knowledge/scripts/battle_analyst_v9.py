@@ -22300,6 +22300,16 @@ def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
         turn=turn,
         **replay_rule_fields(effect_data),
     )
+    if any(entry.get("dealt", 0) > 0 for entry in damaged):
+        trigger_spell_damage_token_engines(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            phase="resolution",
+            damage_event="damage_each_opponent",
+        )
     finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
 
 
@@ -23009,6 +23019,65 @@ def process_taii_wakeen_noncombat_damage_to_creature(
             **replay_rule_fields(permanent),
         )
     return triggers
+
+
+def trigger_spell_damage_token_engines(
+    player,
+    opponents,
+    source_spell,
+    effect_data,
+    turn,
+    *,
+    phase="resolution",
+    damage_event="spell_damage",
+    stack=None,
+    all_players=None,
+):
+    if not is_instant_or_sorcery_spell(source_spell):
+        return 0
+    created_total = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("trigger") != "instant_sorcery_spell_you_control_deals_damage":
+            continue
+        if permanent.get("trigger_effect") != "token_maker":
+            continue
+
+        token_count = int(permanent.get("trigger_token_count") or permanent.get("token_count") or 1)
+        created = create_creature_tokens_from_effect(
+            player,
+            permanent,
+            count=token_count,
+            opponents=opponents,
+            turn=turn,
+            source_event="spell_damage_token_trigger",
+            stack=stack,
+            active_player=player,
+            all_players=all_players,
+        )
+        created_total += created
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="instant_sorcery_spell_you_control_deals_damage",
+            effect="token_maker",
+            source_spell=source_spell.get("name", "?") if isinstance(source_spell, dict) else source_spell,
+            source_spell_type_line=source_spell.get("type_line", "") if isinstance(source_spell, dict) else "",
+            damage_event=damage_event,
+            tokens_created=created,
+            token_name=permanent.get("token_name"),
+            token_power=permanent.get("token_power"),
+            token_toughness=permanent.get("token_toughness"),
+            token_subtype=permanent.get("token_subtype"),
+            token_colors=permanent.get("token_colors") or [],
+            token_haste=bool(permanent.get("token_haste") or permanent.get("haste")),
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+    return created_total
 
 
 def _damage_sweep_creature_toughness(creature):
@@ -24290,21 +24359,63 @@ def process_player_draw_triggers(
     )
 
 
+def normalize_ward_payment_cost(raw_cost):
+    if raw_cost is None or raw_cost is False:
+        return None
+    if isinstance(raw_cost, (int, float)):
+        cost = int(raw_cost)
+        if cost <= 0:
+            return None
+        return {"payment_cost": cost, "mana_value": cost, "raw_cost": raw_cost}
+    text = str(raw_cost).strip()
+    if not text or text.lower() in ("0", "false", "none", "no", "no ward"):
+        return None
+    if re.fullmatch(r"\d+", text):
+        cost = int(text)
+        if cost <= 0:
+            return None
+        return {"payment_cost": cost, "mana_value": cost, "raw_cost": raw_cost}
+
+    parsed = parse_mana_cost(text, 0)
+    mana_value = int(parsed.get("generic", 0) or 0)
+    mana_value += sum(int(value or 0) for value in parsed.get("colored", {}).values())
+    mana_value += len(parsed.get("hybrid", []) or [])
+    mana_value += len(parsed.get("phyrexian", []) or [])
+    mana_value += len(parsed.get("phyrexian_hybrid", []) or [])
+    mana_value += sum(
+        int(option.get("generic", 2) or 2)
+        for option in parsed.get("monocolored_hybrid", []) or []
+    )
+    if mana_value <= 0:
+        return {"payment_cost": None, "mana_value": 0, "raw_cost": raw_cost, "unsupported": True}
+    return {"payment_cost": text, "mana_value": mana_value, "raw_cost": raw_cost}
+
+
 
 
 def check_ward(target, spell, controller, rng):
     """v9: Ward triggered ability (CR 702.21a).
     If target has ward, spell is countered unless controller pays cost."""
-    ward_cost = target.get("ward_cost") or target.get("ward", 0)
-    if ward_cost <= 0:
+    ward_payment = normalize_ward_payment_cost(target.get("ward_cost") or target.get("ward", 0))
+    if not ward_payment:
         return False  # No ward
+    ward_cost = ward_payment.get("payment_cost")
+    ward_mana_value = int(ward_payment.get("mana_value", 0) or 0)
+    if ward_payment.get("unsupported") or ward_cost is None:
+        emit_replay_event(
+            "ward_cost_unmodeled",
+            target=target.get("name"),
+            spell=spell.get("name"),
+            ward_cost=ward_payment.get("raw_cost"),
+        )
+        return False
 
     # Ward triggers: AI opponent pays 50% of the time if affordable
-    can_pay = controller.available_mana() >= ward_cost
+    can_pay = controller.can_pay(ward_cost)
     if not can_pay:
         # Counter the spell (ward resolved)
         emit_replay_event("ward_countered", target=target.get("name"),
-                         spell=spell.get("name"), ward_cost=ward_cost)
+                         spell=spell.get("name"), ward_cost=ward_cost, ward_mana_value=ward_mana_value)
         return True  # Spell is countered
 
     # Decision: pay or let it be countered
@@ -24312,11 +24423,11 @@ def check_ward(target, spell, controller, rng):
         # Pay ward cost
         controller.spend_mana(ward_cost)
         emit_replay_event("ward_paid", target=target.get("name"),
-                         spell=spell.get("name"), ward_cost=ward_cost)
+                         spell=spell.get("name"), ward_cost=ward_cost, ward_mana_value=ward_mana_value)
         return False  # Ward paid, spell proceeds
     else:
         emit_replay_event("ward_countered", target=target.get("name"),
-                         spell=spell.get("name"), ward_cost=ward_cost)
+                         spell=spell.get("name"), ward_cost=ward_cost, ward_mana_value=ward_mana_value)
         return True  # Spell countered by ward
 
 

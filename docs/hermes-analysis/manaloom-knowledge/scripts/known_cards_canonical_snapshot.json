@@ -2871,6 +2871,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Blaze Commando": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "instant_sorcery_spell_damage_create_two_1_1_red_white_soldier_haste_v1",
+    "effect": "token_maker",
+    "power": 5,
+    "token_colors": [
+      "R",
+      "W"
+    ],
+    "token_count": 2,
+    "token_haste": true,
+    "token_keywords": [
+      "haste"
+    ],
+    "token_name": "Soldier Token",
+    "token_power": 1,
+    "token_subtype": "Soldier",
+    "token_toughness": 1,
+    "toughness": 3,
+    "trigger": "instant_sorcery_spell_you_control_deals_damage",
+    "trigger_effect": "token_maker",
+    "trigger_token_count": 2,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bb53685ff2f0c9074dd2512b79c42c08",
+    "battle_rule_oracle_hash": "4abc037978046cd0dff44e8254ce3d0c"
+  },
   "Blazemire Verge": {
     "effect": "land",
     "battle_rule_source": "curated",

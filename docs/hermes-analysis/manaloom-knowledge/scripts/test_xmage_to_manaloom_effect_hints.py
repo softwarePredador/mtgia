@@ -3741,6 +3741,46 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["token_flying"])
         self.assertEqual(primary["token_keywords"], ["flying"])
 
+    def test_blaze_commando_maps_to_spell_damage_soldier_token_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BlazeCommando",
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["SpellControlledDealsDamageTriggeredAbility"],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new SpellControlledDealsDamageTriggeredAbility(Zone.BATTLEFIELD, "
+                    "new CreateTokenEffect(new SoldierHasteToken(), 2), "
+                    "StaticFilters.FILTER_SPELL_INSTANT_OR_SORCERY, false)"
+                ),
+            },
+            (
+                "Whenever an instant or sorcery spell you control deals damage, "
+                "create two 1/1 red and white Soldier creature tokens with haste."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "instant_sorcery_spell_damage_create_two_1_1_red_white_soldier_haste_v1",
+        )
+        self.assertEqual(primary["power"], 5)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertEqual(primary["trigger"], "instant_sorcery_spell_you_control_deals_damage")
+        self.assertEqual(primary["trigger_effect"], "token_maker")
+        self.assertEqual(primary["trigger_token_count"], 2)
+        self.assertEqual(primary["token_count"], 2)
+        self.assertEqual(primary["token_name"], "Soldier Token")
+        self.assertEqual(primary["token_subtype"], "Soldier")
+        self.assertEqual(primary["token_colors"], ["R", "W"])
+        self.assertEqual(primary["token_power"], 1)
+        self.assertEqual(primary["token_toughness"], 1)
+        self.assertTrue(primary["token_haste"])
+        self.assertEqual(primary["token_keywords"], ["haste"])
+
     def test_cool_but_rude_maps_to_exact_class_attack_rummage_scope(self) -> None:
         result = hints.build_effect_hints(
             {
