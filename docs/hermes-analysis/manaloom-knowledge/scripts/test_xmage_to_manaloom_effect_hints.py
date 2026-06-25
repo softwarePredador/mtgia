@@ -3539,6 +3539,27 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertFalse(primary["instant"])
         self.assertTrue(primary["sorcery"])
 
+    def test_armageddon_maps_to_destroy_all_lands_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Armageddon",
+                "effect_classes": ["DestroyAllEffect"],
+                "ability_classes": [],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": "new DestroyAllEffect(StaticFilters.FILTER_LANDS)",
+            },
+            "Destroy all lands.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "board_wipe")
+        self.assertEqual(primary["battle_model_scope"], "destroy_all_lands_v1")
+        self.assertEqual(primary["destroy_card_types"], ["land"])
+        self.assertTrue(primary["destroy_all_lands"])
+        self.assertEqual(primary["destination"], "graveyard")
+        self.assertTrue(primary["sorcery"])
+
     def test_agate_instigator_maps_to_another_creature_enter_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

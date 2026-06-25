@@ -6375,6 +6375,38 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 )
             )
 
+    if (
+        "DestroyAllEffect" in effect_classes
+        and card_types == {"SORCERY"}
+        and not ability_classes
+        and (
+            "staticfilters.filter_lands" in normalized_text
+            or "destroy all lands" in normalized_text
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="board_wipe",
+                scope="destroy_all_lands_v1",
+                reason=(
+                    "XMage uses DestroyAllEffect with the lands filter; "
+                    "ManaLoom can model this as destroying all land permanents."
+                ),
+                ability_kind="one_shot",
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "destroy_card_types": ["land"],
+                    "destroy_all_lands": True,
+                    "destination": "graveyard",
+                    "sorcery": True,
+                },
+                matched_signals=[
+                    "DestroyAllEffect",
+                    "FILTER_LANDS",
+                ],
+            )
+        )
+
     class_to_effect = [
         ("DestroyAllEffect", "board_wipe", "destroy_all_permanents_or_creatures_variant_v1", True),
         ("DestroyTargetEffect", "removal_destroy", "targeted_destroy_variant_v1", True),

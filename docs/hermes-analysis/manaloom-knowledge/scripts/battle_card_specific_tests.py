@@ -15222,6 +15222,67 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg208_armageddon_destroys_all_lands_only():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+                {"name": "Boros Signet", "effect": "ramp_permanent", "type_line": "Artifact"},
+                {"name": "Lorehold Guardian", "effect": "creature", "type_line": "Creature", "power": 2, "toughness": 2},
+                "land",
+            ]
+            opponent.battlefield = [
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+                {"name": "Opponent Creature", "effect": "creature", "type_line": "Creature", "power": 3, "toughness": 3},
+            ]
+            card = {"name": "Armageddon", "type_line": "Sorcery", "cmc": 4}
+            effect_data = {
+                "effect": "board_wipe",
+                "battle_model_scope": "destroy_all_lands_v1",
+                "destroy_card_types": ["land"],
+                "destroy_all_lands": True,
+                "destination": "graveyard",
+                "sorcery": True,
+                "_rule_logical_key": "battle_rule_v1:pg208_armageddon_test",
+                "_rule_oracle_hash": "pg208_armageddon_hash",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                8,
+                random.Random(208),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert {c.get("name") for c in active.battlefield if isinstance(c, dict)} == {
+            "Boros Signet",
+            "Lorehold Guardian",
+        }
+        assert {c.get("name") for c in opponent.battlefield if isinstance(c, dict)} == {
+            "Opponent Creature",
+        }
+        assert any(isinstance(c, dict) and c.get("name") == "Plains" for c in active.graveyard)
+        assert any(c == "land" for c in active.graveyard)
+        assert any(isinstance(c, dict) and c.get("name") == "Mountain" for c in opponent.graveyard)
+        wipe_event = next(
+            data
+            for event, data in events
+            if event == "board_wipe_resolved" and data.get("card") == "Armageddon"
+        )
+        assert wipe_event["destroy_card_types"] == ["land"]
+        assert wipe_event["destroyed"] == 3
+        assert wipe_event["lands_destroyed"] == 3
+        assert wipe_event["creatures_seen"] == 0
+        assert wipe_event["rule_logical_key"].startswith("battle_rule_v1:")
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -15471,6 +15532,7 @@ def register_tests(battle, player):
         test_pg206_boltwave_damages_each_opponent,
         test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering,
         test_pg207_impact_tremors_damages_each_opponent_when_token_enters,
+        test_pg208_armageddon_destroys_all_lands_only,
         test_everything_comes_to_dust_oracle_normalizes_to_convoke_exile_wipe,
         test_everything_comes_to_dust_exiles_artifacts_enchantments_and_nonshared_creatures,
         test_fated_clash_oracle_normalizes_to_protect_then_destroy_wipe,

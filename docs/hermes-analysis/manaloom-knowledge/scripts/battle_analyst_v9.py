@@ -11973,6 +11973,49 @@ def resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
     finish_resolved_spell(player, card, turn=turn)
 
 
+def _permanent_type_line(permanent):
+    if isinstance(permanent, dict):
+        return str(permanent.get("type_line") or "").lower()
+    return str(permanent or "").lower()
+
+
+def _permanent_matches_destroy_card_types(permanent, destroy_card_types):
+    requested = {str(card_type or "").lower() for card_type in (destroy_card_types or ["creature"])}
+    type_line = _permanent_type_line(permanent)
+    if "creature" in requested and is_battlefield_creature(permanent):
+        return True
+    if "land" in requested and (
+        permanent == "land"
+        or type_line == "land"
+        or " land" in f" {type_line}"
+        or (isinstance(permanent, dict) and is_effective_land(permanent))
+    ):
+        return True
+    if "artifact" in requested and "artifact" in type_line:
+        return True
+    if "enchantment" in requested and "enchantment" in type_line:
+        return True
+    if "planeswalker" in requested and "planeswalker" in type_line:
+        return True
+    if "battle" in requested and "battle" in type_line:
+        return True
+    if "permanent" in requested and is_permanent_card(permanent):
+        return True
+    return False
+
+
+def _destroyed_permanent_type_flags(permanent):
+    type_line = _permanent_type_line(permanent)
+    return {
+        "creature": is_battlefield_creature(permanent),
+        "land": permanent == "land" or type_line == "land" or " land" in f" {type_line}",
+        "artifact": "artifact" in type_line,
+        "enchantment": "enchantment" in type_line,
+        "planeswalker": "planeswalker" in type_line,
+        "battle": "battle" in type_line,
+    }
+
+
 def creature_candidates_for_player(player, *, controller, source, effect_data):
     return [
         permanent
@@ -26524,11 +26567,19 @@ def apply_effect_immediate(
         if effect_data.get("modal_destroy_modes") or effect_data.get("destroy_modes"):
             resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
             return
+        destroy_card_types = list(effect_data.get("destroy_card_types") or ["creature"])
         context = board_wipe_decision_context(player, opponents)
         destroyed = 0
         protected = 0
         creatures_seen = 0
         unprotected_seen = 0
+        permanents_seen = 0
+        noncreature_permanents_destroyed = 0
+        lands_destroyed = 0
+        artifacts_destroyed = 0
+        enchantments_destroyed = 0
+        planeswalkers_destroyed = 0
+        battles_destroyed = 0
         own_creatures_destroyed = 0
         opponent_creatures_destroyed = 0
         live_opponent_creatures_destroyed = 0
@@ -26538,10 +26589,13 @@ def apply_effect_immediate(
         for p in [player] + list(opponents):
             is_self = p is player
             is_live_opponent = (not is_self) and p.is_alive()
-            survivors = []
             destroyed_cards = []
             for c in list(p.battlefield):
-                if is_battlefield_creature(c):
+                if not _permanent_matches_destroy_card_types(c, destroy_card_types):
+                    continue
+                permanents_seen += 1
+                type_flags = _destroyed_permanent_type_flags(c)
+                if type_flags["creature"]:
                     creatures_seen += 1
                     if is_self:
                         own_creatures_seen += 1
@@ -26549,30 +26603,52 @@ def apply_effect_immediate(
                         opponent_creatures_seen += 1
                         if is_live_opponent:
                             live_opponent_creatures_seen += 1
-                    # v8: indestructible per-creature
-                    if c.get("indestructible"):
-                        survivors.append(c)
-                        protected += 1
-                        continue
-                    unprotected_seen += 1
-                    destroyed_cards.append(c)
-                    destroyed += 1
+                if isinstance(c, dict) and c.get("indestructible"):
+                    protected += 1
+                    continue
+                unprotected_seen += 1
+                destroyed_cards.append(c)
+                destroyed += 1
+                if type_flags["land"]:
+                    lands_destroyed += 1
+                if type_flags["artifact"]:
+                    artifacts_destroyed += 1
+                if type_flags["enchantment"]:
+                    enchantments_destroyed += 1
+                if type_flags["planeswalker"]:
+                    planeswalkers_destroyed += 1
+                if type_flags["battle"]:
+                    battles_destroyed += 1
+                if not type_flags["creature"]:
+                    noncreature_permanents_destroyed += 1
+                if type_flags["creature"]:
                     if is_self:
                         own_creatures_destroyed += 1
                     else:
                         opponent_creatures_destroyed += 1
                         if is_live_opponent:
                             live_opponent_creatures_destroyed += 1
-                else:
-                    survivors.append(c)
-            p.battlefield = survivors
             for c in destroyed_cards:
-                move_creature_from_battlefield(
-                    p,
-                    c,
-                    reason="board_wipe",
-                    source=card,
-                )
+                if is_battlefield_creature(c):
+                    move_creature_from_battlefield(
+                        p,
+                        c,
+                        reason="board_wipe",
+                        source=card,
+                    )
+                elif isinstance(c, dict):
+                    move_permanent_from_battlefield(
+                        p,
+                        c,
+                        reason="board_wipe",
+                        source=card,
+                    )
+                else:
+                    try:
+                        p.battlefield.remove(c)
+                    except ValueError:
+                        pass
+                    p.graveyard.append(c)
         effective_opponent_destroyed = live_opponent_creatures_destroyed
         actual_asymmetry = effective_opponent_destroyed - own_creatures_destroyed
         self_protected_from_wipe = bool(
@@ -26589,10 +26665,18 @@ def apply_effect_immediate(
             **context,
             "pre_resolution_timing_justified": context["timing_justified"],
             "timing_justified": resolution_timing_justified,
+            "destroy_card_types": destroy_card_types,
+            "permanents_seen": permanents_seen,
             "creatures_seen": creatures_seen,
             "unprotected_seen": unprotected_seen,
             "actual_destroyed": destroyed,
             "protected": protected,
+            "noncreature_permanents_destroyed": noncreature_permanents_destroyed,
+            "lands_destroyed": lands_destroyed,
+            "artifacts_destroyed": artifacts_destroyed,
+            "enchantments_destroyed": enchantments_destroyed,
+            "planeswalkers_destroyed": planeswalkers_destroyed,
+            "battles_destroyed": battles_destroyed,
             "own_creatures_seen": own_creatures_seen,
             "opponent_creatures_seen": opponent_creatures_seen,
             "live_opponent_creatures_seen": live_opponent_creatures_seen,
@@ -26660,10 +26744,19 @@ def apply_effect_immediate(
             "board_wipe_resolved",
             player=player.name,
             card=card.get("name", "?"),
+            destroy_card_types=destroy_card_types,
             destroyed=destroyed,
             protected=protected,
+            permanents_seen=permanents_seen,
             creatures_seen=creatures_seen,
             unprotected_seen=unprotected_seen,
+            noncreature_permanents_destroyed=noncreature_permanents_destroyed,
+            lands_destroyed=lands_destroyed,
+            artifacts_destroyed=artifacts_destroyed,
+            enchantments_destroyed=enchantments_destroyed,
+            planeswalkers_destroyed=planeswalkers_destroyed,
+            battles_destroyed=battles_destroyed,
+            **fields,
             own_creatures_destroyed=own_creatures_destroyed,
             opponent_creatures_destroyed=opponent_creatures_destroyed,
             live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,

@@ -864,6 +864,34 @@ ETB damage engine from the current Lorehold/opponent matrix:
    `event_contract_static_status=event_contract_static_ready`, and
    `test_results_status_counts={"pass":18}`.
 
+`Armageddon` is the twenty-third completed proof group and closes the exact
+`DestroyAllEffect(StaticFilters.FILTER_LANDS)` family:
+
+1. XMage local source matched a pure `DestroyAllEffect` over
+   `StaticFilters.FILTER_LANDS`.
+2. The mapper/classifier now promotes the exact `destroy_all_lands_v1` scope
+   as `board_wipe`, while leaving mixed cards such as `Ultima` in runtime
+   review because `EndTurnEffect` still needs a real executor.
+3. Battle runtime now lets `board_wipe` target typed permanent groups via
+   `destroy_card_types`, defaulting old rules to creature-only, and emits rule
+   metadata on `board_wipe_resolved` for audit traceability.
+4. PG208 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made `Armageddon` report as `battle_ready`; the matrix
+   moved it out of `needs_rule_before_strategy`.
+6. The PG208 matrix now reports `205` total `needs_rule_before_strategy` rows
+   and `375` `battle_ready` rows. The effective queue now has
+   `333` mapper backlog, `74` split-scope backlog, `19` runtime-family
+   backlog, and `4` blocked missing XMage source rows, with no unprepared
+   package-ready rows.
+7. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_073349/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `event_contract_static_status=event_contract_static_ready`, and
+   `test_results_status_counts={"pass":18}`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

@@ -12647,3 +12647,95 @@ Register decision:
 - Continue Lorehold-first rule closure on the remaining `206`
   `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
 - Next package number is PG208.
+
+## PG208 - destroy all lands exact XMage scope
+
+Status: applied, postchecked, synced to Hermes, and strategy-audited.
+
+Scope:
+
+- Exact XMage family:
+  `DestroyAllEffect(StaticFilters.FILTER_LANDS)`.
+- Promoted card:
+  - `Armageddon`.
+- Deliberately excluded `Ultima` because its XMage source also contains
+  `EndTurnEffect`; ManaLoom still needs a real end-turn executor before that
+  card can be promoted safely.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg208_destroy_all_lands_package_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg208_destroy_all_lands_package_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg208_destroy_all_lands_package_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg208_destroy_all_lands_package_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg208_destroy_all_lands_package_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `Armageddon` had `target_card_rows=1`, `expected_rule_rows_before=0`,
+  `would_deprecate_shadow_rows=2`, and canonical card id
+  `4c3450e8-7091-44dd-a7ff-09952f50b901`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg208_destroy_all_lands_20260625_0731.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3242`,
+  `generated_rows=1`.
+- Runtime cache spot-check:
+  `Armageddon` resolves from local cache with
+  `effect=board_wipe`, `battle_model_scope=destroy_all_lands_v1`,
+  `destroy_card_types=["land"]`, `destroy_all_lands=true`, and
+  `_rule_execution_status=auto`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg208_destroy_all_lands_postsync_v1_manifest.json`;
+  expanded scope moved to `high=385`, `medium=63`, `pass=514`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg208_destroy_all_lands_postsync_v1.json`;
+  scoped rows `580`, `battle_ready=375`,
+  `needs_rule_before_strategy=205`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg208_destroy_all_lands_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=19`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg208_destroy_all_lands_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  focused mapper/classifier tests passed through `unittest`;
+  focused runtime regression
+  `test_pg208_armageddon_destroys_all_lands_only` passed through the battle
+  harness.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_073349/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `test_results_status_counts={"pass":18}`, and `test_results_total=18`.
+
+Runtime changes:
+
+- `board_wipe` now supports typed permanent destruction through
+  `destroy_card_types`, defaulting to creature-only for existing rules.
+- `board_wipe_resolved` now emits rule metadata from `replay_rule_fields`, so
+  battle/audit evidence can trace the promoted rule used for the resolution.
+
+Register decision:
+
+- PG208 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG208.
+- Continue Lorehold-first rule closure on the remaining `205`
+  `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
+- Next package number is PG209.

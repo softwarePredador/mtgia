@@ -781,6 +781,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("sorcery")) == ("SORCERY" in types)
         )
 
+    if effect == "board_wipe" and scope == "destroy_all_lands_v1":
+        return (
+            types == {"SORCERY"}
+            and effect_classes == {"DestroyAllEffect"}
+            and not ability_classes
+            and not cost_classes
+            and effect_json.get("destroy_card_types") == ["land"]
+            and bool(effect_json.get("destroy_all_lands"))
+            and effect_json.get("destination") == "graveyard"
+            and bool(effect_json.get("sorcery"))
+        )
+
     if effect in {"creature", "passive"} and scope == "controlled_creature_enters_damage_each_opponent_v1":
         allowed_abilities = {
             "EntersBattlefieldControlledTriggeredAbility",

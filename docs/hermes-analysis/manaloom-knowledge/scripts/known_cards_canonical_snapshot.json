@@ -1467,14 +1467,22 @@
     "battle_rule_logical_key": "battle_rule_v1:d060f39142261847d31b48c0088866a1"
   },
   "Armageddon": {
-    "cmc": 4.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "destroy_all_lands_v1",
+    "destination": "graveyard",
+    "destroy_all_lands": true,
+    "destroy_card_types": [
+      "land"
+    ],
     "effect": "board_wipe",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cf8f05433163f19c19ad60378af66b92"
+    "sorcery": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9c01fbb5ff66fc2094234a00587be33f",
+    "battle_rule_oracle_hash": "8ef29e198bc7b9775331aba09a69ec16"
   },
   "Army of the Damned": {
     "cmc": 8.0,

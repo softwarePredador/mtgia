@@ -6273,6 +6273,44 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "opponent_damage_spell")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_destroy_all_lands_family_is_batch_safe_for_armageddon_scope(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Armageddon",
+                        "severity": "high",
+                        "oracle_hash": "armageddonhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Armageddon",
+                            "path": "/xmage/Armageddon.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["DestroyAllEffect"],
+                            "ability_classes": [],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "board_wipe",
+                                "battle_model_scope": "destroy_all_lands_v1",
+                                "destroy_card_types": ["land"],
+                                "destroy_all_lands": True,
+                                "destination": "graveyard",
+                                "sorcery": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["family_id"], "board_wipe_choice")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_controlled_creature_etb_damage_family_is_batch_safe_for_simple_xmage_sources(self) -> None:
         report = classifier.build_family_report(
             {
