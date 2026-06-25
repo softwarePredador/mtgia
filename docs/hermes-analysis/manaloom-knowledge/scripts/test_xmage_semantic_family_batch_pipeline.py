@@ -6273,6 +6273,46 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "opponent_damage_spell")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_soul_immolation_blight_x_damage_sweep_scope_is_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Soul Immolation",
+                        "severity": "high",
+                        "oracle_hash": "soulimmolationhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "SoulImmolation",
+                            "path": "/xmage/SoulImmolation.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["DamagePlayersEffect", "DamageAllEffect"],
+                            "ability_classes": [],
+                            "target_classes": [],
+                            "cost_classes": ["BlightCost", "SoulImmolationCost"],
+                            "primary_effect": {
+                                "effect": "damage_each_opponent_and_opponent_creatures",
+                                "battle_model_scope": "blight_x_damage_each_opponent_and_opponent_creatures_v1",
+                                "requires_blight_x": True,
+                                "x_value_source": "blight_greatest_toughness_controlled_creature",
+                                "additional_cost_kind": "blight_x",
+                                "target_controller": "opponents",
+                                "damage_scope": "each_opponent_and_creatures_they_control",
+                                "damage_amount_source": "x_value",
+                                "sorcery": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "board_wipe_choice")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_destroy_all_lands_family_is_batch_safe_for_armageddon_scope(self) -> None:
         report = classifier.build_family_report(
             {

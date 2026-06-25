@@ -1,0 +1,1366 @@
+{
+  "effective_queue": {
+    "lane_counts": {
+      "blocked_missing_xmage_source": 4,
+      "manual_mapper_backlog": 333,
+      "package_already_prepared": 0,
+      "package_ready_unprepared": 0,
+      "runtime_family_backlog": 14,
+      "split_scope_backlog": 74
+    },
+    "lanes": {
+      "blocked_missing_xmage_source": {
+        "count": 4,
+        "family_rollups": [
+          {
+            "count": 4,
+            "effect": "",
+            "family_id": "manual_model",
+            "sample_cards": [
+              "Alicia Masters, Skilled Sculptor",
+              "Mj\u00f6lnir, Hammer of Thor",
+              "Molecule Man",
+              "Thor, God of Thunder"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "",
+                "count": 4
+              }
+            ]
+          }
+        ],
+        "sample_cards": [
+          "Alicia Masters, Skilled Sculptor",
+          "Mj\u00f6lnir, Hammer of Thor",
+          "Molecule Man",
+          "Thor, God of Thunder"
+        ],
+        "scope_rollups": [
+          {
+            "battle_model_scope": "",
+            "cards": [
+              "Alicia Masters, Skilled Sculptor",
+              "Mj\u00f6lnir, Hammer of Thor",
+              "Molecule Man",
+              "Thor, God of Thunder"
+            ],
+            "count": 4,
+            "effect": "",
+            "family_id": "manual_model",
+            "sample_cards": [
+              "Alicia Masters, Skilled Sculptor",
+              "Mj\u00f6lnir, Hammer of Thor",
+              "Molecule Man",
+              "Thor, God of Thunder"
+            ]
+          }
+        ]
+      },
+      "manual_mapper_backlog": {
+        "count": 333,
+        "family_rollups": [
+          {
+            "count": 332,
+            "effect": "external_reference_required_manual_model",
+            "family_id": "manual_model",
+            "sample_cards": [
+              "\"Name Sticker\" Goblin",
+              "Ad Nauseam",
+              "Akroma's Will",
+              "Alhammarret's Archive",
+              "All Is Dust",
+              "Altar of Dementia",
+              "Aminatou's Augury",
+              "Amphibian Downpour"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+                "count": 332
+              }
+            ]
+          },
+          {
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Spiked Corridor // Torture Pit"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "xmage_create_token_variant_spikedcorridortorturepit_v1",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        "sample_cards": [
+          "\"Name Sticker\" Goblin",
+          "Ad Nauseam",
+          "Akroma's Will",
+          "Alhammarret's Archive",
+          "All Is Dust",
+          "Altar of Dementia",
+          "Aminatou's Augury",
+          "Amphibian Downpour",
+          "Ancient Copper Dragon",
+          "Ancient Gold Dragon",
+          "Angel's Grace",
+          "Apex of Power"
+        ],
+        "scope_rollups": [
+          {
+            "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+            "cards": [
+              "\"Name Sticker\" Goblin",
+              "Ad Nauseam",
+              "Akroma's Will",
+              "Alhammarret's Archive",
+              "All Is Dust",
+              "Altar of Dementia",
+              "Aminatou's Augury",
+              "Amphibian Downpour",
+              "Ancient Copper Dragon",
+              "Ancient Gold Dragon",
+              "Angel's Grace",
+              "Apex of Power",
+              "Arcane Bombardment",
+              "Archfiend of Ifnir",
+              "Archon of Emeria",
+              "Ardenn, Intrepid Archaeologist",
+              "Ash Barrens",
+              "Ashnod's Altar",
+              "Assemble the Players",
+              "Authority of the Consuls",
+              "Autumn's Veil",
+              "Aven Interrupter",
+              "Aven Mindcensor",
+              "Basilisk Collar",
+              "Beacon of Immortality",
+              "Beseech the Mirror",
+              "Birgi, God of Storytelling",
+              "Blazing Firesinger",
+              "Blightsteel Colossus // Blightsteel Colossus",
+              "Blood Moon",
+              "Blood Seeker",
+              "Bloodletter of Aclazotz",
+              "Bloodthirster",
+              "Bloodthirsty Conqueror",
+              "Bolas's Citadel",
+              "Bolt Bend",
+              "Bond of Insight",
+              "Boros Garrison",
+              "Boseiju, Who Shelters All",
+              "Breena, the Demagogue",
+              "Bridgeworks Battle",
+              "Buried Ruin",
+              "Burnt Offering",
+              "Carpet of Flowers",
+              "Cavern of Souls",
+              "Chandra's Ignition",
+              "Chaos Wand",
+              "Charmbreaker Devils",
+              "Chrome Mox",
+              "City of Traitors",
+              "Cloud Key",
+              "Cloud of Faeries",
+              "Clout of the Dominus",
+              "Codex Shredder",
+              "Collector Ouphe",
+              "Colonel Autumn",
+              "Command Beacon",
+              "Commandeer",
+              "Conduit Pylons",
+              "Containment Construct",
+              "Cori Mountain Monastery",
+              "Coruscation Mage",
+              "Court of Ambition",
+              "Crystal Vein",
+              "Culling Ritual",
+              "Currency Converter",
+              "Cursed Mirror",
+              "Dance with Calamity",
+              "Dark Deal",
+              "Darksteel Citadel",
+              "Dauntless Dismantler",
+              "Deafening Silence",
+              "Deathbellow War Cry",
+              "Decaying Time Loop",
+              "Decree of Pain",
+              "Defense Grid",
+              "Delighted Halfling",
+              "Delney, Streetwise Lookout",
+              "Demonic Consultation",
+              "Derevi, Empyrial Tactician",
+              "Devoted Druid",
+              "Dimensional Infiltrator",
+              "Dismember",
+              "Displacer Kitten",
+              "Disruptor Flute",
+              "Dragon's Rage Channeler",
+              "Drown in Dreams",
+              "Eidolon of Rhetoric",
+              "Eight-and-a-Half-Tails",
+              "Eldritch Evolution",
+              "Electro, Assaulting Battery",
+              "Emergence Zone",
+              "Emiel the Blessed",
+              "Endurance",
+              "Entomb",
+              "Entropic Battlecruiser",
+              "Ephemerate",
+              "Epic Experiment",
+              "Etali, Primal Conqueror",
+              "Eternal Witness",
+              "Ethersworn Canonist",
+              "Experimental Overload",
+              "Exquisite Blood",
+              "Fabled Passage",
+              "Faeburrow Elder",
+              "Falkenrath Noble",
+              "Feed the Swarm",
+              "Fell Specter",
+              "Fiery Inscription",
+              "Finale of Devastation",
+              "Fire Nation Palace",
+              "Flashback",
+              "Fomori Vault",
+              "Food Chain",
+              "Forbidden Orchard",
+              "Force of Negation",
+              "Formidable Speaker",
+              "Fractured Powerstone",
+              "Freed from the Real",
+              "Fury",
+              "Furycalm Snarl",
+              "Galvanoth",
+              "Gandalf's Sanction",
+              "Genji Glove",
+              "Geosurge",
+              "Ghoulcaller's Bell",
+              "Gifts Ungiven",
+              "Gilded Drake",
+              "Gisela, Blade of Goldnight",
+              "Glittering Massif",
+              "Goliath Daydreamer",
+              "Gray Merchant of Asphodel",
+              "Growing Rites of Itlimoc",
+              "Guildless Commons",
+              "Guttersnipe",
+              "Hammer of Nazahn",
+              "Harmonic Prodigy",
+              "Hellkite Courser",
+              "Helm of Awakening",
+              "Heroes Remembered",
+              "Hope of Ghirapur",
+              "Hunting Velociraptor",
+              "Hydroelectric Specimen",
+              "Incubation Druid",
+              "Intuition",
+              "Invasion of Ikoria",
+              "Invincible Hymn",
+              "Jin-Gitaxias, Progress Tyrant",
+              "Kaalia of the Vast",
+              "Kaervek the Merciless",
+              "Kardur, Doomscourge // Kardur, Doomscourge",
+              "Karlach, Fury of Avernus",
+              "Karn's Sylex",
+              "Karn, the Great Creator",
+              "Kaya's Ghostform",
+              "Kayla's Music Box",
+              "Kinnan, Bonder Prodigy",
+              "Knight of the White Orchid",
+              "Lantern of Insight",
+              "Lens of Clarity",
+              "Leyline Dowser",
+              "Light Up the Stage",
+              "Lightning, Army of One",
+              "Liliana's Caress",
+              "Lim-Dul's Vault",
+              "Lion's Eye Diamond",
+              "Longshot, Rebel Bowman",
+              "Lotus Vale",
+              "Loyal Warhound",
+              "Magmakin Artillerist",
+              "Magus of the Wheel",
+              "Mai, Scornful Striker",
+              "Malakir Rebirth // Malakir Mire",
+              "Mana Drain",
+              "Mana Geyser",
+              "Manifold Key",
+              "Mardu Devotee",
+              "Marvin, Murderous Mimic",
+              "Massacre Girl",
+              "Massacre Wurm",
+              "Master of Cruelties",
+              "Memnite",
+              "Metallurgic Summonings",
+              "Metamorphosis",
+              "Millikin",
+              "Mirage Mirror",
+              "Misdirection",
+              "Mnemonic Betrayal",
+              "Moonshadow",
+              "Mox Diamond",
+              "Myriad Landscape",
+              "Mystic Forge",
+              "Mystic Reflection",
+              "Naktamun Lorespinner // Wheel of Fortune",
+              "Nature's Chosen",
+              "Necrogoyf",
+              "Neheb, the Eternal",
+              "Neoform",
+              "Noxious Revival",
+              "Nyxbloom Ancient",
+              "One with the Multiverse",
+              "Open the Omenpaths",
+              "Open the Vaults",
+              "Opposition Agent",
+              "Oppression",
+              "Orcish Lumberjack",
+              "Orcish Spy",
+              "Ornithopter of Paradise",
+              "Oswald Fiddlebender",
+              "Painful Quandary",
+              "Patrolling Peacemaker",
+              "Peer into the Abyss",
+              "Penance",
+              "Perpetual Timepiece",
+              "Phyrexian Censor",
+              "Planetarium of Wan Shi Tong",
+              "Plaza of Heroes",
+              "Possibility Storm",
+              "Praetor's Grasp",
+              "Prismatic Lens",
+              "Protective Bubble",
+              "Prototype Portal",
+              "Psychosis Crawler",
+              "Pulsemage Advocate",
+              "Pyrokinesis",
+              "Pyromancer's Goggles",
+              "Pyxis of Pandemonium",
+              "Radiant Performer",
+              "Radiant Scrollwielder",
+              "Radiant Summit",
+              "Raiders' Wake",
+              "Rain of Filth",
+              "Rakdos Signet",
+              "Reckless Barbarian",
+              "Reliquary Tower",
+              "Rem Karolus, Stalwart Slayer",
+              "Roaming Throne",
+              "Roar of Reclamation",
+              "Rograkh, Son of Rohgahh",
+              "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence",
+              "Rustvale Bridge",
+              "Sacrifice",
+              "Sadistic Shell Game",
+              "Sangromancer",
+              "Sawhorn Nemesis",
+              "Scavenger Grounds",
+              "Scholar of New Horizons",
+              "Scrawling Crawler",
+              "Screaming Nemesis",
+              "Sculpting Steel",
+              "Seedborn Muse",
+              "Selvala, Heart of the Wilds",
+              "Semblance Anvil",
+              "Serra Ascendant",
+              "Shark Typhoon",
+              "Sheoldred, the Apocalypse",
+              "Shinka, the Bloodsoaked Keep",
+              "Sigarda's Aid",
+              "Single Combat",
+              "Slickshot Show-Off",
+              "Sokenzan, Crucible of Defiance",
+              "Spellskite",
+              "Spinerock Knoll",
+              "Spire of Industry",
+              "Squee, the Immortal",
+              "Star Athlete",
+              "Starting Town",
+              "Steal Enchantment",
+              "Stitcher's Supplier",
+              "Stoneforge Mystic",
+              "Strangleroot Geist",
+              "Stuffy Doll",
+              "Subjugate the Hobbits",
+              "Subtlety",
+              "Summons of Saruman",
+              "Swift Reconfiguration",
+              "Sylvan Library",
+              "Sylvan Safekeeper",
+              "Syr Konrad, the Grim",
+              "Tablet of Discovery",
+              "Tainted Pact",
+              "Taunt from the Rampart",
+              "Tayam, Luminous Enigma",
+              "Teferi's Time Twist",
+              "Temple of Triumph",
+              "Tezzeret the Seeker",
+              "Thassa's Oracle",
+              "The Meathook Massacre",
+              "The Seriema",
+              "The Walls of Ba Sing Se",
+              "The Warring Triad",
+              "Thousand-Year Elixir",
+              "Tidal Barracuda",
+              "Tinybones, Bauble Burglar",
+              "Touch the Spirit Realm",
+              "Toxic Deluge",
+              "Transmute Artifact",
+              "Treasonous Ogre",
+              "Triumphant Reckoning",
+              "Turbulent Steppe",
+              "Twinflame Tyrant",
+              "Tymna the Weaver",
+              "Tyvar, Jubilant Brawler",
+              "Uncivil Unrest",
+              "Unstable Glyphbridge // Sandswirl Wanderglyph",
+              "Unwinding Clock",
+              "Urborg, Tomb of Yawgmoth",
+              "Valley Floodcaller",
+              "Vedalken Orrery",
+              "Velomachus Lorehold",
+              "Verge Rangers",
+              "Vial Smasher the Fierce",
+              "Voice of Victory",
+              "Void Winnower",
+              "Volatile Stormdrake",
+              "Volcanic Vision",
+              "Voltaic Key",
+              "Vorpal Sword",
+              "Wand of Vertebrae",
+              "Wandering Archaic",
+              "Wheel of Fate",
+              "Whispersilk Cloak",
+              "White Plume Adventurer",
+              "Wild Ricochet",
+              "Wishclaw Talisman",
+              "Words of Waste",
+              "Worldfire",
+              "Wound Reflection",
+              "Young Wolf",
+              "Zephid's Embrace",
+              "Zhalfirin Void",
+              "Zirda, the Dawnwaker"
+            ],
+            "count": 332,
+            "effect": "external_reference_required_manual_model",
+            "family_id": "manual_model",
+            "sample_cards": [
+              "\"Name Sticker\" Goblin",
+              "Ad Nauseam",
+              "Akroma's Will",
+              "Alhammarret's Archive",
+              "All Is Dust",
+              "Altar of Dementia",
+              "Aminatou's Augury",
+              "Amphibian Downpour"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_spikedcorridortorturepit_v1",
+            "cards": [
+              "Spiked Corridor // Torture Pit"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Spiked Corridor // Torture Pit"
+            ]
+          }
+        ]
+      },
+      "package_already_prepared": {
+        "count": 0,
+        "family_rollups": [],
+        "sample_cards": [],
+        "scope_rollups": []
+      },
+      "package_ready_unprepared": {
+        "count": 0,
+        "family_rollups": [],
+        "sample_cards": [],
+        "scope_rollups": []
+      },
+      "runtime_family_backlog": {
+        "count": 14,
+        "family_rollups": [
+          {
+            "count": 13,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Aclazotz, Deepest Betrayal // Temple of the Dead",
+              "Adagia, Windswept Bastion",
+              "Biotransference",
+              "Black Market Connections",
+              "Bone Miser",
+              "Davros, Dalek Creator",
+              "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+              "Green Goblin, Nemesis"
+            ],
+            "scope_count": 13,
+            "top_scopes": [
+              {
+                "battle_model_scope": "xmage_create_token_variant_bonemiser_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "xmage_create_token_variant_maskwoodnexus_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "xmage_create_token_variant_thelocustgod_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "xmage_create_token_variant_wastenot_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "xmage_create_token_variant_blackmarketconnections_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 1,
+            "effect": "sweeper_damage",
+            "family_id": "board_wipe_choice",
+            "sample_cards": [
+              "Ashling, Flame Dancer"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "damage_all_variant_v1",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        "sample_cards": [
+          "Aclazotz, Deepest Betrayal // Temple of the Dead",
+          "Adagia, Windswept Bastion",
+          "Ashling, Flame Dancer",
+          "Biotransference",
+          "Black Market Connections",
+          "Bone Miser",
+          "Davros, Dalek Creator",
+          "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+          "Green Goblin, Nemesis",
+          "Hazel's Brewmaster",
+          "Maskwood Nexus",
+          "Smuggler's Share"
+        ],
+        "scope_rollups": [
+          {
+            "battle_model_scope": "damage_all_variant_v1",
+            "cards": [
+              "Ashling, Flame Dancer"
+            ],
+            "count": 1,
+            "effect": "sweeper_damage",
+            "family_id": "board_wipe_choice",
+            "sample_cards": [
+              "Ashling, Flame Dancer"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_aclazotzdeepestbetrayal_v1",
+            "cards": [
+              "Aclazotz, Deepest Betrayal // Temple of the Dead"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Aclazotz, Deepest Betrayal // Temple of the Dead"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_adagiawindsweptbastion_v1",
+            "cards": [
+              "Adagia, Windswept Bastion"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Adagia, Windswept Bastion"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_biotransference_v1",
+            "cards": [
+              "Biotransference"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Biotransference"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_blackmarketconnections_v1",
+            "cards": [
+              "Black Market Connections"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Black Market Connections"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_bonemiser_v1",
+            "cards": [
+              "Bone Miser"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Bone Miser"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_davrosdalekcreator_v1",
+            "cards": [
+              "Davros, Dalek Creator"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Davros, Dalek Creator"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_fableofthemirrorbreaker_v1",
+            "cards": [
+              "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_greengoblinnemesis_v1",
+            "cards": [
+              "Green Goblin, Nemesis"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Green Goblin, Nemesis"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_hazelsbrewmaster_v1",
+            "cards": [
+              "Hazel's Brewmaster"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Hazel's Brewmaster"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_maskwoodnexus_v1",
+            "cards": [
+              "Maskwood Nexus"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Maskwood Nexus"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_smugglersshare_v1",
+            "cards": [
+              "Smuggler's Share"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Smuggler's Share"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_thelocustgod_v1",
+            "cards": [
+              "The Locust God"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "The Locust God"
+            ]
+          },
+          {
+            "battle_model_scope": "xmage_create_token_variant_wastenot_v1",
+            "cards": [
+              "Waste Not"
+            ],
+            "count": 1,
+            "effect": "token_maker",
+            "family_id": "token_maker",
+            "sample_cards": [
+              "Waste Not"
+            ]
+          }
+        ]
+      },
+      "split_scope_backlog": {
+        "count": 74,
+        "family_rollups": [
+          {
+            "count": 20,
+            "effect": "direct_damage",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Balefire Liege",
+              "Boros Reckoner",
+              "Brash Taunter",
+              "Cemetery Gatekeeper",
+              "Eiganjo, Seat of the Empire",
+              "Firesong and Sunspeaker",
+              "Gleeful Arsonist",
+              "Harsh Mentor"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "targeted_damage_variant_v1",
+                "count": 20
+              }
+            ]
+          },
+          {
+            "count": 13,
+            "effect": "draw_cards",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Arcane Denial",
+              "Archivist of Oghma",
+              "Bedlam Reveler",
+              "Blood Sun",
+              "Kefka, Court Mage // Kefka, Ruler of Ruin",
+              "Morbid Opportunist",
+              "Phyrexian Arena",
+              "Psychic Frog"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "source_controller_draw_variant_v1",
+                "count": 13
+              }
+            ]
+          },
+          {
+            "count": 11,
+            "effect": "add_counters",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Bloodchief Ascension",
+              "Brallin, Skyshark Rider",
+              "Nightshade Harvester",
+              "Palant\u00edr of Orthanc",
+              "Persistent Constrictor",
+              "Primal Amulet // Primal Wellspring",
+              "Solphim, Mayhem Dominus",
+              "S\u00e9ance Board"
+            ],
+            "scope_count": 2,
+            "top_scopes": [
+              {
+                "battle_model_scope": "source_add_counters_variant_v1",
+                "count": 10
+              },
+              {
+                "battle_model_scope": "targeted_add_counters_variant_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 10,
+            "effect": "removal_destroy",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Abrade",
+              "Erode",
+              "Infernal Grasp",
+              "Rakdos Charm",
+              "Sheoldred // The True Scriptures",
+              "Star of Extinction",
+              "Sundering Eruption // Volcanic Fissure",
+              "Suspended Sentence"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "targeted_destroy_variant_v1",
+                "count": 10
+              }
+            ]
+          },
+          {
+            "count": 4,
+            "effect": "creature",
+            "family_id": "creature",
+            "sample_cards": [
+              "Blood Artist",
+              "Razaketh, the Foulblooded",
+              "Rune-Scarred Demon",
+              "Starfield Shepherd"
+            ],
+            "scope_count": 3,
+            "top_scopes": [
+              {
+                "battle_model_scope": "etb_tutor_to_hand_creature_variant_v1",
+                "count": 2
+              },
+              {
+                "battle_model_scope": "activated_pay_life_sacrifice_creature_any_tutor_to_hand_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "another_creature_dies_target_player_loses_life_you_gain_life_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 4,
+            "effect": "tutor",
+            "family_id": "tutor",
+            "sample_cards": [
+              "Demonic Counsel",
+              "Grim Tutor",
+              "Reckless Handling",
+              "Summoner's Pact"
+            ],
+            "scope_count": 4,
+            "top_scopes": [
+              {
+                "battle_model_scope": "artifact_tutor_to_hand_random_discard_damage_if_artifact_discarded_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "conditional_delirium_restricted_or_any_tutor_to_hand_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "any_tutor_to_hand_controller_loses_life_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "pact_green_creature_tutor_to_hand_delayed_payment_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 2,
+            "effect": "recursion",
+            "family_id": "recursion",
+            "sample_cards": [
+              "Forge Anew",
+              "The Soul Stone"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "graveyard_to_battlefield_variant_v1",
+                "count": 2
+              }
+            ]
+          },
+          {
+            "count": 2,
+            "effect": "static_cost_reduction",
+            "family_id": "static_cost_reducer",
+            "sample_cards": [
+              "Explosive Singularity",
+              "Vanquish the Horde"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "static_self_spell_cost_reduction_variant_v1",
+                "count": 2
+              }
+            ]
+          },
+          {
+            "count": 2,
+            "effect": "bounce",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Chain of Vapor",
+              "Reprieve"
+            ],
+            "scope_count": 2,
+            "top_scopes": [
+              {
+                "battle_model_scope": "return_target_nonland_permanent_controller_may_sacrifice_land_copy_v1",
+                "count": 1
+              },
+              {
+                "battle_model_scope": "targeted_return_to_hand_variant_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 1,
+            "effect": "creature",
+            "family_id": "controlled_creature_etb_damage_engine",
+            "sample_cards": [
+              "Purphoros, God of the Forge"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 1,
+            "effect": "passive",
+            "family_id": "controlled_creature_etb_damage_engine",
+            "sample_cards": [
+              "Warleader's Call"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 1,
+            "effect": "mill_engine",
+            "family_id": "mill_spell",
+            "sample_cards": [
+              "Grinding Station"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "artifact_tap_sacrifice_permanent_target_player_mill_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 1,
+            "effect": "modal_spell",
+            "family_id": "modal_spell",
+            "sample_cards": [
+              "Scour for Scrap"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 1,
+            "effect": "counter_spell",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Flusterstorm"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "storm_counter_instant_or_sorcery_unless_controller_pays_one_v1",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "count": 1,
+            "effect": "removal_exile",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Whip of Erebos"
+            ],
+            "scope_count": 1,
+            "top_scopes": [
+              {
+                "battle_model_scope": "targeted_exile_variant_v1",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        "sample_cards": [
+          "Abrade",
+          "Arcane Denial",
+          "Archivist of Oghma",
+          "Balefire Liege",
+          "Bedlam Reveler",
+          "Blood Artist",
+          "Blood Sun",
+          "Bloodchief Ascension",
+          "Boros Reckoner",
+          "Brallin, Skyshark Rider",
+          "Brash Taunter",
+          "Cemetery Gatekeeper"
+        ],
+        "scope_rollups": [
+          {
+            "battle_model_scope": "targeted_damage_variant_v1",
+            "cards": [
+              "Balefire Liege",
+              "Boros Reckoner",
+              "Brash Taunter",
+              "Cemetery Gatekeeper",
+              "Eiganjo, Seat of the Empire",
+              "Firesong and Sunspeaker",
+              "Gleeful Arsonist",
+              "Harsh Mentor",
+              "Kederekt Parasite",
+              "Mayhem Devil",
+              "Mogis, God of Slaughter",
+              "Niv-Mizzet, Parun",
+              "Rampaging Ferocidon",
+              "Razorgrass Ambush // Razorgrass Field",
+              "Repercussion",
+              "Spiteful Visions",
+              "Terror of the Peaks",
+              "The Lord of Pain",
+              "Toralf, God of Fury // Toralf's Hammer",
+              "Valakut, the Molten Pinnacle"
+            ],
+            "count": 20,
+            "effect": "direct_damage",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Balefire Liege",
+              "Boros Reckoner",
+              "Brash Taunter",
+              "Cemetery Gatekeeper",
+              "Eiganjo, Seat of the Empire",
+              "Firesong and Sunspeaker",
+              "Gleeful Arsonist",
+              "Harsh Mentor"
+            ]
+          },
+          {
+            "battle_model_scope": "source_controller_draw_variant_v1",
+            "cards": [
+              "Arcane Denial",
+              "Archivist of Oghma",
+              "Bedlam Reveler",
+              "Blood Sun",
+              "Kefka, Court Mage // Kefka, Ruler of Ruin",
+              "Morbid Opportunist",
+              "Phyrexian Arena",
+              "Psychic Frog",
+              "Puresteel Paladin",
+              "Solemn Simulacrum",
+              "Sram, Senior Edificer",
+              "Tinybones, Trinket Thief",
+              "Valgavoth, Harrower of Souls"
+            ],
+            "count": 13,
+            "effect": "draw_cards",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Arcane Denial",
+              "Archivist of Oghma",
+              "Bedlam Reveler",
+              "Blood Sun",
+              "Kefka, Court Mage // Kefka, Ruler of Ruin",
+              "Morbid Opportunist",
+              "Phyrexian Arena",
+              "Psychic Frog"
+            ]
+          },
+          {
+            "battle_model_scope": "source_add_counters_variant_v1",
+            "cards": [
+              "Bloodchief Ascension",
+              "Brallin, Skyshark Rider",
+              "Nightshade Harvester",
+              "Palant\u00edr of Orthanc",
+              "Primal Amulet // Primal Wellspring",
+              "Solphim, Mayhem Dominus",
+              "S\u00e9ance Board",
+              "Tezzeret, Cruel Captain",
+              "The Haunt of Hightower",
+              "Vivi Ornitier"
+            ],
+            "count": 10,
+            "effect": "add_counters",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Bloodchief Ascension",
+              "Brallin, Skyshark Rider",
+              "Nightshade Harvester",
+              "Palant\u00edr of Orthanc",
+              "Primal Amulet // Primal Wellspring",
+              "Solphim, Mayhem Dominus",
+              "S\u00e9ance Board",
+              "Tezzeret, Cruel Captain"
+            ]
+          },
+          {
+            "battle_model_scope": "targeted_destroy_variant_v1",
+            "cards": [
+              "Abrade",
+              "Erode",
+              "Infernal Grasp",
+              "Rakdos Charm",
+              "Sheoldred // The True Scriptures",
+              "Star of Extinction",
+              "Sundering Eruption // Volcanic Fissure",
+              "Suspended Sentence",
+              "Vandalblast",
+              "Withering Torment"
+            ],
+            "count": 10,
+            "effect": "removal_destroy",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Abrade",
+              "Erode",
+              "Infernal Grasp",
+              "Rakdos Charm",
+              "Sheoldred // The True Scriptures",
+              "Star of Extinction",
+              "Sundering Eruption // Volcanic Fissure",
+              "Suspended Sentence"
+            ]
+          },
+          {
+            "battle_model_scope": "etb_tutor_to_hand_creature_variant_v1",
+            "cards": [
+              "Rune-Scarred Demon",
+              "Starfield Shepherd"
+            ],
+            "count": 2,
+            "effect": "creature",
+            "family_id": "creature",
+            "sample_cards": [
+              "Rune-Scarred Demon",
+              "Starfield Shepherd"
+            ]
+          },
+          {
+            "battle_model_scope": "graveyard_to_battlefield_variant_v1",
+            "cards": [
+              "Forge Anew",
+              "The Soul Stone"
+            ],
+            "count": 2,
+            "effect": "recursion",
+            "family_id": "recursion",
+            "sample_cards": [
+              "Forge Anew",
+              "The Soul Stone"
+            ]
+          },
+          {
+            "battle_model_scope": "static_self_spell_cost_reduction_variant_v1",
+            "cards": [
+              "Explosive Singularity",
+              "Vanquish the Horde"
+            ],
+            "count": 2,
+            "effect": "static_cost_reduction",
+            "family_id": "static_cost_reducer",
+            "sample_cards": [
+              "Explosive Singularity",
+              "Vanquish the Horde"
+            ]
+          },
+          {
+            "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+            "cards": [
+              "Purphoros, God of the Forge"
+            ],
+            "count": 1,
+            "effect": "creature",
+            "family_id": "controlled_creature_etb_damage_engine",
+            "sample_cards": [
+              "Purphoros, God of the Forge"
+            ]
+          },
+          {
+            "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+            "cards": [
+              "Warleader's Call"
+            ],
+            "count": 1,
+            "effect": "passive",
+            "family_id": "controlled_creature_etb_damage_engine",
+            "sample_cards": [
+              "Warleader's Call"
+            ]
+          },
+          {
+            "battle_model_scope": "activated_pay_life_sacrifice_creature_any_tutor_to_hand_v1",
+            "cards": [
+              "Razaketh, the Foulblooded"
+            ],
+            "count": 1,
+            "effect": "creature",
+            "family_id": "creature",
+            "sample_cards": [
+              "Razaketh, the Foulblooded"
+            ]
+          },
+          {
+            "battle_model_scope": "another_creature_dies_target_player_loses_life_you_gain_life_v1",
+            "cards": [
+              "Blood Artist"
+            ],
+            "count": 1,
+            "effect": "creature",
+            "family_id": "creature",
+            "sample_cards": [
+              "Blood Artist"
+            ]
+          },
+          {
+            "battle_model_scope": "artifact_tap_sacrifice_permanent_target_player_mill_v1",
+            "cards": [
+              "Grinding Station"
+            ],
+            "count": 1,
+            "effect": "mill_engine",
+            "family_id": "mill_spell",
+            "sample_cards": [
+              "Grinding Station"
+            ]
+          },
+          {
+            "battle_model_scope": "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1",
+            "cards": [
+              "Scour for Scrap"
+            ],
+            "count": 1,
+            "effect": "modal_spell",
+            "family_id": "modal_spell",
+            "sample_cards": [
+              "Scour for Scrap"
+            ]
+          },
+          {
+            "battle_model_scope": "return_target_nonland_permanent_controller_may_sacrifice_land_copy_v1",
+            "cards": [
+              "Chain of Vapor"
+            ],
+            "count": 1,
+            "effect": "bounce",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Chain of Vapor"
+            ]
+          },
+          {
+            "battle_model_scope": "storm_counter_instant_or_sorcery_unless_controller_pays_one_v1",
+            "cards": [
+              "Flusterstorm"
+            ],
+            "count": 1,
+            "effect": "counter_spell",
+            "family_id": "targeted_interaction",
+            "sample_cards": [
+              "Flusterstorm"
+            ]
+          }
+        ]
+      }
+    },
+    "prepared_packages": []
+  },
+  "generated_at": "2026-06-25T09:27:20+00:00",
+  "mutations_performed": [],
+  "package_card_coverage_count": 214,
+  "package_manifest_count": 91,
+  "proposal_report_path": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg213_soul_immolation_postsync_v1_proposals.json",
+  "proposal_summary": {
+    "blocked_missing_xmage_source_count": 4,
+    "family_counts": {
+      "board_wipe_choice": 1,
+      "controlled_creature_etb_damage_engine": 2,
+      "creature": 4,
+      "manual_model": 336,
+      "mill_spell": 1,
+      "modal_spell": 1,
+      "recursion": 2,
+      "static_cost_reducer": 2,
+      "targeted_interaction": 58,
+      "token_maker": 14,
+      "tutor": 4
+    },
+    "proposal_count": 425,
+    "proposal_status_counts": {
+      "blocked_missing_xmage_source": 4,
+      "mapper_metadata_or_test_scenario_required": 333,
+      "runtime_family_implementation_required": 14,
+      "split_family_scope_review_required": 74
+    },
+    "runtime_family_required_count": 14,
+    "safe_for_batch_pg_package_count": 0
+  },
+  "recommendations": [
+    {
+      "action": "After the PG-ready lane shrinks, batch the biggest split-scope cluster.",
+      "priority": "P1",
+      "reason": "The partially supported backlog is 74 cards. Top exact cluster: targeted_damage_variant_v1 (20)"
+    },
+    {
+      "action": "Open new runtime only on the most reusable family remaining.",
+      "priority": "P1",
+      "reason": "Runtime-only backlog is 14 cards. Top reusable exact scope cluster: damage_all_variant_v1 (1). Largest raw family is token_maker (13 cards across 13 scopes), so it should wait for taxonomy/test-miner support instead of leading the queue."
+    },
+    {
+      "action": "Keep the manual mapper lane last.",
+      "priority": "P2",
+      "reason": "333 cards still need mapper/manual review; this lane should not drive executor architecture."
+    },
+    {
+      "action": "Isolate missing-XMage cards as a separate exception lane.",
+      "priority": "P2",
+      "reason": "4 cards are blocked by missing local XMage source."
+    }
+  ],
+  "report_dir": "docs/hermes-analysis/master_optimizer_reports",
+  "status": "ready"
+}

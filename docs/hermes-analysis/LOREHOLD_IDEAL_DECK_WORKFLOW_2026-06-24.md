@@ -1048,12 +1048,61 @@ What changed:
    `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
    `mandatory_gate_divergences=["event_contract_static=review_required"]`.
 
+## PG213 Runtime Checkpoint - Soul Immolation
+
+`Soul Immolation` is the twenty-eighth completed proof group. It closes the
+remaining `board_wipe_choice` runtime-needed row from the PG212 expanded
+matrix by modeling the XMage variable Blight cost and the X-damage sweep over
+opponents and their creatures.
+
+What changed:
+
+1. XMage mapper now recognizes `SoulImmolation` only when the class has
+   `BlightCost`, `DamagePlayersEffect`, `DamageAllEffect`, sorcery type, and
+   the controlled-creature toughness cap.
+2. ManaLoom effect scope is
+   `blight_x_damage_each_opponent_and_opponent_creatures_v1` with
+   `requires_blight_x=true`,
+   `x_value_source=blight_greatest_toughness_controlled_creature`, and
+   `damage_amount_source=x_value`.
+3. Battle runtime now chooses X from live board context, pays `blight_x` by
+   applying -1/-1 counters to a controlled creature, and resolves X damage to
+   each live opponent and each creature they control.
+4. PG213 precheck/apply/postcheck promoted one verified auto rule for
+   `Soul Immolation`; there were no stale shadow rows to deprecate.
+5. PG -> Hermes sync made `Soul Immolation` report as `battle_ready`; the local
+   cache spot-check resolves
+   `effect=damage_each_opponent_and_opponent_creatures`,
+   `battle_model_scope=blight_x_damage_each_opponent_and_opponent_creatures_v1`,
+   `review_status=verified`, and `execution_status=auto`.
+6. The PG213 expanded matrix for decks `6,606-619` reports `580` rows,
+   `battle_ready=380`, `runtime_needed=10`, `mapper_manual=131`,
+   `split_scope=55`, and `blocked_missing_xmage_source=4`.
+7. Effective queue
+   `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg213_soul_immolation_postsync_v1.json`
+   reports no package-ready unprepared rows; remaining operational lanes are
+   `manual_mapper_backlog=333`, `split_scope_backlog=74`,
+   `runtime_family_backlog=14`, and `blocked_missing_xmage_source=4`.
+8. Strategy consistency audit
+   `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg213_soul_immolation_postsync_v1.json`
+   passed `18/18`.
+9. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_093405/summary.json`
+   reports `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `forensic_lineage_status=complete`,
+   `target_pressure_statuses={"pass":16}`,
+   `table_intent_statuses={"pass":16}`,
+   `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+   `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+   `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
 Next operational order:
 
-1. Close `Soul Immolation` separately, because it needs variable-X/Blight cost
-   and damage-to-each-opponent/every-opponent-creature modeling.
-2. Then handle the token-maker runtime family surfaced by newly included decks
+1. Handle the token-maker runtime family surfaced by newly included decks
    `617/619`.
+2. Reduce exact mapper/split-scope backlog only after the token-maker runtime
+   lane is no longer the top blocker for Lorehold/opponent coverage.
 3. Only after those runtime lanes shrink, resume benchmark candidates with the
    baseline/hash/slot-optimizer gate.
 

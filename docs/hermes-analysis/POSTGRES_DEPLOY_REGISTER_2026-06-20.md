@@ -13129,3 +13129,107 @@ Register decision:
   `board_wipe_choice` runtime card, then the token-maker runtime family from
   newly included decks `617/619`.
 - Next package number is PG213.
+
+## PG213 - Soul Immolation XMage batch
+
+Status: applied, postchecked, synced, tested, strategy-audited.
+
+Scope:
+
+- Card: `Soul Immolation`.
+- Family: `board_wipe_choice`.
+- XMage source:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SoulImmolation.java`.
+- ManaLoom runtime scope:
+  `blight_x_damage_each_opponent_and_opponent_creatures_v1`.
+- Logical rule key:
+  `battle_rule_v1:86324946621827f59ca016b47cb61f73`.
+- Oracle hash:
+  `87d1491af3cd1da95d2ec2769d1475b5`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg213_soul_immolation_package_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg213_soul_immolation_package_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg213_soul_immolation_package_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg213_soul_immolation_package_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg213_soul_immolation_package_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, canonical card id
+  `42ea67ef-2460-4386-b9b2-d9ec55e4d44d`,
+  `existing_rule_rows=0`, `expected_rule_rows_before=0`, and
+  `would_deprecate_shadow_rows=0`.
+- Apply:
+  backup rows `0`, `deprecated_shadow_rows=0`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `backup_rows=0`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg213_soul_immolation_20260625.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=1`, and
+  `canonical_snapshot_rows_exported=3244`.
+- Runtime cache spot-check:
+  local SQLite resolves `soul immolation` as
+  `effect=damage_each_opponent_and_opponent_creatures`,
+  `battle_model_scope=blight_x_damage_each_opponent_and_opponent_creatures_v1`,
+  `review_status=verified`, `execution_status=auto`, and the expected Oracle
+  hash.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg213_soul_immolation_postsync_v1_manifest.json`;
+  expanded scope moved to `high=380`, `medium=63`, `pass=519`, with no
+  package-ready unprepared proposal remaining.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg213_soul_immolation_postsync_v1.json`;
+  expanded decks `6,606-619` matrix has `580` rows, `battle_ready=380`,
+  `runtime_needed=10`, `mapper_manual=131`, `split_scope=55`, and
+  `blocked_missing_xmage_source=4`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg213_soul_immolation_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=14`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg213_soul_immolation_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  mapper/classifier tests passed through `unittest`, and the battle harness
+  passed including
+  `test_pg213_soul_immolation_pays_blight_x_and_damages_opponents_and_their_creatures`.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_093405/summary.json`;
+  `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `forensic_lineage_status=complete`, `target_pressure_statuses={"pass":16}`,
+  `table_intent_statuses={"pass":16}`,
+  `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Runtime changes:
+
+- `runtime_cast_plan_for_card` can choose an X value for
+  `blight_greatest_toughness_controlled_creature` scopes using live board
+  context.
+- `pay_additional_card_costs` now pays `blight_x` by applying -1/-1 counters to
+  the selected controlled creature and moving it if toughness becomes zero or
+  less.
+- New executor `damage_each_opponent_and_opponent_creatures` deals X damage to
+  each live opponent and to each creature they control.
+
+Register decision:
+
+- PG213 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG213.
+- Continue Lorehold-first closure on the token-maker runtime family from newly
+  included decks `617/619`.
+- Next package number is PG214.

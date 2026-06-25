@@ -3539,6 +3539,41 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertFalse(primary["instant"])
         self.assertTrue(primary["sorcery"])
 
+    def test_soul_immolation_maps_to_blight_x_opponent_damage_sweep_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "SoulImmolation",
+                "effect_classes": ["DamagePlayersEffect", "DamageAllEffect"],
+                "ability_classes": [],
+                "cost_classes": ["BlightCost"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addCost(new SoulImmolationCost()); "
+                    "GreatestAmongPermanentsValue.TOUGHNESS_CONTROLLED_CREATURES.getHint(); "
+                    "new DamagePlayersEffect(GetXValue.instance, TargetController.OPPONENT); "
+                    "new DamageAllEffect(GetXValue.instance, StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURES);"
+                ),
+            },
+            (
+                "As an additional cost to cast this spell, blight X. X can't be greater than the greatest "
+                "toughness among creatures you control. Soul Immolation deals X damage to each opponent "
+                "and each creature they control."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "damage_each_opponent_and_opponent_creatures")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "blight_x_damage_each_opponent_and_opponent_creatures_v1",
+        )
+        self.assertTrue(primary["requires_blight_x"])
+        self.assertEqual(primary["x_value_source"], "blight_greatest_toughness_controlled_creature")
+        self.assertEqual(primary["additional_cost_kind"], "blight_x")
+        self.assertEqual(primary["target_controller"], "opponents")
+        self.assertEqual(primary["damage_amount_source"], "x_value")
+        self.assertTrue(primary["sorcery"])
+
     def test_armageddon_maps_to_destroy_all_lands_scope(self) -> None:
         result = hints.build_effect_hints(
             {

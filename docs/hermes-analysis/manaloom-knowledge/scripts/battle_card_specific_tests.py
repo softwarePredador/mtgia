@@ -15288,6 +15288,132 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg213_soul_immolation_pays_blight_x_and_damages_opponents_and_their_creatures():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            blight_target = {
+                "name": "Lorehold Guardian",
+                "type_line": "Creature - Spirit",
+                "effect": "creature",
+                "power": 6,
+                "toughness": 6,
+                "cmc": 4,
+            }
+            active.battlefield = [
+                blight_target,
+                *[
+                    {
+                        "name": f"Red Source {index}",
+                        "effect": "land",
+                        "type_line": "Land",
+                        "produces": "R",
+                        "mana_produced": 1,
+                    }
+                    for index in range(5)
+                ],
+            ]
+            active.refresh_mana_sources(turn=5)
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            doomed_a = {
+                "name": "Small Rival",
+                "type_line": "Creature - Goblin",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "cmc": 2,
+            }
+            doomed_b = {
+                "name": "Mid Rival",
+                "type_line": "Creature - Ogre",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "cmc": 4,
+            }
+            survivor_b = {
+                "name": "Large Rival",
+                "type_line": "Creature - Giant",
+                "effect": "creature",
+                "power": 7,
+                "toughness": 7,
+                "cmc": 7,
+            }
+            opponent_a.battlefield = [doomed_a]
+            opponent_b.battlefield = [doomed_b, survivor_b]
+            active._current_opponents = [opponent_a, opponent_b]
+            card = {
+                "name": "Soul Immolation",
+                "type_line": "Sorcery",
+                "mana_cost": "{3}{R}{R}",
+                "cmc": 5,
+            }
+            effect_data = {
+                "effect": "damage_each_opponent_and_opponent_creatures",
+                "battle_model_scope": "blight_x_damage_each_opponent_and_opponent_creatures_v1",
+                "requires_blight_x": True,
+                "x_value_source": "blight_greatest_toughness_controlled_creature",
+                "additional_cost_kind": "blight_x",
+                "target_controller": "opponents",
+                "damage_scope": "each_opponent_and_creatures_they_control",
+                "damage_amount_source": "x_value",
+                "sorcery": True,
+                "_rule_logical_key": "battle_rule_v1:pg213_soul_immolation_test",
+                "_rule_oracle_hash": "pg213-soul-immolation-test-hash",
+            }
+            cast_plan = battle.runtime_cast_plan_for_card(active, card, effect_data)
+            assert cast_plan is not None
+            assert cast_plan["x_value"] == 5
+            assert cast_plan["additional_costs"] == ["blight:5"]
+            battle.store_cast_context_fields(effect_data, {"x_value": cast_plan["x_value"]})
+            assert battle.pay_additional_card_costs(
+                active,
+                card,
+                effect_data,
+                turn=5,
+                cost_context=cast_plan.get("cost_context"),
+            )
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent_a, opponent_b],
+                card,
+                5,
+                random.Random(213),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert blight_target in active.battlefield
+        assert blight_target["toughness"] == 1
+        assert doomed_a not in opponent_a.battlefield
+        assert doomed_b not in opponent_b.battlefield
+        assert survivor_b in opponent_b.battlefield
+        assert opponent_a.life == 35
+        assert opponent_b.life == 35
+        assert any(card.get("name") == "Soul Immolation" for card in active.graveyard)
+        assert any(
+            event == "additional_cost_paid"
+            and data.get("card") == "Soul Immolation"
+            and data.get("cost") == "blight_x"
+            and data.get("x_value") == 5
+            and data.get("blighted") == "Lorehold Guardian"
+            for event, data in events
+        )
+        assert any(
+            event == "damage_each_opponent_and_opponent_creatures_resolved"
+            and data.get("card") == "Soul Immolation"
+            and data.get("amount") == 5
+            and data.get("damaged_opponents") == ["Opponent A", "Opponent B"]
+            and data.get("opponent_creatures_destroyed") == 2
+            and data.get("rule_logical_key") == "battle_rule_v1:pg213_soul_immolation_test"
+            for event, data in events
+        )
+
     def test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -15898,6 +16024,7 @@ def register_tests(battle, player):
         test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them,
         test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit,
         test_pg206_boltwave_damages_each_opponent,
+        test_pg213_soul_immolation_pays_blight_x_and_damages_opponents_and_their_creatures,
         test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage,
         test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering,
         test_pg207_impact_tremors_damages_each_opponent_when_token_enters,

@@ -160,6 +160,7 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
             "gift_destroy_all_creatures_return_own_destroyed_creature",
             "selective_nonland_sacrifice",
             "board_wipe",
+            "damage_each_opponent_and_opponent_creatures",
             "sweeper_damage",
         },
         "support_status": "runtime_family_required",
@@ -779,6 +780,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target_controller") == "opponents"
             and bool(effect_json.get("instant")) == ("INSTANT" in types)
             and bool(effect_json.get("sorcery")) == ("SORCERY" in types)
+        )
+
+    if (
+        effect == "damage_each_opponent_and_opponent_creatures"
+        and scope == "blight_x_damage_each_opponent_and_opponent_creatures_v1"
+    ):
+        return (
+            types == {"SORCERY"}
+            and effect_classes == {"DamageAllEffect", "DamagePlayersEffect"}
+            and not ability_classes
+            and "BlightCost" in cost_classes
+            and cost_classes.issubset({"BlightCost", "SoulImmolationCost"})
+            and bool(effect_json.get("requires_blight_x"))
+            and effect_json.get("x_value_source") == "blight_greatest_toughness_controlled_creature"
+            and effect_json.get("additional_cost_kind") == "blight_x"
+            and effect_json.get("target_controller") == "opponents"
+            and effect_json.get("damage_scope") == "each_opponent_and_creatures_they_control"
+            and effect_json.get("damage_amount_source") == "x_value"
+            and bool(effect_json.get("sorcery"))
         )
 
     if effect == "board_wipe" and scope == "destroy_all_lands_v1":

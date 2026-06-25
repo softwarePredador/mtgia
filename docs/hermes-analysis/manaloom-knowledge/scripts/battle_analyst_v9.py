@@ -146,6 +146,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "copy_creature_token",
     "copy_permanent_etb",
     "copy_spell",
+    "damage_each_opponent_and_opponent_creatures",
     "damage_player_and_creatures",
     "damage_wipe",
     "damage_wipe_treasure",
@@ -175,6 +176,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
 BOARD_WIPE_LIKE_EFFECTS = {
     "airbend_other_creatures",
     "board_wipe",
+    "damage_each_opponent_and_opponent_creatures",
     "damage_wipe",
     "exile_artifact_enchantment_creature_convoke_wipe",
     "fated_clash_protect_then_destroy",
@@ -1463,6 +1465,19 @@ def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=
         return variable_plan
 
     x_value = 0
+    cost_context = {}
+    additional_costs = []
+    if effect_data.get("x_value_source") == "blight_greatest_toughness_controlled_creature":
+        blight_plan = choose_blight_x_cost_plan(
+            player,
+            getattr(player, "_current_opponents", []),
+            effect_data,
+        )
+        if blight_plan is None:
+            return None
+        x_value = int(blight_plan.get("x_value") or 0)
+        cost_context["blight"] = blight_plan
+        additional_costs.append(f"blight:{x_value}")
     if effect_data.get("target_mana_value_max_from_x"):
         max_candidate_x = max(0, int(player.available_mana() or 0))
         chosen_x = None
@@ -1484,14 +1499,17 @@ def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=
         player,
         card,
         additional_generic,
-        x_value=x_value,
+        x_value=0
+        if effect_data.get("x_value_source") == "blight_greatest_toughness_controlled_creature"
+        else x_value,
     )
     if not player.can_pay(locked_cost):
         return None
     return {
         "locked_cost": locked_cost,
-        "cost_context": {},
+        "cost_context": cost_context,
         "x_value": x_value,
+        "additional_costs": additional_costs,
     }
 
 
@@ -2712,6 +2730,22 @@ def add_plus_one_counters(permanent, count=1):
     if is_battlefield_creature(permanent):
         permanent["power"] = int(float(permanent.get("power") or 0)) + added
         permanent["toughness"] = int(float(permanent.get("toughness") or 0)) + added
+
+
+def add_minus_one_counters(permanent, count=1):
+    if not isinstance(permanent, dict):
+        return 0
+    added = max(0, int(count or 0))
+    if added <= 0:
+        return 0
+    permanent["minus_one_counters"] = int(permanent.get("minus_one_counters") or 0) + added
+    counters = permanent.get("counters")
+    if isinstance(counters, dict):
+        counters["-1/-1"] = permanent["minus_one_counters"]
+    if is_battlefield_creature(permanent):
+        permanent["power"] = int(float(permanent.get("power") or 0)) - added
+        permanent["toughness"] = int(float(permanent.get("toughness") or 0)) - added
+    return added
 
 
 def get_named_counter_count(permanent, counter_name):
@@ -10373,6 +10407,109 @@ def choose_creature_for_resource_cost(player, *, required_color=None):
     return ranked[0], option_rows, selection_reason
 
 
+def choose_blight_x_cost_plan(player, opponents, effect_data):
+    if not effect_data.get("requires_blight_x"):
+        return None
+    candidates = [
+        permanent
+        for permanent in player.battlefield
+        if is_battlefield_creature(permanent)
+    ]
+    if not candidates:
+        return None
+
+    alive_opponents = [
+        opponent
+        for opponent in opponents or []
+        if getattr(opponent, "is_alive", lambda: False)()
+    ]
+    max_x = max(0, *(_damage_sweep_creature_toughness(permanent) for permanent in candidates))
+    if max_x <= 0:
+        return None
+
+    best = None
+    options = []
+    for x_value in range(1, max_x + 1):
+        legal_targets = [
+            permanent
+            for permanent in candidates
+            if _damage_sweep_creature_toughness(permanent) >= x_value
+        ]
+        if not legal_targets:
+            continue
+
+        def blight_target_key(permanent):
+            toughness = _damage_sweep_creature_toughness(permanent)
+            survives = toughness > x_value
+            return (
+                1 if permanent.get("is_commander") else 0,
+                0 if survives else 1,
+                int(float(permanent.get("cmc") or 0)),
+                int(float(permanent.get("power") or 0)),
+                toughness,
+                permanent.get("name", ""),
+            )
+
+        target = sorted(legal_targets, key=blight_target_key)[0]
+        opponent_creatures = [
+            permanent
+            for opponent in alive_opponents
+            for permanent in getattr(opponent, "battlefield", []) or []
+            if is_battlefield_creature(permanent)
+        ]
+        killable = [
+            permanent
+            for permanent in opponent_creatures
+            if not permanent.get("indestructible")
+            and _damage_sweep_creature_toughness(permanent) <= x_value
+        ]
+        lethal_count = sum(1 for opponent in alive_opponents if getattr(opponent, "life", 0) <= x_value)
+        own_toughness = _damage_sweep_creature_toughness(target)
+        own_loss_penalty = 18 if own_toughness <= x_value else x_value
+        if target.get("is_commander"):
+            own_loss_penalty += 30
+        score = (
+            x_value * max(1, len(alive_opponents)) * 2
+            + len(killable) * 14
+            + lethal_count * 60
+            - own_loss_penalty
+        )
+        row = {
+            "x_value": x_value,
+            "target": target,
+            "target_name": target.get("name", "?"),
+            "target_toughness": own_toughness,
+            "opponent_creatures_destroyable": len(killable),
+            "lethal_opponents": lethal_count,
+            "score": score,
+            "own_loss_penalty": own_loss_penalty,
+        }
+        options.append({key: value for key, value in row.items() if key != "target"})
+        if best is None or (
+            score,
+            x_value,
+            len(killable),
+            -own_loss_penalty,
+        ) > (
+            best["score"],
+            best["x_value"],
+            best["opponent_creatures_destroyable"],
+            -best["own_loss_penalty"],
+        ):
+            best = row
+    if best is None:
+        return None
+    return {
+        "x_value": int(best["x_value"]),
+        "target": best["target"],
+        "target_name": best["target_name"],
+        "target_toughness": best["target_toughness"],
+        "options": options[:12],
+        "selection_reason": "maximize_opponent_damage_and_creature_sweep_after_blight_cost",
+        "runtime_cost_model": "blight_x_put_minus_one_counters_on_controlled_creature",
+    }
+
+
 def choose_untapped_creature_for_resource_cost(player, *, required_color=None):
     candidates = [
         permanent
@@ -10429,6 +10566,8 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
     planned_sacrifices = list((cost_context or {}).get("sacrifice_artifact_or_creature") or [])
     if planned_sacrifices:
         return True
+    if effect_data.get("requires_blight_x") and not (cost_context or {}).get("blight"):
+        return False
     if effect_data.get("requires_discard_card"):
         discardable = [
             candidate
@@ -10467,14 +10606,56 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
     """Pay non-mana costs that materially affect battlefield validity."""
     cost_context = dict(cost_context or {})
     planned_sacrifices = list(cost_context.get("sacrifice_artifact_or_creature") or [])
+    planned_blight = dict(cost_context.get("blight") or {})
     if (
         not effect_data.get("requires_discard_card")
         and not effect_data.get("requires_discard_land")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_green_creature")
         and not planned_sacrifices
+        and not planned_blight
     ):
         return True
+    if planned_blight:
+        target = planned_blight.get("target")
+        x_value = int(planned_blight.get("x_value") or 0)
+        if x_value <= 0 or target not in player.battlefield or not is_battlefield_creature(target):
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="blight_x",
+                x_value=x_value,
+                turn=turn,
+            )
+            return False
+        toughness_before = _damage_sweep_creature_toughness(target)
+        power_before = int(float(target.get("power") or 0))
+        add_minus_one_counters(target, x_value)
+        destination = None
+        if _damage_sweep_creature_toughness(target) <= 0:
+            destination = move_creature_from_battlefield(
+                player,
+                target,
+                reason="blight_additional_cost",
+                source=card,
+            )
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="blight_x",
+            x_value=x_value,
+            blighted=target.get("name", "?"),
+            target_power_before=power_before,
+            target_toughness_before=toughness_before,
+            target_power_after=target.get("power"),
+            target_toughness_after=target.get("toughness"),
+            destination=destination,
+            selection_reason=planned_blight.get("selection_reason"),
+            runtime_cost_model=planned_blight.get("runtime_cost_model"),
+            turn=turn,
+        )
     if effect_data.get("requires_discard_card"):
         discard_any = next(
             (
@@ -22338,6 +22519,116 @@ def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
     finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
 
 
+def damage_amount_from_x_context(effect_data, default=0):
+    cast_context = effect_data.get("_cast_context") or {}
+    try:
+        return int(float(cast_context.get("x_value") or effect_data.get("x_value") or default or 0))
+    except Exception:
+        return int(default or 0)
+
+
+def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, effect_data, turn):
+    amount = damage_amount_from_x_context(
+        effect_data,
+        effect_data.get("amount") or effect_data.get("damage") or 0,
+    )
+    amount = apply_controller_noncombat_damage_modifiers(
+        player,
+        amount,
+        card,
+        turn=turn,
+        phase="resolution",
+    )
+    damaged = []
+    destroyed = []
+    protected = []
+    survived_damage = []
+    creatures_seen = 0
+    for opponent in opponents:
+        if not opponent.is_alive():
+            continue
+        life_before = opponent.life
+        dealt = deal_damage(opponent, amount, source=card)
+        damaged.append(
+            {
+                "player": opponent.name,
+                "life_before": life_before,
+                "life_after": opponent.life,
+                "dealt": amount if dealt else 0,
+                "result": "player_damage" if dealt else "prevented",
+            }
+        )
+        for permanent in list(opponent.battlefield):
+            if not is_battlefield_creature(permanent):
+                continue
+            creatures_seen += 1
+            if permanent.get("indestructible"):
+                protected.append({"controller": opponent.name, "name": permanent.get("name", "?")})
+                continue
+            toughness = _damage_sweep_creature_toughness(permanent)
+            if toughness > amount:
+                survived_damage.append(
+                    {
+                        "controller": opponent.name,
+                        "name": permanent.get("name", "?"),
+                        "toughness": toughness,
+                    }
+                )
+                continue
+            process_taii_wakeen_noncombat_damage_to_creature(
+                player,
+                opponent,
+                card,
+                permanent,
+                amount,
+                turn=turn,
+                phase="resolution",
+            )
+            destination = move_creature_from_battlefield(
+                opponent,
+                permanent,
+                reason="damage_each_opponent_and_opponent_creatures",
+                source=card,
+            )
+            destroyed.append(
+                {
+                    "controller": opponent.name,
+                    "name": permanent.get("name", "?"),
+                    "toughness": toughness,
+                    "destination": destination,
+                }
+            )
+
+    emit_replay_event(
+        "damage_each_opponent_and_opponent_creatures_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        amount=amount,
+        x_value=amount,
+        damaged_opponents=[entry["player"] for entry in damaged],
+        damage_results=damaged,
+        creatures_seen=creatures_seen,
+        opponent_creatures_destroyed=len(destroyed),
+        live_opponent_creatures_destroyed=len(destroyed),
+        destroyed=destroyed[:20],
+        protected=protected[:20],
+        survived_damage=survived_damage[:20],
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    if any(entry.get("dealt", 0) > 0 for entry in damaged):
+        trigger_spell_damage_token_engines(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            phase="resolution",
+            damage_event="damage_each_opponent_and_opponent_creatures",
+        )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
 def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
     amount = int(effect_data.get("damage") or effect_data.get("average_damage") or 6)
     amount = apply_controller_noncombat_damage_modifiers(
@@ -24957,6 +25248,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 role="commander",
                 source_zone="command_zone",
                 x_value=cmd_cast_plan.get("x_value", 0),
+                additional_costs=cmd_cast_plan.get("additional_costs"),
                 locked_cost_override=cmd_cast_plan.get("locked_cost"),
             )
             cost = cmd["cmc"] + player.commander_tax
@@ -25463,6 +25755,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     role="high_threat",
                     targets=declared_targets,
                     x_value=cast_plan.get("x_value", 0),
+                    additional_costs=cast_plan.get("additional_costs"),
                     locked_cost_override=cast_plan.get("locked_cost"),
                 )
                 if not commit_cast_payment(cast_ctx):
@@ -25590,6 +25883,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     effect_data=eff,
                     role="creature",
                     x_value=cast_plan.get("x_value", 0),
+                    additional_costs=cast_plan.get("additional_costs"),
                     locked_cost_override=cast_plan.get("locked_cost"),
                 )
                 if not commit_cast_payment(cast_ctx):
@@ -25737,6 +26031,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     role="normal",
                     targets=declared_targets,
                     x_value=cast_plan.get("x_value", 0),
+                    additional_costs=cast_plan.get("additional_costs"),
                     locked_cost_override=cast_plan.get("locked_cost"),
                 )
                 if not commit_cast_payment(cast_ctx):
@@ -26818,6 +27113,8 @@ def apply_effect_immediate(
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_each_opponent":
         apply_damage_each_opponent(player, opponents, card, effect_data, turn)
+    elif effect == "damage_each_opponent_and_opponent_creatures":
+        apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, effect_data, turn)
     elif effect == "damage_player_and_creatures":
         apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_wipe":
@@ -29972,6 +30269,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     CURRENT_REPLAY_TURN = turn
     if game_winner(all_players):
         return
+    player._current_opponents = list(opponents or [])
     clear_turn_scoped_permanent_flags(all_players)
     emit_replay_event(
         "turn_start",

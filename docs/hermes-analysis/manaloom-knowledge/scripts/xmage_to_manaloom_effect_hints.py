@@ -6460,6 +6460,53 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
 
     if (
         "DamagePlayersEffect" in effect_classes
+        and "DamageAllEffect" in effect_classes
+        and "BlightCost" in cost_classes
+        and xmage_class_name == "SoulImmolation"
+        and card_types == {"SORCERY"}
+        and not ability_classes
+        and (
+            "filter_opponents_permanent_creatures" in normalized_text
+            or "filter_opponents_permanent_a_creature" in normalized_text
+            or "each creature they control" in normalized_text
+        )
+        and (
+            "greatestamongpermanentsvalue.toughness_controlled_creatures" in normalized_text
+            or "greatest toughness among creatures you control" in normalized_text
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="damage_each_opponent_and_opponent_creatures",
+                scope="blight_x_damage_each_opponent_and_opponent_creatures_v1",
+                reason=(
+                    "XMage Soul Immolation uses variable BlightCost X bounded by controlled-creature toughness, "
+                    "then DamagePlayersEffect and DamageAllEffect over opponents' creatures."
+                ),
+                ability_kind="one_shot",
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "requires_blight_x": True,
+                    "x_value_source": "blight_greatest_toughness_controlled_creature",
+                    "additional_cost_kind": "blight_x",
+                    "target_controller": "opponents",
+                    "damage_scope": "each_opponent_and_creatures_they_control",
+                    "damage_amount_source": "x_value",
+                    "sorcery": True,
+                },
+                matched_signals=[
+                    "BlightCost",
+                    "GetXValue",
+                    "GreatestAmongPermanentsValue.TOUGHNESS_CONTROLLED_CREATURES",
+                    "DamagePlayersEffect",
+                    "DamageAllEffect",
+                    "FILTER_OPPONENTS_PERMANENT_CREATURES",
+                ],
+            )
+        )
+
+    if (
+        "DamagePlayersEffect" in effect_classes
         and not ability_classes
         and card_types <= {"INSTANT", "SORCERY"}
         and (
