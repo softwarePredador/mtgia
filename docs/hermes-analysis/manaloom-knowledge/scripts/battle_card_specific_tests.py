@@ -11448,6 +11448,87 @@ def register_tests(battle, player):
         assert any(event == "rebound_exiled" and data.get("card") == "Profound Journey" for event, data in events)
         assert any(event == "rebound_cast" and data.get("card") == "Profound Journey" for event, data in events)
 
+    def test_pg202_redress_fate_returns_all_artifact_enchantment_cards():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            effect_data = {
+                "effect": "recursion",
+                "target": "artifact_or_enchantment",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact", "enchantment"],
+                "miracle": True,
+                "miracle_cost": "{3}{W}",
+                "battle_model_scope": "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1",
+                "_rule_logical_key": "battle_rule_v1:redress-fate-test",
+                "_rule_oracle_hash": "redress-fate-test-hash",
+            }
+            spell = {
+                "name": "Redress Fate",
+                "cmc": 8,
+                "type_line": "Sorcery",
+                **effect_data,
+            }
+            active.graveyard = [
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Smothering Tithe", "cmc": 4, "type_line": "Enchantment", "effect": "ramp_engine"},
+                {"name": "Esper Sentinel", "cmc": 1, "type_line": "Creature", "effect": "creature"},
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land - Plains", "effect": "land"},
+                {"name": "Lightning Bolt", "cmc": 1, "type_line": "Instant", "effect": "direct_damage"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=5,
+                rng=random.Random(202),
+                effect_data_override=dict(effect_data),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        battlefield_names = [card.get("name") for card in active.battlefield]
+        graveyard_names = [card.get("name") for card in active.graveyard]
+        assert battlefield_names == ["Sol Ring", "Smothering Tithe"]
+        assert graveyard_names == ["Esper Sentinel", "Plains", "Lightning Bolt", "Redress Fate"]
+        assert any(
+            event == "recursion_resolved"
+            and data.get("card") == "Redress Fate"
+            and data.get("recovered") == ["Sol Ring", "Smothering Tithe"]
+            and data.get("recovered_count") == 2
+            and data.get("target_type") == "artifact_or_enchantment"
+            and data.get("destination") == "battlefield"
+            and data.get("return_all_matching") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:redress-fate-test"
+            and data.get("rule_oracle_hash") == "redress-fate-test-hash"
+            for event, data in events
+        )
+
+    def test_pg202_redress_fate_rule_resolves_from_sqlite_cache():
+        effect_data = battle.get_card_effect({"name": "Redress Fate", "type_line": "Sorcery", "cmc": 8})
+        assert effect_data["effect"] == "recursion"
+        assert (
+            effect_data["battle_model_scope"]
+            == "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1"
+        )
+        assert effect_data["target"] == "artifact_or_enchantment"
+        assert effect_data["destination"] == "battlefield"
+        assert effect_data["return_all_matching"] is True
+        assert effect_data["target_card_types"] == ["artifact", "enchantment"]
+        assert effect_data["miracle"] is True
+        assert effect_data["miracle_cost"] == "{3}{W}"
+        assert effect_data["_rule_logical_key"] == "battle_rule_v1:e78fc833fc5528c9fff3788f2d82d5d0"
+        assert effect_data["_rule_oracle_hash"] == "43b0f9e8d3e2fc829b55e89d812750cd"
+        assert effect_data["_rule_review_status"] == "verified"
+        assert effect_data["_rule_execution_status"] == "auto"
+
     def test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -14808,6 +14889,8 @@ def register_tests(battle, player):
         test_double_vision_copies_only_first_instant_or_sorcery_each_turn,
         test_swarm_intelligence_copies_second_instant_or_sorcery_spell_too,
         test_profound_journey_rebounds_and_returns_permanents_to_battlefield,
+        test_pg202_redress_fate_returns_all_artifact_enchantment_cards,
+        test_pg202_redress_fate_rule_resolves_from_sqlite_cache,
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
         test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep,
         test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures,

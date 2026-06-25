@@ -422,6 +422,33 @@ def test_strategy_auditor_flags_unjustified_tutor_and_wipe_wheel():
     assert result["summary"]["verdict"] == "needs_review"
 
 
+def test_strategy_auditor_accepts_already_resolving_board_wipe_copy():
+    result = auditor.audit_strategy(
+        events=[],
+        decisions=[
+            {
+                "decision_id": "d-wipe-copy-resolution",
+                "decision_type": "board_wipe",
+                "chosen_option": {"card": "Austere Command", "effect": "board_wipe"},
+                "score_components": {
+                    "actual_asymmetry": 0,
+                    "behind_on_board": False,
+                    "rebuild_plan": False,
+                },
+                "strategic_principle": "resolve_spell_already_on_stack",
+                "heuristic_version": "test",
+                "resource_delta": {"actual_asymmetry": 0},
+                "risk_flags": ["wipe_without_clear_asymmetry"],
+                "rejected_reason": "spell_already_resolving",
+                "alternatives_considered": [{"action": "defer_wipe_not_available_after_resolution"}],
+            }
+        ],
+    )
+
+    assert result["summary"]["findings"] == 0
+    assert result["summary"]["verdict"] == "usable_for_strategy_learning"
+
+
 def test_strategy_auditor_accepts_contextual_pass_no_action():
     result = auditor.audit_strategy(
         events=[],
@@ -712,6 +739,7 @@ if __name__ == "__main__":
         test_strategy_auditor_accepts_documented_land_sacrifice_benefit,
         test_strategy_auditor_still_blocks_last_land_spend_without_payoff,
         test_strategy_auditor_flags_unjustified_tutor_and_wipe_wheel,
+        test_strategy_auditor_accepts_already_resolving_board_wipe_copy,
         test_strategy_auditor_accepts_contextual_pass_no_action,
         test_strategy_auditor_accepts_multiplayer_wheel_with_payoff,
         test_strategy_auditor_accepts_wheel_of_misfortune_compact_scope,

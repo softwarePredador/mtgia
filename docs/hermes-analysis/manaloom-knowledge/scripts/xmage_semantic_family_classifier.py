@@ -259,12 +259,21 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
             "direct_damage",
             "counter_spell",
             "add_counters",
-            "recursion",
             "draw_cards",
         },
         "support_status": "runtime_family_partially_supported_review_required",
         "implementation_unit": "target legality, resolution, zone transition, and event provenance",
         "family_tests": [],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "recursion": {
+        "effects": {"recursion"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "graveyard target selection, zone movement to hand or battlefield, and replacement-cost annotations",
+        "family_tests": [
+            "test_profound_journey_rebounds_and_returns_permanents_to_battlefield",
+            "test_pg202_redress_fate_returns_all_artifact_enchantment_cards",
+        ],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
     "manual_model": {
@@ -372,6 +381,7 @@ GENERIC_BATCH_SAFE_SCOPES = {
     ("direct_damage", "targeted_damage_variant_v1"),
     ("recursion", "graveyard_to_battlefield_variant_v1"),
     ("recursion", "return_target_permanent_from_graveyard_to_battlefield_rebound_v1"),
+    ("recursion", "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1"),
     ("sweeper_damage", "damage_all_variant_v1"),
 }
 MANA_ROCK_BATCH_SAFE_SCOPE = (
@@ -395,7 +405,7 @@ GENERIC_BATCH_SAFE_ABILITY_CLASSES = {
     "removal_destroy": {"AlternativeCostSourceAbility", "CantBeCounteredSourceAbility"},
     "direct_damage": set(),
     "sweeper_damage": {"ConvokeAbility"},
-    "recursion": {"FlashbackAbility"},
+    "recursion": {"FlashbackAbility", "MiracleAbility"},
 }
 
 
@@ -451,8 +461,6 @@ def generic_runtime_batch_safe(card: dict[str, Any]) -> bool:
     if not types or not types.issubset({"INSTANT", "SORCERY"}):
         return False
     if effect == "recursion":
-        if "ReturnFromGraveyardToBattlefieldTargetEffect" not in effect_classes:
-            return False
         if scope == "return_target_permanent_from_graveyard_to_battlefield_rebound_v1":
             return (
                 types == {"SORCERY"}
@@ -463,6 +471,20 @@ def generic_runtime_batch_safe(card: dict[str, Any]) -> bool:
                 and int(effect_json.get("count") or 0) == 1
                 and bool(effect_json.get("rebound"))
             )
+        if scope == "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1":
+            return (
+                types == {"SORCERY"}
+                and effect_classes == {"ReturnFromYourGraveyardToBattlefieldAllEffect"}
+                and ability_classes == {"MiracleAbility"}
+                and str(effect_json.get("target") or "") == "artifact_or_enchantment"
+                and str(effect_json.get("destination") or "") == "battlefield"
+                and bool(effect_json.get("return_all_matching"))
+                and effect_json.get("target_card_types") == ["artifact", "enchantment"]
+                and bool(effect_json.get("miracle"))
+                and effect_json.get("miracle_cost") == "{3}{W}"
+            )
+        if "ReturnFromGraveyardToBattlefieldTargetEffect" not in effect_classes:
+            return False
     else:
         allowed_effects = GENERIC_BATCH_SAFE_EFFECT_CLASSES.get(effect)
         if allowed_effects is None or not effect_classes.issubset(allowed_effects):

@@ -26881,7 +26881,8 @@ def apply_effect_immediate(
             phase=phase,
         )
     elif effect == "recursion":
-        count = int(effect_data.get("count") or 2)
+        return_all_matching = bool(effect_data.get("return_all_matching"))
+        count = len(player.graveyard) if return_all_matching else int(effect_data.get("count") or 2)
         target_type = effect_data.get("target")
         mana_value_max = recursion_mana_value_max(effect_data)
         candidates = [
@@ -26903,7 +26904,12 @@ def apply_effect_immediate(
         ):
                 if destination == "battlefield":
                     permanent_effect = get_card_effect(recovered_card)
-                    permanent = enrich_card({**recovered_card, **permanent_effect})
+                    permanent = prepare_entering_permanent(
+                        enrich_card({**recovered_card, **permanent_effect}),
+                        controller=player,
+                        all_players=[player] + list(opponents or []),
+                        turn=turn,
+                    )
                     if is_creature_card(recovered_card):
                         permanent["effect"] = "creature"
                         permanent["haste"] = has_haste(permanent)
@@ -26917,9 +26923,13 @@ def apply_effect_immediate(
             player=player.name,
             card=card.get("name", "?"),
             recovered=[recovered_card.get("name", "?") for recovered_card in recovered],
+            recovered_count=len(recovered),
+            target_type=target_type,
             destination=destination,
             mana_value_max=mana_value_max,
+            return_all_matching=return_all_matching,
             turn=turn,
+            **replay_rule_fields(effect_data),
         )
         if effect_data.get("exiles_self"):
             move_to_exile(player, card, reason="spell_exiles_self", turn=turn)

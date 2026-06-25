@@ -302,7 +302,10 @@ def audit_decision(decision: dict[str, Any]) -> list[dict[str, Any]]:
             ))
 
     if decision_type == "board_wipe":
-        if "wipe_without_timing_justification" in risk_flags:
+        spell_already_resolving = decision.get("rejected_reason") == "spell_already_resolving"
+        if spell_already_resolving:
+            pass
+        elif "wipe_without_timing_justification" in risk_flags:
             findings.append(finding(
                 "medium",
                 "board_wipe_without_timing_justification",

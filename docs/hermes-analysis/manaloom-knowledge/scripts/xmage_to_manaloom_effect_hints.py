@@ -2485,6 +2485,36 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "RedressFate"
+        or (
+            card_types == {"SORCERY"}
+            and effect_classes == {"ReturnFromYourGraveyardToBattlefieldAllEffect"}
+            and ability_classes == {"MiracleAbility"}
+            and "FilterArtifactOrEnchantmentCard" in filter_classes
+        )
+    ):
+        return {
+            "effect": "recursion",
+            "scope": "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1",
+            "fields": {
+                "target": "artifact_or_enchantment",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact", "enchantment"],
+                "miracle": True,
+                "miracle_cost": "{3}{W}",
+            },
+            "reason": "XMage structure matches Redress Fate returning all artifact and enchantment cards from your graveyard to the battlefield with miracle {3}{W}.",
+            "signals": [
+                "ReturnFromYourGraveyardToBattlefieldAllEffect",
+                "FilterArtifactOrEnchantmentCard",
+                "MiracleAbility",
+            ],
+        }
+
+    if (
         xmage_class_name == "DoubleVision"
         or (
             card_types == {"ENCHANTMENT"}

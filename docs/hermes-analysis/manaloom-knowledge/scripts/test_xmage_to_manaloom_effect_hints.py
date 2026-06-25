@@ -521,6 +521,36 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["life_for_colored_mana"], 3)
         self.assertEqual(primary["life_loss_on_colored_mana_status"], "annotation_only")
 
+    def test_redress_fate_maps_to_all_artifact_enchantment_recursion_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "RedressFate",
+                "effect_classes": ["ReturnFromYourGraveyardToBattlefieldAllEffect"],
+                "ability_classes": ["MiracleAbility"],
+                "filter_classes": ["FilterArtifactOrEnchantmentCard", "FilterCard"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{6}{W}{W}"); '
+                    "new ReturnFromYourGraveyardToBattlefieldAllEffect(filter); "
+                    'this.addAbility(new MiracleAbility("{3}{W}"));'
+                ),
+            },
+            "Return all artifact and enchantment cards from your graveyard to the battlefield. Miracle {3}{W}.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "recursion")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1",
+        )
+        self.assertEqual(primary["target"], "artifact_or_enchantment")
+        self.assertEqual(primary["destination"], "battlefield")
+        self.assertTrue(primary["return_all_matching"])
+        self.assertEqual(primary["target_card_types"], ["artifact", "enchantment"])
+        self.assertTrue(primary["miracle"])
+        self.assertEqual(primary["miracle_cost"], "{3}{W}")
+
     def test_moonsnare_prototype_maps_to_artifact_or_creature_support_colorless_scope(self) -> None:
         result = hints.build_effect_hints(
             {

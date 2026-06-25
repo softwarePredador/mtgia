@@ -47,6 +47,7 @@ DECK_ROLE_BY_FAMILY: dict[str, dict[str, Any]] = {
     "creature": {"category": "board_presence", "effect": "creature", "timing": "battlefield"},
     "passive": {"category": "support", "effect": "passive", "timing": "static"},
     "targeted_interaction": {"category": "interaction", "effect": "targeted_interaction", "timing": "resolution"},
+    "recursion": {"category": "recursion", "effect": "recursion", "subtype": "graveyard_to_battlefield_or_hand", "timing": "resolution"},
     "manual_model": {"category": "manual_review", "effect": "external_reference_required_manual_model"},
 }
 

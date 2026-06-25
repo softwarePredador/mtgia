@@ -11996,4 +11996,119 @@ Register decision:
   `Redress Fate`, `Molecule Man`, `Scholar of New Horizons`,
   `Deathbellow War Cry`, `Millikin`, `Starfield Shepherd`, and
   `Bedlam Reveler`.
-- Next package number is PG202.
+- PG202 consumed the `Redress Fate` recursion scope below.
+- Next package number after PG202 is PG203.
+
+## PG202 - Redress Fate
+
+Status: applied to PostgreSQL, synced into Hermes SQLite, validated in deck
+610, and accepted by the battle strategy gate.
+
+Scope:
+
+- Card: `Redress Fate`.
+- Deck touched by current Lorehold/opponent matrix: `610`.
+- XMage source:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RedressFate.java`.
+- Exact XMage mapping:
+  `ReturnFromYourGraveyardToBattlefieldAllEffect(FilterArtifactOrEnchantmentCard)`
+  returns all artifact and enchantment cards from your graveyard to the
+  battlefield; `MiracleAbility("{3}{W}")` preserves the miracle alternative
+  cost metadata.
+- ManaLoom battle model scope:
+  `return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1`.
+- Logical rule key:
+  `battle_rule_v1:e78fc833fc5528c9fff3788f2d82d5d0`.
+- Oracle hash:
+  `43b0f9e8d3e2fc829b55e89d812750cd`.
+
+Implementation:
+
+- XMage hint maps the exact `RedressFate` class from
+  `ReturnFromYourGraveyardToBattlefieldAllEffect`,
+  `FilterArtifactOrEnchantmentCard`, and `MiracleAbility`.
+- Semantic classifier now separates `recursion` from generic targeted
+  interaction and marks only this exact Redress Fate recursion scope as
+  batch-safe.
+- Batch generator now emits a recursion deck role instead of falling back to
+  manual-review role metadata.
+- Battle runtime recursion now supports `return_all_matching` and sends
+  battlefield returns through `prepare_entering_permanent`.
+- Strategy auditor now ignores board-wipe asymmetry warnings for spell copies
+  already resolving on the stack; this fixed a false mandatory gate review from
+  copied `Austere Command`, without relaxing freely chosen board wipes.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg202_redress_fate_package_20260625_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg202_redress_fate_package_20260625_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg202_redress_fate_package_20260625_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg202_redress_fate_package_20260625_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg202_redress_fate_package_20260625_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, canonical card id
+  `5d5e2edb-c368-443b-85f0-8da650d28863`,
+  `existing_rule_rows=0`, `expected_rule_rows_before=0`,
+  `would_deprecate_shadow_rows=0`.
+- Apply:
+  backup rows `0`, `deprecated_shadow_rows=0`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=0`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg202_redress_fate_20260625.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=1`, `canonical_snapshot_rows_exported=3242`.
+- Runtime cache:
+  `battle_analyst_v9.get_card_effect("Redress Fate")` resolves as
+  `effect=recursion`, `review_status=verified`, `execution_status=auto`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg202_redress_fate_postsync_v1_manifest.json`;
+  expanded scope moved to `high=395`, `medium=63`, `pass=504`, and there are
+  no remaining `batch_pg_candidate_after_precheck` proposals.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg202_redress_fate_postsync_v1.json`;
+  scoped rows `567`, `battle_ready=352`,
+  `needs_rule_before_strategy=215`, and `Redress Fate` moved to
+  `priority_benchmark_candidate` with score `50.0`.
+- Lorehold deck block:
+  decks `608` through `616` have `0` remaining
+  `needs_rule_before_strategy` rows in the PG202 matrix.
+- Affected deck audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck610_battle_rule_coherence_pg202_redress_fate_postsync_v1.json`;
+  `Redress Fate` reports `pass/coherent_for_current_gate`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg202_redress_fate_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  mapper tests ran `182` tests OK; classifier/generator tests ran `169` tests
+  OK; `battle_card_specific_tests.py`, `test_battle_decision_strategy_auditor.py`,
+  and the full battle gate test suite passed.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_042201/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`, `forensic_rule_findings=0`,
+  `forensic_turn_findings=0`, `decision_audit_decision_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `test_results_status_counts={"pass":18}`, `seeds_completed=16`,
+  `seeds_requested=16`.
+
+Register decision:
+
+- PG202 is applied, postchecked, synced, locally tested, deck-coherence
+  validated for deck `610`, and strategy-audited.
+- Do not reuse PG202.
+- Continue with `priority_benchmark_candidate` testing for the now battle-ready
+  Lorehold candidates, then handle non-Lorehold residual
+  `needs_rule_before_strategy` lanes by split-scope/runtime/manual families.
+- Next package number is PG203.

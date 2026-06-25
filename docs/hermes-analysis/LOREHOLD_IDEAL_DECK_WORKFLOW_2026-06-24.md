@@ -660,6 +660,33 @@ Lorehold/opponent matrix:
    `priority_benchmark_candidate` with score `54.0`.
 6. Full gate
    `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_034603/summary.json`
+  reports `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+  `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
+`Redress Fate` is the seventeenth completed proof and the first exact
+all-matching artifact/enchantment recursion scope promoted from the current
+Lorehold/opponent matrix:
+
+1. XMage local source matched `RedressFate` directly through
+   `ReturnFromYourGraveyardToBattlefieldAllEffect`,
+   `FilterArtifactOrEnchantmentCard`, and `MiracleAbility("{3}{W}")`.
+2. The mapper/classifier promoted only the exact
+   `return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1`
+   scope, and the generator now emits a `recursion` deck role instead of
+   falling back to manual-review metadata.
+3. Battle runtime now supports `return_all_matching` for recursion and routes
+   battlefield returns through shared permanent-entry preparation.
+4. PG202 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated no shadow rows.
+5. PG -> Hermes sync made deck `610` report `Redress Fate` as `pass`; the
+   matrix moved it to `battle_ready` / `priority_benchmark_candidate` with
+   score `50.0`.
+6. The PG202 matrix shows decks `608` through `616` have `0` remaining
+   `needs_rule_before_strategy` rows; remaining rule work is now outside that
+   Lorehold block.
+7. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_042201/summary.json`
    reports `battle_replay_final_status=trusted_for_strategy_learning`,
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
