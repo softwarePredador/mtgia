@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg205_phase_out_protection_20260625_061320",
+  "deploy_id": "pg205",
+  "family_counts": {
+    "phase_out_protection": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg205_phase_out_protection_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg205_phase_out_protection_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg205_phase_out_protection_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg205_phase_out_protection_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg205_phase_out_protection_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg205_phase_out_protection_rollback.sql"
+  },
+  "generated_at": "2026-06-25T06:13:20+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Clever Concealment"
+  ],
+  "selected_count": 1,
+  "slug": "phase_out_protection",
+  "status": "prepared_read_only_pending_apply_approval"
+}

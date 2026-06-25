@@ -159,6 +159,55 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_name["Promise of Loyalty"]["proposal_status"], "runtime_family_implementation_required")
         self.assertFalse(by_name["Molecule Man"]["safe_for_batch_pg_package"])
 
+    def test_phase_out_protection_family_is_batch_safe_with_oracle_hash(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Clever Concealment",
+                    "severity": "high",
+                    "oracle_hash": "3a2f2dd3fc65cfdc950d12ec1f3602cc",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 1},
+                    "xmage": {
+                        "class_name": "CleverConcealment",
+                        "path": "/xmage/CleverConcealment.java",
+                        "types": ["INSTANT"],
+                        "effect_classes": ["PhaseOutTargetEffect"],
+                        "ability_classes": ["ConvokeAbility"],
+                        "target_classes": ["TargetPermanent"],
+                        "filter_classes": ["FilterControlledPermanent", "FilterPermanent"],
+                        "primary_effect": {
+                            "effect": "phase_out",
+                            "battle_model_scope": "target_nonland_permanents_you_control_phase_out_v1",
+                            "ability_kind": "one_shot",
+                            "instant": True,
+                            "convoke": True,
+                            "target": "nonland_permanents_you_control",
+                            "phase_out_all_permanents_you_control": True,
+                            "phase_out_includes_lands": False,
+                            "choice_model": "phase_out_all_legal_nonland_permanents_you_control",
+                        },
+                    },
+                }
+            ]
+        }
+        family_report = classifier.build_family_report(batch_audit)
+        self.assertEqual(family_report["cards"][0]["family_id"], "phase_out_protection")
+        self.assertEqual(
+            family_report["cards"][0]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
+
+        generator_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["effect"], "phase_out")
+        self.assertEqual(proposal["deck_role_json"]["category"], "protection")
+        self.assertEqual(proposal["deck_role_json"]["subtype"], "phase_out")
+
     def test_classifier_marks_activated_ability_cost_reducer_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

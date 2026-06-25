@@ -864,6 +864,79 @@ def register_tests(battle, player):
         assert phase_event["rule_logical_key"] == "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a"
         assert phase_event["rule_oracle_hash"] == "bdc0faecf4420dc6162c7e72e98cc0eb"
 
+    def test_pg205_clever_concealment_phases_controlled_nonland_permanents_only():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            creature = {
+                "name": "Monastery Mentor",
+                "cmc": 3,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            artifact = {
+                "name": "Sol Ring",
+                "cmc": 1,
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+            }
+            enchantment = {
+                "name": "Impact Tremors",
+                "cmc": 2,
+                "type_line": "Enchantment",
+                "effect": "passive",
+            }
+            land = {
+                "name": "Plains",
+                "cmc": 0,
+                "type_line": "Basic Land - Plains",
+                "effect": "land",
+            }
+            active.battlefield = [creature, artifact, enchantment, land]
+            clever = {"name": "Clever Concealment", "cmc": 4, "type_line": "Instant"}
+            effect_data = {
+                "effect": "phase_out",
+                "battle_model_scope": "target_nonland_permanents_you_control_phase_out_v1",
+                "instant": True,
+                "convoke": True,
+                "target": "nonland_permanents_you_control",
+                "phase_out_all_permanents_you_control": True,
+                "phase_out_includes_lands": False,
+                "choice_model": "phase_out_all_legal_nonland_permanents_you_control",
+                "_rule_logical_key": "battle_rule_v1:pg205_clever_concealment",
+                "_rule_oracle_hash": "3a2f2dd3fc65cfdc950d12ec1f3602cc",
+            }
+            battle.apply_effect_immediate(
+                active,
+                [],
+                clever,
+                turn=9,
+                rng=random.Random(20501),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.battlefield == [land]
+        assert creature in active.phased_out
+        assert artifact in active.phased_out
+        assert enchantment in active.phased_out
+        assert land not in active.phased_out
+        assert clever in active.graveyard
+        phase_event = next(
+            data
+            for event, data in events
+            if event == "phase_out_resolved" and data.get("card") == "Clever Concealment"
+        )
+        assert phase_event["phased_count"] == 3
+        assert phase_event["phase_out_includes_lands"] is False
+        assert phase_event["rule_logical_key"] == "battle_rule_v1:pg205_clever_concealment"
+        assert phase_event["rule_oracle_hash"] == "3a2f2dd3fc65cfdc950d12ec1f3602cc"
+
     def test_pg192_perch_protection_creates_birds_then_phases_everything_and_exiles_self():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -15060,6 +15133,7 @@ def register_tests(battle, player):
         test_pg095_winds_of_abandon_exiles_opponent_creature_with_rule_provenance,
         test_pg096_high_noon_is_passive_static_rule_not_creature_removal,
         test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance,
+        test_pg205_clever_concealment_phases_controlled_nonland_permanents_only,
         test_pg192_perch_protection_creates_birds_then_phases_everything_and_exiles_self,
         test_pg192_sand_scout_tutors_desert_when_behind_and_creates_one_sand_warrior_per_turn,
         test_reverberate_copies_stack_spell_with_pg038_rule_provenance,

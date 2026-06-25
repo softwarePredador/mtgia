@@ -238,6 +238,15 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "batch_strategy": "metadata_batch_after_pg_precheck",
     },
+    "phase_out_protection": {
+        "effects": {"phase_out"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "phase-out protection for controlled permanents with land inclusion/exclusion flags",
+        "family_tests": [
+            "test_pg205_clever_concealment_phases_controlled_nonland_permanents_only",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "tutor": {
         "effects": {"tutor"},
         "support_status": "runtime_family_partially_supported_review_required",

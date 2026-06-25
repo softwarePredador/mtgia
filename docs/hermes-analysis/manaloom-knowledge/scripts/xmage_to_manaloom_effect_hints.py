@@ -6205,6 +6205,48 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 )
             )
 
+    if (
+        "PhaseOutTargetEffect" in effect_classes
+        and "TargetPermanent" in target_classes
+        and (
+            "FilterControlledPermanent" in filter_classes
+            or "nonland permanents you control" in normalized_text
+        )
+        and ("nonland" in normalized_text or "cardtype.land.getpredicate" in normalized_text)
+    ):
+        candidates.append(
+            _candidate(
+                effect="phase_out",
+                scope="target_nonland_permanents_you_control_phase_out_v1",
+                reason=(
+                    "XMage uses PhaseOutTargetEffect with a controlled nonland permanent filter; "
+                    "ManaLoom can model this as phasing out all controlled nonland permanents."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=False,
+                target_constraints={
+                    "controller_scope": "source_controller",
+                    "card_types": ["permanent"],
+                    "exclude_card_types": ["land"],
+                    "target_count": "any_number",
+                },
+                extra_effect_fields={
+                    "instant": "INSTANT" in card_types,
+                    "convoke": "ConvokeAbility" in ability_classes,
+                    "target": "nonland_permanents_you_control",
+                    "phase_out_all_permanents_you_control": True,
+                    "phase_out_includes_lands": False,
+                    "choice_model": "phase_out_all_legal_nonland_permanents_you_control",
+                },
+                matched_signals=[
+                    "PhaseOutTargetEffect",
+                    "TargetPermanent",
+                    "FilterControlledPermanent",
+                    "nonland",
+                ],
+            )
+        )
+
     class_to_effect = [
         ("DestroyAllEffect", "board_wipe", "destroy_all_permanents_or_creatures_variant_v1", True),
         ("DestroyTargetEffect", "removal_destroy", "targeted_destroy_variant_v1", True),

@@ -4509,6 +4509,37 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["token_colors"], [])
         self.assertTrue(primary["token_sacrifice_for_colorless_mana"])
 
+    def test_clever_concealment_maps_to_controlled_nonland_phase_out_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CleverConcealment",
+                "effect_classes": ["PhaseOutTargetEffect"],
+                "ability_classes": ["ConvokeAbility"],
+                "target_classes": ["TargetPermanent"],
+                "filter_classes": ["FilterControlledPermanent", "FilterPermanent"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    'private static final FilterPermanent filter = new FilterControlledPermanent("nonland permanents you control"); '
+                    "filter.add(Predicates.not(CardType.LAND.getPredicate())); "
+                    "this.addAbility(new ConvokeAbility()); "
+                    "this.getSpellAbility().addEffect(new PhaseOutTargetEffect()); "
+                    "this.getSpellAbility().addTarget(new TargetPermanent(0, Integer.MAX_VALUE, filter));"
+                ),
+            },
+            "Convoke. Any number of target nonland permanents you control phase out.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "phase_out")
+        self.assertEqual(primary["battle_model_scope"], "target_nonland_permanents_you_control_phase_out_v1")
+        self.assertTrue(primary["instant"])
+        self.assertTrue(primary["convoke"])
+        self.assertEqual(primary["target"], "nonland_permanents_you_control")
+        self.assertTrue(primary["phase_out_all_permanents_you_control"])
+        self.assertFalse(primary["phase_out_includes_lands"])
+        self.assertEqual(primary["choice_model"], "phase_out_all_legal_nonland_permanents_you_control")
+        self.assertEqual(primary["target_constraints"]["exclude_card_types"], ["land"])
+
     def test_ruthless_technomancer_maps_to_exact_treasure_and_reanimate_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -765,6 +765,39 @@ family from the current Lorehold/opponent matrix:
    `action_findings=0`, `event_contract_static_status=event_contract_static_ready`,
    and `test_results_status_counts={"pass":18}`.
 
+`Clever Concealment` is the twentieth completed proof group and closes the
+first targeted nonland-permanent phase-out protection family from the current
+Lorehold/opponent matrix:
+
+1. XMage local source `CleverConcealment` matched
+   `PhaseOutTargetEffect`, `TargetPermanent`, `FilterControlledPermanent`, and
+   the nonland controlled permanent filter.
+2. The mapper/classifier now promotes the exact
+   `target_nonland_permanents_you_control_phase_out_v1` scope as
+   `phase_out_protection`, instead of leaving it as manual-model work.
+3. No new broad battle executor was needed: the existing `phase_out` runtime
+   already supports land inclusion/exclusion. The new focused regression proves
+   `Clever Concealment` phases controlled nonland permanents and leaves lands
+   on battlefield.
+4. PG205 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made `Clever Concealment` report as `battle_ready`; the
+   matrix moved it out of `needs_rule_before_strategy` and into
+   `watchlist_candidate` with score `44.0`.
+6. The PG205 matrix now reports `210` total `needs_rule_before_strategy` rows
+   and `101` Lorehold-touching rows across decks `608` through `616`:
+   `79` mapper manual, `16` split-scope, and `6` runtime-needed. This remains
+   the current Lorehold-first queue before broad benchmark/deck swaps.
+7. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_061534/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+   `mandatory_gate_divergences=[]`,
+   `decision_audit_statuses={"turn_invariants_clean":16}`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `event_contract_static_status=event_contract_static_ready`, and
+   `test_results_status_counts={"pass":18}`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top
