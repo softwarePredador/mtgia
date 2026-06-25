@@ -11131,6 +11131,44 @@ def process_rebound_upkeep(player, opponents, all_players, turn, rng, stack=None
     return cast_count
 
 
+def process_graveyard_upkeep_self_return(player, turn):
+    """Resolve optional graveyard upkeep triggers that return their source to hand."""
+    returned = 0
+    for card in list(getattr(player, "graveyard", []) or []):
+        if not isinstance(card, dict):
+            continue
+        effect_data = card if card.get("battle_model_scope") else get_card_effect(card)
+        if (
+            effect_data.get("effect") != "creature"
+            or effect_data.get("battle_model_scope") != "graveyard_upkeep_return_self_to_hand_v1"
+            or not effect_data.get("graveyard_upkeep_return_self_to_hand")
+        ):
+            continue
+        if card.get("graveyard_upkeep_return_last_turn") == turn:
+            continue
+        card["graveyard_upkeep_return_last_turn"] = turn
+        if card not in player.graveyard:
+            continue
+        player.graveyard.remove(card)
+        player.hand.append(card)
+        returned += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            trigger="beginning_of_your_upkeep",
+            source_zone="graveyard",
+            destination="hand",
+            effect="graveyard_upkeep_return_self_to_hand",
+            optional=bool(effect_data.get("graveyard_upkeep_optional", True)),
+            chosen=True,
+            returned_count=1,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+    return returned
+
+
 def resolve_top_nonland_free_cast(
     player,
     opponents,
@@ -24944,6 +24982,30 @@ def apply_effect_immediate(
                 stack=stack,
                 turn_player=player,
             )
+    elif effect == "planeswalker":
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "planeswalker"
+        handle_planeswalker_etb(permanent, player)
+        player.battlefield.append(permanent)
+        emit_replay_event(
+            "planeswalker_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            loyalty=permanent.get("loyalty"),
+            opponents_can_cast_only_as_sorcery=bool(
+                permanent.get("opponents_can_cast_only_as_sorcery")
+            ),
+            plus_one_sorceries_have_flash_until_your_next_turn=bool(
+                permanent.get("plus_one_sorceries_have_flash_until_your_next_turn")
+            ),
+            minus_three_bounce_up_to_one_artifact_creature_or_enchantment_draw=int(
+                permanent.get("minus_three_bounce_up_to_one_artifact_creature_or_enchantment_draw")
+                or 0
+            ),
+            turn=turn,
+            phase=phase or "resolution",
+            **replay_rule_fields(effect_data),
+        )
     elif effect == "cantrip_mana_filter_artifact":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "cantrip_mana_filter_artifact"
@@ -28332,6 +28394,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.protection_from_everything_source = None
     player.refresh_mana_sources(turn)
     process_upkeep_utility_lands(player, turn, all_players=all_players)
+    process_graveyard_upkeep_self_return(player, turn)
     process_rebound_upkeep(player, opponents, all_players, turn, rng, stack=stack)
 
     # The One Ring loses life on upkeep; drawing happens through its tap

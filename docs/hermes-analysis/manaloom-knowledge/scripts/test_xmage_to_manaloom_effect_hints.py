@@ -4478,6 +4478,35 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["attack_recursion_destination"], "battlefield")
         self.assertEqual(primary["attack_recursion_mana_value_max"], 3)
 
+    def test_squee_goblin_nabob_maps_to_exact_graveyard_upkeep_return_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "SqueeGoblinNabob",
+                "effect_classes": ["ReturnSourceFromGraveyardToHandEffect"],
+                "ability_classes": ["BeginningOfUpkeepTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.addAbility(new BeginningOfUpkeepTriggeredAbility(Zone.GRAVEYARD, "
+                    "TargetController.YOU, new ReturnSourceFromGraveyardToHandEffect(), true));"
+                ),
+            },
+            "At the beginning of your upkeep, you may return Squee, Goblin Nabob from your graveyard to your hand.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "graveyard_upkeep_return_self_to_hand_v1",
+        )
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["legendary"])
+        self.assertTrue(primary["graveyard_upkeep_return_self_to_hand"])
+        self.assertTrue(primary["graveyard_upkeep_optional"])
+        self.assertEqual(primary["graveyard_upkeep_trigger_zone"], "graveyard")
+        self.assertEqual(primary["graveyard_upkeep_trigger_controller"], "source_controller")
+
 
 if __name__ == "__main__":
     unittest.main()

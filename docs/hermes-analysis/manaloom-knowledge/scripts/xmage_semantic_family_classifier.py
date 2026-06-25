@@ -567,6 +567,19 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("attack_recursion_mana_value_max") or 0) == 3
         )
 
+    if effect == "creature" and scope == "graveyard_upkeep_return_self_to_hand_v1":
+        return (
+            types == {"CREATURE"}
+            and "ReturnSourceFromGraveyardToHandEffect" in effect_classes
+            and "BeginningOfUpkeepTriggeredAbility" in ability_classes
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("graveyard_upkeep_return_self_to_hand"))
+            and bool(effect_json.get("graveyard_upkeep_optional"))
+            and effect_json.get("graveyard_upkeep_trigger_zone") == "graveyard"
+            and effect_json.get("graveyard_upkeep_trigger_controller") == "source_controller"
+        )
+
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
         return (
             types == {"CREATURE"}

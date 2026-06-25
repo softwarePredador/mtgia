@@ -37,6 +37,58 @@ def register_tests(battle, player):
         assert walker in active.graveyard
         assert walker not in active.battlefield
 
+    def test_teferi_time_raveler_resolves_as_planeswalker_permanent():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            teferi = {
+                "name": "Teferi, Time Raveler",
+                "type_line": "Legendary Planeswalker — Teferi",
+                "cmc": 3,
+            }
+            effect_data = {
+                "effect": "planeswalker",
+                "battle_model_scope": "opponents_sorcery_speed_only_plus1_sorcery_flash_minus3_bounce_draw_v1",
+                "starting_loyalty": 4,
+                "opponents_can_cast_only_as_sorcery": True,
+                "plus_one_sorceries_have_flash_until_your_next_turn": True,
+                "minus_three_bounce_up_to_one_artifact_creature_or_enchantment_draw": 1,
+                "_rule_logical_key": "battle_rule_v1:teferi-test",
+                "_rule_oracle_hash": "teferi-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                teferi,
+                turn=5,
+                rng=random.Random(3),
+                effect_data_override=effect_data,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.graveyard == []
+        assert len(active.battlefield) == 1
+        permanent = active.battlefield[0]
+        assert permanent["name"] == "Teferi, Time Raveler"
+        assert permanent["effect"] == "planeswalker"
+        assert permanent["loyalty"] == 4
+        assert permanent["opponents_can_cast_only_as_sorcery"] is True
+        assert any(
+            event == "planeswalker_resolved"
+            and data.get("card") == "Teferi, Time Raveler"
+            and data.get("loyalty") == 4
+            and data.get("rule_logical_key") == "battle_rule_v1:teferi-test"
+            and data.get("rule_oracle_hash") == "teferi-test-hash"
+            for event, data in events
+        )
+
     def test_battle_defense_damage_and_sba():
         active = player("Active")
         protector = player("Protector")
@@ -238,6 +290,7 @@ def register_tests(battle, player):
 
     return [
         test_planeswalker_loyalty_activation_damage_and_sba,
+        test_teferi_time_raveler_resolves_as_planeswalker_permanent,
         test_battle_defense_damage_and_sba,
         test_battle_defeated_casts_back_face,
         test_dfc_characteristics_and_color_identity_use_all_faces,

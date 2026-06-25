@@ -510,6 +510,32 @@ matrix:
    `pass`; the matrix moved it to `battle_ready` / `watchlist_candidate`.
 6. Full gate
    `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_001857/summary.json`
+  reports `battle_replay_final_status=trusted_for_strategy_learning`,
+  `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+  `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
+`Squee, Goblin Nabob` is the eleventh completed proof and the first exact
+graveyard-upkeep self-return scope promoted from the current Lorehold matrix:
+
+1. XMage local source matched `SqueeGoblinNabob` directly through
+   `BeginningOfUpkeepTriggeredAbility(Zone.GRAVEYARD, TargetController.YOU,
+   ReturnSourceFromGraveyardToHandEffect, optional=true)`.
+2. The mapper/classifier promoted only the exact
+   `graveyard_upkeep_return_self_to_hand_v1` scope.
+3. Battle runtime now processes beginning-of-upkeep graveyard self-return,
+   moves the source from graveyard to hand, and emits `trigger_resolved` with
+   rule provenance.
+4. PG196 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made decks `609` and `610` report
+   `Squee, Goblin Nabob` as `pass`; the matrix moved it to `battle_ready` /
+   `watchlist_candidate`.
+6. The final full gate also closed a runtime-contract gap found in the same
+   replay set: `Teferi, Time Raveler` now resolves as a planeswalker permanent,
+   and `planeswalker` / `planeswalker_resolved` are known to the forensic and
+   event-contract layers.
+7. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_010820/summary.json`
    reports `battle_replay_final_status=trusted_for_strategy_learning`,
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.

@@ -11338,3 +11338,113 @@ Register decision:
   `Deflecting Palm`, `Primal Amulet // Primal Wellspring`,
   `Squee, Goblin Nabob`, and `Goldspan Dragon`.
 - Next package number is PG196.
+
+## PG196 - Squee, Goblin Nabob
+
+Status: applied to PostgreSQL, synced into Hermes SQLite, validated in deck
+audits, and accepted by the battle strategy gate.
+
+Scope:
+
+- Card: `Squee, Goblin Nabob`.
+- Decks touched by current Lorehold matrix: `609` and `610`.
+- XMage source:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SqueeGoblinNabob.java`.
+- Exact XMage mapping:
+  `BeginningOfUpkeepTriggeredAbility(Zone.GRAVEYARD, TargetController.YOU,
+  ReturnSourceFromGraveyardToHandEffect, optional=true)`.
+- ManaLoom battle model scope:
+  `graveyard_upkeep_return_self_to_hand_v1`.
+- Logical rule key:
+  `battle_rule_v1:4565272d5decc69322e01a4f919df77e`.
+- Oracle hash:
+  `f8f6891272310b0d70a2b23621f7ea5d`.
+
+Implementation:
+
+- XMage hint maps `SqueeGoblinNabob` from
+  `BeginningOfUpkeepTriggeredAbility`,
+  `ReturnSourceFromGraveyardToHandEffect`, and graveyard trigger zone.
+- Semantic classifier marks only the exact
+  `graveyard_upkeep_return_self_to_hand_v1` scope as batch-safe.
+- Battle runtime now processes the beginning-of-upkeep graveyard self-return
+  trigger, moves the source from graveyard to hand, and emits
+  `trigger_resolved` with rule provenance.
+- The same gate exposed a runtime-contract gap for a real replayed
+  `Teferi, Time Raveler`; battle now resolves planeswalkers as permanents, and
+  the event/forensic contract recognizes `planeswalker` /
+  `planeswalker_resolved`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg196_squee_goblin_nabob_package_20260625_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg196_squee_goblin_nabob_package_20260625_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg196_squee_goblin_nabob_package_20260625_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg196_squee_goblin_nabob_package_20260625_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg196_squee_goblin_nabob_package_20260625_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, canonical card id
+  `a307ccea-dffb-4fce-b6d1-31e7450a28f6`,
+  `existing_rule_rows=2`, `expected_rule_rows_before=0`,
+  `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg196_squee_goblin_nabob_20260625.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3240`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg196_squee_postsync_v1_manifest.json`;
+  expanded scope moved to `high=391`, `medium=59`, `pass=486`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg196_squee_postsync_v1.json`;
+  scoped rows `567`, `battle_ready=346`,
+  `needs_rule_before_strategy=221`, `runtime_needed=18`,
+  `mapper_manual=144`, `split_scope=55`.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg196_squee_postsync_v1.json`;
+  `18/18` checks passed.
+- Affected deck audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck609_battle_rule_coherence_pg196_squee_postsync_v1.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck610_battle_rule_coherence_pg196_squee_postsync_v1.json`;
+  decks `609` and `610` report `Squee, Goblin Nabob` as
+  `pass/coherent_for_current_gate`.
+- Tests:
+  mapper tests ran `176` tests OK; classifier tests ran `162` tests OK;
+  `battle_card_specific_tests.py`, `test_battle_analyst_v10_3.py`,
+  `test_battle_event_contract_static_audit.py`, and
+  `test_battle_forensic_audit_supported_effects.py` passed.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_010820/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`,
+  `test_results_status_counts={"pass":18}`.
+
+Register decision:
+
+- PG196 is applied, postchecked, synced, locally tested, deck-coherence
+  validated for decks `609` and `610`, and strategy-audited.
+- Do not reuse PG196.
+- Continue next with the remaining Lorehold `needs_rule_before_strategy`
+  cards. Current top items after PG196 are `Taii Wakeen, Perfect Shot`,
+  `Deflecting Palm`, `Primal Amulet // Primal Wellspring`, and
+  `Goldspan Dragon`.
+- Next package number is PG197.

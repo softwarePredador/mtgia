@@ -53,6 +53,7 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "land_tax" in audit.SUPPORTED_EFFECTS
     assert "equipment_static_attachment" in audit.SUPPORTED_EFFECTS
     assert "exile_top_nonland_free_cast" in audit.SUPPORTED_EFFECTS
+    assert "planeswalker" in audit.SUPPORTED_EFFECTS
     assert "redistribute_life_totals" in audit.SUPPORTED_EFFECTS
     assert "removal_exile" in audit.SUPPORTED_EFFECTS
     assert "pile_selection_draw" in audit.SUPPORTED_EFFECTS

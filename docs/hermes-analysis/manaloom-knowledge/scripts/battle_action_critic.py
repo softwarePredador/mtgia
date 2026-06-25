@@ -32,6 +32,7 @@ ACTION_EVENTS = {
     "miracle_cast",
     "multi_defender_attack",
     "player_eliminated",
+    "planeswalker_resolved",
     "redirect_removal_resolved",
     "recursion_resolved",
     "removal_resolved",

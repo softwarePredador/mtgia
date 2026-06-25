@@ -11405,6 +11405,53 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            squee = {
+                "name": "Squee, Goblin Nabob",
+                "cmc": 3,
+                "type_line": "Legendary Creature — Goblin",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "graveyard_upkeep_return_self_to_hand": True,
+                "graveyard_upkeep_optional": True,
+                "graveyard_upkeep_trigger_zone": "graveyard",
+                "graveyard_upkeep_trigger_controller": "source_controller",
+                "battle_model_scope": "graveyard_upkeep_return_self_to_hand_v1",
+                "_rule_logical_key": "battle_rule_v1:squee-test",
+                "_rule_oracle_hash": "squee-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            active.graveyard = [
+                squee,
+                {"name": "Faithless Looting", "cmc": 1, "type_line": "Sorcery", "effect": "draw"},
+            ]
+
+            returned = battle.process_graveyard_upkeep_self_return(active, turn=7)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert returned == 1
+        assert [card.get("name") for card in active.hand] == ["Squee, Goblin Nabob"]
+        assert [card.get("name") for card in active.graveyard] == ["Faithless Looting"]
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Squee, Goblin Nabob"
+            and data.get("trigger") == "beginning_of_your_upkeep"
+            and data.get("source_zone") == "graveyard"
+            and data.get("destination") == "hand"
+            and data.get("effect") == "graveyard_upkeep_return_self_to_hand"
+            and data.get("chosen") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:squee-test"
+            and data.get("rule_oracle_hash") == "squee-test-hash"
+            for event, data in events
+        )
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -14008,6 +14055,7 @@ def register_tests(battle, player):
         test_swarm_intelligence_copies_second_instant_or_sorcery_spell_too,
         test_profound_journey_rebounds_and_returns_permanents_to_battlefield,
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
+        test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,

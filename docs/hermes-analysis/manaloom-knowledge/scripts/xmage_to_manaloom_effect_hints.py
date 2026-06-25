@@ -1547,6 +1547,37 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and xmage_class_name == "SqueeGoblinNabob"
+        and "ReturnSourceFromGraveyardToHandEffect" in effect_classes
+        and "BeginningOfUpkeepTriggeredAbility" in ability_classes
+        and (
+            "Zone.GRAVEYARD" in rules_text
+            or "zone.graveyard" in normalized
+            or _oracle_has(rules_text, "beginning of your upkeep", "graveyard", "return", "hand")
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "graveyard_upkeep_return_self_to_hand_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "legendary": True,
+                "graveyard_upkeep_return_self_to_hand": True,
+                "graveyard_upkeep_optional": True,
+                "graveyard_upkeep_trigger_zone": "graveyard",
+                "graveyard_upkeep_trigger_controller": "source_controller",
+            },
+            "reason": "XMage structure matches Squee, Goblin Nabob: a 1/1 legendary creature with an optional beginning-of-your-upkeep trigger from graveyard returning itself to hand.",
+            "signals": [
+                "BeginningOfUpkeepTriggeredAbility(Zone.GRAVEYARD)",
+                "TargetController.YOU",
+                "ReturnSourceFromGraveyardToHandEffect",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and xmage_class_name == "GlintHornBuccaneer"
         and {"DamagePlayersEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
         and "ActivateIfConditionActivatedAbility" in ability_classes
