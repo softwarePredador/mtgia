@@ -1,0 +1,5 @@
+         card_name         |      normalized_name      |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+---------------------------+---------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Taii Wakeen, Perfect Shot | taii wakeen, perfect shot | battle_rule_v1:92e28c9f363acf93363f11f48b98ddeb |                  1 |                           1 |                         1 |           0
+(1 row)
+

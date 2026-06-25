@@ -4601,6 +4601,59 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
         self.assertTrue(primary["controller_discard_fight_optional"])
 
+    def test_taii_wakeen_maps_to_exact_noncombat_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TaiiWakeenPerfectShot",
+                "effect_classes": [
+                    "DrawCardSourceControllerEffect",
+                    "TaiiWakeenPerfectShotEffect",
+                ],
+                "ability_classes": [
+                    "TaiiWakeenPerfectShotTriggeredAbility",
+                    "SimpleActivatedAbility",
+                ],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(2); this.toughness = new MageInt(3); "
+                    "event.getType() == GameEvent.EventType.DAMAGED_PERMANENT; "
+                    "new DrawCardSourceControllerEffect(1); "
+                    "new SimpleActivatedAbility(new TaiiWakeenPerfectShotEffect(), "
+                    "new ManaCostsImpl<>(\"{X}\")); ability.addCost(new TapSourceCost()); "
+                    "case DAMAGE_PERMANENT: case DAMAGE_PLAYER: "
+                    "event.setAmount(CardUtil.overflowInc(event.getAmount(), "
+                    "CardUtil.getSourceCostsTag(game, source, \"X\", 0)));"
+                ),
+            },
+            "Whenever a source you control deals noncombat damage to a creature equal to that creature's toughness, draw a card. "
+            "{X}, {T}: If a source you control would deal noncombat damage to a permanent or player this turn, "
+            "it deals that much damage plus X instead.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertEqual(
+            primary["trigger"],
+            "source_you_control_noncombat_damage_to_creature_equal_toughness",
+        )
+        self.assertTrue(primary["noncombat_damage_to_creature_equal_toughness_draw"])
+        self.assertEqual(primary["noncombat_damage_equal_toughness_draw_count"], 1)
+        self.assertTrue(primary["activated_noncombat_damage_plus_x_until_eot"])
+        self.assertTrue(primary["activation_cost_x_generic"])
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertEqual(
+            primary["damage_modifier_applies_to"],
+            "sources_you_control_noncombat_damage",
+        )
+        self.assertEqual(primary["damage_modifier_duration"], "until_end_of_turn")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -589,6 +589,31 @@ discarded-card-type trigger scope promoted from the current Lorehold matrix:
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
 
+`Taii Wakeen, Perfect Shot` is the fourteenth completed proof and the first
+exact noncombat-damage modifier plus damage-equals-toughness draw trigger scope
+promoted from the current Lorehold matrix:
+
+1. XMage local source matched `TaiiWakeenPerfectShot` directly through
+   `TaiiWakeenPerfectShotTriggeredAbility`,
+   `DrawCardSourceControllerEffect`, `TaiiWakeenPerfectShotEffect`,
+   `SimpleActivatedAbility`, and `TapSourceCost`.
+2. The mapper/classifier promoted only the exact
+   `taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1` scope.
+3. Battle runtime now stores Taii's `{X}, {T}` noncombat damage modifier until
+   cleanup, applies it to sources the controller controls, and draws a card
+   when the modified or unmodified noncombat damage dealt to a creature equals
+   that creature's toughness.
+4. PG199 precheck/apply/postcheck promoted one verified auto rule with no
+   stale generated shadows to deprecate.
+5. PG -> Hermes sync made deck `612` report `Taii Wakeen, Perfect Shot` as
+   `pass`; the matrix moved it to `battle_ready` /
+   `priority_benchmark_candidate`.
+6. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_023640/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+   `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

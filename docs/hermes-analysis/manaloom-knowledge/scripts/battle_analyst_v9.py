@@ -523,6 +523,7 @@ def clear_turn_scoped_permanent_flags(all_players):
             if not isinstance(permanent, dict):
                 continue
             permanent.pop("discard_modal_modes_used_this_turn", None)
+        participant.noncombat_damage_modifiers = []
 
 
 class EngineMetrics:
@@ -4913,6 +4914,20 @@ def card_power_value(card, default=1):
     return default
 
 
+def card_toughness_value(card, default=1):
+    if not isinstance(card, dict):
+        return default
+    for key in ("toughness", "base_toughness"):
+        value = card.get(key)
+        if value is None:
+            continue
+        try:
+            return max(0, int(float(value)))
+        except Exception:
+            continue
+    return default
+
+
 def first_present_value(mapping, keys):
     for key in keys:
         if key in mapping and mapping.get(key) is not None:
@@ -5127,6 +5142,7 @@ class Player:
         self.cannot_lose_this_turn = False
         self.damage_life_floor = None
         self.damage_prevention_shields = []
+        self.noncombat_damage_modifiers = []
         self.silenced_opponents = False
         self.silenced_opponents_until_eot = False
         self.non_hand_cast_locks = []
@@ -21823,6 +21839,13 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
         amount = max(1, int(card.get("cmc") or 0), player.available_mana())
     else:
         amount = int(raw_amount)
+    amount = apply_controller_noncombat_damage_modifiers(
+        player,
+        amount,
+        card,
+        turn=turn,
+        phase="resolution",
+    )
     life_gain_requested = int(effect_data.get("gain_life") or effect_data.get("controller_gain_life") or 0)
 
     def apply_controller_lifegain():
@@ -21840,6 +21863,15 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
         ]
         if targets:
             target = choose_best_creature_target(targets)
+            process_taii_wakeen_noncombat_damage_to_creature(
+                player,
+                opp,
+                card,
+                target,
+                amount,
+                turn=turn,
+                phase="resolution",
+            )
             destination = move_creature_from_battlefield(
                 opp,
                 target,
@@ -21893,6 +21925,13 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
 
 def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
     amount = int(effect_data.get("damage") or effect_data.get("average_damage") or 6)
+    amount = apply_controller_noncombat_damage_modifiers(
+        player,
+        amount,
+        card,
+        turn=turn,
+        phase="resolution",
+    )
     treasure_count = int(effect_data.get("treasure_count") or effect_data.get("average_treasure_count") or amount)
     destroyed = []
     protected = []
@@ -21907,6 +21946,15 @@ def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
                 continue
             if _damage_sweep_creature_toughness(permanent) > amount:
                 continue
+            process_taii_wakeen_noncombat_damage_to_creature(
+                player,
+                participant,
+                card,
+                permanent,
+                amount,
+                turn=turn,
+                phase="resolution",
+            )
             destination = move_creature_from_battlefield(
                 participant,
                 permanent,
@@ -21964,6 +22012,13 @@ def damage_wipe_amount(player, card, effect_data):
 
 def apply_damage_wipe(player, opponents, card, effect_data, turn):
     amount = damage_wipe_amount(player, card, effect_data)
+    amount = apply_controller_noncombat_damage_modifiers(
+        player,
+        amount,
+        card,
+        turn=turn,
+        phase="resolution",
+    )
     damage_scope = effect_data.get("damage_scope", "each_creature")
     affected_players = (
         list(opponents)
@@ -22007,6 +22062,15 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn):
                     }
                 )
                 continue
+            process_taii_wakeen_noncombat_damage_to_creature(
+                player,
+                participant,
+                card,
+                permanent,
+                amount,
+                turn=turn,
+                phase="resolution",
+            )
             destination = move_creature_from_battlefield(
                 participant,
                 permanent,
@@ -22236,6 +22300,236 @@ def apply_redistribute_life_totals(player, opponents, card, effect_data, turn):
     finish_resolved_spell(player, card, turn=turn)
 
 
+TAII_WAKEEN_SCOPE = "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1"
+
+
+def _taii_wakeen_permanents(player):
+    return [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == TAII_WAKEEN_SCOPE
+        and bool(permanent.get("noncombat_damage_to_creature_equal_toughness_draw"))
+    ]
+
+
+def _taii_damage_spell_base_amount(card, effect_data):
+    if not isinstance(effect_data, dict):
+        return 0
+    if effect_data.get("effect") not in {
+        "deal_damage",
+        "direct_damage",
+        "damage_player_and_creatures",
+        "damage_player_and_creature",
+        "sweeper_damage",
+    }:
+        return 0
+    try:
+        return int(effect_data.get("amount") or effect_data.get("damage") or 0)
+    except Exception:
+        return 0
+
+
+def _taii_best_x_bonus(player, opponents):
+    available = max(0, int(player.available_mana() or 0))
+    if available <= 0:
+        return 0, None
+    best = (0, None)
+    for card in list(getattr(player, "hand", []) or []):
+        effect_data = {**get_card_effect(card), **card}
+        base_amount = _taii_damage_spell_base_amount(card, effect_data)
+        if base_amount <= 0:
+            continue
+        for opponent in opponents or []:
+            for permanent in getattr(opponent, "battlefield", []) or []:
+                if not is_battlefield_creature(permanent) or permanent.get("indestructible"):
+                    continue
+                toughness = card_toughness_value(permanent, default=2)
+                if toughness <= base_amount:
+                    continue
+                needed = toughness - base_amount
+                if needed <= available and (best[0] == 0 or needed < best[0]):
+                    best = (
+                        needed,
+                        {
+                            "spell": card.get("name", "?"),
+                            "target": permanent.get("name", "?"),
+                            "base_amount": base_amount,
+                            "target_toughness": toughness,
+                        },
+                    )
+    return best
+
+
+def activate_taii_wakeen_noncombat_damage_bonus(
+    player,
+    opponents,
+    all_players,
+    turn,
+    *,
+    phase="precombat_main",
+):
+    if not player.is_alive() or phase not in MAIN_PHASES:
+        return 0
+    for permanent in _taii_wakeen_permanents(player):
+        if permanent.get("utility_activation_used_this_turn") or permanent.get("tapped"):
+            continue
+        if permanent.get("activation_requires_tap") and permanent.get("summoning_sick"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="taii_wakeen_noncombat_damage_bonus",
+                reason="summoning_sick_source_cannot_pay_tap_activation",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        x_value, context = _taii_best_x_bonus(player, opponents)
+        if x_value <= 0:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="taii_wakeen_noncombat_damage_bonus",
+                reason="no_contextual_noncombat_damage_breakpoint",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        activation_cost = f"{{{x_value}}}"
+        if not player.spend_mana(activation_cost):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="taii_wakeen_noncombat_damage_bonus",
+                reason="failed_to_pay_x_activation_cost",
+                x_value=x_value,
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if permanent.get("activation_requires_tap"):
+            permanent["tapped"] = True
+        permanent["utility_activation_used_this_turn"] = True
+        player.noncombat_damage_modifiers.append(
+            {
+                "source": permanent.get("name", "?"),
+                "source_card": permanent,
+                "scope": TAII_WAKEEN_SCOPE,
+                "bonus": x_value,
+                "controller": player.name,
+                "duration": "until_end_of_turn",
+                "applies_to": "sources_you_control_noncombat_damage",
+            }
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="taii_wakeen_noncombat_damage_bonus",
+            activation_cost=activation_cost,
+            x_value=x_value,
+            selected_breakpoint=context,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return 1
+    return 0
+
+
+def apply_controller_noncombat_damage_modifiers(
+    controller,
+    amount,
+    source_card,
+    *,
+    turn=None,
+    phase=None,
+    target=None,
+):
+    try:
+        modified_amount = int(amount or 0)
+    except Exception:
+        modified_amount = 0
+    original_amount = modified_amount
+    applied = []
+    for modifier in list(getattr(controller, "noncombat_damage_modifiers", []) or []):
+        if modifier.get("scope") != TAII_WAKEEN_SCOPE:
+            continue
+        try:
+            bonus = max(0, int(modifier.get("bonus") or 0))
+        except Exception:
+            bonus = 0
+        if bonus <= 0:
+            continue
+        modified_amount += bonus
+        applied.append(modifier)
+    if applied:
+        emit_replay_event(
+            "noncombat_damage_modified",
+            player=controller.name,
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else source_card,
+            target=target.get("name", "?") if isinstance(target, dict) else target,
+            original_amount=original_amount,
+            final_amount=modified_amount,
+            modifiers=[
+                {
+                    "source": modifier.get("source"),
+                    "scope": modifier.get("scope"),
+                    "bonus": modifier.get("bonus"),
+                }
+                for modifier in applied
+            ],
+            turn=turn,
+            phase=phase,
+        )
+    return modified_amount
+
+
+def process_taii_wakeen_noncombat_damage_to_creature(
+    controller,
+    target_controller,
+    source_card,
+    target_creature,
+    amount,
+    *,
+    turn=None,
+    phase=None,
+):
+    if not is_battlefield_creature(target_creature):
+        return 0
+    toughness = card_toughness_value(target_creature, default=2)
+    if int(amount or 0) != toughness:
+        return 0
+    triggers = 0
+    for permanent in _taii_wakeen_permanents(controller):
+        draw_count = max(1, int(permanent.get("noncombat_damage_equal_toughness_draw_count") or 1))
+        drawn = controller.draw(draw_count)
+        triggers += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=controller.name,
+            card=permanent.get("name", "?"),
+            trigger="source_you_control_noncombat_damage_to_creature_equal_toughness",
+            effect="draw_cards",
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else source_card,
+            target_controller=getattr(target_controller, "name", None),
+            target=target_creature.get("name", "?"),
+            damage_amount=int(amount or 0),
+            target_toughness=toughness,
+            cards_drawn=len(drawn),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+    return triggers
+
+
 def _damage_sweep_creature_toughness(creature):
     try:
         return int(creature.get("toughness") or creature.get("power") or 2)
@@ -22277,6 +22571,13 @@ def _player_and_creatures_damage_target_score(target, amount):
 def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng):
     raw_amount = effect_data.get("amount") or effect_data.get("damage") or 4
     amount = int(raw_amount)
+    amount = apply_controller_noncombat_damage_modifiers(
+        player,
+        amount,
+        card,
+        turn=turn,
+        phase="resolution",
+    )
     alive_opponents = [opponent for opponent in opponents if opponent.is_alive()]
     if not alive_opponents:
         finish_resolved_spell(player, card, turn=turn)
@@ -22300,6 +22601,15 @@ def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn
             continue
         if _damage_sweep_creature_toughness(permanent) > amount:
             continue
+        process_taii_wakeen_noncombat_damage_to_creature(
+            player,
+            target,
+            card,
+            permanent,
+            amount,
+            turn=turn,
+            phase="resolution",
+        )
         destination = move_creature_from_battlefield(
             target,
             permanent,
@@ -28859,6 +29169,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         rng,
         phase="precombat_main",
     )
+    activate_taii_wakeen_noncombat_damage_bonus(
+        player,
+        opponents,
+        all_players,
+        turn,
+        phase="precombat_main",
+    )
     activate_class_level_abilities(
         player,
         opponents,
@@ -28916,6 +29233,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         all_players,
         turn,
         rng,
+        phase="postcombat_main",
+    )
+    activate_taii_wakeen_noncombat_damage_bonus(
+        player,
+        opponents,
+        all_players,
+        turn,
         phase="postcombat_main",
     )
     activate_postcombat_token_creatures(

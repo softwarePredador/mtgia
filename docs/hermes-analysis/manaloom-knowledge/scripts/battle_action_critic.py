@@ -456,6 +456,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "technical",
         "kicker payment ledger detail; primary cast remains the audited action.",
     ),
+    "noncombat_damage_modified": (
+        "strategy_signal",
+        "noncombat damage modifier context explains downstream damage resolution and trigger decisions.",
+    ),
     "paradigm_exiled": (
         "renderer_only",
         "library/exile state transition for Paradigm Shift-style effects.",

@@ -618,6 +618,24 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("controller_discard_fight_optional"))
         )
 
+    if effect == "creature" and scope == "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1":
+        return (
+            types == {"CREATURE"}
+            and {"DrawCardSourceControllerEffect", "TaiiWakeenPerfectShotEffect"}.issubset(effect_classes)
+            and {"TaiiWakeenPerfectShotTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and "TapSourceCost" in cost_classes
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 3
+            and effect_json.get("trigger") == "source_you_control_noncombat_damage_to_creature_equal_toughness"
+            and bool(effect_json.get("noncombat_damage_to_creature_equal_toughness_draw"))
+            and int(effect_json.get("noncombat_damage_equal_toughness_draw_count") or 0) == 1
+            and bool(effect_json.get("activated_noncombat_damage_plus_x_until_eot"))
+            and bool(effect_json.get("activation_cost_x_generic"))
+            and bool(effect_json.get("activation_requires_tap"))
+            and effect_json.get("damage_modifier_applies_to") == "sources_you_control_noncombat_damage"
+            and effect_json.get("damage_modifier_duration") == "until_end_of_turn"
+        )
+
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
         return (
             types == {"CREATURE"}

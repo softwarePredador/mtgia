@@ -11630,6 +11630,102 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg199_taii_wakeen_modifies_noncombat_damage_and_draws_on_exact_toughness():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            taii = {
+                "name": "Taii Wakeen, Perfect Shot",
+                "cmc": 2,
+                "type_line": "Legendary Creature — Human Mercenary",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 3,
+                "battle_model_scope": "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1",
+                "trigger": "source_you_control_noncombat_damage_to_creature_equal_toughness",
+                "noncombat_damage_to_creature_equal_toughness_draw": True,
+                "noncombat_damage_equal_toughness_draw_count": 1,
+                "activated_noncombat_damage_plus_x_until_eot": True,
+                "activation_cost_x_generic": True,
+                "activation_requires_tap": True,
+                "damage_modifier_applies_to": "sources_you_control_noncombat_damage",
+                "damage_modifier_duration": "until_end_of_turn",
+                "_rule_logical_key": "battle_rule_v1:taii-test",
+                "_rule_oracle_hash": "taii-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            shock = {
+                "name": "Test Shock",
+                "cmc": 1,
+                "type_line": "Instant",
+                "effect": "direct_damage",
+                "amount": 2,
+            }
+            target = {
+                "name": "Three Toughness Target",
+                "cmc": 3,
+                "type_line": "Creature — Beast",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+            }
+            active.battlefield = [taii]
+            active.hand = [shock]
+            active.library = [{"name": "Drawn Card", "type_line": "Instant"}]
+            active.mana_pool.add_generic(1)
+            opponent.battlefield = [target]
+
+            activated = battle.activate_taii_wakeen_noncombat_damage_bonus(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=7,
+                phase="precombat_main",
+            )
+            battle.apply_direct_damage(
+                active,
+                [opponent],
+                shock,
+                shock,
+                turn=7,
+                rng=random.Random(199),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert activated == 1
+        assert target not in opponent.battlefield
+        assert any(card.get("name") == "Drawn Card" for card in active.hand)
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Taii Wakeen, Perfect Shot"
+            and data.get("activation_kind") == "taii_wakeen_noncombat_damage_bonus"
+            and data.get("x_value") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:taii-test"
+            for event, data in events
+        )
+        assert any(
+            event == "noncombat_damage_modified"
+            and data.get("source") == "Test Shock"
+            and data.get("original_amount") == 2
+            and data.get("final_amount") == 3
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Taii Wakeen, Perfect Shot"
+            and data.get("effect") == "draw_cards"
+            and data.get("source") == "Test Shock"
+            and data.get("target") == "Three Toughness Target"
+            and data.get("damage_amount") == 3
+            and data.get("cards_drawn") == 1
+            and data.get("rule_oracle_hash") == "taii-test-hash"
+            for event, data in events
+        )
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -14236,6 +14332,7 @@ def register_tests(battle, player):
         test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep,
         test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures,
         test_pg198_surly_badgersaur_discard_card_type_triggers_counter_treasure_and_fight,
+        test_pg199_taii_wakeen_modifies_noncombat_damage_and_draws_on_exact_toughness,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,

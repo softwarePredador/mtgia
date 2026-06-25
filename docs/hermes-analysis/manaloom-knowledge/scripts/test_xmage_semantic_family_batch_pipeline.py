@@ -6635,6 +6635,54 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_taii_wakeen_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Taii Wakeen, Perfect Shot",
+                        "severity": "high",
+                        "oracle_hash": "taiihash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TaiiWakeenPerfectShot",
+                            "path": "/xmage/TaiiWakeenPerfectShot.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "DrawCardSourceControllerEffect",
+                                "TaiiWakeenPerfectShotEffect",
+                            ],
+                            "ability_classes": [
+                                "TaiiWakeenPerfectShotTriggeredAbility",
+                                "SimpleActivatedAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": ["TapSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1",
+                                "power": 2,
+                                "toughness": 3,
+                                "trigger": "source_you_control_noncombat_damage_to_creature_equal_toughness",
+                                "noncombat_damage_to_creature_equal_toughness_draw": True,
+                                "noncombat_damage_equal_toughness_draw_count": 1,
+                                "activated_noncombat_damage_plus_x_until_eot": True,
+                                "activation_cost_x_generic": True,
+                                "activation_requires_tap": True,
+                                "damage_modifier_applies_to": "sources_you_control_noncombat_damage",
+                                "damage_modifier_duration": "until_end_of_turn",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
 
 if __name__ == "__main__":
     unittest.main()

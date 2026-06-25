@@ -1632,6 +1632,43 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and xmage_class_name == "TaiiWakeenPerfectShot"
+        and "DrawCardSourceControllerEffect" in effect_classes
+        and "TaiiWakeenPerfectShotEffect" in effect_classes
+        and {"TaiiWakeenPerfectShotTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+        and "TapSourceCost" in cost_classes
+        and (
+            "DAMAGED_PERMANENT" in rules_text
+            or "deals noncombat damage to a creature equal to that creature's toughness" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 3,
+                "trigger": "source_you_control_noncombat_damage_to_creature_equal_toughness",
+                "noncombat_damage_to_creature_equal_toughness_draw": True,
+                "noncombat_damage_equal_toughness_draw_count": 1,
+                "activated_noncombat_damage_plus_x_until_eot": True,
+                "activation_cost_x_generic": True,
+                "activation_requires_tap": True,
+                "damage_modifier_applies_to": "sources_you_control_noncombat_damage",
+                "damage_modifier_duration": "until_end_of_turn",
+            },
+            "reason": "XMage structure matches Taii Wakeen, Perfect Shot: a 2/3 creature with a noncombat-damage-equals-toughness draw trigger and an X tap replacement effect that increases noncombat damage from sources you control until end of turn.",
+            "signals": [
+                "TriggeredAbilityImpl(DAMAGED_PERMANENT)",
+                "DrawCardSourceControllerEffect(1)",
+                "ReplacementEffectImpl(DAMAGE_PERMANENT/DAMAGE_PLAYER)",
+                "SimpleActivatedAbility(ManaCostsImpl({X}))",
+                "TapSourceCost",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and xmage_class_name == "SqueeGoblinNabob"
         and "ReturnSourceFromGraveyardToHandEffect" in effect_classes
         and "BeginningOfUpkeepTriggeredAbility" in ability_classes
