@@ -33753,16 +33753,35 @@
     "battle_rule_logical_key": "battle_rule_v1:777a70e82c3538b54b4ff1ab69eda8e2"
   },
   "Utvara Hellkite": {
-    "cmc": 8.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "dragon_you_control_attacks_create_6_6_red_flying_dragon_v1",
     "effect": "token_maker",
+    "flying": true,
+    "power": 6,
+    "token_colors": [
+      "R"
+    ],
     "token_count": 1,
-    "token_power": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ebeccd20138dc9e808e6f80621ef40a8"
+    "token_flying": true,
+    "token_keywords": [
+      "flying"
+    ],
+    "token_name": "Dragon Token",
+    "token_power": 6,
+    "token_subtype": "Dragon",
+    "token_toughness": 6,
+    "toughness": 6,
+    "trigger": "dragon_you_control_attacks",
+    "trigger_attacking_creature_subtype": "Dragon",
+    "trigger_effect": "token_maker",
+    "trigger_token_count": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:012931e8f186299c8f59ebec2e9b1eb8",
+    "battle_rule_oracle_hash": "f3228e8b8e9f9938c173c5b82b529e7f"
   },
   "Valakut Awakening": {
     "battle_model_scope": "bottom_then_draw_plus_one_v1",

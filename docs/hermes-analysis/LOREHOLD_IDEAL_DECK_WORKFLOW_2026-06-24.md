@@ -901,8 +901,8 @@ exact noncreature-spell token trigger for the current Lorehold/opponent matrix:
 2. The mapper/classifier now promotes
    `noncreature_spell_cast_create_1_1_white_monk_prowess_v1` as
    `token_maker`, while leaving adjacent token-maker cards such as
-   `Blaze Commando` and `Utvara Hellkite` in runtime review because they need
-   damage-by-spell and Dragon-attack hooks.
+   `Blaze Commando` and, at that checkpoint, `Utvara Hellkite` in runtime
+   review because they need damage-by-spell and Dragon-attack hooks.
 3. Battle runtime now resolves generic `spell_cast`/`noncreature_spell_cast`
    token makers and preserves token keywords such as `prowess`.
 4. PG209 precheck/apply/postcheck promoted one verified auto rule and
@@ -921,6 +921,41 @@ exact noncreature-spell token trigger for the current Lorehold/opponent matrix:
    `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
    `event_contract_static_status=event_contract_static_ready`, and
    `test_results_status_counts={"pass":18}`.
+
+`Utvara Hellkite` is the twenty-fifth completed proof group and closes the
+exact Dragon-controlled attack token trigger for the current Lorehold/opponent
+matrix:
+
+1. XMage local source matched `AttacksCreatureYouControlTriggeredAbility` with
+   `CreateTokenEffect(UtvaraHellkiteDragonToken)` and a controlled Dragon
+   subtype filter.
+2. The mapper/classifier now promotes
+   `dragon_you_control_attacks_create_6_6_red_flying_dragon_v1` as
+   `token_maker`, while leaving `Blaze Commando` in runtime review because it
+   needs the separate damage-by-spell trigger hook.
+3. Battle runtime now resolves controlled attack token triggers by subtype,
+   so each declared Dragon attacker creates one 6/6 red flying Dragon token
+   without allowing newly created tokens to retrigger in the same declaration.
+4. PG210 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made `Utvara Hellkite` report as `battle_ready`; the
+   matrix moved it out of `needs_rule_before_strategy`.
+6. The PG210 matrix now reports `96` total Lorehold-scoped
+   `needs_rule_before_strategy` rows and `299` `battle_ready` rows. The
+   Lorehold runtime-needed block across decks `608` through `616` is now `3`
+   rows. The effective queue still has `333` mapper backlog, `74`
+   split-scope backlog, `17` runtime-family backlog, and `4` blocked missing
+   XMage source rows, with no unprepared package-ready rows.
+7. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_081415/summary.json`
+   reports `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `event_contract_static_status=event_contract_static_ready`, and
+   `mandatory_gate_divergences=["strategy_audit=review_required"]`. The final
+   status remains `review_required` only because the strategy audit found one
+   review-required and one low-confidence strategy item, not because of
+   runtime, event-contract, decision-trace, forensic, target-pressure, or
+   table-intent failures.
 
 ## Current Benchmark Candidate Lane
 

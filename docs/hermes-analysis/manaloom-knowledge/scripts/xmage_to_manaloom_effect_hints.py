@@ -1945,6 +1945,47 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        card_types == {"CREATURE"}
+        and xmage_class_name == "UtvaraHellkite"
+        and "CreateTokenEffect" in effect_classes
+        and "AttacksCreatureYouControlTriggeredAbility" in ability_classes
+        and (
+            "UtvaraHellkiteDragonToken" in rules_text
+            or "utvarahellkitedragontoken" in normalized
+            or _oracle_has(rules_text, "dragon you control attacks", "6/6 red dragon", "flying")
+        )
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "dragon_you_control_attacks_create_6_6_red_flying_dragon_v1",
+            "fields": {
+                "power": 6,
+                "toughness": 6,
+                "flying": True,
+                "trigger": "dragon_you_control_attacks",
+                "trigger_effect": "token_maker",
+                "trigger_token_count": 1,
+                "trigger_attacking_creature_subtype": "Dragon",
+                "token_count": 1,
+                "token_name": "Dragon Token",
+                "token_subtype": "Dragon",
+                "token_colors": ["R"],
+                "token_power": 6,
+                "token_toughness": 6,
+                "token_flying": True,
+                "token_keywords": ["flying"],
+            },
+            "reason": "XMage structure matches Utvara Hellkite: a 6/6 flying Dragon whose controller creates one 6/6 red flying Dragon token whenever a Dragon they control attacks.",
+            "signals": [
+                "AttacksCreatureYouControlTriggeredAbility",
+                "CreateTokenEffect",
+                "UtvaraHellkiteDragonToken",
+                "FilterControlledCreaturePermanent(SubType.DRAGON)",
+                "FlyingAbility",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and xmage_class_name == "InvokeCalamity"
         and {

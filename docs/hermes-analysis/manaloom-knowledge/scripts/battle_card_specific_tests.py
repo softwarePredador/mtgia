@@ -13516,6 +13516,95 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg210_utvara_hellkite_creates_dragon_token_when_dragons_attack():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            utvara = {
+                "name": "Utvara Hellkite",
+                "cmc": 8,
+                "type_line": "Creature - Dragon",
+                "effect": "token_maker",
+                "battle_model_scope": "dragon_you_control_attacks_create_6_6_red_flying_dragon_v1",
+                "power": 6,
+                "toughness": 6,
+                "flying": True,
+                "trigger": "dragon_you_control_attacks",
+                "trigger_effect": "token_maker",
+                "trigger_token_count": 1,
+                "trigger_attacking_creature_subtype": "Dragon",
+                "token_count": 1,
+                "token_name": "Dragon Token",
+                "token_subtype": "Dragon",
+                "token_colors": ["R"],
+                "token_power": 6,
+                "token_toughness": 6,
+                "token_flying": True,
+                "token_keywords": ["flying"],
+                "_rule_logical_key": "battle_rule_v1:pg210_utvara_hellkite_test",
+                "_rule_oracle_hash": "pg210-utvara-hellkite-test-hash",
+            }
+            other_dragon = {
+                "name": "Dragon Whelp",
+                "cmc": 4,
+                "type_line": "Creature - Dragon",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 3,
+            }
+            non_dragon = {
+                "name": "Monastery Swiftspear",
+                "cmc": 1,
+                "type_line": "Creature - Human Monk",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 2,
+            }
+            active.battlefield = [utvara, other_dragon, non_dragon]
+            created = battle.resolve_controlled_attack_token_triggers(
+                active,
+                [utvara, other_dragon, non_dragon],
+                [opponent],
+                [active, opponent],
+                turn=6,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        dragon_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Dragon Token"
+        ]
+        assert created == 2
+        assert len(dragon_tokens) == 2
+        assert all(token.get("power") == 6 for token in dragon_tokens)
+        assert all(token.get("toughness") == 6 for token in dragon_tokens)
+        assert all(token.get("type_line") == "Creature Token — Dragon" for token in dragon_tokens)
+        assert all(token.get("colors") == ["R"] for token in dragon_tokens)
+        assert all(token.get("flying") is True for token in dragon_tokens)
+        assert all("flying" in token.get("keywords", []) for token in dragon_tokens)
+        trigger_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Utvara Hellkite"
+            and data.get("trigger") == "dragon_you_control_attacks"
+        ]
+        assert len(trigger_events) == 2
+        assert {data.get("attacking_creature") for data in trigger_events} == {
+            "Utvara Hellkite",
+            "Dragon Whelp",
+        }
+        assert all(data.get("tokens_created") == 1 for data in trigger_events)
+        assert all(
+            data.get("rule_logical_key") == "battle_rule_v1:pg210_utvara_hellkite_test"
+            for data in trigger_events
+        )
+
     def test_cool_but_rude_level_three_tutors_then_randomly_discards():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -15660,6 +15749,7 @@ def register_tests(battle, player):
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg209_monastery_mentor_creates_monk_on_noncreature_spell_only,
+        test_pg210_utvara_hellkite_creates_dragon_token_when_dragons_attack,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,

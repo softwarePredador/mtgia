@@ -3697,6 +3697,50 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["token_keywords"], ["prowess"])
         self.assertTrue(primary["token_prowess"])
 
+    def test_utvara_hellkite_maps_to_dragon_attack_token_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "UtvaraHellkite",
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": [
+                    "AttacksCreatureYouControlTriggeredAbility",
+                    "FlyingAbility",
+                ],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "filter.add(SubType.DRAGON.getPredicate());"
+                    "new AttacksCreatureYouControlTriggeredAbility("
+                    "new CreateTokenEffect(new UtvaraHellkiteDragonToken()), false, filter)"
+                ),
+            },
+            (
+                "Flying\nWhenever a Dragon you control attacks, create a 6/6 "
+                "red Dragon creature token with flying."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "dragon_you_control_attacks_create_6_6_red_flying_dragon_v1",
+        )
+        self.assertEqual(primary["power"], 6)
+        self.assertEqual(primary["toughness"], 6)
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["trigger"], "dragon_you_control_attacks")
+        self.assertEqual(primary["trigger_effect"], "token_maker")
+        self.assertEqual(primary["trigger_token_count"], 1)
+        self.assertEqual(primary["trigger_attacking_creature_subtype"], "Dragon")
+        self.assertEqual(primary["token_name"], "Dragon Token")
+        self.assertEqual(primary["token_subtype"], "Dragon")
+        self.assertEqual(primary["token_colors"], ["R"])
+        self.assertEqual(primary["token_power"], 6)
+        self.assertEqual(primary["token_toughness"], 6)
+        self.assertTrue(primary["token_flying"])
+        self.assertEqual(primary["token_keywords"], ["flying"])
+
     def test_cool_but_rude_maps_to_exact_class_attack_rummage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

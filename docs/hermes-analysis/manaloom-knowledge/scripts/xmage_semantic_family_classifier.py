@@ -867,6 +867,28 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("token_prowess"))
         )
 
+    if effect == "token_maker" and scope == "dragon_you_control_attacks_create_6_6_red_flying_dragon_v1":
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenEffect" in effect_classes
+            and "AttacksCreatureYouControlTriggeredAbility" in ability_classes
+            and int(effect_json.get("power") or 0) == 6
+            and int(effect_json.get("toughness") or 0) == 6
+            and bool(effect_json.get("flying"))
+            and effect_json.get("trigger") == "dragon_you_control_attacks"
+            and effect_json.get("trigger_effect") == "token_maker"
+            and int(effect_json.get("trigger_token_count") or 0) == 1
+            and effect_json.get("trigger_attacking_creature_subtype") == "Dragon"
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_name") == "Dragon Token"
+            and effect_json.get("token_subtype") == "Dragon"
+            and effect_json.get("token_colors") == ["R"]
+            and int(effect_json.get("token_power") or 0) == 6
+            and int(effect_json.get("token_toughness") or 0) == 6
+            and bool(effect_json.get("token_flying"))
+            and effect_json.get("token_keywords") == ["flying"]
+        )
+
     if effect == "counter_spell" and scope == "pact_of_negation_delayed_upkeep_counter_v1":
         return (
             types == {"INSTANT"}

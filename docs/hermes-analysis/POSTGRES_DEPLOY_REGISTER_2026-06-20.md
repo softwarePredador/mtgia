@@ -12833,3 +12833,101 @@ Register decision:
 - Continue Lorehold-first rule closure on the remaining `204`
   `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
 - Next package number is PG210.
+
+## PG210 - Utvara Hellkite Dragon attack token trigger
+
+Status: applied, postchecked, synced to Hermes, and strategy-audited.
+
+Scope:
+
+- Exact XMage family:
+  `AttacksCreatureYouControlTriggeredAbility(CreateTokenEffect(UtvaraHellkiteDragonToken),
+  FilterControlledCreaturePermanent(SubType.DRAGON))`.
+- Promoted card:
+  - `Utvara Hellkite`.
+- Deliberately left adjacent token-maker cards such as `Blaze Commando` in
+  runtime backlog because it needs a separate damage-by-spell hook.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg210_utvara_hellkite_package_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg210_utvara_hellkite_package_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg210_utvara_hellkite_package_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg210_utvara_hellkite_package_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg210_utvara_hellkite_package_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `Utvara Hellkite` had `target_card_rows=1`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`, and
+  canonical card id `5c2625c5-081e-4feb-8710-65977a8e19e2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg210_utvara_hellkite_20260625_051255.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3242`,
+  `generated_rows=1`.
+- Runtime cache spot-check:
+  `Utvara Hellkite` resolves from local cache with
+  `effect=token_maker`,
+  `battle_model_scope=dragon_you_control_attacks_create_6_6_red_flying_dragon_v1`,
+  `trigger=dragon_you_control_attacks`,
+  `trigger_attacking_creature_subtype=Dragon`, `token_name=Dragon Token`,
+  `token_power=6`, `token_toughness=6`, `token_flying=true`, and
+  `_rule_execution_status=auto`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg210_utvara_hellkite_postsync_v1_manifest.json`;
+  expanded scope moved to `high=383`, `medium=63`, `pass=516`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg210_utvara_hellkite_postsync_v1.json`;
+  scoped rows `395`, `battle_ready=299`,
+  `needs_rule_before_strategy=96`, and Lorehold runtime-needed rows now `3`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg210_utvara_hellkite_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=17`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg210_utvara_hellkite_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  focused mapper/classifier tests passed through `unittest`;
+  focused runtime regression
+  `test_pg210_utvara_hellkite_creates_dragon_token_when_dragons_attack`
+  passed through the battle harness.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_081415/summary.json`;
+  `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `mandatory_gate_divergences=["strategy_audit=review_required"]`, and
+  `battle_replay_final_status=review_required` due only to one strategy
+  review-required finding and one low-confidence finding.
+
+Runtime changes:
+
+- Battle runtime now resolves controlled-attacker token triggers for
+  `dragon_you_control_attacks` and uses a reusable subtype matcher for
+  battlefield permanents.
+- `declare_attackers_step` now dispatches those controlled attack token
+  triggers after attackers are declared, so newly created Dragon tokens do not
+  recursively trigger in the same attack declaration.
+
+Register decision:
+
+- PG210 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG210.
+- Continue Lorehold-first rule closure on the remaining `96`
+  `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
+- Next package number is PG211.

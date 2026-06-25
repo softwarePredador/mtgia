@@ -2578,6 +2578,19 @@ def is_battlefield_creature(card):
     )
 
 
+def permanent_has_subtype(permanent, subtype):
+    if not isinstance(permanent, dict) or not subtype:
+        return False
+    normalized_subtype = str(subtype).strip().lower()
+    explicit_subtypes = permanent.get("subtypes") or permanent.get("subtype") or []
+    if isinstance(explicit_subtypes, str):
+        explicit_subtypes = [explicit_subtypes]
+    if normalized_subtype in {str(value).strip().lower() for value in explicit_subtypes}:
+        return True
+    type_line = str(permanent.get("type_line") or "").lower()
+    return normalized_subtype in type_line.replace("-", " ").replace("—", " ").split()
+
+
 def is_mana_source_permanent(source):
     if source == "land":
         return True
@@ -15479,6 +15492,77 @@ def resolve_attack_treasure_triggers(player, attackers, turn, *, phase="combat")
             phase=phase,
         )
     return created
+
+
+def resolve_controlled_attack_token_triggers(
+    player,
+    attackers,
+    opponents,
+    all_players,
+    turn,
+    *,
+    phase="combat",
+    stack=None,
+):
+    created_total = 0
+    battlefield = getattr(player, "battlefield", []) or []
+    declared_attackers = [
+        permanent
+        for permanent in list(attackers or [])
+        if isinstance(permanent, dict) and permanent in battlefield
+    ]
+    if not declared_attackers:
+        return 0
+
+    for source in list(battlefield):
+        if not isinstance(source, dict):
+            continue
+        if source.get("trigger") != "dragon_you_control_attacks":
+            continue
+        if source.get("trigger_effect") != "token_maker":
+            continue
+
+        required_subtype = source.get("trigger_attacking_creature_subtype") or "Dragon"
+        token_count = int(source.get("trigger_token_count") or 1)
+        for attacking_creature in declared_attackers:
+            if not is_battlefield_creature(attacking_creature):
+                continue
+            if not permanent_has_subtype(attacking_creature, required_subtype):
+                continue
+
+            created = create_creature_tokens_from_effect(
+                player,
+                source,
+                count=token_count,
+                opponents=opponents,
+                turn=turn,
+                source_event="controlled_attack_token_trigger",
+                stack=stack,
+                active_player=player,
+                all_players=all_players,
+            )
+            created_total += created
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=source.get("name", "?"),
+                trigger="dragon_you_control_attacks",
+                effect="token_maker",
+                attacking_creature=attacking_creature.get("name", "?"),
+                attacking_creature_subtype=required_subtype,
+                tokens_created=created,
+                token_name=source.get("token_name"),
+                token_power=source.get("token_power"),
+                token_toughness=source.get("token_toughness"),
+                token_subtype=source.get("token_subtype"),
+                token_colors=source.get("token_colors") or [],
+                token_flying=bool(source.get("token_flying") or source.get("flying")),
+                token_keywords=source.get("token_keywords") or [],
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+    return created_total
 
 
 def resolve_spell_target_treasure_trigger(target_controller, target, source_spell, turn, *, phase="resolution"):
@@ -28906,6 +28990,14 @@ def declare_attackers_step(attacker, opponents, all_players, turn):
         turn=turn,
     )
     resolve_trouble_in_pairs_attack_triggers(attacker, attack_groups, all_players, turn)
+    resolve_controlled_attack_token_triggers(
+        attacker,
+        attackers,
+        alive_defenders,
+        all_players,
+        turn,
+        phase="combat",
+    )
     if len(attack_groups) > 1:
         emit_replay_event(
             "multi_defender_attack",
