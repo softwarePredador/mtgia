@@ -145,6 +145,48 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
         self.assertEqual(known_cards["Alpha Card"]["battle_rule_source"], "manual")
         self.assertNotIn("Beta Card", known_cards)
 
+    def test_load_candidate_allowlist_keeps_only_battle_ready_lane_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            matrix_path = Path(tmpdir) / "matrix.json"
+            matrix_path.write_text(
+                json.dumps(
+                    {
+                        "rows": [
+                            {
+                                "card_name": "Library of Leng",
+                                "recommendation_lane": "priority_benchmark_candidate",
+                                "rule_status": "battle_ready",
+                            },
+                            {
+                                "card_name": "Manual Card",
+                                "recommendation_lane": "priority_benchmark_candidate",
+                                "rule_status": "mapper_manual",
+                            },
+                            {
+                                "card_name": "Watch Card",
+                                "recommendation_lane": "watchlist_candidate",
+                                "rule_status": "battle_ready",
+                            },
+                            {
+                                "card_name": "Pinnacle Monk // Mystic Peak",
+                                "recommendation_lane": "priority_benchmark_candidate",
+                                "rule_status": "battle_ready",
+                            },
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            allowed = slot_optimizer.load_candidate_allowlist(str(matrix_path))
+
+        self.assertIn("library of leng", allowed)
+        self.assertIn("pinnacle monk // mystic peak", allowed)
+        self.assertIn("pinnacle monk", allowed)
+        self.assertIn("mystic peak", allowed)
+        self.assertNotIn("manual card", allowed)
+        self.assertNotIn("watch card", allowed)
+
 
 if __name__ == "__main__":
     unittest.main()

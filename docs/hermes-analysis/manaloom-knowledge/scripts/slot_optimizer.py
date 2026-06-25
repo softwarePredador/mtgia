@@ -267,6 +267,28 @@ def name_variants(name: str) -> set[str]:
     return variants
 
 
+def load_candidate_allowlist(
+    matrix_path: str,
+    lane: str = "priority_benchmark_candidate",
+) -> set[str]:
+    if not matrix_path:
+        return set()
+    path = Path(matrix_path)
+    data = json.loads(path.read_text(encoding="utf-8"))
+    rows = data.get("rows") or data.get("matrix_rows") or []
+    allowed: set[str] = set()
+    for row in rows:
+        if str(row.get("recommendation_lane") or "") != lane:
+            continue
+        if str(row.get("rule_status") or "") != "battle_ready":
+            continue
+        card_name = str(row.get("card_name") or row.get("name") or "").strip()
+        if not card_name:
+            continue
+        allowed.update(name_variants(card_name))
+    return allowed
+
+
 def choose_primary_category(categories: list[str]) -> str | None:
     present = set(categories)
     for category in REAL_CATEGORY_PRIORITY:
@@ -496,7 +518,14 @@ def choose_swap_targets(deck_categories: dict[str, list[tuple[str, float]]]) -> 
     return targets
 
 
-def legal_candidates(conn, deck_id: int, known_cards, max_per_category: int, only_category: str):
+def legal_candidates(
+    conn,
+    deck_id: int,
+    known_cards,
+    max_per_category: int,
+    only_category: str,
+    allowed_candidate_names: set[str] | None = None,
+):
     allowed = deck_commander_identity(conn, deck_id)
     deck_names = {
         variant
@@ -504,14 +533,27 @@ def legal_candidates(conn, deck_id: int, known_cards, max_per_category: int, onl
         for variant in name_variants(str(row["card_name"]))
     }
     by_category: dict[str, list[tuple[float, str, float, str, dict[str, object]]]] = defaultdict(list)
-    stats = {"deck": 0, "basic": 0, "unknown_category": 0, "missing_meta": 0, "off_color": 0, "illegal": 0, "high_cmc": 0}
+    stats = {
+        "deck": 0,
+        "basic": 0,
+        "not_in_candidate_matrix": 0,
+        "unknown_category": 0,
+        "missing_meta": 0,
+        "off_color": 0,
+        "illegal": 0,
+        "high_cmc": 0,
+    }
 
     for name, entry in known_cards.items():
-        if name_variants(name) & deck_names:
+        variants = name_variants(name)
+        if variants & deck_names:
             stats["deck"] += 1
             continue
         if name in BASICS:
             stats["basic"] += 1
+            continue
+        if allowed_candidate_names and not (variants & allowed_candidate_names):
+            stats["not_in_candidate_matrix"] += 1
             continue
         effect = str(entry.get("effect") or "unknown")
         category = str(entry.get("deck_category") or EFFECT_TO_CATEGORY.get(effect, "unknown"))
@@ -555,6 +597,8 @@ def main() -> int:
     parser.add_argument("--games", type=int, default=int(os.environ.get("MANALOOM_SLOT_GAMES", "10")))
     parser.add_argument("--max-per-category", type=int, default=int(os.environ.get("MANALOOM_SLOT_MAX_PER_CATEGORY", "15")))
     parser.add_argument("--category", default="")
+    parser.add_argument("--candidate-matrix", default="")
+    parser.add_argument("--candidate-lane", default="priority_benchmark_candidate")
     parser.add_argument("--phase", default="phase1")
     parser.add_argument("--reset-current-baseline", action="store_true")
     args = parser.parse_args()
@@ -569,6 +613,7 @@ def main() -> int:
 
     try:
         known_cards = load_known_cards()
+        allowed_candidate_names = load_candidate_allowlist(args.candidate_matrix, args.candidate_lane)
         with connect() as conn:
             ensure_optimizer_tables(conn)
             baseline = latest_baseline(conn, args.deck_id)
@@ -602,6 +647,7 @@ def main() -> int:
                 known_cards,
                 args.max_per_category,
                 args.category,
+                allowed_candidate_names,
             )
 
             total = sum(len(items) for items in candidates.values())
@@ -613,6 +659,10 @@ def main() -> int:
             print(f"baseline_hash={baseline_hash}")
             print(f"baseline_semantics_hash={baseline_semantics_hash or 'legacy-missing'}")
             print(f"baseline_ruleset_hash={baseline_ruleset_hash or 'legacy-missing'}")
+            if args.candidate_matrix:
+                print(f"candidate_matrix={args.candidate_matrix}")
+                print(f"candidate_lane={args.candidate_lane}")
+                print(f"candidate_allowlist_size={len(allowed_candidate_names)}")
             for line in battle_gate_cli_lines():
                 print(line)
             print(f"games_per_opponent={args.games}")

@@ -1413,6 +1413,52 @@ These are candidate rows only. They still require baseline hash guard,
 category-safe cut target, temporary battle benchmark, quality gate,
 confirmation, handoff, and explicit apply approval.
 
+## PG217 First Priority Benchmark Checkpoint
+
+The first post-runtime benchmark used the PG217 matrix as an allowlist and did
+not apply any deck change.
+
+What changed in tooling:
+
+1. `slot_optimizer.py` now accepts `--candidate-matrix` and
+   `--candidate-lane`, then filters candidates to `battle_ready` rows in the
+   requested recommendation lane.
+2. `master_optimizer_gate_baseline.py` can freeze a baseline from the official
+   `battle-strategy-audit` summary, preserving deck, semantic, and ruleset
+   hash guards without relying on the slower local baseline runner.
+3. `master_optimizer_quality_gate.py` now accepts `--phase`, so isolated
+   benchmark phases such as `pg217_priority_matrix_v1` can be reviewed without
+   mixing historical rows.
+
+Evidence:
+
+1. Baseline report:
+   `docs/hermes-analysis/master_optimizer_reports/master_optimizer_gate_baseline_20260625_114942.md`.
+2. Benchmark report:
+   `docs/hermes-analysis/master_optimizer_reports/pg217_priority_benchmark_flashback_engine_20260625.md`.
+3. Quality gate report:
+   `docs/hermes-analysis/master_optimizer_reports/master_optimizer_quality_gate_20260625_115439.md`.
+4. Baseline id `9` is tied to deck hash
+   `8f719f40b096e17644e1e9308c8f1be9ea2a6c122344d61967cad9fedd358d9f`,
+   semantics hash
+   `b942018cbf4c67c5011a2d6465832ace4cda6aca67b6020695fb2b9bfb247418`,
+   and ruleset hash
+   `2f6276b7d7ddb3060a1e6a54119a3658ba95db23b83b8eaa33c20b6ec3427b9f`.
+5. `Flashback` replacing `Reverberate` was tested as an `engine` slot:
+   baseline `12.5%`, benchmark `8.3%`, delta `-4.2pp`.
+6. The quality gate structurally passed the row, but the benchmark result is
+   below baseline; therefore no confirmation, handoff, deck apply, or
+   PostgreSQL write is authorized from this row.
+7. Post-benchmark hash check confirmed the temporary swap restored the deck to
+   the baseline hash above.
+
+Next operational order:
+
+1. Continue small, matrix-filtered benchmark batches by category or candidate.
+2. Reject any row below baseline before confirmation.
+3. Only rows with positive benchmark delta should enter confirmation/full
+   confirmation, then handoff, then explicit apply approval.
+
 ## Historical Tools Removed From Active Path
 
 The following are retained only as history/compatibility and must not guide new

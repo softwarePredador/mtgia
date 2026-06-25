@@ -1043,14 +1043,15 @@ def candidate_rows(
     deck_id: int | None = None,
     baseline_id: int | None = None,
     baseline_hash: str = "",
+    phases: tuple[str, ...] = ("best-in-slot", "phase1"),
     include_existing: bool = False,
     only_added: str = "",
 ) -> list[sqlite3.Row]:
     ensure_optimizer_tables(conn)
     where = [
-        "phase IN ('best-in-slot', 'phase1')",
+        f"phase IN ({','.join('?' for _ in phases)})",
     ]
-    params: list[object] = []
+    params: list[object] = list(phases)
     if deck_id is not None:
         where.append("deck_id=?")
         params.append(deck_id)

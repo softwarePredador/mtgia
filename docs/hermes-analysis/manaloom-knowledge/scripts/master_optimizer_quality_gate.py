@@ -22,8 +22,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--deck-id", type=int, default=6)
     parser.add_argument("--limit", type=int, default=25)
+    parser.add_argument("--phase", default="best-in-slot,phase1")
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
+    phases = tuple(item.strip() for item in args.phase.split(",") if item.strip())
 
     with connect() as conn:
         ensure_optimizer_tables(conn)
@@ -41,6 +43,7 @@ def main() -> int:
             deck_id=args.deck_id,
             baseline_id=int(baseline["id"]),
             baseline_hash=str(baseline["deck_hash"]),
+            phases=phases,
         )
         reviews = []
         for row in rows:
@@ -62,6 +65,7 @@ def main() -> int:
         f"- baseline_semantics_hash: `{baseline['semantics_hash'] or 'legacy-missing'}`",
         f"- baseline_ruleset_hash: `{baseline['ruleset_hash'] or 'legacy-missing'}`",
         f"- baseline_wr: {float(baseline['wr']):.1f}%",
+        f"- phases: `{','.join(phases)}`",
         f"- candidates_reviewed: {len(reviews)}",
         "",
     ]
