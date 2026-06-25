@@ -1,0 +1,3131 @@
+{
+  "generated_at": "2026-06-25T12:17:25.847762+00:00",
+  "status": "generated_isolated_candidate",
+  "deck_id": 6,
+  "source_matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg217_saga_draw_artifact_postsync_v1.json",
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/knowledge_candidate.db",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "max_novel": 16,
+  "candidate_hash": "ef278cefb669df32bc6c921f422f218791252c81bc1e08abf5663f3a02f54036",
+  "current_deck_summary": {
+    "deck_id": 6,
+    "cards": 100,
+    "lands": 33,
+    "nonlands": 67,
+    "avg_cmc": 2.597,
+    "hash": "8f719f40b096e17644e1e9308c8f1be9ea2a6c122344d61967cad9fedd358d9f",
+    "semantics_hash": "b942018cbf4c67c5011a2d6465832ace4cda6aca67b6020695fb2b9bfb247418",
+    "ruleset_hash": "2f6276b7d7ddb3060a1e6a54119a3658ba95db23b83b8eaa33c20b6ec3427b9f"
+  },
+  "candidate_deck_summary": {
+    "deck_id": 6,
+    "cards": 100,
+    "lands": 33,
+    "nonlands": 67,
+    "avg_cmc": 2.478,
+    "hash": "48cc7e6c7ccf67847163fc1d5e79b5e54eec52d7b7c4ac1a581b7a1e5e15fca2",
+    "semantics_hash": "de73e9fae5f5a35a7272a6c52c9073c4104c1255fa8ae33acff9c9b87d16aae4",
+    "ruleset_hash": "ee79c14a1b0b2ac21e6c46c67a9979e93b020cbed92bded70302c00ef7d26924"
+  },
+  "matrix_summary": {
+    "active_deck_id": 6,
+    "active_profile": {
+      "board_wipe": 2,
+      "draw": 25,
+      "engine": 16,
+      "land": 33,
+      "protection": 18,
+      "ramp": 53,
+      "recursion": 6,
+      "removal": 8,
+      "stax": 7,
+      "tutor": 8,
+      "wincon": 12
+    },
+    "deck_ids": [
+      6,
+      606,
+      607,
+      608,
+      609,
+      610,
+      611,
+      612,
+      613,
+      614,
+      615,
+      616,
+      617,
+      618,
+      619
+    ],
+    "generated_at": "2026-06-25T11:13:07.481073+00:00",
+    "policy": {
+      "no_deck_mutations": true,
+      "postgres_writes": false,
+      "premium_mox_blocklist": [
+        "chrome mox",
+        "mox diamond",
+        "mox opal"
+      ]
+    },
+    "recommendation_lane_counts": {
+      "active_low_confidence_review": 12,
+      "core_keep": 88,
+      "low_priority": 93,
+      "needs_rule_before_strategy": 190,
+      "policy_blocked": 2,
+      "priority_benchmark_candidate": 52,
+      "watchlist_candidate": 143
+    },
+    "role_counts_in_matrix": {
+      "board_wipe": 17,
+      "draw": 108,
+      "engine": 44,
+      "land": 122,
+      "protection": 42,
+      "ramp": 121,
+      "recursion": 23,
+      "removal": 42,
+      "stax": 8,
+      "tutor": 30,
+      "unknown": 106,
+      "wincon": 57
+    },
+    "row_count": 580,
+    "rule_status_counts": {
+      "battle_ready": 390,
+      "blocked_missing_xmage_source": 4,
+      "mapper_manual": 131,
+      "split_scope": 55
+    },
+    "status": "ready",
+    "target_profile": {
+      "board_wipe": 2,
+      "draw": 18,
+      "engine": 37,
+      "land": 33,
+      "protection": 13,
+      "ramp": 20,
+      "recursion": 4,
+      "removal": 8,
+      "tutor": 5,
+      "wincon": 13
+    }
+  },
+  "selection_summary": {
+    "eligible_cards": 243,
+    "eligible_lands": 49,
+    "eligible_nonlands": 194,
+    "blocked_reasons": {
+      "pending_promotion_lane:mapper_metadata_or_test_scenario_required": 197,
+      "pending_proposal_status:mapper_metadata_or_test_scenario_required": 197,
+      "not_battle_ready": 190,
+      "pending_promotion_lane:split_family_scope_review_required": 69,
+      "pending_proposal_status:split_family_scope_review_required": 69,
+      "missing_oracle_cache": 55,
+      "color_identity_outside_lorehold:B": 44,
+      "color_identity_outside_lorehold:BR": 21,
+      "color_identity_outside_lorehold:RU": 10,
+      "color_identity_outside_lorehold:BU": 7,
+      "pending_promotion_lane:blocked_missing_xmage_source": 4,
+      "pending_proposal_status:blocked_missing_xmage_source": 4,
+      "color_identity_outside_lorehold:U": 4,
+      "color_identity_outside_lorehold:BW": 4,
+      "color_identity_outside_lorehold:BRU": 3,
+      "pending_promotion_lane:runtime_family_implementation_required": 3,
+      "pending_proposal_status:runtime_family_implementation_required": 3,
+      "policy_blocked": 2,
+      "color_identity_outside_lorehold:BRW": 1
+    },
+    "novel_cards": [
+      "Exotic Orchard",
+      "Goblin Engineer",
+      "Improvisation Capstone",
+      "Increasing Vengeance",
+      "Library of Leng",
+      "Monument to Endurance",
+      "Pinnacle Monk // Mystic Peak",
+      "Reforge the Soul",
+      "Restoration Seminar",
+      "The Biblioplex",
+      "Verdant Catacombs"
+    ],
+    "cut_from_active": [
+      "Aetherflux Reservoir",
+      "Crawlspace",
+      "Drannith Magistrate",
+      "Hall of Heliod's Generosity",
+      "Inspiring Vantage",
+      "Magus of the Moat",
+      "Mana Confluence",
+      "Mox Amber",
+      "Silent Arbiter",
+      "Sphere of Safety",
+      "Windborn Muse"
+    ]
+  },
+  "validation": {
+    "status": "passed",
+    "issues": [],
+    "quantity": 100,
+    "main_quantity": 99,
+    "land_count": 33,
+    "nonland_count": 66,
+    "distinct_cards": 100,
+    "duplicate_normalized_names": [],
+    "role_counts": {
+      "board_wipe": 2,
+      "draw": 28,
+      "engine": 20,
+      "land": 33,
+      "protection": 14,
+      "ramp": 52,
+      "recursion": 7,
+      "removal": 8,
+      "stax": 5,
+      "tutor": 9,
+      "wincon": 11
+    },
+    "role_metric_counts": {
+      "board_wipe": 2,
+      "draw": 27,
+      "engine": 19,
+      "nonland_ramp": 20,
+      "protection": 14,
+      "recursion": 7,
+      "removal": 8,
+      "stax": 5,
+      "tutor": 9,
+      "wincon": 11
+    },
+    "role_shortfalls": {},
+    "color_identity_issues": [],
+    "battle_ready_cards": 100
+  },
+  "final_deck": [
+    {
+      "card_name": "Lorehold, the Historian",
+      "normalized_name": "lorehold, the historian",
+      "roles": [
+        "draw",
+        "engine"
+      ],
+      "is_land": false,
+      "is_commander": true,
+      "score": 79.5,
+      "effective_score": 79.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616
+      ],
+      "cmc": 5.0,
+      "type_line": "Legendary Creature — Elder Dragon",
+      "oracle_text": "Flying, haste\nEach instant and sorcery card in your hand has miracle {2}. (You may cast a card for its miracle cost when you draw it if it's the first card you drew this turn.)\nAt the beginning of each opponent's upkeep, you may discard a card. If you do, draw a card.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true
+    },
+    {
+      "card_name": "Ancient Den",
+      "normalized_name": "ancient den",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 43.5,
+      "effective_score": 34.3,
+      "recommendation_lane": "active_low_confidence_review",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        610,
+        614
+      ],
+      "cmc": 0.0,
+      "type_line": "Artifact Land",
+      "oracle_text": "{T}: Add {W}.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Ancient Tomb",
+      "normalized_name": "ancient tomb",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 53.5,
+      "effective_score": 77.3,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        608,
+        612,
+        613,
+        614,
+        615,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add {C}{C}. This land deals 2 damage to you.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Arid Mesa",
+      "normalized_name": "arid mesa",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 61.0,
+      "effective_score": 86.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        611,
+        612,
+        614,
+        615,
+        618,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Battlefield Forge",
+      "normalized_name": "battlefield forge",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 47.5,
+      "effective_score": 69.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        609,
+        610,
+        611
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add {C}.\n{T}: Add {R} or {W}. This land deals 1 damage to you.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Bloodstained Mire",
+      "normalized_name": "bloodstained mire",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 57.0,
+      "effective_score": 81.4,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        608,
+        611,
+        612,
+        613,
+        614,
+        618,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "City of Brass",
+      "normalized_name": "city of brass",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 45.5,
+      "effective_score": 66.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        612,
+        613,
+        618
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "Whenever this land becomes tapped, it deals 1 damage to you.\n{T}: Add one mana of any color.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Clifftop Retreat",
+      "normalized_name": "clifftop retreat",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 53.5,
+      "effective_score": 77.3,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        609,
+        610,
+        611,
+        614,
+        615,
+        616,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "This land enters tapped unless you control a Mountain or a Plains.\n{T}: Add {R} or {W}.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Command Tower",
+      "normalized_name": "command tower",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 59.5,
+      "effective_score": 86.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616,
+        617,
+        618,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Elegant Parlor",
+      "normalized_name": "elegant parlor",
+      "roles": [
+        "land",
+        "ramp",
+        "recursion"
+      ],
+      "is_land": true,
+      "score": 60.5,
+      "effective_score": 85.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        610,
+        611,
+        612,
+        613,
+        614,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land — Mountain Plains",
+      "oracle_text": "({T}: Add {R} or {W}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Exotic Orchard",
+      "normalized_name": "exotic orchard",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 35.5,
+      "effective_score": 38.8,
+      "recommendation_lane": "watchlist_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        607,
+        617,
+        618
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce.",
+      "color_identity": [],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Flooded Strand",
+      "normalized_name": "flooded strand",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 49.0,
+      "effective_score": 71.0,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        611,
+        612,
+        614
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Gemstone Caverns",
+      "normalized_name": "gemstone caverns",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 43.5,
+      "effective_score": 34.3,
+      "recommendation_lane": "active_low_confidence_review",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        612,
+        613
+      ],
+      "cmc": 0.0,
+      "type_line": "Legendary Land",
+      "oracle_text": "If this card is in your opening hand and you're not the starting player, you may begin the game with Gemstone Caverns on the battlefield with a luck counter on it. If you do, exile a card from your hand.\n{T}: Add {C}. If Gemstone Caverns has a luck counter on it, instead add one mana of any color.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Great Furnace",
+      "normalized_name": "great furnace",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 43.5,
+      "effective_score": 34.3,
+      "recommendation_lane": "active_low_confidence_review",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        610,
+        614
+      ],
+      "cmc": 0.0,
+      "type_line": "Artifact Land",
+      "oracle_text": "{T}: Add {R}.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Inventors' Fair",
+      "normalized_name": "inventors' fair",
+      "roles": [
+        "draw",
+        "land",
+        "ramp",
+        "tutor"
+      ],
+      "is_land": true,
+      "score": 49.5,
+      "effective_score": 69.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        610
+      ],
+      "cmc": 0.0,
+      "type_line": "Legendary Land",
+      "oracle_text": "At the beginning of your upkeep, if you control three or more artifacts, you gain 1 life.\n{T}: Add {C}.\n{4}, {T}, Sacrifice Inventors' Fair: Search your library for an artifact card, reveal it, put it into your hand, then shuffle. Activate only if you control three or more artifacts.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Marsh Flats",
+      "normalized_name": "marsh flats",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 55.0,
+      "effective_score": 78.8,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        608,
+        612,
+        613,
+        614,
+        618,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Mountain // Mountain",
+      "normalized_name": "mountain // mountain",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 59.5,
+      "effective_score": 86.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        613,
+        614,
+        615,
+        616,
+        617,
+        618,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Basic Land — Mountain",
+      "oracle_text": "({T}: Add {R}.)",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Needleverge Pathway // Pillarverge Pathway",
+      "normalized_name": "needleverge pathway // pillarverge pathway",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 45.5,
+      "effective_score": 66.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        609,
+        611
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add {R}.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Plains // Plains",
+      "normalized_name": "plains // plains",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 59.5,
+      "effective_score": 85.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Basic Land — Plains",
+      "oracle_text": "({T}: Add {W}.)",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Plateau",
+      "normalized_name": "plateau",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 55.5,
+      "effective_score": 79.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616
+      ],
+      "cmc": 0.0,
+      "type_line": "Land — Mountain Plains",
+      "oracle_text": "({T}: Add {R} or {W}.)",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Prismatic Vista",
+      "normalized_name": "prismatic vista",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 47.0,
+      "effective_score": 68.4,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        611,
+        614
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Rugged Prairie",
+      "normalized_name": "rugged prairie",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 49.5,
+      "effective_score": 72.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        609,
+        610,
+        611,
+        616
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add {C}.\n{R/W}, {T}: Add {R}{R}, {R}{W}, or {W}{W}.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Sacred Foundry",
+      "normalized_name": "sacred foundry",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 59.5,
+      "effective_score": 86.3,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land — Mountain Plains",
+      "oracle_text": "({T}: Add {R} or {W}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Scalding Tarn",
+      "normalized_name": "scalding tarn",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 53.0,
+      "effective_score": 76.2,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        608,
+        612,
+        614,
+        617,
+        618
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Spectator Seating",
+      "normalized_name": "spectator seating",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 55.5,
+      "effective_score": 79.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        610,
+        611,
+        613,
+        614,
+        615
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {R} or {W}.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Sunbaked Canyon",
+      "normalized_name": "sunbaked canyon",
+      "roles": [
+        "draw",
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 52.0,
+      "effective_score": 74.0,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        610,
+        614
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life: Add {R} or {W}.\n{1}, {T}, Sacrifice this land: Draw a card.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Sunbillow Verge",
+      "normalized_name": "sunbillow verge",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 55.5,
+      "effective_score": 79.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        609,
+        610,
+        611,
+        613,
+        614,
+        615
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add {W}.\n{T}: Add {R}. Activate only if you control a Mountain or a Plains.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Sundown Pass",
+      "normalized_name": "sundown pass",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 49.5,
+      "effective_score": 72.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        609,
+        611,
+        613,
+        615,
+        619
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "This land enters tapped unless you control two or more other lands.\n{T}: Add {R} or {W}.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "The Biblioplex",
+      "normalized_name": "the biblioplex",
+      "roles": [
+        "land"
+      ],
+      "is_land": true,
+      "score": 32.5,
+      "effective_score": 34.6,
+      "recommendation_lane": "watchlist_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        613
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add {C}.\n{2}, {T}: Look at the top card of your library. If it's an instant or sorcery card, you may reveal it and put it into your hand. If you don't put the card into your hand, you may put it into your graveyard. Activate only if you have exactly zero or seven cards in hand.",
+      "color_identity": [],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Urza's Saga",
+      "normalized_name": "urza's saga",
+      "roles": [
+        "land",
+        "ramp",
+        "tutor",
+        "wincon"
+      ],
+      "is_land": true,
+      "score": 71.5,
+      "effective_score": 97.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615
+      ],
+      "cmc": 0.0,
+      "type_line": "Enchantment Land — Urza's Saga",
+      "oracle_text": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — This Saga gains \"{T}: Add {C}.\"\nII — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"\nIII — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Verdant Catacombs",
+      "normalized_name": "verdant catacombs",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 33.0,
+      "effective_score": 35.1,
+      "recommendation_lane": "watchlist_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        618
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Forest card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "War Room",
+      "normalized_name": "war room",
+      "roles": [
+        "draw",
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 46.0,
+      "effective_score": 66.2,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}: Add {C}.\n{3}, {T}, Pay life equal to the number of colors in your commanders' color identity: Draw a card.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Windswept Heath",
+      "normalized_name": "windswept heath",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 51.0,
+      "effective_score": 73.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        608,
+        612,
+        613,
+        614
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Wooded Foothills",
+      "normalized_name": "wooded foothills",
+      "roles": [
+        "land",
+        "ramp"
+      ],
+      "is_land": true,
+      "score": 49.0,
+      "effective_score": 71.0,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        611,
+        612,
+        614
+      ],
+      "cmc": 0.0,
+      "type_line": "Land",
+      "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Forest card, put it onto the battlefield, then shuffle.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Approach of the Second Sun",
+      "normalized_name": "approach of the second sun",
+      "roles": [
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 55.5,
+      "effective_score": 71.3,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        609,
+        610,
+        612,
+        613,
+        614,
+        615
+      ],
+      "cmc": 7.0,
+      "type_line": "Sorcery",
+      "oracle_text": "If this spell was cast from your hand and you've cast another spell named Approach of the Second Sun this game, you win the game. Otherwise, put Approach of the Second Sun into its owner's library seventh from the top and you gain 7 life.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Arcane Signet",
+      "normalized_name": "arcane signet",
+      "roles": [
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 63.5,
+      "effective_score": 92.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616,
+        617,
+        618,
+        619
+      ],
+      "cmc": 2.0,
+      "type_line": "Artifact",
+      "oracle_text": "{T}: Add one mana of any color in your commander's color identity.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Austere Command",
+      "normalized_name": "austere command",
+      "roles": [
+        "board_wipe"
+      ],
+      "is_land": false,
+      "score": 49.0,
+      "effective_score": 88.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        609,
+        610,
+        611,
+        612
+      ],
+      "cmc": 6.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Choose two —\n• Destroy all artifacts.\n• Destroy all enchantments.\n• Destroy all creatures with mana value 3 or less.\n• Destroy all creatures with mana value 4 or greater.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "normalized_name": "birgi, god of storytelling // harnfel, horn of bounty",
+      "roles": [
+        "engine",
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 58.5,
+      "effective_score": 122.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        608,
+        612,
+        615,
+        619
+      ],
+      "cmc": 3.0,
+      "type_line": "Legendary Creature — God",
+      "oracle_text": "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.\nCreatures you control can boast twice during each of your turns rather than once.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Blasphemous Act",
+      "normalized_name": "blasphemous act",
+      "roles": [
+        "board_wipe"
+      ],
+      "is_land": false,
+      "score": 52.0,
+      "effective_score": 79.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        609,
+        610,
+        612,
+        614,
+        616,
+        618
+      ],
+      "cmc": 9.0,
+      "type_line": "Sorcery",
+      "oracle_text": "This spell costs {1} less to cast for each creature on the battlefield.\nBlasphemous Act deals 13 damage to each creature.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Boros Charm",
+      "normalized_name": "boros charm",
+      "roles": [
+        "protection",
+        "removal"
+      ],
+      "is_land": false,
+      "score": 64.5,
+      "effective_score": 89.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        609,
+        612,
+        613,
+        614,
+        615
+      ],
+      "cmc": 2.0,
+      "type_line": "Instant",
+      "oracle_text": "Choose one —\n• Boros Charm deals 4 damage to target player or planeswalker.\n• Permanents you control gain indestructible until end of turn.\n• Target creature gains double strike until end of turn.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Boros Signet",
+      "normalized_name": "boros signet",
+      "roles": [
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 51.5,
+      "effective_score": 75.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        609,
+        611
+      ],
+      "cmc": 2.0,
+      "type_line": "Artifact",
+      "oracle_text": "{1}, {T}: Add {R}{W}.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Brainstone",
+      "normalized_name": "brainstone",
+      "roles": [
+        "draw"
+      ],
+      "is_land": false,
+      "score": 46.5,
+      "effective_score": 68.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6
+      ],
+      "cmc": 1.0,
+      "type_line": "Artifact",
+      "oracle_text": "{2}, {T}, Sacrifice this artifact: Draw three cards, then put two cards from your hand on top of your library in any order.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Chaos Warp",
+      "normalized_name": "chaos warp",
+      "roles": [
+        "draw",
+        "removal"
+      ],
+      "is_land": false,
+      "score": 56.0,
+      "effective_score": 125.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        611,
+        615,
+        616,
+        617,
+        618
+      ],
+      "cmc": 3.0,
+      "type_line": "Instant",
+      "oracle_text": "The owner of target permanent shuffles it into their library, then reveals the top card of their library. If it's a permanent card, they put it onto the battlefield.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Deflecting Swat",
+      "normalized_name": "deflecting swat",
+      "roles": [
+        "draw",
+        "protection"
+      ],
+      "is_land": false,
+      "score": 68.0,
+      "effective_score": 143.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        611,
+        613,
+        614,
+        615,
+        616,
+        617,
+        618
+      ],
+      "cmc": 3.0,
+      "type_line": "Instant",
+      "oracle_text": "If you control a commander, you may cast this spell without paying its mana cost.\nYou may choose new targets for target spell or ability.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Dualcaster Mage",
+      "normalized_name": "dualcaster mage",
+      "roles": [
+        "engine"
+      ],
+      "is_land": false,
+      "score": 63.0,
+      "effective_score": 84.4,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        611,
+        612,
+        613
+      ],
+      "cmc": 3.0,
+      "type_line": "Creature — Human Wizard",
+      "oracle_text": "Flash\nWhen this creature enters, copy target instant or sorcery spell. You may choose new targets for the copy.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Enlightened Tutor",
+      "normalized_name": "enlightened tutor",
+      "roles": [
+        "tutor"
+      ],
+      "is_land": false,
+      "score": 68.0,
+      "effective_score": 119.3,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        608,
+        611,
+        612,
+        613,
+        614,
+        615,
+        619
+      ],
+      "cmc": 1.0,
+      "type_line": "Instant",
+      "oracle_text": "Search your library for an artifact or enchantment card, reveal it, then shuffle and put that card on top.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Esper Sentinel",
+      "normalized_name": "esper sentinel",
+      "roles": [
+        "draw",
+        "engine"
+      ],
+      "is_land": false,
+      "score": 68.5,
+      "effective_score": 149.8,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        609,
+        611,
+        613,
+        614,
+        615,
+        619
+      ],
+      "cmc": 1.0,
+      "type_line": "Artifact Creature — Human Soldier",
+      "oracle_text": "Whenever an opponent casts their first noncreature spell each turn, draw a card unless that player pays {X}, where X is this creature's power.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Faithless Looting",
+      "normalized_name": "faithless looting",
+      "roles": [
+        "draw",
+        "recursion"
+      ],
+      "is_land": false,
+      "score": 61.5,
+      "effective_score": 126.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        611,
+        615,
+        617
+      ],
+      "cmc": 1.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Fellwar Stone",
+      "normalized_name": "fellwar stone",
+      "roles": [
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 53.5,
+      "effective_score": 78.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        609,
+        610,
+        611,
+        618
+      ],
+      "cmc": 2.0,
+      "type_line": "Artifact",
+      "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Flawless Maneuver",
+      "normalized_name": "flawless maneuver",
+      "roles": [
+        "protection"
+      ],
+      "is_land": false,
+      "score": 56.5,
+      "effective_score": 97.4,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        614
+      ],
+      "cmc": 3.0,
+      "type_line": "Instant",
+      "oracle_text": "If you control a commander, you may cast this spell without paying its mana cost.\nCreatures you control gain indestructible until end of turn.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Gamble",
+      "normalized_name": "gamble",
+      "roles": [
+        "tutor"
+      ],
+      "is_land": false,
+      "score": 66.0,
+      "effective_score": 114.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        609,
+        612,
+        613,
+        614,
+        615
+      ],
+      "cmc": 1.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Get Lost",
+      "normalized_name": "get lost",
+      "roles": [
+        "removal",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 46.5,
+      "effective_score": 87.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6
+      ],
+      "cmc": 2.0,
+      "type_line": "Instant",
+      "oracle_text": "Destroy target creature, enchantment, or planeswalker. Its controller creates two Map tokens. (They're artifacts with \"{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.\")",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Ghostly Prison",
+      "normalized_name": "ghostly prison",
+      "roles": [
+        "draw",
+        "protection",
+        "stax"
+      ],
+      "is_land": false,
+      "score": 48.0,
+      "effective_score": 68.8,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        613,
+        616
+      ],
+      "cmc": 3.0,
+      "type_line": "Enchantment",
+      "oracle_text": "Creatures can't attack you unless their controller pays {2} for each creature they control that's attacking you.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Giver of Runes",
+      "normalized_name": "giver of runes",
+      "roles": [
+        "protection"
+      ],
+      "is_land": false,
+      "score": 50.0,
+      "effective_score": 72.8,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        609
+      ],
+      "cmc": 1.0,
+      "type_line": "Creature — Kor Cleric",
+      "oracle_text": "{T}: Another target creature you control gains protection from colorless or from the color of your choice until end of turn.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Goblin Engineer",
+      "normalized_name": "goblin engineer",
+      "roles": [
+        "tutor"
+      ],
+      "is_land": false,
+      "score": 49.0,
+      "effective_score": 79.3,
+      "recommendation_lane": "priority_benchmark_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        608,
+        610,
+        611
+      ],
+      "cmc": 2.0,
+      "type_line": "Creature — Goblin Artificer",
+      "oracle_text": "When this creature enters, you may search your library for an artifact card, put it into your graveyard, then shuffle.\n{R}, {T}, Sacrifice an artifact: Return target artifact card with mana value 3 or less from your graveyard to the battlefield.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Grand Abolisher",
+      "normalized_name": "grand abolisher",
+      "roles": [
+        "protection",
+        "stax"
+      ],
+      "is_land": false,
+      "score": 56.5,
+      "effective_score": 80.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        613,
+        615,
+        616,
+        619
+      ],
+      "cmc": 2.0,
+      "type_line": "Creature — Human Cleric",
+      "oracle_text": "During your turn, your opponents can't cast spells or activate abilities of artifacts, creatures, or enchantments.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Heat Shimmer",
+      "normalized_name": "heat shimmer",
+      "roles": [
+        "engine",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 60.5,
+      "effective_score": 80.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        612
+      ],
+      "cmc": 3.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Create a token that's a copy of target creature, except it has haste and \"At the beginning of the end step, exile this token.\"",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Imperial Recruiter",
+      "normalized_name": "imperial recruiter",
+      "roles": [
+        "draw",
+        "tutor"
+      ],
+      "is_land": false,
+      "score": 50.0,
+      "effective_score": 92.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        608
+      ],
+      "cmc": 3.0,
+      "type_line": "Creature — Human Advisor",
+      "oracle_text": "When this creature enters, search your library for a creature card with power 2 or less, reveal it, put it into your hand, then shuffle.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Improvisation Capstone",
+      "normalized_name": "improvisation capstone",
+      "roles": [
+        "draw"
+      ],
+      "is_land": false,
+      "score": 54.0,
+      "effective_score": 66.6,
+      "recommendation_lane": "priority_benchmark_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        606,
+        607,
+        609,
+        610,
+        611,
+        613
+      ],
+      "cmc": 0.0,
+      "type_line": "Sorcery — Lesson",
+      "oracle_text": "Exile cards from the top of your library until you exile cards with total mana value 4 or greater. You may cast any number of spells from among them without paying their mana costs.\nParadigm (Then exile this spell. After you first resolve a spell with this name, you may cast a copy of it from exile without paying its mana cost at the beginning of each of your first main phases.)",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Increasing Vengeance",
+      "normalized_name": "increasing vengeance",
+      "roles": [
+        "engine"
+      ],
+      "is_land": false,
+      "score": 60.0,
+      "effective_score": 70.2,
+      "recommendation_lane": "priority_benchmark_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        606,
+        612
+      ],
+      "cmc": 2.0,
+      "type_line": "Instant",
+      "oracle_text": "Copy target instant or sorcery spell you control. If this spell was cast from a graveyard, copy that spell twice instead. You may choose new targets for the copies.\nFlashback {3}{R}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Jeska's Will",
+      "normalized_name": "jeska's will",
+      "roles": [
+        "draw",
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 65.5,
+      "effective_score": 138.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        612,
+        613,
+        614,
+        615,
+        616,
+        619
+      ],
+      "cmc": 3.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Choose one. If you control a commander as you cast this spell, you may choose both instead.\n• Add {R} for each card in target opponent's hand.\n• Exile the top three cards of your library. You may play them this turn.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Land Tax",
+      "normalized_name": "land tax",
+      "roles": [
+        "draw",
+        "ramp",
+        "tutor"
+      ],
+      "is_land": false,
+      "score": 66.0,
+      "effective_score": 185.4,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        609,
+        610,
+        611,
+        613,
+        614,
+        615
+      ],
+      "cmc": 1.0,
+      "type_line": "Enchantment",
+      "oracle_text": "At the beginning of your upkeep, if an opponent controls more lands than you, you may search your library for up to three basic land cards, reveal them, put them into your hand, then shuffle.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Library of Leng",
+      "normalized_name": "library of leng",
+      "roles": [
+        "engine",
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 66.0,
+      "effective_score": 126.0,
+      "recommendation_lane": "priority_benchmark_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615
+      ],
+      "cmc": 1.0,
+      "type_line": "Artifact",
+      "oracle_text": "You have no maximum hand size.\nIf an effect causes you to discard a card, discard it, but you may put it on top of your library instead of into your graveyard.",
+      "color_identity": [],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Lightning Greaves",
+      "normalized_name": "lightning greaves",
+      "roles": [
+        "protection"
+      ],
+      "is_land": false,
+      "score": 56.0,
+      "effective_score": 101.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        615,
+        618,
+        619
+      ],
+      "cmc": 2.0,
+      "type_line": "Artifact — Equipment",
+      "oracle_text": "Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\nEquip {0}",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Lotus Petal",
+      "normalized_name": "lotus petal",
+      "roles": [
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 47.5,
+      "effective_score": 70.3,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        608,
+        613
+      ],
+      "cmc": 0.0,
+      "type_line": "Artifact",
+      "oracle_text": "{T}, Sacrifice this artifact: Add one mana of any color.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Mana Vault",
+      "normalized_name": "mana vault",
+      "roles": [
+        "engine",
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 65.0,
+      "effective_score": 142.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        612,
+        613,
+        615,
+        619
+      ],
+      "cmc": 1.0,
+      "type_line": "Artifact",
+      "oracle_text": "This artifact doesn't untap during your untap step.\nAt the beginning of your upkeep, you may pay {4}. If you do, untap this artifact.\nAt the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.\n{T}: Add {C}{C}{C}.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Mizzix's Mastery",
+      "normalized_name": "mizzix's mastery",
+      "roles": [
+        "draw",
+        "recursion",
+        "removal",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 76.5,
+      "effective_score": 220.0,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        615,
+        616
+      ],
+      "cmc": 4.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Exile target card that's an instant or sorcery from your graveyard. For each card exiled this way, copy it, and you may cast the copy without paying its mana cost. Exile Mizzix's Mastery.\nOverload {5}{R}{R}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Molten Duplication",
+      "normalized_name": "molten duplication",
+      "roles": [
+        "engine",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 62.5,
+      "effective_score": 84.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        612
+      ],
+      "cmc": 2.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Create a token that's a copy of target artifact or creature you control, except it's an artifact in addition to its other types. It gains haste until end of turn. Sacrifice it at the beginning of the next end step.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Monument to Endurance",
+      "normalized_name": "monument to endurance",
+      "roles": [
+        "draw",
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 54.5,
+      "effective_score": 66.3,
+      "recommendation_lane": "priority_benchmark_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        607,
+        608,
+        609,
+        611,
+        613,
+        614,
+        615,
+        617
+      ],
+      "cmc": 3.0,
+      "type_line": "Artifact",
+      "oracle_text": "Whenever you discard a card, choose one that hasn't been chosen this turn —\n• Draw a card.\n• Create a Treasure token.\n• Each opponent loses 3 life.",
+      "color_identity": [],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Mother of Runes",
+      "normalized_name": "mother of runes",
+      "roles": [
+        "protection"
+      ],
+      "is_land": false,
+      "score": 52.0,
+      "effective_score": 75.4,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        609,
+        614
+      ],
+      "cmc": 1.0,
+      "type_line": "Creature — Human Cleric",
+      "oracle_text": "{T}: Target creature you control gains protection from the color of your choice until end of turn.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Orim's Chant",
+      "normalized_name": "orim's chant",
+      "roles": [
+        "protection",
+        "stax"
+      ],
+      "is_land": false,
+      "score": 52.5,
+      "effective_score": 74.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6
+      ],
+      "cmc": 1.0,
+      "type_line": "Instant",
+      "oracle_text": "Kicker {W} (You may pay an additional {W} as you cast this spell.)\nTarget player can't cast spells this turn. If this spell was kicked, creatures can't attack this turn.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Past in Flames",
+      "normalized_name": "past in flames",
+      "roles": [
+        "draw",
+        "engine",
+        "recursion"
+      ],
+      "is_land": false,
+      "score": 61.0,
+      "effective_score": 162.8,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        612
+      ],
+      "cmc": 4.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Each instant and sorcery card in your graveyard gains flashback until end of turn. The flashback cost is equal to its mana cost.\nFlashback {4}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Path to Exile",
+      "normalized_name": "path to exile",
+      "roles": [
+        "removal"
+      ],
+      "is_land": false,
+      "score": 54.0,
+      "effective_score": 99.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        609,
+        613,
+        616
+      ],
+      "cmc": 1.0,
+      "type_line": "Instant",
+      "oracle_text": "Exile target creature. Its controller may search their library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "normalized_name": "pinnacle monk // mystic peak",
+      "roles": [
+        "engine",
+        "recursion",
+        "removal"
+      ],
+      "is_land": false,
+      "score": 54.0,
+      "effective_score": 137.5,
+      "recommendation_lane": "priority_benchmark_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        607,
+        608,
+        609,
+        610,
+        611
+      ],
+      "cmc": 5.0,
+      "type_line": "Creature — Djinn Monk",
+      "oracle_text": "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nWhen this creature enters, return target instant or sorcery card from your graveyard to your hand.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Professional Face-Breaker",
+      "normalized_name": "professional face-breaker",
+      "roles": [
+        "draw",
+        "engine",
+        "ramp",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 55.5,
+      "effective_score": 210.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        619
+      ],
+      "cmc": 3.0,
+      "type_line": "Creature — Human Warrior",
+      "oracle_text": "Menace\nWhenever one or more creatures you control deal combat damage to a player, create a Treasure token.\nSacrifice a Treasure: Exile the top card of your library. You may play that card this turn.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Pyroblast",
+      "normalized_name": "pyroblast",
+      "roles": [
+        "protection",
+        "removal"
+      ],
+      "is_land": false,
+      "score": 52.5,
+      "effective_score": 120.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6
+      ],
+      "cmc": 1.0,
+      "type_line": "Instant",
+      "oracle_text": "Choose one —\n• Counter target spell if it's blue.\n• Destroy target permanent if it's blue.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Ranger-Captain of Eos",
+      "normalized_name": "ranger-captain of eos",
+      "roles": [
+        "draw",
+        "protection",
+        "stax",
+        "tutor"
+      ],
+      "is_land": false,
+      "score": 52.5,
+      "effective_score": 176.2,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        619
+      ],
+      "cmc": 3.0,
+      "type_line": "Creature — Human Soldier Ranger",
+      "oracle_text": "When this creature enters, you may search your library for a creature card with mana value 1 or less, reveal it, put it into your hand, then shuffle.\nSacrifice this creature: Your opponents can't cast noncreature spells this turn.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Recruiter of the Guard",
+      "normalized_name": "recruiter of the guard",
+      "roles": [
+        "draw",
+        "tutor"
+      ],
+      "is_land": false,
+      "score": 48.0,
+      "effective_score": 88.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6
+      ],
+      "cmc": 3.0,
+      "type_line": "Creature — Human Soldier",
+      "oracle_text": "When this creature enters, you may search your library for a creature card with toughness 2 or less, reveal it, put it into your hand, then shuffle.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Reforge the Soul",
+      "normalized_name": "reforge the soul",
+      "roles": [
+        "draw"
+      ],
+      "is_land": false,
+      "score": 61.5,
+      "effective_score": 73.3,
+      "recommendation_lane": "priority_benchmark_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        606,
+        607,
+        609,
+        611,
+        612,
+        613,
+        615,
+        616
+      ],
+      "cmc": 5.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Each player discards their hand, then draws seven cards.\nMiracle {1}{R} (You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Reiterate",
+      "normalized_name": "reiterate",
+      "roles": [
+        "engine"
+      ],
+      "is_land": false,
+      "score": 65.0,
+      "effective_score": 85.8,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        612,
+        615
+      ],
+      "cmc": 3.0,
+      "type_line": "Instant",
+      "oracle_text": "Buyback {3} (You may pay an additional {3} as you cast this spell. If you do, put this card into your hand as it resolves.)\nCopy target instant or sorcery spell. You may choose new targets for the copy.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Restoration Seminar",
+      "normalized_name": "restoration seminar",
+      "roles": [
+        "engine",
+        "recursion"
+      ],
+      "is_land": false,
+      "score": 62.0,
+      "effective_score": 74.0,
+      "recommendation_lane": "priority_benchmark_candidate",
+      "promotion_lane": null,
+      "deck_ids": [
+        606,
+        609,
+        610,
+        611,
+        612
+      ],
+      "cmc": 0.0,
+      "type_line": "Sorcery — Lesson",
+      "oracle_text": "Return target nonland permanent card from your graveyard to the battlefield.\nParadigm (Then exile this spell. After you first resolve a spell with this name, you may cast a copy of it from exile without paying its mana cost at the beginning of each of your first main phases.)",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": false,
+      "is_commander": false
+    },
+    {
+      "card_name": "Reverberate",
+      "normalized_name": "reverberate",
+      "roles": [
+        "engine"
+      ],
+      "is_land": false,
+      "score": 69.0,
+      "effective_score": 111.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        612,
+        613
+      ],
+      "cmc": 2.0,
+      "type_line": "Instant",
+      "oracle_text": "Copy target instant or sorcery spell. You may choose new targets for the copy.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Rite of Flame",
+      "normalized_name": "rite of flame",
+      "roles": [
+        "ramp",
+        "recursion"
+      ],
+      "is_land": false,
+      "score": 50.5,
+      "effective_score": 72.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6
+      ],
+      "cmc": 1.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Add {R}{R}, then add {R} for each card named Rite of Flame in each graveyard.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Ruby Medallion",
+      "normalized_name": "ruby medallion",
+      "roles": [
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 52.0,
+      "effective_score": 76.6,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        608,
+        611,
+        612,
+        614
+      ],
+      "cmc": 2.0,
+      "type_line": "Artifact",
+      "oracle_text": "Red spells you cast cost {1} less to cast.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Scroll Rack",
+      "normalized_name": "scroll rack",
+      "roles": [
+        "draw",
+        "engine",
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 70.0,
+      "effective_score": 202.0,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        616
+      ],
+      "cmc": 2.0,
+      "type_line": "Artifact",
+      "oracle_text": "{1}, {T}: Exile any number of cards from your hand face down. Put that many cards from the top of your library into your hand. Then look at the exiled cards and put them on top of your library in any order.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Seething Song",
+      "normalized_name": "seething song",
+      "roles": [
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 51.5,
+      "effective_score": 72.9,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        612,
+        614,
+        615
+      ],
+      "cmc": 3.0,
+      "type_line": "Instant",
+      "oracle_text": "Add {R}{R}{R}{R}{R}.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Sensei's Divining Top",
+      "normalized_name": "sensei's divining top",
+      "roles": [
+        "draw"
+      ],
+      "is_land": false,
+      "score": 66.5,
+      "effective_score": 114.2,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616
+      ],
+      "cmc": 1.0,
+      "type_line": "Artifact",
+      "oracle_text": "{1}: Look at the top three cards of your library, then put them back in any order.\n{T}: Draw a card, then put this artifact on top of its owner's library.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Silence",
+      "normalized_name": "silence",
+      "roles": [
+        "protection",
+        "stax"
+      ],
+      "is_land": false,
+      "score": 64.5,
+      "effective_score": 89.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        612,
+        613,
+        614,
+        615,
+        616,
+        619
+      ],
+      "cmc": 1.0,
+      "type_line": "Instant",
+      "oracle_text": "Your opponents can't cast spells this turn.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Smothering Tithe",
+      "normalized_name": "smothering tithe",
+      "roles": [
+        "engine",
+        "ramp",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 76.5,
+      "effective_score": 192.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616,
+        619
+      ],
+      "cmc": 4.0,
+      "type_line": "Enchantment",
+      "oracle_text": "Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Sol Ring",
+      "normalized_name": "sol ring",
+      "roles": [
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 63.5,
+      "effective_score": 112.0,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616,
+        617,
+        618,
+        619
+      ],
+      "cmc": 1.0,
+      "type_line": "Artifact",
+      "oracle_text": "{T}: Add {C}{C}.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Storm-Kiln Artist",
+      "normalized_name": "storm-kiln artist",
+      "roles": [
+        "engine",
+        "ramp",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 72.0,
+      "effective_score": 177.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        608,
+        611,
+        612,
+        613,
+        614
+      ],
+      "cmc": 4.0,
+      "type_line": "Creature — Dwarf Shaman",
+      "oracle_text": "This creature gets +1/+0 for each artifact you control.\nMagecraft — Whenever you cast or copy an instant or sorcery spell, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Swords to Plowshares",
+      "normalized_name": "swords to plowshares",
+      "roles": [
+        "removal"
+      ],
+      "is_land": false,
+      "score": 56.0,
+      "effective_score": 103.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        610,
+        615
+      ],
+      "cmc": 1.0,
+      "type_line": "Instant",
+      "oracle_text": "Exile target creature. Its controller gains life equal to its power.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Talisman of Conviction",
+      "normalized_name": "talisman of conviction",
+      "roles": [
+        "ramp"
+      ],
+      "is_land": false,
+      "score": 53.5,
+      "effective_score": 78.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        609,
+        611
+      ],
+      "cmc": 2.0,
+      "type_line": "Artifact",
+      "oracle_text": "{T}: Add {C}.\n{T}: Add {R} or {W}. This artifact deals 1 damage to you.",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Teferi's Protection",
+      "normalized_name": "teferi's protection",
+      "roles": [
+        "protection"
+      ],
+      "is_land": false,
+      "score": 68.5,
+      "effective_score": 93.5,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        607,
+        608,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616
+      ],
+      "cmc": 3.0,
+      "type_line": "Instant",
+      "oracle_text": "Until your next turn, your life total can't change and you gain protection from everything. All permanents you control phase out. (While they're phased out, they're treated as though they don't exist. They phase in before you untap during your untap step.)\nExile Teferi's Protection.",
+      "color_identity": [
+        "W"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "The One Ring",
+      "normalized_name": "the one ring",
+      "roles": [
+        "draw",
+        "engine",
+        "protection"
+      ],
+      "is_land": false,
+      "score": 65.0,
+      "effective_score": 180.0,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        608,
+        613,
+        615,
+        619
+      ],
+      "cmc": 4.0,
+      "type_line": "Legendary Artifact",
+      "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.",
+      "color_identity": [],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Twinflame",
+      "normalized_name": "twinflame",
+      "roles": [
+        "engine",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 66.5,
+      "effective_score": 133.4,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        611,
+        612,
+        613
+      ],
+      "cmc": 2.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Strive — This spell costs {2}{R} more to cast for each target beyond the first.\nChoose any number of target creatures you control. For each of them, create a token that's a copy of that creature, except it has haste. Exile those tokens at the beginning of the next end step.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Unexpected Windfall",
+      "normalized_name": "unexpected windfall",
+      "roles": [
+        "draw",
+        "ramp",
+        "wincon"
+      ],
+      "is_land": false,
+      "score": 65.5,
+      "effective_score": 166.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        607,
+        609,
+        611,
+        613,
+        615
+      ],
+      "cmc": 4.0,
+      "type_line": "Instant",
+      "oracle_text": "As an additional cost to cast this spell, discard a card.\nDraw two cards and create two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Valakut Awakening // Valakut Stoneforge",
+      "normalized_name": "valakut awakening // valakut stoneforge",
+      "roles": [
+        "draw"
+      ],
+      "is_land": false,
+      "score": 58.5,
+      "effective_score": 81.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        608,
+        609,
+        610,
+        611
+      ],
+      "cmc": 3.0,
+      "type_line": "Instant",
+      "oracle_text": "Put any number of cards from your hand on the bottom of your library, then draw that many cards plus one.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Wheel of Fortune",
+      "normalized_name": "wheel of fortune",
+      "roles": [
+        "draw"
+      ],
+      "is_land": false,
+      "score": 60.5,
+      "effective_score": 83.1,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        606,
+        608,
+        609,
+        612,
+        616
+      ],
+      "cmc": 3.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Each player discards their hand, then draws seven cards.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    },
+    {
+      "card_name": "Wheel of Misfortune",
+      "normalized_name": "wheel of misfortune",
+      "roles": [
+        "draw"
+      ],
+      "is_land": false,
+      "score": 52.5,
+      "effective_score": 72.7,
+      "recommendation_lane": "core_keep",
+      "promotion_lane": null,
+      "deck_ids": [
+        6,
+        609
+      ],
+      "cmc": 3.0,
+      "type_line": "Sorcery",
+      "oracle_text": "Each player secretly chooses a number 0 or greater, then all players reveal those numbers simultaneously and determine the highest and lowest numbers revealed this way. Wheel of Misfortune deals damage equal to the highest number to each player who chose that number. Each player who didn't choose the lowest number discards their hand, then draws seven cards.",
+      "color_identity": [
+        "R"
+      ],
+      "in_active_deck": true,
+      "is_commander": false
+    }
+  ],
+  "battle_load": {
+    "status": "completed",
+    "commander": "Lorehold, the Historian",
+    "deck_count": 99,
+    "total_loaded": 100,
+    "construction_report": {
+      "format": "commander",
+      "is_valid": true,
+      "issues": [],
+      "commander_count": 1,
+      "commander_names": [
+        "Lorehold, the Historian"
+      ],
+      "commander_color_identity": [
+        "red",
+        "white"
+      ],
+      "main_quantity": 99,
+      "total_quantity": 100,
+      "singleton_violations": [],
+      "off_color_cards": [],
+      "color_identity_checked": true
+    },
+    "sample": [
+      "Ancient Den",
+      "Ancient Tomb",
+      "Approach of the Second Sun",
+      "Arcane Signet",
+      "Arid Mesa",
+      "Austere Command",
+      "Battlefield Forge",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "Blasphemous Act",
+      "Bloodstained Mire",
+      "Boros Charm",
+      "Boros Signet"
+    ]
+  },
+  "battle_smoke": {
+    "status": "completed",
+    "returncode": 0,
+    "started_at": "2026-06-25T12:18:18.894389+00:00",
+    "finished_at": "2026-06-25T12:19:32.268678+00:00",
+    "cmd": [
+      "python3",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+      "--games",
+      "1",
+      "--seed",
+      "20260625"
+    ],
+    "env_subset": {
+      "MANALOOM_BATTLE_EVALUATION_MODE": "target_pressure",
+      "MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER": "Lorehold",
+      "MANALOOM_BATTLE_REAL_OPPONENT_CANDIDATES": "12",
+      "MANALOOM_BATTLE_REAL_OPPONENT_LIMIT": "3",
+      "MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS": "80",
+      "MANALOOM_BATTLE_REAL_OPPONENT_SEED": "20260625",
+      "MANALOOM_KNOWLEDGE_DB": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/knowledge_candidate.db",
+      "MANALOOM_KNOWLEDGE_DIR": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/knowledge_dir"
+    },
+    "stdout_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/battle_smoke_stdout.txt",
+    "stderr_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/battle_smoke_stderr.txt",
+    "stdout_tail": "============================================================\nBATTLE ANALYST v9 — Interactive Commander (Priority + Stack + Miracle)\n============================================================\nCommander: Lorehold, the Historian\nDeck: 1+99 | L=33 R=52 X=10 CMC=2.44 Instants=19\nv9: Priority, Stack, Instant/Sorcery Timing, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste\nEvaluation mode: target-deck-under-pressure\nEvaluation target player: Lorehold\nLoaded 3 real opponent decks from 12 valid candidates (seed=20260625)\n\nUsing 3 REAL learned opponent decks\n\n1 games vs each of 3 real opponents (4-player)...\n\n  loss vs Kinnan, Bonder Prodigy #120 (real) WR=  0.0% W=0 L=1 S=0 T=0.0 []\n  win vs Najeela, the Blade-Blossom #111 (real) WR=100.0% W=1 L=0 S=0 T=17.0 [elimination=1]\n  loss vs Rograkh, Son of Rohgahh #118 (real) WR=  0.0% W=0 L=1 S=0 T=0.0 []\n\n  OVERALL v9: WR=33.3% (1W/2L/0S)\n\nLog: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/knowledge_dir/decks/lorehold-the-historian/BATTLE_LOG.md",
+    "stderr_tail": "",
+    "overall": {
+      "wr": 33.3,
+      "wins": 1,
+      "losses": 2,
+      "stalls": 0
+    }
+  }
+}

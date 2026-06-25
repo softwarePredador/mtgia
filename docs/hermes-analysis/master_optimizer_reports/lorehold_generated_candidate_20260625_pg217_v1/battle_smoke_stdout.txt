@@ -1,0 +1,21 @@
+============================================================
+BATTLE ANALYST v9 — Interactive Commander (Priority + Stack + Miracle)
+============================================================
+Commander: Lorehold, the Historian
+Deck: 1+99 | L=33 R=52 X=10 CMC=2.44 Instants=19
+v9: Priority, Stack, Instant/Sorcery Timing, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste
+Evaluation mode: target-deck-under-pressure
+Evaluation target player: Lorehold
+Loaded 3 real opponent decks from 12 valid candidates (seed=20260625)
+
+Using 3 REAL learned opponent decks
+
+1 games vs each of 3 real opponents (4-player)...
+
+  loss vs Kinnan, Bonder Prodigy #120 (real) WR=  0.0% W=0 L=1 S=0 T=0.0 []
+  win vs Najeela, the Blade-Blossom #111 (real) WR=100.0% W=1 L=0 S=0 T=17.0 [elimination=1]
+  loss vs Rograkh, Son of Rohgahh #118 (real) WR=  0.0% W=0 L=1 S=0 T=0.0 []
+
+  OVERALL v9: WR=33.3% (1W/2L/0S)
+
+Log: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/knowledge_dir/decks/lorehold-the-historian/BATTLE_LOG.md

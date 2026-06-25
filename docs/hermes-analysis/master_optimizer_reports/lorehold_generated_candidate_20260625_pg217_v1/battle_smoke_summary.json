@@ -1,0 +1,34 @@
+{
+  "status": "completed",
+  "returncode": 0,
+  "started_at": "2026-06-25T12:18:18.894389+00:00",
+  "finished_at": "2026-06-25T12:19:32.268678+00:00",
+  "cmd": [
+    "python3",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+    "--games",
+    "1",
+    "--seed",
+    "20260625"
+  ],
+  "env_subset": {
+    "MANALOOM_BATTLE_EVALUATION_MODE": "target_pressure",
+    "MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER": "Lorehold",
+    "MANALOOM_BATTLE_REAL_OPPONENT_CANDIDATES": "12",
+    "MANALOOM_BATTLE_REAL_OPPONENT_LIMIT": "3",
+    "MANALOOM_BATTLE_REAL_OPPONENT_MIN_CARDS": "80",
+    "MANALOOM_BATTLE_REAL_OPPONENT_SEED": "20260625",
+    "MANALOOM_KNOWLEDGE_DB": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/knowledge_candidate.db",
+    "MANALOOM_KNOWLEDGE_DIR": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/knowledge_dir"
+  },
+  "stdout_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/battle_smoke_stdout.txt",
+  "stderr_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/battle_smoke_stderr.txt",
+  "stdout_tail": "============================================================\nBATTLE ANALYST v9 — Interactive Commander (Priority + Stack + Miracle)\n============================================================\nCommander: Lorehold, the Historian\nDeck: 1+99 | L=33 R=52 X=10 CMC=2.44 Instants=19\nv9: Priority, Stack, Instant/Sorcery Timing, Counterspells, SBAs, Miracle, Boros Charm modal, Lifelink, Haste\nEvaluation mode: target-deck-under-pressure\nEvaluation target player: Lorehold\nLoaded 3 real opponent decks from 12 valid candidates (seed=20260625)\n\nUsing 3 REAL learned opponent decks\n\n1 games vs each of 3 real opponents (4-player)...\n\n  loss vs Kinnan, Bonder Prodigy #120 (real) WR=  0.0% W=0 L=1 S=0 T=0.0 []\n  win vs Najeela, the Blade-Blossom #111 (real) WR=100.0% W=1 L=0 S=0 T=17.0 [elimination=1]\n  loss vs Rograkh, Son of Rohgahh #118 (real) WR=  0.0% W=0 L=1 S=0 T=0.0 []\n\n  OVERALL v9: WR=33.3% (1W/2L/0S)\n\nLog: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260625_pg217_v1/knowledge_dir/decks/lorehold-the-historian/BATTLE_LOG.md",
+  "stderr_tail": "",
+  "overall": {
+    "wr": 33.3,
+    "wins": 1,
+    "losses": 2,
+    "stalls": 0
+  }
+}
