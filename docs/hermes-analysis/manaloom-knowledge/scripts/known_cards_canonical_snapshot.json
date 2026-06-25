@@ -12591,16 +12591,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Gods Willing": {
-    "cmc": 1.0,
-    "duration": 1,
-    "effect": "indestructible",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "target_creature_you_control_protection_from_chosen_color_until_eot_v1",
+    "effect": "grant_protection_from_chosen_color",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d37f5b6d39e91d4584e5a0e83b91b026"
+    "protection_color_choice": "contextual_best_source_color",
+    "protection_from_chosen_color_until_eot": true,
+    "target": "creature_you_control",
+    "target_controller": "own",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:55c7847be59181f29da7aa82c5667a30",
+    "battle_rule_oracle_hash": "745771d02a8a4d49bf5823457be81f09"
   },
   "Gods' Eye, Gate to the Reikai": {
     "effect": "land",
@@ -26187,15 +26192,21 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Sejiri Shelter // Sejiri Glacier": {
-    "cmc": 2.0,
-    "effect": "indestructible",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "target_creature_you_control_protection_from_chosen_color_until_eot_v1",
+    "effect": "grant_protection_from_chosen_color",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:3962fa5937b9b37311d110e5c30a29cb"
+    "protection_color_choice": "contextual_best_source_color",
+    "protection_from_chosen_color_until_eot": true,
+    "target": "creature_you_control",
+    "target_controller": "own",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:55c7847be59181f29da7aa82c5667a30",
+    "battle_rule_oracle_hash": "e43013ce9cf0dbab47befb40e3c5c1ba"
   },
   "Sejiri Steppe": {
     "effect": "land",

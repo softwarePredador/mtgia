@@ -72,6 +72,31 @@ def sample_batch_audit() -> dict:
                 "checks": {},
                 "xmage": {"status": "not_found"},
             },
+            {
+                "card_name": "Gods Willing",
+                "severity": "high",
+                "oracle_hash": "22f7f449ee56143d6b63814fecd37176",
+                "status": "ready_for_structured_xmage_pull_review_required",
+                "ready_for_structured_pull": True,
+                "valid_xmage_source": True,
+                "coherence_findings": ["review_only_or_needs_review_rule"],
+                "checks": {"focused_test_scenario_count": 1},
+                "xmage": {
+                    "class_name": "GodsWilling",
+                    "path": "/xmage/GodsWilling.java",
+                    "types": ["INSTANT"],
+                    "effect_classes": ["GainProtectionFromColorTargetEffect"],
+                    "target_classes": ["TargetControlledCreaturePermanent"],
+                    "primary_effect": {
+                        "effect": "grant_protection_from_chosen_color",
+                        "battle_model_scope": "target_creature_you_control_protection_from_chosen_color_until_eot_v1",
+                        "ability_kind": "one_shot",
+                        "instant": True,
+                        "target": "creature_you_control",
+                        "protection_from_chosen_color_until_eot": True,
+                    },
+                },
+            },
         ],
     }
 
@@ -95,6 +120,11 @@ def sample_external_harvest() -> dict:
                 "card_name": "Promise of Loyalty",
                 "candidate_rule": {"oracle_hash": "11f7f449ee56143d6b63814fecd37176"},
             },
+            {
+                "card_name": "Gods Willing",
+                "candidate_rule": {"oracle_hash": "22f7f449ee56143d6b63814fecd37176"},
+                "external_references": {"scryfall": {"mana_cost": "{W}"}},
+            },
         ],
     }
 
@@ -103,11 +133,12 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
     def test_classifier_groups_cards_by_family_and_lane(self) -> None:
         report = classifier.build_family_report(sample_batch_audit())
 
-        self.assertEqual(report["summary"]["card_count"], 3)
+        self.assertEqual(report["summary"]["card_count"], 4)
         self.assertEqual(report["summary"]["family_counts"]["static_cost_reducer"], 1)
         self.assertEqual(report["summary"]["family_counts"]["board_wipe_choice"], 1)
         self.assertEqual(report["summary"]["family_counts"]["manual_model"], 1)
-        self.assertEqual(report["summary"]["batch_metadata_candidate_count"], 1)
+        self.assertEqual(report["summary"]["family_counts"]["targeted_protection"], 1)
+        self.assertEqual(report["summary"]["batch_metadata_candidate_count"], 2)
         self.assertEqual(report["summary"]["runtime_family_required_count"], 1)
 
     def test_generator_marks_only_supported_oracle_hashed_family_as_batch_safe(self) -> None:
@@ -122,6 +153,9 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_name["Pearl Medallion"]["review_status"], "verified")
         self.assertEqual(by_name["Pearl Medallion"]["effect_json"]["applies_to_spell_colors"], ["W"])
         self.assertEqual(by_name["Pearl Medallion"]["effect_json"]["cmc"], 2.0)
+        self.assertTrue(by_name["Gods Willing"]["safe_for_batch_pg_package"])
+        self.assertEqual(by_name["Gods Willing"]["review_status"], "verified")
+        self.assertEqual(by_name["Gods Willing"]["effect_json"]["cmc"], 1.0)
         self.assertEqual(by_name["Promise of Loyalty"]["proposal_status"], "runtime_family_implementation_required")
         self.assertFalse(by_name["Molecule Man"]["safe_for_batch_pg_package"])
 

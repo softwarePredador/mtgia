@@ -229,6 +229,15 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "batch_strategy": "metadata_batch_after_pg_precheck",
     },
+    "targeted_protection": {
+        "effects": {"grant_protection_from_chosen_color"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "targeted own-creature protection grant and cleanup-aware target legality",
+        "family_tests": [
+            "test_pg204_gods_willing_grants_protection_to_best_creature_until_cleanup",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "tutor": {
         "effects": {"tutor"},
         "support_status": "runtime_family_partially_supported_review_required",

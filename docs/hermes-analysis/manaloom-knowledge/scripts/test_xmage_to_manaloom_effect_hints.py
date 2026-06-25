@@ -4264,6 +4264,42 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target"], "creature")
         self.assertEqual(primary["untap_lands_count"], 2)
 
+    def test_gods_willing_maps_to_targeted_protection_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["GainProtectionFromColorTargetEffect", "ScryEffect"],
+                "target_classes": ["TargetControlledCreaturePermanent"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "grant_protection_from_chosen_color")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "target_creature_you_control_protection_from_chosen_color_until_eot_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "creature_you_control")
+        self.assertTrue(primary["protection_from_chosen_color_until_eot"])
+
+    def test_sejiri_shelter_mdfc_maps_to_targeted_protection_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["GainProtectionFromColorTargetEffect"],
+                "ability_classes": ["EntersBattlefieldTappedAbility", "WhiteManaAbility"],
+                "target_classes": ["TargetControlledCreaturePermanent"],
+                "constructor_metadata": {"card_types": ["INSTANT", "LAND"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "grant_protection_from_chosen_color")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "target_creature_you_control_protection_from_chosen_color_until_eot_v1",
+        )
+
     def test_manamorphose_maps_to_exact_mana_then_draw_scope(self) -> None:
         result = hints.build_effect_hints(
             {

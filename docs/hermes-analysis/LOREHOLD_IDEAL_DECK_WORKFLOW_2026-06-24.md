@@ -727,6 +727,44 @@ Lorehold/opponent matrix:
    `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
    `effect_coverage_residual_status=effect_coverage_residual_accepted`.
 
+`Gods Willing` and `Sejiri Shelter // Sejiri Glacier` are the nineteenth
+completed proof group and close the first targeted protection-from-chosen-color
+family from the current Lorehold/opponent matrix:
+
+1. XMage local sources matched `GodsWilling` and `SejiriShelter` through
+   `GainProtectionFromColorTargetEffect(Duration.EndOfTurn)` plus
+   `TargetControlledCreaturePermanent`; `Sejiri Shelter // Sejiri Glacier` is
+   handled as an instant/land MDFC instead of a simple instant-only card.
+2. The mapper/classifier promoted only the exact
+   `target_creature_you_control_protection_from_chosen_color_until_eot_v1`
+   scope, and the generator emits protection-role metadata for
+   `grant_protection_from_chosen_color`.
+3. Battle runtime now grants temporary `protection_from` to the best controlled
+   creature target until cleanup and emits `targeted_protection_granted`.
+4. The event contract classifies `targeted_protection_granted` as a
+   `strategy_signal`.
+5. PG204 precheck/apply/postcheck promoted two verified auto rules and
+   deprecated four stale generated shadows.
+6. PG -> Hermes sync made both cards report as `battle_ready`; the matrix moved
+   them out of `needs_rule_before_strategy` and into `watchlist_candidate`.
+7. The PG204 matrix now reports `211` total `needs_rule_before_strategy` rows
+   and `102` Lorehold-touching rows across decks `608` through `616`:
+   `80` mapper manual, `16` split-scope, and `6` runtime-needed. This is the
+   current Lorehold-first queue before broad benchmark/deck swaps.
+8. The validation gate exposed one unrelated but real runtime weakness:
+   `Reiterate` could copy an opponent `Green Sun's Zenith` even when the copy
+   controller had no legal library target. Stack-copy handling now preserves
+   copied X values and skips tutor copies without controller-side payoff.
+9. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_055132/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+   `mandatory_gate_divergences=[]`,
+   `decision_audit_statuses={"turn_invariants_clean":16}`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `action_findings=0`, `event_contract_static_status=event_contract_static_ready`,
+   and `test_results_status_counts={"pass":18}`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

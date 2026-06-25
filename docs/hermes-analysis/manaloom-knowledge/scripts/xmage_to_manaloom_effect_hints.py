@@ -1507,6 +1507,28 @@ def _build_exact_runtime_variant_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        "INSTANT" in card_types
+        and "GainProtectionFromColorTargetEffect" in effect_classes
+        and "TargetControlledCreaturePermanent" in target_classes
+    ):
+        return {
+            "effect": "grant_protection_from_chosen_color",
+            "scope": "target_creature_you_control_protection_from_chosen_color_until_eot_v1",
+            "fields": {
+                "instant": True,
+                "target": "creature_you_control",
+                "target_controller": "own",
+                "protection_from_chosen_color_until_eot": True,
+                "protection_color_choice": "contextual_best_source_color",
+            },
+            "reason": "XMage structure matches a white instant giving target creature you control protection from the color of your choice until end of turn.",
+            "signals": [
+                "GainProtectionFromColorTargetEffect",
+                "TargetControlledCreaturePermanent",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and xmage_class_name == "DeflectingPalm"
         and "PreventNextDamageFromChosenSourceEffect" in effect_classes

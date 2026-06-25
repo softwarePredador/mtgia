@@ -12240,3 +12240,119 @@ Register decision:
 - Continue Lorehold-first rule closure on the remaining `104` Lorehold-touching
   `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
 - Next package number is PG204.
+
+## PG204 - Targeted Protection From Chosen Color
+
+Date: 2026-06-25
+
+Status: applied, postchecked, synced, runtime-tested, and strategy-gated.
+
+Scope:
+
+- Cards: `Gods Willing`, `Sejiri Shelter // Sejiri Glacier`.
+- Decks touched by current Lorehold/opponent matrix: Lorehold expansion block
+  including decks `608` through `616`.
+- XMage sources:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GodsWilling.java`
+  and
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SejiriShelter.java`.
+- Exact XMage mapping:
+  `GainProtectionFromColorTargetEffect(Duration.EndOfTurn)` with
+  `TargetControlledCreaturePermanent`; `Gods Willing` also has `ScryEffect(1)`,
+  and `Sejiri Shelter // Sejiri Glacier` is an instant/land MDFC.
+- ManaLoom battle model scope:
+  `target_creature_you_control_protection_from_chosen_color_until_eot_v1`.
+- Logical rule key:
+  `battle_rule_v1:55c7847be59181f29da7aa82c5667a30`.
+- Oracle hashes:
+  `745771d02a8a4d49bf5823457be81f09` and
+  `e43013ce9cf0dbab47befb40e3c5c1ba`.
+
+Implementation:
+
+- XMage hint maps real set classes by effect/target class membership, including
+  MDFC card-type shape for `Sejiri Shelter // Sejiri Glacier`.
+- Semantic classifier marks the exact targeted-protection family as
+  batch-safe and runtime-supported.
+- Deck-role generator emits a protection role for
+  `grant_protection_from_chosen_color`.
+- Battle runtime applies temporary `protection_from` to the best controlled
+  creature target until cleanup and emits `targeted_protection_granted`.
+- Event contract classifies `targeted_protection_granted` as a
+  `strategy_signal`.
+- Gate follow-up fixed stack-copy strategy for tutor spells: copied X spells
+  now preserve copied `x_value`, and copy responses skip tutor copies when the
+  copy controller has no valid library target. This prevented `Reiterate` from
+  copying an opponent `Green Sun's Zenith` into a no-target Lorehold resolution.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_package_20260625_pg204_targeted_protection_v1_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_package_20260625_pg204_targeted_protection_v1_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_package_20260625_pg204_targeted_protection_v1_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_package_20260625_pg204_targeted_protection_v1_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_batch_pg_package_20260625_pg204_targeted_protection_v1_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  both cards had `target_card_rows=1`, `expected_rule_rows_before=0`, and
+  `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `4`, `deprecated_shadow_rows=4`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  each card has `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=4`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg204_targeted_protection_20260625_0520.json`;
+  `selected_card_count=2`, `pg_rows_loaded=6`,
+  `sqlite_inserted_or_updated=6`, `canonical_snapshot_rows_exported=3242`,
+  `generated_rows=2`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg204_targeted_protection_postsync_v1_manifest.json`;
+  expanded scope moved to `high=391`, `medium=63`, `pass=508`, with no
+  remaining `targeted_protection` package proposals because both scoped cards
+  became battle-ready.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg204_targeted_protection_postsync_v1.json`;
+  scoped rows `580`, `battle_ready=369`,
+  `needs_rule_before_strategy=211`.
+- Lorehold deck block:
+  decks `608` through `616` moved from `104` to `102` remaining
+  `needs_rule_before_strategy` rows by structured `deck_ids`
+  (`80` mapper manual, `16` split-scope, `6` runtime-needed).
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg204_targeted_protection_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=340`,
+  `split_scope_backlog=72`, `runtime_family_backlog=20`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg204_targeted_protection_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  mapper tests ran `186` tests OK; classifier/generator tests ran `171` tests
+  OK; event-contract tests ran `7` tests OK; `test_battle_analyst_v10_3.py`
+  passed with targeted-protection and tutor-copy regressions.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_055132/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `decision_audit_statuses={"turn_invariants_clean":16}`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `action_findings=0`, `event_contract_static_status=event_contract_static_ready`,
+  `test_results_status_counts={"pass":18}`, `test_results_total=18`.
+
+Register decision:
+
+- PG204 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG204.
+- Continue Lorehold-first rule closure on the remaining `102` Lorehold-touching
+  `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
+- Next package number is PG205.

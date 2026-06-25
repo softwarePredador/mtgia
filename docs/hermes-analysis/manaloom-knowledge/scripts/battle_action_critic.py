@@ -516,6 +516,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "temporary protection-from-everything grant is consumed by replay damage-prevention checks.",
     ),
+    "targeted_protection_granted": (
+        "strategy_signal",
+        "temporary targeted protection grant is consumed by replay target-legality and damage-prevention checks.",
+    ),
     "random_discard_after_tutor": (
         "strategy_signal",
         "Gamble-style random discard after tutor changes card-flow/resource context.",

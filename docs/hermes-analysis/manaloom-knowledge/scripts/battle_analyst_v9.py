@@ -5687,6 +5687,9 @@ def copy_spell_on_stack(
     if isinstance(original_effect_data, dict):
         original_context.update(copy.deepcopy(original_effect_data.get("_cast_context") or {}))
         original_context.update(copy.deepcopy(original_effect_data.get("_resolution_context") or {}))
+    original_x_value = original_context.get("x_value")
+    if original_x_value is not None:
+        copied_effect["_cast_context"] = {"x_value": original_x_value}
     copied_effect["_resolution_context"] = {
         "phase": original_context.get("phase"),
         "source_zone": "stack_copy",
@@ -5695,10 +5698,25 @@ def copy_spell_on_stack(
         "locked_cost": {"copied_spell": True},
         "role": "copy",
     }
+    if original_x_value is not None:
+        copied_effect["_resolution_context"]["x_value"] = original_x_value
     item = StackItem(copied_card, controller, copied_effect)
     item.was_cast = False
     stack.push(item)
     return item
+
+
+def copied_spell_has_required_library_target(player, stack_item):
+    target_card = getattr(stack_item, "card", None)
+    effect_data = copy.deepcopy(getattr(stack_item, "effect_data", None) or get_card_effect(target_card))
+    if str(effect_data.get("effect") or "") != "tutor":
+        return True
+    context = {}
+    context.update(copy.deepcopy(effect_data.get("_cast_context") or {}))
+    context.update(copy.deepcopy(effect_data.get("_resolution_context") or {}))
+    if context.get("x_value") is not None:
+        effect_data["_cast_context"] = {"x_value": context.get("x_value")}
+    return spell_has_required_library_target(player, effect_data)
 
 
 def copy_spell_stack_target_context(player, stack_item, effect_data):
@@ -5709,6 +5727,8 @@ def copy_spell_stack_target_context(player, stack_item, effect_data):
         return None
     target_scope = str((effect_data or {}).get("target") or "instant_or_sorcery_on_stack").lower()
     if target_scope.startswith("own_") and getattr(stack_item, "controller", None) is not player:
+        return None
+    if not copied_spell_has_required_library_target(player, stack_item):
         return None
     return {
         "target": target_card.get("name", "?"),
@@ -26606,6 +26626,30 @@ def apply_effect_immediate(
             player=player.name,
             card=card.get("name", "?"),
             life_floor_on_damage=player.damage_life_floor,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+    elif effect == "grant_protection_from_chosen_color":
+        candidates = [permanent for permanent in player.battlefield if is_battlefield_creature(permanent)]
+        target = choose_best_creature_target(candidates) if candidates else None
+        colors = effect_data.get("protection_colors") or ["W", "U", "B", "R", "G"]
+        if isinstance(colors, str):
+            colors = read_json_list(colors) or [colors]
+        normalized_colors = sorted({_normalize_color_symbol(color) for color in colors if color})
+        if target:
+            existing = target.get("protection_from") or []
+            if isinstance(existing, str):
+                existing = [existing]
+            merged = sorted({_normalize_color_symbol(color) for color in existing if color} | set(normalized_colors))
+            set_until_eot(target, "protection_from", merged)
+        emit_replay_event(
+            "targeted_protection_granted",
+            player=player.name,
+            card=card.get("name", "?"),
+            target=target.get("name", "?") if target else None,
+            protection_from=normalized_colors,
+            target_found=bool(target),
             turn=turn,
             **replay_rule_fields(effect_data),
         )

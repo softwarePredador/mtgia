@@ -1226,6 +1226,129 @@ def register_tests(battle, player):
         assert copied_event["rule_oracle_hash"] == "996fb5f02f16605ff7f1c899f2c50f60"
         assert copied_event["choose_new_targets_status"] == "annotation_only"
 
+    def test_reiterate_skips_green_suns_copy_without_controller_library_target():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            responder = player("Responder")
+            responder.hand = [
+                {
+                    "name": "Reiterate",
+                    "cmc": 3,
+                    "mana_cost": "{1}{R}{R}",
+                    "type_line": "Instant",
+                }
+            ]
+            responder.library = [
+                {
+                    "name": "Red Target",
+                    "cmc": 2,
+                    "colors": ["R"],
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "type_line": "Creature — Goblin",
+                }
+            ]
+            responder.mana_pool.add("red", 2)
+            responder.mana_pool.add_generic(1)
+            target_spell = {
+                "name": "Green Sun's Zenith",
+                "cmc": 1,
+                "mana_cost": "{X}{G}",
+                "type_line": "Sorcery",
+            }
+            target_effect = {
+                "effect": "tutor",
+                "target": "green_creature_to_battlefield",
+                "target_mana_value_max_from_x": True,
+                "shuffle_self_into_library_on_resolution": True,
+            }
+            battle.store_cast_context_fields(
+                target_effect,
+                {
+                    "phase": "precombat_main",
+                    "x_value": 2,
+                    "locked_cost": {"generic": 2, "colored": {"green": 1}},
+                },
+            )
+            stack = battle.Stack()
+            stack.push(target_spell, active, target_effect)
+
+            acted = battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                7,
+                random.Random(20635),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert acted is False
+        assert responder.hand and responder.hand[0]["name"] == "Reiterate"
+        assert not any(event == "spell_copied" for event, _data in events)
+
+    def test_reiterate_preserves_x_when_copying_green_suns_with_valid_target():
+        active = player("Active")
+        responder = player("Responder")
+        responder.library = [
+            {
+                "name": "Green Target",
+                "cmc": 2,
+                "colors": ["G"],
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "type_line": "Creature — Elf",
+            }
+        ]
+        target_spell = {
+            "name": "Green Sun's Zenith",
+            "cmc": 1,
+            "mana_cost": "{X}{G}",
+            "type_line": "Sorcery",
+        }
+        target_effect = {
+            "effect": "tutor",
+            "target": "green_creature_to_battlefield",
+            "target_mana_value_max_from_x": True,
+            "shuffle_self_into_library_on_resolution": True,
+        }
+        battle.store_cast_context_fields(
+            target_effect,
+            {
+                "phase": "precombat_main",
+                "x_value": 2,
+                "locked_cost": {"generic": 2, "colored": {"green": 1}},
+            },
+        )
+        stack = battle.Stack()
+        stack.push(target_spell, active, target_effect)
+        copy_item = battle.copy_spell_on_stack(
+            target_spell,
+            responder,
+            stack,
+            original_effect_data=target_effect,
+            source_card={"name": "Reiterate"},
+            source_effect_data={"effect": "copy_spell"},
+        )
+
+        assert copy_item is not None
+        assert copy_item.effect_data["_cast_context"]["x_value"] == 2
+        battle.apply_effect_immediate(
+            responder,
+            [active],
+            copy_item.card,
+            7,
+            random.Random(20636),
+            effect_data_override=copy_item.effect_data,
+        )
+        assert any(card.get("name") == "Green Target" for card in responder.battlefield)
+
     def test_dualcaster_mage_etb_copies_stack_spell_with_pg068_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -1648,6 +1771,59 @@ def register_tests(battle, player):
         battle.clear_until_eot(active)
         for permanent in (creature, artifact, enchantment):
             assert "indestructible" not in permanent
+
+    def test_pg204_gods_willing_grants_protection_to_best_creature_until_cleanup():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            small = {
+                "name": "Small Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 1,
+                "toughness": 1,
+            }
+            best = {
+                "name": "Best Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 5,
+                "toughness": 5,
+            }
+            active.battlefield = [small, best, "land"]
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Gods Willing", "cmc": 1, "type_line": "Instant", "colors": ["W"]},
+                turn=4,
+                rng=random.Random(204),
+                effect_data_override={
+                    "effect": "grant_protection_from_chosen_color",
+                    "instant": True,
+                    "target": "creature_you_control",
+                    "protection_from_chosen_color_until_eot": True,
+                    "battle_model_scope": "target_creature_you_control_protection_from_chosen_color_until_eot_v1",
+                    "_rule_logical_key": "battle_rule_v1:gods-willing-test",
+                    "_rule_oracle_hash": "gods-willing-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert best["protection_from"] == ["black", "blue", "green", "red", "white"]
+        assert "protection_from" not in small
+        assert any(
+            event == "targeted_protection_granted"
+            and data.get("card") == "Gods Willing"
+            and data.get("target") == "Best Creature"
+            and data.get("rule_logical_key") == "battle_rule_v1:gods-willing-test"
+            for event, data in events
+        )
+        battle.clear_until_eot(active)
+        assert "protection_from" not in best
 
     def test_boros_charm_double_strike_targets_one_creature_until_cleanup():
         active = player("Lorehold")
@@ -14888,6 +15064,8 @@ def register_tests(battle, player):
         test_pg192_sand_scout_tutors_desert_when_behind_and_creates_one_sand_warrior_per_turn,
         test_reverberate_copies_stack_spell_with_pg038_rule_provenance,
         test_reiterate_copies_stack_spell_with_pg068_rule_provenance,
+        test_reiterate_skips_green_suns_copy_without_controller_library_target,
+        test_reiterate_preserves_x_when_copying_green_suns_with_valid_target,
         test_dualcaster_mage_etb_copies_stack_spell_with_pg068_rule_provenance,
         test_deflecting_swat_redirects_targeted_removal_for_free_with_commander,
         test_flawless_maneuver_protects_creatures_for_free_with_commander,
@@ -14896,6 +15074,7 @@ def register_tests(battle, player):
         test_reforge_resolution_draws_seven_when_count_missing,
         test_boros_charm_protects_creatures_until_cleanup,
         test_boros_charm_grants_indestructible_to_all_permanents_until_cleanup,
+        test_pg204_gods_willing_grants_protection_to_best_creature_until_cleanup,
         test_boros_charm_double_strike_targets_one_creature_until_cleanup,
         test_dawns_truce_oracle_normalizes_to_gift_hexproof_indestructible,
         test_dawns_truce_gifts_card_and_grants_hexproof_indestructible_until_cleanup,
