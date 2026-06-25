@@ -1,0 +1,3741 @@
+{
+  "cards": [
+    {
+      "active_rule_count": 2,
+      "card_name": "Agate Instigator",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "token_maker"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:6ac82803941cd9e2ddd7b736de91d403",
+        "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
+      ],
+      "normalized_name": "agate instigator",
+      "oracle_cache_present": true,
+      "oracle_hash": "0635eac06cb2147f8638ef0123a40f2b",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Creature \u2014 Lizard Rogue"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Ancient Gold Dragon",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "token_maker"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:25733caef1aa1db65c165b13ef619368",
+        "battle_rule_v1:b9c8732f6cafef392e640b0d77d92737"
+      ],
+      "normalized_name": "ancient gold dragon",
+      "oracle_cache_present": true,
+      "oracle_hash": "4ee7da13b4db1902895c7523fb04fdd2",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Creature \u2014 Elder Dragon"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Ephemerate",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "remove_creature"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:542895a0a061a3a76e0f3bb73d52a7db",
+        "battle_rule_v1:6d605e71cab499f7d5f6da75903de044"
+      ],
+      "normalized_name": "ephemerate",
+      "oracle_cache_present": true,
+      "oracle_hash": "4671452857f7b532c0c9cc6088b3e25c",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Gisela, Blade of Goldnight",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "finisher"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:6e281d363c92040c064cda01b445b596",
+        "battle_rule_v1:d816a3ec5c9c24e763abaccb27b2a2b3"
+      ],
+      "normalized_name": "gisela, blade of goldnight",
+      "oracle_cache_present": true,
+      "oracle_hash": "c59105cb2fa02882b4485d6a06ab6187",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Legendary Creature \u2014 Angel"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Impact Tremors",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "draw_engine"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:81701a2e0221de09cf7cf5ba202a3ef0",
+        "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b"
+      ],
+      "normalized_name": "impact tremors",
+      "oracle_cache_present": true,
+      "oracle_hash": "1681308f8ec8a6ff4638b6a2a2d20867",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Enchantment"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Longshot, Rebel Bowman",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "creature",
+        "finisher"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        },
+        {
+          "code": "trusted_rule_without_oracle_hash",
+          "detail": "1 trusted executable rows lack oracle_hash.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:53d7252f111b777ddf7ff42a275c4a38",
+        "battle_rule_v1:7dc599b371f5088b59d18696e3b706fd"
+      ],
+      "normalized_name": "longshot, rebel bowman",
+      "oracle_cache_present": true,
+      "oracle_hash": "262ee0e8c9dd03d7ef792501201f0df9",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 1,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Legendary Creature \u2014 Human Rebel Ally"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Molten Gatekeeper",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "recursion"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:5cf1370532981c5c6d977d5abfce1152",
+        "battle_rule_v1:7028e0aba8409e45d6156211b87d6f8e"
+      ],
+      "normalized_name": "molten gatekeeper",
+      "oracle_cache_present": true,
+      "oracle_hash": "c4620cc0ede7c230f59128f6773d9982",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Artifact Creature \u2014 Golem"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Reprieve",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "counter"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        },
+        {
+          "code": "generic_effect_without_model_scope",
+          "detail": "Trusted rule uses broad effect without battle_model_scope/oracle-specific marker: counter",
+          "severity": "high"
+        },
+        {
+          "code": "trusted_rule_without_oracle_hash",
+          "detail": "1 trusted executable rows lack oracle_hash.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:1ed1c27b9744871ef4ffc467d11b3aa5",
+        "battle_rule_v1:e2ba76b96968ff477efac76a2d0f12f9"
+      ],
+      "normalized_name": "reprieve",
+      "oracle_cache_present": true,
+      "oracle_hash": "9fe3522a99303186c1defd1362fdce2c",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 1,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Ultima",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "board_wipe"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:84dca9d12c0abf5610fa673e6d82eab8",
+        "battle_rule_v1:8d54214335142fbda9e139f79184cd30"
+      ],
+      "normalized_name": "ultima",
+      "oracle_cache_present": true,
+      "oracle_hash": "2b6ebea707b8aaf76a72a2a5ded6daf3",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Cloud Key",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:cefbed3716a64a7d8c9b2497a4986591",
+        "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
+      ],
+      "normalized_name": "cloud key",
+      "oracle_cache_present": true,
+      "oracle_hash": "19792b44d184aed6b5b075cfa5c0cbe4",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Grinding Station",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        },
+        {
+          "code": "generic_effect_without_model_scope",
+          "detail": "Trusted rule uses broad effect without battle_model_scope/oracle-specific marker: ramp_permanent",
+          "severity": "medium"
+        },
+        {
+          "code": "trusted_rule_without_oracle_hash",
+          "detail": "1 trusted executable rows lack oracle_hash.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+        "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67"
+      ],
+      "normalized_name": "grinding station",
+      "oracle_cache_present": true,
+      "oracle_hash": "288857f5e91e9574eff7a561f5d6708e",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 1,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Helm of Awakening",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_engine",
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        },
+        {
+          "code": "generic_effect_without_model_scope",
+          "detail": "Trusted rule uses broad effect without battle_model_scope/oracle-specific marker: ramp_engine",
+          "severity": "medium"
+        },
+        {
+          "code": "trusted_rule_without_oracle_hash",
+          "detail": "1 trusted executable rows lack oracle_hash.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+        "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
+      ],
+      "normalized_name": "helm of awakening",
+      "oracle_cache_present": true,
+      "oracle_hash": "4b4cac675852e401c4baf1582715d35d",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 1,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Lion's Eye Diamond",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_ritual"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        },
+        {
+          "code": "generic_effect_without_model_scope",
+          "detail": "Trusted rule uses broad effect without battle_model_scope/oracle-specific marker: ramp_ritual",
+          "severity": "medium"
+        },
+        {
+          "code": "trusted_rule_without_oracle_hash",
+          "detail": "1 trusted executable rows lack oracle_hash.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:adac7681cc22507153853a57da5212f8",
+        "battle_rule_v1:ae7edb7dd5d64d029f374af84e82e8ae"
+      ],
+      "normalized_name": "lion's eye diamond",
+      "oracle_cache_present": true,
+      "oracle_hash": "104ca32c3e7c2d1dca1e49db5dd37b64",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 1,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Mana Geyser",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_ritual"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        },
+        {
+          "code": "generic_effect_without_model_scope",
+          "detail": "Trusted rule uses broad effect without battle_model_scope/oracle-specific marker: ramp_ritual",
+          "severity": "medium"
+        },
+        {
+          "code": "trusted_rule_without_oracle_hash",
+          "detail": "1 trusted executable rows lack oracle_hash.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:0dc67620dfc6f74a63fa0f4c968c8875",
+        "battle_rule_v1:2c6cc881c92be4d266a230b2ef32c639"
+      ],
+      "normalized_name": "mana geyser",
+      "oracle_cache_present": true,
+      "oracle_hash": "684f03297624aa968fe22e1b6d6f63d9",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 1,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Pyromancer's Goggles",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:695460c0e719d22fff2862489042ea36",
+        "battle_rule_v1:d491eb5bd49e767cbb09724ec816c640"
+      ],
+      "normalized_name": "pyromancer's goggles",
+      "oracle_cache_present": true,
+      "oracle_hash": "a87d2dc7618186343d2ecaf662405c11",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Legendary Artifact"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Semblance Anvil",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:cefbed3716a64a7d8c9b2497a4986591",
+        "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
+      ],
+      "normalized_name": "semblance anvil",
+      "oracle_cache_present": true,
+      "oracle_hash": "32a67417a2ff0e86b36986f3d0973d8c",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 0,
+      "card_name": "Boros Reckoner",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [],
+      "findings": [
+        {
+          "code": "no_active_battle_rule",
+          "detail": "No active battle_card_rules row for a deck card.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [],
+      "normalized_name": "boros reckoner",
+      "oracle_cache_present": true,
+      "oracle_hash": "8cb6c980428b2501343f3f38dc686efb",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 0,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Creature \u2014 Minotaur Wizard"
+    },
+    {
+      "active_rule_count": 0,
+      "card_name": "Charmbreaker Devils",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [],
+      "findings": [
+        {
+          "code": "no_active_battle_rule",
+          "detail": "No active battle_card_rules row for a deck card.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [],
+      "normalized_name": "charmbreaker devils",
+      "oracle_cache_present": true,
+      "oracle_hash": "84e84ddacde81b208e8b5cd06b87e10e",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 0,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Creature \u2014 Devil"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Purphoros, God of the Forge",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "pump_all"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:01c10aa9256a03f7e022f27ae739bb7c",
+        "battle_rule_v1:e90b582e4b128b4c890db8959fb6005c"
+      ],
+      "normalized_name": "purphoros, god of the forge",
+      "oracle_cache_present": true,
+      "oracle_hash": "01ee853118a4f1e5fe31a9d1e3ec6c5d",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Legendary Enchantment Creature \u2014 God"
+    },
+    {
+      "active_rule_count": 0,
+      "card_name": "Rem Karolus, Stalwart Slayer",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [],
+      "findings": [
+        {
+          "code": "no_active_battle_rule",
+          "detail": "No active battle_card_rules row for a deck card.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [],
+      "normalized_name": "rem karolus, stalwart slayer",
+      "oracle_cache_present": true,
+      "oracle_hash": "7d58da0feedf10778e5f0a84b724e08c",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 0,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Legendary Creature \u2014 Human Knight"
+    },
+    {
+      "active_rule_count": 0,
+      "card_name": "Repercussion",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [],
+      "findings": [
+        {
+          "code": "no_active_battle_rule",
+          "detail": "No active battle_card_rules row for a deck card.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [],
+      "normalized_name": "repercussion",
+      "oracle_cache_present": true,
+      "oracle_hash": "8e1ed4f8063ab89dd8906878a6232862",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 0,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Enchantment"
+    },
+    {
+      "active_rule_count": 0,
+      "card_name": "Taii Wakeen, Perfect Shot",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [],
+      "findings": [
+        {
+          "code": "no_active_battle_rule",
+          "detail": "No active battle_card_rules row for a deck card.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [],
+      "normalized_name": "taii wakeen, perfect shot",
+      "oracle_cache_present": true,
+      "oracle_hash": "6222a19da7f6b4b6b9ba97d28c512e39",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 0,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Legendary Creature \u2014 Human Mercenary"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Terror of the Peaks",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "creature"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:5fd479142565a7c180ed98b05f730ab6"
+      ],
+      "normalized_name": "terror of the peaks",
+      "oracle_cache_present": true,
+      "oracle_hash": "90c007ac59cdd400f58e89c47d81440e",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 1,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "active_rule_count": 0,
+      "card_name": "Toralf, God of Fury // Toralf's Hammer",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [],
+      "findings": [
+        {
+          "code": "no_active_battle_rule",
+          "detail": "No active battle_card_rules row for a deck card.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [],
+      "normalized_name": "toralf, god of fury // toralf's hammer",
+      "oracle_cache_present": true,
+      "oracle_hash": "900c199972617df82c6ddf796e2cf04f",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 0,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Legendary Creature \u2014 God"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Warleader's Call",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "pump_all"
+      ],
+      "findings": [
+        {
+          "code": "no_trusted_executable_rule",
+          "detail": "Rules exist, but none are verified/active and executable.",
+          "severity": "high"
+        },
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "2 active rows are needs_review/review_only/disabled.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:99bcd829c88de9a13440ddc11ec7e3b8",
+        "battle_rule_v1:e1b335368e296cff47b71c65fb6cfbe2"
+      ],
+      "normalized_name": "warleader's call",
+      "oracle_cache_present": true,
+      "oracle_hash": "0b6b075fd5c59b4634262b2658685f1d",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 2,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Enchantment"
+    },
+    {
+      "active_rule_count": 0,
+      "card_name": "Wild Ricochet",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [],
+      "findings": [
+        {
+          "code": "no_active_battle_rule",
+          "detail": "No active battle_card_rules row for a deck card.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [],
+      "normalized_name": "wild ricochet",
+      "oracle_cache_present": true,
+      "oracle_hash": "c7d62b1c3e0178970919cd0fc3b6b995",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 0,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 0,
+      "card_name": "Zirda, the Dawnwaker",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [],
+      "findings": [
+        {
+          "code": "no_active_battle_rule",
+          "detail": "No active battle_card_rules row for a deck card.",
+          "severity": "high"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [],
+      "normalized_name": "zirda, the dawnwaker",
+      "oracle_cache_present": true,
+      "oracle_hash": "23860bc4072cc27137ba346b82b9f548",
+      "oracle_text_present": true,
+      "priority_score": 7051,
+      "review_only_rule_count": 0,
+      "severity": "high",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 0,
+      "type_line": "Legendary Creature \u2014 Elemental Fox"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Boseiju, Who Shelters All",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:2be7a9b6c891893428bd34f4866a48a8",
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "boseiju, who shelters all",
+      "oracle_cache_present": true,
+      "oracle_hash": "d9692140b06619e1fb472205c995224b",
+      "oracle_text_present": true,
+      "priority_score": 4051,
+      "review_only_rule_count": 1,
+      "severity": "medium",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Legendary Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Cavern of Souls",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:2be7a9b6c891893428bd34f4866a48a8",
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "cavern of souls",
+      "oracle_cache_present": true,
+      "oracle_hash": "278de7cb46a695e7f621d3706ee8c7e3",
+      "oracle_text_present": true,
+      "priority_score": 4051,
+      "review_only_rule_count": 1,
+      "severity": "medium",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "City of Traitors",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:3c94f7303c0be0aab931f4385f787b73",
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "city of traitors",
+      "oracle_cache_present": true,
+      "oracle_hash": "a069ebfc938abee0a870b661a913e368",
+      "oracle_text_present": true,
+      "priority_score": 4051,
+      "review_only_rule_count": 1,
+      "severity": "medium",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Crystal Vein",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:3c94f7303c0be0aab931f4385f787b73",
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "crystal vein",
+      "oracle_cache_present": true,
+      "oracle_hash": "98135d85af6b160828c8fb7c7671a444",
+      "oracle_text_present": true,
+      "priority_score": 4051,
+      "review_only_rule_count": 1,
+      "severity": "medium",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Eiganjo, Seat of the Empire",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167",
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "eiganjo, seat of the empire",
+      "oracle_cache_present": true,
+      "oracle_hash": "25b37ca517c49d61b17a9dc180dc8ea8",
+      "oracle_text_present": true,
+      "priority_score": 4051,
+      "review_only_rule_count": 1,
+      "severity": "medium",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Legendary Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Forbidden Orchard",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+        "battle_rule_v1:7bd12384d7208f94e050051f9f85fb85"
+      ],
+      "normalized_name": "forbidden orchard",
+      "oracle_cache_present": true,
+      "oracle_hash": "0cdcd0521c3a1defd506234eff7ecb43",
+      "oracle_text_present": true,
+      "priority_score": 4051,
+      "review_only_rule_count": 1,
+      "severity": "medium",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Sokenzan, Crucible of Defiance",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "review_only_or_needs_review_rule",
+          "detail": "1 active rows are needs_review/review_only/disabled.",
+          "severity": "medium"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+        "battle_rule_v1:c126aa47820d0df0ec8cce31d3da6b5c"
+      ],
+      "normalized_name": "sokenzan, crucible of defiance",
+      "oracle_cache_present": true,
+      "oracle_hash": "ab4fb4d6fa3da84d5453eb7ce69eba20",
+      "oracle_text_present": true,
+      "priority_score": 4051,
+      "review_only_rule_count": 1,
+      "severity": "medium",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Legendary Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Approach of the Second Sun",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "approach"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:ed74fb069b6c1d635392d907804a1d98"
+      ],
+      "normalized_name": "approach of the second sun",
+      "oracle_cache_present": true,
+      "oracle_hash": "0838960b80a282fb4508532f7bae8c2b",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Artist's Talent",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "draw_engine"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:e57aa58c2e76015a0851a6bfef5dca90"
+      ],
+      "normalized_name": "artist's talent",
+      "oracle_cache_present": true,
+      "oracle_hash": "d49d9b1a361e7d2b0f9a373cb239b875",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Enchantment \u2014 Class"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Austere Command",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "board_wipe"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:5f19a608b87445bcc5c7ebb7ad96eb64"
+      ],
+      "normalized_name": "austere command",
+      "oracle_cache_present": true,
+      "oracle_hash": "22ad7462ce82f2e44ac762994d0ddd59",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Blasphemous Act",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "damage_wipe"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:56271789d639ef390213dbc90059e4d2"
+      ],
+      "normalized_name": "blasphemous act",
+      "oracle_cache_present": true,
+      "oracle_hash": "bf448b785c595bd9eb146e2181aad575",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Call Forth the Tempest",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "damage_wipe"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739"
+      ],
+      "normalized_name": "call forth the tempest",
+      "oracle_cache_present": true,
+      "oracle_hash": "5e76c466448cabbfd764e746566b41c1",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Dualcaster Mage",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55"
+      ],
+      "normalized_name": "dualcaster mage",
+      "oracle_cache_present": true,
+      "oracle_hash": "e26f613394b72e9724d299512983218a",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Creature \u2014 Human Wizard"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Enlightened Tutor",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "tutor"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:ed0d4316c416061742e6eea0e4bade8a"
+      ],
+      "normalized_name": "enlightened tutor",
+      "oracle_cache_present": true,
+      "oracle_hash": "82899cda80d16c0c70ee5861f7e693d5",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Flare of Duplication",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:b82bbb548dab138fa0700cb4cf905617"
+      ],
+      "normalized_name": "flare of duplication",
+      "oracle_cache_present": true,
+      "oracle_hash": "3b1f1bcd5e69cb1f5f306e83345b2a1f",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Fury Storm",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:1c5fc8fcfccde45171603a1ff05f4f05"
+      ],
+      "normalized_name": "fury storm",
+      "oracle_cache_present": true,
+      "oracle_hash": "5a7a4b3e044452c015ecd91bc9897680",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Gamble",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "tutor"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:2861739f22e978549e28d2339288df2a"
+      ],
+      "normalized_name": "gamble",
+      "oracle_cache_present": true,
+      "oracle_hash": "9b3fc8ab7f664f6c084e0bda0ccf9a7c",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Increasing Vengeance",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:30ea39d59aa1ffc3158a49675b767c30"
+      ],
+      "normalized_name": "increasing vengeance",
+      "oracle_cache_present": true,
+      "oracle_hash": "112a3720da30692b859f8a9bedc90a2f",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Past in Flames",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "graveyard_flashback_grant"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be"
+      ],
+      "normalized_name": "past in flames",
+      "oracle_cache_present": true,
+      "oracle_hash": "f4486c8e34e8f0addcbcbdede4de52ec",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Reforge the Soul",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "draw_cards"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:90b82cfc81ff726ac0fc96a1b220f263"
+      ],
+      "normalized_name": "reforge the soul",
+      "oracle_cache_present": true,
+      "oracle_hash": "041645992d04029f74855292bb1459f4",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Reiterate",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
+      ],
+      "normalized_name": "reiterate",
+      "oracle_cache_present": true,
+      "oracle_hash": "996fb5f02f16605ff7f1c899f2c50f60",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Restoration Seminar",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "recursion"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:e354df66477b8437134c5fb0bbb3e371"
+      ],
+      "normalized_name": "restoration seminar",
+      "oracle_cache_present": true,
+      "oracle_hash": "23ccef3f0d08d7be5c4285e10c682356",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery \u2014 Lesson"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Return the Favor",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2"
+      ],
+      "normalized_name": "return the favor",
+      "oracle_cache_present": true,
+      "oracle_hash": "a24911b7ea2027ebba59bb6792eee776",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Reverberate",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:0269136edf067f696c8576740b720e14"
+      ],
+      "normalized_name": "reverberate",
+      "oracle_cache_present": true,
+      "oracle_hash": "80ebc1e39c5f8cf337bb60a5c190f92f",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Scroll Rack",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "topdeck_manipulation"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2"
+      ],
+      "normalized_name": "scroll rack",
+      "oracle_cache_present": true,
+      "oracle_hash": "8133928f03d5a5a77f2beecfcbd09e30",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Sensei's Divining Top",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "topdeck_manipulation"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:70c8478871f352b46cee1af296117951"
+      ],
+      "normalized_name": "sensei's divining top",
+      "oracle_cache_present": true,
+      "oracle_hash": "a4f43750af7b5cffd313c1f462d85d38",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Silence",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "silence_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:74b210b77b004a677906e0216d44e445"
+      ],
+      "normalized_name": "silence",
+      "oracle_cache_present": true,
+      "oracle_hash": "a0ca3c09a7db091c435ab31adb9c1780",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Teferi's Protection",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "phase_out"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a"
+      ],
+      "normalized_name": "teferi's protection",
+      "oracle_cache_present": true,
+      "oracle_hash": "bdc0faecf4420dc6162c7e72e98cc0eb",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Wheel of Fortune",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "draw_cards"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:f8bdb05cc883fda55628d6928c5562d3"
+      ],
+      "normalized_name": "wheel of fortune",
+      "oracle_cache_present": true,
+      "oracle_hash": "c37cd579d8132efac0c2118608f6f001",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Young Pyromancer",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "token_maker"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 0,
+      "impact_tier": "battle_critical",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:8d0d283a016e6e8d51c0807ef0ae6cf9"
+      ],
+      "normalized_name": "young pyromancer",
+      "oracle_cache_present": true,
+      "oracle_hash": "aa19f3984202416be7c877fc90ca0a1b",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Creature \u2014 Human Shaman"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Arcane Signet",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea"
+      ],
+      "normalized_name": "arcane signet",
+      "oracle_cache_present": true,
+      "oracle_hash": "df826611f7a0a91ba8781558b346e7af",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Basalt Monolith",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:13a254365e4f64a322c42899dd7e9ec1"
+      ],
+      "normalized_name": "basalt monolith",
+      "oracle_cache_present": true,
+      "oracle_hash": "7bfcb40a391bef0cb4c2f3a59c007bdc",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Brass's Bounty",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "treasure_maker"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:b5dabaaaba6b2cd47cd998989c11a1fa"
+      ],
+      "normalized_name": "brass's bounty",
+      "oracle_cache_present": true,
+      "oracle_hash": "beb029ff5233032656034de922a112f0",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Jeska's Will",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_ritual"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:c8621a807cc65adc820a8b8189979f70"
+      ],
+      "normalized_name": "jeska's will",
+      "oracle_cache_present": true,
+      "oracle_hash": "e323893e6c38ee2d618b4f9c737fadee",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Mana Vault",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff"
+      ],
+      "normalized_name": "mana vault",
+      "oracle_cache_present": true,
+      "oracle_hash": "35e3fd94c8453c0e326033af49ae18c8",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Mizzix's Mastery",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "overload_recursion"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:e44a8b8d0e4f8fc8e8a5ebd93a73194f"
+      ],
+      "normalized_name": "mizzix's mastery",
+      "oracle_cache_present": true,
+      "oracle_hash": "8b822f0c58e4ab4e91f9e4946e8c04e9",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Monologue Tax",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_engine"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:4c6a09e794fd065ea945bb51e8fe045d"
+      ],
+      "normalized_name": "monologue tax",
+      "oracle_cache_present": true,
+      "oracle_hash": "ebe3a1480ad7cad5f9de5567b06db92e",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Enchantment"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Seething Song",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_ritual"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7"
+      ],
+      "normalized_name": "seething song",
+      "oracle_cache_present": true,
+      "oracle_hash": "ccd492289c6f1c14c8fb7a248d7bbf32",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Smothering Tithe",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_engine"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:242df1cde958c67ece11aae4af5f4bc6"
+      ],
+      "normalized_name": "smothering tithe",
+      "oracle_cache_present": true,
+      "oracle_hash": "bb7d29c1a84a53604c017da1b5f0620c",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Enchantment"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Sol Ring",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "ramp_permanent"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 1,
+      "impact_tier": "battle_support",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:42621fcae461313f674d46db0da059af"
+      ],
+      "normalized_name": "sol ring",
+      "oracle_cache_present": true,
+      "oracle_hash": "7d286f5619ac8934fb07abf152ffcb60",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "creature"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:05576012d8fca56910da7ea072abe15e"
+      ],
+      "normalized_name": "birgi, god of storytelling // harnfel, horn of bounty",
+      "oracle_cache_present": true,
+      "oracle_hash": "5f1ed696a63cd668fd46a2fe9971a54e",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Legendary Creature \u2014 God"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Boros Charm",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "modal_boros_charm"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:32605a838d7a519f44eaa0899d2c40bf"
+      ],
+      "normalized_name": "boros charm",
+      "oracle_cache_present": true,
+      "oracle_hash": "92af987d6d9ee3e55164ddbe33080030",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Heat Shimmer",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_creature_token"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:644897bfa688d33b1a718723360e2480"
+      ],
+      "normalized_name": "heat shimmer",
+      "oracle_cache_present": true,
+      "oracle_hash": "9c4cfbeb99bfea90a8a5d4c3c7894793",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Library of Leng",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "passive"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3"
+      ],
+      "normalized_name": "library of leng",
+      "oracle_cache_present": true,
+      "oracle_hash": "575aef3cc2523831e440ea7dcd55fa6e",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Lorehold, the Historian",
+      "commander_count": 1,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "passive"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4"
+      ],
+      "normalized_name": "lorehold, the historian",
+      "oracle_cache_present": true,
+      "oracle_hash": "11d814aa6546578eab746b36fdb98582",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Legendary Creature \u2014 Elder Dragon"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Molten Duplication",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_creature_token"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:e154b34c0deaa861094d5870f4c0ad69"
+      ],
+      "normalized_name": "molten duplication",
+      "oracle_cache_present": true,
+      "oracle_hash": "7c24d56660499c0af4db967925de1573",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Pearl Medallion",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "static_cost_reduction"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:0d857d5b176cc91065a4754f5824ebf2"
+      ],
+      "normalized_name": "pearl medallion",
+      "oracle_cache_present": true,
+      "oracle_hash": "77f7f449ee56143d6b63814fecd37176",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Red Elemental Blast",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "modal_spell"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:7d7328f000cbeb639e2816886a1eb6c4"
+      ],
+      "normalized_name": "red elemental blast",
+      "oracle_cache_present": true,
+      "oracle_hash": "ea84473287e1d30863243dcebf80a012",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Instant"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Ruby Medallion",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "passive"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
+      ],
+      "normalized_name": "ruby medallion",
+      "oracle_cache_present": true,
+      "oracle_hash": "52bc55846d69bacf3afba1ffa734b81e",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Starfall Invocation",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "gift_destroy_all_creatures_return_own_destroyed_creature"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:58cfb4628b4a4a879f6f9c5e0ab3ee5f"
+      ],
+      "normalized_name": "starfall invocation",
+      "oracle_cache_present": true,
+      "oracle_hash": "3429884949eac8ffe09d86dc85bee1ae",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Storm-Kiln Artist",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "creature"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:128e222b4de1e6308d98743711b54985"
+      ],
+      "normalized_name": "storm-kiln artist",
+      "oracle_cache_present": true,
+      "oracle_hash": "cb2cf161073de3983ac24385743ab78a",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Creature \u2014 Dwarf Shaman"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Twinflame",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "copy_creature_token"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:97ab0167213936bfa544f19731284e56"
+      ],
+      "normalized_name": "twinflame",
+      "oracle_cache_present": true,
+      "oracle_hash": "d9c51f63ac78f713113c52feadfba6db",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Underworld Breach",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "passive"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 2,
+      "impact_tier": "support_or_passive",
+      "land_like": false,
+      "logical_rule_keys": [
+        "battle_rule_v1:3f9f5259b05245670ee19b357aa2e999"
+      ],
+      "normalized_name": "underworld breach",
+      "oracle_cache_present": true,
+      "oracle_hash": "a98ca5777789e48c44daff97999f2beb",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Enchantment"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Ancient Tomb",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:778677cb1baf3abdb20067499dbdcffd",
+        "battle_rule_v1:c364544e9bd651211acf851db2313ccd"
+      ],
+      "normalized_name": "ancient tomb",
+      "oracle_cache_present": true,
+      "oracle_hash": "5f61966c5bfc67508502d929ca891af3",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 2,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Arena of Glory",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "arena of glory",
+      "oracle_cache_present": true,
+      "oracle_hash": "d57b844322be4b15cda602d1f6cb551a",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Arid Mesa",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "arid mesa",
+      "oracle_cache_present": true,
+      "oracle_hash": "ebfe02c9ed9ba9317ab2ed6bb2bd0529",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Barbarian Ring",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "barbarian ring",
+      "oracle_cache_present": true,
+      "oracle_hash": "1591ab621bea186a78f5ba9687b7feae",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Bloodstained Mire",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "bloodstained mire",
+      "oracle_cache_present": true,
+      "oracle_hash": "c2b1d722530ed12d78dbc0993c3392fe",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "City of Brass",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "city of brass",
+      "oracle_cache_present": true,
+      "oracle_hash": "969b41c45b968319b44f77454c6ac55b",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Command Tower",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "command tower",
+      "oracle_cache_present": true,
+      "oracle_hash": "df826611f7a0a91ba8781558b346e7af",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 2,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Elegant Parlor",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "elegant parlor",
+      "oracle_cache_present": true,
+      "oracle_hash": "cb1fd61ed123bf846803d9e607bb2723",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Flooded Strand",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "flooded strand",
+      "oracle_cache_present": true,
+      "oracle_hash": "bdaaea9fa512cffa0852a6f4f28d5fc7",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Gemstone Caverns",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:14d76f420635e9a9c729484d5534e1ef",
+        "battle_rule_v1:9384b4cf2ffc3b4afc5cb65fb4febaea"
+      ],
+      "normalized_name": "gemstone caverns",
+      "oracle_cache_present": true,
+      "oracle_hash": "2c25335e12791e77b9c19c9b3af0a413",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 2,
+      "type_line": "Legendary Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Mana Confluence",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "mana confluence",
+      "oracle_cache_present": true,
+      "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Marsh Flats",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "marsh flats",
+      "oracle_cache_present": true,
+      "oracle_hash": "1e88f8d7987276fdac2c3311b238eaab",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Plains // Plains",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+        "battle_rule_v1:f7fde69c51ea340cdfeda1544dea220b"
+      ],
+      "normalized_name": "plains // plains",
+      "oracle_cache_present": true,
+      "oracle_hash": "0159e87a7fe9f2edbdb9408db4e6cba8",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 2,
+      "type_line": "Basic Land \u2014 Plains"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Plateau",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "plateau",
+      "oracle_cache_present": true,
+      "oracle_hash": "8e07455dc6ab7a5fd45f19262253b9cd",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Sacred Foundry",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "sacred foundry",
+      "oracle_cache_present": true,
+      "oracle_hash": "33b9a82ff9bf4322c280434b47fb3436",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Scalding Tarn",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "scalding tarn",
+      "oracle_cache_present": true,
+      "oracle_hash": "2f8da37c0e286b9d2ab7b9caed62a8c2",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Shivan Gorge",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "shivan gorge",
+      "oracle_cache_present": true,
+      "oracle_hash": "69d3cf5552d5e2ca434547b062d0d15b",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Legendary Land"
+    },
+    {
+      "active_rule_count": 2,
+      "card_name": "Urza's Saga",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:b62b6dfa5cdc9db4b8b21faf7bfc0498",
+        "battle_rule_v1:e9cb68d2e2a585c86ff5699757221488"
+      ],
+      "normalized_name": "urza's saga",
+      "oracle_cache_present": true,
+      "oracle_hash": "43e3b1636425f22bbd834442ddb93bc0",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 2,
+      "type_line": "Enchantment Land \u2014 Urza's Saga"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Windswept Heath",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "windswept heath",
+      "oracle_cache_present": true,
+      "oracle_hash": "f2d4d8a8f608a11052e219ad1aa3c4e4",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    },
+    {
+      "active_rule_count": 1,
+      "card_name": "Wooded Foothills",
+      "commander_count": 0,
+      "deck_count": 1,
+      "deck_ids": [
+        612
+      ],
+      "deck_ids_truncated": false,
+      "effects": [
+        "land"
+      ],
+      "findings": [
+        {
+          "code": "coherent_for_current_gate",
+          "detail": "Oracle/cache and trusted executable battle rule are present.",
+          "severity": "pass"
+        }
+      ],
+      "impact_rank": 4,
+      "impact_tier": "land_or_mana_base",
+      "land_like": true,
+      "logical_rule_keys": [
+        "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+      ],
+      "normalized_name": "wooded foothills",
+      "oracle_cache_present": true,
+      "oracle_hash": "788c9b5400ed42d116b7b1dd4aeaa403",
+      "oracle_text_present": true,
+      "priority_score": 51,
+      "review_only_rule_count": 0,
+      "severity": "pass",
+      "total_quantity": 1,
+      "trusted_executable_rule_count": 1,
+      "type_line": "Land"
+    }
+  ],
+  "deck_id": 612,
+  "finding_counts": {
+    "generic_effect_without_model_scope": 5,
+    "no_active_battle_rule": 8,
+    "no_trusted_executable_rule": 13,
+    "review_only_or_needs_review_rule": 26,
+    "trusted_rule_without_oracle_hash": 6
+  },
+  "generated_at": "2026-06-25T00:17:05+00:00",
+  "scope": "distinct_cards_referenced_by_deck_cards_filtered_by_deck_id",
+  "severity_counts": {
+    "high": 27,
+    "medium": 7,
+    "pass": 66
+  },
+  "source": "sqlite_hermes_knowledge_db",
+  "total_cards": 100
+}

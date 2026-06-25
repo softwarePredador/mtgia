@@ -12038,6 +12038,70 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Young Pyromancer",
+                    "cmc": 2,
+                    "type_line": "Creature - Human Shaman",
+                    "effect": "token_maker",
+                    "battle_model_scope": "instant_sorcery_cast_create_1_1_red_elemental_v1",
+                    "power": 2,
+                    "toughness": 1,
+                    "trigger": "instant_sorcery_cast",
+                    "trigger_effect": "token_maker",
+                    "trigger_token_count": 1,
+                    "token_count": 1,
+                    "token_name": "Elemental Token",
+                    "token_subtype": "Elemental",
+                    "token_colors": ["R"],
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "_rule_logical_key": "battle_rule_v1:young-pyromancer-test",
+                    "_rule_oracle_hash": "young-pyromancer-test-hash",
+                }
+            ]
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                {"name": "Lightning Helix", "type_line": "Instant", "cmc": 2},
+                turn=5,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        elemental_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Elemental Token"
+        ]
+        assert len(elemental_tokens) == 1
+        assert elemental_tokens[0]["power"] == 1
+        assert elemental_tokens[0]["toughness"] == 1
+        assert elemental_tokens[0]["type_line"] == "Creature Token — Elemental"
+        assert elemental_tokens[0]["colors"] == ["R"]
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Young Pyromancer"
+            and data.get("trigger") == "instant_sorcery_cast"
+            and data.get("trigger_spell") == "Lightning Helix"
+            and data.get("effect") == "token_maker"
+            and data.get("tokens_created") == 1
+            and data.get("token_name") == "Elemental Token"
+            and data.get("token_power") == 1
+            and data.get("token_toughness") == 1
+            and data.get("token_subtype") == "Elemental"
+            and data.get("token_colors") == ["R"]
+            and data.get("rule_logical_key") == "battle_rule_v1:young-pyromancer-test"
+            for event, data in events
+        )
+
     def test_cool_but_rude_level_three_tutors_then_randomly_discards():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -13945,6 +14009,7 @@ def register_tests(battle, player):
         test_profound_journey_rebounds_and_returns_permanents_to_battlefield,
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
+        test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,

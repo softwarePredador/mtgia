@@ -3427,6 +3427,43 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["attacking_activated_discard_count"], 1)
         self.assertEqual(primary["attacking_activated_draw_count"], 1)
 
+    def test_young_pyromancer_maps_to_exact_spell_cast_elemental_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "YoungPyromancer",
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["SpellCastControllerTriggeredAbility"],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new SpellCastControllerTriggeredAbility("
+                    "new CreateTokenEffect(new RedElementalToken()), "
+                    "StaticFilters.FILTER_SPELL_AN_INSTANT_OR_SORCERY, false)"
+                ),
+            },
+            (
+                "Whenever you cast an instant or sorcery spell, create a 1/1 red "
+                "Elemental creature token."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "instant_sorcery_cast_create_1_1_red_elemental_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertEqual(primary["trigger"], "instant_sorcery_cast")
+        self.assertEqual(primary["trigger_effect"], "token_maker")
+        self.assertEqual(primary["trigger_token_count"], 1)
+        self.assertEqual(primary["token_name"], "Elemental Token")
+        self.assertEqual(primary["token_subtype"], "Elemental")
+        self.assertEqual(primary["token_colors"], ["R"])
+        self.assertEqual(primary["token_power"], 1)
+        self.assertEqual(primary["token_toughness"], 1)
+
     def test_cool_but_rude_maps_to_exact_class_attack_rummage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

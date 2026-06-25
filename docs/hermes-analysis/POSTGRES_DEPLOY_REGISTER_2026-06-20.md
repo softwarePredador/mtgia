@@ -11236,3 +11236,105 @@ Register decision:
   `Deflecting Palm`, `Primal Amulet // Primal Wellspring`, and
   `Squee, Goblin Nabob`.
 - Next package number is PG195.
+
+## PG195 - Young Pyromancer instant/sorcery Elemental token trigger
+
+Timestamp: 2026-06-24 21:26 -0300.
+
+Authorization and scope:
+
+- Continuation of the approved XMage -> ManaLoom mass adaptation goal with
+  scoped PostgreSQL apply for validated card-rule packages.
+- Promotes `Young Pyromancer` from the Lorehold deck `612`/`616` backlog.
+- No `deck_cards`, learned-deck, deck composition, or swap changes.
+
+Target rule:
+
+- `Young Pyromancer`:
+  `battle_rule_v1:8d0d283a016e6e8d51c0807ef0ae6cf9`,
+  `oracle_hash=aa19f3984202416be7c877fc90ca0a1b`,
+  `effect=token_maker`,
+  `battle_model_scope=instant_sorcery_cast_create_1_1_red_elemental_v1`.
+
+Runtime/mapper changes:
+
+- XMage hint maps `YoungPyromancer` from
+  `SpellCastControllerTriggeredAbility`, `CreateTokenEffect`,
+  `RedElementalToken`, and
+  `StaticFilters.FILTER_SPELL_AN_INSTANT_OR_SORCERY`.
+- No new runtime executor was required: the existing
+  `instant_sorcery_cast` permanent trigger path already creates tokens from
+  `token_name`, `token_subtype`, `token_colors`, `token_power`, and
+  `token_toughness`.
+- A focused PG195 runtime test now proves that casting an instant/sorcery with
+  `Young Pyromancer` on the battlefield creates one 1/1 red Elemental token
+  and emits a canonical `trigger_resolved` event.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg195_young_pyromancer_package_20260625_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg195_young_pyromancer_package_20260625_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg195_young_pyromancer_package_20260625_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg195_young_pyromancer_package_20260625_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg195_young_pyromancer_package_20260625_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg195_young_pyromancer_20260625.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3240`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg195_young_pyromancer_postsync_v1_manifest.json`;
+  expanded scope moved to `high=402`, `medium=63`, `pass=497`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg195_young_pyromancer_postsync_v1.json`;
+  scoped rows `580`, `battle_ready=358`,
+  `needs_rule_before_strategy=222`, `runtime_needed=18`,
+  `mapper_manual=145`, `split_scope=55`.
+- Affected deck audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck612_pg195_young_pyromancer_20260625.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck616_pg195_young_pyromancer_20260625.json`;
+  decks `612` and `616` report `Young Pyromancer` as
+  `pass/coherent_for_current_gate`.
+- Tests:
+  mapper tests ran `175` tests OK; classifier tests ran `161` tests OK;
+  `battle_card_specific_tests.py`, `test_battle_analyst_v10_3.py`,
+  `battle_decision_trace_tests.py`, event-contract static tests,
+  decision-trace taxonomy tests, forensic supported-effects tests, and sync PG
+  selection tests passed.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_001857/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `forensic_rule_findings=0`, `forensic_turn_findings=0`,
+  `decision_audit_decision_findings=0`,
+  `decision_trace_contract_findings=0`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `test_results_status_counts={"pass":18}`.
+
+Register decision:
+
+- PG195 is applied, postchecked, synced, locally tested, deck-coherence
+  validated for decks `612` and `616`, and strategy-audited.
+- Do not reuse PG195.
+- Continue next with the remaining Lorehold `needs_rule_before_strategy`
+  cards. Current top items after PG195 are `Taii Wakeen, Perfect Shot`,
+  `Deflecting Palm`, `Primal Amulet // Primal Wellspring`,
+  `Squee, Goblin Nabob`, and `Goldspan Dragon`.
+- Next package number is PG196.

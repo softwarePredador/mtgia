@@ -584,6 +584,24 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("attacking_activated_draw_count") or 0) == 1
         )
 
+    if effect == "token_maker" and scope == "instant_sorcery_cast_create_1_1_red_elemental_v1":
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenEffect" in effect_classes
+            and "SpellCastControllerTriggeredAbility" in ability_classes
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 1
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and effect_json.get("trigger_effect") == "token_maker"
+            and int(effect_json.get("trigger_token_count") or 0) == 1
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_name") == "Elemental Token"
+            and effect_json.get("token_subtype") == "Elemental"
+            and effect_json.get("token_colors") == ["R"]
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+        )
+
     if effect == "counter_spell" and scope == "pact_of_negation_delayed_upkeep_counter_v1":
         return (
             types == {"INSTANT"}

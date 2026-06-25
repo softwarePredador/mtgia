@@ -490,6 +490,30 @@ activated discard-draw creature scope:
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
 
+`Young Pyromancer` is the tenth completed proof and the first exact
+instant/sorcery Elemental token trigger promoted from the current Lorehold
+matrix:
+
+1. XMage local source matched `YoungPyromancer` directly through
+   `SpellCastControllerTriggeredAbility`, `CreateTokenEffect`,
+   `RedElementalToken`, and
+   `StaticFilters.FILTER_SPELL_AN_INSTANT_OR_SORCERY`.
+2. The mapper/classifier promoted only the exact
+   `instant_sorcery_cast_create_1_1_red_elemental_v1` scope.
+3. Battle runtime already supported this family through the
+   `instant_sorcery_cast` permanent trigger path; PG195 adds focused proof
+   that the executor creates one 1/1 red Elemental token and emits
+   `trigger_resolved`.
+4. PG195 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made decks `612` and `616` report `Young Pyromancer` as
+   `pass`; the matrix moved it to `battle_ready` / `watchlist_candidate`.
+6. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_001857/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+   `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

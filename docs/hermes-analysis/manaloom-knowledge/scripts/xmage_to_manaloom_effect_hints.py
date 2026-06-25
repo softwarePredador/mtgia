@@ -1591,6 +1591,42 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        card_types == {"CREATURE"}
+        and xmage_class_name == "YoungPyromancer"
+        and "CreateTokenEffect" in effect_classes
+        and "SpellCastControllerTriggeredAbility" in ability_classes
+        and (
+            "RedElementalToken" in rules_text
+            or "redelementaltoken" in normalized
+            or _oracle_has(rules_text, "instant or sorcery", "1/1 red elemental")
+        )
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "instant_sorcery_cast_create_1_1_red_elemental_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 1,
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "token_maker",
+                "trigger_token_count": 1,
+                "token_count": 1,
+                "token_name": "Elemental Token",
+                "token_subtype": "Elemental",
+                "token_colors": ["R"],
+                "token_power": 1,
+                "token_toughness": 1,
+            },
+            "reason": "XMage structure matches Young Pyromancer: a 2/1 creature whose controller's instant-or-sorcery casts create one 1/1 red Elemental creature token.",
+            "signals": [
+                "SpellCastControllerTriggeredAbility",
+                "CreateTokenEffect",
+                "RedElementalToken",
+                "FILTER_SPELL_AN_INSTANT_OR_SORCERY",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and xmage_class_name == "InvokeCalamity"
         and {
