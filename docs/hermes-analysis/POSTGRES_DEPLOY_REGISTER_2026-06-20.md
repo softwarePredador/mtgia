@@ -3,12 +3,13 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG216, applied, postchecked, synced from PostgreSQL to Hermes
+this thread is PG217, applied, postchecked, synced from PostgreSQL to Hermes
 SQLite/canonical snapshot, tested, strategy-audited, and documented on
-2026-06-25. PG216 promoted `Black Market Connections`, `Smuggler's Share`,
-and `Davros, Dalek Creator` to Oracle/XMage-backed phase-watcher runtime
-rules. This was not a deck swap, learned-deck promotion, or
-battle rebaseline.
+2026-06-25. PG217 promoted
+`Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
+`The Locust God`, and `Biotransference` to Oracle/XMage-backed Saga,
+draw-trigger token, and static artifact-spell token runtime rules. This was
+not a deck swap, learned-deck promotion, or battle rebaseline.
 
 ## Purpose
 
@@ -13601,7 +13602,145 @@ Register decision:
 - PG216 is applied, postchecked, synced, locally tested, and
   strategy-audited.
 - Do not reuse PG216.
-- Continue Lorehold-first closure on the remaining runtime rows:
+- Continue with PG217 for the remaining Lorehold runtime rows:
   `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
   `The Locust God`, and `Biotransference`.
 - Next package number is PG217.
+
+## PG217 - Saga / draw token / artifact static XMage batch
+
+Status: applied, postchecked, synced, tested, strategy-audited.
+
+Scope:
+
+- Cards: `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
+  `The Locust God`, and `Biotransference`.
+- Families: `token_maker`, `creature`.
+- XMage sources:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FableOfTheMirrorBreaker.java`,
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheLocustGod.java`,
+  and
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/Biotransference.java`.
+- ManaLoom runtime scopes:
+  `saga_goblin_rummage_transform_reflection_copy_v1`,
+  `controller_draw_create_1_1_flying_haste_insect_token_loot_death_return_v1`,
+  and
+  `controlled_creatures_are_artifacts_artifact_spell_life_loss_necron_token_v1`.
+- Logical rule keys:
+  `battle_rule_v1:35f799486c8be66724ba9e6b155490f7` for
+  `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`;
+  `battle_rule_v1:67d30157e4cec4c53fd99294af46a927` for
+  `The Locust God`;
+  `battle_rule_v1:4b017d52015c70dfb33338170767bad8` for
+  `Biotransference`.
+- Oracle hashes:
+  `02f9bffe27fcef275a01555f7b6fc16b` for
+  `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`;
+  `1b1e612bd7ad1564ae4d3ad8619013e2` for `The Locust God`;
+  `db6e884f32d6be76e85eebb3e3dd986c` for `Biotransference`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_rollback.sql`.
+
+Evidence:
+
+- External hash harvest:
+  `docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_external_harvest.json`
+  supplied exact Oracle hashes for all three package rows.
+- Precheck:
+  each card matched exactly one canonical card row. `Fable of the
+  Mirror-Breaker // Reflection of Kiki-Jiki` and `The Locust God` each had
+  `existing_rule_rows=2` and `would_deprecate_shadow_rows=2`;
+  `Biotransference` had `existing_rule_rows=0`; all three had
+  `expected_rule_rows_before=0`.
+- Apply:
+  backup captured `4` pre-existing shadow rows, `deprecated_shadow_rows=4`,
+  `upserted_rows=3`, and `COMMIT`.
+- Postcheck:
+  each card has `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`;
+  package backup rows total `4`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg217_saga_draw_artifact_20260625.json`;
+  `selected_card_count=3`, `pg_rows_loaded=7`,
+  `sqlite_inserted_or_updated=7`, and
+  `canonical_snapshot_rows_exported=3248`.
+- Runtime cache spot-check:
+  local SQLite resolves all three promoted rows as `review_status=verified`
+  and `execution_status=auto`; older Fable and Locust shadow rows are
+  `deprecated/disabled`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg217_saga_draw_artifact_postsync_v1_manifest.json`;
+  expanded scope moved to `high=370`, `medium=63`, `pass=529`, with
+  `runtime_family_implementation_required=4`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg217_saga_draw_artifact_postsync_v1.json`;
+  expanded decks `6,606-619` matrix has `580` rows, `battle_ready=390`,
+  `mapper_manual=131`, `split_scope=55`, and
+  `blocked_missing_xmage_source=4`. The matrix has no `runtime_needed` rows.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg217_saga_draw_artifact_postsync_v1.json`;
+  remaining global lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=4`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg217_saga_draw_artifact_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  mapper tests passed `206/206`, classifier tests passed `191/191`, and the
+  battle harness passed including
+  `test_pg217_fable_saga_creates_rummages_transforms_and_reflection_copies`,
+  `test_pg217_locust_god_draw_trigger_creates_flying_haste_insects`, and
+  `test_pg217_biotransference_creature_spell_counts_as_artifact_and_creates_necron`.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_111525/summary.json`;
+  `start_seed=63261404`, `turn_invariants_clean=16`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `action_verdict_counts={"ok":7420}`,
+  `target_pressure_statuses={"pass":16}`,
+  `table_intent_statuses={"pass":16}`,
+  `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+  `effect_coverage_residual_unaccepted_card_flag_rows=0`,
+  `decision_trace_contract_findings=0`,
+  `decision_trace_missing_required_fields=0`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+  The PG217 cards did not appear in this 16-seed sample; card-specific runtime
+  evidence is from the battle harness tests above.
+
+Runtime changes:
+
+- The battle runtime now supports modeled Saga chapter state, immediate
+  chapter-one resolution for Saga casts, post-draw chapter advancement,
+  chapter-two discard/draw, and final chapter transform metadata.
+- Controller draw triggers can create tokens, used by `The Locust God` for
+  flying haste Insect tokens.
+- Artifact-spell triggers now respect static artifact typing from
+  `Biotransference`, apply controller life loss, and create Necron Warrior
+  tokens.
+- Reflection-style activated copy abilities can pay generic activation cost,
+  tap the source, exclude legendary targets, create a hasty token copy, and
+  defer token sacrifice to the modeled end-step cleanup surface.
+
+Register decision:
+
+- PG217 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG217.
+- Lorehold `runtime_needed` is closed in the current matrix; next work is not
+  more Lorehold runtime unless the matrix reopens it.
+- Continue with `priority_benchmark_candidate` rows using baseline hash guard,
+  slot optimizer, quality gate, handoff, and explicit apply approval.
+- The global non-Lorehold queue still has `runtime_family_backlog=4`.
+- Next package number is PG218.

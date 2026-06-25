@@ -1,0 +1,40 @@
+{
+    "cards": [
+        {
+            "card_name": "Biotransference",
+            "external_references": {
+                "scryfall": {
+                    "mana_cost": "{2}{B}{B}",
+                    "type_line": "Enchantment",
+                    "oracle_text": "Creatures you control are artifacts in addition to their other types. The same is true for creature spells you control and creature cards you own that aren't on the battlefield.\nWhenever you cast an artifact spell, you lose 1 life and create a 2/2 black Necron Warrior artifact creature token.",
+                    "oracle_hash_md5_raw": "db6e884f32d6be76e85eebb3e3dd986c"
+                }
+            }
+        },
+        {
+            "card_name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+            "external_references": {
+                "scryfall": {
+                    "mana_cost": "{2}{R}",
+                    "type_line": "Enchantment \u2014 Saga",
+                    "oracle_text": "(As this Saga enters and after your draw step, add a lore counter.)\nI \u2014 Create a 2/2 red Goblin Shaman creature token with \"Whenever this token attacks, create a Treasure token.\"\nII \u2014 You may discard up to two cards. If you do, draw that many cards.\nIII \u2014 Exile this Saga, then return it to the battlefield transformed under your control.",
+                    "oracle_hash_md5_raw": "02f9bffe27fcef275a01555f7b6fc16b"
+                }
+            }
+        },
+        {
+            "card_name": "The Locust God",
+            "external_references": {
+                "scryfall": {
+                    "mana_cost": "{4}{U}{R}",
+                    "type_line": "Legendary Creature \u2014 God",
+                    "oracle_text": "Flying\nWhenever you draw a card, create a 1/1 blue and red Insect creature token with flying and haste.\n{2}{U}{R}: Draw a card, then discard a card.\nWhen The Locust God dies, return it to its owner's hand at the beginning of the next end step.",
+                    "oracle_hash_md5_raw": "1b1e612bd7ad1564ae4d3ad8619013e2"
+                }
+            }
+        }
+    ],
+    "source": "postgres.cards oracle hash harvest for PG217",
+    "status": "ready",
+    "generated_at": "2026-06-25T12:05:00+00:00"
+}

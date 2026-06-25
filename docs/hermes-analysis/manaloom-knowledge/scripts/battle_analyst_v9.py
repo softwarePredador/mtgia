@@ -12212,6 +12212,22 @@ def is_urzas_saga(permanent):
     )
 
 
+def has_modeled_saga_chapters(permanent):
+    return isinstance(permanent, dict) and bool(permanent.get("saga_chapter_effects"))
+
+
+def initialize_saga_runtime_state(permanent, turn=None):
+    if not has_modeled_saga_chapters(permanent):
+        return permanent
+    permanent.setdefault("lore_counters", 1)
+    permanent.setdefault("current_chapter", 1)
+    permanent.setdefault("final_chapter", int(permanent.get("saga_final_chapter") or 3))
+    if turn is not None:
+        permanent.setdefault("saga_last_lore_turn", turn)
+    permanent.setdefault("chapter_ability_pending", False)
+    return permanent
+
+
 def initialize_special_land_runtime_state(permanent, turn=None):
     if not isinstance(permanent, dict):
         return permanent
@@ -12222,6 +12238,7 @@ def initialize_special_land_runtime_state(permanent, turn=None):
         if turn is not None:
             permanent.setdefault("saga_last_lore_turn", turn)
         permanent.setdefault("chapter_ability_pending", False)
+    initialize_saga_runtime_state(permanent, turn=turn)
     return permanent
 
 
@@ -14000,6 +14017,182 @@ def process_upkeep_utility_lands(player, turn, all_players=None):
                     turn=turn,
                 )
                 triggers += 1
+    return triggers
+
+
+def _saga_chapter_entry(permanent, chapter):
+    chapters = permanent.get("saga_chapter_effects") or {}
+    if not isinstance(chapters, dict):
+        return {}
+    return chapters.get(str(chapter)) or chapters.get(chapter) or {}
+
+
+def resolve_modeled_saga_chapter(player, opponents, permanent, chapter, turn, rng, *, stack=None, all_players=None, phase="after_draw_step"):
+    chapter_effect = _saga_chapter_entry(permanent, chapter)
+    if not isinstance(chapter_effect, dict):
+        chapter_effect = {}
+    effect_kind = chapter_effect.get("effect")
+    if effect_kind == "token_maker":
+        token_fields = dict(permanent)
+        token_fields.update(chapter_effect)
+        created = create_creature_tokens_from_effect(
+            player,
+            token_fields,
+            count=int(chapter_effect.get("token_count") or token_fields.get("token_count") or 1),
+            opponents=opponents,
+            turn=turn,
+            source_event="saga_chapter_token_created",
+            stack=stack,
+            active_player=player,
+            all_players=all_players or [player, *(opponents or [])],
+        )
+        emit_replay_event(
+            "saga_chapter_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            chapter=chapter,
+            effect="token_maker",
+            tokens_created=created,
+            token_name=chapter_effect.get("token_name") or permanent.get("token_name") or "Token",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+        return created
+    if effect_kind == "discard_draw":
+        max_count = max(0, int(chapter_effect.get("max_discard") or 0))
+        candidates = [
+            card
+            for card in list(getattr(player, "hand", []) or [])
+            if isinstance(card, dict) and not card.get("is_commander")
+        ]
+        candidates.sort(
+            key=lambda card: (
+                0 if is_effective_land(card) else 1,
+                int(float(card.get("cmc") or 0)),
+                card.get("name", ""),
+            )
+        )
+        discarded = candidates[:max_count]
+        for discarded_card in discarded:
+            if discarded_card in player.hand:
+                player.hand.remove(discarded_card)
+                player.graveyard.append(discarded_card)
+        if discarded:
+            process_player_discard_triggers(
+                player,
+                discarded,
+                opponents=opponents,
+                turn=turn,
+                phase=phase,
+                rng=rng,
+            )
+        drawn = player.draw(len(discarded), rng)
+        process_player_draw_triggers(
+            player,
+            len(drawn),
+            turn,
+            phase,
+            all_players or [player, *(opponents or [])],
+            stack=stack,
+            turn_player=player,
+        )
+        emit_replay_event(
+            "saga_chapter_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            chapter=chapter,
+            effect="discard_draw",
+            discarded=[card.get("name", "?") for card in discarded],
+            cards_discarded=len(discarded),
+            cards_drawn=len(drawn),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+        return len(drawn)
+    if effect_kind == "transform":
+        transform_to = dict(permanent.get("transform_to") or chapter_effect.get("transform_to") or {})
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+            player.exile.append(permanent)
+        transformed = enrich_card(transform_to)
+        transformed.setdefault("effect", transform_to.get("effect") or "creature")
+        transformed = prepare_entering_permanent(
+            transformed,
+            controller=player,
+            all_players=all_players or [player, *(opponents or [])],
+            turn=turn,
+        )
+        player.battlefield.append(transformed)
+        emit_replay_event(
+            "saga_chapter_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            chapter=chapter,
+            effect="transform",
+            transformed_to=transformed.get("name", "?"),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+        return transformed
+    emit_replay_event(
+        "saga_chapter_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        chapter=chapter,
+        effect=effect_kind or "none",
+        result="no_modeled_effect",
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(permanent),
+    )
+    return None
+
+
+def process_after_draw_step_sagas(player, opponents, all_players, turn, rng, *, stack=None):
+    triggers = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not has_modeled_saga_chapters(permanent):
+            continue
+        initialize_saga_runtime_state(permanent)
+        current_chapter = max(
+            int(permanent.get("current_chapter") or 1),
+            int(permanent.get("lore_counters") or 1),
+        )
+        if permanent.get("saga_last_lore_turn") == turn:
+            continue
+        final_chapter = int(permanent.get("final_chapter") or permanent.get("saga_final_chapter") or 3)
+        if current_chapter >= final_chapter:
+            continue
+        next_chapter = current_chapter + 1
+        permanent["current_chapter"] = next_chapter
+        permanent["lore_counters"] = next_chapter
+        permanent["saga_last_lore_turn"] = turn
+        permanent["chapter_ability_pending"] = True
+        emit_replay_event(
+            "saga_chapter_progressed",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            chapter=next_chapter,
+            turn=turn,
+            phase="after_draw_step",
+            **replay_rule_fields(permanent),
+        )
+        resolve_modeled_saga_chapter(
+            player,
+            opponents,
+            permanent,
+            next_chapter,
+            turn,
+            rng,
+            stack=stack,
+            all_players=all_players,
+            phase="after_draw_step",
+        )
+        permanent["chapter_ability_pending"] = False
+        triggers += 1
     return triggers
 
 
@@ -22619,6 +22812,13 @@ def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None,
             for controller, permanent in candidates
             if permanent is not card
         ]
+    if effect_data.get("exclude_legendary_copy_targets"):
+        candidates = [
+            (controller, permanent)
+            for controller, permanent in candidates
+            if "legendary" not in str(permanent.get("type_line") or "").lower()
+            and not bool(permanent.get("legendary"))
+        ]
     if not candidates:
         emit_replay_event(
             "copy_creature_token_failed",
@@ -23977,12 +24177,18 @@ def trigger_spell_cast_engines(
             )
             continue
         if permanent.get("trigger_effect") == "token_maker":
+            if permanent.get("trigger_artifact_spell") and not is_artifact_spell_for_controller(player, spell):
+                continue
             token_count = max(1, int(permanent.get("trigger_token_count") or permanent.get("token_count") or 1))
 
             def resolve_generic_spell_cast_token_maker_trigger(
                 permanent=permanent,
                 token_count=token_count,
             ):
+                life_loss = int(permanent.get("controller_loses_life_on_trigger") or 0)
+                life_before = player.life
+                if life_loss > 0:
+                    change_life(player, -life_loss)
                 created = create_creature_tokens_from_effect(
                     player,
                     permanent,
@@ -24001,6 +24207,10 @@ def trigger_spell_cast_engines(
                     trigger=trigger_kind,
                     trigger_spell=spell.get("name", "?"),
                     effect="token_maker",
+                    trigger_artifact_spell=bool(permanent.get("trigger_artifact_spell")),
+                    controller_life_lost=max(0, life_before - player.life),
+                    life_before=life_before,
+                    life_after=player.life,
                     tokens_created=created,
                     token_name=permanent.get("token_name") or permanent.get("spell_cast_token_name") or "Token",
                     token_power=permanent.get("token_power"),
@@ -24964,6 +25174,15 @@ def process_player_draw_triggers(
 ):
     if drawn_count <= 0 or not all_players:
         return
+    trigger_controller_draw_token_engines(
+        drawing_player,
+        drawn_count,
+        turn,
+        phase,
+        all_players,
+        stack=stack,
+        turn_player=turn_player,
+    )
     opponents = [
         candidate
         for candidate in all_players
@@ -25001,12 +25220,100 @@ def process_player_draw_triggers(
     )
 
 
+def trigger_controller_draw_token_engines(
+    drawing_player,
+    drawn_count,
+    turn,
+    phase,
+    all_players,
+    *,
+    stack=None,
+    turn_player=None,
+):
+    """Resolve controller draw triggers that create tokens, e.g. The Locust God."""
+    if drawn_count <= 0:
+        return
+    opponents = _live_opponents_for(drawing_player, all_players)
+    for permanent in list(getattr(drawing_player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("controller_draw_create_token"):
+            continue
+        token_count = drawn_count * max(1, int(permanent.get("token_count_per_card_drawn") or 1))
+
+        def resolve_controller_draw_token_trigger(
+            permanent=permanent,
+            token_count=token_count,
+        ):
+            created = create_creature_tokens_from_effect(
+                drawing_player,
+                permanent,
+                count=token_count,
+                opponents=opponents,
+                turn=turn,
+                source_event="controller_draw_token_maker",
+                stack=stack,
+                active_player=turn_player or drawing_player,
+                all_players=all_players,
+            )
+            emit_replay_event(
+                "trigger_resolved",
+                player=drawing_player.name,
+                card=permanent.get("name", "?"),
+                trigger="controller_draw",
+                effect="token_maker",
+                cards_drawn=drawn_count,
+                tokens_created=created,
+                token_name=permanent.get("token_name") or "Token",
+                token_power=permanent.get("token_power"),
+                token_toughness=permanent.get("token_toughness") or permanent.get("token_power"),
+                token_subtype=permanent.get("token_subtype"),
+                token_colors=permanent.get("token_colors") or [],
+                token_flying=bool(permanent.get("token_flying")),
+                token_haste=bool(permanent.get("token_haste")),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+
+        resolve_or_enqueue_trigger(
+            drawing_player,
+            permanent,
+            "controller_draw",
+            resolve_controller_draw_token_trigger,
+            stack=stack,
+            active_player=turn_player or drawing_player,
+            all_players=all_players,
+        )
+
+
 def _live_opponents_for(controller, all_players):
     return [
         candidate
         for candidate in (all_players or [])
         if candidate is not controller and getattr(candidate, "is_alive", lambda: True)()
     ]
+
+
+def _has_biotransference_artifact_static(player):
+    return any(
+        isinstance(permanent, dict)
+        and permanent.get("controlled_creatures_and_creature_spells_are_artifacts")
+        for permanent in getattr(player, "battlefield", []) or []
+    )
+
+
+def is_artifact_spell_for_controller(player, spell):
+    if not isinstance(spell, dict):
+        return False
+    type_line = str(spell.get("type_line") or "").lower()
+    if "artifact" in type_line or spell.get("artifact_token"):
+        return True
+    if _has_biotransference_artifact_static(player) and (
+        is_creature_card(spell) or "creature" in type_line
+    ):
+        return True
+    return False
 
 
 def process_precombat_main_phase_engines(player, opponents, all_players, turn, rng, *, stack=None):
@@ -25090,6 +25397,42 @@ def process_precombat_main_phase_engines(player, opponents, all_players, turn, r
             treasures_after=player.treasures,
             cards_drawn=cards_drawn,
             tokens_created=tokens_created,
+            turn=turn,
+            phase="precombat_main",
+            **replay_rule_fields(permanent),
+        )
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("activated_copy_target_another_nonlegendary_creature_you_control"):
+            continue
+        if permanent.get("activated_copy_last_turn") == turn:
+            continue
+        if permanent.get("tapped"):
+            continue
+        activation_cost = int(permanent.get("activation_cost_generic") or 1)
+        if activation_cost > 0 and not player.can_pay(str(activation_cost)):
+            continue
+        if activation_cost > 0:
+            player.spend_mana(str(activation_cost))
+        permanent["tapped"] = True
+        permanent["activated_copy_last_turn"] = turn
+        created = resolve_copy_creature_token(
+            player,
+            permanent,
+            permanent,
+            turn,
+            opponents=opponents,
+            finish_spell=False,
+        )
+        emit_replay_event(
+            "activated_ability_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            ability="copy_target_another_nonlegendary_creature_you_control",
+            activation_cost_generic=activation_cost,
+            tapped=True,
+            tokens_created=len(created or []),
             turn=turn,
             phase="precombat_main",
             **replay_rule_fields(permanent),
@@ -28310,7 +28653,23 @@ def apply_effect_immediate(
     elif effect == "redistribute_life_totals":
         apply_redistribute_life_totals(player, opponents, card, effect_data, turn)
     elif effect == "token_maker":
-        if (
+        if effect_data.get("saga_chapter_effects"):
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+            permanent["effect"] = "token_maker"
+            initialize_saga_runtime_state(permanent, turn=turn)
+            player.battlefield.append(permanent)
+            resolve_modeled_saga_chapter(
+                player,
+                opponents,
+                permanent,
+                int(permanent.get("current_chapter") or 1),
+                turn,
+                rng,
+                stack=stack,
+                all_players=[player, *(opponents or [])],
+                phase=phase or "resolution",
+            )
+        elif (
             effect_data.get("trigger") == "instant_sorcery_cast"
             and not is_instant(card)
             and not is_sorcery(card)
@@ -30913,6 +31272,14 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         all_players,
         stack=stack,
         turn_player=player,
+    )
+    process_after_draw_step_sagas(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        stack=stack,
     )
     if check_sbas(all_players):
         return

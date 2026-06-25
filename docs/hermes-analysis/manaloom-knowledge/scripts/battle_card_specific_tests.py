@@ -15910,6 +15910,262 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg217_fable_saga_creates_rummages_transforms_and_reflection_copies():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.library = [_card("Chapter Draw A"), _card("Chapter Draw B")]
+            effect_data = {
+                "effect": "token_maker",
+                "battle_model_scope": "saga_goblin_rummage_transform_reflection_copy_v1",
+                "type_line": "Enchantment - Saga",
+                "saga_final_chapter": 3,
+                "saga_chapter_effects": {
+                    "1": {
+                        "effect": "token_maker",
+                        "token_count": 1,
+                        "token_name": "Goblin Shaman Token",
+                        "token_subtype": "Goblin Shaman",
+                        "token_colors": ["R"],
+                        "token_power": 2,
+                        "token_toughness": 2,
+                    },
+                    "2": {"effect": "discard_draw", "max_discard": 2},
+                    "3": {"effect": "transform"},
+                },
+                "transform_to": {
+                    "name": "Reflection of Kiki-Jiki",
+                    "effect": "creature",
+                    "type_line": "Enchantment Creature - Goblin Shaman",
+                    "power": 2,
+                    "toughness": 2,
+                    "activated_copy_target_another_nonlegendary_creature_you_control": True,
+                    "activation_cost_generic": 1,
+                    "copy_target_types": ["creature"],
+                    "target_controller": "own",
+                    "exclude_source_from_copy_targets": True,
+                    "exclude_legendary_copy_targets": True,
+                    "token_haste": True,
+                    "sacrifice_token_at_end_step": True,
+                    "_rule_logical_key": "battle_rule_v1:pg217_fable_test",
+                    "_rule_oracle_hash": "pg217-fable-test-hash",
+                },
+                "_rule_logical_key": "battle_rule_v1:pg217_fable_test",
+                "_rule_oracle_hash": "pg217-fable-test-hash",
+            }
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki", "cmc": 3, "type_line": "Enchantment - Saga"},
+                10,
+                random.Random(217),
+                effect_data_override=effect_data,
+                stack=battle.Stack(),
+                phase="precombat_main",
+            )
+            saga = next(
+                permanent
+                for permanent in active.battlefield
+                if isinstance(permanent, dict)
+                and permanent.get("name") == "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki"
+            )
+            active.hand = [
+                {"name": "Discard Land", "type_line": "Land", "cmc": 0},
+                {"name": "Discard Spell", "type_line": "Instant", "cmc": 1},
+            ]
+            battle.process_after_draw_step_sagas(
+                active,
+                [],
+                [active],
+                turn=11,
+                rng=random.Random(217),
+                stack=battle.Stack(),
+            )
+            battle.process_after_draw_step_sagas(
+                active,
+                [],
+                [active],
+                turn=12,
+                rng=random.Random(217),
+                stack=battle.Stack(),
+            )
+            target = {
+                "name": "Copy Target",
+                "effect": "creature",
+                "type_line": "Creature - Soldier",
+                "power": 4,
+                "toughness": 4,
+            }
+            active.battlefield.append(target)
+            active.mana_pool.add_generic(1)
+            battle.process_precombat_main_phase_engines(
+                active,
+                [],
+                [active],
+                turn=12,
+                rng=random.Random(217),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        goblins = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Goblin Shaman Token"
+        ]
+        reflection = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Reflection of Kiki-Jiki"
+        )
+        copied_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("copy_of") == "Copy Target"
+        ]
+        assert saga in active.exile
+        assert len(goblins) == 1
+        assert any(card.get("name") == "Discard Land" for card in active.graveyard)
+        assert any(card.get("name") == "Discard Spell" for card in active.graveyard)
+        assert any(card.get("name") == "Chapter Draw A" for card in active.hand)
+        assert any(card.get("name") == "Chapter Draw B" for card in active.hand)
+        assert reflection.get("tapped") is True
+        assert len(copied_tokens) == 1
+        assert copied_tokens[0].get("haste") is True
+        assert copied_tokens[0].get("sacrifice_at_end_step") is True
+        assert any(
+            event == "saga_chapter_resolved"
+            and data.get("card") == "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki"
+            and data.get("chapter") == 3
+            and data.get("effect") == "transform"
+            for event, data in events
+        )
+
+    def test_pg217_locust_god_draw_trigger_creates_flying_haste_insects():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Locust Controller")
+            active.library = [_card("Draw A"), _card("Draw B")]
+            active.battlefield = [
+                {
+                    "name": "The Locust God",
+                    "effect": "creature",
+                    "battle_model_scope": "controller_draw_create_1_1_flying_haste_insect_token_loot_death_return_v1",
+                    "type_line": "Legendary Creature - God",
+                    "power": 4,
+                    "toughness": 4,
+                    "flying": True,
+                    "controller_draw_create_token": True,
+                    "token_count_per_card_drawn": 1,
+                    "token_name": "Insect Token",
+                    "token_subtype": "Insect",
+                    "token_colors": ["U", "R"],
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_flying": True,
+                    "token_haste": True,
+                    "_rule_logical_key": "battle_rule_v1:pg217_locust_test",
+                    "_rule_oracle_hash": "pg217-locust-test-hash",
+                }
+            ]
+            drawn = active.draw(2, random.Random(217))
+            battle.process_player_draw_triggers(
+                active,
+                len(drawn),
+                turn=13,
+                phase="main",
+                all_players=[active],
+                stack=None,
+                turn_player=active,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        insects = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Insect Token"
+        ]
+        assert len(insects) == 2
+        assert all(token.get("power") == 1 for token in insects)
+        assert all(token.get("toughness") == 1 for token in insects)
+        assert all(token.get("flying") is True for token in insects)
+        assert all(token.get("haste") is True for token in insects)
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "The Locust God"
+            and data.get("trigger") == "controller_draw"
+            and data.get("tokens_created") == 2
+            and data.get("rule_logical_key") == "battle_rule_v1:pg217_locust_test"
+            for event, data in events
+        )
+
+    def test_pg217_biotransference_creature_spell_counts_as_artifact_and_creates_necron():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Biotransference Controller")
+            active.battlefield = [
+                {
+                    "name": "Biotransference",
+                    "effect": "token_maker",
+                    "battle_model_scope": "controlled_creatures_are_artifacts_artifact_spell_life_loss_necron_token_v1",
+                    "type_line": "Enchantment",
+                    "trigger": "spell_cast",
+                    "trigger_effect": "token_maker",
+                    "trigger_artifact_spell": True,
+                    "controlled_creatures_and_creature_spells_are_artifacts": True,
+                    "controller_loses_life_on_trigger": 1,
+                    "token_count": 1,
+                    "token_name": "Necron Warrior Token",
+                    "token_subtype": "Necron Warrior",
+                    "token_colors": ["B"],
+                    "token_power": 2,
+                    "token_toughness": 2,
+                    "artifact_tokens": True,
+                    "_rule_logical_key": "battle_rule_v1:pg217_biotransference_test",
+                    "_rule_oracle_hash": "pg217-biotransference-test-hash",
+                }
+            ]
+            battle.trigger_spell_cast_engines(
+                active,
+                [active],
+                {"name": "Creature Spell", "type_line": "Creature - Warrior", "cmc": 2},
+                turn=14,
+                phase="precombat_main",
+                stack=None,
+                active_player=active,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        necrons = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Necron Warrior Token"
+        ]
+        assert active.life == 39
+        assert len(necrons) == 1
+        assert necrons[0].get("type_line") == "Artifact Creature Token — Necron Warrior"
+        assert necrons[0].get("power") == 2
+        assert necrons[0].get("toughness") == 2
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Biotransference"
+            and data.get("trigger") == "spell_cast"
+            and data.get("trigger_artifact_spell") is True
+            and data.get("controller_life_lost") == 1
+            and data.get("tokens_created") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:pg217_biotransference_test"
+            for event, data in events
+        )
+
     def test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -16528,6 +16784,9 @@ def register_tests(battle, player):
         test_pg216_black_market_connections_precombat_modal_resources,
         test_pg216_smugglers_share_each_end_step_draws_and_creates_treasure,
         test_pg216_davros_end_step_creates_dalek_and_villainous_discard,
+        test_pg217_fable_saga_creates_rummages_transforms_and_reflection_copies,
+        test_pg217_locust_god_draw_trigger_creates_flying_haste_insects,
+        test_pg217_biotransference_creature_spell_counts_as_artifact_and_creates_necron,
         test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage,
         test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering,
         test_pg207_impact_tremors_damages_each_opponent_when_token_enters,

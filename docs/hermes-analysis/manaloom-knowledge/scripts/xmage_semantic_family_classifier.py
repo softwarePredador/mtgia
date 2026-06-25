@@ -1843,6 +1843,63 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("token_toughness") or 0) == 1
         )
 
+    if effect == "token_maker" and scope == "saga_goblin_rummage_transform_reflection_copy_v1":
+        chapter_effects = effect_json.get("saga_chapter_effects") or {}
+        transform_to = effect_json.get("transform_to") or {}
+        return (
+            "ENCHANTMENT" in types
+            and {"SagaAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"CreateTokenEffect", "DiscardAndDrawThatManyEffect", "ExileSagaAndReturnTransformedEffect", "CreateTokenCopyTargetEffect"}.issubset(effect_classes)
+            and int(effect_json.get("saga_final_chapter") or 0) == 3
+            and (chapter_effects.get("1") or {}).get("token_subtype") == "Goblin Shaman"
+            and int((chapter_effects.get("2") or {}).get("max_discard") or 0) == 2
+            and (chapter_effects.get("3") or {}).get("effect") == "transform"
+            and transform_to.get("name") == "Reflection of Kiki-Jiki"
+            and bool(transform_to.get("activated_copy_target_another_nonlegendary_creature_you_control"))
+            and transform_to.get("copy_target_types") == ["creature"]
+            and bool(transform_to.get("exclude_source_from_copy_targets"))
+            and bool(transform_to.get("token_haste"))
+            and bool(transform_to.get("sacrifice_token_at_end_step"))
+        )
+
+    if effect == "creature" and scope == "controller_draw_create_1_1_flying_haste_insect_token_loot_death_return_v1":
+        return (
+            types == {"CREATURE"}
+            and "DrawCardControllerTriggeredAbility" in ability_classes
+            and {"CreateTokenEffect", "DrawDiscardControllerEffect", "CreateDelayedTriggeredAbilityEffect"}.issubset(effect_classes)
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("controller_draw_create_token"))
+            and int(effect_json.get("token_count_per_card_drawn") or 0) == 1
+            and effect_json.get("token_subtype") == "Insect"
+            and effect_json.get("token_colors") == ["U", "R"]
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+            and bool(effect_json.get("token_flying"))
+            and bool(effect_json.get("token_haste"))
+            and bool(effect_json.get("activated_loot"))
+            and bool(effect_json.get("dies_return_to_owner_hand_next_end_step"))
+        )
+
+    if effect == "token_maker" and scope == "controlled_creatures_are_artifacts_artifact_spell_life_loss_necron_token_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {"SimpleStaticAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+            and {"ModifyObjectAllMultiZoneEffect", "LoseLifeSourceControllerEffect", "CreateTokenEffect"}.issubset(effect_classes)
+            and effect_json.get("trigger") == "spell_cast"
+            and effect_json.get("trigger_effect") == "token_maker"
+            and bool(effect_json.get("trigger_artifact_spell"))
+            and bool(effect_json.get("controlled_creatures_and_creature_spells_are_artifacts"))
+            and int(effect_json.get("controller_loses_life_on_trigger") or 0) == 1
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_subtype") == "Necron Warrior"
+            and effect_json.get("token_colors") == ["B"]
+            and int(effect_json.get("token_power") or 0) == 2
+            and int(effect_json.get("token_toughness") or 0) == 2
+            and bool(effect_json.get("artifact_tokens"))
+        )
+
     if effect == "ramp_permanent" and scope == "artifact_etb_or_dies_create_treasure_v1":
         return (
             types == {"ARTIFACT"}

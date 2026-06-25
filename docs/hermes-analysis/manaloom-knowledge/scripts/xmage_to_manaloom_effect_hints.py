@@ -2043,6 +2043,133 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        "ENCHANTMENT" in card_types
+        and xmage_class_name == "FableOfTheMirrorBreaker"
+        and {"SagaAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+        and {"CreateTokenEffect", "DiscardAndDrawThatManyEffect", "ExileSagaAndReturnTransformedEffect", "CreateTokenCopyTargetEffect"}.issubset(effect_classes)
+        and "FableOfTheMirrorBreakerToken" in rules_text
+        and "ReflectionOfKikiJikiEffect" in rules_text
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "saga_goblin_rummage_transform_reflection_copy_v1",
+            "fields": {
+                "saga_chapter_effects": {
+                    "1": {
+                        "effect": "token_maker",
+                        "token_count": 1,
+                        "token_name": "Goblin Shaman Token",
+                        "token_subtype": "Goblin Shaman",
+                        "token_colors": ["R"],
+                        "token_power": 2,
+                        "token_toughness": 2,
+                        "token_attack_create_treasure": True,
+                    },
+                    "2": {"effect": "discard_draw", "max_discard": 2, "draw_equal_to_discarded": True},
+                    "3": {"effect": "transform"},
+                },
+                "saga_final_chapter": 3,
+                "transform_to": {
+                    "name": "Reflection of Kiki-Jiki",
+                    "effect": "creature",
+                    "type_line": "Enchantment Creature - Goblin Shaman",
+                    "power": 2,
+                    "toughness": 2,
+                    "activated_copy_target_another_nonlegendary_creature_you_control": True,
+                    "activation_cost_generic": 1,
+                    "activation_requires_tap": True,
+                    "copy_target_types": ["creature"],
+                    "target_controller": "own",
+                    "exclude_source_from_copy_targets": True,
+                    "exclude_legendary_copy_targets": True,
+                    "token_haste": True,
+                    "sacrifice_token_at_end_step": True,
+                },
+            },
+            "reason": "XMage structure matches Fable of the Mirror-Breaker: Saga chapter I creates the Goblin Shaman token, chapter II discards up to two and draws that many, chapter III transforms into Reflection of Kiki-Jiki, whose activated ability copies another nonlegendary creature with haste and end-step sacrifice.",
+            "signals": [
+                "SagaAbility",
+                "FableOfTheMirrorBreakerToken",
+                "DiscardAndDrawThatManyEffect(2)",
+                "ExileSagaAndReturnTransformedEffect",
+                "ReflectionOfKikiJikiEffect",
+                "CreateTokenCopyTargetEffect",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and xmage_class_name == "TheLocustGod"
+        and "DrawCardControllerTriggeredAbility" in ability_classes
+        and {"CreateTokenEffect", "DrawDiscardControllerEffect", "CreateDelayedTriggeredAbilityEffect"}.issubset(effect_classes)
+        and "TheLocustGodInsectToken" in rules_text
+    ):
+        return {
+            "effect": "creature",
+            "scope": "controller_draw_create_1_1_flying_haste_insect_token_loot_death_return_v1",
+            "fields": {
+                "power": 4,
+                "toughness": 4,
+                "flying": True,
+                "controller_draw_create_token": True,
+                "token_count_per_card_drawn": 1,
+                "token_name": "Insect Token",
+                "token_subtype": "Insect",
+                "token_colors": ["U", "R"],
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_flying": True,
+                "token_haste": True,
+                "activated_loot": True,
+                "activation_cost": "{2}{U}{R}",
+                "dies_return_to_owner_hand_next_end_step": True,
+            },
+            "reason": "XMage structure matches The Locust God: controller draw trigger creates 1/1 blue-red Insect tokens with flying and haste, activated loot, and delayed death return to hand.",
+            "signals": [
+                "DrawCardControllerTriggeredAbility",
+                "CreateTokenEffect(TheLocustGodInsectToken)",
+                "SimpleActivatedAbility(DrawDiscardControllerEffect)",
+                "DiesSourceTriggeredAbility",
+                "AtTheBeginOfNextEndStepDelayedTriggeredAbility(ReturnToHandTargetEffect)",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "Biotransference"
+        and {"SimpleStaticAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+        and {"ModifyObjectAllMultiZoneEffect", "LoseLifeSourceControllerEffect", "CreateTokenEffect"}.issubset(effect_classes)
+        and "NecronWarriorToken" in rules_text
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "controlled_creatures_are_artifacts_artifact_spell_life_loss_necron_token_v1",
+            "fields": {
+                "trigger": "spell_cast",
+                "trigger_effect": "token_maker",
+                "trigger_artifact_spell": True,
+                "controlled_creatures_and_creature_spells_are_artifacts": True,
+                "controlled_creature_cards_owned_are_artifacts": True,
+                "controller_loses_life_on_trigger": 1,
+                "token_count": 1,
+                "token_name": "Necron Warrior Token",
+                "token_subtype": "Necron Warrior",
+                "token_colors": ["B"],
+                "token_power": 2,
+                "token_toughness": 2,
+                "artifact_tokens": True,
+            },
+            "reason": "XMage structure matches Biotransference: controlled creatures, creature spells, and owned creature cards become artifacts; whenever controller casts an artifact spell, they lose 1 life and create a 2/2 black Necron Warrior artifact creature token.",
+            "signals": [
+                "SimpleStaticAbility(BiotransferenceEffect)",
+                "ModifyObjectAllMultiZoneEffect(add CardType.ARTIFACT)",
+                "SpellCastControllerTriggeredAbility(FILTER_SPELL_AN_ARTIFACT)",
+                "LoseLifeSourceControllerEffect(1)",
+                "CreateTokenEffect(NecronWarriorToken)",
+            ],
+        }
+
+    if (
         card_types == {"CREATURE"}
         and xmage_class_name == "TaiiWakeenPerfectShot"
         and "DrawCardSourceControllerEffect" in effect_classes

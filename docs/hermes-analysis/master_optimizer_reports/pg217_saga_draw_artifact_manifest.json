@@ -1,0 +1,27 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg217_saga_draw_artifact_20260625_111141",
+  "deploy_id": "PG217",
+  "family_counts": {
+    "creature": 1,
+    "token_maker": 2
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_rollback.sql"
+  },
+  "generated_at": "2026-06-25T11:11:41+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "The Locust God",
+    "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+    "Biotransference"
+  ],
+  "selected_count": 3,
+  "slug": "saga_draw_artifact",
+  "status": "prepared_read_only_pending_apply_approval"
+}

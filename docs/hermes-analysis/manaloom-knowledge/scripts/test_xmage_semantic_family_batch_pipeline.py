@@ -7750,6 +7750,160 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "damage_prevention_reflect")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_fable_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+                        "severity": "high",
+                        "oracle_hash": "fablehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 3},
+                        "xmage": {
+                            "class_name": "FableOfTheMirrorBreaker",
+                            "path": "/xmage/FableOfTheMirrorBreaker.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": [
+                                "CreateTokenEffect",
+                                "DiscardAndDrawThatManyEffect",
+                                "ExileSagaAndReturnTransformedEffect",
+                                "CreateTokenCopyTargetEffect",
+                            ],
+                            "ability_classes": ["SagaAbility", "SimpleActivatedAbility"],
+                            "target_classes": [],
+                            "cost_classes": ["TapSourceCost", "GenericManaCost"],
+                            "primary_effect": {
+                                "effect": "token_maker",
+                                "battle_model_scope": "saga_goblin_rummage_transform_reflection_copy_v1",
+                                "saga_final_chapter": 3,
+                                "saga_chapter_effects": {
+                                    "1": {"effect": "token_maker", "token_subtype": "Goblin Shaman"},
+                                    "2": {"effect": "discard_draw", "max_discard": 2},
+                                    "3": {"effect": "transform"},
+                                },
+                                "transform_to": {
+                                    "name": "Reflection of Kiki-Jiki",
+                                    "activated_copy_target_another_nonlegendary_creature_you_control": True,
+                                    "copy_target_types": ["creature"],
+                                    "exclude_source_from_copy_targets": True,
+                                    "token_haste": True,
+                                    "sacrifice_token_at_end_step": True,
+                                },
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "token_maker")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_locust_god_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "The Locust God",
+                        "severity": "high",
+                        "oracle_hash": "locusthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 3},
+                        "xmage": {
+                            "class_name": "TheLocustGod",
+                            "path": "/xmage/TheLocustGod.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "CreateTokenEffect",
+                                "DrawDiscardControllerEffect",
+                                "CreateDelayedTriggeredAbilityEffect",
+                            ],
+                            "ability_classes": [
+                                "DrawCardControllerTriggeredAbility",
+                                "SimpleActivatedAbility",
+                                "DiesSourceTriggeredAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controller_draw_create_1_1_flying_haste_insect_token_loot_death_return_v1",
+                                "power": 4,
+                                "toughness": 4,
+                                "flying": True,
+                                "controller_draw_create_token": True,
+                                "token_count_per_card_drawn": 1,
+                                "token_subtype": "Insect",
+                                "token_colors": ["U", "R"],
+                                "token_power": 1,
+                                "token_toughness": 1,
+                                "token_flying": True,
+                                "token_haste": True,
+                                "activated_loot": True,
+                                "dies_return_to_owner_hand_next_end_step": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "creature")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_biotransference_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Biotransference",
+                        "severity": "high",
+                        "oracle_hash": "biohash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 3},
+                        "xmage": {
+                            "class_name": "Biotransference",
+                            "path": "/xmage/Biotransference.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": [
+                                "ModifyObjectAllMultiZoneEffect",
+                                "LoseLifeSourceControllerEffect",
+                                "CreateTokenEffect",
+                            ],
+                            "ability_classes": ["SimpleStaticAbility", "SpellCastControllerTriggeredAbility"],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "token_maker",
+                                "battle_model_scope": "controlled_creatures_are_artifacts_artifact_spell_life_loss_necron_token_v1",
+                                "trigger": "spell_cast",
+                                "trigger_effect": "token_maker",
+                                "trigger_artifact_spell": True,
+                                "controlled_creatures_and_creature_spells_are_artifacts": True,
+                                "controller_loses_life_on_trigger": 1,
+                                "token_count": 1,
+                                "token_subtype": "Necron Warrior",
+                                "token_colors": ["B"],
+                                "token_power": 2,
+                                "token_toughness": 2,
+                                "artifact_tokens": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "token_maker")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
 
 if __name__ == "__main__":
     unittest.main()

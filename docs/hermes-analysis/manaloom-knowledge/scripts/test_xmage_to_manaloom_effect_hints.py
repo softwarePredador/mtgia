@@ -5430,6 +5430,112 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["reflect_target"], "chosen_source_controller")
         self.assertTrue(primary["source_choice_required"])
 
+    def test_fable_maps_to_exact_saga_transform_copy_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "FableOfTheMirrorBreaker",
+                "effect_classes": [
+                    "CreateTokenEffect",
+                    "DiscardAndDrawThatManyEffect",
+                    "ExileSagaAndReturnTransformedEffect",
+                    "CreateTokenCopyTargetEffect",
+                ],
+                "ability_classes": ["SagaAbility", "SimpleActivatedAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new SagaAbility(this.getLeftHalfCard()); "
+                    "new CreateTokenEffect(new FableOfTheMirrorBreakerToken()); "
+                    "new DiscardAndDrawThatManyEffect(2); "
+                    "new ExileSagaAndReturnTransformedEffect(); "
+                    "class ReflectionOfKikiJikiEffect extends OneShotEffect { "
+                    "new CreateTokenCopyTargetEffect(null, null, true); }"
+                ),
+            },
+            "I — Create a 2/2 red Goblin Shaman creature token. "
+            "II — You may discard up to two cards. If you do, draw that many cards. "
+            "III — Exile this Saga, then return it transformed. "
+            "{1}, {T}: Create a token that's a copy of another target nonlegendary creature you control, "
+            "except it has haste. Sacrifice it at the beginning of the next end step.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(primary["battle_model_scope"], "saga_goblin_rummage_transform_reflection_copy_v1")
+        self.assertEqual(primary["saga_chapter_effects"]["1"]["token_subtype"], "Goblin Shaman")
+        self.assertEqual(primary["saga_chapter_effects"]["2"]["max_discard"], 2)
+        self.assertEqual(primary["transform_to"]["name"], "Reflection of Kiki-Jiki")
+        self.assertTrue(primary["transform_to"]["activated_copy_target_another_nonlegendary_creature_you_control"])
+
+    def test_locust_god_maps_to_exact_draw_token_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TheLocustGod",
+                "effect_classes": [
+                    "CreateTokenEffect",
+                    "DrawDiscardControllerEffect",
+                    "CreateDelayedTriggeredAbilityEffect",
+                ],
+                "ability_classes": [
+                    "DrawCardControllerTriggeredAbility",
+                    "SimpleActivatedAbility",
+                    "DiesSourceTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new DrawCardControllerTriggeredAbility(new CreateTokenEffect(new TheLocustGodInsectToken(), 1, false, false), false); "
+                    "new SimpleActivatedAbility(new DrawDiscardControllerEffect(1, 1, false), new ManaCostsImpl<>(\"{2}{U}{R}\")); "
+                    "new CreateDelayedTriggeredAbilityEffect(new AtTheBeginOfNextEndStepDelayedTriggeredAbility(new ReturnToHandTargetEffect()))"
+                ),
+            },
+            "Flying. Whenever you draw a card, create a 1/1 blue and red Insect creature token with flying and haste. "
+            "{2}{U}{R}: Draw a card, then discard a card. When The Locust God dies, return it to its owner's hand.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controller_draw_create_1_1_flying_haste_insect_token_loot_death_return_v1",
+        )
+        self.assertTrue(primary["controller_draw_create_token"])
+        self.assertEqual(primary["token_subtype"], "Insect")
+        self.assertTrue(primary["token_flying"])
+        self.assertTrue(primary["token_haste"])
+
+    def test_biotransference_maps_to_exact_artifact_spell_token_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Biotransference",
+                "effect_classes": [
+                    "ModifyObjectAllMultiZoneEffect",
+                    "LoseLifeSourceControllerEffect",
+                    "CreateTokenEffect",
+                ],
+                "ability_classes": ["SimpleStaticAbility", "SpellCastControllerTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new SimpleStaticAbility(new BiotransferenceEffect()); "
+                    "new SpellCastControllerTriggeredAbility(new LoseLifeSourceControllerEffect(1), StaticFilters.FILTER_SPELL_AN_ARTIFACT, false); "
+                    "new CreateTokenEffect(new NecronWarriorToken(), 1); "
+                    "class BiotransferenceEffect extends ModifyObjectAllMultiZoneEffect"
+                ),
+            },
+            "Creatures you control are artifacts in addition to their other types. "
+            "The same is true for creature spells you control and creature cards you own that aren't on the battlefield. "
+            "Whenever you cast an artifact spell, you lose 1 life and create a 2/2 black Necron Warrior artifact creature token.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controlled_creatures_are_artifacts_artifact_spell_life_loss_necron_token_v1",
+        )
+        self.assertTrue(primary["trigger_artifact_spell"])
+        self.assertTrue(primary["controlled_creatures_and_creature_spells_are_artifacts"])
+        self.assertEqual(primary["controller_loses_life_on_trigger"], 1)
+        self.assertEqual(primary["token_subtype"], "Necron Warrior")
+
 
 if __name__ == "__main__":
     unittest.main()

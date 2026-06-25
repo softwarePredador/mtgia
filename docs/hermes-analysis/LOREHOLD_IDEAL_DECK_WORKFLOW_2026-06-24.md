@@ -1303,6 +1303,88 @@ Next operational order:
 5. Resume benchmark candidates only after these runtime rows are closed or
    explicitly waived by matrix evidence.
 
+## PG217 Runtime Checkpoint - Saga / Draw Token / Artifact Static
+
+PG217 closes the remaining current Lorehold runtime lane in one verified
+runtime/mapper/PG batch: `Fable of the Mirror-Breaker // Reflection of
+Kiki-Jiki`, `The Locust God`, and `Biotransference`.
+
+What changed:
+
+1. XMage sources:
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FableOfTheMirrorBreaker.java`,
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheLocustGod.java`,
+   and
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/Biotransference.java`.
+2. Runtime scopes:
+   `saga_goblin_rummage_transform_reflection_copy_v1`,
+   `controller_draw_create_1_1_flying_haste_insect_token_loot_death_return_v1`,
+   and
+   `controlled_creatures_are_artifacts_artifact_spell_life_loss_necron_token_v1`.
+3. The battle runtime now models Saga chapter state, immediate chapter-one
+   resolution for Saga casts, post-draw chapter advancement, chapter-two
+   rummage, and final chapter transform metadata.
+4. Reflection-style activated copy abilities now pay activation cost, tap the
+   source, exclude legendary targets, create a hasty token copy, and use the
+   existing end-step cleanup surface for temporary copies.
+5. Controller draw triggers can create tokens; `The Locust God` uses this to
+   produce flying haste Insect tokens.
+6. Artifact-spell triggers can see static artifact typing from
+   `Biotransference`, apply controller life loss, and create Necron Warrior
+   tokens.
+7. PG217 precheck/apply/postcheck promoted one verified auto rule for each
+   card, deprecated four older Fable/Locust shadow rows, and kept rollback SQL
+   in
+   `docs/hermes-analysis/master_optimizer_reports/pg217_saga_draw_artifact_rollback.sql`.
+8. PG -> Hermes sync report
+   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg217_saga_draw_artifact_20260625.json`
+   selected `3` cards, loaded `7` PG rows, upserted `7` SQLite rows, and
+   exported `3248` canonical snapshot rows.
+9. The PG217 expanded matrix for decks `6,606-619` reports `580` rows,
+   `battle_ready=390`, `mapper_manual=131`, `split_scope=55`, and
+   `blocked_missing_xmage_source=4`. It has no `runtime_needed` rows.
+10. Effective queue
+    `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg217_saga_draw_artifact_postsync_v1.json`
+    reports no package-ready unprepared rows; remaining global operational
+    lanes are `manual_mapper_backlog=333`, `split_scope_backlog=74`,
+    `runtime_family_backlog=4`, and `blocked_missing_xmage_source=4`.
+11. Strategy consistency audit
+    `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg217_saga_draw_artifact_postsync_v1.json`
+    passed `18/18`.
+12. Full gate
+    `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_111525/summary.json`
+    reports `turn_invariants_clean=16`,
+    `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+    `action_verdict_counts={"ok":7420}`,
+    `target_pressure_statuses={"pass":16}`,
+    `table_intent_statuses={"pass":16}`,
+    `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+    `effect_coverage_residual_unaccepted_card_flag_rows=0`,
+    `decision_trace_contract_findings=0`,
+    `decision_trace_missing_required_fields=0`, and
+    `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+    The three PG217 cards did not appear in this 16-seed sample; the
+    card-specific proof is from the battle harness tests.
+
+Next operational order:
+
+1. Treat the current Lorehold runtime lane as closed: do not add more runtime
+   work before benchmarking unless the regenerated matrix reintroduces
+   `runtime_needed`.
+2. Start with `priority_benchmark_candidate` rows only, using baseline hash
+   guard, category-safe cut target, temporary slot optimizer benchmark,
+   quality gate, confirmation/handoff artifact, and explicit apply approval.
+3. Current top benchmark candidates are `Library of Leng`,
+   `Restoration Seminar`, `Reforge the Soul`, `Increasing Vengeance`,
+   `Flare of Duplication`, `Monument to Endurance`, `Volcanic Vision`,
+   `Big Score`, `Flashback`, `Improvisation Capstone`,
+   `Pinnacle Monk // Mystic Peak`, `Pyromancer Ascension`, `Fury Storm`,
+   `Return the Favor`, `Hexing Squelcher`, `Invoke Calamity`,
+   `Dawn's Truce`, `Tibalt's Trickery`, `Arcane Bombardment`, and
+   `Creative Technique`.
+4. Keep the global non-Lorehold `runtime_family_backlog=4` separate from the
+   Lorehold benchmark lane.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top
