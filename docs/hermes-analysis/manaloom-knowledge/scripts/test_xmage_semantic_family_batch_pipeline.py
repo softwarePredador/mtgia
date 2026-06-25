@@ -6235,6 +6235,44 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_damage_each_opponent_spell_family_is_batch_safe_with_oracle_hash(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Boltwave",
+                        "severity": "high",
+                        "oracle_hash": "boltwavehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Boltwave",
+                            "path": "/xmage/Boltwave.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["DamagePlayersEffect"],
+                            "ability_classes": [],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "damage_each_opponent",
+                                "battle_model_scope": "spell_damage_each_opponent_v1",
+                                "amount": 3,
+                                "damage": 3,
+                                "target_controller": "opponents",
+                                "instant": False,
+                                "sorcery": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "opponent_damage_spell")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_young_pyromancer_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

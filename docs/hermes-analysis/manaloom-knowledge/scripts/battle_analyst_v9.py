@@ -21996,6 +21996,43 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     player.graveyard.append(card)
 
 
+def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
+    amount = int(effect_data.get("amount") or effect_data.get("damage") or 0)
+    amount = apply_controller_noncombat_damage_modifiers(
+        player,
+        amount,
+        card,
+        turn=turn,
+        phase="resolution",
+    )
+    damaged = []
+    for opponent in opponents:
+        if not opponent.is_alive():
+            continue
+        life_before = opponent.life
+        dealt = deal_damage(opponent, amount, source=card)
+        damaged.append(
+            {
+                "player": opponent.name,
+                "life_before": life_before,
+                "life_after": opponent.life,
+                "dealt": amount if dealt else 0,
+                "result": "player_damage" if dealt else "prevented",
+            }
+        )
+    emit_replay_event(
+        "damage_each_opponent_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        amount=amount,
+        damaged_opponents=[entry["player"] for entry in damaged],
+        damage_results=damaged,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
 def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
     amount = int(effect_data.get("damage") or effect_data.get("average_damage") or 6)
     amount = apply_controller_noncombat_damage_modifiers(
@@ -26288,6 +26325,8 @@ def apply_effect_immediate(
         finish_resolved_spell(player, card, turn=turn)
     elif effect in ("deal_damage", "direct_damage"):
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
+    elif effect == "damage_each_opponent":
+        apply_damage_each_opponent(player, opponents, card, effect_data, turn)
     elif effect == "damage_player_and_creatures":
         apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_wipe":

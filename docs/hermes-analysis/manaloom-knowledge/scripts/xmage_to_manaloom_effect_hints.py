@@ -6247,6 +6247,44 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             )
         )
 
+    if (
+        "DamagePlayersEffect" in effect_classes
+        and not ability_classes
+        and card_types <= {"INSTANT", "SORCERY"}
+        and (
+            "targetcontroller.opponent" in normalized_text
+            or "each opponent" in normalized_text
+        )
+    ):
+        amount = _first_int(r"damageplayerseffect\((\d+)", normalized_text)
+        if amount is None:
+            amount = _first_int(r"deals\s+(\d+)\s+damage\s+to\s+each\s+opponent", normalized_text)
+        if amount is not None:
+            candidates.append(
+                _candidate(
+                    effect="damage_each_opponent",
+                    scope="spell_damage_each_opponent_v1",
+                    reason=(
+                        "XMage uses one-shot DamagePlayersEffect targeting opponents; "
+                        "ManaLoom can resolve this as damage to each live opponent."
+                    ),
+                    ability_kind=ability_kind,
+                    requires_runtime_executor=False,
+                    extra_effect_fields={
+                        "amount": amount,
+                        "damage": amount,
+                        "target_controller": "opponents",
+                        "instant": "INSTANT" in card_types,
+                        "sorcery": "SORCERY" in card_types,
+                    },
+                    matched_signals=[
+                        "DamagePlayersEffect",
+                        "TargetController.OPPONENT",
+                        "one_shot",
+                    ],
+                )
+            )
+
     class_to_effect = [
         ("DestroyAllEffect", "board_wipe", "destroy_all_permanents_or_creatures_variant_v1", True),
         ("DestroyTargetEffect", "removal_destroy", "targeted_destroy_variant_v1", True),

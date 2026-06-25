@@ -15074,6 +15074,51 @@ def register_tests(battle, player):
         assert effect_data["stolen_creatures_gain_haste"] is True
         assert effect_data["runtime_model"] == "compact_damage_projection"
 
+    def test_pg206_boltwave_damages_each_opponent():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            opponent_b.life = 2
+            card = {"name": "Boltwave", "type_line": "Sorcery", "cmc": 1}
+            effect_data = {
+                "effect": "damage_each_opponent",
+                "battle_model_scope": "spell_damage_each_opponent_v1",
+                "amount": 3,
+                "damage": 3,
+                "target_controller": "opponents",
+                "sorcery": True,
+                "_rule_logical_key": "battle_rule_v1:pg206_boltwave_test",
+                "_rule_oracle_hash": "pg206_boltwave_hash",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent_a, opponent_b],
+                card,
+                4,
+                random.Random(206),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert opponent_a.life == 37
+        assert opponent_b.life <= 0
+        assert any(card.get("name") == "Boltwave" for card in active.graveyard)
+        assert any(
+            event == "damage_each_opponent_resolved"
+            and data.get("card") == "Boltwave"
+            and data.get("amount") == 3
+            and data.get("damaged_opponents") == ["Opponent A", "Opponent B"]
+            and data.get("rule_logical_key") == "battle_rule_v1:pg206_boltwave_test"
+            and data.get("rule_oracle_hash") == "pg206_boltwave_hash"
+            for event, data in events
+        )
+
     def test_pg079_deck606_high_rules_resolve_from_sqlite_cache():
         expected = {
             "Flare of Duplication": (
@@ -15320,6 +15365,7 @@ def register_tests(battle, player):
         test_pg102_creative_technique_demonstrates_top_nonland_free_casts,
         test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them,
         test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit,
+        test_pg206_boltwave_damages_each_opponent,
         test_everything_comes_to_dust_oracle_normalizes_to_convoke_exile_wipe,
         test_everything_comes_to_dust_exiles_artifacts_enchantments_and_nonshared_creatures,
         test_fated_clash_oracle_normalizes_to_protect_then_destroy_wipe,

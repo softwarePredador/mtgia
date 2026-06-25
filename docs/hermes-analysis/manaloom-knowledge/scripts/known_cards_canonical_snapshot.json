@@ -3224,15 +3224,21 @@
     "battle_rule_logical_key": "battle_rule_v1:e21a09af20904932ce575966774b7905"
   },
   "Boltwave": {
-    "cmc": 1.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f04100c569e015b2f09abed12f5040fe"
+    "ability_kind": "one_shot",
+    "amount": 3,
+    "battle_model_scope": "spell_damage_each_opponent_v1",
+    "damage": 3,
+    "effect": "damage_each_opponent",
+    "instant": false,
+    "sorcery": true,
+    "target_controller": "opponents",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50c63854aa8fb56018a56312c07cdd69",
+    "battle_rule_oracle_hash": "0c062fe415bc928cf3762258c2073736"
   },
   "Bonders' Enclave": {
     "effect": "land",

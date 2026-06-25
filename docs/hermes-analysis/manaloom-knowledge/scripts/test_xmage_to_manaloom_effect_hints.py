@@ -3514,6 +3514,31 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["attacking_activated_discard_count"], 1)
         self.assertEqual(primary["attacking_activated_draw_count"], 1)
 
+    def test_boltwave_maps_to_spell_damage_each_opponent_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Boltwave",
+                "effect_classes": ["DamagePlayersEffect"],
+                "ability_classes": [],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect("
+                    "new DamagePlayersEffect(3, TargetController.OPPONENT));"
+                ),
+            },
+            "Boltwave deals 3 damage to each opponent.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "damage_each_opponent")
+        self.assertEqual(primary["battle_model_scope"], "spell_damage_each_opponent_v1")
+        self.assertEqual(primary["amount"], 3)
+        self.assertEqual(primary["damage"], 3)
+        self.assertEqual(primary["target_controller"], "opponents")
+        self.assertFalse(primary["instant"])
+        self.assertTrue(primary["sorcery"])
+
     def test_young_pyromancer_maps_to_exact_spell_cast_elemental_scope(self) -> None:
         result = hints.build_effect_hints(
             {

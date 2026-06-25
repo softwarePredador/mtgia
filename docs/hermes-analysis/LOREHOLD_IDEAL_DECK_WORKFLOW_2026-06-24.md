@@ -798,6 +798,40 @@ Lorehold/opponent matrix:
    `event_contract_static_status=event_contract_static_ready`, and
    `test_results_status_counts={"pass":18}`.
 
+`Boltwave` is the twenty-first completed proof group and closes the first
+one-shot `DamagePlayersEffect(... TargetController.OPPONENT)` spell family from
+the current Lorehold/opponent matrix:
+
+1. XMage local source `Boltwave` matched a one-shot `DamagePlayersEffect(3,
+   TargetController.OPPONENT)` on a sorcery spell.
+2. The mapper/classifier now promotes the exact
+   `spell_damage_each_opponent_v1` scope as `opponent_damage_spell`, instead
+   of mixing it with permanent ETB/cast/discard trigger variants.
+3. Battle runtime now has a small `damage_each_opponent` executor that applies
+   noncombat damage modifiers, damages each live opponent, emits
+   `damage_each_opponent_resolved`, and finishes the resolved spell through the
+   standard zone path.
+4. The event contract classifies `damage_each_opponent_resolved` as a
+   `strategy_signal`.
+5. PG206 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+6. PG -> Hermes sync made `Boltwave` report as `battle_ready`; the matrix moved
+   it out of `needs_rule_before_strategy`.
+7. The PG206 matrix now reports `209` total `needs_rule_before_strategy` rows:
+   `136` mapper manual, `53` split-scope, `16` runtime-needed, and `4`
+   blocked missing XMage source. The Lorehold deck block across decks `608`
+   through `616` now has `100` remaining rows: `78` mapper manual, `16`
+   split-scope, and `6` runtime-needed. This remains the current
+   Lorehold-first queue before broad benchmark/deck swaps.
+8. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_064531/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+   `mandatory_gate_divergences=[]`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `event_contract_static_status=event_contract_static_ready`, and
+   `test_results_status_counts={"pass":18}`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

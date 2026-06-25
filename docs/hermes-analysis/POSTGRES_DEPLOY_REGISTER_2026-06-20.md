@@ -12462,3 +12462,99 @@ Register decision:
 - Continue Lorehold-first rule closure on the remaining `101` Lorehold-touching
   `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
 - Next package number is PG206.
+
+## PG206 - Damage Each Opponent Spell
+
+Status: applied, postchecked, synced, tested, strategy-audited.
+
+Scope:
+
+- Promotes exactly `Boltwave`.
+- XMage local source:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/Boltwave.java`.
+- Semantic family:
+  `opponent_damage_spell`.
+- Runtime effect:
+  `damage_each_opponent`.
+- Battle scope:
+  `spell_damage_each_opponent_v1`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg206_damage_each_opponent_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg206_damage_each_opponent_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg206_damage_each_opponent_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg206_damage_each_opponent_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg206_damage_each_opponent_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `target_card_rows=1`, `expected_rule_rows_before=0`, and
+  `would_deprecate_shadow_rows=2`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg206_damage_each_opponent_20260625_0633.json`;
+  `selected_card_count=1`, `pg_rows_loaded=3`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3242`,
+  `generated_rows=1`.
+- Runtime cache spot-check:
+  `Boltwave` resolves from local cache as `effect=damage_each_opponent`,
+  `battle_model_scope=spell_damage_each_opponent_v1`, `amount=3`,
+  `damage=3`, `target_controller=opponents`,
+  `_rule_logical_key=battle_rule_v1:50c63854aa8fb56018a56312c07cdd69`,
+  `_rule_oracle_hash=0c062fe415bc928cf3762258c2073736`, and
+  `_rule_execution_status=auto`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg206_damage_each_opponent_postsync_v1_manifest.json`;
+  expanded scope moved to `high=389`, `medium=63`, `pass=510`, with no
+  remaining `opponent_damage_spell` package proposal because `Boltwave`
+  became battle-ready.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg206_damage_each_opponent_postsync_v1.json`;
+  scoped rows `580`, `battle_ready=371`,
+  `needs_rule_before_strategy=209`.
+- Lorehold deck block:
+  decks `608` through `616` moved from `101` to `100` remaining
+  `needs_rule_before_strategy` rows by structured `deck_ids`
+  (`78` mapper manual, `16` split-scope, `6` runtime-needed).
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg206_damage_each_opponent_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=338`,
+  `split_scope_backlog=72`, `runtime_family_backlog=20`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg206_damage_each_opponent_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  focused mapper/classifier tests passed through `unittest`;
+  event-contract static test passed; focused battle regression
+  `test_pg206_boltwave_damages_each_opponent` passed through the
+  `test_battle_analyst_v10_3.py` harness.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_064531/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `mandatory_gate_divergences=[]`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `test_results_status_counts={"pass":18}`, `test_results_total=18`,
+  and `deck_provenance_files=16`.
+
+Register decision:
+
+- PG206 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG206.
+- Continue Lorehold-first rule closure on the remaining `209`
+  `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
+- Next package number is PG207.

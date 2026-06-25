@@ -204,6 +204,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "renderer_only",
         "life-change explanation for human replay continuity.",
     ),
+    "damage_each_opponent_resolved": (
+        "strategy_signal",
+        "fixed spell damage to each opponent is resolution outcome context for replay and strategy checks.",
+    ),
     "damage_wipe_resolved": (
         "strategy_signal",
         "damage wipe resolution is consumed by replay and strategy checks.",

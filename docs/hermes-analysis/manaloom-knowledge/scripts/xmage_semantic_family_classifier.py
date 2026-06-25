@@ -229,6 +229,15 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "batch_strategy": "metadata_batch_after_pg_precheck",
     },
+    "opponent_damage_spell": {
+        "effects": {"damage_each_opponent"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "one-shot spell resolution that deals fixed noncombat damage to each live opponent",
+        "family_tests": [
+            "test_pg206_boltwave_damages_each_opponent",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "targeted_protection": {
         "effects": {"grant_protection_from_chosen_color"},
         "support_status": "runtime_supported_family",
@@ -735,6 +744,19 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("reflect_prevented_damage"))
             and effect_json.get("reflect_target") == "chosen_source_controller"
             and bool(effect_json.get("source_choice_required"))
+        )
+
+    if effect == "damage_each_opponent" and scope == "spell_damage_each_opponent_v1":
+        return (
+            types.issubset({"INSTANT", "SORCERY"})
+            and bool(types)
+            and effect_classes == {"DamagePlayersEffect"}
+            and not ability_classes
+            and not cost_classes
+            and int(effect_json.get("amount") or effect_json.get("damage") or 0) > 0
+            and effect_json.get("target_controller") == "opponents"
+            and bool(effect_json.get("instant")) == ("INSTANT" in types)
+            and bool(effect_json.get("sorcery")) == ("SORCERY" in types)
         )
 
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
