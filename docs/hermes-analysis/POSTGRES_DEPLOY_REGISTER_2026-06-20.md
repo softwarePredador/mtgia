@@ -12739,3 +12739,97 @@ Register decision:
 - Continue Lorehold-first rule closure on the remaining `205`
   `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
 - Next package number is PG209.
+
+## PG209 - Monastery Mentor noncreature spell token trigger
+
+Status: applied, postchecked, synced to Hermes, and strategy-audited.
+
+Scope:
+
+- Exact XMage family:
+  `SpellCastControllerTriggeredAbility(CreateTokenEffect(MonasteryMentorToken),
+  StaticFilters.FILTER_SPELL_A_NON_CREATURE)`.
+- Promoted card:
+  - `Monastery Mentor`.
+- Deliberately left adjacent token-maker cards such as `Blaze Commando` and
+  `Utvara Hellkite` in runtime backlog because they need different hooks:
+  damage-by-spell and Dragon attack triggers.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_rollback.sql`.
+
+Evidence:
+
+- Precheck:
+  `Monastery Mentor` had `target_card_rows=1`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`, and
+  canonical card id `6d05baa0-097e-4366-a302-435de758fa48`.
+- Apply:
+  backup rows `2`, `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg209_monastery_mentor_20260625_0752.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=3`, `canonical_snapshot_rows_exported=3242`,
+  `generated_rows=1`.
+- Runtime cache spot-check:
+  `Monastery Mentor` resolves from local cache with
+  `effect=token_maker`,
+  `battle_model_scope=noncreature_spell_cast_create_1_1_white_monk_prowess_v1`,
+  `trigger=noncreature_spell_cast`, `trigger_effect=token_maker`,
+  `token_name=Monk Token`, `token_keywords=["prowess"]`, and
+  `_rule_execution_status=auto`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg209_monastery_mentor_postsync_v1_manifest.json`;
+  expanded scope moved to `high=384`, `medium=63`, `pass=515`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg209_monastery_mentor_postsync_v1.json`;
+  scoped rows `580`, `battle_ready=376`,
+  `needs_rule_before_strategy=204`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg209_monastery_mentor_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=18`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg209_monastery_mentor_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  focused mapper/classifier tests passed through `unittest`;
+  focused runtime regression
+  `test_pg209_monastery_mentor_creates_monk_on_noncreature_spell_only`
+  passed through the battle harness.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_075241/summary.json`;
+  `battle_replay_final_status=trusted_for_strategy_learning`,
+  `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `event_contract_static_status=event_contract_static_ready`,
+  `test_results_status_counts={"pass":18}`, and `test_results_total=18`.
+
+Runtime changes:
+
+- Generic spell-cast engines now support `trigger_effect=token_maker` for
+  `spell_cast` and `noncreature_spell_cast` triggers.
+- Token creation now preserves optional token keywords such as `prowess`.
+
+Register decision:
+
+- PG209 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG209.
+- Continue Lorehold-first rule closure on the remaining `204`
+  `needs_rule_before_strategy` rows before broad benchmark/deck swaps.
+- Next package number is PG210.

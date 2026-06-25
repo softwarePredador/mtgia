@@ -19397,16 +19397,34 @@
     "battle_rule_logical_key": "battle_rule_v1:e378617268163d419f2f6fa1a9d10f00"
   },
   "Monastery Mentor": {
-    "cmc": 3.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "noncreature_spell_cast_create_1_1_white_monk_prowess_v1",
     "effect": "token_maker",
+    "power": 2,
+    "prowess": true,
+    "token_colors": [
+      "W"
+    ],
     "token_count": 1,
+    "token_keywords": [
+      "prowess"
+    ],
+    "token_name": "Monk Token",
     "token_power": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0fc70b708c82d7e428741ef7060a57cb"
+    "token_prowess": true,
+    "token_subtype": "Monk",
+    "token_toughness": 1,
+    "toughness": 2,
+    "trigger": "noncreature_spell_cast",
+    "trigger_effect": "token_maker",
+    "trigger_token_count": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf3b56796d6a3dd8d523f48dd33ea589",
+    "battle_rule_oracle_hash": "b10893ae9ffbf66a5255617c56492e08"
   },
   "Mondrak, Glory Dominus": {
     "cmc": 4.0,

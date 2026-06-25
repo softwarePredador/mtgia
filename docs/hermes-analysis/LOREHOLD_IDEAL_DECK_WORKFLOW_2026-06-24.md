@@ -892,6 +892,36 @@ ETB damage engine from the current Lorehold/opponent matrix:
    `event_contract_static_status=event_contract_static_ready`, and
    `test_results_status_counts={"pass":18}`.
 
+`Monastery Mentor` is the twenty-fourth completed proof group and closes the
+exact noncreature-spell token trigger for the current Lorehold/opponent matrix:
+
+1. XMage local source matched `SpellCastControllerTriggeredAbility` with
+   `CreateTokenEffect(MonasteryMentorToken)` and
+   `StaticFilters.FILTER_SPELL_A_NON_CREATURE`.
+2. The mapper/classifier now promotes
+   `noncreature_spell_cast_create_1_1_white_monk_prowess_v1` as
+   `token_maker`, while leaving adjacent token-maker cards such as
+   `Blaze Commando` and `Utvara Hellkite` in runtime review because they need
+   damage-by-spell and Dragon-attack hooks.
+3. Battle runtime now resolves generic `spell_cast`/`noncreature_spell_cast`
+   token makers and preserves token keywords such as `prowess`.
+4. PG209 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made `Monastery Mentor` report as `battle_ready`; the
+   matrix moved it out of `needs_rule_before_strategy`.
+6. The PG209 matrix now reports `204` total `needs_rule_before_strategy` rows
+   and `376` `battle_ready` rows. The effective queue now has
+   `333` mapper backlog, `74` split-scope backlog, `18` runtime-family
+   backlog, and `4` blocked missing XMage source rows, with no unprepared
+   package-ready rows.
+7. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_075241/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `battle_replay_final_status_reason=all_mandatory_gates_pass`,
+   `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+   `event_contract_static_status=event_contract_static_ready`, and
+   `test_results_status_counts={"pass":18}`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

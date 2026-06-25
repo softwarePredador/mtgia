@@ -846,6 +846,27 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("token_toughness") or 0) == 1
         )
 
+    if effect == "token_maker" and scope == "noncreature_spell_cast_create_1_1_white_monk_prowess_v1":
+        return (
+            types == {"CREATURE"}
+            and "CreateTokenEffect" in effect_classes
+            and "SpellCastControllerTriggeredAbility" in ability_classes
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 2
+            and bool(effect_json.get("prowess"))
+            and effect_json.get("trigger") == "noncreature_spell_cast"
+            and effect_json.get("trigger_effect") == "token_maker"
+            and int(effect_json.get("trigger_token_count") or 0) == 1
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_name") == "Monk Token"
+            and effect_json.get("token_subtype") == "Monk"
+            and effect_json.get("token_colors") == ["W"]
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+            and effect_json.get("token_keywords") == ["prowess"]
+            and bool(effect_json.get("token_prowess"))
+        )
+
     if effect == "counter_spell" and scope == "pact_of_negation_delayed_upkeep_counter_v1":
         return (
             types == {"INSTANT"}

@@ -6444,6 +6444,57 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_monastery_mentor_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Monastery Mentor",
+                        "severity": "high",
+                        "oracle_hash": "monasterymentorhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "MonasteryMentor",
+                            "path": "/xmage/MonasteryMentor.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["CreateTokenEffect"],
+                            "ability_classes": [
+                                "ProwessAbility",
+                                "SpellCastControllerTriggeredAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "token_maker",
+                                "battle_model_scope": (
+                                    "noncreature_spell_cast_create_1_1_white_monk_prowess_v1"
+                                ),
+                                "power": 2,
+                                "toughness": 2,
+                                "prowess": True,
+                                "trigger": "noncreature_spell_cast",
+                                "trigger_effect": "token_maker",
+                                "trigger_token_count": 1,
+                                "token_count": 1,
+                                "token_name": "Monk Token",
+                                "token_subtype": "Monk",
+                                "token_colors": ["W"],
+                                "token_power": 1,
+                                "token_toughness": 1,
+                                "token_keywords": ["prowess"],
+                                "token_prowess": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_snap_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

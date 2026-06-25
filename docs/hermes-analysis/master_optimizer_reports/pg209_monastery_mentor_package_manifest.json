@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg209_monastery_mentor_20260625_075104",
+  "deploy_id": "PG209",
+  "family_counts": {
+    "token_maker": 1
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg209_monastery_mentor_package_rollback.sql"
+  },
+  "generated_at": "2026-06-25T07:51:04+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Monastery Mentor"
+  ],
+  "selected_count": 1,
+  "slug": "monastery_mentor",
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -19770,6 +19770,7 @@ def create_creature_token(
     toughness=None,
     haste=False,
     flying=False,
+    keywords=None,
     artifact=False,
     subtype=None,
     colors=None,
@@ -19798,9 +19799,14 @@ def create_creature_token(
     if colors:
         token["colors"] = list(colors)
         token["color_identity"] = list(colors)
+    token_keywords = list(keywords or [])
     if flying:
         token["flying"] = True
-        token["keywords"] = ["flying"]
+        token_keywords.append("flying")
+    if token_keywords:
+        token["keywords"] = list(dict.fromkeys(token_keywords))
+    if "prowess" in token_keywords:
+        token["prowess"] = True
     player.battlefield.append(token)
     if opponents is not None and turn is not None:
         process_controlled_creature_enters_triggers(
@@ -19896,6 +19902,9 @@ def create_creature_tokens_from_effect(
     token_toughness = (effect_data or {}).get("token_toughness", token_power)
     token_haste = bool((effect_data or {}).get("token_haste") or (effect_data or {}).get("haste"))
     token_flying = bool((effect_data or {}).get("token_flying") or (effect_data or {}).get("flying"))
+    token_keywords = list((effect_data or {}).get("token_keywords") or [])
+    if (effect_data or {}).get("token_prowess") and "prowess" not in token_keywords:
+        token_keywords.append("prowess")
     artifact_tokens = bool((effect_data or {}).get("artifact_tokens"))
     token_colors = (effect_data or {}).get("token_colors") or []
     for _ in range(min(max(0, token_count), 20)):
@@ -19906,6 +19915,7 @@ def create_creature_tokens_from_effect(
             toughness=token_toughness,
             haste=token_haste,
             flying=token_flying,
+            keywords=token_keywords,
             artifact=artifact_tokens,
             subtype=token_subtype,
             colors=token_colors,
@@ -23166,6 +23176,53 @@ def trigger_spell_cast_engines(
                 permanent,
                 trigger_kind,
                 resolve_spell_cast_rummage_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
+        if permanent.get("trigger_effect") == "token_maker":
+            token_count = max(1, int(permanent.get("trigger_token_count") or permanent.get("token_count") or 1))
+
+            def resolve_generic_spell_cast_token_maker_trigger(
+                permanent=permanent,
+                token_count=token_count,
+            ):
+                created = create_creature_tokens_from_effect(
+                    player,
+                    permanent,
+                    count=token_count,
+                    opponents=opponents,
+                    turn=turn,
+                    source_event=f"{trigger_kind}_token_maker",
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
+                )
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    effect="token_maker",
+                    tokens_created=created,
+                    token_name=permanent.get("token_name") or permanent.get("spell_cast_token_name") or "Token",
+                    token_power=permanent.get("token_power"),
+                    token_toughness=permanent.get("token_toughness") or permanent.get("token_power"),
+                    token_subtype=permanent.get("token_subtype"),
+                    token_colors=permanent.get("token_colors") or [],
+                    token_keywords=permanent.get("token_keywords") or [],
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_generic_spell_cast_token_maker_trigger,
                 stack=stack,
                 active_player=active_player,
                 all_players=all_players,

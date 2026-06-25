@@ -13436,6 +13436,86 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg209_monastery_mentor_creates_monk_on_noncreature_spell_only():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {
+                    "name": "Monastery Mentor",
+                    "cmc": 3,
+                    "type_line": "Creature - Human Monk",
+                    "effect": "token_maker",
+                    "battle_model_scope": "noncreature_spell_cast_create_1_1_white_monk_prowess_v1",
+                    "power": 2,
+                    "toughness": 2,
+                    "prowess": True,
+                    "trigger": "noncreature_spell_cast",
+                    "trigger_effect": "token_maker",
+                    "trigger_token_count": 1,
+                    "token_count": 1,
+                    "token_name": "Monk Token",
+                    "token_subtype": "Monk",
+                    "token_colors": ["W"],
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_keywords": ["prowess"],
+                    "token_prowess": True,
+                    "_rule_logical_key": "battle_rule_v1:pg209_monastery_mentor_test",
+                    "_rule_oracle_hash": "pg209-monastery-mentor-test-hash",
+                }
+            ]
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                {"name": "Sol Ring", "type_line": "Artifact", "cmc": 1},
+                turn=5,
+                phase="precombat_main",
+            )
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                {"name": "Recruiter", "type_line": "Creature - Human", "cmc": 3},
+                turn=5,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        monk_tokens = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Monk Token"
+        ]
+        assert len(monk_tokens) == 1
+        assert monk_tokens[0]["power"] == 1
+        assert monk_tokens[0]["toughness"] == 1
+        assert monk_tokens[0]["type_line"] == "Creature Token — Monk"
+        assert monk_tokens[0]["colors"] == ["W"]
+        assert "prowess" in monk_tokens[0].get("keywords", [])
+        assert monk_tokens[0].get("prowess") is True
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Monastery Mentor"
+            and data.get("trigger") == "noncreature_spell_cast"
+            and data.get("trigger_spell") == "Sol Ring"
+            and data.get("effect") == "token_maker"
+            and data.get("tokens_created") == 1
+            and data.get("token_name") == "Monk Token"
+            and data.get("token_keywords") == ["prowess"]
+            and data.get("rule_logical_key") == "battle_rule_v1:pg209_monastery_mentor_test"
+            for event, data in events
+        )
+        assert not any(
+            event == "trigger_resolved"
+            and data.get("card") == "Monastery Mentor"
+            and data.get("trigger_spell") == "Recruiter"
+            for event, data in events
+        )
+
     def test_cool_but_rude_level_three_tutors_then_randomly_discards():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -15579,6 +15659,7 @@ def register_tests(battle, player):
         test_pg201_deflecting_palm_combat_window_chooses_largest_lethal_source,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
+        test_pg209_monastery_mentor_creates_monk_on_noncreature_spell_only,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,

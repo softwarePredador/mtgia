@@ -3656,6 +3656,47 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["token_power"], 1)
         self.assertEqual(primary["token_toughness"], 1)
 
+    def test_monastery_mentor_maps_to_noncreature_spell_cast_monk_prowess_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "MonasteryMentor",
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["ProwessAbility", "SpellCastControllerTriggeredAbility"],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.addAbility(new ProwessAbility());"
+                    "new SpellCastControllerTriggeredAbility("
+                    "new CreateTokenEffect(new MonasteryMentorToken()), "
+                    "StaticFilters.FILTER_SPELL_A_NON_CREATURE, false)"
+                ),
+            },
+            (
+                "Prowess\nWhenever you cast a noncreature spell, create a 1/1 "
+                "white Monk creature token with prowess."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "noncreature_spell_cast_create_1_1_white_monk_prowess_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 2)
+        self.assertTrue(primary["prowess"])
+        self.assertEqual(primary["trigger"], "noncreature_spell_cast")
+        self.assertEqual(primary["trigger_effect"], "token_maker")
+        self.assertEqual(primary["trigger_token_count"], 1)
+        self.assertEqual(primary["token_name"], "Monk Token")
+        self.assertEqual(primary["token_subtype"], "Monk")
+        self.assertEqual(primary["token_colors"], ["W"])
+        self.assertEqual(primary["token_power"], 1)
+        self.assertEqual(primary["token_toughness"], 1)
+        self.assertEqual(primary["token_keywords"], ["prowess"])
+        self.assertTrue(primary["token_prowess"])
+
     def test_cool_but_rude_maps_to_exact_class_attack_rummage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -1905,6 +1905,46 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        card_types == {"CREATURE"}
+        and xmage_class_name == "MonasteryMentor"
+        and "CreateTokenEffect" in effect_classes
+        and "SpellCastControllerTriggeredAbility" in ability_classes
+        and (
+            "MonasteryMentorToken" in rules_text
+            or "monasterymentortoken" in normalized
+            or _oracle_has(rules_text, "noncreature spell", "1/1 white monk", "prowess")
+        )
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "noncreature_spell_cast_create_1_1_white_monk_prowess_v1",
+            "fields": {
+                "power": 2,
+                "toughness": 2,
+                "prowess": True,
+                "trigger": "noncreature_spell_cast",
+                "trigger_effect": "token_maker",
+                "trigger_token_count": 1,
+                "token_count": 1,
+                "token_name": "Monk Token",
+                "token_subtype": "Monk",
+                "token_colors": ["W"],
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_keywords": ["prowess"],
+                "token_prowess": True,
+            },
+            "reason": "XMage structure matches Monastery Mentor: a 2/2 prowess creature whose controller's noncreature spells create one 1/1 white Monk creature token with prowess.",
+            "signals": [
+                "SpellCastControllerTriggeredAbility",
+                "CreateTokenEffect",
+                "MonasteryMentorToken",
+                "FILTER_SPELL_A_NON_CREATURE",
+                "ProwessAbility",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and xmage_class_name == "InvokeCalamity"
         and {
