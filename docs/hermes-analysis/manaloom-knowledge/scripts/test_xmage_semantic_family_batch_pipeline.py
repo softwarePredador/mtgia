@@ -6683,6 +6683,50 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_trouble_in_pairs_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Trouble in Pairs",
+                        "severity": "high",
+                        "oracle_hash": "troublehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 3},
+                        "xmage": {
+                            "class_name": "TroubleInPairs",
+                            "path": "/xmage/TroubleInPairs.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DrawCardSourceControllerEffect"],
+                            "ability_classes": [
+                                "SkipExtraTurnsAbility",
+                                "TroubleInPairsTriggeredAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "draw_engine",
+                                "battle_model_scope": "opponent_second_draw_second_spell_two_attackers_draw_v1",
+                                "draw_count": 1,
+                                "skip_opponent_extra_turns": True,
+                                "opponent_attacks_you_with_two_or_more_creatures_draw": True,
+                                "opponent_second_card_draw_each_turn": True,
+                                "opponent_second_spell_each_turn": True,
+                                "trigger": "opponent_second_spell",
+                                "tax": 0,
+                                "tax_payment_status": "not_applicable",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "draw_engine")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
 
 if __name__ == "__main__":
     unittest.main()

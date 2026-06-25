@@ -4654,6 +4654,48 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
         self.assertEqual(primary["damage_modifier_duration"], "until_end_of_turn")
 
+    def test_trouble_in_pairs_maps_to_exact_second_action_draw_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TroubleInPairs",
+                "effect_classes": ["DrawCardSourceControllerEffect"],
+                "ability_classes": [
+                    "SkipExtraTurnsAbility",
+                    "TroubleInPairsTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new SkipExtraTurnsAbility(true); "
+                    "new TroubleInPairsTriggeredAbility(); "
+                    "event.getType() == GameEvent.EventType.DECLARED_ATTACKERS "
+                    "|| event.getType() == GameEvent.EventType.DREW_CARD "
+                    "|| event.getType() == GameEvent.EventType.SPELL_CAST; "
+                    "CardsDrawnThisTurnWatcher drawWatcher; "
+                    "drawWatcher.getCardsDrawnThisTurn(event.getPlayerId()) == 2; "
+                    "CastSpellLastTurnWatcher spellWatcher; "
+                    "spellWatcher.getAmountOfSpellsPlayerCastOnCurrentTurn(event.getPlayerId()) == 2; "
+                    "new DrawCardSourceControllerEffect(1)"
+                ),
+            },
+            "If an opponent would begin an extra turn, that player skips that turn instead. "
+            "Whenever an opponent attacks you with two or more creatures, draws their second card each turn, "
+            "or casts their second spell each turn, you draw a card.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponent_second_draw_second_spell_two_attackers_draw_v1",
+        )
+        self.assertTrue(primary["skip_opponent_extra_turns"])
+        self.assertTrue(primary["opponent_attacks_you_with_two_or_more_creatures_draw"])
+        self.assertTrue(primary["opponent_second_card_draw_each_turn"])
+        self.assertTrue(primary["opponent_second_spell_each_turn"])
+        self.assertEqual(primary["trigger"], "opponent_second_spell")
+        self.assertEqual(primary["tax"], 0)
+        self.assertEqual(primary["draw_count"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

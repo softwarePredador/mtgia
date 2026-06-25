@@ -324,6 +324,10 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "extra-turn consumption signal for strategy/replay context.",
     ),
+    "extra_turn_skipped": (
+        "strategy_signal",
+        "replacement effect skipped an extra turn and affects turn sequencing strategy.",
+    ),
     "flashback_cast": (
         "strategy_signal",
         "alternate graveyard cast mode represented in stack/cast context and human replay.",

@@ -66,6 +66,7 @@ def test_known_static_and_observed_events_are_classified():
                 "modal_spell_resolved",
                 "noncombat_damage_modified",
                 "powerbalance_trigger_resolved",
+                "extra_turn_skipped",
                 "rebound_cast",
                 "rebound_exiled",
                 "rebound_skipped",

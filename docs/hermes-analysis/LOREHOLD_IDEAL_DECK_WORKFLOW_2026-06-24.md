@@ -614,6 +614,31 @@ promoted from the current Lorehold matrix:
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
 
+`Trouble in Pairs` is the fifteenth completed proof and the first exact
+opponent-second-action draw engine plus opponent-extra-turn skip scope promoted
+from the current Lorehold/opponent matrix:
+
+1. XMage local source matched `TroubleInPairs` directly through
+   `SkipExtraTurnsAbility(true)`, `TroubleInPairsTriggeredAbility`,
+   `CardsDrawnThisTurnWatcher`, `CastSpellLastTurnWatcher`, and
+   `DrawCardSourceControllerEffect`.
+2. The mapper/classifier promoted only the exact
+   `opponent_second_draw_second_spell_two_attackers_draw_v1` scope.
+3. Battle runtime now draws for the controller when an opponent draws their
+   second card in a turn, casts their second spell in a turn, or attacks the
+   controller with two or more creatures, and it skips opponent extra turns
+   while the enchantment is controlled.
+4. PG200 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made decks `614` and `619` report `Trouble in Pairs` as
+   `pass`; the matrix moved it to `battle_ready` /
+   `priority_benchmark_candidate`.
+6. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_030625/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+   `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

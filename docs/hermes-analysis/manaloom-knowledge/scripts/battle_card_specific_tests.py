@@ -11726,6 +11726,169 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def _pg200_trouble_in_pairs_rule():
+        return {
+            "name": "Trouble in Pairs",
+            "cmc": 4,
+            "type_line": "Enchantment",
+            "effect": "draw_engine",
+            "battle_model_scope": "opponent_second_draw_second_spell_two_attackers_draw_v1",
+            "draw_count": 1,
+            "skip_opponent_extra_turns": True,
+            "opponent_attacks_you_with_two_or_more_creatures_draw": True,
+            "opponent_second_card_draw_each_turn": True,
+            "opponent_second_spell_each_turn": True,
+            "trigger": "opponent_second_spell",
+            "tax": 0,
+            "tax_payment_status": "not_applicable",
+            "_rule_logical_key": "battle_rule_v1:trouble-test",
+            "_rule_oracle_hash": "trouble-test-hash",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+        }
+
+    def test_pg200_trouble_in_pairs_draws_on_opponent_second_card_each_turn():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            battle.CURRENT_REPLAY_TURN = 8
+            controller = player("Lorehold")
+            opponent = player("Opponent")
+            controller.battlefield = [_pg200_trouble_in_pairs_rule()]
+            controller.library = [{"name": "Trouble Draw", "type_line": "Instant"}]
+            opponent.library = [
+                {"name": "Opponent Draw 1", "type_line": "Sorcery"},
+                {"name": "Opponent Draw 2", "type_line": "Sorcery"},
+            ]
+            drawn = opponent.draw(2, random.Random(200))
+            battle.process_player_draw_triggers(
+                opponent,
+                len(drawn),
+                8,
+                "draw",
+                [controller, opponent],
+                turn_player=opponent,
+            )
+        finally:
+            battle.CURRENT_REPLAY_TURN = None
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(card.get("name") == "Trouble Draw" for card in controller.hand)
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Trouble in Pairs"
+            and data.get("trigger") == "opponent_second_card_draw_each_turn"
+            and data.get("drawing_player") == "Opponent"
+            and data.get("opponent_cards_drawn_this_turn") == 2
+            and data.get("cards_drawn") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:trouble-test"
+            for event, data in events
+        )
+
+    def test_pg200_trouble_in_pairs_draws_on_opponent_second_spell_without_tax():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            caster = player("Opponent")
+            controller = player("Lorehold")
+            controller.battlefield = [_pg200_trouble_in_pairs_rule()]
+            controller.library = [{"name": "Second Spell Draw", "type_line": "Instant"}]
+            first_spell = {"name": "First Spell", "type_line": "Sorcery", "cmc": 1}
+            second_spell = {"name": "Second Spell", "type_line": "Sorcery", "cmc": 2}
+            caster.record_spell_cast(9, card=first_spell)
+            caster.record_spell_cast(9, card=second_spell)
+            battle.trigger_opponent_spell_draw_engines(
+                caster,
+                [controller],
+                second_spell,
+                9,
+                "main",
+                random.Random(201),
+                all_players=[controller, caster],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(card.get("name") == "Second Spell Draw" for card in controller.hand)
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Trouble in Pairs"
+            and data.get("trigger") == "opponent_second_spell"
+            and data.get("trigger_spell") == "Second Spell"
+            and data.get("tax_amount") == 0
+            and data.get("tax_paid") is False
+            and data.get("cards_drawn") == 1
+            for event, data in events
+        )
+
+    def test_pg200_trouble_in_pairs_draws_when_attacked_by_two_or_more_creatures():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Lorehold")
+            attacker = player("Opponent")
+            controller.battlefield = [_pg200_trouble_in_pairs_rule()]
+            controller.library = [{"name": "Attack Trigger Draw", "type_line": "Instant"}]
+            attackers = [
+                {"name": "Attacker One", "type_line": "Creature", "effect": "creature", "power": 2, "toughness": 2},
+                {"name": "Attacker Two", "type_line": "Creature", "effect": "creature", "power": 2, "toughness": 2},
+            ]
+            battle.resolve_trouble_in_pairs_attack_triggers(
+                attacker,
+                [(controller, attackers)],
+                [controller, attacker],
+                10,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(card.get("name") == "Attack Trigger Draw" for card in controller.hand)
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Trouble in Pairs"
+            and data.get("trigger") == "opponent_attacks_you_with_two_or_more_creatures"
+            and data.get("attacking_player") == "Opponent"
+            and data.get("defending_player") == "Lorehold"
+            and data.get("attackers") == 2
+            and data.get("cards_drawn") == 1
+            for event, data in events
+        )
+
+    def test_pg200_trouble_in_pairs_skips_opponent_extra_turn():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Lorehold")
+            extra_turn_player = player("Opponent")
+            controller.battlefield = [_pg200_trouble_in_pairs_rule()]
+            controller.library = [{"name": "Controller Filler", "type_line": "Instant"}]
+            extra_turn_player.library = [
+                {"name": "Opponent Filler 1", "type_line": "Sorcery"},
+                {"name": "Opponent Filler 2", "type_line": "Sorcery"},
+            ]
+            extra_turn_player.extra_turns = 1
+            battle.play_turn_sequence_v8(
+                extra_turn_player,
+                [controller],
+                [controller, extra_turn_player],
+                turn=11,
+                rng=random.Random(202),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert extra_turn_player.extra_turns == 0
+        assert not any(event == "extra_turn_taken" for event, _ in events)
+        assert any(
+            event == "extra_turn_skipped"
+            and data.get("card") == "Trouble in Pairs"
+            and data.get("skipped_player") == "Opponent"
+            and data.get("source_controller") == "Lorehold"
+            and data.get("rule_oracle_hash") == "trouble-test-hash"
+            for event, data in events
+        )
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -14333,6 +14496,10 @@ def register_tests(battle, player):
         test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures,
         test_pg198_surly_badgersaur_discard_card_type_triggers_counter_treasure_and_fight,
         test_pg199_taii_wakeen_modifies_noncombat_damage_and_draws_on_exact_toughness,
+        test_pg200_trouble_in_pairs_draws_on_opponent_second_card_each_turn,
+        test_pg200_trouble_in_pairs_draws_on_opponent_second_spell_without_tax,
+        test_pg200_trouble_in_pairs_draws_when_attacked_by_two_or_more_creatures,
+        test_pg200_trouble_in_pairs_skips_opponent_extra_turn,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,

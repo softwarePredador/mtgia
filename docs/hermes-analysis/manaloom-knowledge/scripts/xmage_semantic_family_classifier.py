@@ -636,6 +636,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("damage_modifier_duration") == "until_end_of_turn"
         )
 
+    if effect == "draw_engine" and scope == "opponent_second_draw_second_spell_two_attackers_draw_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"DrawCardSourceControllerEffect"}
+            and {"SkipExtraTurnsAbility", "TroubleInPairsTriggeredAbility"}.issubset(ability_classes)
+            and not cost_classes
+            and int(effect_json.get("draw_count") or 0) == 1
+            and bool(effect_json.get("skip_opponent_extra_turns"))
+            and bool(effect_json.get("opponent_attacks_you_with_two_or_more_creatures_draw"))
+            and bool(effect_json.get("opponent_second_card_draw_each_turn"))
+            and bool(effect_json.get("opponent_second_spell_each_turn"))
+            and effect_json.get("trigger") == "opponent_second_spell"
+            and int(effect_json.get("tax") or 0) == 0
+        )
+
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
         return (
             types == {"CREATURE"}
@@ -2340,6 +2355,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("tax") or 0) == 4
             and not bool(effect_json.get("draw_on_enter"))
             and int(effect_json.get("cumulative_upkeep_generic") or 0) == 1
+        )
+
+    if effect == "draw_engine" and scope == "opponent_second_draw_second_spell_two_attackers_draw_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"DrawCardSourceControllerEffect"}
+            and {"SkipExtraTurnsAbility", "TroubleInPairsTriggeredAbility"}.issubset(ability_classes)
+            and not cost_classes
+            and int(effect_json.get("draw_count") or 0) == 1
+            and bool(effect_json.get("skip_opponent_extra_turns"))
+            and bool(effect_json.get("opponent_attacks_you_with_two_or_more_creatures_draw"))
+            and bool(effect_json.get("opponent_second_card_draw_each_turn"))
+            and bool(effect_json.get("opponent_second_spell_each_turn"))
+            and effect_json.get("trigger") == "opponent_second_spell"
+            and int(effect_json.get("tax") or 0) == 0
         )
 
     if effect == "draw_engine" and scope == "opponent_discards_card_may_draw_v1":

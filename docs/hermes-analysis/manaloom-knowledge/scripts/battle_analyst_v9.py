@@ -22301,6 +22301,7 @@ def apply_redistribute_life_totals(player, opponents, card, effect_data, turn):
 
 
 TAII_WAKEEN_SCOPE = "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1"
+TROUBLE_IN_PAIRS_SCOPE = "opponent_second_draw_second_spell_two_attackers_draw_v1"
 
 
 def _taii_wakeen_permanents(player):
@@ -22311,6 +22312,62 @@ def _taii_wakeen_permanents(player):
         and permanent.get("battle_model_scope") == TAII_WAKEEN_SCOPE
         and bool(permanent.get("noncombat_damage_to_creature_equal_toughness_draw"))
     ]
+
+
+def _trouble_in_pairs_permanents(player):
+    return [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == TROUBLE_IN_PAIRS_SCOPE
+    ]
+
+
+def _resolve_trouble_in_pairs_draw(
+    controller,
+    permanent,
+    trigger,
+    *,
+    turn=None,
+    phase=None,
+    all_players=None,
+    stack=None,
+    turn_player=None,
+    **event_fields,
+):
+    drawn = controller.draw(max(1, int(permanent.get("draw_count") or 1)))
+    process_player_draw_triggers(
+        controller,
+        len(drawn),
+        turn,
+        phase,
+        all_players or [controller],
+        stack=stack,
+        turn_player=turn_player,
+    )
+    emit_replay_event(
+        "trigger_resolved",
+        player=controller.name,
+        card=permanent.get("name", "?"),
+        trigger=trigger,
+        effect="draw_cards",
+        cards_drawn=len(drawn),
+        turn=turn,
+        phase=phase,
+        **event_fields,
+        **replay_rule_fields(permanent),
+    )
+    return len(drawn)
+
+
+def trouble_in_pairs_skip_extra_turn_source(player, all_players):
+    for opponent in all_players or []:
+        if opponent is player or not getattr(opponent, "is_alive", lambda: True)():
+            continue
+        for permanent in _trouble_in_pairs_permanents(opponent):
+            if permanent.get("skip_opponent_extra_turns"):
+                return opponent, permanent
+    return None, None
 
 
 def _taii_damage_spell_base_amount(card, effect_data):
@@ -23294,7 +23351,7 @@ def trigger_opponent_spell_draw_engines(
             if permanent.get("effect") != "draw_engine":
                 continue
             trigger = permanent.get("trigger")
-            if trigger not in ("opponent_spell", "opponent_noncreature_spell"):
+            if trigger not in ("opponent_spell", "opponent_noncreature_spell", "opponent_second_spell"):
                 continue
             if trigger == "opponent_noncreature_spell" and not is_noncreature_spell:
                 continue
@@ -23384,11 +23441,13 @@ def trigger_opponent_spell_draw_engines(
                 # Compact model: caster sometimes pays the tax when spare mana exists.
                 can_pay_tax = tax > 0 and caster.available_mana() >= tax
                 pays_tax = can_pay_tax and rng.random() < 0.35
+                cards_drawn = 0
                 if pays_tax:
                     caster.spend_mana(tax)
                     result = "tax_paid"
                 else:
                     drawn = opponent.draw(1, rng)
+                    cards_drawn = len(drawn)
                     process_player_draw_triggers(
                         opponent,
                         len(drawn),
@@ -23407,6 +23466,7 @@ def trigger_opponent_spell_draw_engines(
                     trigger_spell=spell.get("name", "?"),
                     effect="draw_cards",
                     result=result,
+                    cards_drawn=cards_drawn,
                     tax_amount=tax,
                     tax_paid=pays_tax,
                     noncreature_spell_number=noncreature_spell_number,
@@ -23557,6 +23617,39 @@ def trigger_opponent_draw_card_engines(
         for permanent in list(opponent.battlefield):
             if not isinstance(permanent, dict):
                 continue
+            if permanent.get("opponent_second_card_draw_each_turn"):
+                current_drawn = int(getattr(drawing_player, "cards_drawn_this_turn", 0) or 0)
+                previous_drawn = max(0, current_drawn - drawn_count)
+                if previous_drawn < 2 <= current_drawn:
+                    def resolve_trouble_second_draw_trigger(
+                        opponent=opponent,
+                        permanent=permanent,
+                        current_drawn=current_drawn,
+                    ):
+                        _resolve_trouble_in_pairs_draw(
+                            opponent,
+                            permanent,
+                            "opponent_second_card_draw_each_turn",
+                            drawing_player=drawing_player.name,
+                            drawn_player=drawing_player.name,
+                            opponent_cards_drawn_this_turn=current_drawn,
+                            all_players=all_players or [drawing_player, *opponents],
+                            stack=stack,
+                            turn_player=turn_player,
+                            turn=turn,
+                            phase=phase,
+                        )
+
+                    resolve_or_enqueue_trigger(
+                        opponent,
+                        permanent,
+                        "opponent_second_card_draw_each_turn",
+                        resolve_trouble_second_draw_trigger,
+                        stack=stack,
+                        active_player=drawing_player,
+                        all_players=all_players or [drawing_player, *opponents],
+                    )
+                    continue
             draw_per_card = int(permanent.get("opponent_draws_card_may_draw") or 0)
             if draw_per_card <= 0:
                 continue
@@ -27959,6 +28052,29 @@ def apply_attack_restrictions(attacker, attack_groups, all_players):
     return restricted_groups, details
 
 
+def resolve_trouble_in_pairs_attack_triggers(attacker, attack_groups, all_players, turn):
+    for defender, group_attackers in attack_groups or []:
+        if defender is attacker or len(group_attackers or []) < 2:
+            continue
+        for permanent in _trouble_in_pairs_permanents(defender):
+            if not permanent.get("opponent_attacks_you_with_two_or_more_creatures_draw"):
+                continue
+            _resolve_trouble_in_pairs_draw(
+                defender,
+                permanent,
+                "opponent_attacks_you_with_two_or_more_creatures",
+                attacking_player=attacker.name,
+                attacker=attacker.name,
+                defending_player=defender.name,
+                attackers=len(group_attackers),
+                attackers_detail=[replay_card_snapshot(card) for card in group_attackers],
+                all_players=all_players,
+                turn_player=attacker,
+                turn=turn,
+                phase="combat",
+            )
+
+
 def declare_attackers_step(attacker, opponents, all_players, turn):
     if getattr(attacker, "creatures_cant_attack_this_turn", False):
         emit_replay_event(
@@ -28201,6 +28317,7 @@ def declare_attackers_step(attacker, opponents, all_players, turn):
         attack_restrictions=attack_restriction_details,
         turn=turn,
     )
+    resolve_trouble_in_pairs_attack_triggers(attacker, attack_groups, all_players, turn)
     if len(attack_groups) > 1:
         emit_replay_event(
             "multi_defender_attack",
@@ -29380,6 +29497,21 @@ def play_turn_sequence_v8(player, opponents, all_players, turn, rng, stack, max_
         and not game_winner(all_players)
         and extra_turns_taken < max_extra_turns
     ):
+        skip_controller, skip_source = trouble_in_pairs_skip_extra_turn_source(player, all_players)
+        if skip_source is not None:
+            player.extra_turns -= 1
+            emit_replay_event(
+                "extra_turn_skipped",
+                player=player.name,
+                skipped_player=player.name,
+                source_controller=skip_controller.name,
+                card=skip_source.get("name", "?"),
+                reason="opponent_skip_extra_turn_replacement",
+                remaining_extra_turns=player.extra_turns,
+                turn=turn,
+                **replay_rule_fields(skip_source),
+            )
+            continue
         player.extra_turns -= 1
         extra_turns_taken += 1
         emit_replay_event(

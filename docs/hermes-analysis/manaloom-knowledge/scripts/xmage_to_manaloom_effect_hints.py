@@ -4656,7 +4656,54 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     target_constraints = _target_constraints(target_classes, filter_classes)
     card_types = _constructor_card_types(index_entry)
     xmage_class_name = str(index_entry.get("xmage_class_name") or "").strip()
+    normalized_text = _normalized_rules_text(rules_text)
+    normalized_imports = _normalized_rules_text(" ".join(str(value or "") for value in index_entry.get("imports") or []))
     candidates: list[dict[str, Any]] = []
+
+    if (
+        xmage_class_name == "TroubleInPairs"
+        and card_types == {"ENCHANTMENT"}
+        and effect_classes == {"DrawCardSourceControllerEffect"}
+        and {"SkipExtraTurnsAbility", "TroubleInPairsTriggeredAbility"}.issubset(ability_classes)
+        and (
+            "cardsdrawnthisturnwatcher" in normalized_text
+            or "cardsdrawnthisturnwatcher" in normalized_imports
+        )
+        and (
+            "castspelllastturnwatcher" in normalized_text
+            or "castspelllastturnwatcher" in normalized_imports
+        )
+        and "declared_attackers" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="draw_engine",
+                scope="opponent_second_draw_second_spell_two_attackers_draw_v1",
+                reason=(
+                    "XMage structure matches Trouble in Pairs: skip opponent extra turns and draw when an opponent "
+                    "attacks you with two or more creatures, draws their second card, or casts their second spell."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "draw_count": 1,
+                    "skip_opponent_extra_turns": True,
+                    "opponent_attacks_you_with_two_or_more_creatures_draw": True,
+                    "opponent_second_card_draw_each_turn": True,
+                    "opponent_second_spell_each_turn": True,
+                    "trigger": "opponent_second_spell",
+                    "tax": 0,
+                    "tax_payment_status": "not_applicable",
+                },
+                matched_signals=[
+                    "SkipExtraTurnsAbility",
+                    "TroubleInPairsTriggeredAbility",
+                    "CardsDrawnThisTurnWatcher",
+                    "CastSpellLastTurnWatcher",
+                    "DrawCardSourceControllerEffect",
+                ],
+            )
+        )
 
     if _oracle_has(rules_text, "vow counter", "sacrifices the rest") or (
         "VOW" in counter_types and ("SacrificeAllEffect" in effect_classes or "OneShotEffect" in inner_extends)
