@@ -3,10 +3,11 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG189, applied, postchecked, synced from PostgreSQL to Hermes
+this thread is PG216, applied, postchecked, synced from PostgreSQL to Hermes
 SQLite/canonical snapshot, tested, strategy-audited, and documented on
-2026-06-24. PG189 promoted `Profound Journey` to an Oracle/XMage-backed
-rebound recursion rule. This was not a deck swap, learned-deck promotion, or
+2026-06-25. PG216 promoted `Black Market Connections`, `Smuggler's Share`,
+and `Davros, Dalek Creator` to Oracle/XMage-backed phase-watcher runtime
+rules. This was not a deck swap, learned-deck promotion, or
 battle rebaseline.
 
 ## Purpose
@@ -13466,6 +13467,141 @@ Register decision:
 - Do not reuse PG215.
 - Continue Lorehold-first closure on the remaining runtime rows:
   `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
-  `Black Market Connections`, `Smuggler's Share`, `Davros, Dalek Creator`,
   `The Locust God`, and `Biotransference`.
 - Next package number is PG216.
+
+## PG216 - Phase watcher / end-step engine XMage batch
+
+Status: applied, postchecked, synced, tested, strategy-audited.
+
+Scope:
+
+- Cards: `Black Market Connections`, `Smuggler's Share`, and
+  `Davros, Dalek Creator`.
+- Families: `token_maker`, `creature`.
+- XMage sources:
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BlackMarketConnections.java`,
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SmugglersShare.java`,
+  and
+  `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DavrosDalekCreator.java`.
+- ManaLoom runtime scopes:
+  `precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1`,
+  `each_end_step_opponent_extra_draw_landfall_draw_treasure_v1`, and
+  `controller_end_step_opponent_lost_life_dalek_villainous_choice_v1`.
+- Logical rule keys:
+  `battle_rule_v1:9627a4437f1b6029c04032ba2e552c0b` for
+  `Black Market Connections`;
+  `battle_rule_v1:d1967f626af998349b300eee21f20156` for
+  `Smuggler's Share`;
+  `battle_rule_v1:d03959f01d684d887bec04985c092274` for
+  `Davros, Dalek Creator`.
+- Oracle hashes:
+  `7d64928ea3153bf9390dc2356ccccb64` for
+  `Black Market Connections`;
+  `1076ff44243459457e22ec5bec940daf` for `Smuggler's Share`;
+  `b3c9d6bb7aba3a111395e2ab07ccd32f` for
+  `Davros, Dalek Creator`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg216_phase_watchers_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg216_phase_watchers_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg216_phase_watchers_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg216_phase_watchers_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg216_phase_watchers_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg216_phase_watchers_rollback.sql`.
+
+Evidence:
+
+- External hash harvest:
+  `docs/hermes-analysis/master_optimizer_reports/pg216_phase_watchers_external_harvest.json`
+  supplied exact Oracle hashes for all three package rows.
+- Precheck:
+  each card matched exactly one canonical card row. `Black Market Connections`
+  and `Smuggler's Share` each had `existing_rule_rows=2` and
+  `would_deprecate_shadow_rows=2`; `Davros, Dalek Creator` had
+  `existing_rule_rows=0`; all three had `expected_rule_rows_before=0`.
+- Apply:
+  backup captured `4` pre-existing shadow rows, `deprecated_shadow_rows=4`,
+  `upserted_rows=3`, and `COMMIT`.
+- Postcheck:
+  each card has `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`;
+  package backup rows total `4`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg216_phase_watchers_20260625.json`;
+  `selected_card_count=3`, `pg_rows_loaded=7`,
+  `sqlite_inserted_or_updated=7`, and
+  `canonical_snapshot_rows_exported=3247`.
+- Runtime cache spot-check:
+  local SQLite resolves `black market connections`,
+  `smuggler's share`, and `davros, dalek creator` to the expected
+  `battle_model_scope` values above as `review_status=verified` and
+  `execution_status=auto`; the older Black Market and Smuggler shadow rows are
+  `deprecated/disabled`.
+- Post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260625_pg216_phase_watchers_postsync_v1_manifest.json`;
+  expanded scope moved to `high=373`, `medium=63`, `pass=526`, with
+  `runtime_family_implementation_required=7`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg216_phase_watchers_postsync_v1.json`;
+  expanded decks `6,606-619` matrix has `580` rows, `battle_ready=387`,
+  `runtime_needed=3`, `mapper_manual=131`, `split_scope=55`, and
+  `blocked_missing_xmage_source=4`.
+- Effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg216_phase_watchers_postsync_v1.json`;
+  remaining lane counts are `manual_mapper_backlog=333`,
+  `split_scope_backlog=74`, `runtime_family_backlog=7`,
+  `blocked_missing_xmage_source=4`, and no package-ready unprepared rows.
+- Strategy consistency:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg216_phase_watchers_postsync_v1.json`;
+  `18/18` checks passed.
+- Tests:
+  mapper tests passed `203/203`, classifier tests passed `188/188`, and the
+  battle harness passed including
+  `test_pg216_black_market_connections_precombat_modal_resources`,
+  `test_pg216_smugglers_share_each_end_step_draws_and_creates_treasure`, and
+  `test_pg216_davros_end_step_creates_dalek_and_villainous_discard`.
+- Battle strategy gate:
+  `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_105025/summary.json`;
+  `run_scope=recurring_full`, `start_seed=63261388`,
+  `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+  `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+  `action_verdict_counts={"ok":6435}`,
+  `target_pressure_statuses={"pass":16}`,
+  `table_intent_statuses={"pass":16}`,
+  `effect_coverage_unknowns=0`,
+  `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+  `runtime_surface_manifest_status=runtime_surface_manifest_ready`,
+  `runtime_surface_manifest_total_files=122`, and
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Runtime changes:
+
+- The battle runtime now tracks per-turn life loss after replacement-aware
+  life changes and damage resolution.
+- Turn-scoped counters for cards drawn, lands played, and life lost are reset
+  at turn boundaries for all participants.
+- Precombat-main phase engines now support Black Market's modal Treasure,
+  draw, Shapeshifter token, and life-payment branches with a configurable life
+  floor.
+- End-step phase engines now support Smuggler's Share using opponent
+  cards-drawn and lands-played counters.
+- End-step phase engines now support Davros using opponent life-loss counters,
+  Dalek token creation, and compact villainous-choice discard/draw modeling.
+
+Register decision:
+
+- PG216 is applied, postchecked, synced, locally tested, and
+  strategy-audited.
+- Do not reuse PG216.
+- Continue Lorehold-first closure on the remaining runtime rows:
+  `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
+  `The Locust God`, and `Biotransference`.
+- Next package number is PG217.

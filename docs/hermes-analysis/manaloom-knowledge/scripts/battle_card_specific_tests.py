@@ -15713,6 +15713,203 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg216_black_market_connections_precombat_modal_resources():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.library = [_card("Drawn Card")]
+            active.battlefield = [
+                {
+                    "name": "Black Market Connections",
+                    "effect": "token_maker",
+                    "battle_model_scope": "precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1",
+                    "type_line": "Enchantment",
+                    "trigger": "beginning_precombat_main",
+                    "precombat_main_choose_modes_treasure_draw_token_life_loss": True,
+                    "mode_selection_life_floor": 4,
+                    "precombat_main_modes": [
+                        {"name": "Sell Contraband", "effect": "create_treasure", "treasure_count": 1, "life_loss": 1},
+                        {"name": "Buy Information", "effect": "draw_cards", "draw_cards": 1, "life_loss": 2},
+                        {
+                            "name": "Hire a Mercenary",
+                            "effect": "token_maker",
+                            "token_count": 1,
+                            "life_loss": 3,
+                            "token": {
+                                "token_name": "Shapeshifter Token",
+                                "token_subtype": "Shapeshifter",
+                                "token_power": 3,
+                                "token_toughness": 2,
+                                "token_colors": [],
+                                "token_keywords": ["changeling"],
+                            },
+                        },
+                    ],
+                    "_rule_logical_key": "battle_rule_v1:pg216_black_market_test",
+                    "_rule_oracle_hash": "pg216-black-market-test-hash",
+                }
+            ]
+
+            battle.process_precombat_main_phase_engines(
+                active,
+                [],
+                [active],
+                turn=6,
+                rng=random.Random(216),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        shapeshifters = [
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Shapeshifter Token"
+        ]
+        assert active.life == 34
+        assert active.treasures == 1
+        assert any(card.get("name") == "Drawn Card" for card in active.hand)
+        assert len(shapeshifters) == 1
+        assert shapeshifters[0]["power"] == 3
+        assert shapeshifters[0]["toughness"] == 2
+        assert "changeling" in shapeshifters[0].get("keywords", [])
+        assert any(
+            event == "phase_trigger_resolved"
+            and data.get("card") == "Black Market Connections"
+            and data.get("trigger") == "beginning_precombat_main"
+            and data.get("life_lost") == 6
+            and data.get("treasures_created") == 1
+            and data.get("cards_drawn") == 1
+            and data.get("tokens_created") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:pg216_black_market_test"
+            for event, data in events
+        )
+
+    def test_pg216_smugglers_share_each_end_step_draws_and_creates_treasure():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Smuggler Controller")
+            active_opponent = player("Active Opponent")
+            controller.library = [_card("Smuggler Draw")]
+            controller.battlefield = [
+                {
+                    "name": "Smuggler's Share",
+                    "effect": "token_maker",
+                    "battle_model_scope": "each_end_step_opponent_extra_draw_landfall_draw_treasure_v1",
+                    "type_line": "Enchantment",
+                    "trigger": "each_end_step",
+                    "each_end_step_opponent_extra_draw_land_treasure": True,
+                    "opponent_cards_drawn_threshold": 2,
+                    "draw_cards_per_qualified_opponent": 1,
+                    "opponent_lands_entered_threshold": 2,
+                    "treasure_count_per_qualified_opponent": 1,
+                    "_rule_logical_key": "battle_rule_v1:pg216_smugglers_share_test",
+                    "_rule_oracle_hash": "pg216-smugglers-share-test-hash",
+                }
+            ]
+            active_opponent.cards_drawn_this_turn = 2
+            active_opponent.lands_played_this_turn = 2
+
+            battle.process_end_step_phase_engines(
+                active_opponent,
+                [controller, active_opponent],
+                turn=6,
+                rng=random.Random(216),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert controller.treasures == 1
+        assert any(card.get("name") == "Smuggler Draw" for card in controller.hand)
+        assert any(
+            event == "phase_trigger_resolved"
+            and data.get("card") == "Smuggler's Share"
+            and data.get("trigger") == "each_end_step"
+            and data.get("active_player") == "Active Opponent"
+            and data.get("cards_drawn") == 1
+            and data.get("treasures_created") == 1
+            and data.get("draw_qualified_opponents") == ["Active Opponent"]
+            and data.get("treasure_qualified_opponents") == ["Active Opponent"]
+            and data.get("rule_logical_key") == "battle_rule_v1:pg216_smugglers_share_test"
+            for event, data in events
+        )
+
+    def test_pg216_davros_end_step_creates_dalek_and_villainous_discard():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_turn = battle.CURRENT_REPLAY_TURN
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.CURRENT_REPLAY_TURN = 7
+        try:
+            controller = player("Davros Controller")
+            opponent = player("Damaged Opponent")
+            opponent.hand = [_card("Discard Choice")]
+            controller.battlefield = [
+                {
+                    "name": "Davros, Dalek Creator",
+                    "effect": "creature",
+                    "battle_model_scope": "controller_end_step_opponent_lost_life_dalek_villainous_choice_v1",
+                    "type_line": "Legendary Artifact Creature - Alien Scientist",
+                    "power": 3,
+                    "toughness": 4,
+                    "menace": True,
+                    "trigger": "controller_end_step",
+                    "controller_end_step_opponent_lost_life_dalek_villainous_choice": True,
+                    "opponent_life_lost_threshold": 3,
+                    "token_count": 1,
+                    "token_name": "Dalek Token",
+                    "token_subtype": "Dalek",
+                    "token_colors": ["B"],
+                    "token_power": 3,
+                    "token_toughness": 3,
+                    "artifact_tokens": True,
+                    "token_keywords": ["menace"],
+                    "_rule_logical_key": "battle_rule_v1:pg216_davros_test",
+                    "_rule_oracle_hash": "pg216-davros-test-hash",
+                }
+            ]
+            battle.deal_damage(opponent, 3)
+
+            battle.process_end_step_phase_engines(
+                controller,
+                [controller, opponent],
+                turn=7,
+                rng=random.Random(216),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            battle.CURRENT_REPLAY_TURN = previous_turn
+
+        daleks = [
+            permanent
+            for permanent in controller.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Dalek Token"
+        ]
+        assert opponent.life == 37
+        assert len(daleks) == 1
+        assert daleks[0]["power"] == 3
+        assert daleks[0]["toughness"] == 3
+        assert daleks[0].get("type_line") == "Artifact Creature Token — Dalek"
+        assert "menace" in daleks[0].get("keywords", [])
+        assert opponent.hand == []
+        assert any(card.get("name") == "Discard Choice" for card in opponent.graveyard)
+        assert any(
+            event == "phase_trigger_resolved"
+            and data.get("card") == "Davros, Dalek Creator"
+            and data.get("trigger") == "controller_end_step"
+            and data.get("tokens_created") == 1
+            and data.get("qualified_opponents") == ["Damaged Opponent"]
+            and data.get("villainous_choices")[0]["choice"] == "discard_card"
+            and data.get("rule_logical_key") == "battle_rule_v1:pg216_davros_test"
+            for event, data in events
+        )
+
     def test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -16328,6 +16525,9 @@ def register_tests(battle, player):
         test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw,
         test_pg215_green_goblin_discard_nonland_counter_and_land_treasure,
         test_pg215_aclazotz_opponent_discard_land_creates_flying_bat,
+        test_pg216_black_market_connections_precombat_modal_resources,
+        test_pg216_smugglers_share_each_end_step_draws_and_creates_treasure,
+        test_pg216_davros_end_step_creates_dalek_and_villainous_discard,
         test_pg211_blaze_commando_creates_soldiers_when_spell_deals_damage,
         test_pg207_another_creature_enter_damage_each_opponent_excludes_source_entering,
         test_pg207_impact_tremors_damages_each_opponent_when_token_enters,

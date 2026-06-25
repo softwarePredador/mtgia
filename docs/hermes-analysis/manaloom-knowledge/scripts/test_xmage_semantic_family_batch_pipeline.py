@@ -7491,6 +7491,132 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_black_market_connections_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Black Market Connections",
+                        "severity": "high",
+                        "oracle_hash": "blackmarkethash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "BlackMarketConnections",
+                            "path": "/xmage/BlackMarketConnections.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": [
+                                "CreateTokenEffect",
+                                "DrawCardSourceControllerEffect",
+                                "LoseLifeSourceControllerEffect",
+                            ],
+                            "ability_classes": ["BeginningOfFirstMainTriggeredAbility"],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "token_maker",
+                                "battle_model_scope": "precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1",
+                                "trigger": "beginning_precombat_main",
+                                "precombat_main_choose_modes_treasure_draw_token_life_loss": True,
+                                "mode_selection_life_floor": 4,
+                                "precombat_main_modes": [
+                                    {"name": "Sell Contraband", "effect": "create_treasure"},
+                                    {"name": "Buy Information", "effect": "draw_cards"},
+                                    {"name": "Hire a Mercenary", "effect": "token_maker"},
+                                ],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_smugglers_share_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Smuggler's Share",
+                        "severity": "high",
+                        "oracle_hash": "smugglershash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "SmugglersShare",
+                            "path": "/xmage/SmugglersShare.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+                            "ability_classes": ["BeginningOfEndStepTriggeredAbility"],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "token_maker",
+                                "battle_model_scope": "each_end_step_opponent_extra_draw_landfall_draw_treasure_v1",
+                                "trigger": "each_end_step",
+                                "each_end_step_opponent_extra_draw_land_treasure": True,
+                                "opponent_cards_drawn_threshold": 2,
+                                "draw_cards_per_qualified_opponent": 1,
+                                "opponent_lands_entered_threshold": 2,
+                                "treasure_count_per_qualified_opponent": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_davros_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Davros, Dalek Creator",
+                        "severity": "high",
+                        "oracle_hash": "davroshash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "DavrosDalekCreator",
+                            "path": "/xmage/DavrosDalekCreator.java",
+                            "types": ["ARTIFACT", "CREATURE"],
+                            "effect_classes": ["CreateTokenEffect", "DavrosDalekCreatorEffect"],
+                            "ability_classes": ["BeginningOfEndStepTriggeredAbility"],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controller_end_step_opponent_lost_life_dalek_villainous_choice_v1",
+                                "power": 3,
+                                "toughness": 4,
+                                "menace": True,
+                                "trigger": "controller_end_step",
+                                "controller_end_step_opponent_lost_life_dalek_villainous_choice": True,
+                                "opponent_life_lost_threshold": 3,
+                                "token_count": 1,
+                                "token_name": "Dalek Token",
+                                "token_subtype": "Dalek",
+                                "token_power": 3,
+                                "token_toughness": 3,
+                                "artifact_tokens": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_taii_wakeen_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

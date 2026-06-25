@@ -5216,6 +5216,92 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["token_colors"], ["B"])
         self.assertTrue(primary["token_flying"])
 
+    def test_black_market_connections_maps_to_exact_precombat_modal_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BlackMarketConnections",
+                "effect_classes": [
+                    "CreateTokenEffect",
+                    "DrawCardSourceControllerEffect",
+                    "LoseLifeSourceControllerEffect",
+                ],
+                "ability_classes": ["BeginningOfFirstMainTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new BeginningOfFirstMainTriggeredAbility(new CreateTokenEffect(new TreasureToken())); "
+                    "new LoseLifeSourceControllerEffect(1); "
+                    "new Mode(new DrawCardSourceControllerEffect(1)).addEffect(new LoseLifeSourceControllerEffect(2)); "
+                    "new Mode(new CreateTokenEffect(new Shapeshifter32Token())).addEffect(new LoseLifeSourceControllerEffect(3));"
+                ),
+            },
+            "At the beginning of your precombat main phase, choose one or more.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1",
+        )
+        self.assertTrue(primary["precombat_main_choose_modes_treasure_draw_token_life_loss"])
+        self.assertEqual(len(primary["precombat_main_modes"]), 3)
+        self.assertEqual(primary["precombat_main_modes"][2]["token"]["token_subtype"], "Shapeshifter")
+
+    def test_smugglers_share_maps_to_exact_each_end_step_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "SmugglersShare",
+                "effect_classes": ["CreateTokenEffect", "DrawCardSourceControllerEffect"],
+                "ability_classes": ["BeginningOfEndStepTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new BeginningOfEndStepTriggeredAbility(TargetController.EACH_PLAYER, "
+                    "new DrawCardSourceControllerEffect(SmugglersShareDrawValue.instance), false); "
+                    "new CreateTokenEffect(new TreasureToken(), SmugglersShareTreasureValue.instance); "
+                    "new CardsAmountDrawnThisTurnWatcher(); new PermanentsEnteredBattlefieldWatcher();"
+                ),
+            },
+            "At the beginning of each end step, draw a card for each opponent who drew two or more cards this turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "token_maker")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "each_end_step_opponent_extra_draw_landfall_draw_treasure_v1",
+        )
+        self.assertEqual(primary["trigger"], "each_end_step")
+        self.assertEqual(primary["opponent_cards_drawn_threshold"], 2)
+        self.assertEqual(primary["opponent_lands_entered_threshold"], 2)
+
+    def test_davros_maps_to_exact_end_step_lost_life_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "DavrosDalekCreator",
+                "effect_classes": ["CreateTokenEffect", "DavrosDalekCreatorEffect"],
+                "ability_classes": ["BeginningOfEndStepTriggeredAbility", "MenaceAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT", "CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(3); this.toughness = new MageInt(4); "
+                    "new BeginningOfEndStepTriggeredAbility(new ConditionalOneShotEffect("
+                    "new CreateTokenEffect(new DalekToken()), new OpponentLostLifeCondition(ComparisonType.OR_GREATER, 3))); "
+                    "PlayerLostLifeWatcher watcher = game.getState().getWatcher(PlayerLostLifeWatcher.class); "
+                    "new FaceVillainousChoice(Outcome.Detriment, new DavrosDalekCreatorFirstChoice(), new DavrosDalekCreatorSecondChoice())"
+                ),
+            },
+            "At the beginning of your end step, create a Dalek if an opponent lost 3 or more life this turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controller_end_step_opponent_lost_life_dalek_villainous_choice_v1",
+        )
+        self.assertEqual(primary["opponent_life_lost_threshold"], 3)
+        self.assertEqual(primary["token_name"], "Dalek Token")
+        self.assertTrue(primary["artifact_tokens"])
+
     def test_taii_wakeen_maps_to_exact_noncombat_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -507,12 +507,31 @@ class ReplacementRegistry:
         )
 
 
+def _record_life_lost_this_turn(player, life_before):
+    if player is None:
+        return
+    try:
+        lost = max(0, int(life_before) - int(getattr(player, "life", life_before)))
+    except Exception:
+        lost = 0
+    if lost > 0 and hasattr(player, "record_life_lost"):
+        player.record_life_lost(lost, CURRENT_REPLAY_TURN)
+
+
 def change_life(player, delta):
-    return _change_life(player, delta, emit_replay_event=emit_replay_event)
+    life_before = getattr(player, "life", None)
+    changed = _change_life(player, delta, emit_replay_event=emit_replay_event)
+    if changed and life_before is not None:
+        _record_life_lost_this_turn(player, life_before)
+    return changed
 
 
 def deal_damage(player, amount, source=None):
-    return _deal_damage(player, amount, emit_replay_event=emit_replay_event, source=source)
+    life_before = getattr(player, "life", None)
+    dealt = _deal_damage(player, amount, emit_replay_event=emit_replay_event, source=source)
+    if dealt and life_before is not None:
+        _record_life_lost_this_turn(player, life_before)
+    return dealt
 
 
 def gain_life(player, amount, cap=40):
@@ -526,6 +545,11 @@ def clear_turn_scoped_permanent_flags(all_players):
                 continue
             permanent.pop("discard_modal_modes_used_this_turn", None)
         participant.noncombat_damage_modifiers = []
+        participant.cards_drawn_this_turn = 0
+        participant._cards_drawn_turn_marker = CURRENT_REPLAY_TURN
+        participant.lands_played_this_turn = 0
+        participant.life_lost_this_turn = 0
+        participant._life_lost_turn_marker = CURRENT_REPLAY_TURN
 
 
 class EngineMetrics:
@@ -5143,6 +5167,19 @@ class Player:
         self.noncreature_spells_cast_this_turn += 1
         return self.noncreature_spells_cast_this_turn
 
+    def record_life_lost(self, amount, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_life_lost_turn_marker", None) != turn_marker:
+            self.life_lost_this_turn = 0
+            self._life_lost_turn_marker = turn_marker
+        self.life_lost_this_turn += max(0, int(amount or 0))
+        return self.life_lost_this_turn
+
+    def life_lost_this_turn_count(self, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_life_lost_turn_marker", None) != turn_marker:
+            self.life_lost_this_turn = 0
+            self._life_lost_turn_marker = turn_marker
+        return int(getattr(self, "life_lost_this_turn", 0) or 0)
+
     def draw(self, n=1, rng=None):
         drawn = []
         turn_marker = CURRENT_REPLAY_TURN
@@ -5216,6 +5253,8 @@ class Player:
         self._spells_cast_turn_marker = None
         self.noncreature_spells_cast_this_turn = 0
         self._noncreature_spells_cast_turn_marker = None
+        self.life_lost_this_turn = 0
+        self._life_lost_turn_marker = None
         self.surge_to_victory_delayed_triggers = []
         self.failed_draw_from_empty_library = False
         self.turn_end_requested = False
@@ -24962,6 +25001,242 @@ def process_player_draw_triggers(
     )
 
 
+def _live_opponents_for(controller, all_players):
+    return [
+        candidate
+        for candidate in (all_players or [])
+        if candidate is not controller and getattr(candidate, "is_alive", lambda: True)()
+    ]
+
+
+def process_precombat_main_phase_engines(player, opponents, all_players, turn, rng, *, stack=None):
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("precombat_main_choose_modes_treasure_draw_token_life_loss"):
+            continue
+        if permanent.get("precombat_main_last_trigger_turn") == turn:
+            continue
+        permanent["precombat_main_last_trigger_turn"] = turn
+        life_floor = int(permanent.get("mode_selection_life_floor") or 4)
+        modes = list(permanent.get("precombat_main_modes") or [])
+        selected_modes = []
+        total_life_loss = 0
+        for mode in modes:
+            life_loss = int(mode.get("life_loss") or 0)
+            if player.life - (total_life_loss + life_loss) >= life_floor:
+                selected_modes.append(mode)
+                total_life_loss += life_loss
+        if not selected_modes and modes:
+            selected_modes = [modes[0]]
+
+        life_before = player.life
+        treasures_before = player.treasures
+        cards_drawn = 0
+        tokens_created = 0
+        selected_names = []
+        for mode in selected_modes:
+            selected_names.append(mode.get("name") or mode.get("effect") or "mode")
+            mode_effect = mode.get("effect")
+            if mode_effect == "create_treasure":
+                player.treasures += int(mode.get("treasure_count") or 1)
+            elif mode_effect == "draw_cards":
+                drawn = player.draw(int(mode.get("draw_cards") or 1), rng)
+                cards_drawn += len(drawn)
+                process_player_draw_triggers(
+                    player,
+                    len(drawn),
+                    turn,
+                    "precombat_main",
+                    all_players,
+                    stack=stack,
+                    turn_player=player,
+                )
+            elif mode_effect == "token_maker":
+                token_fields = dict(permanent)
+                token_fields.update(mode.get("token") or {})
+                tokens_created += create_creature_tokens_from_effect(
+                    player,
+                    token_fields,
+                    count=int(mode.get("token_count") or token_fields.get("token_count") or 1),
+                    opponents=opponents,
+                    turn=turn,
+                    source_event="phase_trigger_token_created",
+                    stack=stack,
+                    active_player=player,
+                    all_players=all_players,
+                )
+            life_loss = int(mode.get("life_loss") or 0)
+            if life_loss > 0:
+                change_life(player, -life_loss)
+
+        emit_replay_event(
+            "phase_trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="beginning_precombat_main",
+            effect="modal_resources",
+            selected_modes=selected_names,
+            mode_selection_model=permanent.get(
+                "mode_selection_model",
+                "all_modes_if_life_after_loss_at_least_floor",
+            ),
+            mode_selection_life_floor=life_floor,
+            life_lost=max(0, life_before - player.life),
+            life_before=life_before,
+            life_after=player.life,
+            treasures_created=max(0, player.treasures - treasures_before),
+            treasures_before=treasures_before,
+            treasures_after=player.treasures,
+            cards_drawn=cards_drawn,
+            tokens_created=tokens_created,
+            turn=turn,
+            phase="precombat_main",
+            **replay_rule_fields(permanent),
+        )
+
+
+def process_end_step_phase_engines(active_player, all_players, turn, rng, *, stack=None):
+    participants = [p for p in (all_players or []) if getattr(p, "is_alive", lambda: True)()]
+    for controller in participants:
+        controller_opponents = _live_opponents_for(controller, participants)
+        for permanent in list(getattr(controller, "battlefield", []) or []):
+            if not isinstance(permanent, dict):
+                continue
+            if permanent.get("each_end_step_opponent_extra_draw_land_treasure"):
+                if (
+                    permanent.get("each_end_step_last_trigger_turn") == turn
+                    and permanent.get("each_end_step_last_trigger_player") == active_player.name
+                ):
+                    continue
+                permanent["each_end_step_last_trigger_turn"] = turn
+                permanent["each_end_step_last_trigger_player"] = active_player.name
+                draw_qualifiers = [
+                    opponent
+                    for opponent in controller_opponents
+                    if int(getattr(opponent, "cards_drawn_this_turn", 0) or 0)
+                    >= int(permanent.get("opponent_cards_drawn_threshold") or 2)
+                ]
+                land_qualifiers = [
+                    opponent
+                    for opponent in controller_opponents
+                    if int(getattr(opponent, "lands_played_this_turn", 0) or 0)
+                    >= int(permanent.get("opponent_lands_entered_threshold") or 2)
+                ]
+                cards_to_draw = len(draw_qualifiers) * int(permanent.get("draw_cards_per_qualified_opponent") or 1)
+                treasure_count = len(land_qualifiers) * int(permanent.get("treasure_count_per_qualified_opponent") or 1)
+                if cards_to_draw <= 0 and treasure_count <= 0:
+                    continue
+                treasures_before = controller.treasures
+                drawn = controller.draw(cards_to_draw, rng)
+                process_player_draw_triggers(
+                    controller,
+                    len(drawn),
+                    turn,
+                    "end_step",
+                    participants,
+                    stack=stack,
+                    turn_player=active_player,
+                )
+                controller.treasures += max(0, treasure_count)
+                emit_replay_event(
+                    "phase_trigger_resolved",
+                    player=controller.name,
+                    card=permanent.get("name", "?"),
+                    trigger="each_end_step",
+                    active_player=active_player.name,
+                    effect="draw_cards_create_treasure",
+                    cards_drawn=len(drawn),
+                    draw_qualified_opponents=[opponent.name for opponent in draw_qualifiers],
+                    treasures_created=max(0, treasure_count),
+                    treasure_qualified_opponents=[opponent.name for opponent in land_qualifiers],
+                    treasures_before=treasures_before,
+                    treasures_after=controller.treasures,
+                    turn=turn,
+                    phase="end_step",
+                    **replay_rule_fields(permanent),
+                )
+                continue
+
+            if (
+                permanent.get("controller_end_step_opponent_lost_life_dalek_villainous_choice")
+                and controller is active_player
+            ):
+                if permanent.get("controller_end_step_last_trigger_turn") == turn:
+                    continue
+                permanent["controller_end_step_last_trigger_turn"] = turn
+                threshold = int(permanent.get("opponent_life_lost_threshold") or 3)
+                qualified = [
+                    opponent
+                    for opponent in controller_opponents
+                    if opponent.life_lost_this_turn_count(turn) >= threshold
+                ]
+                if not qualified:
+                    continue
+                tokens_created = create_creature_tokens_from_effect(
+                    controller,
+                    permanent,
+                    count=int(permanent.get("token_count") or 1),
+                    opponents=controller_opponents,
+                    turn=turn,
+                    source_event="phase_trigger_token_created",
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=participants,
+                )
+                choices = []
+                controller_drawn = 0
+                for opponent in qualified:
+                    if opponent.hand:
+                        discarded = [opponent.hand.pop(0)]
+                        opponent.graveyard.extend(discarded)
+                        process_player_discard_triggers(
+                            opponent,
+                            discarded,
+                            opponents=[candidate for candidate in participants if candidate is not opponent],
+                            turn=turn,
+                            phase="end_step",
+                            rng=rng,
+                        )
+                        choices.append({
+                            "opponent": opponent.name,
+                            "choice": "discard_card",
+                            "discarded": discarded[0].get("name", "?"),
+                        })
+                    else:
+                        drawn = controller.draw(1, rng)
+                        controller_drawn += len(drawn)
+                        process_player_draw_triggers(
+                            controller,
+                            len(drawn),
+                            turn,
+                            "end_step",
+                            participants,
+                            stack=stack,
+                            turn_player=active_player,
+                        )
+                        choices.append({
+                            "opponent": opponent.name,
+                            "choice": "controller_draws_card",
+                            "cards_drawn": len(drawn),
+                        })
+                emit_replay_event(
+                    "phase_trigger_resolved",
+                    player=controller.name,
+                    card=permanent.get("name", "?"),
+                    trigger="controller_end_step",
+                    effect="dalek_token_villainous_choice",
+                    qualified_opponents=[opponent.name for opponent in qualified],
+                    opponent_life_lost_threshold=threshold,
+                    tokens_created=tokens_created,
+                    villainous_choices=choices,
+                    controller_cards_drawn=controller_drawn,
+                    turn=turn,
+                    phase="end_step",
+                    **replay_rule_fields(permanent),
+                )
+
+
 def normalize_ward_payment_cost(raw_cost):
     if raw_cost is None or raw_cost is False:
         return None
@@ -30658,6 +30933,18 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             return
 
     # ── PRECOMBAT MAIN ──
+    process_precombat_main_phase_engines(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        stack=stack,
+    )
+    while not stack.empty() or _pending_triggers:
+        priority_round(player, all_players, stack, turn, rng, phase="precombat_main")
+        if turn_ended_by_effect(player):
+            return
     total_mana = player.available_mana()
     lands_in_hand = [c for c in player.hand if is_effective_land(c)]  # v10.2
     if lands_in_hand and player.lands_played_this_turn < player.max_lands_per_turn:
@@ -30845,6 +31132,11 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
 
 
     # ── END STEP (v8.3) ──
+    process_end_step_phase_engines(player, all_players, turn, rng, stack=stack)
+    while not stack.empty() or _pending_triggers:
+        priority_round(player, all_players, stack, turn, rng, phase="end_step")
+        if turn_ended_by_effect(player):
+            return
     for c in player.battlefield:
         if isinstance(c, dict) and c.get("effect") == "draw_engine" and not c.get("burden"):
             player.draw(1, rng)

@@ -802,6 +802,50 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("token_flying"))
         )
 
+    if effect == "token_maker" and scope == "precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1":
+        modes = effect_json.get("precombat_main_modes") or []
+        mode_names = {mode.get("name") for mode in modes if isinstance(mode, dict)}
+        return (
+            types == {"ENCHANTMENT"}
+            and {"CreateTokenEffect", "DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"}.issubset(effect_classes)
+            and "BeginningOfFirstMainTriggeredAbility" in ability_classes
+            and effect_json.get("trigger") == "beginning_precombat_main"
+            and bool(effect_json.get("precombat_main_choose_modes_treasure_draw_token_life_loss"))
+            and {"Sell Contraband", "Buy Information", "Hire a Mercenary"}.issubset(mode_names)
+            and int(effect_json.get("mode_selection_life_floor") or 0) == 4
+        )
+
+    if effect == "token_maker" and scope == "each_end_step_opponent_extra_draw_landfall_draw_treasure_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {"CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and "BeginningOfEndStepTriggeredAbility" in ability_classes
+            and effect_json.get("trigger") == "each_end_step"
+            and bool(effect_json.get("each_end_step_opponent_extra_draw_land_treasure"))
+            and int(effect_json.get("opponent_cards_drawn_threshold") or 0) == 2
+            and int(effect_json.get("draw_cards_per_qualified_opponent") or 0) == 1
+            and int(effect_json.get("opponent_lands_entered_threshold") or 0) == 2
+            and int(effect_json.get("treasure_count_per_qualified_opponent") or 0) == 1
+        )
+
+    if effect == "creature" and scope == "controller_end_step_opponent_lost_life_dalek_villainous_choice_v1":
+        return (
+            types == {"ARTIFACT", "CREATURE"}
+            and {"CreateTokenEffect", "DavrosDalekCreatorEffect"}.issubset(effect_classes)
+            and "BeginningOfEndStepTriggeredAbility" in ability_classes
+            and effect_json.get("trigger") == "controller_end_step"
+            and bool(effect_json.get("controller_end_step_opponent_lost_life_dalek_villainous_choice"))
+            and int(effect_json.get("opponent_life_lost_threshold") or 0) == 3
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("menace"))
+            and effect_json.get("token_name") == "Dalek Token"
+            and effect_json.get("token_subtype") == "Dalek"
+            and int(effect_json.get("token_power") or 0) == 3
+            and int(effect_json.get("token_toughness") or 0) == 3
+            and bool(effect_json.get("artifact_tokens"))
+        )
+
     if effect == "creature" and scope == "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1":
         return (
             types == {"CREATURE"}

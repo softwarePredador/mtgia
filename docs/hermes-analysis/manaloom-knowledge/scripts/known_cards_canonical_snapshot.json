@@ -2792,14 +2792,51 @@
     "battle_rule_logical_key": "battle_rule_v1:bdfc00d674cb68d8e2a12125213ab559"
   },
   "Black Market Connections": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1",
     "cmc": 3.0,
-    "effect": "ramp_engine",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b7602d6f4394bcf05ab962f0f844ef1d"
+    "effect": "token_maker",
+    "mode_selection_life_floor": 4,
+    "mode_selection_model": "all_modes_if_life_after_loss_at_least_floor",
+    "precombat_main_choose_modes_treasure_draw_token_life_loss": true,
+    "precombat_main_modes": [
+      {
+        "effect": "create_treasure",
+        "life_loss": 1,
+        "name": "Sell Contraband",
+        "treasure_count": 1
+      },
+      {
+        "draw_cards": 1,
+        "effect": "draw_cards",
+        "life_loss": 2,
+        "name": "Buy Information"
+      },
+      {
+        "effect": "token_maker",
+        "life_loss": 3,
+        "name": "Hire a Mercenary",
+        "token": {
+          "token_colors": [],
+          "token_keywords": [
+            "changeling"
+          ],
+          "token_name": "Shapeshifter Token",
+          "token_power": 3,
+          "token_subtype": "Shapeshifter",
+          "token_toughness": 2
+        },
+        "token_count": 1
+      }
+    ],
+    "trigger": "beginning_precombat_main",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9627a4437f1b6029c04032ba2e552c0b",
+    "battle_rule_oracle_hash": "7d64928ea3153bf9390dc2356ccccb64"
   },
   "Black Sun's Zenith": {
     "cmc": 2.0,
@@ -7003,6 +7040,39 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Davros, Dalek Creator": {
+    "ability_kind": "triggered",
+    "artifact_creature": true,
+    "artifact_tokens": true,
+    "battle_model_scope": "controller_end_step_opponent_lost_life_dalek_villainous_choice_v1",
+    "cmc": 4.0,
+    "controller_end_step_opponent_lost_life_dalek_villainous_choice": true,
+    "effect": "creature",
+    "menace": true,
+    "opponent_life_lost_threshold": 3,
+    "power": 3,
+    "token_colors": [
+      "B"
+    ],
+    "token_count": 1,
+    "token_keywords": [
+      "menace"
+    ],
+    "token_name": "Dalek Token",
+    "token_power": 3,
+    "token_subtype": "Dalek",
+    "token_toughness": 3,
+    "toughness": 4,
+    "trigger": "controller_end_step",
+    "villainous_choice_model": "opponent_discards_if_possible_else_controller_draws",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d03959f01d684d887bec04985c092274",
+    "battle_rule_oracle_hash": "b3c9d6bb7aba3a111395e2ab07ccd32f"
   },
   "Dawn Charm": {
     "cmc": 2.0,
@@ -27730,14 +27800,24 @@
     "battle_rule_logical_key": "battle_rule_v1:c56afbdd6c79ce9fb9a6a8fcbd5b0846"
   },
   "Smuggler's Share": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "each_end_step_opponent_extra_draw_landfall_draw_treasure_v1",
     "cmc": 3.0,
-    "effect": "ramp_engine",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b7602d6f4394bcf05ab962f0f844ef1d"
+    "draw_cards_per_qualified_opponent": 1,
+    "each_end_step_opponent_extra_draw_land_treasure": true,
+    "effect": "token_maker",
+    "land_entry_runtime_proxy": "lands_played_this_turn",
+    "opponent_cards_drawn_threshold": 2,
+    "opponent_lands_entered_threshold": 2,
+    "treasure_count_per_qualified_opponent": 1,
+    "trigger": "each_end_step",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d1967f626af998349b300eee21f20156",
+    "battle_rule_oracle_hash": "1076ff44243459457e22ec5bec940daf"
   },
   "Smuggler's Surprise": {
     "cmc": 1.0,

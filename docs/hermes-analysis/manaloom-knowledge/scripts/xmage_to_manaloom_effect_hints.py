@@ -1927,6 +1927,122 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "BlackMarketConnections"
+        and "BeginningOfFirstMainTriggeredAbility" in ability_classes
+        and {"CreateTokenEffect", "DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"}.issubset(effect_classes)
+        and "TreasureToken" in rules_text
+        and "Shapeshifter32Token" in rules_text
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1",
+            "fields": {
+                "trigger": "beginning_precombat_main",
+                "precombat_main_choose_modes_treasure_draw_token_life_loss": True,
+                "mode_selection_model": "all_modes_if_life_after_loss_at_least_floor",
+                "mode_selection_life_floor": 4,
+                "precombat_main_modes": [
+                    {"name": "Sell Contraband", "effect": "create_treasure", "treasure_count": 1, "life_loss": 1},
+                    {"name": "Buy Information", "effect": "draw_cards", "draw_cards": 1, "life_loss": 2},
+                    {
+                        "name": "Hire a Mercenary",
+                        "effect": "token_maker",
+                        "token_count": 1,
+                        "life_loss": 3,
+                        "token": {
+                            "token_name": "Shapeshifter Token",
+                            "token_subtype": "Shapeshifter",
+                            "token_power": 3,
+                            "token_toughness": 2,
+                            "token_colors": [],
+                            "token_keywords": ["changeling"],
+                        },
+                    },
+                ],
+            },
+            "reason": "XMage structure matches Black Market Connections: beginning of precombat main modal resource trigger creating Treasure, drawing, and creating a 3/2 colorless Shapeshifter with life-loss mode costs.",
+            "signals": [
+                "BeginningOfFirstMainTriggeredAbility",
+                "CreateTokenEffect(TreasureToken)",
+                "DrawCardSourceControllerEffect(1)",
+                "CreateTokenEffect(Shapeshifter32Token)",
+                "LoseLifeSourceControllerEffect(1/2/3)",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "SmugglersShare"
+        and "BeginningOfEndStepTriggeredAbility" in ability_classes
+        and {"CreateTokenEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+        and "CardsAmountDrawnThisTurnWatcher" in rules_text
+        and "PermanentsEnteredBattlefieldWatcher" in rules_text
+        and "TreasureToken" in rules_text
+    ):
+        return {
+            "effect": "token_maker",
+            "scope": "each_end_step_opponent_extra_draw_landfall_draw_treasure_v1",
+            "fields": {
+                "trigger": "each_end_step",
+                "each_end_step_opponent_extra_draw_land_treasure": True,
+                "opponent_cards_drawn_threshold": 2,
+                "draw_cards_per_qualified_opponent": 1,
+                "opponent_lands_entered_threshold": 2,
+                "treasure_count_per_qualified_opponent": 1,
+                "land_entry_runtime_proxy": "lands_played_this_turn",
+            },
+            "reason": "XMage structure matches Smuggler's Share: each end step draw for opponents with two or more cards drawn this turn and create Treasure for opponents with two or more lands entering this turn.",
+            "signals": [
+                "BeginningOfEndStepTriggeredAbility(TargetController.EACH_PLAYER)",
+                "CardsAmountDrawnThisTurnWatcher",
+                "PermanentsEnteredBattlefieldWatcher",
+                "DrawCardSourceControllerEffect(dynamic)",
+                "CreateTokenEffect(TreasureToken dynamic)",
+            ],
+        }
+
+    if (
+        card_types == {"ARTIFACT", "CREATURE"}
+        and xmage_class_name == "DavrosDalekCreator"
+        and "BeginningOfEndStepTriggeredAbility" in ability_classes
+        and {"CreateTokenEffect", "DavrosDalekCreatorEffect"}.issubset(effect_classes)
+        and "PlayerLostLifeWatcher" in rules_text
+        and "DalekToken" in rules_text
+    ):
+        return {
+            "effect": "creature",
+            "scope": "controller_end_step_opponent_lost_life_dalek_villainous_choice_v1",
+            "fields": {
+                "power": 3,
+                "toughness": 4,
+                "menace": True,
+                "artifact_creature": True,
+                "trigger": "controller_end_step",
+                "controller_end_step_opponent_lost_life_dalek_villainous_choice": True,
+                "opponent_life_lost_threshold": 3,
+                "token_count": 1,
+                "token_name": "Dalek Token",
+                "token_subtype": "Dalek",
+                "token_colors": ["B"],
+                "token_power": 3,
+                "token_toughness": 3,
+                "artifact_tokens": True,
+                "token_keywords": ["menace"],
+                "villainous_choice_model": "opponent_discards_if_possible_else_controller_draws",
+            },
+            "reason": "XMage structure matches Davros, Dalek Creator: controller end-step trigger checks opponents that lost 3 or more life, creates a Dalek token, then applies villainous choice.",
+            "signals": [
+                "BeginningOfEndStepTriggeredAbility",
+                "OpponentLostLifeCondition(>=3)",
+                "PlayerLostLifeWatcher",
+                "CreateTokenEffect(DalekToken)",
+                "DavrosDalekCreatorEffect",
+                "FaceVillainousChoice",
+            ],
+        }
+
+    if (
         card_types == {"CREATURE"}
         and xmage_class_name == "TaiiWakeenPerfectShot"
         and "DrawCardSourceControllerEffect" in effect_classes

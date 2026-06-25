@@ -1230,6 +1230,79 @@ Next operational order:
 4. Resume benchmark candidates only after the remaining runtime rows are closed
    or explicitly waived by matrix evidence.
 
+## PG216 Runtime Checkpoint - Phase Watchers / End-Step Engines
+
+PG216 closes the compatible phase-watcher subfamily in one runtime/mapper/PG
+batch: `Black Market Connections`, `Smuggler's Share`, and
+`Davros, Dalek Creator`.
+
+What changed:
+
+1. XMage sources:
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BlackMarketConnections.java`,
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SmugglersShare.java`,
+   and
+   `/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DavrosDalekCreator.java`.
+2. Runtime scopes:
+   `precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1`,
+   `each_end_step_opponent_extra_draw_landfall_draw_treasure_v1`, and
+   `controller_end_step_opponent_lost_life_dalek_villainous_choice_v1`.
+3. The battle runtime now tracks per-turn life loss after actual life changes
+   and damage resolution, then resets cards-drawn, lands-played, and life-lost
+   counters at turn boundaries.
+4. The battle runtime now resolves Black Market's precombat-main modal modes:
+   Treasure, card draw, Shapeshifter token, and life payment, guarded by a
+   conservative life floor.
+5. The battle runtime now resolves Smuggler's Share at each end step from the
+   observed opponent extra-draw and extra-land counters.
+6. The battle runtime now resolves Davros at controller end step from opponent
+   life-loss counters, creates a Dalek token, and models villainous choice as
+   discard when possible or controller draw otherwise.
+7. PG216 precheck/apply/postcheck promoted one verified auto rule for each
+   card, deprecated four older Black Market/Smuggler shadow rows, and kept
+   rollback SQL in
+   `docs/hermes-analysis/master_optimizer_reports/pg216_phase_watchers_rollback.sql`.
+8. PG -> Hermes sync report
+   `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg216_phase_watchers_20260625.json`
+   selected `3` cards, loaded `7` PG rows, upserted `7` SQLite rows, and
+   exported `3247` canonical snapshot rows.
+9. The PG216 expanded matrix for decks `6,606-619` reports `580` rows,
+   `battle_ready=387`, `runtime_needed=3`, `mapper_manual=131`,
+   `split_scope=55`, and `blocked_missing_xmage_source=4`.
+10. Effective queue
+    `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260625_pg216_phase_watchers_postsync_v1.json`
+    reports no package-ready unprepared rows; remaining operational lanes are
+    `manual_mapper_backlog=333`, `split_scope_backlog=74`,
+    `runtime_family_backlog=7`, and `blocked_missing_xmage_source=4`.
+11. Strategy consistency audit
+    `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260625_pg216_phase_watchers_postsync_v1.json`
+    passed `18/18`.
+12. Full gate
+    `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_105025/summary.json`
+    reports `seeds_completed=16/16`, `test_results_status_counts={"pass":18}`,
+    `decision_audit_severity_counts={"critical":0,"high":0,"low":0,"medium":0}`,
+    `action_verdict_counts={"ok":6435}`,
+    `target_pressure_statuses={"pass":16}`,
+    `table_intent_statuses={"pass":16}`,
+    `effect_coverage_unknowns=0`,
+    `effect_coverage_residual_status=effect_coverage_residual_accepted`,
+    `runtime_surface_manifest_status=runtime_surface_manifest_ready`, and
+    `mandatory_gate_divergences=["event_contract_static=review_required"]`.
+
+Next operational order:
+
+1. Continue the remaining runtime rows in separated implementation lanes:
+   `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
+   `The Locust God`, and `Biotransference`.
+2. Treat `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki` as a
+   Saga/transform/copy-token lane. It should not be merged into the generic
+   end-step watcher engine.
+3. Treat `The Locust God` as a draw-trigger token lane.
+4. Treat `Biotransference` as a static type-modification plus creature-spell
+   token lane.
+5. Resume benchmark candidates only after these runtime rows are closed or
+   explicitly waived by matrix evidence.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top
