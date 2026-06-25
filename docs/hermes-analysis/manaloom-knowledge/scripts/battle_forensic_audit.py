@@ -95,6 +95,7 @@ SUPPORTED_EFFECTS = {
     "recursion",
     "redirect_removal",
     "redistribute_life_totals",
+    "removal_destroy",
     "removal_exile",
     "remove_artifact_or_3dmg",
     "remove_creature",
@@ -104,6 +105,7 @@ SUPPORTED_EFFECTS = {
     "silence_spell",
     "static_cost_reduction",
     "steal_all_creatures",
+    "sweeper_damage",
     "thassa_oracle",
     "token_maker",
     "topdeck_manipulation",
@@ -167,12 +169,14 @@ GAME_IMPACT_EFFECTS = {
     "pump_all",
     "recursion",
     "redistribute_life_totals",
+    "removal_destroy",
     "remove_artifact_or_3dmg",
     "remove_creature",
     "remove_permanent",
     "silence_opponents",
     "silence_spell",
     "steal_all_creatures",
+    "sweeper_damage",
     "thassa_oracle",
     "token_maker",
     "treasure_maker",
@@ -357,6 +361,7 @@ def event_has_accepted_compact_runtime_normalization(
         ("modal_spell", "remove_permanent"),
         ("removal_destroy", "remove_permanent"),
         ("removal_exile", "remove_creature"),
+        ("sweeper_damage", "damage_wipe"),
     }
 
 

@@ -639,6 +639,31 @@ from the current Lorehold/opponent matrix:
    `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
    `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
 
+`Deflecting Palm` is the sixteenth completed proof and the first exact
+chosen-source damage prevention plus reflection scope promoted from the current
+Lorehold/opponent matrix:
+
+1. XMage local source matched `DeflectingPalm` directly through
+   `PreventNextDamageFromChosenSourceEffect`,
+   `DeflectingPalmPreventionApplier`, and `objectController.damage`.
+2. The mapper/classifier promoted only the exact
+   `prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1`
+   scope.
+3. Battle runtime now chooses the largest/lethal incoming combat damage source,
+   creates a source-specific prevention shield, prevents only that source's next
+   damage to the controller, and reflects the prevented damage to that source's
+   controller.
+4. PG201 precheck/apply/postcheck promoted one verified auto rule and
+   deprecated two stale generated shadows.
+5. PG -> Hermes sync made decks `614`, `615`, and `616` report
+   `Deflecting Palm` as `pass`; the matrix moved it to `battle_ready` /
+   `priority_benchmark_candidate` with score `54.0`.
+6. Full gate
+   `/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/20260625_034603/summary.json`
+   reports `battle_replay_final_status=trusted_for_strategy_learning`,
+   `mandatory_gate_divergences=[]`, `event_contract_static_status=event_contract_static_ready`,
+   `forensic_rule_findings=0`, and `decision_audit_decision_findings=0`.
+
 ## Current Benchmark Candidate Lane
 
 After rules are ready, the first battle-benchmark candidates are the top

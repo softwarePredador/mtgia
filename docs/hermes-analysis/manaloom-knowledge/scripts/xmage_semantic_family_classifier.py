@@ -219,6 +219,16 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "family_tests": [],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
+    "damage_prevention_reflect": {
+        "effects": {"damage_prevention_reflect"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "source-specific damage prevention shield plus reflected damage to the chosen source controller",
+        "family_tests": [
+            "test_pg201_deflecting_palm_prevents_chosen_source_and_reflects_damage",
+            "test_pg201_deflecting_palm_combat_window_chooses_largest_lethal_source",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "tutor": {
         "effects": {"tutor"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -649,6 +659,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("opponent_second_spell_each_turn"))
             and effect_json.get("trigger") == "opponent_second_spell"
             and int(effect_json.get("tax") or 0) == 0
+        )
+
+    if effect == "damage_prevention_reflect" and scope == "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"PreventNextDamageFromChosenSourceEffect"}
+            and not ability_classes
+            and not cost_classes
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("prevent_next_damage_from_chosen_source"))
+            and effect_json.get("prevent_damage_to") == "you"
+            and effect_json.get("prevent_damage_duration") == "until_end_of_turn"
+            and bool(effect_json.get("reflect_prevented_damage"))
+            and effect_json.get("reflect_target") == "chosen_source_controller"
+            and bool(effect_json.get("source_choice_required"))
         )
 
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":
@@ -2370,6 +2395,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("opponent_second_spell_each_turn"))
             and effect_json.get("trigger") == "opponent_second_spell"
             and int(effect_json.get("tax") or 0) == 0
+        )
+
+    if effect == "damage_prevention_reflect" and scope == "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"PreventNextDamageFromChosenSourceEffect"}
+            and not ability_classes
+            and not cost_classes
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("prevent_next_damage_from_chosen_source"))
+            and effect_json.get("prevent_damage_to") == "you"
+            and effect_json.get("prevent_damage_duration") == "until_end_of_turn"
+            and bool(effect_json.get("reflect_prevented_damage"))
+            and effect_json.get("reflect_target") == "chosen_source_controller"
+            and bool(effect_json.get("source_choice_required"))
         )
 
     if effect == "draw_engine" and scope == "opponent_discards_card_may_draw_v1":

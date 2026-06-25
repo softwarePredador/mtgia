@@ -4696,6 +4696,39 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["tax"], 0)
         self.assertEqual(primary["draw_count"], 1)
 
+    def test_deflecting_palm_maps_to_exact_prevent_reflect_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "DeflectingPalm",
+                "effect_classes": ["PreventNextDamageFromChosenSourceEffect"],
+                "ability_classes": [],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "new PreventNextDamageFromChosenSourceEffect(Duration.EndOfTurn, true, "
+                    "DeflectingPalmPreventionApplier.instance); "
+                    "objectController.damage(prevented, source.getSourceId(), source, game);"
+                ),
+            },
+            "The next time a source of your choice would deal damage to you this turn, "
+            "prevent that damage. If damage is prevented this way, Deflecting Palm deals "
+            "that much damage to that source's controller.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "damage_prevention_reflect")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertTrue(primary["prevent_next_damage_from_chosen_source"])
+        self.assertEqual(primary["prevent_damage_to"], "you")
+        self.assertEqual(primary["prevent_damage_duration"], "until_end_of_turn")
+        self.assertTrue(primary["reflect_prevented_damage"])
+        self.assertEqual(primary["reflect_target"], "chosen_source_controller")
+        self.assertTrue(primary["source_choice_required"])
+
 
 if __name__ == "__main__":
     unittest.main()

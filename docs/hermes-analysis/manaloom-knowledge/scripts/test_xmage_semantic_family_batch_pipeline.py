@@ -6727,6 +6727,47 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "draw_engine")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_deflecting_palm_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Deflecting Palm",
+                        "severity": "high",
+                        "oracle_hash": "deflecthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "DeflectingPalm",
+                            "path": "/xmage/DeflectingPalm.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["PreventNextDamageFromChosenSourceEffect"],
+                            "ability_classes": [],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "damage_prevention_reflect",
+                                "battle_model_scope": "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1",
+                                "instant": True,
+                                "prevent_next_damage_from_chosen_source": True,
+                                "prevent_damage_to": "you",
+                                "prevent_damage_duration": "until_end_of_turn",
+                                "reflect_prevented_damage": True,
+                                "reflect_target": "chosen_source_controller",
+                                "source_choice_required": True,
+                                "prevent_damage_amount": 999,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "damage_prevention_reflect")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
 
 if __name__ == "__main__":
     unittest.main()

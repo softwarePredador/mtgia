@@ -34,6 +34,7 @@ class ReplacementEvent:
         self.prevented = False
         self.replacements = []
         self.replacement_order = []
+        self.reflections = []
         self._applied_replacement_names = set()
 
     def mark_prevented(self, replacement):
@@ -62,6 +63,12 @@ class ReplacementEvent:
                 or source.get("id")
             )
         return source
+
+    @staticmethod
+    def _source_controller(source):
+        if isinstance(source, dict):
+            return source.get("controller") or source.get("owner")
+        return None
 
     def _replacement_rule_source(self, replacement):
         name = str(replacement).split(":", 1)[0]
@@ -120,6 +127,16 @@ class ReplacementEvent:
             "final_delta": self.delta,
             "replacements": list(self.replacements),
             "replacement_rule_sources": list(replacement_sources),
+            "reflections": [
+                {
+                    "target_player": getattr(reflection.get("target_player"), "name", None),
+                    "amount": reflection.get("amount"),
+                    "source": self._source_name(reflection.get("source")),
+                    "source_controller": self._source_controller(reflection.get("source")),
+                    "reflect_card": self._source_name(reflection.get("reflect_card")),
+                }
+                for reflection in self.reflections
+            ],
         }
         return {
             "replacement_pipeline": "replacement_prevention_minimal",
@@ -151,6 +168,7 @@ class ReplacementEvent:
             "replacement_order": list(self.replacement_order),
             "replacement_rule_source": replacement_sources[0] if replacement_sources else None,
             "replacement_rule_sources": list(replacement_sources),
+            "reflections": causal_event["reflections"],
         }
 
 
@@ -246,6 +264,9 @@ class ReplacementRegistry:
         kept_shields = []
         prevented_total = 0
         for shield in shields:
+            if not ReplacementRegistry._shield_matches_damage_source(shield, event.source):
+                kept_shields.append(shield)
+                continue
             try:
                 available = int(shield.get("amount", 0))
             except (TypeError, ValueError):
@@ -260,7 +281,19 @@ class ReplacementRegistry:
             available -= prevented
             source = shield.get("source", "prevention_shield")
             event.replacements.append(f"damage_prevention_shield:{source}:{prevented}")
-            if available > 0:
+            reflect_player = shield.get("reflect_to_player")
+            if reflect_player is not None and prevented > 0:
+                event.reflections.append(
+                    {
+                        "target_player": reflect_player,
+                        "amount": prevented,
+                        "source": event.source,
+                        "reflect_card": shield.get("reflect_card"),
+                        "reflect_source": source,
+                        "turn": shield.get("turn"),
+                    }
+                )
+            if available > 0 and not shield.get("consume_once"):
                 updated = dict(shield)
                 updated["amount"] = available
                 kept_shields.append(updated)
@@ -270,6 +303,23 @@ class ReplacementRegistry:
             event.delta = -remaining_damage
             if remaining_damage <= 0:
                 event.prevented = True
+
+    @staticmethod
+    def _shield_matches_damage_source(shield, damage_source):
+        mode = shield.get("source_match")
+        if mode in (None, "", "any"):
+            return True
+        if mode != "chosen_source":
+            return True
+        chosen_name = shield.get("chosen_source_name")
+        chosen_controller = shield.get("chosen_source_controller")
+        source_name = ReplacementEvent._source_name(damage_source)
+        source_controller = ReplacementEvent._source_controller(damage_source)
+        if chosen_name and str(chosen_name) != str(source_name):
+            return False
+        if chosen_controller and str(chosen_controller) != str(source_controller):
+            return False
+        return True
 
     @staticmethod
     def _life_change_replacement_candidates(event):
@@ -316,13 +366,55 @@ def change_life(player, delta, *, emit_replay_event=None):
     return True
 
 
-def deal_damage(player, amount, *, emit_replay_event=None):
+def deal_damage(player, amount, *, emit_replay_event=None, source=None):
     if amount <= 0:
         return False
     event = ReplacementRegistry.process_event(
-        ReplacementEvent("damage", affected_player=player, amount=amount, delta=-amount),
+        ReplacementEvent(
+            "damage",
+            affected_player=player,
+            amount=amount,
+            delta=-amount,
+            source=source,
+        ),
         emit_replay_event=emit_replay_event,
     )
+    for reflection in list(event.reflections):
+        reflect_player = reflection.get("target_player")
+        reflect_amount = int(reflection.get("amount") or 0)
+        if reflect_player is None or reflect_amount <= 0:
+            continue
+        reflect_source = reflection.get("reflect_card") or {
+            "name": reflection.get("reflect_source") or "damage_prevention_reflection"
+        }
+        reflected_event = ReplacementRegistry.process_event(
+            ReplacementEvent(
+                "damage",
+                affected_player=reflect_player,
+                amount=reflect_amount,
+                delta=-reflect_amount,
+                source=reflect_source,
+                reason="damage_reflection",
+            ),
+            emit_replay_event=emit_replay_event,
+        )
+        dealt_reflected = False
+        if not reflected_event.prevented and reflected_event.amount > 0:
+            reflect_player.life -= reflected_event.amount
+            dealt_reflected = True
+        if emit_replay_event is not None:
+            emit_replay_event(
+                "damage_reflected",
+                affected_player=getattr(event.affected_player, "name", None),
+                target_player=getattr(reflect_player, "name", None),
+                amount=reflect_amount,
+                damage_dealt=reflected_event.amount if dealt_reflected else 0,
+                prevented=not dealt_reflected,
+                source=ReplacementEvent._source_name(reflection.get("source")),
+                source_controller=ReplacementEvent._source_controller(reflection.get("source")),
+                reflect_card=ReplacementEvent._source_name(reflect_source),
+                turn=reflection.get("turn"),
+            )
     if event.prevented or event.amount <= 0:
         return False
     player.life -= event.amount
@@ -342,8 +434,10 @@ def gain_life(player, amount, cap=40, *, emit_replay_event=None):
     return True
 
 
-def add_damage_prevention_shield(player, amount, source="prevention"):
+def add_damage_prevention_shield(player, amount, source="prevention", **metadata):
     if amount <= 0:
         return False
-    player.damage_prevention_shields.append({"amount": int(amount), "source": source})
+    shield = {"amount": int(amount), "source": source}
+    shield.update({key: value for key, value in metadata.items() if value is not None})
+    player.damage_prevention_shields.append(shield)
     return True

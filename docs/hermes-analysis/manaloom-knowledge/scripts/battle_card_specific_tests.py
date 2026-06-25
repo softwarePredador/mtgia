@@ -3067,6 +3067,128 @@ def register_tests(battle, player):
             for entry in damage_event["survived_damage"]
         )
 
+    def test_runtime_alias_force_of_vigor_destroys_artifacts_or_enchantments_only():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Caster")
+            opponent = player("Opponent")
+            opponent.battlefield = [
+                {"name": "Mana Rock", "effect": "ramp_permanent", "type_line": "Artifact"},
+                {"name": "Value Enchantment", "effect": "draw_engine", "type_line": "Enchantment"},
+                {
+                    "name": "Large Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 8,
+                    "toughness": 8,
+                },
+            ]
+            effect_data = {
+                "effect": "removal_destroy",
+                "battle_model_scope": "targeted_destroy_variant_v1",
+                "target_constraints": {"card_types": ["artifact"]},
+                "_rule_logical_key": "battle_rule_v1:force-vigor-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Force of Vigor", "cmc": 4, "type_line": "Instant"},
+                turn=8,
+                rng=random.Random(260625),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        names = {card.get("name") for card in opponent.battlefield}
+        assert "Mana Rock" not in names
+        assert "Value Enchantment" not in names
+        assert "Large Creature" in names
+        resolution = next(data for event, data in events if event == "multi_target_resolution")
+        assert resolution["target_type"] == "artifact_or_enchantment"
+        assert set(resolution["resolved"]) == {"Mana Rock", "Value Enchantment"}
+
+    def test_runtime_alias_calamity_of_cinders_damages_only_untapped_creatures():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Caster")
+            active.battlefield = [
+                {
+                    "name": "Tapped Own Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "tapped": True,
+                },
+            ]
+            opponent = player("Opponent")
+            opponent.battlefield = [
+                {
+                    "name": "Untapped Small Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 3,
+                    "toughness": 3,
+                    "tapped": False,
+                },
+                {
+                    "name": "Tapped Small Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 3,
+                    "toughness": 3,
+                    "tapped": True,
+                },
+                {
+                    "name": "Untapped Huge Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 7,
+                    "toughness": 7,
+                    "tapped": False,
+                },
+            ]
+            effect_data = {
+                "effect": "sweeper_damage",
+                "battle_model_scope": "damage_all_variant_v1",
+                "target_constraints": {"card_types": ["creature"]},
+                "_rule_logical_key": "battle_rule_v1:calamity-cinders-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Calamity of Cinders", "cmc": 7, "type_line": "Sorcery"},
+                turn=9,
+                rng=random.Random(260626),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        active_names = {card.get("name") for card in active.battlefield}
+        opponent_names = {card.get("name") for card in opponent.battlefield}
+        assert "Tapped Own Creature" in active_names
+        assert "Untapped Small Creature" not in opponent_names
+        assert "Tapped Small Creature" in opponent_names
+        assert "Untapped Huge Creature" in opponent_names
+        damage_event = next(data for event, data in events if event == "damage_wipe_resolved")
+        assert damage_event["damage"] == 6
+        assert damage_event["creatures_seen"] == 2
+        assert damage_event["creatures_destroyed"] == 1
+        assert damage_event["rule_oracle_normalized_effect_from"] == "sweeper_damage"
+        assert damage_event["rule_oracle_normalized_effect_to"] == "damage_wipe"
+
     def test_pg098_call_forth_tempest_uses_dynamic_opponent_creature_damage():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -11889,6 +12011,199 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def _pg201_deflecting_palm_rule():
+        return {
+            "name": "Deflecting Palm",
+            "cmc": 2,
+            "type_line": "Instant",
+            "mana_cost": "{R}{W}",
+            "effect": "damage_prevention_reflect",
+            "battle_model_scope": "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1",
+            "instant": True,
+            "prevent_next_damage_from_chosen_source": True,
+            "prevent_damage_to": "you",
+            "prevent_damage_duration": "until_end_of_turn",
+            "reflect_prevented_damage": True,
+            "reflect_target": "chosen_source_controller",
+            "source_choice_required": True,
+            "prevent_damage_amount": 999,
+            "_rule_logical_key": "battle_rule_v1:deflecting-palm-test",
+            "_rule_oracle_hash": "deflecting-palm-test-hash",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+        }
+
+    def test_pg201_deflecting_palm_prevents_chosen_source_and_reflects_damage():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            protected = player("Lorehold")
+            protected.life = 6
+            opponent = player("Opponent")
+            opponent.life = 40
+            source = {
+                "name": "Huge Attacker",
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 8,
+                "controller": "Opponent",
+            }
+            palm = {"name": "Deflecting Palm", "type_line": "Instant", "cmc": 2, "mana_cost": "{R}{W}"}
+            effect_data = {
+                **_pg201_deflecting_palm_rule(),
+                "_chosen_damage_source": source,
+                "_chosen_damage_source_name": "Huge Attacker",
+                "_chosen_damage_source_controller": "Opponent",
+                "_chosen_damage_amount": 8,
+            }
+            battle.apply_effect_immediate(
+                protected,
+                [opponent],
+                palm,
+                turn=12,
+                rng=random.Random(201),
+                effect_data_override=effect_data,
+                phase="combat_damage",
+            )
+            dealt = battle.deal_damage(protected, 8, source=source)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert dealt is False
+        assert protected.life == 6
+        assert opponent.life == 32
+        assert any(card.get("name") == "Deflecting Palm" for card in protected.graveyard)
+        assert any(
+            event == "damage_prevention_reflect_created"
+            and data.get("card") == "Deflecting Palm"
+            and data.get("chosen_source") == "Huge Attacker"
+            and data.get("reflect_target_player") == "Opponent"
+            and data.get("rule_logical_key") == "battle_rule_v1:deflecting-palm-test"
+            for event, data in events
+        )
+        assert any(
+            event == "replacement_applied"
+            and data.get("affected_player") == "Lorehold"
+            and data.get("prevented") is True
+            and data.get("source") == "Huge Attacker"
+            for event, data in events
+        )
+        assert any(
+            event == "damage_reflected"
+            and data.get("affected_player") == "Lorehold"
+            and data.get("target_player") == "Opponent"
+            and data.get("amount") == 8
+            and data.get("damage_dealt") == 8
+            and data.get("turn") == 12
+            for event, data in events
+        )
+
+    def test_pg201_deflecting_palm_combat_window_chooses_largest_lethal_source():
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        old_db = battle.DB
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                db_path = Path(tmpdir) / "rules.db"
+                with sqlite3.connect(db_path) as conn:
+                    battle.battle_rule_registry.upsert_battle_card_rule(
+                        conn,
+                        "Deflecting Palm",
+                        _pg201_deflecting_palm_rule(),
+                        source="xmage",
+                        confidence=1.0,
+                        review_status="verified",
+                        execution_status="auto",
+                        logical_rule_key_value="battle_rule_v1:deflecting-palm-test",
+                        oracle_hash="deflecting-palm-test-hash",
+                    )
+                    conn.commit()
+                battle.DB = str(db_path)
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                protected = player("Lorehold")
+                protected.life = 5
+                protected.hand = [
+                    {"name": "Deflecting Palm", "type_line": "Instant", "cmc": 2, "mana_cost": "{R}{W}"}
+                ]
+                protected.mana_pool.add("red", 1)
+                protected.mana_pool.add("white", 1)
+                attacker = player("Opponent")
+                attacker.life = 40
+                large = {
+                    "name": "Large Attacker",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 7,
+                    "toughness": 7,
+                    "controller": "Opponent",
+                    "owner": "Opponent",
+                }
+                small = {
+                    "name": "Small Attacker",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "controller": "Opponent",
+                    "owner": "Opponent",
+                }
+                attacker.battlefield = [large, small]
+                block_assignments = [(large, []), (small, [])]
+                cast = battle.combat_defensive_response_window(
+                    attacker,
+                    protected,
+                    [large, small],
+                    block_assignments,
+                    [protected, attacker],
+                    13,
+                    random.Random(203),
+                )
+                battle.combat_damage_steps(
+                    attacker,
+                    [protected],
+                    protected,
+                    [large, small],
+                    block_assignments,
+                    13,
+                    random.Random(203),
+                    all_players=[protected, attacker],
+                    stack=battle.Stack(),
+                )
+        finally:
+            battle.DB = old_db
+            battle.battle_rule_registry._RULE_CACHE.clear()
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert cast is True
+        assert protected.life == 3
+        assert attacker.life == 33
+        assert not any(card.get("name") == "Deflecting Palm" for card in protected.hand)
+        assert any(card.get("name") == "Deflecting Palm" for card in protected.graveyard)
+        assert any(
+            event == "spell_cast"
+            and data.get("card") == "Deflecting Palm"
+            and data.get("chosen_damage_source") == "Large Attacker"
+            and data.get("chosen_damage_amount") == 7
+            for event, data in events
+        )
+        assert any(
+            event == "damage_reflected"
+            and data.get("source") == "Large Attacker"
+            and data.get("target_player") == "Opponent"
+            and data.get("damage_dealt") == 7
+            for event, data in events
+        )
+        assert any(
+            decision.get("chosen_option", {}).get("card") == "Deflecting Palm"
+            and decision.get("score_components", {}).get("chosen_damage_source") == "Large Attacker"
+            for decision in decisions
+        )
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -14354,6 +14669,8 @@ def register_tests(battle, player):
         test_pg077_jeskas_will_uses_opponent_hand_and_impulse_exiles_top_three,
         test_pg077_mizzixs_mastery_exiles_graveyard_spell_and_resolves_copy,
         test_pg106_mizzixs_mastery_copy_declares_target_before_removal_resolution,
+        test_runtime_alias_force_of_vigor_destroys_artifacts_or_enchantments_only,
+        test_runtime_alias_calamity_of_cinders_damages_only_untapped_creatures,
         test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax,
         test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime,
         test_pg076_support_passive_annotations_and_ranger_small_creature_tutor,
@@ -14500,6 +14817,8 @@ def register_tests(battle, player):
         test_pg200_trouble_in_pairs_draws_on_opponent_second_spell_without_tax,
         test_pg200_trouble_in_pairs_draws_when_attacked_by_two_or_more_creatures,
         test_pg200_trouble_in_pairs_skips_opponent_extra_turn,
+        test_pg201_deflecting_palm_prevents_chosen_source_and_reflects_damage,
+        test_pg201_deflecting_palm_combat_window_chooses_largest_lethal_source,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,

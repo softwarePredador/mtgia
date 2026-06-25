@@ -212,6 +212,14 @@ EVENT_CONTRACT_OVERRIDES = {
         "strategy_signal",
         "variable damage wipe plus treasure creation result is consumed by replay and strategy checks.",
     ),
+    "damage_prevention_reflect_created": (
+        "strategy_signal",
+        "source-specific prevention/reflection shield creation is consumed by replay and strategy checks.",
+    ),
+    "damage_reflected": (
+        "strategy_signal",
+        "reflected damage result is consumed by replay and strategy checks after replacement prevention.",
+    ),
     "demonstrate_resolved": (
         "strategy_signal",
         "demonstrate copy choice and resulting free-cast resolutions are card-specific strategy context.",

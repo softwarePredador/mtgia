@@ -1,0 +1,4 @@
+    card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Deflecting Palm | deflecting palm | battle_rule_v1:9334b18a0bd0394173c9de47e5344045 |                  1 |                           1 |                         1 |           2
+(1 row)

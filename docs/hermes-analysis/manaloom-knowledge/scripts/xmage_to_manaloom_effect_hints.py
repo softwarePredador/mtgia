@@ -1506,6 +1506,37 @@ def _build_exact_runtime_variant_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        card_types == {"INSTANT"}
+        and xmage_class_name == "DeflectingPalm"
+        and "PreventNextDamageFromChosenSourceEffect" in effect_classes
+        and "DeflectingPalmPreventionApplier" in rules_text
+        and (
+            "deals that much damage to that source's controller" in normalized
+            or "objectController.damage(prevented" in rules_text
+        )
+    ):
+        return {
+            "effect": "damage_prevention_reflect",
+            "scope": "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1",
+            "fields": {
+                "instant": True,
+                "prevent_next_damage_from_chosen_source": True,
+                "prevent_damage_to": "you",
+                "prevent_damage_duration": "until_end_of_turn",
+                "reflect_prevented_damage": True,
+                "reflect_target": "chosen_source_controller",
+                "source_choice_required": True,
+                "prevent_damage_amount": 999,
+            },
+            "reason": "XMage structure matches Deflecting Palm: PreventNextDamageFromChosenSourceEffect until end of turn with a prevention applier that deals the prevented damage to the chosen source's controller.",
+            "signals": [
+                "PreventNextDamageFromChosenSourceEffect(Duration.EndOfTurn, true)",
+                "DeflectingPalmPreventionApplier",
+                "objectController.damage(prevented, source.getSourceId(), source, game)",
+            ],
+        }
+
+    if (
         card_types == {"CREATURE"}
         and xmage_class_name == "SunTitan"
         and "ReturnFromGraveyardToBattlefieldTargetEffect" in effect_classes

@@ -509,8 +509,8 @@ def change_life(player, delta):
     return _change_life(player, delta, emit_replay_event=emit_replay_event)
 
 
-def deal_damage(player, amount):
-    return _deal_damage(player, amount, emit_replay_event=emit_replay_event)
+def deal_damage(player, amount, source=None):
+    return _deal_damage(player, amount, emit_replay_event=emit_replay_event, source=source)
 
 
 def gain_life(player, amount, cap=40):
@@ -6587,10 +6587,47 @@ def removal_exile_targets_stack(effect_data):
     return "stack" in target_text or "spell" in target_text
 
 
+def _target_constraints_dict(effect_data):
+    constraints = (effect_data or {}).get("target_constraints") or {}
+    if isinstance(constraints, str):
+        try:
+            constraints = json.loads(constraints)
+        except Exception:
+            constraints = {"raw": constraints}
+    return constraints if isinstance(constraints, dict) else {}
+
+
+def _constraint_card_types(effect_data):
+    constraints = _target_constraints_dict(effect_data)
+    raw_types = constraints.get("card_types") or constraints.get("target_card_types") or []
+    if isinstance(raw_types, str):
+        raw_types = [raw_types]
+    return {str(value or "").strip().lower() for value in raw_types if str(value or "").strip()}
+
+
+def _target_type_from_constraints(effect_data):
+    card_types = _constraint_card_types(effect_data)
+    if {"artifact", "enchantment"}.issubset(card_types):
+        return "artifact_or_enchantment"
+    if "artifact" in card_types and "creature" in card_types:
+        return "artifact_or_creature"
+    if "creature" in card_types and "enchantment" in card_types:
+        return "creature_or_enchantment"
+    if {"creature", "enchantment", "planeswalker"}.issubset(card_types):
+        return "creature_enchantment_or_planeswalker"
+    for candidate in ("creature", "artifact", "enchantment", "planeswalker", "permanent"):
+        if candidate in card_types:
+            return candidate
+    return ""
+
+
 def removal_target_type(effect_data):
     target_type = str((effect_data or {}).get("target") or "").lower()
     if target_type:
         return target_type
+    constrained_type = _target_type_from_constraints(effect_data)
+    if constrained_type:
+        return constrained_type
     return (
         "creature"
         if (effect_data or {}).get("effect") == "remove_creature"
@@ -6960,6 +6997,17 @@ def prepare_declared_removal_targets(player, opponents, card, effect_data):
         return effect_data, replay
 
     target_type = removal_target_type(effect_data)
+    try:
+        max_targets = int(
+            first_present_value(
+                effect_data,
+                ("max_targets", "max_target_count", "target_count"),
+            )
+            or 1
+        )
+    except Exception:
+        max_targets = 1
+    max_targets = max(1, max_targets)
     for opponent in prioritize_evaluation_target_opponents(player, opponents):
         candidates = removal_target_candidates(
             opponent,
@@ -6969,22 +7017,27 @@ def prepare_declared_removal_targets(player, opponents, card, effect_data):
         )
         if not candidates:
             continue
-        target = choose_best_creature_target(candidates)
-        decision = targeting_decision(
-            card,
-            target,
-            player,
-            target_controller=opponent,
-            target_type=target_type,
-        )
-        declared = {
-            "target": target,
-            "controller": opponent,
-            "target_type": target_type,
-            "declared_by": player,
-        }
-        replay = [declared_target_replay_entry(decision)]
-        return {**effect_data, "declared_targets": [declared]}, replay
+        ranked_targets = sorted(candidates, key=target_priority, reverse=True)[:max_targets]
+        declared_targets = []
+        replay = []
+        for target in ranked_targets:
+            decision = targeting_decision(
+                card,
+                target,
+                player,
+                target_controller=opponent,
+                target_type=target_type,
+            )
+            declared_targets.append(
+                {
+                    "target": target,
+                    "controller": opponent,
+                    "target_type": target_type,
+                    "declared_by": player,
+                }
+            )
+            replay.append(declared_target_replay_entry(decision))
+        return {**effect_data, "declared_targets": declared_targets}, replay
     return effect_data, []
 
 
@@ -22043,6 +22096,8 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn):
         for permanent in list(participant.battlefield):
             if not is_battlefield_creature(permanent):
                 continue
+            if damage_scope == "each_untapped_creature" and bool(permanent.get("tapped")):
+                continue
             creatures_seen += 1
             if permanent.get("indestructible"):
                 protected.append(
@@ -22302,6 +22357,48 @@ def apply_redistribute_life_totals(player, opponents, card, effect_data, turn):
 
 TAII_WAKEEN_SCOPE = "taii_wakeen_noncombat_damage_equal_toughness_draw_plus_x_v1"
 TROUBLE_IN_PAIRS_SCOPE = "opponent_second_draw_second_spell_two_attackers_draw_v1"
+
+
+def normalize_runtime_effect_aliases(card, effect_data):
+    """Map batch-safe XMage family labels onto existing battle executors."""
+    if not isinstance(effect_data, dict):
+        return effect_data
+    effect = str(effect_data.get("effect") or "").lower()
+    if effect not in {"removal_destroy", "sweeper_damage"}:
+        return effect_data
+
+    normalized = dict(effect_data)
+    card_name = normalize_card_name(card.get("name", "") if isinstance(card, dict) else "")
+
+    if effect == "removal_destroy":
+        if card_name == "force of vigor":
+            normalized["target_constraints"] = {"card_types": ["artifact", "enchantment"]}
+            normalized["target"] = "artifact_or_enchantment"
+            normalized["max_targets"] = 2
+            normalized["battle_model_scope"] = (
+                normalized.get("battle_model_scope")
+                or "destroy_up_to_two_artifacts_or_enchantments_v1"
+            )
+        return apply_oracle_effect_normalization(
+            normalized,
+            "remove_permanent",
+            target=removal_target_type(normalized),
+        )
+
+    if effect == "sweeper_damage":
+        if card_name == "calamity of cinders":
+            normalized["damage"] = 6
+            normalized["damage_scope"] = "each_untapped_creature"
+            normalized["convoke"] = True
+            normalized["battle_model_scope"] = (
+                normalized.get("battle_model_scope")
+                or "deal_6_damage_each_untapped_creature_convoke_v1"
+            )
+        elif not first_present_value(normalized, ("damage", "amount")):
+            normalized["damage"] = 0
+        return apply_oracle_effect_normalization(normalized, "damage_wipe")
+
+    return effect_data
 
 
 def _taii_wakeen_permanents(player):
@@ -25409,6 +25506,7 @@ def apply_effect_immediate(
 ):
     """v8: Apply card effect (called when spell resolves from stack)."""
     effect_data = copy.deepcopy(effect_data_override) if effect_data_override else get_card_effect(card)
+    effect_data = normalize_runtime_effect_aliases(card, effect_data)
     effect = effect_data.get("effect", "unknown")
     if effect == "ramp_ritual" and effect_data.get("hand_exile_mana_ability"):
         activate_hand_exile_mana_ability(
@@ -25496,6 +25594,51 @@ def apply_effect_immediate(
             move_to_exile(player, card, reason="spell_exiles_self", turn=turn)
         else:
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    elif effect == "damage_prevention_reflect":
+        chosen_source = effect_data.get("_chosen_damage_source") or {}
+        chosen_source_name = (
+            effect_data.get("_chosen_damage_source_name")
+            or (chosen_source.get("name") if isinstance(chosen_source, dict) else None)
+        )
+        chosen_source_controller = effect_data.get("_chosen_damage_source_controller")
+        reflect_player = next(
+            (
+                participant
+                for participant in all_players_for_entry
+                if participant.name == chosen_source_controller
+            ),
+            None,
+        )
+        prevention_amount = int(effect_data.get("prevent_damage_amount") or 999)
+        if chosen_source_name and reflect_player is not None:
+            add_damage_prevention_shield(
+                player,
+                prevention_amount,
+                source=card.get("name", "damage_prevention_reflect"),
+                source_match="chosen_source",
+                chosen_source_name=chosen_source_name,
+                chosen_source_controller=chosen_source_controller,
+                reflect_to_player=reflect_player,
+                reflect_card={**card, **effect_data},
+                consume_once=True,
+                turn=turn,
+            )
+            result = "shield_created"
+        else:
+            result = "no_chosen_source"
+        emit_replay_event(
+            "damage_prevention_reflect_created",
+            player=player.name,
+            card=card.get("name", "?"),
+            chosen_source=chosen_source_name,
+            chosen_source_controller=chosen_source_controller,
+            reflect_target_player=getattr(reflect_player, "name", None),
+            prevention_amount=prevention_amount if result == "shield_created" else 0,
+            result=result,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "land": pass
     elif effect == "creature":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
@@ -26002,6 +26145,13 @@ def apply_effect_immediate(
         )
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
+        if not effect_data.get("declared_targets"):
+            effect_data, _declared_replay = prepare_declared_removal_targets(
+                player,
+                opponents,
+                card,
+                effect_data,
+            )
         declared_targets = effect_data.get("declared_targets") or []
         if len(declared_targets) == 1 and resolve_declared_single_removal(
             player,
@@ -28489,6 +28639,7 @@ def projected_player_combat_damage_details(attacker, target, attackers, block_as
         "player_damage": 0,
         "commander_lethal": False,
         "commander_lethal_sources": [],
+        "sources": [],
     }
     for attacking_creature, declared_blockers in block_assignments:
         if attacking_creature not in attackers:
@@ -28504,6 +28655,16 @@ def projected_player_combat_damage_details(attacker, target, attackers, block_as
             )
             projected_damage = max(0, power - lethal_blocker_damage)
         details["player_damage"] += projected_damage
+        source_entry = None
+        if projected_damage > 0:
+            source_entry = {
+                "source": attacking_creature,
+                "source_name": attacking_creature.get("name", "?"),
+                "source_controller": getattr(attacker, "name", None),
+                "projected_damage": projected_damage,
+                "commander_lethal": False,
+            }
+            details["sources"].append(source_entry)
         if (
             projected_damage > 0
             and attacker is not None
@@ -28516,6 +28677,10 @@ def projected_player_combat_damage_details(attacker, target, attackers, block_as
             projected_total = existing_damage + projected_damage
             if projected_total >= COMMANDER_DAMAGE_LETHAL:
                 details["commander_lethal"] = True
+                if source_entry is not None:
+                    source_entry["commander_lethal"] = True
+                    source_entry["existing_commander_damage"] = existing_damage
+                    source_entry["projected_commander_total"] = projected_total
                 details["commander_lethal_sources"].append(
                     {
                         "source": source_key,
@@ -28525,6 +28690,27 @@ def projected_player_combat_damage_details(attacker, target, attackers, block_as
                     }
                 )
     return details
+
+
+def choose_deflecting_palm_damage_source(projection, target):
+    sources = list((projection or {}).get("sources") or [])
+    if not sources:
+        return None
+    sources.sort(
+        key=lambda item: (
+            bool(item.get("commander_lethal")),
+            int(item.get("projected_damage") or 0),
+            str(item.get("source_name") or ""),
+        ),
+        reverse=True,
+    )
+    best = sources[0]
+    projected_damage = int((projection or {}).get("player_damage") or 0)
+    best_damage = int(best.get("projected_damage") or 0)
+    life_after_prevention = int(getattr(target, "life", 0) or 0) - max(0, projected_damage - best_damage)
+    if best.get("commander_lethal") or life_after_prevention > 0:
+        return best
+    return None
 
 
 def projected_player_combat_damage(attackers, block_assignments):
@@ -28555,8 +28741,17 @@ def combat_defensive_response_window(attacker, target, attackers, block_assignme
             continue
         effect_data = get_card_effect(candidate)
         effect = str(effect_data.get("effect") or "").lower()
-        if effect not in ("phase_out", "cannot_lose_turn"):
+        if effect not in ("phase_out", "cannot_lose_turn", "damage_prevention_reflect"):
             continue
+        if effect == "damage_prevention_reflect":
+            chosen_source = choose_deflecting_palm_damage_source(projection, target)
+            if not chosen_source:
+                continue
+            effect_data = dict(effect_data)
+            effect_data["_chosen_damage_source"] = chosen_source.get("source")
+            effect_data["_chosen_damage_source_name"] = chosen_source.get("source_name")
+            effect_data["_chosen_damage_source_controller"] = chosen_source.get("source_controller")
+            effect_data["_chosen_damage_amount"] = chosen_source.get("projected_damage")
         if not target.can_pay_card(candidate):
             continue
         response_options.append((candidate, effect_data))
@@ -28564,7 +28759,11 @@ def combat_defensive_response_window(attacker, target, attackers, block_assignme
         return False
 
     response_options.sort(
-        key=lambda item: 0 if item[1].get("effect") == "phase_out" else 1
+        key=lambda item: {
+            "phase_out": 0,
+            "cannot_lose_turn": 1,
+            "damage_prevention_reflect": 2,
+        }.get(item[1].get("effect"), 9)
     )
     card, effect_data = response_options[0]
     fields = replay_rule_fields(effect_data)
@@ -28589,6 +28788,8 @@ def combat_defensive_response_window(attacker, target, attackers, block_assignme
             "available_responses": len(response_options),
             "commander_lethal": commander_lethal,
             "commander_lethal_sources": projection["commander_lethal_sources"],
+            "chosen_damage_source": effect_data.get("_chosen_damage_source_name"),
+            "chosen_damage_source_projected_damage": effect_data.get("_chosen_damage_amount"),
         },
         rule_source=fields.get("rule_source", "battle_heuristic"),
         rule_status=fields.get("rule_review_status", "heuristic"),
@@ -28621,6 +28822,9 @@ def combat_defensive_response_window(attacker, target, attackers, block_assignme
         role="response",
         response_to="combat_damage",
         projected_combat_damage=projected_damage,
+        chosen_damage_source=effect_data.get("_chosen_damage_source_name"),
+        chosen_damage_source_controller=effect_data.get("_chosen_damage_source_controller"),
+        chosen_damage_amount=effect_data.get("_chosen_damage_amount"),
         **fields,
     )
     apply_effect_immediate(
@@ -28688,7 +28892,9 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
 
     def deal_player_damage(creature, damage=None):
         damage = combat_stat(creature, "power", 2) if damage is None else damage
-        damage_dealt = deal_damage(target, damage)
+        damage_source = dict(creature)
+        damage_source.setdefault("controller", attacker.name)
+        damage_dealt = deal_damage(target, damage, source=damage_source)
         if damage_dealt:
             record_table_hostility(
                 target,
