@@ -18389,7 +18389,7 @@ def resolve_effect_discard_cards(
 
 
 def player_has_lorehold_miracle_engine(player):
-    return lorehold_miracle_engine_permanent(player) is not None
+    return miracle_engine_permanent(player) is not None
 
 
 def lorehold_miracle_engine_permanent(player):
@@ -18399,16 +18399,49 @@ def lorehold_miracle_engine_permanent(player):
     return _player_named_permanent(player, "Lorehold, the Historian")
 
 
+def miracle_engine_permanents(player):
+    permanents = []
+    seen = set()
+    for permanent in player.battlefield:
+        if not isinstance(permanent, dict) or "grants_miracle_cost" not in permanent:
+            continue
+        identity = id(permanent)
+        if identity in seen:
+            continue
+        permanents.append(permanent)
+        seen.add(identity)
+    lorehold_engine = lorehold_miracle_engine_permanent(player)
+    if lorehold_engine is not None and id(lorehold_engine) not in seen:
+        permanents.append(lorehold_engine)
+    return permanents
+
+
+def miracle_engine_permanent(player):
+    permanents = miracle_engine_permanents(player)
+    return permanents[0] if permanents else None
+
+
 def lorehold_miracle_cost(player):
-    permanents = _player_permanents_with_flag(player, "grants_miracle_cost")
+    permanents = miracle_engine_permanents(player)
     if not permanents:
-        return 2 if lorehold_miracle_engine_permanent(player) is not None else None
-    costs = [
-        int(permanent.get("grants_miracle_cost") or 0)
-        for permanent in permanents
-        if int(permanent.get("grants_miracle_cost") or 0) > 0
-    ]
+        return None
+    costs = []
+    for permanent in permanents:
+        if isinstance(permanent, dict) and "grants_miracle_cost" in permanent:
+            costs.append(max(0, int(permanent.get("grants_miracle_cost") or 0)))
+    if not costs and lorehold_miracle_engine_permanent(player) is not None:
+        costs.append(2)
     return min(costs) if costs else None
+
+
+def miracle_card_scope_allows(player, card):
+    if not isinstance(card, dict) or is_effective_land(card):
+        return False
+    for permanent in miracle_engine_permanents(player):
+        scope = str(permanent.get("grants_miracle_card_scope") or "").strip().lower()
+        if permanent.get("grants_miracle_nonland") or scope in {"nonland", "nonland_cards"}:
+            return True
+    return is_instant_or_sorcery_spell(card)
 
 
 def lorehold_draw_priority(card, player):
@@ -18542,7 +18575,7 @@ def activate_lorehold_topdeck_artifacts(
             hand_candidates = [
                 card
                 for card in player.hand
-                if isinstance(card, dict) and is_instant_or_sorcery_spell(card)
+                if isinstance(card, dict) and miracle_card_scope_allows(player, card)
             ]
             if not hand_candidates:
                 _utility_artifact_skip_event(
@@ -18720,7 +18753,7 @@ def activate_lorehold_topdeck_artifacts(
             first_draw_score = lorehold_draw_priority(first_draw_candidate, player)
             if (
                 first_draw_score < 130
-                or not is_instant_or_sorcery_spell(first_draw_candidate)
+                or not miracle_card_scope_allows(player, first_draw_candidate)
             ):
                 _utility_artifact_skip_event(
                     player,
@@ -18924,7 +18957,7 @@ def activate_lorehold_topdeck_artifacts(
             and bool(permanent.get("activated_draw_put_self_on_top"))
             and player.cards_drawn_this_turn == 0
             and miracle_cost is not None
-            and is_instant_or_sorcery_spell(visible[0])
+            and miracle_card_scope_allows(player, visible[0])
             and current_top_score >= 130
             and player.available_mana() >= miracle_cost
         )
@@ -19256,8 +19289,9 @@ def try_lorehold_miracle_cast(
     miracle_cost = lorehold_miracle_cost(player)
     if miracle_cost is None:
         return False
+    miracle_engine = miracle_engine_permanent(player)
     last_drawn = miracle_candidate or drawn_for_turn[-1]
-    if not last_drawn or not is_instant_or_sorcery_spell(last_drawn):
+    if not last_drawn or not miracle_card_scope_allows(player, last_drawn):
         return False
     if player.available_mana() < miracle_cost:
         return False
@@ -19324,7 +19358,8 @@ def try_lorehold_miracle_cast(
         type_line=last_drawn.get("type_line", ""),
         cmc=last_drawn.get("cmc", 0),
         miracle_cost=miracle_cost,
-        lorehold_on_board=True,
+        miracle_engine=miracle_engine.get("name", "?") if isinstance(miracle_engine, dict) else None,
+        lorehold_on_board=lorehold_miracle_engine_permanent(player) is not None,
         cards_drawn_this_turn=player.cards_drawn_this_turn,
         first_draw_miracle_candidate=miracle_candidate is not None,
         phase=phase,

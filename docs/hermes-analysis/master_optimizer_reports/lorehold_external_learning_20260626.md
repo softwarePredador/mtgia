@@ -40,12 +40,15 @@ Implemented in `lorehold_strategy_profile_v3_2026_06_26`.
 | `deck_607` | baseline | protected baseline | `5W/4L/0S`, WR `55.56%` | `2W/1L` | keep |
 | `candidate_607_penance_v1` | `+Penance`, `-Promise of Loyalty` | add topdeck/protection from external research | `3W/6L/0S`, WR `33.33%` | `0W/3L` | reject |
 | `candidate_607_longshot_v1` | `+Longshot, Rebel Bowman`, `-Storm Herd` | replace expensive token finisher with lower-curve spell payoff | `2W/7L/0S`, WR `22.22%` | `1W/2L` | reject |
+| `candidate_607_birgi_v1` | `+Birgi, God of Storytelling // Harnfel, Horn of Bounty`, `-Bender's Waterskin` | isolated mana/engine sidegrade | `3W/6L/0S`, WR `33.33%` | `1W/2L` | reject |
 
 ## What Was Learned
 
 `Penance` looked correct on paper, but cutting a five-mana pressure spell reduced the deck's ability to survive the pressure sample. The candidate kept spell volume but lost both miracle/topdeck game frequency and the Winota matchup.
 
 `Longshot, Rebel Bowman` looked like a better curve/payoff conversion than `Storm Herd`, but it did not improve execution. It reduced cost-paid events, spell casts, miracle games, and overall win rate.
+
+`Birgi, God of Storytelling` was the cleanest same-function sidegrade hypothesis left from the external research. It still failed when isolated: miracle games dropped from `8/9` to `4/9`, topdeck games dropped from `3/9` to `2/9`, and the Winota result dropped from `2W/1L` to `1W/2L`. This makes `Bender's Waterskin` a protected mana-engine piece until a same-function replacement wins.
 
 The current `deck_607` wins because it is already balanced around a narrow but effective shell: topdeck setup plus cost reducers plus high-impact spells plus enough pressure absorption. External cards that are individually synergistic still fail if the swap removes one of the pieces that lets the shell survive.
 
@@ -72,4 +75,6 @@ Generated artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_battle_gate_20260626_penance_v1.json`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260626_longshot_v1.json`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_battle_gate_20260626_longshot_v1.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260626_birgi_v1.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_battle_gate_20260626_birgi_v1_post_molecule.json`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`

@@ -104,6 +104,63 @@ def register_tests(battle, player):
         assert any(event == "miracle_cast" for event, _ in events)
         assert active.graveyard[0]["name"] == "Reforge the Soul"
 
+    def test_molecule_man_grants_zero_miracle_to_nonland_first_draw():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_turn = battle.CURRENT_REPLAY_TURN
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            active.is_human = True
+            creature = {
+                "name": "Storm-Kiln Artist",
+                "cmc": 4,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            active.hand = [creature]
+            active.cards_drawn_this_turn = 1
+            active._cards_drawn_turn_marker = 3
+            battle.CURRENT_REPLAY_TURN = 3
+            active.battlefield = [
+                {
+                    "name": "Molecule Man",
+                    "effect": "passive",
+                    "type_line": "Creature",
+                    "grants_miracle_cost": 0,
+                    "grants_miracle_nonland": True,
+                    "grants_miracle_card_scope": "nonland",
+                    "_rule_logical_key": "battle_rule_v1:molecule-man-test",
+                    "_rule_oracle_hash": "molecule-man-test-hash",
+                    "_rule_review_status": "verified",
+                    "_rule_execution_status": "auto",
+                }
+            ]
+            opponent = player("Opponent", [_card("Opp Filler")])
+
+            cast = battle.try_lorehold_miracle_cast(
+                active,
+                [creature],
+                3,
+                "draw_step",
+                [active, opponent],
+                random.Random(243),
+                battle.Stack(),
+                source="draw_step",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            battle.CURRENT_REPLAY_TURN = previous_turn
+
+        assert cast is True
+        miracle_event = next(data for event, data in events if event == "miracle_cast")
+        assert miracle_event["card"] == "Storm-Kiln Artist"
+        assert miracle_event["miracle_cost"] == 0
+        assert miracle_event["miracle_engine"] == "Molecule Man"
+        assert miracle_event["lorehold_on_board"] is False
+
     def test_lorehold_miracle_does_not_use_second_draw_of_turn():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -18844,6 +18901,7 @@ def register_tests(battle, player):
     return [
         test_lorehold_miracle_requires_lorehold_on_battlefield,
         test_lorehold_miracle_casts_first_draw_only_with_lorehold,
+        test_molecule_man_grants_zero_miracle_to_nonland_first_draw,
         test_lorehold_miracle_does_not_use_second_draw_of_turn,
         test_lorehold_miracle_skips_bad_wheel_refill,
         test_lorehold_miracle_does_not_cast_counter_without_stack_target,
