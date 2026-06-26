@@ -9657,16 +9657,20 @@
     "battle_rule_logical_key": "battle_rule_v1:87a47eb9600289eacc5312fdf7f9de79"
   },
   "Erode": {
-    "cmc": 0.0,
+    "ability_kind": "one_shot",
+    "basic_land_compensation_status": "annotation_only",
+    "battle_model_scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1",
     "effect": "remove_creature",
     "instant": true,
     "target": "creature",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d8d6a94ecd1057e1b04a0eb6241c2d4f"
+    "target_controller_basic_land_tapped": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dd175af9c77feea940de97138a916fe3",
+    "battle_rule_oracle_hash": "fade62a3cbc3e6987d7988b711a5a834"
   },
   "Eroded Canyon": {
     "effect": "land",
@@ -23175,14 +23179,23 @@
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
   },
   "Purphoros, God of the Forge": {
-    "cmc": 4.0,
-    "effect": "pump_all",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e90b582e4b128b4c890db8959fb6005c"
+    "ability_kind": "triggered",
+    "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+    "damage": 2,
+    "effect": "passive",
+    "target_controller": "opponents",
+    "trigger": "creature_you_control_enters",
+    "trigger_another_creature_you_control_enters": true,
+    "trigger_creature_you_control_enters": true,
+    "trigger_damage_each_opponent": 2,
+    "trigger_effect": "damage_each_opponent",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2fb771380609b4d180c1e6816bf8b556",
+    "battle_rule_oracle_hash": "01ee853118a4f1e5fe31a9d1e3ec6c5d"
   },
   "Pursue the Past": {
     "cmc": 0.0,
@@ -29557,15 +29570,24 @@
     "battle_rule_logical_key": "battle_rule_v1:bbe7f2ee03b52177a39e4f4eb4998043"
   },
   "Sundering Eruption // Volcanic Fissure": {
-    "cmc": 3.0,
+    "ability_kind": "one_shot",
+    "basic_land_compensation_status": "annotation_only",
+    "battle_model_scope": "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1",
+    "cant_block_mode_status": "annotation_only",
+    "cant_block_target_restriction": "creatures_without_flying",
     "effect": "remove_permanent",
-    "instant": true,
+    "land_side_add_mana": "R",
+    "land_side_pay_three_life_else_tapped": true,
+    "sorcery": true,
+    "target": "land",
+    "target_controller_basic_land_tapped": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.82,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9d5afecce0b2500c1dff74bcd97e6eb4"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a",
+    "battle_rule_oracle_hash": "09148a5a6f4d14c04a30bf19819e20b8"
   },
   "Sundial of the Infinite": {
     "cmc": 2.0,
@@ -34984,15 +35006,24 @@
     "battle_rule_oracle_hash": "ceb13a31308fc0f6e25631a6266a257a"
   },
   "Warleader's Call": {
-    "cmc": 3.0,
-    "effect": "pump_all",
-    "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e1b335368e296cff47b71c65fb6cfbe2"
+    "ability_kind": "triggered",
+    "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+    "damage": 1,
+    "effect": "passive",
+    "is_creature_permanent": false,
+    "target_controller": "opponents",
+    "trigger": "creature_you_control_enters",
+    "trigger_another_creature_you_control_enters": false,
+    "trigger_creature_you_control_enters": true,
+    "trigger_damage_each_opponent": 1,
+    "trigger_effect": "damage_each_opponent",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cc55ae76863ec402fabc99b2691625a7",
+    "battle_rule_oracle_hash": "0b6b075fd5c59b4634262b2658685f1d"
   },
   "Warp World": {
     "cmc": 8.0,

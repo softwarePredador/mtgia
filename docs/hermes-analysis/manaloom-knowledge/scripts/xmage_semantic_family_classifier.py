@@ -2933,6 +2933,53 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("token_sacrifice_for_colorless_mana"))
         )
 
+    if effect == "remove_permanent" and scope == "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"DestroyTargetEffect", "SearchLibraryPutInPlayTargetControllerEffect"}
+            and not ability_classes
+            and "TargetCreatureOrPlaneswalker" in target_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "creature_or_planeswalker"
+            and bool(effect_json.get("target_controller_basic_land_tapped"))
+            and effect_json.get("basic_land_compensation_status") == "annotation_only"
+        )
+
+    if effect == "remove_permanent" and scope == "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1":
+        return (
+            types == {"LAND", "SORCERY"}
+            and {
+                "CantBlockAllEffect",
+                "DestroyTargetEffect",
+                "SearchLibraryPutInPlayTargetControllerEffect",
+                "TapSourceUnlessPaysEffect",
+            }.issubset(effect_classes)
+            and {"AsEntersBattlefieldAbility", "RedManaAbility"}.issubset(ability_classes)
+            and "TargetLandPermanent" in target_classes
+            and bool(effect_json.get("sorcery"))
+            and effect_json.get("target") == "land"
+            and bool(effect_json.get("target_controller_basic_land_tapped"))
+            and effect_json.get("basic_land_compensation_status") == "annotation_only"
+            and effect_json.get("cant_block_mode_status") == "annotation_only"
+            and effect_json.get("cant_block_target_restriction") == "creatures_without_flying"
+            and bool(effect_json.get("land_side_pay_three_life_else_tapped"))
+            and effect_json.get("land_side_add_mana") == "R"
+        )
+
+    if effect == "remove_permanent" and scope == "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1":
+        return (
+            types == {"SORCERY"}
+            and effect_classes == {"DestroyTargetEffect"}
+            and ability_classes == {"OverloadAbility"}
+            and "TargetPermanent" in target_classes
+            and bool(effect_json.get("sorcery"))
+            and effect_json.get("target") == "artifact"
+            and effect_json.get("target_controller") == "opponent"
+            and effect_json.get("overload_cost") == "{4}{R}"
+            and effect_json.get("overload_status") == "annotation_only"
+            and effect_json.get("overload_target_rewrite") == "target_to_each"
+        )
+
     if effect == "bounce" and scope == "gift_bounce_opponent_creature_or_nonland_v1":
         return (
             types == {"INSTANT"}

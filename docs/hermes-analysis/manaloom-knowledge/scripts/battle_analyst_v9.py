@@ -6590,8 +6590,12 @@ def target_matches_type(target, target_type):
         return is_artifact_permanent(target) or is_battlefield_creature(target)
     if target_type == "creature_or_enchantment":
         return is_battlefield_creature(target) or is_enchantment_permanent(target)
+    if target_type in ("creature_or_planeswalker", "creature_planeswalker"):
+        return is_battlefield_creature(target) or is_planeswalker_permanent(target)
     if target_type in ("planeswalker", "planeswalker_permanent"):
         return "planeswalker" in str(target.get("type_line") or "").lower()
+    if target_type in ("land", "land_permanent"):
+        return is_effective_land(target)
     if target_type in (
         "creature_enchantment_or_planeswalker",
         "creature_or_enchantment_or_planeswalker",
@@ -6719,11 +6723,13 @@ def _target_type_from_constraints(effect_data):
         return "artifact_or_enchantment"
     if "artifact" in card_types and "creature" in card_types:
         return "artifact_or_creature"
+    if "creature" in card_types and "planeswalker" in card_types:
+        return "creature_or_planeswalker"
     if "creature" in card_types and "enchantment" in card_types:
         return "creature_or_enchantment"
     if {"creature", "enchantment", "planeswalker"}.issubset(card_types):
         return "creature_enchantment_or_planeswalker"
-    for candidate in ("creature", "artifact", "enchantment", "planeswalker", "permanent"):
+    for candidate in ("creature", "artifact", "enchantment", "planeswalker", "land", "permanent"):
         if candidate in card_types:
             return candidate
     return ""

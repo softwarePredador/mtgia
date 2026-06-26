@@ -1293,6 +1293,101 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target_controller_gains_life"], 4)
         self.assertTrue(primary["instant"])
 
+    def test_erode_maps_to_exact_creature_or_planeswalker_basic_land_annotation_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "DestroyTargetEffect",
+                    "SearchLibraryPutInPlayTargetControllerEffect",
+                ],
+                "target_classes": ["TargetCreatureOrPlaneswalker"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect()); "
+                    "this.getSpellAbility().addEffect(new SearchLibraryPutInPlayTargetControllerEffect(true)); "
+                    "this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "remove_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1",
+        )
+        self.assertEqual(primary["target"], "creature_or_planeswalker")
+        self.assertTrue(primary["target_controller_basic_land_tapped"])
+        self.assertEqual(primary["basic_land_compensation_status"], "annotation_only")
+        self.assertTrue(primary["instant"])
+
+    def test_sundering_eruption_maps_to_exact_land_destroy_annotation_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": [
+                    "CantBlockAllEffect",
+                    "DestroyTargetEffect",
+                    "SearchLibraryPutInPlayTargetControllerEffect",
+                    "TapSourceUnlessPaysEffect",
+                ],
+                "ability_classes": ["AsEntersBattlefieldAbility", "RedManaAbility"],
+                "target_classes": ["TargetLandPermanent"],
+                "constructor_metadata": {"card_types": ["SORCERY", "LAND"]},
+                "raw_excerpt": (
+                    "this.getLeftHalfCard().getSpellAbility().addTarget(new TargetLandPermanent()); "
+                    "this.getLeftHalfCard().getSpellAbility().addEffect(new DestroyTargetEffect()); "
+                    "this.getLeftHalfCard().getSpellAbility().addEffect(new SearchLibraryPutInPlayTargetControllerEffect(true)); "
+                    "this.getLeftHalfCard().getSpellAbility().addEffect(new CantBlockAllEffect(filter, Duration.EndOfTurn)); "
+                    "this.getRightHalfCard().addAbility(new AsEntersBattlefieldAbility(new TapSourceUnlessPaysEffect(new PayLifeCost(3)))); "
+                    "this.getRightHalfCard().addAbility(new RedManaAbility());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "remove_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1",
+        )
+        self.assertEqual(primary["target"], "land")
+        self.assertTrue(primary["target_controller_basic_land_tapped"])
+        self.assertEqual(primary["basic_land_compensation_status"], "annotation_only")
+        self.assertEqual(primary["cant_block_mode_status"], "annotation_only")
+        self.assertTrue(primary["land_side_pay_three_life_else_tapped"])
+        self.assertEqual(primary["land_side_add_mana"], "R")
+
+    def test_vandalblast_maps_to_exact_artifact_overload_annotation_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DestroyTargetEffect"],
+                "ability_classes": ["OverloadAbility"],
+                "target_classes": ["TargetPermanent"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "OverloadAbility.implementOverloadAbility(this, new ManaCostsImpl<>(\"{4}{R}\"), "
+                    "new TargetPermanent(FILTER), new DestroyTargetEffect()); "
+                    "FILTER.add(TargetController.NOT_YOU.getControllerPredicate());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "remove_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1",
+        )
+        self.assertEqual(primary["target"], "artifact")
+        self.assertEqual(primary["target_controller"], "opponent")
+        self.assertEqual(primary["overload_cost"], "{4}{R}")
+        self.assertEqual(primary["overload_status"], "annotation_only")
+        self.assertEqual(primary["overload_target_rewrite"], "target_to_each")
+        self.assertTrue(primary["sorcery"])
+
     def test_agathas_soul_cauldron_maps_to_exact_passive_scope(self) -> None:
         result = hints.build_effect_hints(
             {

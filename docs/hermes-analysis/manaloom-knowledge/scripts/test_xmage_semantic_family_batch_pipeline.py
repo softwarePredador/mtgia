@@ -1820,6 +1820,131 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_erode_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Erode",
+                        "severity": "high",
+                        "oracle_hash": "erodehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Erode",
+                            "path": "/xmage/Erode.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "DestroyTargetEffect",
+                                "SearchLibraryPutInPlayTargetControllerEffect",
+                            ],
+                            "ability_classes": [],
+                            "target_classes": ["TargetCreatureOrPlaneswalker"],
+                            "primary_effect": {
+                                "effect": "remove_permanent",
+                                "battle_model_scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1",
+                                "target": "creature_or_planeswalker",
+                                "target_controller_basic_land_tapped": True,
+                                "basic_land_compensation_status": "annotation_only",
+                                "instant": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_sundering_eruption_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Sundering Eruption // Volcanic Fissure",
+                        "severity": "high",
+                        "oracle_hash": "sunderinghash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "SunderingEruption",
+                            "path": "/xmage/SunderingEruption.java",
+                            "types": ["LAND", "SORCERY"],
+                            "effect_classes": [
+                                "CantBlockAllEffect",
+                                "DestroyTargetEffect",
+                                "SearchLibraryPutInPlayTargetControllerEffect",
+                                "TapSourceUnlessPaysEffect",
+                            ],
+                            "ability_classes": ["AsEntersBattlefieldAbility", "RedManaAbility"],
+                            "target_classes": ["TargetLandPermanent"],
+                            "primary_effect": {
+                                "effect": "remove_permanent",
+                                "battle_model_scope": "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1",
+                                "target": "land",
+                                "target_controller_basic_land_tapped": True,
+                                "basic_land_compensation_status": "annotation_only",
+                                "cant_block_mode_status": "annotation_only",
+                                "cant_block_target_restriction": "creatures_without_flying",
+                                "land_side_pay_three_life_else_tapped": True,
+                                "land_side_add_mana": "R",
+                                "sorcery": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_vandalblast_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Vandalblast",
+                        "severity": "high",
+                        "oracle_hash": "vandalblasthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Vandalblast",
+                            "path": "/xmage/Vandalblast.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["DestroyTargetEffect"],
+                            "ability_classes": ["OverloadAbility"],
+                            "target_classes": ["TargetPermanent"],
+                            "primary_effect": {
+                                "effect": "remove_permanent",
+                                "battle_model_scope": "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1",
+                                "target": "artifact",
+                                "target_controller": "opponent",
+                                "overload_cost": "{4}{R}",
+                                "overload_status": "annotation_only",
+                                "overload_target_rewrite": "target_to_each",
+                                "sorcery": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_agathas_soul_cauldron_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

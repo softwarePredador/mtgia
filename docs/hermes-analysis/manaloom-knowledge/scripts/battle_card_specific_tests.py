@@ -770,6 +770,112 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_exact_erode_scope_can_target_planeswalker_and_preserves_basic_land_annotation():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            planeswalker = {
+                "name": "Test Walker",
+                "cmc": 3,
+                "type_line": "Legendary Planeswalker",
+                "effect": "planeswalker",
+                "loyalty": 4,
+            }
+            basic_land = {
+                "name": "Plains",
+                "cmc": 0,
+                "type_line": "Basic Land - Plains",
+                "effect": "land",
+            }
+            opponent.battlefield = [planeswalker]
+            opponent.library = [basic_land]
+            effect_data = {
+                "effect": "remove_permanent",
+                "battle_model_scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1",
+                "target": "creature_or_planeswalker",
+                "instant": True,
+                "target_controller_basic_land_tapped": True,
+                "basic_land_compensation_status": "annotation_only",
+                "_rule_logical_key": "battle_rule_v1:erode-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Erode", "cmc": 1, "type_line": "Instant"},
+                turn=6,
+                rng=random.Random(260627),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert planeswalker not in opponent.battlefield
+        assert planeswalker in opponent.graveyard
+        assert basic_land in opponent.library
+        removal_event = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Erode"
+        )
+        assert removal_event["target"] == "Test Walker"
+        assert removal_event["target_type"] == "creature_or_planeswalker"
+        assert removal_event["target_controller_basic_land_tapped"] is True
+        assert removal_event["basic_land_compensation_status"] == "annotation_only"
+
+    def test_exact_land_removal_scope_can_target_land():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            target_land = {
+                "name": "Ancient Tomb",
+                "cmc": 0,
+                "type_line": "Land",
+                "effect": "land",
+            }
+            opponent.battlefield = [target_land]
+            effect_data = {
+                "effect": "remove_permanent",
+                "battle_model_scope": "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1",
+                "target": "land",
+                "sorcery": True,
+                "target_controller_basic_land_tapped": True,
+                "basic_land_compensation_status": "annotation_only",
+                "_rule_logical_key": "battle_rule_v1:sundering-eruption-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Sundering Eruption", "cmc": 3, "type_line": "Sorcery"},
+                turn=7,
+                rng=random.Random(260628),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target_land not in opponent.battlefield
+        assert target_land in opponent.graveyard
+        removal_event = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Sundering Eruption"
+        )
+        assert removal_event["target"] == "Ancient Tomb"
+        assert removal_event["target_type"] == "land"
+        assert removal_event["basic_land_compensation_status"] == "annotation_only"
+
     def test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -16868,6 +16974,8 @@ def register_tests(battle, player):
         test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache,
         test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance,
         test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance,
+        test_exact_erode_scope_can_target_planeswalker_and_preserves_basic_land_annotation,
+        test_exact_land_removal_scope_can_target_land,
         test_pg093_insurrection_uses_compact_steal_attack_runtime,
         test_pg093_insurrection_rule_resolves_from_sqlite_cache,
     ]

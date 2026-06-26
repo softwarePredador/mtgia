@@ -1,0 +1,6 @@
+               card_name                |            normalized_name             |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+----------------------------------------+----------------------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Erode                                  | erode                                  | battle_rule_v1:dd175af9c77feea940de97138a916fe3 |                  1 |                           1 |                         1 |           4
+ Sundering Eruption // Volcanic Fissure | sundering eruption // volcanic fissure | battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a |                  1 |                           1 |                         1 |           4
+(2 rows)
+

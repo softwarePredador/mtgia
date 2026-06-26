@@ -1561,3 +1561,64 @@ Any actual deck change must pass:
 9. post-apply battle gate and strategy-coherence review.
 
 No matrix row is an automatic swap.
+
+## Post-PG220 exact-destroy checkpoint
+
+Post-PG220 Lorehold-focused checkpoint generated on 2026-06-26 after promoting
+`Erode` and `Sundering Eruption // Volcanic Fissure` as exact XMage-derived
+destroy scopes with annotation-only riders where the runtime still should not
+invent hidden behavior:
+
+- proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg220_destroy_exact_lorehold_v1_proposals.json`;
+  `Erode` and `Sundering Eruption // Volcanic Fissure` moved to
+  `batch_pg_candidate_after_precheck`, while `Star of Extinction` remained
+  `split_family_scope_review_required`.
+- package/apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg220_erode_sundering_destroy_exact_package.md`,
+  `..._precheck.out`, `..._apply.out`, and `..._postcheck.out`.
+- sync evidence:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg220_erode_sundering_20260626.json`.
+- updated matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg220_erode_sundering_postsync_v1.json`.
+
+Routing impact:
+
+- `Erode` moved from
+  `split_scope / needs_rule_before_strategy`
+  to
+  `battle_ready / watchlist_candidate`.
+- `Sundering Eruption // Volcanic Fissure` stayed
+  `battle_ready / watchlist_candidate`,
+  but now uses the exact destroy-land MDFC scope instead of the stale generic
+  destroy bucket.
+- `Star of Extinction` is still
+  `split_scope / needs_rule_before_strategy`.
+- matrix counts changed to:
+  `needs_rule_before_strategy=88`,
+  `watchlist_candidate=93`,
+  `priority_benchmark_candidate=38`,
+  `battle_ready=276`,
+  `split_scope=15`.
+
+Candidate impact:
+
+- generated candidate:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg220_v1.json`.
+- candidate hash changed from PG219
+  `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`
+  to PG220
+  `480b57715f6b05ad9a98c5336e28601aca4083fb0bd99e2fbd656c51697157d1`.
+- the material deck delta was the return of `Crawlspace` and the removal of
+  `Improvisation Capstone`, reducing the candidate novelty from `8` to `7`.
+- smoke result with the same short real-opponent sample
+  (`seed=20260625`, `1x3`) remained `0W/3L/0S`, so the rule closure improved
+  routing and candidate composition, but still does not justify any deck swap.
+
+Next operational order:
+
+1. Close the remaining exact destroy outlier `Star of Extinction`.
+2. Package the already-ready `Vandalblast` follow-up or another Lorehold-touching
+   exact-scope card if it outranks it by routing value.
+3. Re-run candidate hash/smoke only after the next rule-first closure that
+   materially touches `priority_benchmark_candidate` or defensive core cuts.

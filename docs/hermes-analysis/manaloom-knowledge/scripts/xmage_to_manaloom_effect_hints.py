@@ -3403,6 +3403,101 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"INSTANT"}
+        and effect_classes
+        == {"DestroyTargetEffect", "SearchLibraryPutInPlayTargetControllerEffect"}
+        and not ability_classes
+        and "TargetCreatureOrPlaneswalker" in target_classes
+    ):
+        return {
+            "effect": "remove_permanent",
+            "scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1",
+            "fields": {
+                "instant": True,
+                "target": "creature_or_planeswalker",
+                "target_controller_basic_land_tapped": True,
+                "basic_land_compensation_status": "annotation_only",
+            },
+            "reason": (
+                "XMage structure matches Erode destroying target creature or planeswalker, "
+                "with that permanent's controller optionally searching for a basic land and "
+                "putting it onto the battlefield tapped."
+            ),
+            "signals": [
+                "DestroyTargetEffect",
+                "SearchLibraryPutInPlayTargetControllerEffect",
+                "TargetCreatureOrPlaneswalker",
+            ],
+        }
+
+    if (
+        card_types == {"LAND", "SORCERY"}
+        and {
+            "CantBlockAllEffect",
+            "DestroyTargetEffect",
+            "SearchLibraryPutInPlayTargetControllerEffect",
+            "TapSourceUnlessPaysEffect",
+        }.issubset(effect_classes)
+        and {"AsEntersBattlefieldAbility", "RedManaAbility"}.issubset(ability_classes)
+        and "TargetLandPermanent" in target_classes
+    ):
+        return {
+            "effect": "remove_permanent",
+            "scope": "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1",
+            "fields": {
+                "sorcery": True,
+                "target": "land",
+                "target_controller_basic_land_tapped": True,
+                "basic_land_compensation_status": "annotation_only",
+                "cant_block_mode_status": "annotation_only",
+                "cant_block_target_restriction": "creatures_without_flying",
+                "land_side_pay_three_life_else_tapped": True,
+                "land_side_add_mana": "R",
+            },
+            "reason": (
+                "XMage structure matches Sundering Eruption destroying target land, "
+                "letting that land's controller search for a basic land tapped, applying a "
+                "can't-block rider to creatures without flying, and carrying a tapped-red-land back face."
+            ),
+            "signals": [
+                "DestroyTargetEffect",
+                "SearchLibraryPutInPlayTargetControllerEffect",
+                "CantBlockAllEffect",
+                "TargetLandPermanent",
+                "RedManaAbility",
+            ],
+        }
+
+    if (
+        card_types == {"SORCERY"}
+        and effect_classes == {"DestroyTargetEffect"}
+        and ability_classes == {"OverloadAbility"}
+        and "TargetPermanent" in target_classes
+        and "targetcontroller.not_you" in normalized
+    ):
+        return {
+            "effect": "remove_permanent",
+            "scope": "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1",
+            "fields": {
+                "sorcery": True,
+                "target": "artifact",
+                "target_controller": "opponent",
+                "overload_cost": "{4}{R}",
+                "overload_status": "annotation_only",
+                "overload_target_rewrite": "target_to_each",
+            },
+            "reason": (
+                "XMage structure matches Vandalblast destroying target artifact you don't control, "
+                "with overload to hit each artifact you don't control."
+            ),
+            "signals": [
+                "DestroyTargetEffect",
+                "OverloadAbility",
+                "TargetController.NOT_YOU",
+            ],
+        }
+
+    if (
+        card_types == {"INSTANT"}
         and effect_classes == {"ReturnToHandTargetEffect"}
         and ability_classes == {"OverloadAbility"}
         and "targetcontroller.not_you" in normalized

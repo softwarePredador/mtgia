@@ -13851,3 +13851,68 @@ Register decision:
 - Remaining Lorehold `needs_rule_before_strategy` backlog is now concentrated in
   `manual_model`, `targeted_interaction`, `static_cost_reducer`, and one
   `creature` split-scope card.
+
+### PG220 - Erode and Sundering exact destroy scopes
+
+Status: `applied_postchecked_sqlite_synced_matrix_validated`
+Source front: XMage exact-scope refinement for `targeted_interaction`
+Target table: `public.card_battle_rules`
+DB mutations executed by this checkpoint: `true`
+
+Current evidence:
+
+- Package files:
+  `docs/hermes-analysis/master_optimizer_reports/pg220_erode_sundering_destroy_exact_package.md`
+  and sibling `precheck/apply/postcheck/rollback.sql`.
+- Generator/pipeline evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg220_destroy_exact_lorehold_v1_proposals.json`
+  promoted `Erode` and `Sundering Eruption // Volcanic Fissure` to
+  `batch_pg_candidate_after_precheck` with exact scopes
+  `destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1`
+  and
+  `destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg220_erode_sundering_destroy_exact_precheck.out`;
+  `target_card_rows=1` for both cards,
+  `expected_rule_rows_before=0`, and
+  `would_deprecate_shadow_rows=2` per card.
+- Shadow inspection before apply:
+  `erode` had two stale `needs_review/review_only remove_creature` rows;
+  `sundering eruption // volcanic fissure` had one stale
+  `needs_review/review_only remove_permanent` row and one stale
+  `verified/auto remove_permanent instant=true` row from the old generic bucket.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg220_erode_sundering_destroy_exact_apply.out`;
+  `deprecated_shadow_rows=4`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg220_erode_sundering_destroy_exact_postcheck.out`;
+  both cards now have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`,
+  `backup_rows=4`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg220_erode_sundering_20260626.json`;
+  `selected_card_count=2`, `generated_rows=2`,
+  `sqlite_inserted_or_updated=6`.
+- Focused tests:
+  `test_xmage_to_manaloom_effect_hints.py` `210` passing,
+  `test_xmage_semantic_family_batch_pipeline.py` `197` passing,
+  and targeted battle harness checks passed for
+  `test_exact_erode_scope_can_target_planeswalker_and_preserves_basic_land_annotation`
+  and `test_exact_land_removal_scope_can_target_land`.
+- Post-sync operational queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg220_erode_sundering_v1.json`;
+  lane counts became
+  `manual_mapper_backlog=269`,
+  `split_scope_backlog=27`,
+  `package_already_prepared=3`,
+  `package_ready_unprepared=1`,
+  `runtime_family_backlog=3`.
+
+Register decision:
+
+- PG220 is applied and should not be rebuilt.
+- `Erode` is removed from the Lorehold rule-first lane.
+- The next package-ready follow-up from this destroy-scope refinement is
+  `Vandalblast`; `Star of Extinction` remains split-scope and still needs an
+  exact runtime/model split before promotion.
