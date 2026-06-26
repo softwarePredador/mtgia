@@ -280,6 +280,45 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
         )
 
+    def test_palantir_of_orthanc_maps_to_exact_end_step_choice_draw_engine_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "PalantirOfOrthanc",
+                "effect_classes": [
+                    "AddCountersSourceEffect",
+                    "OneShotEffect",
+                    "ScryEffect",
+                ],
+                "ability_classes": [
+                    "BeginningOfEndStepTriggeredAbility",
+                ],
+                "target_classes": ["TargetOpponent"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            },
+            "",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controller_end_step_add_influence_scry_two_target_opponent_may_draw_else_mill_and_life_loss_v1",
+        )
+        self.assertEqual(primary["trigger"], "controller_end_step")
+        self.assertEqual(
+            primary["trigger_effect"],
+            "add_named_counter_scry_target_opponent_may_draw_else_mill_life_loss",
+        )
+        self.assertEqual(primary["trigger_counter_type"], "influence")
+        self.assertEqual(primary["trigger_counter_count"], 1)
+        self.assertEqual(primary["trigger_scry_count"], 2)
+        self.assertEqual(primary["target"], "opponent")
+        self.assertEqual(primary["target_opponent_may_have_you_draw_count"], 1)
+        self.assertEqual(primary["decline_mill_count_source"], "source_named_counter_count")
+        self.assertEqual(primary["decline_mill_counter_type"], "influence")
+        self.assertTrue(primary["decline_opponent_life_loss_equals_milled_cards_total_mana_value"])
+
     def test_vanquish_the_horde_maps_to_exact_cost_reduced_board_wipe_scope(self) -> None:
         result = hints.build_effect_hints(
             {

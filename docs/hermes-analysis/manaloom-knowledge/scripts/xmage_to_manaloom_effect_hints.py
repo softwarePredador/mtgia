@@ -1780,6 +1780,42 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "PalantirOfOrthanc"
+        and card_types == {"ARTIFACT"}
+        and {
+            "AddCountersSourceEffect",
+            "OneShotEffect",
+            "ScryEffect",
+        }.issubset(effect_classes)
+        and "BeginningOfEndStepTriggeredAbility" in ability_classes
+        and "TargetOpponent" in target_classes
+    ):
+        return {
+            "effect": "draw_engine",
+            "scope": "controller_end_step_add_influence_scry_two_target_opponent_may_draw_else_mill_and_life_loss_v1",
+            "fields": {
+                "trigger": "controller_end_step",
+                "trigger_effect": "add_named_counter_scry_target_opponent_may_draw_else_mill_life_loss",
+                "trigger_counter_type": "influence",
+                "trigger_counter_count": 1,
+                "trigger_scry_count": 2,
+                "target": "opponent",
+                "target_opponent_may_have_you_draw_count": 1,
+                "decline_mill_count_source": "source_named_counter_count",
+                "decline_mill_counter_type": "influence",
+                "decline_opponent_life_loss_equals_milled_cards_total_mana_value": True,
+            },
+            "reason": "XMage structure matches Palantir of Orthanc: controller end step adds an influence counter, scries 2, then target opponent chooses between letting you draw or taking life loss from a mill equal to influence counters.",
+            "signals": [
+                "BeginningOfEndStepTriggeredAbility",
+                "AddCountersSourceEffect",
+                "ScryEffect",
+                "TargetOpponent",
+                "OneShotEffect",
+            ],
+        }
+
+    if (
         card_types == {"CREATURE"}
         and xmage_class_name == "SurlyBadgersaur"
         and {"AddCountersSourceEffect", "CreateTokenEffect", "FightTargetSourceEffect"}.issubset(effect_classes)

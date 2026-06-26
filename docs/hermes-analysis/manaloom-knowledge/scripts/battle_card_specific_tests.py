@@ -17,6 +17,27 @@ def _card(name, cmc=99, effect="unknown", power=0):
     }
 
 
+def _palantir_of_orthanc_rule():
+    return {
+        "name": "Palantír of Orthanc",
+        "effect": "draw_engine",
+        "battle_model_scope": "controller_end_step_add_influence_scry_two_target_opponent_may_draw_else_mill_and_life_loss_v1",
+        "type_line": "Legendary Artifact",
+        "trigger": "controller_end_step",
+        "trigger_effect": "add_named_counter_scry_target_opponent_may_draw_else_mill_life_loss",
+        "trigger_counter_type": "influence",
+        "trigger_counter_count": 1,
+        "trigger_scry_count": 2,
+        "target": "opponent",
+        "target_opponent_may_have_you_draw_count": 1,
+        "decline_mill_count_source": "source_named_counter_count",
+        "decline_mill_counter_type": "influence",
+        "decline_opponent_life_loss_equals_milled_cards_total_mana_value": True,
+        "_rule_logical_key": "battle_rule_v1:pg229_palantir_test",
+        "_rule_oracle_hash": "pg229-palantir-test-hash",
+    }
+
+
 def register_tests(battle, player):
     def test_lorehold_miracle_requires_lorehold_on_battlefield():
         events = []
@@ -16749,6 +16770,96 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg229_palantir_end_step_target_opponent_allows_draw_when_projected_loss_is_high():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Palantir Controller")
+            controller.library = [
+                {"name": "Apex Sorcery", "cmc": 7, "type_line": "Sorcery", "effect": "draw_cards"},
+                {"name": "Setup Instant", "cmc": 4, "type_line": "Instant", "effect": "draw_cards"},
+                _card("Library Filler", cmc=1, effect="creature"),
+            ]
+            opponent = player("Low Life Opponent")
+            opponent.life = 4
+            controller.battlefield = [_palantir_of_orthanc_rule()]
+
+            battle.process_end_step_phase_engines(
+                controller,
+                [controller, opponent],
+                turn=9,
+                rng=random.Random(229),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert controller.battlefield[0]["influence_counters"] == 1
+        assert any(card.get("name") == "Apex Sorcery" for card in controller.hand)
+        assert controller.graveyard == []
+        assert opponent.life == 4
+        assert any(
+            event == "phase_trigger_resolved"
+            and data.get("card") == "Palantír of Orthanc"
+            and data.get("trigger") == "controller_end_step"
+            and data.get("target_opponent") == "Low Life Opponent"
+            and data.get("opponent_choice") == "allow_draw"
+            and data.get("cards_drawn") == 1
+            and data.get("projected_life_loss") == 7
+            and data.get("rule_logical_key") == "battle_rule_v1:pg229_palantir_test"
+            for event, data in events
+        )
+
+    def test_pg229_palantir_end_step_decline_draw_mills_and_deals_total_mana_value_damage():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Palantir Controller")
+            controller.library = [
+                {"name": "Small Utility", "cmc": 1, "type_line": "Creature", "effect": "creature"},
+                {"name": "Tiny Land", "cmc": 0, "type_line": "Land", "effect": "land"},
+                _card("Library Filler", cmc=6, effect="draw_cards"),
+            ]
+            opponent = player("Healthy Opponent")
+            opponent.life = 20
+            palantir = _palantir_of_orthanc_rule()
+            palantir["influence_counters"] = 1
+            controller.battlefield = [palantir]
+
+            battle.process_end_step_phase_engines(
+                controller,
+                [controller, opponent],
+                turn=10,
+                rng=random.Random(230),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert controller.battlefield[0]["influence_counters"] == 2
+        assert [card.get("name") for card in controller.graveyard] == ["Small Utility", "Tiny Land"]
+        assert opponent.life == 19
+        assert any(
+            event == "mill_resolved"
+            and data.get("card") == "Palantír of Orthanc"
+            and data.get("target_player") == "Palantir Controller"
+            and data.get("requested_mill") == 2
+            and data.get("cards_milled") == 2
+            for event, data in events
+        )
+        assert any(
+            event == "phase_trigger_resolved"
+            and data.get("card") == "Palantír of Orthanc"
+            and data.get("trigger") == "controller_end_step"
+            and data.get("opponent_choice") == "decline_draw"
+            and data.get("life_lost") == 1
+            and data.get("milled_cards") == ["Small Utility", "Tiny Land"]
+            and data.get("rule_logical_key") == "battle_rule_v1:pg229_palantir_test"
+            for event, data in events
+        )
+
     def test_pg217_fable_saga_creates_rummages_transforms_and_reflection_copies():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -17628,6 +17739,8 @@ def register_tests(battle, player):
         test_pg216_black_market_connections_precombat_modal_resources,
         test_pg216_smugglers_share_each_end_step_draws_and_creates_treasure,
         test_pg216_davros_end_step_creates_dalek_and_villainous_discard,
+        test_pg229_palantir_end_step_target_opponent_allows_draw_when_projected_loss_is_high,
+        test_pg229_palantir_end_step_decline_draw_mills_and_deals_total_mana_value_damage,
         test_pg217_fable_saga_creates_rummages_transforms_and_reflection_copies,
         test_pg217_locust_god_draw_trigger_creates_flying_haste_insects,
         test_pg217_biotransference_creature_spell_counts_as_artifact_and_creates_necron,

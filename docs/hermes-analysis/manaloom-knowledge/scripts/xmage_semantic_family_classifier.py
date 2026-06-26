@@ -970,6 +970,30 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("tax") or 0) == 0
         )
 
+    if (
+        effect == "draw_engine"
+        and scope
+        == "controller_end_step_add_influence_scry_two_target_opponent_may_draw_else_mill_and_life_loss_v1"
+    ):
+        return (
+            types == {"ARTIFACT"}
+            and {"AddCountersSourceEffect", "OneShotEffect", "ScryEffect"}.issubset(effect_classes)
+            and "BeginningOfEndStepTriggeredAbility" in ability_classes
+            and "TargetOpponent" in target_classes
+            and not cost_classes
+            and effect_json.get("trigger") == "controller_end_step"
+            and effect_json.get("trigger_effect")
+            == "add_named_counter_scry_target_opponent_may_draw_else_mill_life_loss"
+            and effect_json.get("trigger_counter_type") == "influence"
+            and int(effect_json.get("trigger_counter_count") or 0) == 1
+            and int(effect_json.get("trigger_scry_count") or 0) == 2
+            and effect_json.get("target") == "opponent"
+            and int(effect_json.get("target_opponent_may_have_you_draw_count") or 0) == 1
+            and effect_json.get("decline_mill_count_source") == "source_named_counter_count"
+            and effect_json.get("decline_mill_counter_type") == "influence"
+            and bool(effect_json.get("decline_opponent_life_loss_equals_milled_cards_total_mana_value"))
+        )
+
     if effect == "damage_prevention_reflect" and scope == "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1":
         return (
             types == {"INSTANT"}

@@ -17983,6 +17983,56 @@ def lorehold_draw_priority(card, player):
     return 20 + min(cmc, 6)
 
 
+def card_mana_value(card):
+    if not isinstance(card, dict):
+        return 0
+    return max(0, int(_opening_hand_card_cmc(card) or card.get("cmc") or 0))
+
+
+def scry_library_for_controller(player, count):
+    look_count = max(0, min(int(count or 0), len(getattr(player, "library", []) or [])))
+    if look_count <= 0:
+        return {
+            "looked_at": [],
+            "kept_on_top": [],
+            "bottomed": [],
+            "top_after": [],
+        }
+
+    looked_at = list(player.library[:look_count])
+    ranked = sorted(
+        looked_at,
+        key=lambda card: (
+            -lorehold_draw_priority(card, player),
+            -card_mana_value(card),
+            card.get("name", "?") if isinstance(card, dict) else str(card),
+        ),
+    )
+    kept_on_top = []
+    bottomed = []
+    can_bottom = len(player.library) > look_count
+    for card in ranked:
+        if can_bottom and lorehold_draw_priority(card, player) < 15:
+            bottomed.append(card)
+        else:
+            kept_on_top.append(card)
+    if not kept_on_top and ranked:
+        kept_on_top = [ranked[0]]
+        bottomed = ranked[1:]
+
+    remainder = list(player.library[look_count:])
+    player.library[:] = [*kept_on_top, *remainder, *bottomed]
+    return {
+        "looked_at": [card.get("name", "?") if isinstance(card, dict) else str(card) for card in looked_at],
+        "kept_on_top": [card.get("name", "?") if isinstance(card, dict) else str(card) for card in kept_on_top],
+        "bottomed": [card.get("name", "?") if isinstance(card, dict) else str(card) for card in bottomed],
+        "top_after": [
+            card.get("name", "?") if isinstance(card, dict) else str(card)
+            for card in player.library[:look_count]
+        ],
+    }
+
+
 def is_lorehold_protected_win_condition(card):
     if not isinstance(card, dict):
         return False
@@ -26191,6 +26241,115 @@ def process_end_step_phase_engines(active_player, all_players, turn, rng, *, sta
                     tokens_created=tokens_created,
                     villainous_choices=choices,
                     controller_cards_drawn=controller_drawn,
+                    turn=turn,
+                    phase="end_step",
+                    **replay_rule_fields(permanent),
+                )
+                continue
+
+            if (
+                permanent.get("trigger") == "controller_end_step"
+                and permanent.get("trigger_effect")
+                == "add_named_counter_scry_target_opponent_may_draw_else_mill_life_loss"
+                and controller is active_player
+            ):
+                if permanent.get("controller_end_step_last_trigger_turn") == turn:
+                    continue
+                permanent["controller_end_step_last_trigger_turn"] = turn
+                if not controller_opponents:
+                    continue
+
+                counter_type = str(permanent.get("trigger_counter_type") or "influence")
+                counters_added = add_named_counters(
+                    permanent,
+                    counter_type,
+                    int(permanent.get("trigger_counter_count") or 1),
+                )
+                total_counters = get_named_counter_count(permanent, counter_type)
+                scry_result = scry_library_for_controller(
+                    controller,
+                    int(permanent.get("trigger_scry_count") or 0),
+                )
+                target_opponent = min(
+                    controller_opponents,
+                    key=lambda opponent: (opponent.life, opponent.name),
+                )
+                mill_count = total_counters
+                projected_mill_cards = list(controller.library[:mill_count])
+                projected_life_loss = sum(card_mana_value(card) for card in projected_mill_cards)
+                draw_count = int(permanent.get("target_opponent_may_have_you_draw_count") or 1)
+                draw_threshold = min(5, max(1, target_opponent.life))
+                allow_draw = projected_life_loss >= draw_threshold
+                milled = []
+                cards_drawn = 0
+                life_lost = 0
+
+                if allow_draw:
+                    drawn = controller.draw(draw_count, rng)
+                    cards_drawn = len(drawn)
+                    process_player_draw_triggers(
+                        controller,
+                        cards_drawn,
+                        turn,
+                        "end_step",
+                        participants,
+                        stack=stack,
+                        turn_player=active_player,
+                    )
+                else:
+                    library_before = len(controller.library)
+                    for _ in range(min(mill_count, len(controller.library))):
+                        milled_card = controller.library.pop(0)
+                        controller.graveyard.append(milled_card)
+                        milled.append(milled_card)
+                    life_lost = sum(card_mana_value(card) for card in milled)
+                    if milled:
+                        emit_replay_event(
+                            "mill_resolved",
+                            player=controller.name,
+                            card=permanent.get("name", "?"),
+                            target_player=controller.name,
+                            requested_mill=mill_count,
+                            cards_milled=len(milled),
+                            milled=[
+                                milled_card.get("name", "?")
+                                for milled_card in milled
+                                if isinstance(milled_card, dict)
+                            ][:12],
+                            target_library_before=library_before,
+                            target_library_after=len(controller.library),
+                            turn=turn,
+                            **replay_rule_fields(permanent),
+                        )
+                    if life_lost > 0:
+                        change_life(target_opponent, -life_lost)
+
+                emit_replay_event(
+                    "phase_trigger_resolved",
+                    player=controller.name,
+                    card=permanent.get("name", "?"),
+                    trigger="controller_end_step",
+                    active_player=active_player.name,
+                    effect="add_counter_scry_target_opponent_draw_or_mill_life_loss",
+                    counter_type=counter_type,
+                    counters_added=counters_added,
+                    total_counters=total_counters,
+                    scry_count=int(permanent.get("trigger_scry_count") or 0),
+                    scry_looked_at=scry_result["looked_at"],
+                    scry_kept_on_top=scry_result["kept_on_top"],
+                    scry_bottomed=scry_result["bottomed"],
+                    scry_top_after=scry_result["top_after"],
+                    target_opponent=target_opponent.name,
+                    opponent_choice="allow_draw" if allow_draw else "decline_draw",
+                    cards_drawn=cards_drawn,
+                    mill_count=mill_count,
+                    milled_cards=[
+                        milled_card.get("name", "?")
+                        for milled_card in milled
+                        if isinstance(milled_card, dict)
+                    ],
+                    projected_life_loss=projected_life_loss,
+                    life_lost=life_lost,
                     turn=turn,
                     phase="end_step",
                     **replay_rule_fields(permanent),

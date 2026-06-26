@@ -8452,6 +8452,52 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "draw_engine")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_palantir_of_orthanc_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Palantír of Orthanc",
+                        "severity": "high",
+                        "oracle_hash": "a85ec353e0a18e783ae88be2f64536ec",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "PalantirOfOrthanc",
+                            "path": "/xmage/PalantirOfOrthanc.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": [
+                                "AddCountersSourceEffect",
+                                "OneShotEffect",
+                                "ScryEffect",
+                            ],
+                            "ability_classes": ["BeginningOfEndStepTriggeredAbility"],
+                            "target_classes": ["TargetOpponent"],
+                            "primary_effect": {
+                                "effect": "draw_engine",
+                                "battle_model_scope": "controller_end_step_add_influence_scry_two_target_opponent_may_draw_else_mill_and_life_loss_v1",
+                                "trigger": "controller_end_step",
+                                "trigger_effect": "add_named_counter_scry_target_opponent_may_draw_else_mill_life_loss",
+                                "trigger_counter_type": "influence",
+                                "trigger_counter_count": 1,
+                                "trigger_scry_count": 2,
+                                "target": "opponent",
+                                "target_opponent_may_have_you_draw_count": 1,
+                                "decline_mill_count_source": "source_named_counter_count",
+                                "decline_mill_counter_type": "influence",
+                                "decline_opponent_life_loss_equals_milled_cards_total_mana_value": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "draw_engine")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_deflecting_palm_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
