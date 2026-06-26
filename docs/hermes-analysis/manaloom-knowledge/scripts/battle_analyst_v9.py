@@ -2877,6 +2877,58 @@ def add_named_counters(permanent, counter_name, count=1):
     return added
 
 
+def remove_named_counters(permanent, counter_name, count=None):
+    if not isinstance(permanent, dict):
+        return 0
+    key = f"{counter_name}_counters"
+    current = get_named_counter_count(permanent, counter_name)
+    if current <= 0:
+        return 0
+    removed = current if count is None else max(0, min(current, int(count or 0)))
+    permanent[key] = max(0, current - removed)
+    counters = permanent.get("counters")
+    if isinstance(counters, dict):
+        counters[counter_name] = permanent[key]
+    return removed
+
+
+def transform_permanent_to_face(
+    player,
+    permanent,
+    transform_to,
+    *,
+    turn=None,
+    phase=None,
+    opponents=None,
+    all_players=None,
+):
+    if not isinstance(player, Player) or not isinstance(permanent, dict) or not isinstance(transform_to, dict):
+        return None
+    transformed_payload = enrich_card(copy.deepcopy(transform_to))
+    transformed_payload.setdefault("effect", transform_to.get("effect") or "creature")
+    all_players_for_entry = all_players or [player, *(opponents or [])]
+    if permanent in player.battlefield:
+        player.battlefield.remove(permanent)
+        player.exile.append(permanent)
+    transformed = prepare_entering_permanent(
+        transformed_payload,
+        controller=player,
+        all_players=all_players_for_entry,
+        turn=turn,
+    )
+    player.battlefield.append(transformed)
+    emit_replay_event(
+        "permanent_transformed",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        transformed_to=transformed.get("name", "?"),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(permanent),
+    )
+    return transformed
+
+
 def resolve_creature_cards_leave_graveyard_triggers(
     player,
     leaving_cards,
@@ -24771,6 +24823,66 @@ def trigger_spell_cast_engines(
             continue
         if permanent.get("trigger") != "instant_sorcery_cast":
             continue
+        if permanent.get("trigger_effect") == "add_named_counter_then_transform":
+            counter_type = str(permanent.get("trigger_counter_type") or "charge")
+            counter_count = max(1, int(permanent.get("trigger_counter_count") or 1))
+            threshold = max(0, int(permanent.get("transform_counter_threshold") or 0))
+            transform_to = dict(permanent.get("transform_to") or {})
+
+            def resolve_named_counter_transform_trigger(
+                permanent=permanent,
+                spell=spell,
+                counter_type=counter_type,
+                counter_count=counter_count,
+                threshold=threshold,
+                transform_to=transform_to,
+            ):
+                counters_before = get_named_counter_count(permanent, counter_type)
+                added = add_named_counters(permanent, counter_type, counter_count)
+                counters_after = get_named_counter_count(permanent, counter_type)
+                transformed = None
+                counters_removed = 0
+                if threshold > 0 and counters_after >= threshold and transform_to:
+                    if permanent.get("transform_remove_all_named_counters"):
+                        counters_removed = remove_named_counters(permanent, counter_type)
+                    transformed = transform_permanent_to_face(
+                        player,
+                        permanent,
+                        transform_to,
+                        turn=turn,
+                        phase=phase,
+                        opponents=opponents,
+                        all_players=all_players,
+                    )
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    effect="add_counter",
+                    counter_type=counter_type,
+                    counters_added=added,
+                    counters_before=counters_before,
+                    counters_after=counters_after,
+                    transform_threshold=threshold,
+                    counters_removed_for_transform=counters_removed,
+                    transformed_to=transformed.get("name", "?") if transformed else None,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "instant_sorcery_cast",
+                resolve_named_counter_transform_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         if permanent.get("trigger_effect") == "pyromancer_ascension":
             threshold = max(1, int(permanent.get("quest_counter_threshold_to_copy") or 2))
             quest_counters_before = get_named_counter_count(permanent, "quest")
@@ -24865,6 +24977,99 @@ def trigger_spell_cast_engines(
                 permanent,
                 "instant_sorcery_cast",
                 resolve_pyromancer_ascension_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
+        if permanent.get("trigger_effect") == "copy_when_mana_spent":
+            card_types = [
+                str(value).lower()
+                for value in _as_list(permanent.get("copy_when_mana_spent_card_types"))
+                if value
+            ]
+            if card_types and not _card_type_matches(spell, card_types):
+                continue
+
+            def resolve_spell_cast_mana_spent_copy_trigger(
+                permanent=permanent,
+                spell=spell,
+            ):
+                if permanent.get("tapped"):
+                    emit_replay_event(
+                        "trigger_skipped",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger="instant_sorcery_cast",
+                        trigger_spell=spell.get("name", "?"),
+                        reason="source_already_tapped_for_mana_copy",
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+                    return
+                permanent["tapped"] = True
+                target_item = stack_item_for_spell_reference(stack, spell, controller=player)
+                copy_target = copy_spell_stack_target_context(player, target_item, permanent)
+                if not copy_target:
+                    emit_replay_event(
+                        "trigger_skipped",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger="instant_sorcery_cast",
+                        trigger_spell=spell.get("name", "?"),
+                        reason="no_copyable_stack_target",
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+                    return
+                mana_colors = source_colors({"produces": permanent.get("produces")})
+                emit_replay_event(
+                    "activated_ability",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    activation_kind="mana_spent_copy_spell",
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    mana_color=mana_colors[0] if mana_colors else "generic",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+                copied_item = copy_spell_on_stack(
+                    target_item.card,
+                    player,
+                    stack,
+                    original_effect_data=target_item.effect_data,
+                    source_card=permanent,
+                    source_effect_data=permanent,
+                )
+                emit_replay_event(
+                    "spell_copied",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    copied_spell=target_item.card.get("name", "?"),
+                    copied_spell_controller=getattr(target_item.controller, "name", None),
+                    copied_stack_object=getattr(copied_item, "card", {}).get("name", "?") if copied_item else None,
+                    copy_controller=player.name,
+                    copy_is_cast=False,
+                    copy_stack_depth=len(stack.items) if stack is not None else 0,
+                    may_choose_new_targets=bool(permanent.get("may_choose_new_targets")),
+                    choose_new_targets_status=permanent.get("choose_new_targets_status"),
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    turn=turn,
+                    phase=phase,
+                    **copy_target,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "instant_sorcery_cast",
+                resolve_spell_cast_mana_spent_copy_trigger,
                 stack=stack,
                 active_player=active_player,
                 all_players=all_players,
@@ -27855,6 +28060,13 @@ def apply_effect_immediate(
         else:
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
+            player.battlefield.append(permanent)
+    elif effect == "static_cost_reduction":
+        if is_instant(card) or is_sorcery(card):
+            finish_resolved_spell(player, card, turn=turn)
+        else:
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+            permanent["effect"] = "static_cost_reduction"
             player.battlefield.append(permanent)
     elif effect == "discard_trigger_modal_draw_treasure_opponent_life_loss":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))

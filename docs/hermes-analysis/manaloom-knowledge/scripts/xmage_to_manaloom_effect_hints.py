@@ -1720,6 +1720,66 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "PrimalAmulet"
+        and card_types == {"ARTIFACT", "LAND"}
+        and {
+            "AddCountersSourceEffect",
+            "CopyTargetStackObjectEffect",
+            "CreateDelayedTriggeredAbilityEffect",
+            "OneShotEffect",
+            "SpellsCostReductionControllerEffect",
+        }.issubset(effect_classes)
+        and {
+            "AnyColorManaAbility",
+            "DelayedTriggeredAbility",
+            "SimpleStaticAbility",
+            "SpellCastControllerTriggeredAbility",
+        }.issubset(ability_classes)
+    ):
+        return {
+            "effect": "static_cost_reduction",
+            "scope": "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
+            "fields": {
+                "cost_reduction_applies_to": "instant_sorcery_spells_you_cast",
+                "cost_reduction_generic": 1,
+                "applies_to_card_types": ["instant", "sorcery"],
+                "ability_kind": "static",
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "add_named_counter_then_transform",
+                "trigger_counter_type": "charge",
+                "trigger_counter_count": 1,
+                "transform_counter_threshold": 4,
+                "transform_remove_all_named_counters": True,
+                "transform_optional": True,
+                "transform_to": {
+                    "name": "Primal Wellspring",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "battle_model_scope": "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
+                    "is_mana_source": True,
+                    "mana_produced": 1,
+                    "produces": "WUBRG",
+                    "trigger": "instant_sorcery_cast",
+                    "trigger_effect": "copy_when_mana_spent",
+                    "target": "own_instant_or_sorcery_on_stack",
+                    "copy_when_mana_spent_to_cast_matching_spell": True,
+                    "copy_when_mana_spent_card_types": ["instant", "sorcery"],
+                    "may_choose_new_targets": True,
+                    "choose_new_targets_status": "may",
+                },
+            },
+            "reason": "XMage structure matches Primal Amulet front-side instant/sorcery cost reduction plus charge counters that transform into Primal Wellspring, whose mana copies the instant or sorcery spell it helps cast.",
+            "signals": [
+                "SpellsCostReductionControllerEffect",
+                "SpellCastControllerTriggeredAbility",
+                "AddCountersSourceEffect",
+                "AnyColorManaAbility",
+                "CopyTargetStackObjectEffect",
+                "transform_threshold_4_charge",
+            ],
+        }
+
+    if (
         card_types == {"CREATURE"}
         and xmage_class_name == "SurlyBadgersaur"
         and {"AddCountersSourceEffect", "CreateTokenEffect", "FightTargetSourceEffect"}.issubset(effect_classes)
@@ -6435,7 +6495,8 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         rules_text=rules_text,
     )
     if exact_runtime_variant_fields is not None:
-        candidates.append(
+        candidates.insert(
+            0,
             _candidate(
                 effect=str(exact_runtime_variant_fields["effect"]),
                 scope=str(exact_runtime_variant_fields["scope"]),

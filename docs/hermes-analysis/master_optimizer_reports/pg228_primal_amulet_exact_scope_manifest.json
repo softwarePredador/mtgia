@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg228_primal_amulet_exact_scope_20260626_061537",
+  "deploy_id": "PG228",
+  "family_counts": {
+    "static_cost_reducer": 1
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_rollback.sql"
+  },
+  "generated_at": "2026-06-26T06:15:37+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Primal Amulet // Primal Wellspring"
+  ],
+  "selected_count": 1,
+  "slug": "primal_amulet_exact_scope",
+  "status": "prepared_read_only_pending_apply_approval"
+}

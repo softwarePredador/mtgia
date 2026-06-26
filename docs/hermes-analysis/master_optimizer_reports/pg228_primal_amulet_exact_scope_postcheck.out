@@ -1,0 +1,5 @@
+             card_name              |          normalized_name           |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+------------------------------------+------------------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Primal Amulet // Primal Wellspring | primal amulet // primal wellspring | battle_rule_v1:d05b887f76ae9cd5cee7c89045dc65cc |                  1 |                           1 |                         1 |           2
+(1 row)
+

@@ -12999,6 +12999,166 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def _primal_amulet_rule():
+        return {
+            "name": "Primal Amulet // Primal Wellspring",
+            "cmc": 4,
+            "type_line": "Artifact",
+            "effect": "static_cost_reduction",
+            "battle_model_scope": "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
+            "cost_reduction_applies_to": "instant_sorcery_spells_you_cast",
+            "cost_reduction_generic": 1,
+            "applies_to_card_types": ["instant", "sorcery"],
+            "trigger": "instant_sorcery_cast",
+            "trigger_effect": "add_named_counter_then_transform",
+            "trigger_counter_type": "charge",
+            "trigger_counter_count": 1,
+            "transform_counter_threshold": 4,
+            "transform_remove_all_named_counters": True,
+            "transform_to": {
+                "name": "Primal Wellspring",
+                "type_line": "Land",
+                "effect": "land",
+                "battle_model_scope": "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "copy_when_mana_spent",
+                "target": "own_instant_or_sorcery_on_stack",
+                "copy_when_mana_spent_to_cast_matching_spell": True,
+                "copy_when_mana_spent_card_types": ["instant", "sorcery"],
+                "may_choose_new_targets": True,
+                "choose_new_targets_status": "may",
+            },
+            "_rule_logical_key": "battle_rule_v1:primal-amulet-test",
+            "_rule_oracle_hash": "primal-amulet-test-hash",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+        }
+
+    def test_primal_amulet_reduces_instant_cost_and_transforms_after_four_spells():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            primal = _primal_amulet_rule()
+            active.battlefield = [primal]
+            active.mana_pool.generic = 8
+            instant = {"name": "Test Opt", "mana_cost": "{2}", "cmc": 2, "type_line": "Instant"}
+            creature = {"name": "Test Bear", "mana_cost": "{2}", "cmc": 2, "type_line": "Creature"}
+
+            instant_plan = battle.runtime_cast_plan_for_card(
+                active,
+                instant,
+                {"effect": "draw_cards", "count": 1, "instant": True},
+            )
+            creature_plan = battle.runtime_cast_plan_for_card(
+                active,
+                creature,
+                {"effect": "creature", "power": 2, "toughness": 2},
+            )
+
+            for idx in range(4):
+                spell = {"name": f"Cantrip {idx}", "type_line": "Instant", "cmc": 1}
+                active.record_spell_cast(30 + idx, card=spell)
+                battle.trigger_spell_cast_engines(
+                    active,
+                    [active, opponent],
+                    spell,
+                    turn=30 + idx,
+                    phase="precombat_main",
+                )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert instant_plan is not None
+        assert instant_plan["locked_cost"]["generic"] == 1
+        assert creature_plan is not None
+        assert creature_plan["locked_cost"]["generic"] == 2
+        assert not any(
+            isinstance(permanent, dict) and permanent.get("name") == "Primal Amulet // Primal Wellspring"
+            for permanent in active.battlefield
+        )
+        transformed = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Primal Wellspring"
+        )
+        assert transformed.get("effect") == "land"
+        assert transformed.get("copy_when_mana_spent_to_cast_matching_spell") is True
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Primal Amulet // Primal Wellspring"
+            and data.get("effect") == "add_counter"
+            and data.get("counter_type") == "charge"
+            and data.get("transformed_to") == "Primal Wellspring"
+            for event, data in events
+        )
+        assert any(
+            event == "permanent_transformed"
+            and data.get("card") == "Primal Amulet // Primal Wellspring"
+            and data.get("transformed_to") == "Primal Wellspring"
+            for event, data in events
+        )
+
+    def test_primal_wellspring_copies_spell_when_its_mana_is_spent():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            wellspring = _primal_amulet_rule()["transform_to"]
+            support_land = {
+                "name": "Support Land",
+                "type_line": "Land",
+                "effect": "land",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "R",
+            }
+            active.battlefield = [wellspring, support_land]
+            stack = battle.Stack()
+            draw_effect = {
+                "effect": "draw_cards",
+                "count": 1,
+                "instant": True,
+                "battle_model_scope": "test_draw_one_spell",
+            }
+            spell = {"name": "Lightning Bolt", "type_line": "Instant", "cmc": 1}
+
+            active.record_spell_cast(40, card=spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                spell,
+                turn=40,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(spell, active, draw_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 40, random.Random(617), phase="precombat_main")
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert wellspring.get("tapped") is True
+        copied_events = [
+            data
+            for event, data in events
+            if event == "spell_copied" and data.get("card") == "Primal Wellspring"
+        ]
+        assert len(copied_events) == 1
+        assert copied_events[0]["trigger_spell"] == "Lightning Bolt"
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Primal Wellspring"
+            and data.get("activation_kind") == "mana_spent_copy_spell"
+            for event, data in events
+        )
+
     def _pg200_trouble_in_pairs_rule():
         return {
             "name": "Trouble in Pairs",
@@ -17517,6 +17677,8 @@ def register_tests(battle, player):
         test_pg198_surly_badgersaur_discard_card_type_triggers_counter_treasure_and_fight,
         test_pg199_taii_wakeen_modifies_noncombat_damage_and_draws_on_exact_toughness,
         test_direct_damage_combat_restriction_only_hits_attacking_or_blocking_creatures,
+        test_primal_amulet_reduces_instant_cost_and_transforms_after_four_spells,
+        test_primal_wellspring_copies_spell_when_its_mana_is_spent,
         test_pg200_trouble_in_pairs_draws_on_opponent_second_card_each_turn,
         test_pg200_trouble_in_pairs_draws_on_opponent_second_spell_without_tax,
         test_pg200_trouble_in_pairs_draws_when_attacked_by_two_or_more_creatures,

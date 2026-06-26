@@ -186,6 +186,100 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             "instant_sorcery_cards_in_your_graveyard_count",
         )
 
+    def test_primal_amulet_maps_to_exact_cost_reduction_transform_copy_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "PrimalAmulet",
+                "effect_classes": [
+                    "AddCountersSourceEffect",
+                    "CopyTargetStackObjectEffect",
+                    "CreateDelayedTriggeredAbilityEffect",
+                    "OneShotEffect",
+                    "SpellsCostReductionControllerEffect",
+                ],
+                "ability_classes": [
+                    "AnyColorManaAbility",
+                    "DelayedTriggeredAbility",
+                    "SimpleStaticAbility",
+                    "SpellCastControllerTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["ARTIFACT", "LAND"]},
+                "raw_excerpt": (
+                    "new SimpleStaticAbility(new SpellsCostReductionControllerEffect(filter, 1)); "
+                    "new SpellCastControllerTriggeredAbility(new AddCountersSourceEffect(CounterType.CHARGE.createInstance()), "
+                    "StaticFilters.FILTER_SPELL_AN_INSTANT_OR_SORCERY, false); "
+                    "Then if there are four or more charge counters on it, you may remove those counters and transform it. "
+                    "new AnyColorManaAbility(); "
+                    "When that mana is spent to cast an instant or sorcery spell, copy that spell and you may choose new targets for the copy."
+                ),
+            },
+            "Instant and sorcery spells you cast cost {1} less to cast. "
+            "Whenever you cast an instant or sorcery spell, put a charge counter on Primal Amulet. "
+            "Then if there are four or more charge counters on it, you may remove those counters and transform it. "
+            "Add one mana of any color. When that mana is spent to cast an instant or sorcery spell, "
+            "copy that spell and you may choose new targets for the copy.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "static_cost_reduction")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
+        )
+        self.assertEqual(primary["cost_reduction_applies_to"], "instant_sorcery_spells_you_cast")
+        self.assertEqual(primary["cost_reduction_generic"], 1)
+        self.assertEqual(primary["applies_to_card_types"], ["instant", "sorcery"])
+        self.assertEqual(primary["trigger"], "instant_sorcery_cast")
+        self.assertEqual(primary["trigger_effect"], "add_named_counter_then_transform")
+        self.assertEqual(primary["trigger_counter_type"], "charge")
+        self.assertEqual(primary["transform_counter_threshold"], 4)
+        self.assertTrue(primary["transform_remove_all_named_counters"])
+        self.assertEqual(primary["transform_to"]["name"], "Primal Wellspring")
+        self.assertEqual(primary["transform_to"]["effect"], "land")
+        self.assertTrue(primary["transform_to"]["copy_when_mana_spent_to_cast_matching_spell"])
+        self.assertEqual(primary["transform_to"]["copy_when_mana_spent_card_types"], ["instant", "sorcery"])
+        self.assertEqual(primary["transform_to"]["produces"], "WUBRG")
+
+    def test_primal_amulet_exact_scope_survives_truncated_local_excerpt(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "PrimalAmulet",
+                "effect_classes": [
+                    "AddCountersSourceEffect",
+                    "CopyTargetStackObjectEffect",
+                    "CreateDelayedTriggeredAbilityEffect",
+                    "OneShotEffect",
+                    "SpellsCostReductionControllerEffect",
+                ],
+                "ability_classes": [
+                    "AnyColorManaAbility",
+                    "DelayedTriggeredAbility",
+                    "PrimalWellspringTriggeredAbility",
+                    "SimpleStaticAbility",
+                    "SpellCastControllerTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["ARTIFACT", "LAND"]},
+                "raw_excerpt": (
+                    "public final class PrimalAmulet extends TransformingDoubleFacedCard { "
+                    "new SimpleStaticAbility(new SpellsCostReductionControllerEffect(filter, 1)); "
+                    "new SpellCastControllerTriggeredAbility(new AddCountersSourceEffect(CounterType.CHARGE.createInstance()), "
+                    "StaticFilters.FILTER_SPELL_AN_INSTANT_OR_SORCERY, false); "
+                    "new CreateDelayedTriggeredAbilityEffect(new PrimalWellspringTriggeredAbility("
+                    "new CopyTargetStackObjectEffect(true)));"
+                ),
+            },
+            "",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "static_cost_reduction")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
+        )
+
     def test_vanquish_the_horde_maps_to_exact_cost_reduced_board_wipe_scope(self) -> None:
         result = hints.build_effect_hints(
             {

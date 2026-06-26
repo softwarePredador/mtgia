@@ -14177,3 +14177,72 @@ Register decision:
 - PG225 is applied and should not be rebuilt.
 - `Starfield Shepherd` no longer belongs to the Lorehold rule-first lane.
 - Next package number is PG226.
+
+### PG228 - Primal Amulet exact transform/copy land scope
+
+Status: applied, postchecked, synced to Hermes SQLite, and reflected in the
+Lorehold matrix/audit reroute on 2026-06-26.
+
+Scope:
+
+- Exact XMage scope promoted:
+  `artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1`.
+- Promoted card:
+  - `Primal Amulet // Primal Wellspring`
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_rollback.sql`.
+
+Execution evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_precheck.out`;
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_apply.out`;
+  `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg228_primal_amulet_exact_scope_postcheck.out`;
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg228_primal_amulet_exact_scope_20260626.json`;
+  `selected_card_count=1`, `pg_rows_loaded=3`,
+  `generated_rows=1`, `sqlite_inserted_or_updated=3`.
+
+Post-sync routing evidence:
+
+- Presync proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg228_primal_amulet_runtime_v2_proposals.json`;
+  `Primal Amulet // Primal Wellspring` was the only
+  `batch_pg_candidate_after_precheck` row.
+- Post-sync proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg228_primal_amulet_postsync_v1_proposals.json`;
+  the package-ready backlog returned to `0`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg228_primal_amulet_postsync_v1.json`;
+  `Primal Amulet // Primal Wellspring` is now
+  `battle_ready / watchlist_candidate`
+  with score `38.0`.
+- Post-sync strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg228_primal_amulet_postsync_v1.json`;
+  `status=pass`.
+
+Register decision:
+
+- PG228 is applied and should not be rebuilt.
+- `Primal Amulet // Primal Wellspring` no longer belongs to the Lorehold
+  `needs_rule_before_strategy` lane.
+- The expanded Lorehold + opponent queue is back to
+  `package_ready_unprepared=0`.

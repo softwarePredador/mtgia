@@ -51,63 +51,61 @@ It does not mutate deck rows, SQLite, or PostgreSQL.
 
 ## Current Checkpoint
 
-Post-PG223 Lorehold-focused checkpoint generated on 2026-06-26 after promoting
-the exact scopes for `Vanquish the Horde` and `Explosive Singularity` into
-PostgreSQL, syncing Hermes SQLite, and regenerating the matrix from the live
-post-sync state:
+Post-PG228 Lorehold-focused checkpoint generated on 2026-06-26 after promoting
+the exact XMage scope for `Primal Amulet // Primal Wellspring`, syncing Hermes
+SQLite, rerunning the batch pipeline with the expanded Lorehold plus opponent
+scope, and regenerating the matrix/audits from the live post-sync state:
 
 - current matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg223_cost_scope_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg228_primal_amulet_postsync_v1.json`
 - current proposal report:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_postsync_v1_proposals.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg228_primal_amulet_postsync_v1_proposals.json`
+- current effective queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg228_primal_amulet_postsync_v1.json`
+- current strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg228_primal_amulet_postsync_v1.json`
 - current generated candidate:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg222_v2.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg228_primal_amulet_postsync_v1.json`
 
 Current matrix result:
 
 - total Lorehold-touching cards in matrix: `395`;
 - `core_keep`: `87`;
 - `priority_benchmark_candidate`: `44`;
-- `watchlist_candidate`: `115`;
-- `needs_rule_before_strategy`: `84`;
+- `watchlist_candidate`: `119`;
+- `needs_rule_before_strategy`: `80`;
 - `active_low_confidence_review`: `13`;
 - `low_priority`: `50`;
 - `policy_blocked`: `2`.
 
 Current rule-readiness split:
 
-- `battle_ready`: `311`;
+- `battle_ready`: `315`;
 - `mapper_manual`: `70`;
-- `split_scope`: `12`;
+- `split_scope`: `8`;
 - `blocked_missing_xmage_source`: `2`.
 
 Key routing delta:
 
-- `Vanquish the Horde` is now
-  `battle_ready / low_priority`
-  with scope
-  `destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1`.
-- `Explosive Singularity` is now
-  `battle_ready / low_priority`
-  with scope
-  `damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1`.
-- `Open the Vaults` moved from stale `no_rule_signal / needs_rule_before_strategy`
-  into `battle_ready / watchlist_candidate`.
-- `Roar of Reclamation` moved from stale
-  `no_rule_signal / needs_rule_before_strategy` into
-  `battle_ready / low_priority`.
-- `Triumphant Reckoning` moved from stale
-  `no_rule_signal / needs_rule_before_strategy` into
-  `battle_ready / low_priority`.
-- There are no remaining `no_rule_signal` rows in the live PG222 matrix; the
-  backlog is now purely `mapper_manual`, `split_scope`, or
-  `blocked_missing_xmage_source`.
+- `Primal Amulet // Primal Wellspring` moved from
+  `split_scope / needs_rule_before_strategy`
+  into
+  `battle_ready / watchlist_candidate`
+  with next action
+  `run_safe_slot_benchmark_after_baseline_hash_guard`.
+- the live effective queue returned to
+  `package_ready_unprepared=0`;
+  `Purphoros, God of the Forge` remains the only
+  `package_already_prepared` row.
+- `needs_rule_before_strategy` dropped from `84` to `80`
+  and the remaining Lorehold rule-first backlog is concentrated in the
+  unresolved split-scope families and manual mapper backlog.
 
 Generated deck evidence:
 
 - stale PG221 / PG222-v1 carry-forward hash:
   `a6128298aafade21fd2177eccafe51d756e4b4382e0cf09ea1f7a43c8cf08dbd`
-- current PG222 candidate hash:
+- current PG228 candidate hash:
   `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`
 - current novel cards:
   `Goblin Engineer`, `Improvisation Capstone`, `Increasing Vengeance`,
@@ -120,15 +118,12 @@ Generated deck evidence:
 
 Smoke note:
 
-- the matrix-fixed PG222 v2 candidate changed materially from the stale
-  PG221/PG222-v1 carry-forward and finished the same short real-opponent sample
-  at `1W/2L/0S`, beating `Thrasios, Triton Hero #115` while losing to
-  `Rograkh, Son of Rohgahh #118` and `Tayam, Luminous Enigma #116`. This is
-  enough to prove deck delta and replay viability, not enough to approve a
-  swap.
-- PG223 did not trigger a new candidate generation pass because both promoted
-  cards landed in `low_priority`; the benchmark lane remained
-  `priority_benchmark_candidate=44`.
+- the PG228 post-sync candidate regenerated to the same deck hash as the
+  earlier PG227 isolated candidate:
+  `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`.
+- that proves the `Primal Amulet // Primal Wellspring` promotion removed a
+  Lorehold rule blocker without changing the current isolated Lorehold
+  candidate composition.
 
 ## Current Matrix Result
 

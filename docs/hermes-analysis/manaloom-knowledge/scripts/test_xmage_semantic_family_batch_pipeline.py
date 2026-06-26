@@ -408,6 +408,70 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(proposal["deck_role_json"]["category"], "draw")
         self.assertEqual(proposal["deck_role_json"]["subtype"], "etb_refill_creature")
 
+    def test_classifier_marks_primal_amulet_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Primal Amulet // Primal Wellspring",
+                        "severity": "high",
+                        "oracle_hash": "primalhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "PrimalAmulet",
+                            "path": "/xmage/PrimalAmulet.java",
+                            "types": ["ARTIFACT", "LAND"],
+                            "effect_classes": [
+                                "AddCountersSourceEffect",
+                                "CopyTargetStackObjectEffect",
+                                "SpellsCostReductionControllerEffect",
+                            ],
+                            "ability_classes": [
+                                "AnyColorManaAbility",
+                                "SimpleStaticAbility",
+                                "SpellCastControllerTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "static_cost_reduction",
+                                "battle_model_scope": "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
+                                "cost_reduction_applies_to": "instant_sorcery_spells_you_cast",
+                                "cost_reduction_generic": 1,
+                                "applies_to_card_types": ["instant", "sorcery"],
+                                "trigger": "instant_sorcery_cast",
+                                "trigger_effect": "add_named_counter_then_transform",
+                                "trigger_counter_type": "charge",
+                                "trigger_counter_count": 1,
+                                "transform_counter_threshold": 4,
+                                "transform_remove_all_named_counters": True,
+                                "transform_to": {
+                                    "name": "Primal Wellspring",
+                                    "effect": "land",
+                                    "battle_model_scope": "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
+                                    "is_mana_source": True,
+                                    "mana_produced": 1,
+                                    "produces": "WUBRG",
+                                    "trigger": "instant_sorcery_cast",
+                                    "trigger_effect": "copy_when_mana_spent",
+                                    "target": "own_instant_or_sorcery_on_stack",
+                                    "copy_when_mana_spent_to_cast_matching_spell": True,
+                                    "copy_when_mana_spent_card_types": ["instant", "sorcery"],
+                                    "may_choose_new_targets": True,
+                                },
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_single_treasure_creation_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

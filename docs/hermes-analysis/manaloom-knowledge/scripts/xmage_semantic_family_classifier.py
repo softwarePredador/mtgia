@@ -399,6 +399,11 @@ def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
     applies_to = str(effect_json.get("cost_reduction_applies_to") or "")
     cost_classes = xmage_cost_classes(card)
     types = xmage_types(card)
+    effect_classes = xmage_effect_classes(card)
+    ability_classes = xmage_ability_classes(card)
+    trigger_effect = str(effect_json.get("trigger_effect") or "")
+    transform_to = effect_json.get("transform_to") or {}
+    transform_scope = str(transform_to.get("battle_model_scope") or "")
     if scope == "static_activated_ability_cost_reduction_variant_v1":
         return (
             applies_to in {
@@ -427,6 +432,40 @@ def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
             == "instant_sorcery_cards_in_your_graveyard_count"
             and effect_json.get("graveyard_count_card_types") == ["instant", "sorcery"]
             and int(effect_json.get("cost_reduction_generic") or 0) == 1
+        )
+    if scope == "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1":
+        return (
+            types == {"ARTIFACT", "LAND"}
+            and {
+                "AddCountersSourceEffect",
+                "CopyTargetStackObjectEffect",
+                "SpellsCostReductionControllerEffect",
+            }.issubset(effect_classes)
+            and {
+                "AnyColorManaAbility",
+                "SimpleStaticAbility",
+                "SpellCastControllerTriggeredAbility",
+            }.issubset(ability_classes)
+            and applies_to == "instant_sorcery_spells_you_cast"
+            and int(effect_json.get("cost_reduction_generic") or 0) == 1
+            and effect_json.get("applies_to_card_types") == ["instant", "sorcery"]
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and trigger_effect == "add_named_counter_then_transform"
+            and effect_json.get("trigger_counter_type") == "charge"
+            and int(effect_json.get("trigger_counter_count") or 0) == 1
+            and int(effect_json.get("transform_counter_threshold") or 0) == 4
+            and bool(effect_json.get("transform_remove_all_named_counters"))
+            and transform_scope == scope
+            and transform_to.get("effect") == "land"
+            and bool(transform_to.get("is_mana_source"))
+            and int(transform_to.get("mana_produced") or 0) == 1
+            and transform_to.get("produces") == "WUBRG"
+            and transform_to.get("trigger") == "instant_sorcery_cast"
+            and transform_to.get("trigger_effect") == "copy_when_mana_spent"
+            and transform_to.get("target") == "own_instant_or_sorcery_on_stack"
+            and bool(transform_to.get("copy_when_mana_spent_to_cast_matching_spell"))
+            and transform_to.get("copy_when_mana_spent_card_types") == ["instant", "sorcery"]
+            and bool(transform_to.get("may_choose_new_targets"))
         )
     if scope not in {
         "static_cost_reduction_for_matching_spells_v1",

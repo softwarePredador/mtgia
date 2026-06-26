@@ -1,0 +1,5 @@
+             card_name              |          normalized_name           |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+------------------------------------+------------------------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Primal Amulet // Primal Wellspring | primal amulet // primal wellspring | e90d3ae05767c87dbd3b02c470af4827 | battle_rule_v1:d05b887f76ae9cd5cee7c89045dc65cc | deprecate_nonmatching_rows |                1 | 83aca47f-7af0-455f-8ea2-9aa0a24c2de2 |                  2 |                         0 |                           2
+(1 row)
+
