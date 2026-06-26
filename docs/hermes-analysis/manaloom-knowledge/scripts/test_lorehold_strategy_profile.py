@@ -114,6 +114,29 @@ class LoreholdStrategyProfileTests(unittest.TestCase):
         self.assertEqual(shortfalls["protection_window"]["actual"], 1)
         self.assertIn("pressure_absorber", shortfalls)
 
+    def test_commander_intent_alignment_penalizes_overfilled_ramp(self):
+        cards = [
+            {
+                "card_name": f"Ramp Piece {idx}",
+                "roles": ["ramp"],
+                "type_line": "Artifact",
+                "oracle_text": "Add one mana of any color.",
+                "cmc": 2,
+            }
+            for idx in range(40)
+        ]
+
+        alignment = profile.commander_intent_alignment(cards)
+
+        self.assertEqual(alignment["role_ranges"]["ramp"]["status"], "overfilled")
+        self.assertEqual(alignment["package_ranges"]["early_plan"]["status"], "aligned")
+        self.assertLess(alignment["score"], 55.0)
+        self.assertIn("role_ramp_overfilled", alignment["risks"])
+
+    def test_commander_intent_model_requires_battle_proof(self):
+        self.assertIn("deck_607", profile.COMMANDER_INTENT_MODEL["validation_rule"])
+        self.assertIn("Winota", profile.COMMANDER_INTENT_MODEL["validation_rule"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,905 @@
+{
+  "commander": [
+    {
+      "card_name": "Lorehold, the Historian",
+      "cmc": 5.0,
+      "functional_tag": "engine",
+      "functional_tags_json": "[\"engine\",\"draw\",\"passive\"]",
+      "is_commander": 1,
+      "quantity": 1,
+      "type_line": "Legendary Creature — Elder Dragon"
+    }
+  ],
+  "deck_id": 607,
+  "deck_key": "deck_607",
+  "intent_summary": {
+    "battle_rule_ready_ratio": 0.9787,
+    "commander_intent_risks": [
+      "off_plan_cards"
+    ],
+    "commander_intent_score": 98.75,
+    "commander_intent_status": "needs_battle_proof",
+    "matrix_rank": 1,
+    "objective": "Miracle spellslinger shell that uses topdeck setup and hand filtering to turn Lorehold's commander text into discounted spell chains.",
+    "role_counts": {
+      "approach": 1,
+      "board_wipe": 6,
+      "creature": 4,
+      "draw": 13,
+      "engine": 3,
+      "equipment_haste_shroud": 1,
+      "equipment_static_attachment": 1,
+      "exile_value": 1,
+      "land": 34,
+      "land_tax": 1,
+      "mana_development": 1,
+      "overload_recursion": 1,
+      "passive": 4,
+      "protection": 10,
+      "pump_all": 1,
+      "ramp": 18,
+      "redirect_removal": 1,
+      "removal": 10,
+      "steal_all_creatures": 1,
+      "token_maker": 4,
+      "tutor": 1,
+      "wincon": 9
+    },
+    "strategy_package_counts": {
+      "deterministic_finisher": 9,
+      "early_plan": 35,
+      "graveyard_recursion": 8,
+      "hand_filter": 15,
+      "pressure_absorber": 18,
+      "protection_window": 16,
+      "spell_chain_conversion": 41,
+      "topdeck_miracle_setup": 11
+    },
+    "strategy_score": 138.536
+  },
+  "lands": [
+    {
+      "card_name": "Ancient Tomb",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Arid Mesa",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Battlefield Forge",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Bloodstained Mire",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Command Beacon",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Command Tower",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Eiganjo, Seat of the Empire",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Legendary Land"
+    },
+    {
+      "card_name": "Elegant Parlor",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land — Mountain Plains"
+    },
+    {
+      "card_name": "Exotic Orchard",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Flooded Strand",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Glittering Massif",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land — Mountain Plains"
+    },
+    {
+      "card_name": "Marsh Flats",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Mountain // Mountain",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 4,
+      "type_line": "Basic Land — Mountain"
+    },
+    {
+      "card_name": "Plains // Plains",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 4,
+      "type_line": "Basic Land — Plains"
+    },
+    {
+      "card_name": "Plaza of Heroes",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Prismatic Vista",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Radiant Summit",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land — Mountain Plains"
+    },
+    {
+      "card_name": "Reliquary Tower",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Sacred Foundry",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land — Mountain Plains"
+    },
+    {
+      "card_name": "Scalding Tarn",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Spectator Seating",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Sunbaked Canyon",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Sunbillow Verge",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Turbulent Steppe",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land — Mountain Plains"
+    },
+    {
+      "card_name": "Urza's Saga",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Enchantment Land — Urza's Saga"
+    },
+    {
+      "card_name": "War Room",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Windswept Heath",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    },
+    {
+      "card_name": "Wooded Foothills",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "functional_tags_json": "[\"land\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Land"
+    }
+  ],
+  "nonlands": [
+    {
+      "card_name": "Approach of the Second Sun",
+      "cmc": 7.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"approach\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Artist's Talent",
+      "cmc": 2.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Enchantment — Class"
+    },
+    {
+      "card_name": "Avatar's Wrath",
+      "cmc": 4.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Bender's Waterskin",
+      "cmc": 3.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Big Score",
+      "cmc": 4.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\",\"treasure_maker\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Blasphemous Act",
+      "cmc": 9.0,
+      "functional_tag": "board_wipe",
+      "functional_tags_json": "[\"board_wipe\",\"damage_wipe\",\"wipe\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Boros Signet",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Call Forth the Tempest",
+      "cmc": 8.0,
+      "functional_tag": "board_wipe",
+      "functional_tags_json": "[\"board_wipe\",\"damage_wipe\",\"wipe\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Creative Technique",
+      "cmc": 5.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Dawn's Truce",
+      "cmc": 2.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Deflecting Swat",
+      "cmc": 3.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\",\"protection\",\"redirect_removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "cmc": 7.0,
+      "functional_tag": "unknown",
+      "functional_tags_json": "[\"unknown\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Esper Sentinel",
+      "cmc": 1.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact Creature — Human Soldier"
+    },
+    {
+      "card_name": "Everything Comes to Dust",
+      "cmc": 10.0,
+      "functional_tag": "board_wipe",
+      "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Farewell",
+      "cmc": 6.0,
+      "functional_tag": "board_wipe",
+      "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Fated Clash",
+      "cmc": 5.0,
+      "functional_tag": "board_wipe",
+      "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Flawless Maneuver",
+      "cmc": 3.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Furygale Flocking",
+      "cmc": 0.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"token_maker\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Generous Gift",
+      "cmc": 3.0,
+      "functional_tag": "removal",
+      "functional_tags_json": "[\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Giver of Runes",
+      "cmc": 1.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\",\"creature\",\"unknown\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Creature — Kor Cleric"
+    },
+    {
+      "card_name": "Hexing Squelcher",
+      "cmc": 2.0,
+      "functional_tag": "creature",
+      "functional_tags_json": "[\"creature\",\"unknown\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Creature — Goblin Sorcerer"
+    },
+    {
+      "card_name": "High Noon",
+      "cmc": 2.0,
+      "functional_tag": "removal",
+      "functional_tags_json": "[\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Enchantment"
+    },
+    {
+      "card_name": "Hit the Mother Lode",
+      "cmc": 7.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\",\"ramp\",\"treasure_maker\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Improvisation Capstone",
+      "cmc": 0.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\",\"exile_value\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery — Lesson"
+    },
+    {
+      "card_name": "Insurrection",
+      "cmc": 8.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"steal_all_creatures\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Jeska's Will",
+      "cmc": 3.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Land Tax",
+      "cmc": 1.0,
+      "functional_tag": "tutor",
+      "functional_tags_json": "[\"tutor\",\"land_tax\",\"mana_development\",\"passive\",\"unknown\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Enchantment"
+    },
+    {
+      "card_name": "Library of Leng",
+      "cmc": 1.0,
+      "functional_tag": "engine",
+      "functional_tags_json": "[\"engine\",\"ramp\",\"passive\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Lightning Greaves",
+      "cmc": 2.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\",\"equipment_haste_shroud\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact — Equipment"
+    },
+    {
+      "card_name": "Mizzix's Mastery",
+      "cmc": 4.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"overload_recursion\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Molecule Man",
+      "cmc": 6.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Legendary Creature — Human Villain"
+    },
+    {
+      "card_name": "Monument to Endurance",
+      "cmc": 3.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\",\"passive\",\"unknown\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Mother of Runes",
+      "cmc": 1.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\",\"creature\",\"unknown\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Creature — Human Cleric"
+    },
+    {
+      "card_name": "Path to Exile",
+      "cmc": 1.0,
+      "functional_tag": "removal",
+      "functional_tags_json": "[\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Pearl Medallion",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "cmc": 5.0,
+      "functional_tag": "engine",
+      "functional_tags_json": "[\"engine\",\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Creature — Djinn Monk"
+    },
+    {
+      "card_name": "Prismari Pianist",
+      "cmc": 0.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"token_maker\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Creature — Djinn Bard"
+    },
+    {
+      "card_name": "Promise of Loyalty",
+      "cmc": 5.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Redirect Lightning",
+      "cmc": 1.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant — Lesson"
+    },
+    {
+      "card_name": "Reforge the Soul",
+      "cmc": 5.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Rise of the Eldrazi",
+      "cmc": 12.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Ruby Medallion",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Scroll Rack",
+      "cmc": 2.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\",\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Sensei's Divining Top",
+      "cmc": 1.0,
+      "functional_tag": "draw",
+      "functional_tags_json": "[\"draw\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Smothering Tithe",
+      "cmc": 4.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Enchantment"
+    },
+    {
+      "card_name": "Sol Ring",
+      "cmc": 1.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Starfall Invocation",
+      "cmc": 5.0,
+      "functional_tag": "board_wipe",
+      "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Storm Herd",
+      "cmc": 10.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"token_maker\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Stroke of Midnight",
+      "cmc": 3.0,
+      "functional_tag": "removal",
+      "functional_tags_json": "[\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Surge to Victory",
+      "cmc": 6.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"removal\",\"pump_all\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Swiftfoot Boots",
+      "cmc": 2.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\",\"equipment_static_attachment\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact — Equipment"
+    },
+    {
+      "card_name": "Swords to Plowshares",
+      "cmc": 1.0,
+      "functional_tag": "removal",
+      "functional_tags_json": "[\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Talisman of Conviction",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Teferi's Protection",
+      "cmc": 3.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Tempt with Bunnies",
+      "cmc": 3.0,
+      "functional_tag": "wincon",
+      "functional_tags_json": "[\"wincon\",\"token_maker\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "The Mind Stone",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Legendary Artifact — Infinity Stone"
+    },
+    {
+      "card_name": "The Scarlet Witch",
+      "cmc": 3.0,
+      "functional_tag": "creature",
+      "functional_tags_json": "[\"creature\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Legendary Creature — Mutant Warlock Hero"
+    },
+    {
+      "card_name": "Thor, God of Thunder",
+      "cmc": 5.0,
+      "functional_tag": "removal",
+      "functional_tags_json": "[\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Legendary Creature — God Warrior Hero"
+    },
+    {
+      "card_name": "Tibalt's Trickery",
+      "cmc": 2.0,
+      "functional_tag": "protection",
+      "functional_tags_json": "[\"protection\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Tragic Arrogance",
+      "cmc": 5.0,
+      "functional_tag": "unknown",
+      "functional_tags_json": "[\"unknown\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    },
+    {
+      "card_name": "Unexpected Windfall",
+      "cmc": 4.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\",\"treasure_maker\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Victory Chimes",
+      "cmc": 3.0,
+      "functional_tag": "ramp",
+      "functional_tags_json": "[\"ramp\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Artifact"
+    },
+    {
+      "card_name": "Winds of Abandon",
+      "cmc": 2.0,
+      "functional_tag": "removal",
+      "functional_tags_json": "[\"removal\"]",
+      "is_commander": 0,
+      "quantity": 1,
+      "type_line": "Sorcery"
+    }
+  ],
+  "quantity_total": 100,
+  "rows": 94,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "ready"
+}

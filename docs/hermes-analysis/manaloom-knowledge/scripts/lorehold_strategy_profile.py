@@ -14,7 +14,26 @@ from collections import Counter
 from typing import Any, Mapping
 
 
-STRATEGY_VERSION = "lorehold_strategy_profile_v1_2026_06_26"
+STRATEGY_VERSION = "lorehold_strategy_profile_v2_2026_06_26"
+
+COMMANDER_INTENT_MODEL = {
+    "commander": "Lorehold, the Historian",
+    "objective": (
+        "Use topdeck setup, hand filtering, and Lorehold's commander discount to "
+        "cast high-impact instant/sorcery spells ahead of curve, then convert that "
+        "window into a deterministic finisher while surviving fast combat pressure."
+    ),
+    "plan_a": [
+        "Set up the top of the library and hand before the expensive spell turn.",
+        "Use Lorehold discount/cost reducers to chain impactful instants and sorceries.",
+        "Protect the conversion window instead of filling the deck with generic value pieces.",
+    ],
+    "validation_rule": (
+        "A candidate is not accepted from structure alone. It must tie or beat the "
+        "protected deck_607 baseline on the same real-opponent battle gate and must "
+        "not regress the Winota pressure matchup."
+    ),
+}
 
 PACKAGE_MINIMUMS = {
     "early_plan": 18,
@@ -36,6 +55,28 @@ PACKAGE_WEIGHTS = {
     "pressure_absorber": 9.0,
     "graveyard_recursion": 6.0,
     "deterministic_finisher": 8.0,
+}
+
+INTENT_PACKAGE_RANGES = {
+    "early_plan": {"minimum": 24, "maximum": 45, "weight": 9.0},
+    "topdeck_miracle_setup": {"minimum": 8, "maximum": 14, "weight": 13.0},
+    "hand_filter": {"minimum": 10, "maximum": 18, "weight": 10.0},
+    "spell_chain_conversion": {"minimum": 32, "maximum": 46, "weight": 13.0},
+    "protection_window": {"minimum": 12, "maximum": 20, "weight": 10.0},
+    "pressure_absorber": {"minimum": 12, "maximum": 20, "weight": 11.0},
+    "graveyard_recursion": {"minimum": 5, "maximum": 10, "weight": 7.0},
+    "deterministic_finisher": {"minimum": 8, "maximum": 12, "weight": 10.0},
+}
+
+INTENT_ROLE_RANGES = {
+    "land": {"minimum": 33, "maximum": 36, "weight": 8.0},
+    "ramp": {"minimum": 12, "maximum": 22, "weight": 7.0},
+    "draw": {"minimum": 10, "maximum": 18, "weight": 6.0},
+    "removal": {"minimum": 8, "maximum": 14, "weight": 5.0},
+    "board_wipe": {"minimum": 2, "maximum": 7, "weight": 4.0},
+    "protection": {"minimum": 8, "maximum": 14, "weight": 5.0},
+    "wincon": {"minimum": 7, "maximum": 12, "weight": 5.0},
+    "tutor": {"minimum": 1, "maximum": 6, "weight": 3.0},
 }
 
 ACTIVE_ANCHOR_BONUS = {
@@ -209,6 +250,103 @@ def strategy_shortfalls(cards: list[Mapping[str, Any]]) -> dict[str, dict[str, i
         package: {"actual": counts[package], "minimum": minimum}
         for package, minimum in PACKAGE_MINIMUMS.items()
         if counts[package] < minimum
+    }
+
+
+def _weighted_role_counts(cards: list[Mapping[str, Any]]) -> Counter[str]:
+    counts: Counter[str] = Counter()
+    for card in cards:
+        quantity = int(card.get("quantity") or 1)
+        roles = set(_roles(card))
+        type_line = str(card.get("type_line") or "")
+        if card.get("is_land") or "Land" in type_line:
+            roles.add("land")
+        for role in roles:
+            counts[role] += quantity
+    return counts
+
+
+def _range_score(actual: int, spec: Mapping[str, float]) -> dict[str, Any]:
+    minimum = int(spec["minimum"])
+    maximum = int(spec["maximum"])
+    weight = float(spec["weight"])
+    if actual < minimum:
+        ratio = actual / max(1, minimum)
+        score = weight * ratio
+        status = "shortfall"
+        gap = minimum - actual
+        overage = 0
+    elif actual > maximum:
+        overage = actual - maximum
+        penalty = min(weight * 0.72, overage * max(0.2, weight / max(1, maximum)))
+        score = max(0.0, weight - penalty)
+        status = "overfilled"
+        gap = 0
+    else:
+        score = weight
+        status = "aligned"
+        gap = 0
+        overage = 0
+    return {
+        "actual": actual,
+        "minimum": minimum,
+        "maximum": maximum,
+        "status": status,
+        "gap": gap,
+        "overage": overage,
+        "score": round(score, 3),
+        "weight": weight,
+    }
+
+
+def commander_intent_alignment(cards: list[Mapping[str, Any]]) -> dict[str, Any]:
+    package_counts = strategy_counts(cards)
+    role_counts = _weighted_role_counts(cards)
+    package_ranges = {
+        package: _range_score(int(package_counts.get(package, 0)), spec)
+        for package, spec in INTENT_PACKAGE_RANGES.items()
+    }
+    role_ranges = {
+        role: _range_score(int(role_counts.get(role, 0)), spec)
+        for role, spec in INTENT_ROLE_RANGES.items()
+    }
+    off_plan_cards = []
+    for card in cards:
+        if card.get("is_land"):
+            continue
+        tags = strategy_tags_for_card(card)
+        roles = _roles(card)
+        if not tags and not roles.intersection({"land", "ramp", "draw", "removal", "board_wipe", "protection", "wincon"}):
+            off_plan_cards.append(str(card.get("card_name") or card.get("name") or "?"))
+
+    total_weight = sum(float(spec["weight"]) for spec in INTENT_PACKAGE_RANGES.values()) + sum(
+        float(spec["weight"]) for spec in INTENT_ROLE_RANGES.values()
+    )
+    raw_score = sum(item["score"] for item in package_ranges.values()) + sum(
+        item["score"] for item in role_ranges.values()
+    )
+    off_plan_penalty = min(8.0, len(off_plan_cards) * 1.25)
+    score = max(0.0, min(100.0, (raw_score / total_weight * 100.0) - off_plan_penalty))
+    risks = [
+        f"package_{package}_{status['status']}"
+        for package, status in package_ranges.items()
+        if status["status"] != "aligned"
+    ]
+    risks.extend(
+        f"role_{role}_{status['status']}"
+        for role, status in role_ranges.items()
+        if status["status"] != "aligned"
+    )
+    if off_plan_cards:
+        risks.append("off_plan_cards")
+    return {
+        "model": COMMANDER_INTENT_MODEL,
+        "score": round(score, 3),
+        "status": "aligned" if score >= 82 and not risks else "needs_battle_proof",
+        "package_ranges": package_ranges,
+        "role_ranges": role_ranges,
+        "off_plan_cards": off_plan_cards[:12],
+        "risks": risks[:16],
     }
 
 

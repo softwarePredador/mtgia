@@ -21,8 +21,10 @@ from typing import Any, Iterable, Mapping
 
 from lorehold_strategy_profile import (
     ACTIVE_ANCHOR_BONUS,
+    COMMANDER_INTENT_MODEL,
     PACKAGE_MINIMUMS,
     STRATEGY_VERSION,
+    commander_intent_alignment,
     strategy_tags_for_card,
 )
 
@@ -61,19 +63,19 @@ STRATEGY_PACKAGE_LABELS = {
 
 EXTERNAL_METHOD_SOURCES = [
     {
-        "label": "Cardsphere Commander structure guide",
-        "url": "https://blog.cardsphere.com/building-a-commander-deck-part-two-structure/",
-        "use": "mana base, ramp/draw/removal/package balance should be validated as a deck structure, not only as individual card quality",
-    },
-    {
-        "label": "Card Kingdom spellslinger Commander guide",
-        "url": "https://blog.cardkingdom.com/spellslinger-commander-deck-building-guide/",
-        "use": "instant/sorcery-heavy decks need cheap interaction, card flow, cost reduction, recursion, and payoffs",
-    },
-    {
         "label": "EDHREC Lorehold commander page",
         "url": "https://edhrec.com/commanders/lorehold-the-historian",
-        "use": "external comparison source for commonly played Lorehold cards and commander-specific package signals",
+        "use": "commander-specific comparison lane for Lorehold package expectations and recurring card choices",
+    },
+    {
+        "label": "EDHREC spellslinger Commander guide",
+        "url": "https://edhrec.com/guides/edhrec-guide-to-spellslinger-in-commander",
+        "use": "method source for instant/sorcery-heavy shells: card flow, cheap spells, protection, recursion, and payoffs",
+    },
+    {
+        "label": "EDHREC Commander deckbuilding guide",
+        "url": "https://edhrec.com/articles/how-to-build-a-commander-deck",
+        "use": "baseline deck-structure guardrails for lands, ramp, draw, removal, and focused packages",
     },
     {
         "label": "Archidekt Lorehold corpus",
@@ -451,6 +453,7 @@ def summarize_deck(
     package_counts = strategy_package_counts(cards)
     package_status = strategy_health(package_counts)
     role_status = role_health(role_counts)
+    intent_alignment = commander_intent_alignment(cards)
     key_cards = rank_key_cards(cards)
     unique_names = {normalize_name(card.get("card_name")) for card in cards}
     ready_names = {name for name in unique_names if name in battle_ready_names}
@@ -475,6 +478,10 @@ def summarize_deck(
         "strategy_package_counts": dict(sorted(package_counts.items())),
         "strategy_package_health": package_status,
         "strategy_package_shortfalls": shortfalls,
+        "commander_intent_alignment": intent_alignment,
+        "commander_intent_score": intent_alignment["score"],
+        "commander_intent_status": intent_alignment["status"],
+        "commander_intent_risks": intent_alignment["risks"],
         "battle_rule_ready_unique_cards": len(ready_names),
         "battle_rule_total_unique_cards": len(unique_names),
         "battle_rule_ready_ratio": round(battle_ready_ratio, 4),
@@ -510,7 +517,11 @@ def strategy_score(deck: Mapping[str, Any]) -> float:
     elif land_count > 37:
         land_penalty = (land_count - 37) * 1.5
     shortfall_penalty = len(deck.get("strategy_package_shortfalls") or []) * 3.0
-    return round(package_points + role_points + readiness_points - land_penalty - shortfall_penalty, 3)
+    intent_score = float(deck.get("commander_intent_score") or 0)
+    intent_risks = deck.get("commander_intent_risks") or []
+    intent_penalty = min(16.0, len(intent_risks) * 1.5)
+    legacy_score = package_points + role_points + readiness_points - land_penalty - shortfall_penalty
+    return round((legacy_score * 0.45) + (intent_score * 0.8) - intent_penalty, 3)
 
 
 def build_matrix(
@@ -548,8 +559,10 @@ def build_matrix(
         "method": {
             "unit_of_analysis": "one registered Lorehold deck or candidate deck",
             "primary_question": "Which deck structure best supports Lorehold's commander plan under battle pressure?",
+            "commander_intent_model": COMMANDER_INTENT_MODEL,
             "score_components": [
                 "strategy package health against Lorehold-specific minimums",
+                "commander intent package and role ranges with overfill penalties",
                 "functional role health against Commander/Lorehold minimums",
                 "battle-rule readiness ratio",
                 "mana base land-count guardrail",
@@ -572,10 +585,11 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
         f"- Strategy profile: `{payload['strategy_version']}`",
         f"- Scope: decks `{', '.join(str(deck_id) for deck_id in payload['deck_ids'])}` plus candidate v7 when available.",
         f"- Best structural deck before equal battle gate: `{payload.get('best_structural_deck')}`",
+        f"- Commander intent: {COMMANDER_INTENT_MODEL['objective']}",
         "",
         "## Validation Frame",
         "",
-        "This matrix treats each Lorehold deck as a strategic hypothesis. A deck is not considered better just because it has individually strong cards; it must show a coherent plan, enough package density to execute that plan, enough battle-rule readiness for simulations to be meaningful, and a fair battle result in the next gate.",
+        "This matrix treats each Lorehold deck as a strategic hypothesis. A deck is not considered better just because it has individually strong cards; it must show a coherent plan, enough package density to execute that plan, avoid overfilled generic packages, keep enough battle-rule readiness for simulations to be meaningful, and produce a fair battle result in the next gate.",
         "",
         "External method sources used as criteria inputs:",
     ]
@@ -586,15 +600,15 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
             "",
             "## Ranked Structural Read",
             "",
-            "| Rank | Deck | Archetype | Score | Lands | Rule Ready | Objective | Main Risks |",
-            "| ---: | --- | --- | ---: | ---: | ---: | --- | --- |",
+            "| Rank | Deck | Archetype | Score | Intent | Lands | Rule Ready | Objective | Main Risks |",
+            "| ---: | --- | --- | ---: | ---: | ---: | ---: | --- | --- |",
         ]
     )
     for deck in sorted(payload.get("decks") or [], key=lambda item: ranked.get(item["deck_key"], 999)):
         risks = ", ".join(deck.get("primary_risks") or []) or "none"
         objective = str(deck.get("objective") or "").replace("|", "\\|")
         lines.append(
-            f"| {ranked.get(deck['deck_key'], 999)} | {deck['deck_name']} (`{deck['deck_key']}`) | {deck['archetype']} | {deck['strategy_score']:.1f} | {deck['land_count']} | {deck['battle_rule_ready_ratio']:.1%} | {objective} | {risks} |"
+            f"| {ranked.get(deck['deck_key'], 999)} | {deck['deck_name']} (`{deck['deck_key']}`) | {deck['archetype']} | {deck['strategy_score']:.1f} | {deck['commander_intent_score']:.1f} | {deck['land_count']} | {deck['battle_rule_ready_ratio']:.1%} | {objective} | {risks} |"
         )
 
     for deck in sorted(payload.get("decks") or [], key=lambda item: ranked.get(item["deck_key"], 999)):
@@ -604,6 +618,10 @@ def write_markdown(payload: Mapping[str, Any], path: Path) -> None:
                 f"## {ranked.get(deck['deck_key'], 999)}. {deck['deck_name']} (`{deck['deck_key']}`)",
                 "",
                 f"**Objective:** {deck['objective']}",
+                "",
+                f"**Commander intent alignment:** score `{deck['commander_intent_score']:.1f}`, status `{deck['commander_intent_status']}`.",
+                "",
+                "**Intent risks:** " + (", ".join(deck.get("commander_intent_risks") or []) or "none"),
                 "",
                 "**Evidence:** " + ("; ".join(deck.get("objective_evidence") or []) or "no direct objective evidence captured"),
                 "",
