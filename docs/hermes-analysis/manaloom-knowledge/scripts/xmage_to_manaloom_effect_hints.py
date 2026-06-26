@@ -1690,6 +1690,37 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"CREATURE"}
+        and xmage_class_name == "MagusOfTheWheel"
+        and {"DiscardHandAllEffect", "DrawCardAllEffect"}.issubset(effect_classes)
+        and "SimpleActivatedAbility" in ability_classes
+        and {"TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "activated_tap_sacrifice_self_each_player_discards_hand_draws_seven_v1",
+            "fields": {
+                "power": 3,
+                "toughness": 3,
+                "activation_cost_generic": 1,
+                "activation_cost_colors": ["R"],
+                "activation_requires_tap": True,
+                "activation_requires_sacrifice": True,
+                "activation_cost": "sacrifice_self",
+                "activated_multiplayer_discard_draw_count": 7,
+                "wheel_like": True,
+            },
+            "reason": "XMage structure matches Magus of the Wheel: a 3/3 creature with {1}{R}, tap, sacrifice to make each player discard their hand and draw seven cards.",
+            "signals": [
+                "DiscardHandAllEffect",
+                "DrawCardAllEffect(7)",
+                "SimpleActivatedAbility",
+                "TapSourceCost",
+                "SacrificeSourceCost",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
         and xmage_class_name == "SunTitan"
         and "ReturnFromGraveyardToBattlefieldTargetEffect" in effect_classes
         and "EntersBattlefieldOrAttacksSourceTriggeredAbility" in ability_classes

@@ -1,0 +1,5 @@
+     card_name      |  normalized_name   |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+--------------------+--------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Magus of the Wheel | magus of the wheel | 0199317c544dda0fdce5321d3d092e58 | battle_rule_v1:15ccc12d23aaede3eccf98152c168243 | deprecate_nonmatching_rows |                1 | fbbd2e0f-f248-4996-90e9-7dc5b61249da |                  2 |                         0 |                           2
+(1 row)
+

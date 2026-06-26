@@ -5882,6 +5882,97 @@ def register_tests(battle, player):
         assert len(life_events) == 1
         assert life_events[0]["entering_creature"] == "Goblin Token"
 
+    def test_magus_of_the_wheel_activates_from_battlefield_and_refills_each_player():
+        events = []
+        decisions = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = lambda payload: decisions.append(payload)
+        try:
+            controller = player("Lorehold")
+            opponent = player("Opponent")
+            magus = {
+                "name": "Magus of the Wheel",
+                "type_line": "Creature — Human Wizard",
+                "effect": "creature",
+                "battle_model_scope": "activated_tap_sacrifice_self_each_player_discards_hand_draws_seven_v1",
+                "power": 3,
+                "toughness": 3,
+                "activation_cost_generic": 1,
+                "activation_cost_colors": ["R"],
+                "activation_requires_tap": True,
+                "activation_requires_sacrifice": True,
+                "activation_cost": "sacrifice_self",
+                "activated_multiplayer_discard_draw_count": 7,
+                "wheel_like": True,
+                "summoning_sick": False,
+                "_rule_logical_key": "battle_rule_v1:magus-of-the-wheel-test",
+                "_rule_oracle_hash": "magus-of-the-wheel-hash",
+                "_rule_source": "xmage",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            controller.battlefield = [
+                magus,
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+            ]
+            controller.hand = [
+                {"name": "Low Impact A", "cmc": 2, "type_line": "Instant"},
+                {"name": "Low Impact B", "cmc": 2, "type_line": "Sorcery"},
+            ]
+            controller.library = [
+                {"name": f"Controller Draw {index}", "cmc": 1, "type_line": "Sorcery"}
+                for index in range(1, 9)
+            ]
+            opponent.hand = [
+                {"name": f"Opponent Keeps {index}", "cmc": 2, "type_line": "Instant"}
+                for index in range(1, 8)
+            ]
+            opponent.library = [
+                {"name": f"Opponent Draw {index}", "cmc": 1, "type_line": "Sorcery"}
+                for index in range(1, 9)
+            ]
+
+            controller.refresh_mana_sources(turn=3)
+            battle.process_precombat_main_phase_engines(
+                controller,
+                [opponent],
+                [controller, opponent],
+                3,
+                random.Random(2301),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+            battle.DECISION_TRACE_HANDLER = None
+
+        assert all(permanent.get("name") != "Magus of the Wheel" for permanent in controller.battlefield)
+        assert any(card.get("name") == "Magus of the Wheel" for card in controller.graveyard)
+        assert len(controller.hand) == 7
+        assert len(opponent.hand) == 7
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Magus of the Wheel"
+            and data.get("activation_kind") == "tap_sacrifice_multiplayer_discard_draw"
+            and data.get("draw_count") == 7
+            and data.get("rule_logical_key") == "battle_rule_v1:magus-of-the-wheel-test"
+            for event, data in events
+        )
+        wheel_event = next(
+            data
+            for event, data in events
+            if event == "wheel_resolved" and data.get("card") == "Magus of the Wheel"
+        )
+        participants = {entry["player"]: entry for entry in wheel_event["participants"]}
+        assert participants["Lorehold"]["discarded"] == 2
+        assert participants["Lorehold"]["drawn"] == 7
+        assert participants["Opponent"]["discarded"] == 7
+        assert participants["Opponent"]["drawn"] == 7
+        assert any(
+            payload.get("decision_type") == "utility_creature_activation"
+            and payload.get("chosen_option", {}).get("card") == "Magus of the Wheel"
+            for payload in decisions
+        )
+
     def test_land_tax_tutors_three_basic_lands_when_opponent_has_more_lands():
         events = []
         decisions = []
@@ -18381,6 +18472,7 @@ def register_tests(battle, player):
         test_blood_sun_suppresses_urzas_saga_upkeep_progression,
         test_authority_of_the_consuls_taps_opponent_creatures_and_gains_life,
         test_authority_of_the_consuls_taps_opponent_tokens_and_gains_life,
+        test_magus_of_the_wheel_activates_from_battlefield_and_refills_each_player,
         test_land_tutor_artifact_trace_scores_rejected_options,
         test_fetch_land_activation_filters_targets_by_subtype_and_pays_life,
         test_fetch_land_skips_when_life_payment_would_be_lethal,

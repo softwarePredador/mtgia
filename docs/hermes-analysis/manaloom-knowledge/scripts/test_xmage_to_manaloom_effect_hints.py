@@ -1321,6 +1321,36 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["trigger_effect"], "gain_life")
         self.assertEqual(primary["trigger_gain_life"], 1)
 
+    def test_magus_of_the_wheel_maps_to_exact_activated_wheel_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "MagusOfTheWheel",
+                "effect_classes": ["DiscardHandAllEffect", "DrawCardAllEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["TapSourceCost", "SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": 'new SimpleActivatedAbility(new DiscardHandAllEffect(), new ManaCostsImpl<>("{1}{R}"));',
+            },
+            "{1}{R}, {T}, Sacrifice Magus of the Wheel: Each player discards their hand, then draws seven cards.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_tap_sacrifice_self_each_player_discards_hand_draws_seven_v1",
+        )
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertEqual(primary["activation_cost_generic"], 1)
+        self.assertEqual(primary["activation_cost_colors"], ["R"])
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertTrue(primary["activation_requires_sacrifice"])
+        self.assertEqual(primary["activation_cost"], "sacrifice_self")
+        self.assertEqual(primary["activated_multiplayer_discard_draw_count"], 7)
+        self.assertTrue(primary["wheel_like"])
+
     def test_patrol_signaler_maps_to_exact_untap_token_creature_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -1,0 +1,5 @@
+     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+--------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Magus of the Wheel | magus of the wheel | battle_rule_v1:15ccc12d23aaede3eccf98152c168243 |                  1 |                           1 |                         1 |           2
+(1 row)
+

@@ -963,6 +963,48 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "passive")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_magus_of_the_wheel_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Magus of the Wheel",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "MagusOfTheWheel",
+                            "path": "/xmage/MagusOfTheWheel.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DiscardHandAllEffect", "DrawCardAllEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "cost_classes": ["TapSourceCost", "SacrificeSourceCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "activated_tap_sacrifice_self_each_player_discards_hand_draws_seven_v1",
+                                "power": 3,
+                                "toughness": 3,
+                                "activation_cost_generic": 1,
+                                "activation_cost_colors": ["R"],
+                                "activation_requires_tap": True,
+                                "activation_requires_sacrifice": True,
+                                "activation_cost": "sacrifice_self",
+                                "activated_multiplayer_discard_draw_count": 7,
+                                "wheel_like": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "creature")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_generator_uses_treasure_role_for_treasure_vault_batch_candidate(self) -> None:
         report = generator.build_generator_report(
             batch_audit={

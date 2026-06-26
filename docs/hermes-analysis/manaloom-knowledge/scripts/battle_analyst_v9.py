@@ -26748,6 +26748,188 @@ def process_precombat_main_phase_engines(player, opponents, all_players, turn, r
             phase="precombat_main",
             **replay_rule_fields(permanent),
         )
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") != "creature":
+            continue
+        draw_count = int(permanent.get("activated_multiplayer_discard_draw_count") or 0)
+        if draw_count <= 0:
+            continue
+        if permanent.get("summoning_sick"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="creature",
+                reason="summoning_sick",
+                activation_kind="multiplayer_discard_draw",
+                turn=turn,
+                phase="precombat_main",
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="creature",
+                reason="source_already_tapped",
+                activation_kind="multiplayer_discard_draw",
+                turn=turn,
+                phase="precombat_main",
+                **replay_rule_fields(permanent),
+            )
+            continue
+
+        activation_colors = list(permanent.get("activation_cost_colors") or [])
+        activation_cost_generic = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(permanent.get("activation_cost_generic") or 0),
+            activation_colors=activation_colors,
+        )
+        activation_cost_text = ""
+        if activation_cost_generic > 0:
+            activation_cost_text += "{%d}" % activation_cost_generic
+        activation_cost_text += "".join("{%s}" % color for color in activation_colors)
+        if not activation_cost_text:
+            activation_cost_text = "{0}"
+
+        context = wheel_decision_context(player, opponents, draw_count, permanent)
+        if not context["library_can_support_draw"]:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="creature",
+                reason="insufficient_library_for_wheel",
+                activation_kind="multiplayer_discard_draw",
+                draw_count=draw_count,
+                turn=turn,
+                phase="precombat_main",
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if not context["timing_justified"]:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="creature",
+                reason="wheel_strategic_guardrail",
+                activation_kind="multiplayer_discard_draw",
+                draw_count=draw_count,
+                hand_size_before=context["hand_size_before"],
+                total_opponent_net_cards=context["total_opponent_net_cards"],
+                opponent_refill_risk=context["opponent_refill_risk"],
+                turn=turn,
+                phase="precombat_main",
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="creature",
+                reason="failed_to_pay_activation_cost",
+                activation_kind="multiplayer_discard_draw",
+                activation_cost=activation_cost_text,
+                turn=turn,
+                phase="precombat_main",
+                **replay_rule_fields(permanent),
+            )
+            continue
+
+        hand_before = len(player.hand)
+        if permanent.get("activation_requires_tap"):
+            permanent["tapped"] = True
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        activation_score = max(
+            0,
+            context["net_cards_for_player"] * 10 - context["total_opponent_net_cards"] * 4,
+        )
+        emit_decision_trace(
+            decision_type="utility_creature_activation",
+            player=player,
+            turn=turn,
+            phase="precombat_main",
+            available_options=[
+                decision_card_option(
+                    permanent,
+                    action="activate_multiplayer_discard_draw",
+                    effect="creature",
+                    score=activation_score,
+                ),
+                decision_card_option(
+                    permanent,
+                    action="defer_multiplayer_discard_draw",
+                    effect="creature",
+                    score=0,
+                ),
+            ],
+            chosen_option=decision_card_option(
+                permanent,
+                action="activate_multiplayer_discard_draw",
+                effect="creature",
+                score=activation_score,
+            ),
+            rejected_options=[
+                decision_card_option(
+                    permanent,
+                    action="defer_multiplayer_discard_draw",
+                    effect="creature",
+                    score=0,
+                )
+            ],
+            score_components={
+                "activation_cost_generic": activation_cost_generic,
+                "activation_cost_colors": activation_colors,
+                **context,
+            },
+            rule_source="utility_creature_activation_v1",
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=activation_score,
+            reason="convert_low_value_hand_into_wheel_refill_before_spell_casts",
+            strategic_principle="use precombat wheel only when the refill clearly improves your hand relative to the table",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "mana": -(activation_cost_generic + len(activation_colors)),
+                "cards_expected": draw_count,
+                "sacrificed_source": permanent.get("name", "?"),
+            },
+            risk_flags=["tap_creature", "sacrifice_creature", *([] if context["payoff_expected"] else ["opponent_refill"])],
+            rejected_reason="lower_expected_refill_value_than_activate",
+        )
+        resolve_wheel_like_draw(
+            player,
+            opponents,
+            permanent,
+            draw_count,
+            turn,
+            rng,
+            permanent,
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            effect="creature",
+            activation_kind="tap_sacrifice_multiplayer_discard_draw",
+            activation_cost=activation_cost_text,
+            draw_count=draw_count,
+            hand_before=hand_before,
+            hand_after=len(player.hand),
+            turn=turn,
+            phase="precombat_main",
+            **replay_rule_fields(permanent),
+        )
 
 
 def process_end_step_phase_engines(active_player, all_players, turn, rng, *, stack=None):

@@ -2523,6 +2523,23 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("activation_only_your_upkeep"))
         )
 
+    if effect == "creature" and scope == "activated_tap_sacrifice_self_each_player_discards_hand_draws_seven_v1":
+        return (
+            types == {"CREATURE"}
+            and {"DiscardHandAllEffect", "DrawCardAllEffect"}.issubset(effect_classes)
+            and "SimpleActivatedAbility" in ability_classes
+            and {"TapSourceCost", "SacrificeSourceCost"}.issubset(xmage_cost_classes(card))
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 3
+            and int(effect_json.get("activation_cost_generic") or 0) == 1
+            and effect_json.get("activation_cost_colors") == ["R"]
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("activation_requires_sacrifice"))
+            and effect_json.get("activation_cost") == "sacrifice_self"
+            and int(effect_json.get("activated_multiplayer_discard_draw_count") or 0) == 7
+            and bool(effect_json.get("wheel_like"))
+        )
+
     if effect == "creature" and scope == "end_step_plus_one_counter_and_other_nontoken_creature_endures_x_v1":
         return (
             types == {"CREATURE"}
