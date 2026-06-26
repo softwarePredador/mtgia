@@ -34091,6 +34091,12 @@ def parse_cli_args(argv=None):
         default=42,
         help="RNG seed for reproducible opponent sampling (default: 42)",
     )
+    parser.add_argument(
+        "--deck-id",
+        type=int,
+        default=int(os.environ.get("MANALOOM_BATTLE_DECK_ID", "6")),
+        help="deck id to load from deck_cards (default: 6 or MANALOOM_BATTLE_DECK_ID)",
+    )
     return parser.parse_args(argv)
 
 
@@ -34104,7 +34110,7 @@ def main(argv=None):
     print("BATTLE ANALYST v9 — Interactive Commander (Priority + Stack + Miracle)")
     print("=" * 60)
 
-    commander, deck, construction_report = load_deck_with_construction_report()
+    commander, deck, construction_report = load_deck_with_construction_report(args.deck_id)
     lands = sum(1 for c in deck if card_has_functional_tag(c, "land") or "Land" in c.get("type_line", ""))
     ramp = sum(1 for c in deck if card_has_functional_tag(c, "ramp", "ritual"))
     removal = sum(1 for c in deck if card_has_functional_tag(c, "removal", "board_wipe"))
@@ -34113,6 +34119,7 @@ def main(argv=None):
     instants_in_deck = sum(1 for c in deck if is_instant(c))
 
     print(f"Commander: {commander['name'] if commander else 'NONE'}")
+    print(f"Deck ID: {args.deck_id}")
     print(f"Deck: 1+99 | L={lands} R={ramp} X={removal} CMC={avg_cmc:.2f} Instants={instants_in_deck}")
     if not construction_report["is_valid"]:
         print("Deck construction warnings: " + ", ".join(construction_report["issues"]))

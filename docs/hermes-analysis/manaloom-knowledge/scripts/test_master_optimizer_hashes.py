@@ -158,9 +158,16 @@ class MasterOptimizerHashTests(unittest.TestCase):
             )
 
         with mock.patch.object(optimizer, "run_command", side_effect=fake_run_command):
-            result = optimizer.run_battle(1, battle_path=Path("/tmp/battle_analyst_v9.py"))
+            result = optimizer.run_battle(
+                1,
+                battle_path=Path("/tmp/battle_analyst_v9.py"),
+                deck_id=607,
+            )
 
-        self.assertEqual(captured["command"][-2:], ["--games", "1"])
+        self.assertEqual(
+            captured["command"][-4:],
+            ["--games", "1", "--deck-id", "607"],
+        )
         self.assertEqual(result.win_rate, 100.0)
         self.assertEqual(result.total_games, 1)
 

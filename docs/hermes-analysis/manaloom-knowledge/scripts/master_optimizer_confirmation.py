@@ -195,7 +195,7 @@ def main() -> int:
                 row["card_removed"],
                 row["category"],
             ):
-                result = run_battle(args.games)
+                result = run_battle(args.games, deck_id=args.deck_id)
 
             delta = result.win_rate - baseline_wr
             conn.execute(

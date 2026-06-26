@@ -18,7 +18,6 @@ from pathlib import Path
 from known_cards_fallback_snapshot import load_layered_known_cards
 from master_optimizer_common import (
     DEFAULT_DB,
-    PROTECTED_CARDS,
     SCRIPT_DIR,
     assert_current_deck_matches_baseline,
     battle_gate_cli_lines,
@@ -28,6 +27,7 @@ from master_optimizer_common import (
     deck_commander_identity,
     deck_rows,
     ensure_optimizer_tables,
+    effective_protected_cards,
     functional_tags_for_row,
     json_list,
     latest_baseline,
@@ -239,6 +239,14 @@ LOW_VALUE_BOROS_LANDS = {
     "Misty Rainforest",
     "Polluted Delta",
     "Verdant Catacombs",
+}
+
+CATEGORY_TARGET_FALLBACKS = {
+    "engine": ("draw", "support", "board_development"),
+    "draw": ("engine", "support"),
+    "protection": ("interaction",),
+    "removal": ("interaction", "wipe"),
+    "wipe": ("interaction", "removal"),
 }
 
 
@@ -493,10 +501,34 @@ def build_deck_categories(rows, known_cards):
     return categories
 
 
-def choose_swap_targets(deck_categories: dict[str, list[tuple[str, float]]]) -> dict[str, str]:
-    protected = set(PROTECTED_CARDS) | EXTRA_PROTECTED
+def _target_candidate_pool(
+    deck_categories: dict[str, list[tuple[str, float]]],
+    category: str,
+) -> list[tuple[str, float]]:
+    pools = [category]
+    pools.extend(CATEGORY_TARGET_FALLBACKS.get(category, ()))
+    seen: set[tuple[str, float]] = set()
+    result: list[tuple[str, float]] = []
+    for pool in pools:
+        for item in deck_categories.get(pool, []):
+            if item in seen:
+                continue
+            seen.add(item)
+            result.append(item)
+    return result
+
+
+def choose_swap_targets(
+    deck_categories: dict[str, list[tuple[str, float]]],
+    desired_categories: set[str] | None = None,
+) -> dict[str, str]:
+    protected = effective_protected_cards() | EXTRA_PROTECTED
     targets: dict[str, str] = {}
-    for category, cards in deck_categories.items():
+    categories = set(deck_categories)
+    if desired_categories:
+        categories.update(desired_categories)
+    for category in sorted(categories):
+        cards = _target_candidate_pool(deck_categories, category)
         if category == "unknown" or not cards:
             continue
         if category == "land":
@@ -640,7 +672,6 @@ def main() -> int:
             global _REAL_ROLES_CACHE
             _REAL_ROLES_CACHE = load_real_roles(conn, args.deck_id)
             deck_categories = build_deck_categories(rows, known_cards)
-            targets = choose_swap_targets(deck_categories)
             candidates, stats = legal_candidates(
                 conn,
                 args.deck_id,
@@ -649,6 +680,7 @@ def main() -> int:
                 args.category,
                 allowed_candidate_names,
             )
+            targets = choose_swap_targets(deck_categories, set(candidates))
 
             total = sum(len(items) for items in candidates.values())
             print("=" * 72)
@@ -709,7 +741,7 @@ def main() -> int:
                         blocked += 1
                         continue
                     with temporary_swap(conn, args.deck_id, name, target, category):
-                        result = run_battle(args.games)
+                        result = run_battle(args.games, deck_id=args.deck_id)
                     delta = result.win_rate - baseline_wr
                     conn.execute(
                         """

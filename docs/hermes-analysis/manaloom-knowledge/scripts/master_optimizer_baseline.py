@@ -61,7 +61,7 @@ def main() -> int:
     with connect() as conn:
         ensure_optimizer_tables(conn)
         deck_summary = get_deck_summary(conn, args.deck_id)
-        result = run_battle(args.games)
+        result = run_battle(args.games, deck_id=args.deck_id)
         created_at = utc_now()
         payload = {
             "deck": deck_summary,

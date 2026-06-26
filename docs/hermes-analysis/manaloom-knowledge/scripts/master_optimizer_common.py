@@ -38,6 +38,9 @@ DEFAULT_BATTLE_GATE_SUMMARY = Path(
         str(Path.home() / ".manaloom-agents/artifacts/battle-strategy-audit/latest/summary.json"),
     )
 )
+DEFAULT_LOREHOLD_PROTECTED_REGISTRY = (
+    REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
+)
 
 PROTECTED_CARDS = {
     "Lorehold, the Historian",
@@ -114,6 +117,27 @@ def utc_now() -> str:
 
 def normalize_name(name: str | None) -> str:
     return re.sub(r"\s+", " ", str(name or "").strip().lower())
+
+
+def load_dynamic_protected_cards(
+    registry_path: Path = DEFAULT_LOREHOLD_PROTECTED_REGISTRY,
+) -> set[str]:
+    try:
+        payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    except Exception:
+        return set()
+    values = payload.get("protected_cards_until_same_function_replacement_wins") or []
+    if not isinstance(values, list):
+        return set()
+    return {
+        str(value).strip()
+        for value in values
+        if str(value).strip()
+    }
+
+
+def effective_protected_cards() -> set[str]:
+    return set(PROTECTED_CARDS) | load_dynamic_protected_cards()
 
 
 def connect(db_path: Path = DEFAULT_DB) -> sqlite3.Connection:
@@ -391,7 +415,7 @@ def ruleset_hash(conn: sqlite3.Connection, deck_id: int) -> str:
 def get_deck_summary(conn: sqlite3.Connection, deck_id: int) -> dict[str, object]:
     rows = deck_rows(conn, deck_id)
     lands = sum(
-        1
+        int(row["quantity"] or 1)
         for row in rows
         if "land" in functional_tags_for_row(row) or "Land" in str(row["type_line"] or "")
     )
@@ -400,12 +424,13 @@ def get_deck_summary(conn: sqlite3.Connection, deck_id: int) -> dict[str, object
         for row in rows
         if "land" not in functional_tags_for_row(row) and "Land" not in str(row["type_line"] or "")
     ]
-    avg_cmc = sum(float(row["cmc"] or 0) for row in nonlands) / max(1, len(nonlands))
+    nonland_cards = sum(int(row["quantity"] or 1) for row in nonlands)
+    avg_cmc = sum(float(row["cmc"] or 0) * int(row["quantity"] or 1) for row in nonlands) / max(1, nonland_cards)
     return {
         "deck_id": deck_id,
-        "cards": len(rows),
+        "cards": sum(int(row["quantity"] or 1) for row in rows),
         "lands": lands,
-        "nonlands": len(nonlands),
+        "nonlands": nonland_cards,
         "avg_cmc": round(avg_cmc, 3),
         "hash": deck_hash(conn, deck_id),
         "semantics_hash": semantics_hash(conn, deck_id),
@@ -511,8 +536,16 @@ def parse_battle_output(output: str, games_per_opponent: int) -> BattleResult:
     )
 
 
-def run_battle(games_per_opponent: int, battle_path: Path = DEFAULT_BATTLE) -> BattleResult:
-    env_extra = {"MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER": "Lorehold"}
+def run_battle(
+    games_per_opponent: int,
+    battle_path: Path = DEFAULT_BATTLE,
+    *,
+    deck_id: int = 6,
+) -> BattleResult:
+    env_extra = {
+        "MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER": "Lorehold",
+        "MANALOOM_BATTLE_DECK_ID": str(deck_id),
+    }
     metrics_dir = os.environ.get("MANALOOM_ENGINE_METRICS_DIR")
     if metrics_dir:
         Path(metrics_dir).mkdir(parents=True, exist_ok=True)
@@ -522,7 +555,14 @@ def run_battle(games_per_opponent: int, battle_path: Path = DEFAULT_BATTLE) -> B
             / f"battle_engine_metrics_{battle_path.stem}_{games_per_opponent}_{stamp}.json"
         )
     code, output = run_command(
-        [sys.executable, str(battle_path), "--games", str(games_per_opponent)],
+        [
+            sys.executable,
+            str(battle_path),
+            "--games",
+            str(games_per_opponent),
+            "--deck-id",
+            str(deck_id),
+        ],
         cwd=SCRIPT_DIR,
         timeout=1200,
         env_extra=env_extra,
@@ -854,7 +894,9 @@ def quality_gate_candidate(
         reasons.append("removed_card_not_in_deck")
     elif removed[0]["is_commander"]:
         reasons.append("cannot_cut_commander")
-    if card_removed in PROTECTED_CARDS:
+    protected_cards = effective_protected_cards()
+    protected_normalized = {normalize_name(name) for name in protected_cards}
+    if normalize_name(card_removed) in protected_normalized:
         reasons.append("cannot_cut_protected_card")
 
     meta = card_metadata(conn, card_added)
