@@ -1,11 +1,12 @@
 {
   "checked_against": "Scryfall cards/collection API",
+  "source_list": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_deck_607_importable_20260626.txt",
   "unique_input_count": 94,
   "found_count": 92,
   "missing_count": 2,
   "missing": [
-    "Emeria's Call // Emeria, Shattered Skyclave",
-    "Pinnacle Monk // Mystic Peak"
+    "Emeria's Call",
+    "Pinnacle Monk"
   ],
   "errors": [],
   "canonical": [
