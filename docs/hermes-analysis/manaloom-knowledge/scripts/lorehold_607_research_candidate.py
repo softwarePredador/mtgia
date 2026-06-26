@@ -76,6 +76,73 @@ RESEARCH_PLANS = {
             "Local battle_card_rules has a verified auto rule for Longshot's noncreature-spell damage trigger.",
         ],
     },
+    "reprieve_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "added": [{"card_name": "Reprieve", "source_deck_id": 612}],
+        "removed": ["Tibalt's Trickery"],
+        "intent": (
+            "Test Reprieve as a same-function protection/counter sidegrade. This "
+            "keeps Molecule Man, miracle/topdeck setup, pressure absorption, board "
+            "wipes, and finishers intact while replacing a two-mana counter with "
+            "a lower-variance two-mana spell-delay cantrip."
+        ),
+        "external_signals": [
+            "Local Lorehold variants 612, 613, and 615 include Reprieve as a protection card.",
+            "Reprieve and Tibalt's Trickery are both two-mana instant interaction/protection slots in the local card corpus.",
+            "The registry marked Reprieve as the P1 next test only if the cut stayed same-function and did not remove pressure or miracle payoff.",
+        ],
+    },
+    "galvanoth_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "added": [{"card_name": "Galvanoth", "source_deck_id": 614}],
+        "removed": ["Creative Technique"],
+        "intent": (
+            "Test Galvanoth as an expensive topdeck/free-cast value sidegrade. "
+            "This preserves Molecule Man, pressure absorption, board wipes, and "
+            "the high-impact discover/cascade package while replacing the closest "
+            "five-mana one-shot topdeck free-cast spell."
+        ),
+        "external_signals": [
+            "Local Lorehold variants 611, 613, 614, and 615 include Galvanoth as a draw/topdeck engine.",
+            "Creative Technique and Galvanoth both occupy expensive topdeck/free-cast value space around mana value five.",
+            "The registry marked Galvanoth as a topdeck/miracle-aligned test only if the cut stayed in the expensive topdeck/value lane.",
+        ],
+    },
+    "ghostly_prison_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "added": [{"card_name": "Ghostly Prison", "source_deck_id": 613}],
+        "removed": ["High Noon"],
+        "intent": (
+            "Test Ghostly Prison as a pressure-absorber stax sidegrade. This "
+            "keeps Molecule Man, board wipes, miracle/topdeck setup, and protected "
+            "pressure pieces intact while replacing the closest nonprotected "
+            "enchantment tax slot."
+        ),
+        "external_signals": [
+            "Local Lorehold variants 613 and 616 tag Ghostly Prison as protection/stax.",
+            "High Noon and Ghostly Prison are both low-cost enchantment stax pieces, but Ghostly Prison maps directly to combat pressure absorption.",
+            "The registry requires Ghostly Prison to be tested only as a pressure/stax replacement, not as a spell-density cut.",
+        ],
+    },
+    "guttersnipe_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "added": [{"card_name": "Guttersnipe", "source_deck_id": 615}],
+        "removed": ["Prismari Pianist"],
+        "intent": (
+            "Test Guttersnipe as an instant/sorcery payoff sidegrade. This keeps "
+            "Molecule Man, pressure absorption, board wipes, and expensive finishers "
+            "intact while replacing the closest nonprotected spell-cast payoff creature."
+        ),
+        "external_signals": [
+            "Local Lorehold variants 615 and 616 include Guttersnipe as a wincon/spell payoff.",
+            "Guttersnipe and Prismari Pianist both reward repeated instant/sorcery casting with multiplayer pressure.",
+            "The registry marks Guttersnipe lower priority because Longshot failed a similar payoff lane, so this test isolates the payoff swap only.",
+        ],
+    },
 }
 
 

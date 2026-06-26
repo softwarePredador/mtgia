@@ -1,0 +1,502 @@
+{
+  "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260626_galvanoth_v1/knowledge_candidate.db",
+  "game_checkpoint_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_galvanoth_v1_galvanoth_v1_gate_game_checkpoint.json",
+  "game_checkpoint_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_galvanoth_v1_galvanoth_v1_gate_game_checkpoint.md",
+  "game_timeout_seconds": 45.0,
+  "games_per_opponent": 3,
+  "generated_at": "2026-06-26T19:31:56Z",
+  "matrix": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v1.json",
+  "opponent_kind": "real",
+  "opponent_seed": 20260626,
+  "opponents": [
+    "Vivi Ornitier #99 (real)",
+    "Sisay, Weatherlight Captain #61 (real)",
+    "Winota, Joiner of Forces #39 (real)"
+  ],
+  "results": [
+    {
+      "archetype": "battle-variant",
+      "avg_win_turn": 17.6,
+      "battle_rank": 1,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": 607,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "deck_size": 100,
+      "games": 9,
+      "lands": 34,
+      "load_deck_id": 607,
+      "losses": 4,
+      "objective": "Miracle spellslinger shell that uses topdeck setup and hand filtering to turn Lorehold's commander text into discounted spell chains.",
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 14.0,
+          "losses": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 15.5,
+          "losses": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "elimination": 2
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "tribal",
+          "avg_win_turn": 21.5,
+          "losses": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "elimination": 2
+          },
+          "wins": 2
+        }
+      ],
+      "primary_risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "ramp": 18,
+      "removal": 16,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": 135.635,
+      "structural_rank": 6,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 8,
+          "activated_ability_skipped": 98,
+          "additional_cost_paid": 8,
+          "airbend_creature_cast_from_exile": 9,
+          "airbend_other_creatures_resolved": 4,
+          "approach_cast_tracked": 5,
+          "approach_first_resolution": 2,
+          "attachment_sba": 2,
+          "board_wipe_resolved": 7,
+          "cast_announced": 335,
+          "cast_illegal": 1,
+          "combat": 170,
+          "combat_result": 195,
+          "combat_step": 1001,
+          "commander_cast": 51,
+          "compensation_tokens_created": 2,
+          "composite_rule_component_resolved": 8,
+          "composite_rule_resolved": 3,
+          "cost_paid": 334,
+          "creature_cast": 58,
+          "damage_resolved": 1,
+          "damage_wipe_resolved": 2,
+          "demonstrate_resolved": 3,
+          "discard_modal_trigger_resolved": 5,
+          "draw_cards_resolved": 8,
+          "end_step_instant": 7,
+          "equipment_attached": 2,
+          "equipment_unattached": 4,
+          "etb_recursion_resolved": 1,
+          "extra_turn_scheduled": 4,
+          "extra_turn_taken": 6,
+          "game_lost": 4,
+          "imprint_resolved": 2,
+          "jeskas_will_resolved": 2,
+          "land_played": 204,
+          "land_ramp_resolved": 2,
+          "land_tax_trigger_skipped": 4,
+          "lorehold_upkeep_rummage": 36,
+          "lorehold_upkeep_rummage_skipped": 50,
+          "mana_refreshed": 308,
+          "mill_resolved": 3,
+          "miracle_cast": 25,
+          "mizzix_mastery_resolved": 1,
+          "multi_defender_attack": 22,
+          "one_ring_burden_life_loss": 2,
+          "phase_out_resolved": 1,
+          "planeswalker_resolved": 2,
+          "player_eliminated": 19,
+          "priority_pass": 3092,
+          "protection_from_everything_granted": 3,
+          "protection_resolved": 3,
+          "redirect_removal_resolved": 5,
+          "removal_resolved": 20,
+          "replacement_applied": 30,
+          "ritual_mana_added": 2,
+          "saga_chapter_progressed": 2,
+          "saga_chapter_resolved": 1,
+          "saga_sacrificed_by_sba": 1,
+          "self_exiled_on_resolution": 6,
+          "spell_cast": 226,
+          "spell_countered": 13,
+          "spell_exiled_from_stack": 2,
+          "spell_resolved": 173,
+          "steal_all_creatures_resolved": 4,
+          "tokens_created": 4,
+          "top_nonland_free_cast": 8,
+          "top_nonland_free_cast_resolved": 9,
+          "topdeck_manipulation_activated": 9,
+          "treasure_created": 9,
+          "trigger_put_on_stack": 95,
+          "trigger_resolved": 99,
+          "trigger_skipped": 14,
+          "turn_end": 292,
+          "turn_start": 308,
+          "tutor_resolved": 6,
+          "utility_artifact_activated": 5,
+          "utility_land_activated": 9
+        },
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 122,
+          "lorehold_spell_cast": 98,
+          "miracle_cast": 25,
+          "topdeck_manipulation_activated": 9
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_spell_cast": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "miracle_cast": {
+            "games": 8,
+            "rate": 0.8889
+          },
+          "topdeck_manipulation_activated": {
+            "games": 3,
+            "rate": 0.3333
+          }
+        },
+        "top_cards": [
+          {
+            "count": 15,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 7,
+            "key": "cost_paid:Prismari Pianist"
+          },
+          {
+            "count": 7,
+            "key": "topdeck:Scroll Rack"
+          },
+          {
+            "count": 6,
+            "key": "cost_paid:Esper Sentinel"
+          },
+          {
+            "count": 5,
+            "key": "cost_paid:Hexing Squelcher"
+          },
+          {
+            "count": 5,
+            "key": "cost_paid:Victory Chimes"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Lightning Greaves"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Ruby Medallion"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Smothering Tithe"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Monument to Endurance"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:The Scarlet Witch"
+          },
+          {
+            "count": 3,
+            "key": "miracle:Insurrection"
+          }
+        ]
+      },
+      "win_rate": 55.56,
+      "win_reasons": {
+        "elimination": 5
+      },
+      "wins": 5
+    },
+    {
+      "archetype": "research-candidate",
+      "avg_win_turn": 18.75,
+      "battle_rank": 2,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": null,
+      "deck_key": "candidate_607_galvanoth_v1",
+      "deck_name": "Lorehold 607 Research Candidate galvanoth_v1",
+      "deck_size": 100,
+      "games": 9,
+      "lands": 34,
+      "load_deck_id": 6,
+      "losses": 5,
+      "objective": null,
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 25.0,
+          "losses": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 16.0,
+          "losses": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "elimination": 2
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "tribal",
+          "avg_win_turn": 18.0,
+          "losses": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        }
+      ],
+      "primary_risks": [],
+      "ramp": 18,
+      "removal": 16,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260626_galvanoth_v1/knowledge_candidate.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": null,
+      "structural_rank": null,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 12,
+          "activated_ability_skipped": 56,
+          "additional_cost_paid": 3,
+          "airbend_creature_cast_from_exile": 13,
+          "airbend_other_creatures_resolved": 2,
+          "approach_cast_tracked": 2,
+          "approach_first_resolution": 1,
+          "board_wipe_resolved": 5,
+          "cast_announced": 318,
+          "cast_illegal": 5,
+          "combat": 158,
+          "combat_result": 175,
+          "combat_step": 926,
+          "commander_cast": 46,
+          "compensation_tokens_created": 5,
+          "composite_rule_component_resolved": 3,
+          "composite_rule_resolved": 1,
+          "cost_paid": 313,
+          "creature_cast": 64,
+          "damage_resolved": 1,
+          "damage_wipe_resolved": 3,
+          "discard_modal_trigger_resolved": 2,
+          "draw_cards_resolved": 10,
+          "end_step_instant": 5,
+          "equipment_attached": 3,
+          "equipment_unattached": 2,
+          "etb_recursion_resolved": 2,
+          "extra_turn_scheduled": 2,
+          "extra_turn_taken": 3,
+          "game_lost": 2,
+          "imprint_resolved": 3,
+          "jeskas_will_resolved": 1,
+          "land_played": 200,
+          "land_ramp_resolved": 1,
+          "land_tax_trigger_resolved": 2,
+          "land_tax_trigger_skipped": 1,
+          "lorehold_upkeep_rummage": 19,
+          "lorehold_upkeep_rummage_skipped": 29,
+          "mana_refreshed": 293,
+          "mill_resolved": 2,
+          "miracle_cast": 20,
+          "mizzix_mastery_copy_cast": 3,
+          "mizzix_mastery_resolved": 3,
+          "multi_defender_attack": 17,
+          "phase_out_resolved": 2,
+          "planeswalker_resolved": 2,
+          "player_eliminated": 17,
+          "priority_pass": 2978,
+          "protection_from_everything_granted": 4,
+          "protection_resolved": 3,
+          "random_discard_after_tutor": 1,
+          "redirect_removal_resolved": 4,
+          "removal_resolved": 24,
+          "replacement_applied": 25,
+          "ritual_mana_added": 1,
+          "saga_chapter_progressed": 4,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "self_exiled_on_resolution": 7,
+          "spell_cast": 200,
+          "spell_copy_ceased_to_exist": 3,
+          "spell_countered": 9,
+          "spell_exiled_from_stack": 1,
+          "spell_resolved": 157,
+          "steal_all_creatures_resolved": 4,
+          "tokens_created": 4,
+          "topdeck_manipulation_activated": 2,
+          "treasure_created": 4,
+          "trigger_put_on_stack": 96,
+          "trigger_resolved": 98,
+          "trigger_skipped": 10,
+          "turn_end": 276,
+          "turn_start": 293,
+          "tutor_life_loss_resolved": 1,
+          "tutor_resolved": 7,
+          "utility_land_activated": 3,
+          "wheel_resolved": 1
+        },
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 97,
+          "lorehold_spell_cast": 75,
+          "miracle_cast": 20,
+          "topdeck_manipulation_activated": 2
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_spell_cast": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "miracle_cast": {
+            "games": 6,
+            "rate": 0.6667
+          },
+          "topdeck_manipulation_activated": {
+            "games": 1,
+            "rate": 0.1111
+          }
+        },
+        "top_cards": [
+          {
+            "count": 12,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 7,
+            "key": "cost_paid:Ruby Medallion"
+          },
+          {
+            "count": 5,
+            "key": "cost_paid:Mother of Runes"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Lightning Greaves"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:The Scarlet Witch"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Library of Leng"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Stroke of Midnight"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Smothering Tithe"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Hexing Squelcher"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Sensei's Divining Top"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Pinnacle Monk // Mystic Peak"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Fellwar Stone"
+          }
+        ]
+      },
+      "win_rate": 44.44,
+      "win_reasons": {
+        "elimination": 4
+      },
+      "wins": 4
+    }
+  ],
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "ready"
+}

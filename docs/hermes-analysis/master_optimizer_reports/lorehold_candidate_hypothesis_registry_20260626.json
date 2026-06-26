@@ -49,42 +49,37 @@
       "status": "rejected",
       "result": "3W/6L/0S, WR 33.33%, Winota 1W/2L, miracle games 4/9, topdeck games 2/9",
       "learning": "Isolated Birgi sidegrade kept structural intent at 100, but reduced miracle games from 8/9 to 4/9 and topdeck games from 3/9 to 2/9 versus the same deck_607 gate. Bender's Waterskin remains protected until a same-function replacement wins."
-    }
-  ],
-  "untested_queue": [
+    },
     {
       "key": "candidate_607_reprieve_v1",
-      "priority": "P1",
-      "swap_or_scope": "+Reprieve; same-function protection/counter slot TBD",
-      "status": "untested",
-      "why": "Cheap protection/cantrip style effect may protect conversion window without cutting pressure package.",
-      "risk": "Needs careful same-function cut; do not cut board wipe or miracle payoff."
+      "swap_or_scope": "+Reprieve; -Tibalt's Trickery",
+      "status": "rejected",
+      "result": "0W/9L/0S, WR 0.00%, Winota 0W/3L, miracle games 4/9, topdeck games 2/9",
+      "learning": "Reprieve preserved Molecule Man and the structural intent score, but replacing Tibalt's Trickery removed too much protection/counter leverage. Tibalt's Trickery is now protected until a same-function replacement wins."
     },
     {
       "key": "candidate_607_galvanoth_v1",
-      "priority": "P2",
-      "swap_or_scope": "+Galvanoth; same-function expensive topdeck/value slot TBD",
-      "status": "untested",
-      "why": "Runtime has verified topdeck free-cast rule; aligns with topdeck/miracle theme.",
-      "risk": "Five-mana creature may be too slow and could reduce current pressure density."
+      "swap_or_scope": "+Galvanoth; -Creative Technique",
+      "status": "rejected",
+      "result": "4W/5L/0S, WR 44.44%, Winota 1W/2L, miracle games 6/9, topdeck games 1/9",
+      "learning": "Galvanoth was closer than Reprieve and preserved Molecule Man, but replacing Creative Technique still regressed win rate, Winota, miracle frequency, and topdeck frequency. Creative Technique remains protected until a same-function replacement wins."
     },
     {
       "key": "candidate_607_ghostly_prison_v1",
-      "priority": "P3",
-      "swap_or_scope": "+Ghostly Prison; pressure-absorber slot TBD",
-      "status": "untested",
-      "why": "May improve combat pressure matchup if replacing same function only.",
-      "risk": "Can reduce spell density if cut is not same-function."
+      "swap_or_scope": "+Ghostly Prison; -High Noon",
+      "status": "rejected",
+      "result": "3W/6L/0S, WR 33.33%, Winota 0W/3L, miracle games 6/9, topdeck games 2/9",
+      "learning": "Ghostly Prison improved the Vivi combat-pressure slice, but cutting High Noon collapsed the Winota and Sisay results and reduced miracle/topdeck frequency. High Noon remains protected until a same-function replacement wins."
     },
     {
       "key": "candidate_607_guttersnipe_v1",
-      "priority": "P4",
-      "swap_or_scope": "+Guttersnipe; finisher slot TBD",
-      "status": "untested",
-      "why": "Verified spell-damage payoff, but Longshot already failed a similar lane.",
-      "risk": "Likely lower priority because similar payoff lane underperformed."
+      "swap_or_scope": "+Guttersnipe; -Prismari Pianist",
+      "status": "rejected",
+      "result": "1W/8L/0S, WR 11.11%, Winota 0W/3L, miracle games 8/9, topdeck games 5/9",
+      "learning": "Guttersnipe increased topdeck event frequency but did not convert to wins. Replacing Prismari Pianist removed too much board-pressure payoff; Prismari Pianist remains protected until a same-function replacement wins."
     }
   ],
+  "untested_queue": [],
   "protected_cards_until_same_function_replacement_wins": [
     "Molecule Man",
     "The Scarlet Witch",
@@ -93,6 +88,10 @@
     "Hexing Squelcher",
     "Sensei's Divining Top",
     "Scroll Rack",
-    "Bender's Waterskin"
+    "Bender's Waterskin",
+    "Tibalt's Trickery",
+    "Creative Technique",
+    "High Noon",
+    "Prismari Pianist"
   ]
 }

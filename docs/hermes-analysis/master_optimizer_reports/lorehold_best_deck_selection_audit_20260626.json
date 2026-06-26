@@ -1,31 +1,16 @@
 {
-  "status": "ready",
-  "generated_at": "2026-06-26T18:31:34Z",
+  "candidate_tested_this_run": "registry_queue_closed",
   "current_best_deck": "deck_607",
-  "postgres_writes": false,
-  "local_hermes_sqlite_mutated": true,
-  "source_runtime_changed": true,
-  "runtime_fixes": [
-    {
-      "card": "Molecule Man",
-      "scope": "nonland_hand_miracle_zero_static_v1",
-      "logical_rule_key": "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
-      "oracle_hash": "35e82bd52776c455745138b048ccc116",
-      "effect": {
-        "effect": "passive",
-        "grants_miracle_cost": 0,
-        "grants_miracle_card_scope": "nonland",
-        "grants_miracle_nonland": true
-      },
-      "postgres_promoted": false
-    }
-  ],
+  "decision_matrix": {
+    "artifact_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_decision_matrix_20260626_registry_queue_closed.json",
+    "artifact_md": "docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_decision_matrix_20260626_registry_queue_closed.md"
+  },
+  "generated_at": "2026-06-26T19:50:30Z",
   "latest_gate": {
-    "artifact_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_battle_gate_20260626_birgi_v1_post_molecule.json",
-    "artifact_md": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_battle_gate_20260626_birgi_v1_post_molecule.md",
+    "artifact_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_decision_matrix_20260626_registry_queue_closed.json",
+    "artifact_md": "docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_decision_matrix_20260626_registry_queue_closed.md",
     "games_per_opponent": 3,
     "opponent_seed": 20260626,
-    "simulation_seed": 42,
     "opponents": [
       "Vivi Ornitier #99 (real)",
       "Sisay, Weatherlight Captain #61 (real)",
@@ -33,79 +18,111 @@
     ],
     "results": [
       {
-        "deck_key": "deck_607",
+        "artifact_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_battle_gate_20260626_reprieve_v1.json",
+        "candidate_json": null,
+        "commander_intent_score": 100.0,
+        "construction_valid": true,
         "decision": "keep_baseline",
-        "wins": 5,
+        "deck_key": "deck_607",
+        "games": 9,
+        "key": "deck_607_baseline",
         "losses": 4,
-        "stalls": 0,
-        "win_rate": 55.56,
-        "winota": "2W/1L",
         "miracle_games": 8,
-        "topdeck_games": 3
+        "molecule_man_preserved": true,
+        "stalls": 0,
+        "status": "none",
+        "swap": "baseline",
+        "topdeck_games": 3,
+        "win_rate": 55.56,
+        "winota": "2W/1L/0S",
+        "wins": 5
       },
       {
-        "deck_key": "candidate_607_birgi_v1",
+        "artifact_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_battle_gate_20260626_reprieve_v1.json",
+        "candidate_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260626_reprieve_v1.json",
+        "commander_intent_score": 100.0,
+        "construction_valid": true,
         "decision": "reject",
-        "wins": 3,
-        "losses": 6,
-        "stalls": 0,
-        "win_rate": 33.33,
-        "winota": "1W/2L",
+        "deck_key": "candidate_607_reprieve_v1",
+        "games": 9,
+        "key": "candidate_607_reprieve_v1",
+        "losses": 9,
         "miracle_games": 4,
+        "molecule_man_preserved": true,
+        "stalls": 0,
+        "status": "rejected",
+        "swap": "+Reprieve; -Tibalt's Trickery",
         "topdeck_games": 2,
-        "learning": "Birgi remained structurally aligned, but replacing Bender's Waterskin reduced miracle/topdeck conversion and pressure matchup performance."
+        "win_rate": 0.0,
+        "winota": "0W/3L/0S",
+        "wins": 0
+      },
+      {
+        "artifact_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_galvanoth_v1_galvanoth_v1_gate.json",
+        "candidate_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260626_galvanoth_v1.json",
+        "commander_intent_score": 100.0,
+        "construction_valid": true,
+        "decision": "reject",
+        "deck_key": "candidate_607_galvanoth_v1",
+        "games": 9,
+        "key": "candidate_607_galvanoth_v1",
+        "losses": 5,
+        "miracle_games": 6,
+        "molecule_man_preserved": true,
+        "stalls": 0,
+        "status": "rejected",
+        "swap": "+Galvanoth; -Creative Technique",
+        "topdeck_games": 1,
+        "win_rate": 44.44,
+        "winota": "1W/2L/0S",
+        "wins": 4
+      },
+      {
+        "artifact_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_ghostly_prison_v1_ghostly_prison_v1_gate.json",
+        "candidate_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260626_ghostly_prison_v1.json",
+        "commander_intent_score": 100.0,
+        "construction_valid": true,
+        "decision": "reject",
+        "deck_key": "candidate_607_ghostly_prison_v1",
+        "games": 9,
+        "key": "candidate_607_ghostly_prison_v1",
+        "losses": 6,
+        "miracle_games": 6,
+        "molecule_man_preserved": true,
+        "stalls": 0,
+        "status": "rejected",
+        "swap": "+Ghostly Prison; -High Noon",
+        "topdeck_games": 2,
+        "win_rate": 33.33,
+        "winota": "0W/3L/0S",
+        "wins": 3
+      },
+      {
+        "artifact_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_guttersnipe_v1_guttersnipe_v1_gate.json",
+        "candidate_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260626_guttersnipe_v1.json",
+        "commander_intent_score": 100.0,
+        "construction_valid": true,
+        "decision": "reject",
+        "deck_key": "candidate_607_guttersnipe_v1",
+        "games": 9,
+        "key": "candidate_607_guttersnipe_v1",
+        "losses": 8,
+        "miracle_games": 8,
+        "molecule_man_preserved": true,
+        "stalls": 0,
+        "status": "rejected",
+        "swap": "+Guttersnipe; -Prismari Pianist",
+        "topdeck_games": 5,
+        "win_rate": 11.11,
+        "winota": "0W/3L/0S",
+        "wins": 1
       }
-    ]
-  },
-  "selection_rules": {
-    "fail_if": [
-      "win_rate_below_deck_607",
-      "winota_result_below_deck_607",
-      "miracle_games_below_deck_607",
-      "topdeck_games_below_deck_607",
-      "construction_report_invalid",
-      "protected_card_cut_without_same_function_win"
     ],
-    "expand_if": [
-      "ties_or_beats_deck_607",
-      "no_winota_regression",
-      "no_miracle_game_regression",
-      "no_topdeck_game_regression"
-    ]
+    "simulation_seed": 42
   },
-  "remaining_backlog": [
-    {
-      "priority": "P0",
-      "work": "Promote Molecule Man rule to PostgreSQL and resync Hermes after approval",
-      "reason": "PostgreSQL is source of truth; current rule is local runtime evidence."
-    },
-    {
-      "priority": "P0",
-      "work": "Add per-game timeout/checkpoint to lorehold_variant_battle_gate.py",
-      "reason": "Long gates currently provide no intra-game visibility."
-    },
-    {
-      "priority": "P1",
-      "work": "Build registry-driven candidate runner",
-      "reason": "Candidate generation, gate execution, and decision writeback should be one repeatable flow."
-    },
-    {
-      "priority": "P1",
-      "work": "Define same-function cuts for Reprieve, Galvanoth, and Ghostly Prison",
-      "reason": "Wrong-function cuts caused the rejected candidates."
-    },
-    {
-      "priority": "P1",
-      "work": "Persist per-candidate decision evidence in one compact matrix",
-      "reason": "Structural score, rule readiness, battle result, and final decision need one source."
-    }
-  ],
-  "next_queue": [
-    "candidate_607_reprieve_v1",
-    "candidate_607_galvanoth_v1",
-    "candidate_607_ghostly_prison_v1",
-    "candidate_607_guttersnipe_v1"
-  ],
+  "local_hermes_sqlite_mutated": true,
+  "next_queue": [],
+  "postgres_writes": true,
   "protected_cards_until_same_function_replacement_wins": [
     "Molecule Man",
     "The Scarlet Witch",
@@ -114,14 +131,73 @@
     "Hexing Squelcher",
     "Sensei's Divining Top",
     "Scroll Rack",
-    "Bender's Waterskin"
+    "Bender's Waterskin",
+    "Tibalt's Trickery",
+    "Creative Technique",
+    "High Noon",
+    "Prismari Pianist"
   ],
+  "queue_status": "closed",
+  "remaining_backlog": [
+    {
+      "priority": "P1",
+      "reason": "The current registry queue is closed and all tested swaps failed.",
+      "work": "Mine a fresh hypothesis queue from deck logs and external strategy evidence"
+    },
+    {
+      "priority": "P1",
+      "reason": "Current writeback is still reviewed and committed after the runner finishes.",
+      "work": "Add runner writeback automation for tested/rejected entries"
+    },
+    {
+      "priority": "P2",
+      "reason": "Avoid spending time proving failed candidates failed harder.",
+      "work": "Run expanded gate only for a future candidate that ties or beats deck_607 in the 3x3 gate"
+    }
+  ],
+  "runtime_fixes": [
+    {
+      "card": "Molecule Man",
+      "effect": {
+        "effect": "passive",
+        "grants_miracle_card_scope": "nonland",
+        "grants_miracle_cost": 0,
+        "grants_miracle_nonland": true
+      },
+      "logical_rule_key": "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
+      "oracle_hash": "35e82bd52776c455745138b048ccc116",
+      "postgres_apply_report": "docs/hermes-analysis/master_optimizer_reports/molecule_man_pg244_apply_20260626.json",
+      "postgres_promoted": true,
+      "scope": "nonland_hand_miracle_zero_static_v1",
+      "sqlite_sync_report": "docs/hermes-analysis/master_optimizer_reports/molecule_man_pg244_sqlite_sync_20260626.json"
+    }
+  ],
+  "selection_rules": {
+    "expand_if": [
+      "ties_or_beats_deck_607",
+      "no_winota_regression",
+      "no_miracle_game_regression",
+      "no_topdeck_game_regression"
+    ],
+    "fail_if": [
+      "win_rate_below_deck_607",
+      "winota_result_below_deck_607",
+      "miracle_games_below_deck_607",
+      "topdeck_games_below_deck_607",
+      "construction_report_invalid",
+      "protected_card_cut_without_same_function_win"
+    ]
+  },
+  "source_runtime_changed": true,
+  "status": "ready",
   "tests_passed": [
     "py_compile battle_analyst_v9.py battle_card_specific_tests.py",
     "focused miracle regression tests including test_molecule_man_grants_zero_miracle_to_nonland_first_draw",
     "test_lorehold_607_research_candidate.py",
+    "test_lorehold_registry_candidate_runner.py",
     "test_lorehold_strategy_profile.py",
     "test_lorehold_variant_battle_gate.py",
-    "Molecule Man runtime rule lookup"
+    "Molecule Man runtime rule lookup",
+    "lorehold_candidate_decision_matrix_20260626_registry_queue_closed"
   ]
 }
