@@ -419,6 +419,15 @@ def static_cost_reducer_batch_safe(card: dict[str, Any]) -> bool:
             == "sacrificed_artifact_or_creature_count_this_turn"
             and bool(effect_json.get("cost_reduction_counts_additional_sacrifices_paid_while_casting"))
         )
+    if scope == "static_self_spell_cost_reduction_variant_v1":
+        return (
+            applies_to == "this_spell"
+            and types in ({"CREATURE"}, {"ARTIFACT"}, {"CREATURE", "ARTIFACT"})
+            and effect_json.get("cost_reduction_amount_source")
+            == "instant_sorcery_cards_in_your_graveyard_count"
+            and effect_json.get("graveyard_count_card_types") == ["instant", "sorcery"]
+            and int(effect_json.get("cost_reduction_generic") or 0) == 1
+        )
     if scope not in {
         "static_cost_reduction_for_matching_spells_v1",
         "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
@@ -2626,6 +2635,31 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("enters_with_x_plus_one_counters"))
             and int(effect_json.get("activated_generic_four_add_plus_one_counter") or 0) == 1
             and int(effect_json.get("activated_remove_plus_one_counter_damage_any_target") or 0) == 1
+        )
+
+    if effect == "creature" and scope == "front_creature_prowess_etb_discard_hand_draw_three_self_instant_sorcery_graveyard_cost_reduction_v1":
+        return (
+            types == {"CREATURE"}
+            and {
+                "DiscardHandControllerEffect",
+                "DrawCardSourceControllerEffect",
+                "SpellCostReductionForEachSourceEffect",
+            }.issubset(effect_classes)
+            and {
+                "EntersBattlefieldTriggeredAbility",
+                "ProwessAbility",
+                "SimpleStaticAbility",
+            }.issubset(ability_classes)
+            and bool(effect_json.get("is_creature_permanent"))
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 4
+            and effect_json.get("keywords") == ["prowess"]
+            and int(effect_json.get("etb_discard_hand_then_draw_count") or 0) == 3
+            and effect_json.get("cost_reduction_applies_to") == "this_spell"
+            and int(effect_json.get("cost_reduction_generic") or 0) == 1
+            and effect_json.get("cost_reduction_amount_source")
+            == "instant_sorcery_cards_in_your_graveyard_count"
+            and effect_json.get("graveyard_count_card_types") == ["instant", "sorcery"]
         )
 
     if effect == "draw_cards" and scope == "draw_one_and_source_controller_spells_gain_flash_until_eot_v1":

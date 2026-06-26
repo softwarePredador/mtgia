@@ -1131,6 +1131,32 @@ def _static_cost_reduction_amount_source(effect_data):
     return ""
 
 
+def _battlefield_creature_count_for_cost_reduction(controller):
+    if controller is None:
+        return 0
+    count = 0
+    participants = [controller, *list(getattr(controller, "_current_opponents", []) or [])]
+    for participant in participants:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if isinstance(permanent, dict) and is_battlefield_creature(permanent):
+                count += 1
+    return count
+
+
+def _graveyard_count_for_cost_reduction(controller, effect_data):
+    if controller is None:
+        return 0
+    allowed_types = [str(value).lower() for value in _as_list(effect_data.get("graveyard_count_card_types")) if value]
+    count = 0
+    for graveyard_card in getattr(controller, "graveyard", []) or []:
+        if not isinstance(graveyard_card, dict):
+            continue
+        if allowed_types and not _card_type_matches(graveyard_card, allowed_types):
+            continue
+        count += 1
+    return count
+
+
 def _source_power_value(source):
     for key in ("current_power", "power", "base_power"):
         if key not in source:
@@ -1142,10 +1168,14 @@ def _source_power_value(source):
     return 0
 
 
-def _static_cost_reduction_amount(source, effect_data):
+def _static_cost_reduction_amount(source, effect_data, *, controller=None):
     amount_source = _static_cost_reduction_amount_source(effect_data)
     if amount_source in {"source_power", "this_power", "source_permanent_power"}:
         return _source_power_value(source)
+    if amount_source == "creature_count_on_battlefield":
+        return _battlefield_creature_count_for_cost_reduction(controller)
+    if amount_source == "instant_sorcery_cards_in_your_graveyard_count":
+        return _graveyard_count_for_cost_reduction(controller, effect_data)
     for key in (
         "cost_reduction_generic",
         "generic_cost_reduction",
@@ -1239,8 +1269,8 @@ def _source_static_cost_reduction_effect(source):
     return {}
 
 
-def _static_cost_reduction_matches_spell(source, effect_data, card):
-    amount = _static_cost_reduction_amount(source, effect_data)
+def _static_cost_reduction_matches_spell(source, effect_data, card, *, controller=None):
+    amount = _static_cost_reduction_amount(source, effect_data, controller=controller)
     if amount <= 0:
         return None
     colors = _static_cost_reduction_color_restrictions(source, effect_data)
@@ -1273,10 +1303,49 @@ def static_cost_reductions_for_spell(player, card):
         effect_data = _source_static_cost_reduction_effect(source)
         if not effect_data:
             continue
-        reduction = _static_cost_reduction_matches_spell(source, effect_data, card)
+        reduction = _static_cost_reduction_matches_spell(
+            source,
+            effect_data,
+            card,
+            controller=player,
+        )
         if reduction:
             reductions.append(reduction)
     return reductions
+
+
+UNSUPPORTED_SELF_COST_REDUCTION_AMOUNT_SOURCES = {
+    "sacrificed_artifact_or_creature_count_this_turn",
+    "creatures_tapped_as_additional_cost_while_casting",
+}
+
+
+def _card_self_cost_reduction_effect(card):
+    if not isinstance(card, dict):
+        return {}
+    direct_applies_to = str(card.get("cost_reduction_applies_to") or "").strip()
+    direct_amount_source = str(card.get("cost_reduction_amount_source") or "").strip().lower()
+    if direct_applies_to == "this_spell" and direct_amount_source not in UNSUPPORTED_SELF_COST_REDUCTION_AMOUNT_SOURCES:
+        return card
+    try:
+        effect_data = get_card_effect(card)
+    except Exception:
+        return {}
+    if not isinstance(effect_data, dict):
+        return {}
+    applies_to = str(effect_data.get("cost_reduction_applies_to") or "").strip()
+    amount_source = str(effect_data.get("cost_reduction_amount_source") or "").strip().lower()
+    if applies_to != "this_spell":
+        return {}
+    if amount_source in UNSUPPORTED_SELF_COST_REDUCTION_AMOUNT_SOURCES:
+        return {}
+    if (
+        effect_data.get("cost_reduction_generic") in (None, "", 0)
+        and not amount_source
+        and effect_data.get("cost_reduction_condition") in (None, "", False)
+    ):
+        return {}
+    return effect_data
 
 
 def apply_static_cost_reductions_to_cost(cost, reductions):
@@ -1563,6 +1632,16 @@ def card_cost_for_player_state(
         additional_costs=additional_costs,
     )
     reductions = static_cost_reductions_for_spell(player, card)
+    self_effect = _card_self_cost_reduction_effect(card)
+    if self_effect:
+        self_reduction = _static_cost_reduction_matches_spell(
+            card,
+            self_effect,
+            card,
+            controller=player,
+        )
+        if self_reduction:
+            reductions.append(self_reduction)
     return apply_static_cost_reductions_to_cost(cost, reductions)
 
 
@@ -9769,7 +9848,18 @@ def process_player_discard_triggers(
     return trigger_events
 
 
-def resolve_generic_permanent_etb(player, opponents, permanent, effect_data, turn, rng):
+def resolve_generic_permanent_etb(
+    player,
+    opponents,
+    permanent,
+    effect_data,
+    turn,
+    rng,
+    *,
+    stack=None,
+    all_players=None,
+    phase="battlefield_etb",
+):
     if effect_data.get("etb_land_ramp_count"):
         if (
             effect_data.get("etb_land_ramp_condition") == "opponent_controls_more_lands"
@@ -9801,8 +9891,62 @@ def resolve_generic_permanent_etb(player, opponents, permanent, effect_data, tur
                 opponents=opponents,
                 source_event="etb_land_ramp",
             )
+    if effect_data.get("etb_discard_hand_then_draw_count"):
+        discarded_cards = list(player.hand)
+        player.hand = []
+        discard_resolution = {
+            "to_top": [],
+            "to_graveyard": [],
+            "used_replacement": False,
+            "trigger_events": [],
+        }
+        if discarded_cards:
+            discard_resolution = resolve_effect_discard_cards(
+                player,
+                discarded_cards,
+                top_limit=0,
+                opponents=opponents,
+                turn=turn,
+                phase=phase,
+                rng=rng,
+            )
+        drawn = player.draw(int(effect_data.get("etb_discard_hand_then_draw_count") or 0), rng)
+        if all_players is not None:
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase,
+                all_players,
+                stack=stack,
+                turn_player=player,
+            )
+        emit_replay_event(
+            "etb_discard_hand_then_draw_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            discarded=len(discarded_cards),
+            discarded_to_graveyard=[
+                entry.get("name", "?")
+                for entry in discard_resolution.get("to_graveyard", [])
+            ],
+            cards_drawn=len(drawn),
+            hand_size=len(player.hand),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
     if effect_data.get("etb_draw_count"):
-        player.draw(int(effect_data.get("etb_draw_count") or 1), rng)
+        drawn = player.draw(int(effect_data.get("etb_draw_count") or 1), rng)
+        if all_players is not None:
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase,
+                all_players,
+                stack=stack,
+                turn_player=player,
+            )
     resolve_etb_library_creature_tutor(player, permanent, effect_data, turn)
     if effect_data.get("etb_tutor_target"):
         resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)
@@ -27603,7 +27747,17 @@ def apply_effect_immediate(
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "creature"
         player.battlefield.append(permanent)
-        resolve_generic_permanent_etb(player, opponents, permanent, effect_data, turn, rng)
+        resolve_generic_permanent_etb(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
+            rng,
+            stack=stack,
+            all_players=all_players_for_entry,
+            phase=phase or "resolution",
+        )
         process_controlled_creature_enters_triggers(
             player,
             opponents,
@@ -27627,7 +27781,17 @@ def apply_effect_immediate(
         permanent = enrich_card({**card, **effect_data})
         permanent = resolve_copy_permanent_etb(player, opponents, permanent, effect_data, turn)
         player.battlefield.append(permanent)
-        resolve_generic_permanent_etb(player, opponents, permanent, permanent, turn, rng)
+        resolve_generic_permanent_etb(
+            player,
+            opponents,
+            permanent,
+            permanent,
+            turn,
+            rng,
+            stack=stack,
+            all_players=all_players_for_entry,
+            phase=phase or "resolution",
+        )
         if is_battlefield_creature(permanent):
             process_controlled_creature_enters_triggers(
                 player,

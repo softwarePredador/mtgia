@@ -89,6 +89,10 @@ def static_cost_reduction_fields_from_oracle(oracle_text: str) -> dict[str, Any]
         "cost_reduction_applies_to": "spells_you_cast",
         "applies_to_controller": "source_controller",
     }
+    graveyard_instant_sorcery_count = (
+        "for each instant and sorcery card in your graveyard" in text
+        or "for each instant or sorcery card in your graveyard" in text
+    )
     if "activated abilities of creatures you control" in text:
         fields["cost_reduction_applies_to"] = "activated_abilities_of_creatures_you_control"
     elif "activated abilities of artifacts you control" in text:
@@ -108,7 +112,10 @@ def static_cost_reduction_fields_from_oracle(oracle_text: str) -> dict[str, Any]
         fields["cost_reduction_amount_source"] = "sacrificed_artifact_or_creature_count_this_turn"
     if "for each permanent sacrificed this way" in text:
         fields["cost_reduction_counts_additional_sacrifices_paid_while_casting"] = True
-    if "instant and sorcery" in text or "instant or sorcery" in text:
+    if graveyard_instant_sorcery_count:
+        fields["graveyard_count_card_types"] = ["instant", "sorcery"]
+        fields["cost_reduction_amount_source"] = "instant_sorcery_cards_in_your_graveyard_count"
+    elif "instant and sorcery" in text or "instant or sorcery" in text:
         fields["applies_to_card_types"] = ["instant", "sorcery"]
         fields["cost_reduction_applies_to"] = "instant_sorcery_spells_you_cast"
     mana_value_match = re.search(r"mana\s+value\s+(\d+)\s+or\s+greater", text)
@@ -5811,7 +5818,64 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             )
         )
 
-    if "SpellsCostReductionControllerEffect" in effect_classes or "SpellCostReductionSourceEffect" in effect_classes:
+    if (
+        xmage_class_name == "BedlamReveler"
+        and card_types == {"CREATURE"}
+        and {
+            "DiscardHandControllerEffect",
+            "DrawCardSourceControllerEffect",
+            "SpellCostReductionForEachSourceEffect",
+        }.issubset(effect_classes)
+        and {
+            "EntersBattlefieldTriggeredAbility",
+            "ProwessAbility",
+            "SimpleStaticAbility",
+        }.issubset(ability_classes)
+        and (
+            _oracle_has(rules_text, "discard your hand", "draw three cards")
+            or (
+                "discardhandcontrollereffect" in normalized_text
+                and "drawcardsourcecontrollereffect(3)" in normalized_text
+                and "cardsincontrollergraveyardcount(staticfilters.filter_card_instant_and_sorcery)" in normalized_text
+            )
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="front_creature_prowess_etb_discard_hand_draw_three_self_instant_sorcery_graveyard_cost_reduction_v1",
+                reason=(
+                    "XMage Bedlam Reveler is a creature spell with prowess, an ETB that discards your hand "
+                    "then draws three cards, and a self-only graveyard-count cost reduction."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "is_creature_permanent": True,
+                    "power": 3,
+                    "toughness": 4,
+                    "keywords": ["prowess"],
+                    "etb_discard_hand_then_draw_count": 3,
+                    "cost_reduction_applies_to": "this_spell",
+                    "cost_reduction_generic": 1,
+                    "cost_reduction_amount_source": "instant_sorcery_cards_in_your_graveyard_count",
+                    "graveyard_count_card_types": ["instant", "sorcery"],
+                },
+                matched_signals=[
+                    "SpellCostReductionForEachSourceEffect",
+                    "DiscardHandControllerEffect",
+                    "DrawCardSourceControllerEffect",
+                    "ProwessAbility",
+                    "EntersBattlefieldTriggeredAbility",
+                ],
+            )
+        )
+
+    if (
+        "SpellsCostReductionControllerEffect" in effect_classes
+        or "SpellCostReductionSourceEffect" in effect_classes
+        or "SpellCostReductionForEachSourceEffect" in effect_classes
+    ):
         cost_fields = static_cost_reduction_fields_from_oracle(rules_text)
         if oracle_supports_cost_reduction_mapping(rules_text):
             candidates.append(
@@ -7292,9 +7356,62 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                         "DamagePlayersEffect",
                         "TargetController.OPPONENT",
                         "one_shot",
-                    ],
-                )
+                ],
             )
+        )
+
+    if (
+        xmage_class_name == "BedlamReveler"
+        and card_types == {"CREATURE"}
+        and {
+            "DiscardHandControllerEffect",
+            "DrawCardSourceControllerEffect",
+            "SpellCostReductionForEachSourceEffect",
+        }.issubset(effect_classes)
+        and {
+            "EntersBattlefieldTriggeredAbility",
+            "ProwessAbility",
+            "SimpleStaticAbility",
+        }.issubset(ability_classes)
+        and (
+            _oracle_has(rules_text, "discard your hand", "draw three cards")
+            or (
+                "discardhandcontrollereffect" in normalized_text
+                and "drawcardsourcecontrollereffect(3)" in normalized_text
+                and "cardsincontrollergraveyardcount(staticfilters.filter_card_instant_and_sorcery)" in normalized_text
+            )
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="front_creature_prowess_etb_discard_hand_draw_three_self_instant_sorcery_graveyard_cost_reduction_v1",
+                reason=(
+                    "XMage Bedlam Reveler is a creature spell with prowess, an ETB that discards your hand "
+                    "then draws three cards, and a self-only graveyard-count cost reduction."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "is_creature_permanent": True,
+                    "power": 3,
+                    "toughness": 4,
+                    "keywords": ["prowess"],
+                    "etb_discard_hand_then_draw_count": 3,
+                    "cost_reduction_applies_to": "this_spell",
+                    "cost_reduction_generic": 1,
+                    "cost_reduction_amount_source": "instant_sorcery_cards_in_your_graveyard_count",
+                    "graveyard_count_card_types": ["instant", "sorcery"],
+                },
+                matched_signals=[
+                    "SpellCostReductionForEachSourceEffect",
+                    "DiscardHandControllerEffect",
+                    "DrawCardSourceControllerEffect",
+                    "ProwessAbility",
+                    "EntersBattlefieldTriggeredAbility",
+                ],
+            )
+        )
 
     if (
         "DestroyAllEffect" in effect_classes

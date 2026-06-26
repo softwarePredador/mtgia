@@ -340,6 +340,74 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         card = report["cards"][0]
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_bedlam_reveler_exact_scope_is_batch_safe_and_keeps_draw_role(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Bedlam Reveler",
+                    "severity": "high",
+                    "oracle_hash": "bedlam-reveler-hash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "BedlamReveler",
+                        "path": "/xmage/BedlamReveler.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": [
+                            "DiscardHandControllerEffect",
+                            "DrawCardSourceControllerEffect",
+                            "SpellCostReductionForEachSourceEffect",
+                        ],
+                        "ability_classes": [
+                            "EntersBattlefieldTriggeredAbility",
+                            "ProwessAbility",
+                            "SimpleStaticAbility",
+                        ],
+                        "primary_effect": {
+                            "effect": "creature",
+                            "battle_model_scope": "front_creature_prowess_etb_discard_hand_draw_three_self_instant_sorcery_graveyard_cost_reduction_v1",
+                            "is_creature_permanent": True,
+                            "power": 3,
+                            "toughness": 4,
+                            "keywords": ["prowess"],
+                            "etb_discard_hand_then_draw_count": 3,
+                            "cost_reduction_applies_to": "this_spell",
+                            "cost_reduction_generic": 1,
+                            "cost_reduction_amount_source": "instant_sorcery_cards_in_your_graveyard_count",
+                            "graveyard_count_card_types": ["instant", "sorcery"],
+                        },
+                    },
+                }
+            ]
+        }
+        external_harvest = {
+            "cards": [
+                {
+                    "card_name": "Bedlam Reveler",
+                    "candidate_rule": {"oracle_hash": "bedlam-reveler-hash"},
+                    "external_references": {"scryfall": {"mana_cost": "{6}{R}{R}"}},
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "creature")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        generator_report = generator.build_generator_report(
+            batch_audit=batch_audit,
+            external_harvest=external_harvest,
+        )
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["effect_json"]["cmc"], 8.0)
+        self.assertEqual(proposal["deck_role_json"]["category"], "draw")
+        self.assertEqual(proposal["deck_role_json"]["subtype"], "etb_refill_creature")
+
     def test_classifier_marks_single_treasure_creation_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

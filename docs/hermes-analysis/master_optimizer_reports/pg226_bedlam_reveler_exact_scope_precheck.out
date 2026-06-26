@@ -1,0 +1,5 @@
+   card_name    | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+----------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Bedlam Reveler | bedlam reveler  | 25edf0dbac766bdc2506f4b317a1897a | battle_rule_v1:ba88301358f5ac10a8fc9ef41e4dd9b3 | deprecate_nonmatching_rows |                1 | b7afef1b-5edc-4bf7-8ab6-3a4ee874bb3a |                  0 |                         0 |                           0
+(1 row)
+

@@ -2512,6 +2512,32 @@
     "battle_rule_logical_key": "battle_rule_v1:24839f966a77da6656c462aa885ccaa4",
     "battle_rule_oracle_hash": "77dcf646b59f535df941f6716b802b26"
   },
+  "Bedlam Reveler": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "front_creature_prowess_etb_discard_hand_draw_three_self_instant_sorcery_graveyard_cost_reduction_v1",
+    "cost_reduction_amount_source": "instant_sorcery_cards_in_your_graveyard_count",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_generic": 1,
+    "effect": "creature",
+    "etb_discard_hand_then_draw_count": 3,
+    "graveyard_count_card_types": [
+      "instant",
+      "sorcery"
+    ],
+    "is_creature_permanent": true,
+    "keywords": [
+      "prowess"
+    ],
+    "power": 3,
+    "toughness": 4,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ba88301358f5ac10a8fc9ef41e4dd9b3",
+    "battle_rule_oracle_hash": "25edf0dbac766bdc2506f4b317a1897a"
+  },
   "Beledros Witherbloom": {
     "cmc": 7.0,
     "effect": "token_maker",
@@ -10035,15 +10061,24 @@
     "battle_rule_logical_key": "battle_rule_v1:d0505af096c10168b5ee4c6e65d71ef2"
   },
   "Explosive Singularity": {
-    "cmc": 10.0,
-    "effect": "remove_creature",
-    "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:fe6783e75b3c89afb6a2d38e4d7f235c"
+    "ability_kind": "static",
+    "additional_cost_kind": "tap_any_number_untapped_creatures_you_control",
+    "battle_model_scope": "damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1",
+    "cost_reduction_amount_source": "creatures_tapped_as_additional_cost_while_casting",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_counts_additional_tapped_creatures_while_casting": true,
+    "cost_reduction_generic": 1,
+    "damage": 10,
+    "effect": "direct_damage",
+    "sorcery": true,
+    "target": "any_target",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:813fc8a713c1192ba10ae28c10787c4d",
+    "battle_rule_oracle_hash": "eff16cee5692c4b5c8943bb59cf2797a"
   },
   "Explosive Vegetation": {
     "basic_only": true,
@@ -21332,6 +21367,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8c4254f4ede36de391215cbb6e8296ca"
   },
+  "Open the Vaults": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "return_all_artifact_enchantment_cards_from_all_graveyards_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "recursion",
+    "return_all_matching": true,
+    "target": "artifact_or_enchantment",
+    "target_card_types": [
+      "artifact",
+      "enchantment"
+    ],
+    "target_controller": "each_player",
+    "target_zone": "graveyard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0c28c8ded1b243187c890e17a32c8ad7",
+    "battle_rule_oracle_hash": "2118b1e4c7600ddb3a7618ec0c9f0360"
+  },
   "Open the Way": {
     "cmc": 2.0,
     "count": 1,
@@ -25097,6 +25153,26 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Roar of Reclamation": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "return_all_artifact_cards_from_all_graveyards_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "recursion",
+    "return_all_matching": true,
+    "target": "artifact",
+    "target_card_types": [
+      "artifact"
+    ],
+    "target_controller": "each_player",
+    "target_zone": "graveyard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d2c83402a1fd7d5f173eb05a961cd60",
+    "battle_rule_oracle_hash": "2e078839d4bcdefe154c53760bbb0538"
+  },
   "Robe of Stars": {
     "cmc": 2.0,
     "effect": "phase_out",
@@ -28854,17 +28930,20 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Star of Extinction": {
-    "cmc": 7.0,
-    "effect": "damage_wipe",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1",
     "damage": 20,
     "damage_scope": "each_creature",
-    "battle_model_scope": "oracle_damage_each_creature_wipe_v1",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e76c42fa1563b790dc293f77850b7451"
+    "effect": "damage_wipe",
+    "sorcery": true,
+    "target": "land",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1a6f24c0c115fe7ac9e259455d1a1939",
+    "battle_rule_oracle_hash": "1300b46737b3dfe534aa1559e70ce5b1"
   },
   "Starfall Invocation": {
     "battle_model_scope": "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1",
@@ -28895,6 +28974,23 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:0366bf085185ab68e66e6e0969dd2406"
+  },
+  "Starfield Shepherd": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "starfield_shepherd_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_v1",
+    "effect": "creature",
+    "etb_tutor_status": "runtime_library_to_hand",
+    "etb_tutor_target": "basic_plains_or_creature_mana_value_1_or_less",
+    "oracle_runtime_scope": "creature_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_runtime",
+    "power": 3,
+    "toughness": 2,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4760bd3415de5c479f4364edd883673b",
+    "battle_rule_oracle_hash": "335dcd62397351353cde2d3cba372fbd"
   },
   "Starlit Sanctum": {
     "effect": "land",
@@ -33020,6 +33116,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e90b582e4b128b4c890db8959fb6005c"
   },
+  "Triumphant Reckoning": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "return_all_artifact_enchantment_planeswalker_cards_from_graveyard_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "recursion",
+    "return_all_matching": true,
+    "target": "artifact_or_enchantment_or_planeswalker",
+    "target_card_types": [
+      "artifact",
+      "enchantment",
+      "planeswalker"
+    ],
+    "target_controller": "self",
+    "target_zone": "graveyard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a041903482312814b1df912c2e6a0cec",
+    "battle_rule_oracle_hash": "66d0e6e6a1dccdc630de50c766593daf"
+  },
   "Trophy Mage": {
     "ability_kind": "triggered",
     "battle_model_scope": "trophy_mage_etb_artifact_mana_value_3_to_hand_v1",
@@ -34217,24 +34335,43 @@
     "battle_rule_oracle_hash": "7418e11fcf0c0158d2b754402dfaac8e"
   },
   "Vandalblast": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1",
     "effect": "remove_permanent",
+    "overload_cost": "{4}{R}",
+    "overload_status": "annotation_only",
+    "overload_target_rewrite": "target_to_each",
+    "sorcery": true,
     "target": "artifact",
+    "target_controller": "opponent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6cf8b54c3f65dc255617fab33e9dbfc3"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7085aab6f752b38276f8e6fc66a7ab50",
+    "battle_rule_oracle_hash": "5ed4ff6fca64fd85279959ae050fdb61"
   },
   "Vanquish the Horde": {
-    "cmc": 8.0,
+    "ability_kind": "static",
+    "battle_model_scope": "destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1",
+    "cost_reduction_amount_source": "creature_count_on_battlefield",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_generic": 1,
+    "destination": "graveyard",
+    "destroy_all_creatures": true,
+    "destroy_card_types": [
+      "creature"
+    ],
     "effect": "board_wipe",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f7544cbd53f0e83560b5568aa5115943"
+    "sorcery": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0c8719c2eedfebdb2aff53648767e51c",
+    "battle_rule_oracle_hash": "5d0174e9aa5e37beb24107a9b5672204"
   },
   "Vanquisher's Banner": {
     "cmc": 5.0,

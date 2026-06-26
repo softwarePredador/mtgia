@@ -121,6 +121,71 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             primary["cost_reduction_counts_additional_sacrifices_paid_while_casting"]
         )
 
+    def test_tolarian_terror_keeps_self_scope_for_graveyard_instant_sorcery_cost_reduction(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TolarianTerror",
+                "effect_classes": ["SpellCostReductionForEachSourceEffect"],
+                "ability_classes": ["SimpleStaticAbility", "WardAbility"],
+                "dynamic_value_classes": ["CardsInControllerGraveyardCount"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            "This spell costs {1} less to cast for each instant and sorcery card in your graveyard. Ward {2}.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "static_cost_reduction")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "static_self_spell_cost_reduction_variant_v1",
+        )
+        self.assertEqual(primary["cost_reduction_applies_to"], "this_spell")
+        self.assertEqual(
+            primary["cost_reduction_amount_source"],
+            "instant_sorcery_cards_in_your_graveyard_count",
+        )
+        self.assertEqual(primary["graveyard_count_card_types"], ["instant", "sorcery"])
+
+    def test_bedlam_reveler_maps_to_exact_creature_scope_with_etb_and_graveyard_cost_reduction(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BedlamReveler",
+                "effect_classes": [
+                    "DiscardHandControllerEffect",
+                    "DrawCardSourceControllerEffect",
+                    "SpellCostReductionForEachSourceEffect",
+                ],
+                "ability_classes": [
+                    "EntersBattlefieldTriggeredAbility",
+                    "ProwessAbility",
+                    "SimpleStaticAbility",
+                ],
+                "dynamic_value_classes": ["CardsInControllerGraveyardCount"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            "This spell costs {1} less to cast for each instant and sorcery card in your graveyard. Prowess. When Bedlam Reveler enters the battlefield, discard your hand, then draw three cards.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "front_creature_prowess_etb_discard_hand_draw_three_self_instant_sorcery_graveyard_cost_reduction_v1",
+        )
+        self.assertTrue(primary["is_creature_permanent"])
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertEqual(primary["keywords"], ["prowess"])
+        self.assertEqual(primary["etb_discard_hand_then_draw_count"], 3)
+        self.assertEqual(primary["cost_reduction_applies_to"], "this_spell")
+        self.assertEqual(primary["cost_reduction_generic"], 1)
+        self.assertEqual(
+            primary["cost_reduction_amount_source"],
+            "instant_sorcery_cards_in_your_graveyard_count",
+        )
+
     def test_vanquish_the_horde_maps_to_exact_cost_reduced_board_wipe_scope(self) -> None:
         result = hints.build_effect_hints(
             {

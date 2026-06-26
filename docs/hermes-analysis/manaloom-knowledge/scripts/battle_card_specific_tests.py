@@ -4916,6 +4916,36 @@ def register_tests(battle, player):
         assert plan is not None
         assert plan["x_value"] == 3
 
+    def test_runtime_cast_plan_supports_self_graveyard_count_cost_reduction_creature():
+        active = player("Active")
+        active.graveyard = [
+            {"name": "Opt", "type_line": "Instant", "cmc": 1},
+            {"name": "Shock", "type_line": "Instant", "cmc": 1},
+            {"name": "Faithless Looting", "type_line": "Sorcery", "cmc": 1},
+        ]
+        active.mana_pool.red = 2
+        active.mana_pool.generic = 3
+        card = {
+            "name": "Bedlam Reveler",
+            "mana_cost": "{6}{R}{R}",
+            "cmc": 8,
+            "type_line": "Creature — Devil Horror",
+            "cost_reduction_applies_to": "this_spell",
+            "cost_reduction_generic": 1,
+            "cost_reduction_amount_source": "instant_sorcery_cards_in_your_graveyard_count",
+            "graveyard_count_card_types": ["instant", "sorcery"],
+        }
+        effect_data = {
+            "effect": "creature",
+            "battle_model_scope": "front_creature_prowess_etb_discard_hand_draw_three_self_instant_sorcery_graveyard_cost_reduction_v1",
+        }
+
+        plan = battle.runtime_cast_plan_for_card(active, card, effect_data)
+
+        assert plan is not None
+        assert plan["locked_cost"]["generic"] == 3
+        assert plan["locked_cost"]["colored"]["red"] == 2
+
     def test_chord_of_calling_x_scope_tutors_only_within_x_limit():
         active = player("Active")
         active.library = [
@@ -14257,6 +14287,69 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg226_bedlam_reveler_etb_discards_hand_and_draws_three():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            keep_a = {"name": "Keep A", "type_line": "Sorcery", "cmc": 2}
+            keep_b = {"name": "Keep B", "type_line": "Instant", "cmc": 1}
+            keep_c = {"name": "Keep C", "type_line": "Artifact", "cmc": 3}
+            active.hand = [keep_a, keep_b, keep_c]
+            active.library = [
+                {"name": "Draw A", "type_line": "Sorcery", "cmc": 1},
+                {"name": "Draw B", "type_line": "Instant", "cmc": 2},
+                {"name": "Draw C", "type_line": "Creature", "cmc": 3},
+                {"name": "Unused Draw", "type_line": "Land", "cmc": 0},
+            ]
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {
+                    "name": "Bedlam Reveler",
+                    "type_line": "Creature — Devil Horror",
+                    "cmc": 8,
+                    "mana_cost": "{6}{R}{R}",
+                },
+                turn=6,
+                rng=random.Random(226),
+                effect_data_override={
+                    "effect": "creature",
+                    "is_creature_permanent": True,
+                    "power": 3,
+                    "toughness": 4,
+                    "keywords": ["prowess"],
+                    "etb_discard_hand_then_draw_count": 3,
+                    "cost_reduction_applies_to": "this_spell",
+                    "cost_reduction_generic": 1,
+                    "cost_reduction_amount_source": "instant_sorcery_cards_in_your_graveyard_count",
+                    "graveyard_count_card_types": ["instant", "sorcery"],
+                    "battle_model_scope": "front_creature_prowess_etb_discard_hand_draw_three_self_instant_sorcery_graveyard_cost_reduction_v1",
+                    "_rule_logical_key": "battle_rule_v1:bedlam-reveler-test",
+                    "_rule_oracle_hash": "bedlam-reveler-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(
+            permanent.get("name") == "Bedlam Reveler"
+            and permanent.get("effect") == "creature"
+            and "prowess" in permanent.get("keywords", [])
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+        )
+        assert [card.get("name") for card in active.hand] == ["Draw A", "Draw B", "Draw C"]
+        assert keep_a in active.graveyard and keep_b in active.graveyard and keep_c in active.graveyard
+        assert any(
+            event == "etb_discard_hand_then_draw_resolved"
+            and data.get("card") == "Bedlam Reveler"
+            and data.get("discarded") == 3
+            and data.get("cards_drawn") == 3
+            and data.get("rule_logical_key") == "battle_rule_v1:bedlam-reveler-test"
+            for event, data in events
+        )
+
     def test_pg150_insidious_roots_creature_recursion_creates_buffed_plant_and_unlocks_token_mana():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -17281,6 +17374,7 @@ def register_tests(battle, player):
         test_magus_of_the_candelabra_skips_when_summoning_sick,
         test_oboro_breezecaller_returns_land_to_hand_for_contextual_unlock,
         test_runtime_cast_plan_chooses_highest_affordable_x_for_battlefield_tutor,
+        test_runtime_cast_plan_supports_self_graveyard_count_cost_reduction_creature,
         test_chord_of_calling_x_scope_tutors_only_within_x_limit,
         test_green_suns_zenith_x_scope_shuffles_self_after_tutor,
         test_whir_of_invention_x_scope_tutors_artifact_within_x_limit,
@@ -17373,6 +17467,7 @@ def register_tests(battle, player):
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,
+        test_pg226_bedlam_reveler_etb_discards_hand_and_draws_three,
         test_pg150_insidious_roots_creature_recursion_creates_buffed_plant_and_unlocks_token_mana,
         test_pg150_insidious_roots_ignores_noncreature_flashback_from_graveyard,
         test_pg152_bartolome_normalizes_to_exact_scope,

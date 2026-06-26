@@ -184,6 +184,12 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
         role.setdefault("effect", effect)
     effect_json = dict(card.get("effect_json") or {})
     if effect == "creature" and (
+        int(effect_json.get("etb_draw_count") or 0) > 0
+        or int(effect_json.get("etb_discard_hand_then_draw_count") or 0) > 0
+    ):
+        role["category"] = "draw"
+        role["subtype"] = "etb_refill_creature"
+    if effect == "creature" and (
         effect_json.get("is_mana_source")
         or effect_json.get("mana_produced_from_colors_among_permanents")
         or effect_json.get("mana_produced_from_controlled_creatures")
