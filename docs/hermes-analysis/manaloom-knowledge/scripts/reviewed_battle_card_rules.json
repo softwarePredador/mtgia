@@ -2656,6 +2656,30 @@
     "oracle_hash": "c37cd579d8132efac0c2118608f6f001",
     "notes": "PG-043 mirror of PostgreSQL source rule: each player discards their hand, then draws seven cards. Runtime uses the multiplayer wheel executor and records opponent refill/payoff context instead of treating this as controller-only draw seven."
   },
+  "Molecule Man": {
+    "effect_json": {
+      "ability_kind": "static",
+      "battle_model_scope": "nonland_hand_miracle_zero_static_v1",
+      "effect": "passive",
+      "grants_miracle_card_scope": "nonland",
+      "grants_miracle_cost": 0,
+      "grants_miracle_nonland": true,
+      "is_creature_permanent": true,
+      "oracle_runtime_scope": "nonland_cards_in_controller_hand_have_miracle_zero"
+    },
+    "deck_role_json": {
+      "category": "topdeck_miracle_setup",
+      "commander_fit": "core_ceiling_piece",
+      "strategy_role": "miracle_zero_engine"
+    },
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "oracle_hash": "35e82bd52776c455745138b048ccc116",
+    "logical_rule_key": "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
+    "notes": "PG-244 promotion from local runtime patch: static creature engine grants miracle cost 0 to nonland cards in controller hand. Runtime scope is constrained to the first drawn nonland card path used by the battle miracle executor."
+  },
   "Victory Chimes": {
     "effect_json": {
       "cmc": 3.0,

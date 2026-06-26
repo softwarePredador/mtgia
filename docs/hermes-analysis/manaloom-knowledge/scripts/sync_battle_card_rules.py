@@ -213,7 +213,7 @@ def cleanup_stale_reviewed_rows(
         if not card_name or not effect_json:
             continue
         normalized = battle_rule_registry.normalize_card_name(card_name)
-        allowed_by_name[normalized].add(
+        allowed_key = str(row.get("logical_rule_key") or "") or (
             battle_rule_registry.logical_rule_key(
                 {
                     "effect_json": effect_json,
@@ -221,6 +221,7 @@ def cleanup_stale_reviewed_rows(
                 }
             )
         )
+        allowed_by_name[normalized].add(allowed_key)
 
     deleted = 0
     for normalized_name, allowed_keys in allowed_by_name.items():

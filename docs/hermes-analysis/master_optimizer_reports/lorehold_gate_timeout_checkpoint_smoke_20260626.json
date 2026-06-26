@@ -1,0 +1,190 @@
+{
+  "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg243_strategy_first_v7/knowledge_candidate.db",
+  "game_checkpoint_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_gate_timeout_checkpoint_smoke_20260626_checkpoint.json",
+  "game_checkpoint_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_gate_timeout_checkpoint_smoke_20260626_checkpoint.md",
+  "game_timeout_seconds": 30.0,
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-26T18:55:13Z",
+  "matrix": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v1.json",
+  "opponent_kind": "generic",
+  "opponent_seed": 20260626,
+  "opponents": [
+    "Aggro (Krenko)"
+  ],
+  "results": [
+    {
+      "archetype": "battle-variant",
+      "avg_win_turn": 0,
+      "battle_rank": 1,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": 607,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "deck_size": 100,
+      "games": 1,
+      "lands": 34,
+      "load_deck_id": 607,
+      "losses": 1,
+      "objective": "Miracle spellslinger shell that uses topdeck setup and hand filtering to turn Lorehold's commander text into discounted spell chains.",
+      "opponents": [
+        {
+          "archetype": "aggro",
+          "avg_win_turn": 0,
+          "losses": 1,
+          "opponent": "Aggro (Krenko)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        }
+      ],
+      "primary_risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "ramp": 18,
+      "removal": 16,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": 135.635,
+      "structural_rank": 6,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability_skipped": 18,
+          "board_wipe_resolved": 1,
+          "cast_announced": 30,
+          "combat": 18,
+          "combat_result": 18,
+          "combat_step": 99,
+          "commander_cast": 4,
+          "composite_rule_component_resolved": 2,
+          "composite_rule_resolved": 1,
+          "cost_paid": 30,
+          "creature_cast": 8,
+          "damage_resolved": 1,
+          "damage_wipe_resolved": 1,
+          "draw_cards_resolved": 1,
+          "jeskas_will_resolved": 1,
+          "land_played": 17,
+          "lorehold_upkeep_rummage": 3,
+          "mana_refreshed": 30,
+          "mizzix_mastery_copy_cast": 1,
+          "mizzix_mastery_resolved": 1,
+          "phase_out_resolved": 1,
+          "player_eliminated": 1,
+          "priority_pass": 152,
+          "removal_resolved": 3,
+          "replacement_applied": 5,
+          "saga_chapter_progressed": 2,
+          "saga_chapter_resolved": 1,
+          "saga_sacrificed_by_sba": 1,
+          "self_exiled_on_resolution": 2,
+          "spell_cast": 19,
+          "spell_copy_ceased_to_exist": 1,
+          "spell_resolved": 17,
+          "trigger_put_on_stack": 5,
+          "trigger_resolved": 5,
+          "turn_end": 28,
+          "turn_start": 30
+        },
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 15,
+          "lorehold_spell_cast": 11
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 1,
+            "rate": 1.0
+          },
+          "lorehold_spell_cast": {
+            "games": 1,
+            "rate": 1.0
+          },
+          "miracle_cast": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "topdeck_manipulation_activated": {
+            "games": 0,
+            "rate": 0.0
+          }
+        },
+        "top_cards": [
+          {
+            "count": 3,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Esper Sentinel"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Fellwar Stone"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Giver of Runes"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Prismari Pianist"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Hexing Squelcher"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Jeska's Will"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Monument to Endurance"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Sensei's Divining Top"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Tempt with Bunnies"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:High Noon"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Mizzix's Mastery"
+          }
+        ]
+      },
+      "win_rate": 0.0,
+      "win_reasons": {},
+      "wins": 0
+    }
+  ],
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "ready"
+}

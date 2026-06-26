@@ -13,12 +13,13 @@ import copy
 import json
 import os
 import random
+import signal
 import sqlite3
 import traceback
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 import battle_analyst_v9 as battle
 
@@ -34,6 +35,10 @@ DEFAULT_CANDIDATE_DB = (
     / "knowledge_candidate.db"
 )
 DEFAULT_DECK_IDS = (6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616)
+
+
+class GameTimeoutError(TimeoutError):
+    """Raised when one simulated game exceeds the configured wall-clock budget."""
 
 
 def utc_now() -> str:
@@ -136,6 +141,40 @@ def load_opponents(db: Path, *, opponent_limit: int, opponent_seed: int) -> tupl
     return "generic", list(battle.OPPONENT_ARCHETYPES[:opponent_limit])
 
 
+def _raise_game_timeout(signum: int, frame: Any) -> None:
+    raise GameTimeoutError("battle game exceeded timeout")
+
+
+def simulate_game_with_timeout(
+    commander: dict[str, Any],
+    deck: list[dict[str, Any]],
+    opponents: list[dict[str, Any]],
+    rng: random.Random,
+    game_index: int,
+    *,
+    timeout_seconds: float,
+) -> tuple[str, int, str]:
+    timeout = float(timeout_seconds or 0)
+    if timeout <= 0 or not hasattr(signal, "setitimer"):
+        return battle.simulate_game_v8(commander, deck, opponents, rng, game_index)
+
+    try:
+        previous_handler = signal.getsignal(signal.SIGALRM)
+        previous_timer = signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, _raise_game_timeout)
+        signal.setitimer(signal.ITIMER_REAL, timeout)
+    except (AttributeError, ValueError):
+        return battle.simulate_game_v8(commander, deck, opponents, rng, game_index)
+
+    try:
+        return battle.simulate_game_v8(commander, deck, opponents, rng, game_index)
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
+        if previous_timer[0] > 0 or previous_timer[1] > 0:
+            signal.setitimer(signal.ITIMER_REAL, previous_timer[0], previous_timer[1])
+
+
 class GateTelemetry:
     def __init__(self) -> None:
         self.current_game = ""
@@ -200,6 +239,8 @@ def run_deck_gate(
     opponents: list[dict[str, Any]],
     games_per_opponent: int,
     simulation_seed: int,
+    game_timeout_seconds: float = 0,
+    progress_callback: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     source_db = Path(str(spec["source_db"]))
     set_battle_db(source_db)
@@ -214,6 +255,8 @@ def run_deck_gate(
     win_turns: list[int] = []
     win_reasons: Counter[str] = Counter()
     opponent_rows: list[dict[str, Any]] = []
+    total_games = games_per_opponent * len(opponents)
+    completed_games = 0
 
     previous_handler = battle.REPLAY_EVENT_HANDLER
 
@@ -232,13 +275,20 @@ def run_deck_gate(
                 battle.CURRENT_REPLAY_TURN = None
                 others = [item for item in opponents if item is not profile]
                 picked = [profile] + rng.sample(others, min(2, len(others)))
-                result, turns, reason = battle.simulate_game_v8(
-                    copy.deepcopy(commander),
-                    copy.deepcopy(deck),
-                    copy.deepcopy(picked),
-                    rng,
-                    game_index,
-                )
+                try:
+                    result, turns, reason = simulate_game_with_timeout(
+                        copy.deepcopy(commander),
+                        copy.deepcopy(deck),
+                        copy.deepcopy(picked),
+                        rng,
+                        game_index,
+                        timeout_seconds=game_timeout_seconds,
+                    )
+                except GameTimeoutError:
+                    result = "stall"
+                    turns = int(battle.CURRENT_REPLAY_TURN or 0)
+                    reason = f"game_timeout_{float(game_timeout_seconds):.1f}s"
+                    telemetry.events["game_timeout"] += 1
                 if result == "win":
                     wins += 1
                     profile_wins += 1
@@ -252,6 +302,27 @@ def run_deck_gate(
                 else:
                     stalls += 1
                     profile_stalls += 1
+                completed_games += 1
+                if progress_callback is not None:
+                    progress_callback(
+                        {
+                            "generated_at": utc_now(),
+                            "deck_key": spec["deck_key"],
+                            "deck_name": spec.get("deck_name"),
+                            "opponent": profile.get("name", "?"),
+                            "game_id": game_id,
+                            "game_index": game_index,
+                            "completed_games": completed_games,
+                            "total_games": total_games,
+                            "last_result": result,
+                            "last_turns": int(turns or 0),
+                            "last_reason": str(reason),
+                            "wins": wins,
+                            "losses": losses,
+                            "stalls": stalls,
+                            "game_timeout_seconds": float(game_timeout_seconds or 0),
+                        }
+                    )
             opponent_rows.append(
                 {
                     "opponent": profile.get("name", "?"),
@@ -269,7 +340,6 @@ def run_deck_gate(
     finally:
         battle.REPLAY_EVENT_HANDLER = previous_handler
 
-    total_games = games_per_opponent * len(opponents)
     lands = sum(1 for card in deck if battle.card_has_functional_tag(card, "land") or "Land" in card.get("type_line", ""))
     ramp = sum(1 for card in deck if battle.card_has_functional_tag(card, "ramp", "ritual"))
     removal = sum(1 for card in deck if battle.card_has_functional_tag(card, "removal", "board_wipe"))
@@ -329,6 +399,8 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- opponent_kind: `{report['opponent_kind']}`",
         f"- opponent_seed: `{report['opponent_seed']}`",
         f"- simulation_seed: `{report['simulation_seed']}`",
+        f"- game_timeout_seconds: `{report.get('game_timeout_seconds', 0)}`",
+        f"- game_checkpoint_json: `{report.get('game_checkpoint_json')}`",
         f"- opponents: `{', '.join(report.get('opponents') or [])}`",
         "- postgres_writes: `false`",
         "- source_db_mutated: `false`",
@@ -400,7 +472,59 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def render_checkpoint_markdown(payload: Mapping[str, Any]) -> str:
+    latest = payload.get("latest") or {}
+    lines = [
+        "# Lorehold Battle Gate Game Checkpoint",
+        "",
+        f"- generated_at: `{payload.get('generated_at')}`",
+        f"- status: `{payload.get('status')}`",
+        f"- stem: `{payload.get('stem')}`",
+        f"- completed_games: `{payload.get('completed_games')}`",
+        f"- total_games: `{payload.get('total_games')}`",
+        f"- game_timeout_seconds: `{payload.get('game_timeout_seconds')}`",
+        "",
+        "## Latest Game",
+        "",
+        f"- deck: `{latest.get('deck_key')}`",
+        f"- opponent: `{latest.get('opponent')}`",
+        f"- result: `{latest.get('last_result')}`",
+        f"- turns: `{latest.get('last_turns')}`",
+        f"- reason: `{latest.get('last_reason')}`",
+        "",
+        "## Recent Events",
+        "",
+        "| Completed | Deck | Opponent | Result | Turns | Reason |",
+        "| ---: | --- | --- | --- | ---: | --- |",
+    ]
+    for event in payload.get("events") or []:
+        lines.append(
+            f"| {event.get('completed_games')} | `{event.get('deck_key')}` | "
+            f"{event.get('opponent')} | {event.get('last_result')} | "
+            f"{event.get('last_turns')} | {event.get('last_reason')} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def write_game_checkpoint(
+    payload: Mapping[str, Any],
+    stem: str,
+    *,
+    report_dir: Path = REPORT_DIR,
+) -> tuple[Path, Path]:
+    report_dir.mkdir(parents=True, exist_ok=True)
+    json_path = report_dir / f"{stem}.json"
+    md_path = report_dir / f"{stem}.md"
+    json_path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    md_path.write_text(render_checkpoint_markdown(payload), encoding="utf-8")
+    return json_path, md_path
+
+
 def write_report(report: Mapping[str, Any], stem: str) -> tuple[Path, Path]:
+    REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{stem}.json"
     md_path = REPORT_DIR / f"{stem}.md"
     json_path.write_text(json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
@@ -422,6 +546,10 @@ def main() -> int:
     parser.add_argument("--opponent-limit", type=int, default=3)
     parser.add_argument("--opponent-seed", type=int, default=20260626)
     parser.add_argument("--simulation-seed", type=int, default=42)
+    parser.add_argument("--game-timeout-seconds", type=float, default=0.0)
+    parser.add_argument("--checkpoint-stem", default=None)
+    parser.add_argument("--checkpoint-history-limit", type=int, default=200)
+    parser.add_argument("--no-game-checkpoint", action="store_true")
     parser.add_argument("--stem", default="lorehold_variant_battle_gate_20260626_v1")
     args = parser.parse_args()
 
@@ -444,6 +572,35 @@ def main() -> int:
 
     results: list[dict[str, Any]] = []
     partial_stem = f"{args.stem}_partial"
+    checkpoint_stem = args.checkpoint_stem or f"{args.stem}_game_checkpoint"
+    checkpoint_events: list[dict[str, Any]] = []
+    checkpoint_json = REPORT_DIR / f"{checkpoint_stem}.json"
+    checkpoint_md = REPORT_DIR / f"{checkpoint_stem}.md"
+
+    def progress_callback(event: dict[str, Any]) -> None:
+        if args.no_game_checkpoint:
+            return
+        checkpoint_events.append(dict(event))
+        recent_events = checkpoint_events[-max(1, int(args.checkpoint_history_limit)) :]
+        latest = recent_events[-1] if recent_events else {}
+        payload = {
+            "generated_at": utc_now(),
+            "status": "running",
+            "stem": checkpoint_stem,
+            "source_db": str(args.db),
+            "matrix": str(args.matrix),
+            "games_per_opponent": max(1, args.games),
+            "opponent_kind": opponent_kind,
+            "opponent_seed": args.opponent_seed,
+            "simulation_seed": args.simulation_seed,
+            "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+            "completed_games": latest.get("completed_games", 0),
+            "total_games": latest.get("total_games", 0),
+            "latest": latest,
+            "events": recent_events,
+        }
+        write_game_checkpoint(payload, checkpoint_stem)
+
     for spec in specs:
         print(f"running {spec['deck_key']} games={args.games} opponents={len(opponents)}", flush=True)
         try:
@@ -452,6 +609,8 @@ def main() -> int:
                 opponents=opponents,
                 games_per_opponent=max(1, args.games),
                 simulation_seed=args.simulation_seed,
+                game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
+                progress_callback=progress_callback,
             )
         except Exception as exc:
             result = {
@@ -478,6 +637,9 @@ def main() -> int:
             "opponent_kind": opponent_kind,
             "opponent_seed": args.opponent_seed,
             "simulation_seed": args.simulation_seed,
+            "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+            "game_checkpoint_json": None if args.no_game_checkpoint else str(checkpoint_json),
+            "game_checkpoint_markdown": None if args.no_game_checkpoint else str(checkpoint_md),
             "opponents": [opponent.get("name", "?") for opponent in opponents],
             "results": merge_structural_context(results, matrix_scores),
         }
@@ -493,10 +655,36 @@ def main() -> int:
         "opponent_kind": opponent_kind,
         "opponent_seed": args.opponent_seed,
         "simulation_seed": args.simulation_seed,
+        "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+        "game_checkpoint_json": None if args.no_game_checkpoint else str(checkpoint_json),
+        "game_checkpoint_markdown": None if args.no_game_checkpoint else str(checkpoint_md),
         "opponents": [opponent.get("name", "?") for opponent in opponents],
         "results": merge_structural_context(results, matrix_scores),
     }
     json_path, md_path = write_report(report, args.stem)
+    if not args.no_game_checkpoint:
+        recent_events = checkpoint_events[-max(1, int(args.checkpoint_history_limit)) :]
+        write_game_checkpoint(
+            {
+                "generated_at": utc_now(),
+                "status": "ready",
+                "stem": checkpoint_stem,
+                "source_db": str(args.db),
+                "matrix": str(args.matrix),
+                "games_per_opponent": max(1, args.games),
+                "opponent_kind": opponent_kind,
+                "opponent_seed": args.opponent_seed,
+                "simulation_seed": args.simulation_seed,
+                "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+                "completed_games": (recent_events[-1].get("completed_games", 0) if recent_events else 0),
+                "total_games": (recent_events[-1].get("total_games", 0) if recent_events else 0),
+                "latest": recent_events[-1] if recent_events else {},
+                "events": recent_events,
+                "report_json": str(json_path),
+                "report_markdown": str(md_path),
+            },
+            checkpoint_stem,
+        )
     print(json.dumps({"status": "ready", "json": str(json_path), "markdown": str(md_path)}, indent=2))
     return 0
 

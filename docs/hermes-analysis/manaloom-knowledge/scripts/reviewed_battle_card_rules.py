@@ -57,6 +57,8 @@ def load_reviewed_rule_rows(
                 "card_name": card_name.strip(),
                 "effect_json": effect_json,
                 "deck_role_json": _as_dict(rule_payload.get("deck_role_json")) or None,
+                "logical_rule_key": rule_payload.get("logical_rule_key")
+                or payload_dict.get("logical_rule_key"),
                 "source": str(rule_payload.get("source") or payload_dict.get("source") or "curated"),
                 "confidence": float(
                     rule_payload.get("confidence")

@@ -44,9 +44,11 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
                     source=row["source"],
                     confidence=row["confidence"],
                     review_status=row["review_status"],
+                    execution_status=row.get("execution_status", "auto"),
                     deck_role_json=row.get("deck_role_json"),
                     notes=row.get("notes", ""),
                     oracle_hash=row.get("oracle_hash"),
+                    logical_rule_key_value=row.get("logical_rule_key"),
                 )
             conn.commit()
 
@@ -184,6 +186,17 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(
             by_name["Aetherflux Reservoir"]["effect_json"]["battle_model_scope"],
             "spell_cast_lifegain_pay_50_damage_annotation_v1",
+        )
+        self.assertEqual(by_name["Molecule Man"]["source"], "curated")
+        self.assertEqual(by_name["Molecule Man"]["review_status"], "verified")
+        self.assertEqual(by_name["Molecule Man"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Molecule Man"]["logical_rule_key"],
+            "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
+        )
+        self.assertEqual(
+            by_name["Molecule Man"]["effect_json"]["battle_model_scope"],
+            "nonland_hand_miracle_zero_static_v1",
         )
         self.assertIn("Ashnod's Altar", by_name)
         self.assertIn("Akroma's Will", by_name)

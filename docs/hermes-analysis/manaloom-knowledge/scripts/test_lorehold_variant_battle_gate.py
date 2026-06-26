@@ -1,4 +1,6 @@
 import unittest
+from tempfile import TemporaryDirectory
+from pathlib import Path
 
 import lorehold_variant_battle_gate as gate
 
@@ -36,6 +38,43 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(by_key["candidate_v7"]["battle_rank"], 1)
         self.assertEqual(by_key["candidate_v7"]["structural_rank"], 1)
         self.assertEqual(by_key["deck_6"]["battle_rank"], 2)
+
+    def test_write_game_checkpoint_persists_latest_progress(self):
+        with TemporaryDirectory() as tmpdir:
+            payload = {
+                "generated_at": "2026-06-26T00:00:00Z",
+                "status": "running",
+                "stem": "checkpoint_test",
+                "completed_games": 1,
+                "total_games": 3,
+                "game_timeout_seconds": 30.0,
+                "latest": {
+                    "deck_key": "deck_607",
+                    "opponent": "Winota",
+                    "last_result": "stall",
+                    "last_turns": 8,
+                    "last_reason": "game_timeout_30.0s",
+                },
+                "events": [
+                    {
+                        "completed_games": 1,
+                        "deck_key": "deck_607",
+                        "opponent": "Winota",
+                        "last_result": "stall",
+                        "last_turns": 8,
+                        "last_reason": "game_timeout_30.0s",
+                    }
+                ],
+            }
+            json_path, md_path = gate.write_game_checkpoint(
+                payload,
+                "checkpoint_test",
+                report_dir=Path(tmpdir),
+            )
+
+            self.assertTrue(json_path.exists())
+            self.assertTrue(md_path.exists())
+            self.assertIn("game_timeout_30.0s", md_path.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
