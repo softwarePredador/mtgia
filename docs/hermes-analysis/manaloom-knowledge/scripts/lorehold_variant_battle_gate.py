@@ -1,0 +1,505 @@
+#!/usr/bin/env python3
+"""Run an equal battle gate for registered Lorehold decks.
+
+The gate compares deck 6, Lorehold variants, and the strategy-first candidate
+with the same opponent sample and simulation seed. It is read-only: no
+PostgreSQL writes, no source SQLite mutation, and no deck swaps.
+"""
+
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+import os
+import random
+import sqlite3
+import traceback
+from collections import Counter
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Mapping
+
+import battle_analyst_v9 as battle
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[3]
+REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
+DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_MATRIX = REPORT_DIR / "lorehold_variant_strategy_matrix_20260626_v1.json"
+DEFAULT_CANDIDATE_DB = (
+    REPORT_DIR
+    / "lorehold_generated_candidate_20260626_pg243_strategy_first_v7"
+    / "knowledge_candidate.db"
+)
+DEFAULT_DECK_IDS = (6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616)
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def parse_deck_ids(raw: str | None) -> list[int]:
+    if not raw:
+        return list(DEFAULT_DECK_IDS)
+    return [int(part.strip()) for part in raw.split(",") if part.strip()]
+
+
+def set_battle_db(path: Path) -> None:
+    os.environ["MANALOOM_KNOWLEDGE_DB"] = str(path)
+    battle.DB = str(path)
+
+
+def load_deck_metadata(db: Path, deck_ids: list[int]) -> dict[str, dict[str, Any]]:
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row
+    placeholders = ",".join("?" for _ in deck_ids)
+    rows = conn.execute(
+        f"""
+        SELECT id, deck_name, archetype, total_cards, notes
+        FROM decks
+        WHERE id IN ({placeholders})
+        ORDER BY id
+        """,
+        tuple(deck_ids),
+    ).fetchall()
+    conn.close()
+    return {
+        f"deck_{row['id']}": {
+            "deck_key": f"deck_{row['id']}",
+            "deck_id": int(row["id"]),
+            "deck_name": row["deck_name"] or f"Deck {row['id']}",
+            "archetype": row["archetype"] or "unknown",
+            "source_db": str(db),
+        }
+        for row in rows
+    }
+
+
+def load_matrix_scores(path: Path) -> dict[str, dict[str, Any]]:
+    if not path.exists():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    ranked = {key: idx + 1 for idx, key in enumerate(payload.get("ranked_deck_keys") or [])}
+    result: dict[str, dict[str, Any]] = {}
+    for deck in payload.get("decks") or []:
+        key = deck.get("deck_key")
+        if not key:
+            continue
+        result[str(key)] = {
+            "structural_rank": ranked.get(key),
+            "strategy_score": deck.get("strategy_score"),
+            "objective": deck.get("objective"),
+            "primary_risks": deck.get("primary_risks") or [],
+        }
+    return result
+
+
+def deck_specs(
+    *,
+    db: Path,
+    deck_ids: list[int],
+    candidate_db: Path | None,
+    include_candidate: bool,
+    candidate_key: str = "candidate_v7",
+    candidate_name: str = "Lorehold strategy-first candidate v7",
+    candidate_archetype: str = "strategy-first-candidate",
+) -> list[dict[str, Any]]:
+    metadata = load_deck_metadata(db, deck_ids)
+    specs = []
+    for deck_id in deck_ids:
+        key = f"deck_{deck_id}"
+        if key in metadata:
+            specs.append({**metadata[key], "load_deck_id": deck_id})
+    if include_candidate and candidate_db and candidate_db.exists():
+        specs.append(
+            {
+                "deck_key": candidate_key,
+                "deck_id": None,
+                "load_deck_id": 6,
+                "deck_name": candidate_name,
+                "archetype": candidate_archetype,
+                "source_db": str(candidate_db),
+            }
+        )
+    return specs
+
+
+def load_opponents(db: Path, *, opponent_limit: int, opponent_seed: int) -> tuple[str, list[dict[str, Any]]]:
+    set_battle_db(db)
+    os.environ["MANALOOM_BATTLE_REAL_OPPONENT_LIMIT"] = str(opponent_limit)
+    os.environ["MANALOOM_BATTLE_REAL_OPPONENT_SEED"] = str(opponent_seed)
+    opponents = battle.load_learned_opponents()
+    if opponents and len(opponents) >= 3:
+        return "real", opponents
+    return "generic", list(battle.OPPONENT_ARCHETYPES[:opponent_limit])
+
+
+class GateTelemetry:
+    def __init__(self) -> None:
+        self.current_game = ""
+        self.events: Counter[str] = Counter()
+        self.strategic_events: Counter[str] = Counter()
+        self.games_with: dict[str, set[str]] = {
+            "miracle_cast": set(),
+            "topdeck_manipulation_activated": set(),
+            "lorehold_cost_paid": set(),
+            "lorehold_spell_cast": set(),
+        }
+        self.cards: Counter[str] = Counter()
+
+    def begin(self, game_id: str) -> None:
+        self.current_game = game_id
+
+    def record(self, event: str, data: Mapping[str, Any]) -> None:
+        self.events[event] += 1
+        player = str(data.get("player") or "")
+        card = str(data.get("card") or "")
+        if event == "miracle_cast" and player == "Lorehold":
+            self.strategic_events[event] += 1
+            self.games_with[event].add(self.current_game)
+            if card:
+                self.cards[f"miracle:{card}"] += 1
+        elif event == "topdeck_manipulation_activated" and player == "Lorehold":
+            self.strategic_events[event] += 1
+            self.games_with[event].add(self.current_game)
+            if card:
+                self.cards[f"topdeck:{card}"] += 1
+        elif event == "cost_paid" and player == "Lorehold":
+            self.strategic_events["lorehold_cost_paid"] += 1
+            self.games_with["lorehold_cost_paid"].add(self.current_game)
+            if card:
+                self.cards[f"cost_paid:{card}"] += 1
+        elif event == "spell_cast" and player == "Lorehold":
+            self.strategic_events["lorehold_spell_cast"] += 1
+            self.games_with["lorehold_spell_cast"].add(self.current_game)
+
+    def as_json(self, total_games: int) -> dict[str, Any]:
+        games = max(1, total_games)
+        return {
+            "event_counts": dict(self.events),
+            "strategic_event_counts": dict(self.strategic_events),
+            "strategic_games": {
+                key: {
+                    "games": len(value),
+                    "rate": round(len(value) / games, 4),
+                }
+                for key, value in self.games_with.items()
+            },
+            "top_cards": [
+                {"key": key, "count": count}
+                for key, count in self.cards.most_common(12)
+            ],
+        }
+
+
+def run_deck_gate(
+    *,
+    spec: Mapping[str, Any],
+    opponents: list[dict[str, Any]],
+    games_per_opponent: int,
+    simulation_seed: int,
+) -> dict[str, Any]:
+    source_db = Path(str(spec["source_db"]))
+    set_battle_db(source_db)
+    commander, deck, construction_report = battle.load_deck_with_construction_report(
+        int(spec["load_deck_id"])
+    )
+    if commander is None:
+        raise RuntimeError(f"no commander loaded for {spec['deck_key']}")
+    rng = random.Random(simulation_seed)
+    telemetry = GateTelemetry()
+    wins = losses = stalls = 0
+    win_turns: list[int] = []
+    win_reasons: Counter[str] = Counter()
+    opponent_rows: list[dict[str, Any]] = []
+
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+
+    def event_handler(event: str, data: Mapping[str, Any]) -> None:
+        telemetry.record(event, data)
+
+    battle.REPLAY_EVENT_HANDLER = event_handler
+    try:
+        for profile in opponents:
+            profile_wins = profile_losses = profile_stalls = 0
+            profile_turns: list[int] = []
+            profile_reasons: Counter[str] = Counter()
+            for game_index in range(games_per_opponent):
+                game_id = f"{spec['deck_key']}:{profile.get('name', '?')}:{game_index}"
+                telemetry.begin(game_id)
+                battle.CURRENT_REPLAY_TURN = None
+                others = [item for item in opponents if item is not profile]
+                picked = [profile] + rng.sample(others, min(2, len(others)))
+                result, turns, reason = battle.simulate_game_v8(
+                    copy.deepcopy(commander),
+                    copy.deepcopy(deck),
+                    copy.deepcopy(picked),
+                    rng,
+                    game_index,
+                )
+                if result == "win":
+                    wins += 1
+                    profile_wins += 1
+                    win_turns.append(int(turns))
+                    profile_turns.append(int(turns))
+                    win_reasons[str(reason)] += 1
+                    profile_reasons[str(reason)] += 1
+                elif result == "loss":
+                    losses += 1
+                    profile_losses += 1
+                else:
+                    stalls += 1
+                    profile_stalls += 1
+            opponent_rows.append(
+                {
+                    "opponent": profile.get("name", "?"),
+                    "archetype": profile.get("archetype", "?"),
+                    "wins": profile_wins,
+                    "losses": profile_losses,
+                    "stalls": profile_stalls,
+                    "win_rate": round(profile_wins / max(1, games_per_opponent) * 100, 2),
+                    "avg_win_turn": round(sum(profile_turns) / len(profile_turns), 2)
+                    if profile_turns
+                    else 0,
+                    "win_reasons": dict(profile_reasons),
+                }
+            )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    total_games = games_per_opponent * len(opponents)
+    lands = sum(1 for card in deck if battle.card_has_functional_tag(card, "land") or "Land" in card.get("type_line", ""))
+    ramp = sum(1 for card in deck if battle.card_has_functional_tag(card, "ramp", "ritual"))
+    removal = sum(1 for card in deck if battle.card_has_functional_tag(card, "removal", "board_wipe"))
+    return {
+        **dict(spec),
+        "status": "pass",
+        "commander": commander.get("name", "?"),
+        "deck_size": len(deck) + 1,
+        "lands": lands,
+        "ramp": ramp,
+        "removal": removal,
+        "construction_report": construction_report,
+        "games": total_games,
+        "wins": wins,
+        "losses": losses,
+        "stalls": stalls,
+        "win_rate": round(wins / max(1, total_games) * 100, 2),
+        "avg_win_turn": round(sum(win_turns) / len(win_turns), 2) if win_turns else 0,
+        "win_reasons": dict(win_reasons),
+        "opponents": opponent_rows,
+        "telemetry": telemetry.as_json(total_games),
+    }
+
+
+def merge_structural_context(
+    results: list[dict[str, Any]],
+    matrix_scores: Mapping[str, Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    for result in results:
+        context = matrix_scores.get(str(result.get("deck_key")), {})
+        result["structural_rank"] = context.get("structural_rank")
+        result["strategy_score"] = context.get("strategy_score")
+        result["objective"] = context.get("objective")
+        result["primary_risks"] = context.get("primary_risks") or []
+    battle_ranked = sorted(
+        results,
+        key=lambda row: (
+            -float(row.get("win_rate") or -1),
+            int(row.get("stalls") or 0),
+            int(row.get("losses") or 0),
+            str(row.get("deck_key")),
+        ),
+    )
+    for idx, row in enumerate(battle_ranked, start=1):
+        row["battle_rank"] = idx
+    return results
+
+
+def render_markdown(report: Mapping[str, Any]) -> str:
+    rows = sorted(report.get("results") or [], key=lambda row: int(row.get("battle_rank") or 999))
+    lines = [
+        "# Lorehold Equal Battle Gate",
+        "",
+        f"- generated_at: `{report['generated_at']}`",
+        f"- source_db: `{report['source_db']}`",
+        f"- games_per_opponent: `{report['games_per_opponent']}`",
+        f"- opponent_kind: `{report['opponent_kind']}`",
+        f"- opponent_seed: `{report['opponent_seed']}`",
+        f"- simulation_seed: `{report['simulation_seed']}`",
+        f"- opponents: `{', '.join(report.get('opponents') or [])}`",
+        "- postgres_writes: `false`",
+        "- source_db_mutated: `false`",
+        "",
+        "## Battle Ranking",
+        "",
+        "| Battle Rank | Structural Rank | Deck | Archetype | Games | W | L | S | WR | Avg Win Turn | Miracle Games | Topdeck Games | Main Risks |",
+        "| ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+    ]
+    for row in rows:
+        telemetry = row.get("telemetry") or {}
+        strategic_games = telemetry.get("strategic_games") or {}
+        miracle_games = (strategic_games.get("miracle_cast") or {}).get("games", 0)
+        topdeck_games = (strategic_games.get("topdeck_manipulation_activated") or {}).get("games", 0)
+        risks = ", ".join(row.get("primary_risks") or []) or "none"
+        lines.append(
+            f"| {row.get('battle_rank')} | {row.get('structural_rank') or ''} | "
+            f"{row.get('deck_name')} (`{row.get('deck_key')}`) | {row.get('archetype')} | "
+            f"{row.get('games')} | {row.get('wins')} | {row.get('losses')} | {row.get('stalls')} | "
+            f"{float(row.get('win_rate') or 0):.2f}% | {float(row.get('avg_win_turn') or 0):.2f} | "
+            f"{miracle_games} | {topdeck_games} | {risks} |"
+        )
+
+    lines.extend(["", "## Deck Detail", ""])
+    for row in rows:
+        lines.extend(
+            [
+                f"### {row.get('battle_rank')}. {row.get('deck_name')} (`{row.get('deck_key')}`)",
+                "",
+                f"- objective: {row.get('objective') or 'not available in structural matrix'}",
+                f"- result: `{row.get('wins')}W/{row.get('losses')}L/{row.get('stalls')}S`, WR `{float(row.get('win_rate') or 0):.2f}%`",
+                f"- construction_valid: `{(row.get('construction_report') or {}).get('is_valid')}`",
+                f"- deck shape: size `{row.get('deck_size')}`, lands `{row.get('lands')}`, ramp `{row.get('ramp')}`, removal `{row.get('removal')}`",
+                "",
+                "| Opponent | W | L | S | WR | Avg Win Turn | Reasons |",
+                "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
+            ]
+        )
+        for opponent in row.get("opponents") or []:
+            reasons = ", ".join(
+                f"{key}={value}" for key, value in (opponent.get("win_reasons") or {}).items()
+            )
+            lines.append(
+                f"| {opponent.get('opponent')} | {opponent.get('wins')} | {opponent.get('losses')} | "
+                f"{opponent.get('stalls')} | {float(opponent.get('win_rate') or 0):.2f}% | "
+                f"{float(opponent.get('avg_win_turn') or 0):.2f} | {reasons} |"
+            )
+        telemetry = row.get("telemetry") or {}
+        lines.extend(
+            [
+                "",
+                "**Strategic event counts:** "
+                + (
+                    ", ".join(
+                        f"{key}={value}"
+                        for key, value in (telemetry.get("strategic_event_counts") or {}).items()
+                    )
+                    or "none"
+                ),
+                "",
+            ]
+        )
+
+    failures = [row for row in rows if row.get("status") != "pass"]
+    if failures:
+        lines.extend(["", "## Runtime Failures", ""])
+        for row in failures:
+            lines.append(f"- `{row.get('deck_key')}`: {row.get('error')}")
+    return "\n".join(lines) + "\n"
+
+
+def write_report(report: Mapping[str, Any], stem: str) -> tuple[Path, Path]:
+    json_path = REPORT_DIR / f"{stem}.json"
+    md_path = REPORT_DIR / f"{stem}.md"
+    json_path.write_text(json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+    md_path.write_text(render_markdown(report), encoding="utf-8")
+    return json_path, md_path
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--db", type=Path, default=DEFAULT_DB)
+    parser.add_argument("--deck-ids", default=None)
+    parser.add_argument("--candidate-db", type=Path, default=DEFAULT_CANDIDATE_DB)
+    parser.add_argument("--candidate-key", default="candidate_v7")
+    parser.add_argument("--candidate-name", default="Lorehold strategy-first candidate v7")
+    parser.add_argument("--candidate-archetype", default="strategy-first-candidate")
+    parser.add_argument("--no-candidate", action="store_true")
+    parser.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
+    parser.add_argument("--games", type=int, default=1)
+    parser.add_argument("--opponent-limit", type=int, default=3)
+    parser.add_argument("--opponent-seed", type=int, default=20260626)
+    parser.add_argument("--simulation-seed", type=int, default=42)
+    parser.add_argument("--stem", default="lorehold_variant_battle_gate_20260626_v1")
+    args = parser.parse_args()
+
+    deck_ids = parse_deck_ids(args.deck_ids)
+    specs = deck_specs(
+        db=args.db,
+        deck_ids=deck_ids,
+        candidate_db=args.candidate_db,
+        include_candidate=not args.no_candidate,
+        candidate_key=args.candidate_key,
+        candidate_name=args.candidate_name,
+        candidate_archetype=args.candidate_archetype,
+    )
+    opponent_kind, opponents = load_opponents(
+        args.db,
+        opponent_limit=args.opponent_limit,
+        opponent_seed=args.opponent_seed,
+    )
+    matrix_scores = load_matrix_scores(args.matrix)
+
+    results: list[dict[str, Any]] = []
+    partial_stem = f"{args.stem}_partial"
+    for spec in specs:
+        print(f"running {spec['deck_key']} games={args.games} opponents={len(opponents)}", flush=True)
+        try:
+            result = run_deck_gate(
+                spec=spec,
+                opponents=opponents,
+                games_per_opponent=max(1, args.games),
+                simulation_seed=args.simulation_seed,
+            )
+        except Exception as exc:
+            result = {
+                **spec,
+                "status": "runtime_error",
+                "error": str(exc),
+                "traceback": traceback.format_exc(limit=8),
+                "games": 0,
+                "wins": 0,
+                "losses": 0,
+                "stalls": 0,
+                "win_rate": 0.0,
+                "avg_win_turn": 0.0,
+                "opponents": [],
+                "telemetry": {},
+            }
+        results.append(result)
+        partial_report = {
+            "generated_at": utc_now(),
+            "status": "partial",
+            "source_db": str(args.db),
+            "matrix": str(args.matrix),
+            "games_per_opponent": max(1, args.games),
+            "opponent_kind": opponent_kind,
+            "opponent_seed": args.opponent_seed,
+            "simulation_seed": args.simulation_seed,
+            "opponents": [opponent.get("name", "?") for opponent in opponents],
+            "results": merge_structural_context(results, matrix_scores),
+        }
+        write_report(partial_report, partial_stem)
+
+    report = {
+        "generated_at": utc_now(),
+        "status": "ready",
+        "source_db": str(args.db),
+        "matrix": str(args.matrix),
+        "candidate_db": str(args.candidate_db) if args.candidate_db else None,
+        "games_per_opponent": max(1, args.games),
+        "opponent_kind": opponent_kind,
+        "opponent_seed": args.opponent_seed,
+        "simulation_seed": args.simulation_seed,
+        "opponents": [opponent.get("name", "?") for opponent in opponents],
+        "results": merge_structural_context(results, matrix_scores),
+    }
+    json_path, md_path = write_report(report, args.stem)
+    print(json.dumps({"status": "ready", "json": str(json_path), "markdown": str(md_path)}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
