@@ -2464,6 +2464,33 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
         self.assertEqual(primary["cost_reduction_generic_if_control_wizard"], 1)
 
+    def test_bolt_bend_maps_to_exact_ferocious_redirect_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["ChooseNewTargetsTargetEffect", "SpellCostReductionSourceEffect"],
+                "target_classes": ["TargetStackObject"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "private static final FilterStackObject filter = new FilterStackObject(\"spell or ability with a single target\"); "
+                    "filter.add(new NumberOfTargetsPredicate(1)); "
+                    "this.addAbility(new SimpleStaticAbility(Zone.ALL, new SpellCostReductionSourceEffect(3, FerociousCondition.instance))); "
+                    "this.getSpellAbility().addEffect(new ChooseNewTargetsTargetEffect(true, true)); "
+                    "this.getSpellAbility().addTarget(new TargetStackObject(filter));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "redirect_removal")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1",
+        )
+        self.assertEqual(primary["target"], "single_target_spell_or_ability")
+        self.assertEqual(primary["cost_reduction_applies_to"], "this_spell")
+        self.assertEqual(primary["cost_reduction_generic"], 3)
+        self.assertEqual(primary["cost_reduction_condition"], "control_creature_power_4_or_greater")
+
     def test_mana_leak_maps_to_exact_soft_counter_scope(self) -> None:
         result = hints.build_effect_hints(
             {

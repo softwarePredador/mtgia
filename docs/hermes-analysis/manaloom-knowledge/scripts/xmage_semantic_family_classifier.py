@@ -414,6 +414,12 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         == "destroy_target_land_then_damage_all_creatures_and_planeswalkers"
     ):
         return "targeted_interaction"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
+        == "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
+        and effect_json.get("effect") == "redirect_removal"
+    ):
+        return "targeted_interaction"
     return family_for_effect(effect_json.get("effect"))
 
 
@@ -1091,6 +1097,26 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("reflect_prevented_damage"))
             and effect_json.get("reflect_target") == "chosen_source_controller"
             and bool(effect_json.get("source_choice_required"))
+        )
+
+    if (
+        effect == "redirect_removal"
+        and scope == "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
+    ):
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"ChooseNewTargetsTargetEffect", "SpellCostReductionSourceEffect"}
+            and ability_classes == {"SimpleStaticAbility"}
+            and not cost_classes
+            and "TargetStackObject" in target_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "single_target_spell_or_ability"
+            and effect_json.get("target_scope") == "target_spell_or_ability"
+            and bool(effect_json.get("chooses_new_targets"))
+            and effect_json.get("oracle_runtime_scope") == "redirect_single_target_stack_object_compact_v1"
+            and effect_json.get("cost_reduction_applies_to") == "this_spell"
+            and int(effect_json.get("cost_reduction_generic") or 0) == 3
+            and effect_json.get("cost_reduction_condition") == "control_creature_power_4_or_greater"
         )
 
     if effect == "damage_each_opponent" and scope == "spell_damage_each_opponent_v1":

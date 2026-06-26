@@ -431,6 +431,57 @@ def _build_spell_cast_damage_each_opponent_fields(
     }
 
 
+def _build_single_target_stack_redirect_fields(
+    *,
+    card_types: set[str],
+    effect_classes: set[str],
+    target_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    if "ChooseNewTargetsTargetEffect" not in effect_classes:
+        return None
+    if "TargetStackObject" not in target_classes:
+        return None
+    if "INSTANT" not in card_types:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+    if "spell or ability with a single target" not in normalized and "numberoftargetspredicate(1)" not in normalized:
+        return None
+
+    if "SpellCostReductionSourceEffect" in effect_classes and (
+        "ferociouscondition.instance" in normalized
+        or _oracle_has(rules_text, "if you control a creature with power 4 or greater")
+    ):
+        return {
+            "effect": "redirect_removal",
+            "scope": "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1",
+            "fields": {
+                "instant": True,
+                "target": "single_target_spell_or_ability",
+                "target_scope": "target_spell_or_ability",
+                "chooses_new_targets": True,
+                "oracle_runtime_scope": "redirect_single_target_stack_object_compact_v1",
+                "cost_reduction_applies_to": "this_spell",
+                "cost_reduction_generic": 3,
+                "cost_reduction_condition": "control_creature_power_4_or_greater",
+            },
+            "reason": (
+                "XMage structure matches Bolt Bend changing the target of a single-target spell or ability, "
+                "with a ferocious self-cost reduction when you control a creature with power 4 or greater."
+            ),
+            "signals": [
+                "ChooseNewTargetsTargetEffect",
+                "TargetStackObject",
+                "NumberOfTargetsPredicate(1)",
+                "SpellCostReductionSourceEffect",
+                "FerociousCondition",
+            ],
+        }
+
+    return None
+
+
 def _build_copy_permanent_etb_fields(
     *,
     index_entry: dict[str, Any],
@@ -7745,6 +7796,25 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=False,
                 extra_effect_fields=dict(spell_cast_damage_fields["fields"]),
                 matched_signals=list(spell_cast_damage_fields["signals"]),
+            )
+        )
+
+    single_target_stack_redirect_fields = _build_single_target_stack_redirect_fields(
+        card_types=card_types,
+        effect_classes=effect_classes,
+        target_classes=target_classes,
+        rules_text=rules_text,
+    )
+    if single_target_stack_redirect_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(single_target_stack_redirect_fields["effect"]),
+                scope=str(single_target_stack_redirect_fields["scope"]),
+                reason=str(single_target_stack_redirect_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=False,
+                extra_effect_fields=dict(single_target_stack_redirect_fields["fields"]),
+                matched_signals=list(single_target_stack_redirect_fields["signals"]),
             )
         )
 

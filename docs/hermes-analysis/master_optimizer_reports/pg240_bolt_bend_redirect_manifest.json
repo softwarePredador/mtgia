@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg240_bolt_bend_redirect_20260626_104058",
+  "deploy_id": "PG240",
+  "family_counts": {
+    "targeted_interaction": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg240_bolt_bend_redirect_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg240_bolt_bend_redirect_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg240_bolt_bend_redirect_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg240_bolt_bend_redirect_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg240_bolt_bend_redirect_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg240_bolt_bend_redirect_rollback.sql"
+  },
+  "generated_at": "2026-06-26T10:40:58+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Bolt Bend"
+  ],
+  "selected_count": 1,
+  "slug": "bolt_bend_redirect",
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -1269,9 +1269,38 @@ def _source_static_cost_reduction_effect(source):
     return {}
 
 
+def _cost_reduction_condition_satisfied(effect_data, controller):
+    condition = str(effect_data.get("cost_reduction_condition") or "").strip().lower()
+    if not condition:
+        return True
+    battlefield = getattr(controller, "battlefield", []) or []
+    if condition == "control_wizard":
+        return any(
+            isinstance(permanent, dict) and "wizard" in str(permanent.get("type_line") or "").lower()
+            for permanent in battlefield
+        )
+    if condition in {"control_creature_power_4_or_greater", "ferocious"}:
+        for permanent in battlefield:
+            if not isinstance(permanent, dict):
+                continue
+            type_line = str(permanent.get("type_line") or "").lower()
+            if "creature" not in type_line:
+                continue
+            try:
+                power = int(float(permanent.get("power") or 0))
+            except (TypeError, ValueError):
+                power = 0
+            if power >= 4:
+                return True
+        return False
+    return False
+
+
 def _static_cost_reduction_matches_spell(source, effect_data, card, *, controller=None):
     amount = _static_cost_reduction_amount(source, effect_data, controller=controller)
     if amount <= 0:
+        return None
+    if controller is not None and not _cost_reduction_condition_satisfied(effect_data, controller):
         return None
     colors = _static_cost_reduction_color_restrictions(source, effect_data)
     if colors and not any(_spell_has_color(card, color) for color in colors):

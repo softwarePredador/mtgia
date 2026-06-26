@@ -51,65 +51,60 @@ It does not mutate deck rows, SQLite, or PostgreSQL.
 
 ## Current Checkpoint
 
-Post-PG239 Lorehold-focused rule-routing checkpoint generated on 2026-06-26
-after opening a reusable XMage/ManaLoom family for spell-cast battlefield
-engines that damage each opponent, applying the PostgreSQL batch for
-`Longshot, Rebel Bowman`, `Guttersnipe`, `Coruscation Mage`,
-`Fiery Inscription`, and `Vivi Ornitier`, syncing those rules back into
-SQLite/Hermes, and regenerating the live queue/matrix/audits from the
-post-sync state:
+Post-PG240 Lorehold-focused rule-routing checkpoint generated on 2026-06-26
+after closing `Bolt Bend` end to end: exact XMage mapper, conditional
+self-cost runtime for ferocious, PostgreSQL promotion, SQLite/Hermes sync, and
+fresh queue/matrix/audits from the post-sync state:
 
 - current matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg239_spell_cast_damage_engine_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg240_bolt_bend_postsync_v1.json`
 - current proposal report:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg239_spell_cast_damage_engine_postsync_v1_proposals.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg240_bolt_bend_postsync_v1_proposals.json`
 - current effective queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg239_spell_cast_damage_engine_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg240_bolt_bend_postsync_v1.json`
 - current strategy audit:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg239_spell_cast_damage_engine_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg240_bolt_bend_postsync_v1.json`
 - latest generated candidate still under benchmark hold:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
 - current slice evidence:
-  `docs/hermes-analysis/master_optimizer_reports/pg239_spell_cast_damage_engine_progress_20260626.md`
+  `docs/hermes-analysis/master_optimizer_reports/pg240_bolt_bend_redirect_progress_20260626.md`
 
 Current operational result:
 
 - effective queue:
   - `package_ready_unprepared=0`
   - `package_already_prepared=1`
-  - `manual_mapper_backlog=318`
+  - `manual_mapper_backlog=317`
   - `split_scope_backlog=59`
   - `runtime_family_backlog=4`
   - `blocked_missing_xmage_source=4`
 - strategy consistency audit:
   - `18/18 pass`
 - matrix:
-  - `battle_ready=722`
-  - `needs_rule_before_strategy=241`
+  - `battle_ready=723`
+  - `needs_rule_before_strategy=240`
   - `watchlist_candidate=324`
 
 Key routing delta:
 
-- `Coruscation Mage` moved from
+- `Bolt Bend` moved from
   `needs_rule_before_strategy / mapper_manual`
   to
   `battle_ready / watchlist_candidate`.
-- `Vivi Ornitier` moved from
-  `needs_rule_before_strategy / split_scope`
-  to
-  `battle_ready / watchlist_candidate`.
-- the new `spell_cast_damage_engine` family closed the live
+- `Coruscation Mage` and `Vivi Ornitier` remain closed from the prior PG239
+  slice, and `Bolt Bend` joins them in the post-sync rule-ready pool.
+- the new `Bolt Bend` slice closed the live
   `package_ready_unprepared` residual it created inside the same run:
-  `5 -> 0`.
+  `1 -> 0`.
 - scoped rule-readiness improved from:
-  - `battle_ready: 720 -> 722`
-  - `mapper_manual: 187 -> 187`
+  - `battle_ready: 722 -> 723`
+  - `mapper_manual: 187 -> 186`
   - `split_scope: 42 -> 42`
-  - `package_ready: 2 -> 0`
-- Lorehold-touching `needs_rule_before_strategy` improved from `70` to `69`.
+  - `package_ready: 1 -> 0`
+- Lorehold-touching `needs_rule_before_strategy` improved from `69` to `68`.
 - the next highest-ROI Lorehold rule-first targets are now:
   `Currency Converter`, `Firesong and Sunspeaker`, `Magmakin Artillerist`,
-  `Bolt Bend`, and `Penance`.
+  `Penance`, and `Radiant Scrollwielder`.
 - the benchmark/generation phase was intentionally not rerun here because the
   workflow still prioritizes closing more Lorehold-touching
   `needs_rule_before_strategy` rows before new slot benchmarking.

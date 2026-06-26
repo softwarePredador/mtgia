@@ -16000,6 +16000,168 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg240_bolt_bend_ferocious_cost_reduction_requires_power_four_creature():
+        bolt_bend = {
+            "name": "Bolt Bend",
+            "cmc": 4,
+            "type_line": "Instant",
+            "mana_cost": "{3}{R}",
+            "effect": "redirect_removal",
+            "instant": True,
+            "target": "single_target_spell_or_ability",
+            "target_scope": "target_spell_or_ability",
+            "chooses_new_targets": True,
+            "oracle_runtime_scope": "redirect_single_target_stack_object_compact_v1",
+            "cost_reduction_applies_to": "this_spell",
+            "cost_reduction_generic": 3,
+            "cost_reduction_condition": "control_creature_power_4_or_greater",
+        }
+        active = player("Lorehold")
+        active.battlefield = [
+            {
+                "name": "Small Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+            }
+        ]
+
+        full_cost = battle.card_cost_for_effect(active, bolt_bend, bolt_bend)
+        assert full_cost["generic"] == 3
+        assert full_cost["colored"]["red"] == 1
+
+        active.battlefield.append(
+            {
+                "name": "Big Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+        )
+        reduced_cost = battle.card_cost_for_effect(active, bolt_bend, bolt_bend)
+        assert reduced_cost["generic"] == 0
+        assert reduced_cost["colored"]["red"] == 1
+
+    def test_pg240_bolt_bend_redirects_with_only_single_red_under_ferocious():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        rule_name = "Bolt Bend Test"
+        previous_rule = battle.HANDCRAFTED_KNOWN_CARD_RULES.get(rule_name)
+        had_known_card = rule_name in battle.HANDCRAFTED_KNOWN_CARDS
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            bolt_bend = {
+                "name": rule_name,
+                "cmc": 4,
+                "type_line": "Instant",
+                "mana_cost": "{3}{R}",
+                "effect": "redirect_removal",
+                "instant": True,
+                "target": "single_target_spell_or_ability",
+                "target_scope": "target_spell_or_ability",
+                "chooses_new_targets": True,
+                "oracle_runtime_scope": "redirect_single_target_stack_object_compact_v1",
+                "cost_reduction_applies_to": "this_spell",
+                "cost_reduction_generic": 3,
+                "cost_reduction_condition": "control_creature_power_4_or_greater",
+                "battle_model_scope": "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1",
+                "_rule_logical_key": "battle_rule_v1:bolt-bend-test",
+                "_rule_oracle_hash": "bolt-bend-test-hash",
+            }
+            battle.HANDCRAFTED_KNOWN_CARD_RULES[rule_name] = dict(bolt_bend)
+            battle.HANDCRAFTED_KNOWN_CARDS.add(rule_name)
+            active = player("Lorehold", [bolt_bend])
+            active.hand = [bolt_bend]
+            active.is_human = True
+            active.mana_pool.red = 1
+            big_creature = {
+                "name": "Big Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            protected = {
+                "name": "Protected Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            active.battlefield = [big_creature, protected]
+
+            caster = player("Caster")
+            opponent_threat = {
+                "name": "Opponent Threat",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 6,
+                "toughness": 6,
+            }
+            caster.battlefield = [opponent_threat]
+            removal = {"name": "Targeted Removal", "cmc": 2, "type_line": "Instant"}
+            removal_effect = {
+                "effect": "remove_creature",
+                "instant": True,
+                "declared_targets": [
+                    {
+                        "target": protected,
+                        "controller": active,
+                        "target_type": "creature",
+                    }
+                ],
+            }
+            stack = battle.Stack()
+            stack.push(removal, caster, removal_effect)
+
+            assert battle.priority_round(
+                caster,
+                [caster, active],
+                stack,
+                3,
+                random.Random(196),
+                phase="combat",
+            )
+            while not stack.empty():
+                battle.priority_round(
+                    caster,
+                    [caster, active],
+                    stack,
+                    3,
+                    random.Random(197),
+                    phase="combat",
+                )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_rule is None:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop(rule_name, None)
+            else:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES[rule_name] = previous_rule
+            if not had_known_card:
+                battle.HANDCRAFTED_KNOWN_CARDS.discard(rule_name)
+
+        assert bolt_bend not in active.hand
+        assert protected in active.battlefield
+        assert opponent_threat not in caster.battlefield
+        spell_event = next(
+            data
+            for event, data in events
+            if event == "spell_cast" and data.get("card") == "Bolt Bend Test"
+        )
+        assert spell_event["locked_cost"]["generic"] == 0
+        assert spell_event["locked_cost"]["colored"]["red"] == 1
+        redirect_event = next(
+            data
+            for event, data in events
+            if event == "redirect_removal_resolved" and data.get("card") == "Bolt Bend Test"
+        )
+        assert redirect_event["target_change_applied"] is True
+        assert redirect_event["old_target"] == "Protected Creature"
+        assert redirect_event["new_target"] == "Opponent Threat"
+        assert redirect_event["rule_logical_key"] == "battle_rule_v1:bolt-bend-test"
+
     def test_pg086_angels_grace_rule_resolves_from_sqlite_cache():
         effect_data = battle.get_card_effect(
             {"name": "Angel's Grace", "type_line": "Instant", "cmc": 1}
@@ -18783,6 +18945,8 @@ def register_tests(battle, player):
         test_pg151_magda_tapped_dwarf_creates_treasure,
         test_pg151_magda_sacrifices_five_treasures_to_tutor_valid_target,
         test_pg081_redirect_lightning_redirects_single_target_stack_object,
+        test_pg240_bolt_bend_ferocious_cost_reduction_requires_power_four_creature,
+        test_pg240_bolt_bend_redirects_with_only_single_red_under_ferocious,
         test_removal_exile_stack_target_exiles_spell_instead_of_countering_to_graveyard,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,

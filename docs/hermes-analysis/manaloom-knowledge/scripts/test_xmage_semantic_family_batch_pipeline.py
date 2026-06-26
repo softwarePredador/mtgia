@@ -4070,6 +4070,48 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_bolt_bend_exact_redirect_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Bolt Bend",
+                        "severity": "high",
+                        "oracle_hash": "boltbendhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "BoltBend",
+                            "path": "/xmage/BoltBend.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": ["ChooseNewTargetsTargetEffect", "SpellCostReductionSourceEffect"],
+                            "ability_classes": ["SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "target_classes": ["TargetStackObject"],
+                            "primary_effect": {
+                                "effect": "redirect_removal",
+                                "battle_model_scope": "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1",
+                                "instant": True,
+                                "target": "single_target_spell_or_ability",
+                                "target_scope": "target_spell_or_ability",
+                                "chooses_new_targets": True,
+                                "oracle_runtime_scope": "redirect_single_target_stack_object_compact_v1",
+                                "cost_reduction_applies_to": "this_spell",
+                                "cost_reduction_generic": 3,
+                                "cost_reduction_condition": "control_creature_power_4_or_greater",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["family_id"], "targeted_interaction")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_vanquish_the_horde_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
