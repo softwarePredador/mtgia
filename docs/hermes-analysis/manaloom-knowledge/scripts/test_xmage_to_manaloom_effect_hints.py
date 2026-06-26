@@ -6342,6 +6342,80 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["reflect_target"], "chosen_source_controller")
         self.assertTrue(primary["source_choice_required"])
 
+    def test_penance_maps_to_exact_activated_prevention_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Penance",
+                "effect_classes": ["PreventNextDamageFromChosenSourceEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "cost_classes": ["PutCardFromHandOnTopOfLibraryCost"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "new SimpleActivatedAbility(new PreventNextDamageFromChosenSourceEffect("
+                    "Duration.EndOfTurn, false, filter), new PutCardFromHandOnTopOfLibraryCost()); "
+                    "new FilterSource(\"black or red source\");"
+                ),
+            },
+            "Put a card from your hand on top of your library: The next time a black or red "
+            "source of your choice would deal damage this turn, prevent that damage.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "damage_prevention_shield")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1",
+        )
+        self.assertTrue(primary["activated_prevent_next_damage_from_chosen_source"])
+        self.assertEqual(primary["activation_cost"], "put_card_from_hand_on_top_of_library")
+        self.assertEqual(primary["activation_cost_generic"], 0)
+        self.assertTrue(primary["activation_requires_put_card_from_hand_on_top_library"])
+        self.assertTrue(primary["prevent_next_damage_from_chosen_source"])
+        self.assertEqual(primary["prevent_damage_to"], "you")
+        self.assertEqual(primary["prevent_damage_duration"], "until_end_of_turn")
+        self.assertEqual(primary["prevent_damage_amount"], 999)
+        self.assertTrue(primary["source_choice_required"])
+        self.assertEqual(primary["source_color_filter"], ["black", "red"])
+
+    def test_magmakin_artillerist_maps_to_exact_discard_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "MagmakinArtillerist",
+                "effect_classes": ["DamagePlayersEffect"],
+                "ability_classes": [
+                    "DiscardOneOrMoreCardsTriggeredAbility",
+                    "CyclingAbility",
+                    "CycleTriggeredAbility",
+                ],
+                "cost_classes": ["ManaCostsImpl"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new DiscardOneOrMoreCardsTriggeredAbility(new DamagePlayersEffect("
+                    "SavedDiscardValue.MUCH, TargetController.OPPONENT)); "
+                    "new CyclingAbility(new ManaCostsImpl<>(\"{1}{R}\")); "
+                    "new CycleTriggeredAbility(new DamagePlayersEffect(1, TargetController.OPPONENT, \"it\"));"
+                ),
+            },
+            "Whenever you discard one or more cards, Magmakin Artillerist deals that much damage "
+            "to each opponent. Cycling {1}{R}. When you cycle this card, it deals 1 damage to each opponent.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controller_discards_one_or_more_damage_each_opponent_cycling_ping_annotation_v1",
+        )
+        self.assertEqual(primary["power"], 1)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertEqual(primary["trigger"], "controller_discard")
+        self.assertEqual(primary["controller_discard_damage_each_opponent"], 1)
+        self.assertEqual(primary["controller_discard_count_mode"], "discarded_cards")
+        self.assertEqual(primary["cycling_cost"], "{1}{R}")
+        self.assertEqual(primary["cycling_status"], "annotation_only")
+        self.assertEqual(primary["cycle_trigger_damage_each_opponent"], 1)
+        self.assertEqual(primary["cycle_trigger_status"], "annotation_only")
+
     def test_fable_maps_to_exact_saga_transform_copy_scope(self) -> None:
         result = hints.build_effect_hints(
             {

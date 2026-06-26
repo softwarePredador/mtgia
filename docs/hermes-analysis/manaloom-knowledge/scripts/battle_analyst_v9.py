@@ -197,7 +197,7 @@ SILENCE_WINDOW_EFFECTS = {
     "silence_opponents",
     "silence_spell",
 }
-
+SURVIVAL_RESPONSE_EFFECTS = {"phase_out", "cannot_lose_turn", "gift_hexproof_indestructible", "damage_prevention_shield"}
 
 def battle_evaluation_mode():
     raw = str(os.environ.get(EVALUATION_MODE_ENV, "") or "").strip().lower()
@@ -7819,7 +7819,7 @@ def should_hold_for_response_window(player, card, effect_data, phase):
 
 
 SURVIVAL_RESPONSE_RESERVE_LIFE_TOTAL = 15
-SURVIVAL_RESPONSE_EFFECTS = {"phase_out", "cannot_lose_turn", "gift_hexproof_indestructible"}
+SURVIVAL_RESPONSE_EFFECTS = {"phase_out", "cannot_lose_turn", "gift_hexproof_indestructible", "damage_prevention_shield"}
 PROACTIVE_COMBAT_DEFENSE_EFFECTS = {"attack_limit", "attack_tax", "equipment_static_attachment"}
 SURVIVAL_RESERVATION_EXEMPT_EFFECTS = {
     "phase_out",
@@ -29038,6 +29038,45 @@ def apply_effect_immediate(
             **replay_rule_fields(effect_data),
         )
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    elif effect == "damage_prevention_shield":
+        if is_instant(card) or is_sorcery(card):
+            chosen_source = effect_data.get("_chosen_damage_source") or {}
+            chosen_source_name = (
+                effect_data.get("_chosen_damage_source_name")
+                or (chosen_source.get("name") if isinstance(chosen_source, dict) else None)
+            )
+            chosen_source_controller = effect_data.get("_chosen_damage_source_controller")
+            prevention_amount = int(effect_data.get("prevent_damage_amount") or 999)
+            if chosen_source_name:
+                add_damage_prevention_shield(
+                    player,
+                    prevention_amount,
+                    source=card.get("name", "damage_prevention_shield"),
+                    source_match="chosen_source",
+                    chosen_source_name=chosen_source_name,
+                    chosen_source_controller=chosen_source_controller,
+                    consume_once=True,
+                    turn=turn,
+                )
+                result = "shield_created"
+            else:
+                result = "no_chosen_source"
+            emit_replay_event(
+                "damage_prevention_shield_created",
+                player=player.name,
+                card=card.get("name", "?"),
+                chosen_source=chosen_source_name,
+                chosen_source_controller=chosen_source_controller,
+                prevention_amount=prevention_amount if result == "shield_created" else 0,
+                result=result,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        else:
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+            permanent["effect"] = "damage_prevention_shield"
+            player.battlefield.append(permanent)
     elif effect == "land": pass
     elif effect == "creature":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
@@ -32361,6 +32400,51 @@ def choose_deflecting_palm_damage_source(projection, target):
     return None
 
 
+def _normalized_color_set(values):
+    if isinstance(values, str):
+        values = read_json_list(values) or [values]
+    return {_normalize_color_symbol(value) for value in (values or []) if value}
+
+
+def damage_source_matches_color_filter(source, allowed_colors):
+    allowed = _normalized_color_set(allowed_colors)
+    if not allowed:
+        return True
+    if not isinstance(source, dict):
+        return False
+    source_color_values = source.get("colors") or source.get("color_identity")
+    normalized = _normalized_color_set(source_color_values)
+    if not normalized:
+        normalized = _normalized_color_set(compute_color_identity(source))
+    return bool(normalized & allowed)
+
+
+def choose_damage_prevention_shield_source(projection, target, effect_data):
+    allowed_colors = effect_data.get("source_color_filter") or []
+    sources = [
+        item
+        for item in list((projection or {}).get("sources") or [])
+        if damage_source_matches_color_filter(item.get("source"), allowed_colors)
+    ]
+    if not sources:
+        return None
+    sources.sort(
+        key=lambda item: (
+            bool(item.get("commander_lethal")),
+            int(item.get("projected_damage") or 0),
+            str(item.get("source_name") or ""),
+        ),
+        reverse=True,
+    )
+    best = sources[0]
+    projected_damage = int((projection or {}).get("player_damage") or 0)
+    best_damage = int(best.get("projected_damage") or 0)
+    life_after_prevention = int(getattr(target, "life", 0) or 0) - max(0, projected_damage - best_damage)
+    if best.get("commander_lethal") or life_after_prevention > 0:
+        return best
+    return None
+
+
 def projected_player_combat_damage(attackers, block_assignments):
     return projected_player_combat_damage_details(
         None,
@@ -32402,7 +32486,43 @@ def combat_defensive_response_window(attacker, target, attackers, block_assignme
             effect_data["_chosen_damage_amount"] = chosen_source.get("projected_damage")
         if not target.can_pay_card(candidate):
             continue
-        response_options.append((candidate, effect_data))
+        response_options.append(
+            {
+                "kind": "spell",
+                "card": candidate,
+                "effect_data": effect_data,
+            }
+        )
+    for permanent in list(getattr(target, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        effect_data = {**get_card_effect(permanent), **permanent}
+        effect = str(effect_data.get("effect") or "").lower()
+        if effect != "damage_prevention_shield":
+            continue
+        if not effect_data.get("activated_prevent_next_damage_from_chosen_source"):
+            continue
+        if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+            continue
+        chosen_source = choose_damage_prevention_shield_source(projection, target, effect_data)
+        if not chosen_source:
+            continue
+        payment_card = choose_cleanup_discard(target)
+        if payment_card is None or payment_card not in getattr(target, "hand", []):
+            continue
+        effect_data = dict(effect_data)
+        effect_data["_chosen_damage_source"] = chosen_source.get("source")
+        effect_data["_chosen_damage_source_name"] = chosen_source.get("source_name")
+        effect_data["_chosen_damage_source_controller"] = chosen_source.get("source_controller")
+        effect_data["_chosen_damage_amount"] = chosen_source.get("projected_damage")
+        response_options.append(
+            {
+                "kind": "activated_permanent",
+                "card": permanent,
+                "effect_data": effect_data,
+                "payment_card": payment_card,
+            }
+        )
     if not response_options:
         return False
 
@@ -32411,9 +32531,12 @@ def combat_defensive_response_window(attacker, target, attackers, block_assignme
             "phase_out": 0,
             "cannot_lose_turn": 1,
             "damage_prevention_reflect": 2,
-        }.get(item[1].get("effect"), 9)
+            "damage_prevention_shield": 3,
+        }.get(item["effect_data"].get("effect"), 9)
     )
-    card, effect_data = response_options[0]
+    selected = response_options[0]
+    card = selected["card"]
+    effect_data = selected["effect_data"]
     fields = replay_rule_fields(effect_data)
     emit_decision_trace(
         decision_type="response",
@@ -32421,13 +32544,13 @@ def combat_defensive_response_window(attacker, target, attackers, block_assignme
         turn=turn,
         phase="combat_damage",
         available_options=[
-            decision_card_option(option_card, option_effect, action="respond")
-            for option_card, option_effect in response_options[:8]
+            decision_card_option(option["card"], option["effect_data"], action="respond")
+            for option in response_options[:8]
         ],
         chosen_option=decision_card_option(card, effect_data, action="prevent_combat_lethal"),
         rejected_options=[
-            decision_card_option(option_card, option_effect, action="reject_response")
-            for option_card, option_effect in response_options[1:8]
+            decision_card_option(option["card"], option["effect_data"], action="reject_response")
+            for option in response_options[1:8]
         ],
         score_components={
             "projected_combat_damage": projected_damage,
@@ -32447,42 +32570,98 @@ def combat_defensive_response_window(attacker, target, attackers, block_assignme
         reason="prevent_lethal_combat_damage",
         strategic_principle="hold_survival_protection_for_lethal_combat_window",
     )
-    if not target.spend_card_mana(card):
-        return False
-    target.hand.remove(card)
-    locked_cost = replay_cost_snapshot(card_mana_cost(card))
-    attach_direct_resolution_context(
-        effect_data,
-        card,
-        "combat_damage",
-        priority_window="combat_damage_prevention",
-        locked_cost=locked_cost,
-    )
-    emit_replay_event(
-        "spell_cast",
-        player=target.name,
-        card=card.get("name", "?"),
-        effect=effect_data.get("effect", "unknown"),
-        type_line=card.get("type_line", ""),
-        cmc=card.get("cmc", 0),
-        turn=turn,
-        phase="combat_damage",
-        role="response",
-        response_to="combat_damage",
-        projected_combat_damage=projected_damage,
-        chosen_damage_source=effect_data.get("_chosen_damage_source_name"),
-        chosen_damage_source_controller=effect_data.get("_chosen_damage_source_controller"),
-        chosen_damage_amount=effect_data.get("_chosen_damage_amount"),
-        **fields,
-    )
-    apply_effect_immediate(
-        target,
-        [player for player in all_players if player is not target],
-        card,
-        turn,
-        rng,
-        effect_data_override=effect_data,
-    )
+    if selected["kind"] == "spell":
+        if not target.spend_card_mana(card):
+            return False
+        target.hand.remove(card)
+        locked_cost = replay_cost_snapshot(card_mana_cost(card))
+        attach_direct_resolution_context(
+            effect_data,
+            card,
+            "combat_damage",
+            priority_window="combat_damage_prevention",
+            locked_cost=locked_cost,
+        )
+        emit_replay_event(
+            "spell_cast",
+            player=target.name,
+            card=card.get("name", "?"),
+            effect=effect_data.get("effect", "unknown"),
+            type_line=card.get("type_line", ""),
+            cmc=card.get("cmc", 0),
+            turn=turn,
+            phase="combat_damage",
+            role="response",
+            response_to="combat_damage",
+            projected_combat_damage=projected_damage,
+            chosen_damage_source=effect_data.get("_chosen_damage_source_name"),
+            chosen_damage_source_controller=effect_data.get("_chosen_damage_source_controller"),
+            chosen_damage_amount=effect_data.get("_chosen_damage_amount"),
+            **fields,
+        )
+        apply_effect_immediate(
+            target,
+            [player for player in all_players if player is not target],
+            card,
+            turn,
+            rng,
+            effect_data_override=effect_data,
+        )
+    else:
+        payment_card = selected.get("payment_card")
+        if payment_card is None or payment_card not in getattr(target, "hand", []):
+            return False
+        activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+        activation_colors = list(effect_data.get("activation_cost_colors") or [])
+        activation_cost_text = ""
+        if activation_cost_generic > 0:
+            activation_cost_text += "{%d}" % activation_cost_generic
+        activation_cost_text += "".join("{%s}" % color for color in activation_colors)
+        if not activation_cost_text:
+            activation_cost_text = "{0}"
+        if not target.can_pay(activation_cost_text) or not target.spend_mana(activation_cost_text):
+            return False
+        target.hand.remove(payment_card)
+        target.library.insert(0, payment_card)
+        if effect_data.get("activation_requires_tap"):
+            card["tapped"] = True
+        add_damage_prevention_shield(
+            target,
+            int(effect_data.get("prevent_damage_amount") or 999),
+            source=card.get("name", "damage_prevention_shield"),
+            source_match="chosen_source",
+            chosen_source_name=effect_data.get("_chosen_damage_source_name"),
+            chosen_source_controller=effect_data.get("_chosen_damage_source_controller"),
+            consume_once=True,
+            turn=turn,
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=target.name,
+            card=card.get("name", "?"),
+            effect=effect_data.get("effect", "unknown"),
+            activation_kind="put_card_from_hand_on_top_library_prevent_chosen_source_damage",
+            activation_cost=effect_data.get("activation_cost", "put_card_from_hand_on_top_of_library"),
+            topdecked_card=payment_card.get("name", "?"),
+            chosen_damage_source=effect_data.get("_chosen_damage_source_name"),
+            chosen_damage_source_controller=effect_data.get("_chosen_damage_source_controller"),
+            chosen_damage_amount=effect_data.get("_chosen_damage_amount"),
+            turn=turn,
+            phase="combat_damage",
+            **fields,
+        )
+        emit_replay_event(
+            "damage_prevention_shield_created",
+            player=target.name,
+            card=card.get("name", "?"),
+            chosen_source=effect_data.get("_chosen_damage_source_name"),
+            chosen_source_controller=effect_data.get("_chosen_damage_source_controller"),
+            prevention_amount=int(effect_data.get("prevent_damage_amount") or 999),
+            topdecked_card=payment_card.get("name", "?"),
+            turn=turn,
+            phase="combat_damage",
+            **fields,
+        )
     return True
 
 

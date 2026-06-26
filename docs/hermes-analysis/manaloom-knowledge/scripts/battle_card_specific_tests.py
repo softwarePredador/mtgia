@@ -14431,6 +14431,153 @@ def register_tests(battle, player):
             for decision in decisions
         )
 
+    def _pg241_penance_rule():
+        return {
+            "name": "Penance",
+            "cmc": 3,
+            "type_line": "Enchantment",
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1",
+            "activated_prevent_next_damage_from_chosen_source": True,
+            "activation_cost": "put_card_from_hand_on_top_of_library",
+            "activation_cost_generic": 0,
+            "activation_requires_put_card_from_hand_on_top_library": True,
+            "prevent_next_damage_from_chosen_source": True,
+            "prevent_damage_to": "you",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_damage_amount": 999,
+            "source_choice_required": True,
+            "source_color_filter": ["black", "red"],
+            "_rule_logical_key": "battle_rule_v1:penance-test",
+            "_rule_oracle_hash": "penance-test-hash",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+        }
+
+    def test_pg241_penance_activates_in_combat_window_and_prevents_matching_damage():
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            protected = player("Lorehold")
+            protected.life = 4
+            protected.library = [
+                {"name": "Future Draw", "cmc": 1, "type_line": "Sorcery"},
+            ]
+            protected.hand = [
+                {"name": "Slow Haymaker", "cmc": 7, "type_line": "Sorcery", "mana_cost": "{6}{R}"},
+            ]
+            penance = {**_pg241_penance_rule()}
+            protected.battlefield = [penance]
+            opponent = player("Opponent")
+            attacker = {
+                "name": "Blackblade Bruiser",
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "controller": "Opponent",
+                "owner": "Opponent",
+                "attacking": True,
+                "color_identity": ["B"],
+            }
+
+            responded = battle.combat_defensive_response_window(
+                opponent,
+                protected,
+                [attacker],
+                [(attacker, [])],
+                [protected, opponent],
+                7,
+                random.Random(241),
+            )
+            dealt = battle.deal_damage(protected, 5, source=attacker)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert responded is True
+        assert dealt is False
+        assert protected.life == 4
+        assert [card.get("name") for card in protected.hand] == []
+        assert protected.library[0].get("name") == "Slow Haymaker"
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Penance"
+            and data.get("activation_kind") == "put_card_from_hand_on_top_library_prevent_chosen_source_damage"
+            and data.get("topdecked_card") == "Slow Haymaker"
+            and data.get("chosen_damage_source") == "Blackblade Bruiser"
+            and data.get("rule_logical_key") == "battle_rule_v1:penance-test"
+            for event, data in events
+        )
+        assert any(
+            event == "damage_prevention_shield_created"
+            and data.get("card") == "Penance"
+            and data.get("chosen_source") == "Blackblade Bruiser"
+            and data.get("prevention_amount") == 999
+            for event, data in events
+        )
+        assert any(
+            event == "replacement_applied"
+            and data.get("affected_player") == "Lorehold"
+            and data.get("source") == "Blackblade Bruiser"
+            and data.get("prevented") is True
+            for event, data in events
+        )
+        assert any(
+            decision.get("chosen_option", {}).get("card") == "Penance"
+            for decision in decisions
+        )
+
+    def test_pg241_penance_skips_non_black_red_source():
+        events = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            protected = player("Lorehold")
+            protected.life = 4
+            protected.library = [{"name": "Future Draw", "cmc": 1, "type_line": "Sorcery"}]
+            protected.hand = [
+                {"name": "Slow Haymaker", "cmc": 7, "type_line": "Sorcery", "mana_cost": "{6}{R}"},
+            ]
+            penance = {**_pg241_penance_rule()}
+            protected.battlefield = [penance]
+            opponent = player("Opponent")
+            attacker = {
+                "name": "Emerald Colossus",
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "controller": "Opponent",
+                "owner": "Opponent",
+                "attacking": True,
+                "color_identity": ["G"],
+            }
+
+            responded = battle.combat_defensive_response_window(
+                opponent,
+                protected,
+                [attacker],
+                [(attacker, [])],
+                [protected, opponent],
+                8,
+                random.Random(242),
+            )
+            dealt = battle.deal_damage(protected, 5, source=attacker)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+
+        assert responded is False
+        assert dealt is True
+        assert protected.life == -1
+        assert [card.get("name") for card in protected.hand] == ["Slow Haymaker"]
+        assert protected.library[0].get("name") == "Future Draw"
+        assert not any(event == "damage_prevention_shield_created" for event, _ in events)
+
     def test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -15061,6 +15208,61 @@ def register_tests(battle, player):
             and data.get("trigger") == "controller_discard"
             and data.get("damage_each_opponent") == 1
             and len(data.get("damaged_opponents") or []) == 2
+            for event, data in events
+        )
+
+    def test_pg242_magmakin_artillerist_discard_count_hits_each_opponent():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            active.battlefield = [
+                {
+                    "name": "Magmakin Artillerist",
+                    "type_line": "Creature - Elemental Pirate",
+                    "effect": "creature",
+                    "battle_model_scope": "controller_discards_one_or_more_damage_each_opponent_cycling_ping_annotation_v1",
+                    "power": 1,
+                    "toughness": 4,
+                    "trigger": "controller_discard",
+                    "controller_discard_damage_each_opponent": 1,
+                    "controller_discard_count_mode": "discarded_cards",
+                    "cycling_cost": "{1}{R}",
+                    "cycling_status": "annotation_only",
+                    "cycle_trigger_damage_each_opponent": 1,
+                    "cycle_trigger_status": "annotation_only",
+                    "_rule_logical_key": "battle_rule_v1:magmakin-test",
+                    "_rule_oracle_hash": "magmakin-test-hash",
+                }
+            ]
+            discarded_cards = [
+                {"name": "Dead Draw Spell", "cmc": 6, "type_line": "Sorcery"},
+                {"name": "Spare Land", "cmc": 0, "type_line": "Land"},
+            ]
+            battle.process_player_discard_triggers(
+                active,
+                discarded_cards,
+                opponents=[opponent_a, opponent_b],
+                turn=6,
+                phase="main2",
+                rng=random.Random(242),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert opponent_a.life == 38
+        assert opponent_b.life == 38
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Magmakin Artillerist"
+            and data.get("trigger") == "controller_discard"
+            and data.get("discarded_count") == 2
+            and data.get("damage_per_card") == 1
+            and data.get("damage_each_opponent") == 2
+            and len(data.get("damaged_opponents") or []) == 2
+            and data.get("rule_logical_key") == "battle_rule_v1:magmakin-test"
             for event, data in events
         )
 
@@ -18929,6 +19131,7 @@ def register_tests(battle, player):
         test_pg201_deflecting_palm_prevents_chosen_source_and_reflects_damage,
         test_pg201_deflecting_palm_combat_window_chooses_largest_lethal_source,
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
+        test_pg242_magmakin_artillerist_discard_count_hits_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg209_monastery_mentor_creates_monk_on_noncreature_spell_only,
         test_pg239_coruscation_mage_damages_each_opponent_only_on_noncreature_spell_cast,
@@ -18947,6 +19150,8 @@ def register_tests(battle, player):
         test_pg081_redirect_lightning_redirects_single_target_stack_object,
         test_pg240_bolt_bend_ferocious_cost_reduction_requires_power_four_creature,
         test_pg240_bolt_bend_redirects_with_only_single_red_under_ferocious,
+        test_pg241_penance_activates_in_combat_window_and_prevents_matching_damage,
+        test_pg241_penance_skips_non_black_red_source,
         test_removal_exile_stack_target_exiles_spell_instead_of_countering_to_graveyard,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,

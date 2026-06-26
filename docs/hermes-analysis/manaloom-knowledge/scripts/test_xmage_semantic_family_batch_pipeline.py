@@ -9002,6 +9002,95 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "damage_prevention_reflect")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_penance_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Penance",
+                        "severity": "high",
+                        "oracle_hash": "penancehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Penance",
+                            "path": "/xmage/Penance.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["PreventNextDamageFromChosenSourceEffect"],
+                            "ability_classes": ["SimpleActivatedAbility"],
+                            "target_classes": [],
+                            "cost_classes": ["PutCardFromHandOnTopOfLibraryCost"],
+                            "primary_effect": {
+                                "effect": "damage_prevention_shield",
+                                "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1",
+                                "activated_prevent_next_damage_from_chosen_source": True,
+                                "activation_cost": "put_card_from_hand_on_top_of_library",
+                                "activation_cost_generic": 0,
+                                "activation_requires_put_card_from_hand_on_top_library": True,
+                                "prevent_next_damage_from_chosen_source": True,
+                                "prevent_damage_to": "you",
+                                "prevent_damage_duration": "until_end_of_turn",
+                                "prevent_damage_amount": 999,
+                                "source_choice_required": True,
+                                "source_color_filter": ["black", "red"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "damage_prevention_shield")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_magmakin_artillerist_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Magmakin Artillerist",
+                        "severity": "high",
+                        "oracle_hash": "magmakinhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "MagmakinArtillerist",
+                            "path": "/xmage/MagmakinArtillerist.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DamagePlayersEffect"],
+                            "ability_classes": [
+                                "DiscardOneOrMoreCardsTriggeredAbility",
+                                "CyclingAbility",
+                                "CycleTriggeredAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": ["ManaCostsImpl"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controller_discards_one_or_more_damage_each_opponent_cycling_ping_annotation_v1",
+                                "power": 1,
+                                "toughness": 4,
+                                "trigger": "controller_discard",
+                                "controller_discard_damage_each_opponent": 1,
+                                "controller_discard_count_mode": "discarded_cards",
+                                "cycling_cost": "{1}{R}",
+                                "cycling_status": "annotation_only",
+                                "cycle_trigger_damage_each_opponent": 1,
+                                "cycle_trigger_status": "annotation_only",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "creature")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_fable_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

@@ -230,6 +230,16 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "batch_strategy": "metadata_batch_after_pg_precheck",
     },
+    "damage_prevention_shield": {
+        "effects": {"damage_prevention_shield"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "activated chosen-source prevention shield that topdecks a hand card and blanks the next matching damage event",
+        "family_tests": [
+            "test_pg241_penance_activates_in_combat_window_and_prevents_matching_damage",
+            "test_pg241_penance_skips_non_black_red_source",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "opponent_damage_spell": {
         "effects": {"damage_each_opponent"},
         "support_status": "runtime_supported_family",
@@ -1100,6 +1110,27 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
         )
 
     if (
+        effect == "damage_prevention_shield"
+        and scope == "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1"
+    ):
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"PreventNextDamageFromChosenSourceEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"PutCardFromHandOnTopOfLibraryCost"}
+            and bool(effect_json.get("activated_prevent_next_damage_from_chosen_source"))
+            and effect_json.get("activation_cost") == "put_card_from_hand_on_top_of_library"
+            and int(effect_json.get("activation_cost_generic") or 0) == 0
+            and bool(effect_json.get("activation_requires_put_card_from_hand_on_top_library"))
+            and bool(effect_json.get("prevent_next_damage_from_chosen_source"))
+            and effect_json.get("prevent_damage_to") == "you"
+            and effect_json.get("prevent_damage_duration") == "until_end_of_turn"
+            and int(effect_json.get("prevent_damage_amount") or 0) == 999
+            and bool(effect_json.get("source_choice_required"))
+            and sorted(effect_json.get("source_color_filter") or []) == ["black", "red"]
+        )
+
+    if (
         effect == "redirect_removal"
         and scope == "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
     ):
@@ -1235,6 +1266,26 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("attacking_activated_discard_draw_cost") == "{1}{R}"
             and int(effect_json.get("attacking_activated_discard_count") or 0) == 1
             and int(effect_json.get("attacking_activated_draw_count") or 0) == 1
+        )
+
+    if effect == "creature" and scope == "controller_discards_one_or_more_damage_each_opponent_cycling_ping_annotation_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"DamagePlayersEffect"}
+            and {
+                "DiscardOneOrMoreCardsTriggeredAbility",
+                "CycleTriggeredAbility",
+                "CyclingAbility",
+            }.issubset(ability_classes)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 4
+            and effect_json.get("trigger") == "controller_discard"
+            and int(effect_json.get("controller_discard_damage_each_opponent") or 0) == 1
+            and effect_json.get("controller_discard_count_mode") == "discarded_cards"
+            and effect_json.get("cycling_cost") == "{1}{R}"
+            and effect_json.get("cycling_status") == "annotation_only"
+            and int(effect_json.get("cycle_trigger_damage_each_opponent") or 0) == 1
+            and effect_json.get("cycle_trigger_status") == "annotation_only"
         )
 
     if effect in {"creature", "passive"} and scope in {
@@ -3224,6 +3275,27 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("reflect_prevented_damage"))
             and effect_json.get("reflect_target") == "chosen_source_controller"
             and bool(effect_json.get("source_choice_required"))
+        )
+
+    if (
+        effect == "damage_prevention_shield"
+        and scope == "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1"
+    ):
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"PreventNextDamageFromChosenSourceEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"PutCardFromHandOnTopOfLibraryCost"}
+            and bool(effect_json.get("activated_prevent_next_damage_from_chosen_source"))
+            and effect_json.get("activation_cost") == "put_card_from_hand_on_top_of_library"
+            and int(effect_json.get("activation_cost_generic") or 0) == 0
+            and bool(effect_json.get("activation_requires_put_card_from_hand_on_top_library"))
+            and bool(effect_json.get("prevent_next_damage_from_chosen_source"))
+            and effect_json.get("prevent_damage_to") == "you"
+            and effect_json.get("prevent_damage_duration") == "until_end_of_turn"
+            and int(effect_json.get("prevent_damage_amount") or 0) == 999
+            and bool(effect_json.get("source_choice_required"))
+            and sorted(effect_json.get("source_color_filter") or []) == ["black", "red"]
         )
 
     if effect == "draw_engine" and scope == "opponent_discards_card_may_draw_v1":

@@ -1790,6 +1790,46 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "Penance"
+        and effect_classes == {"PreventNextDamageFromChosenSourceEffect"}
+        and ability_classes == {"SimpleActivatedAbility"}
+        and cost_classes == {"PutCardFromHandOnTopOfLibraryCost"}
+        and (
+            "black or red source" in normalized
+            or "colorpredicate(objectcolor.black)" in normalized
+            or "colorpredicate(objectcolor.red)" in normalized
+        )
+    ):
+        return {
+            "effect": "damage_prevention_shield",
+            "scope": "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1",
+            "fields": {
+                "activated_prevent_next_damage_from_chosen_source": True,
+                "activation_cost": "put_card_from_hand_on_top_of_library",
+                "activation_cost_generic": 0,
+                "activation_requires_put_card_from_hand_on_top_library": True,
+                "prevent_next_damage_from_chosen_source": True,
+                "prevent_damage_to": "you",
+                "prevent_damage_duration": "until_end_of_turn",
+                "prevent_damage_amount": 999,
+                "source_choice_required": True,
+                "source_color_filter": ["black", "red"],
+            },
+            "reason": (
+                "XMage structure matches Penance: a SimpleActivatedAbility with "
+                "PutCardFromHandOnTopOfLibraryCost that creates a chosen-source "
+                "damage prevention shield restricted to black or red sources."
+            ),
+            "signals": [
+                "SimpleActivatedAbility",
+                "PutCardFromHandOnTopOfLibraryCost",
+                "PreventNextDamageFromChosenSourceEffect(Duration.EndOfTurn, false, filter)",
+                "FilterSource(\"black or red source\")",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
         and xmage_class_name == "AuthorityOfTheConsuls"
         and {"GainLifeEffect", "PermanentsEnterBattlefieldTappedEffect"}.issubset(effect_classes)
         and {"EntersBattlefieldOpponentTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)
@@ -2689,6 +2729,49 @@ def _build_exact_runtime_variant_fields(
                 "SourceAttackingCondition",
                 "DiscardCardCost",
                 "DrawCardSourceControllerEffect(1)",
+            ],
+        }
+
+    if (
+        card_types == {"CREATURE"}
+        and xmage_class_name == "MagmakinArtillerist"
+        and "DamagePlayersEffect" in effect_classes
+        and {"DiscardOneOrMoreCardsTriggeredAbility", "CycleTriggeredAbility", "CyclingAbility"}.issubset(
+            ability_classes
+        )
+        and (
+            _oracle_has(rules_text, "whenever you discard one or more cards", "deals that much damage to each opponent")
+            or (
+                re.search(r"damageplayerseffect\(saveddiscardvalue\.much,\s*targetcontroller\.opponent\)", normalized)
+                and "discardoneormorecardstriggeredability" in normalized
+            )
+        )
+        and (
+            _oracle_has(rules_text, "when you cycle this card", "deals 1 damage to each opponent")
+            or "cycletriggeredability" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "controller_discards_one_or_more_damage_each_opponent_cycling_ping_annotation_v1",
+            "fields": {
+                "power": 1,
+                "toughness": 4,
+                "trigger": "controller_discard",
+                "controller_discard_damage_each_opponent": 1,
+                "controller_discard_count_mode": "discarded_cards",
+                "cycling_cost": "{1}{R}",
+                "cycling_status": "annotation_only",
+                "cycle_trigger_damage_each_opponent": 1,
+                "cycle_trigger_status": "annotation_only",
+            },
+            "reason": "XMage structure matches Magmakin Artillerist: a 1/4 creature that deals damage to each opponent equal to the number of cards you discarded, plus cycling and a cycling-trigger ping rider that ManaLoom preserves as annotation for now.",
+            "signals": [
+                "DiscardOneOrMoreCardsTriggeredAbility",
+                "DamagePlayersEffect(SavedDiscardValue.MUCH, TargetController.OPPONENT)",
+                "CyclingAbility({1}{R})",
+                "CycleTriggeredAbility",
+                "DamagePlayersEffect(1, TargetController.OPPONENT, it)",
             ],
         }
 

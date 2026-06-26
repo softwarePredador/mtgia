@@ -3401,16 +3401,24 @@
     "battle_rule_logical_key": "battle_rule_v1:efb8905b224067dc9b1c61e0bf194bfe"
   },
   "Bolt Bend": {
-    "cmc": 4.0,
-    "count": 1,
-    "effect": "draw_cards",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1",
+    "chooses_new_targets": true,
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_condition": "control_creature_power_4_or_greater",
+    "cost_reduction_generic": 3,
+    "effect": "redirect_removal",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e21a09af20904932ce575966774b7905"
+    "oracle_runtime_scope": "redirect_single_target_stack_object_compact_v1",
+    "target": "single_target_spell_or_ability",
+    "target_scope": "target_spell_or_ability",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d0db9d3b80fdcf684db70edd6537240f",
+    "battle_rule_oracle_hash": "16d71cf56cf890e5817bcbbcda37ae38"
   },
   "Boltwave": {
     "ability_kind": "one_shot",
@@ -6221,14 +6229,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Coruscation Mage": {
-    "cmc": 2.0,
-    "effect": "finisher",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:87a47eb9600289eacc5312fdf7f9de79"
+    "ability_kind": "triggered",
+    "battle_model_scope": "noncreature_spell_cast_damage_each_opponent_v1",
+    "damage": 1,
+    "effect": "creature",
+    "power": 2,
+    "target_controller": "opponents",
+    "toughness": 2,
+    "trigger": "noncreature_spell_cast",
+    "trigger_damage_each_opponent": 1,
+    "trigger_effect": "damage_each_opponent",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e3aad3351d48453dc40be9bc1a246917",
+    "battle_rule_oracle_hash": "825fa07365c51b116f5b708afc4f15ed"
   },
   "Cosmos Elixir": {
     "cmc": 4.0,
@@ -10863,13 +10880,21 @@
     "battle_rule_logical_key": "battle_rule_v1:daf1e5ac212a20bdfc37ca53384ade16"
   },
   "Fiery Inscription": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "instant_sorcery_cast_damage_each_opponent_v1",
+    "damage": 2,
     "effect": "passive",
+    "target_controller": "opponents",
+    "trigger": "instant_sorcery_cast",
+    "trigger_damage_each_opponent": 2,
+    "trigger_effect": "damage_each_opponent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1bd00fa75c597d366720ac22dd18a8fd",
+    "battle_rule_oracle_hash": "78584ef3b8696dacc27441e4952b68f1"
   },
   "Fiery Islet": {
     "effect": "land",
@@ -13755,19 +13780,23 @@
     "battle_rule_oracle_hash": "11231a3dc6228cf87243630826f882a7"
   },
   "Guttersnipe": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "spell_cast_damage_each_opponent_v1",
     "damage": 2,
     "effect": "creature",
-    "is_creature_permanent": true,
     "power": 2,
+    "target_controller": "opponents",
     "toughness": 2,
-    "trigger": "instant_sorcery_cast",
+    "trigger": "spell_cast",
+    "trigger_damage_each_opponent": 2,
     "trigger_effect": "damage_each_opponent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:7df4d731698657dc948cc1d3901fbd5b"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b634b726647d3bd833233759968be5a",
+    "battle_rule_oracle_hash": "f80fdc6153bf00a2198027bfa8b326db"
   },
   "Gwenna, Eyes of Gaea": {
     "cmc": 3.0,
@@ -16738,15 +16767,25 @@
     "battle_rule_logical_key": "battle_rule_v1:919ac49b74ceae821910e4eb8719e5e9"
   },
   "Knight of the White Orchid": {
-    "cmc": 2.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
     "effect": "creature",
+    "etb_land_ramp_condition": "opponent_controls_more_lands",
+    "etb_land_ramp_count": 1,
+    "keywords": [
+      "first_strike"
+    ],
+    "land_enters_tapped": true,
     "power": 2,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0be5c810a7dfffc0c756577871b07374"
+    "toughness": 2,
+    "tutor_target": "plains",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1320e9a85cb9d77de8e4cdf93a894beb",
+    "battle_rule_oracle_hash": "834f9afe428ace236f1988e953b5736d"
   },
   "Knollspine Dragon": {
     "cmc": 7.0,
@@ -17833,22 +17872,23 @@
     "battle_rule_logical_key": "battle_rule_v1:93c180ba34c0c9f4cfbbe9f42ba9168a"
   },
   "Longshot, Rebel Bowman": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "noncreature_spell_cast_damage_each_opponent_v1",
     "damage": 2,
     "effect": "creature",
-    "is_creature_permanent": true,
-    "keywords": [
-      "reach"
-    ],
     "power": 3,
+    "target_controller": "opponents",
     "toughness": 3,
-    "trigger": "instant_sorcery_cast",
+    "trigger": "noncreature_spell_cast",
+    "trigger_damage_each_opponent": 2,
     "trigger_effect": "damage_each_opponent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:7dc599b371f5088b59d18696e3b706fd"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:17f2c09b361ae9a707f4c27cece88bd0",
+    "battle_rule_oracle_hash": "262ee0e8c9dd03d7ef792501201f0df9"
   },
   "Looming Spires": {
     "effect": "land",
@@ -18089,15 +18129,25 @@
     "battle_rule_logical_key": "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
   },
   "Loyal Warhound": {
-    "cmc": 2.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
     "effect": "creature",
-    "power": 2,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0be5c810a7dfffc0c756577871b07374"
+    "etb_land_ramp_condition": "opponent_controls_more_lands",
+    "etb_land_ramp_count": 1,
+    "keywords": [
+      "vigilance"
+    ],
+    "land_enters_tapped": true,
+    "power": 3,
+    "toughness": 1,
+    "tutor_target": "basic_plains",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b715ee06c86326668eb29b42a2951b1a",
+    "battle_rule_oracle_hash": "f3badebe4bde0bfb318ff7280777c8e7"
   },
   "Lumbering Falls": {
     "effect": "land",
@@ -18301,15 +18351,25 @@
     "battle_rule_oracle_hash": "809522892bd5bb1abae8e9c80e1f7d34"
   },
   "Magmakin Artillerist": {
-    "cmc": 3.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2f76bad97175d8bd361b3fd37840ffee"
+    "ability_kind": "triggered",
+    "battle_model_scope": "controller_discards_one_or_more_damage_each_opponent_cycling_ping_annotation_v1",
+    "controller_discard_count_mode": "discarded_cards",
+    "controller_discard_damage_each_opponent": 1,
+    "cycle_trigger_damage_each_opponent": 1,
+    "cycle_trigger_status": "annotation_only",
+    "cycling_cost": "{1}{R}",
+    "cycling_status": "annotation_only",
+    "effect": "creature",
+    "power": 1,
+    "toughness": 4,
+    "trigger": "controller_discard",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4e07d6def685d15fad06df5be83b24d2",
+    "battle_rule_oracle_hash": "a0cad890cfcb5b3938c3d58a32687167"
   },
   "Magmaquake": {
     "cmc": 2.0,
@@ -18375,15 +18435,27 @@
     "battle_rule_oracle_hash": "da1c62032e405fc6fc6151ccdf6df879"
   },
   "Magus of the Wheel": {
-    "cmc": 3.0,
-    "count": 7,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ba92aeefa9850957ac17d04dd54f6192"
+    "ability_kind": "activated",
+    "activated_multiplayer_discard_draw_count": 7,
+    "activation_cost": "sacrifice_self",
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 1,
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "activated_tap_sacrifice_self_each_player_discards_hand_draws_seven_v1",
+    "effect": "creature",
+    "power": 3,
+    "toughness": 3,
+    "wheel_like": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:15ccc12d23aaede3eccf98152c168243",
+    "battle_rule_oracle_hash": "0199317c544dda0fdce5321d3d092e58"
   },
   "Mahadi, Emporium Master": {
     "cmc": 3.0,
@@ -22159,14 +22231,29 @@
     "battle_rule_logical_key": "battle_rule_v1:ab8a7926e0f1a05ad4ce8d94f9ea0edf"
   },
   "Penance": {
-    "cmc": 3.0,
-    "effect": "draw_engine",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
+    "ability_kind": "activated",
+    "activated_prevent_next_damage_from_chosen_source": true,
+    "activation_cost": "put_card_from_hand_on_top_of_library",
+    "activation_cost_generic": 0,
+    "activation_requires_put_card_from_hand_on_top_library": true,
+    "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1",
+    "effect": "damage_prevention_shield",
+    "prevent_damage_amount": 999,
+    "prevent_damage_duration": "until_end_of_turn",
+    "prevent_damage_to": "you",
+    "prevent_next_damage_from_chosen_source": true,
+    "source_choice_required": true,
+    "source_color_filter": [
+      "black",
+      "red"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7b7befc4b77b04202df8c2966004c8e6",
+    "battle_rule_oracle_hash": "fbe58d392a998f29895af142fa09e6d6"
   },
   "Pendelhaven": {
     "effect": "land",
@@ -34897,14 +34984,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Vivi Ornitier": {
-    "cmc": 3.0,
-    "effect": "ramp_ritual",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d56035ac6af9d51b9f671e582bb570cf"
+    "ability_kind": "triggered",
+    "battle_model_scope": "noncreature_spell_cast_damage_each_opponent_v1",
+    "damage": 1,
+    "effect": "creature",
+    "power": 0,
+    "target_controller": "opponents",
+    "toughness": 3,
+    "trigger": "noncreature_spell_cast",
+    "trigger_damage_each_opponent": 1,
+    "trigger_effect": "damage_each_opponent",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6a804c9cfcf1b619a6ea8f29e18b790a",
+    "battle_rule_oracle_hash": "f2eaad7fdd9f97fcb314e495fd4f4a4e"
   },
   "Vivid Crag": {
     "effect": "land",

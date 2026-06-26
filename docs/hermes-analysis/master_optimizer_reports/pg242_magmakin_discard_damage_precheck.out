@@ -1,0 +1,5 @@
+      card_name       |   normalized_name    |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+----------------------+----------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Magmakin Artillerist | magmakin artillerist | a0cad890cfcb5b3938c3d58a32687167 | battle_rule_v1:4e07d6def685d15fad06df5be83b24d2 | deprecate_nonmatching_rows |                1 | 8f5648da-df1c-4873-bf29-228e3cbccb57 |                  2 |                         0 |                           2
+(1 row)
+

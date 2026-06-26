@@ -1,0 +1,5 @@
+ card_name | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+-----------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Penance   | penance         | fbe58d392a998f29895af142fa09e6d6 | battle_rule_v1:7b7befc4b77b04202df8c2966004c8e6 | deprecate_nonmatching_rows |                1 | 2b122a80-ebc8-48ae-a144-53b812b21ad4 |                  2 |                         0 |                           2
+(1 row)
+
