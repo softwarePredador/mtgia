@@ -23841,15 +23841,27 @@
     "battle_rule_logical_key": "battle_rule_v1:9ebdd456c04ec50d9efbc010ee85c689"
   },
   "Razorgrass Ambush // Razorgrass Field": {
-    "cmc": 2.0,
-    "effect": "remove_creature",
+    "ability_kind": "one_shot",
+    "battle_model_scope": "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1",
+    "damage": 3,
+    "effect": "direct_damage",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
+    "land_side_add_mana": "W",
+    "land_side_pay_three_life_else_tapped": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c874e3f31bb90d28d81c0636e7870aa5",
+    "battle_rule_oracle_hash": "3420ea7bfa507b2821269d598068cd33"
   },
   "Razorkin Needlehead": {
     "cmc": 2.0,

@@ -1,0 +1,5 @@
+               card_name               |            normalized_name            |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+---------------------------------------+---------------------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Razorgrass Ambush // Razorgrass Field | razorgrass ambush // razorgrass field | battle_rule_v1:c874e3f31bb90d28d81c0636e7870aa5 |                  1 |                           1 |                         1 |           2
+(1 row)
+

@@ -3145,6 +3145,22 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("land_side_add_mana") == "U"
         )
 
+    if effect == "direct_damage" and scope == "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1":
+        constraints = effect_json.get("target_constraints") or {}
+        return (
+            types == {"INSTANT", "LAND"}
+            and "DamageTargetEffect" in effect_classes
+            and {"AsEntersBattlefieldAbility", "WhiteManaAbility"}.issubset(ability_classes)
+            and "PayLifeCost" in xmage_cost_classes(card)
+            and "TargetAttackingOrBlockingCreature" in target_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "creature"
+            and int(effect_json.get("damage") or 0) == 3
+            and bool(effect_json.get("land_side_pay_three_life_else_tapped"))
+            and effect_json.get("land_side_add_mana") == "W"
+            and constraints.get("combat_state") == "attacking_or_blocking"
+        )
+
     return False
 
 

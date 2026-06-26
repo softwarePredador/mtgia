@@ -6736,6 +6736,16 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     source_colors = {_normalize_color_symbol(color) for color in source_colors}
     if any(c in protections for c in source_colors):
         return False
+    constraints = _target_constraints_dict(spell)
+    combat_state = str(constraints.get("combat_state") or "").lower()
+    if combat_state == "attacking" and not bool(target.get("attacking")):
+        return False
+    if combat_state == "blocking" and not bool(target.get("blocking")):
+        return False
+    if combat_state == "attacking_or_blocking" and not (
+        bool(target.get("attacking")) or bool(target.get("blocking"))
+    ):
+        return False
     # Ward: doesn't affect legality, only triggers on cast
     return True
 
@@ -6837,6 +6847,16 @@ def removal_destination(effect_data):
     if effect_data.get("exile_target"):
         return "exile"
     return "graveyard"
+
+
+def direct_damage_targets_player(effect_data):
+    constraints = _target_constraints_dict(effect_data)
+    if str(constraints.get("scope") or "").lower() == "any_target":
+        return True
+    target = str((effect_data or {}).get("target") or "").lower()
+    if target in {"player", "opponent", "any_target"}:
+        return True
+    return False
 
 
 def removal_annotation_replay_fields(effect_data):
@@ -23129,7 +23149,12 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     for opp in opponents:
         targets = [
             target
-            for target in removal_target_candidates(opp, controller=player, source=card)
+            for target in removal_target_candidates(
+                opp,
+                effect_data,
+                controller=player,
+                source=card,
+            )
             if int(target.get("toughness") or target.get("power") or 2) <= amount
         ]
         if targets:
@@ -23169,6 +23194,18 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             player.graveyard.append(card)
             return
     alive_opponents = [opp for opp in opponents if opp.is_alive()]
+    if not direct_damage_targets_player(effect_data):
+        player.graveyard.append(card)
+        emit_replay_event(
+            "damage_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            amount=amount,
+            result="no_legal_creature_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        return
     if alive_opponents:
         target_player = min(alive_opponents, key=lambda opp: opp.life)
         life_before = target_player.life
@@ -29855,7 +29892,16 @@ def apply_effect_immediate(
         permanent["tapped"] = False
         player.battlefield.append(permanent)
 
+def clear_combat_state(all_players):
+    for participant in all_players or []:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if isinstance(permanent, dict):
+                permanent.pop("attacking", None)
+                permanent.pop("blocking", None)
+
+
 def beginning_of_combat_step(attacker, opponents, all_players, turn, rng, stack):
+    clear_combat_state(all_players)
     emit_replay_event(
         "combat_step",
         step="beginning_of_combat",
@@ -30659,6 +30705,7 @@ def declare_attackers_step(attacker, opponents, all_players, turn):
         return None
 
     for creature in attackers:
+        creature["attacking"] = True
         if not has_vigilance(creature):
             creature["tapped"] = True
             resolve_controlled_dwarf_tap_treasure_triggers(
@@ -30924,6 +30971,8 @@ def declare_blockers_step(target, attackers, turn, rng):
             # Avoid an automatic full-board suicide unless it prevents lethal.
             if estimated_losses == len(blockers):
                 blockers = []
+        for blocker in blockers:
+            blocker["blocking"] = True
         assigned_blockers.extend(blockers)
         block_assignments.append((a, blockers))
     emit_replay_event(
@@ -31420,6 +31469,7 @@ def end_of_combat_step(attacker, all_players, turn, rng, stack):
     trigger_end_of_combat(all_players, attacker, turn, stack)
     flush_triggers_in_apnap(attacker, all_players, stack)
     run_priority_loop(attacker, all_players, stack, turn, "end_of_combat", rng)
+    clear_combat_state(all_players)
 
 
 def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):

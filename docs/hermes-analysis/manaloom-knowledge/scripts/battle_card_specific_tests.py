@@ -12936,6 +12936,69 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_direct_damage_combat_restriction_only_hits_attacking_or_blocking_creatures():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            attacking_target = {
+                "name": "Attacking Target",
+                "cmc": 2,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "attacking": True,
+            }
+            resting_target = {
+                "name": "Resting Target",
+                "cmc": 2,
+                "type_line": "Creature",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            opponent.life = 20
+            opponent.battlefield = [resting_target, attacking_target]
+            razorgrass = {
+                "name": "Razorgrass Ambush // Razorgrass Field",
+                "cmc": 2,
+                "type_line": "Instant",
+                "effect": "direct_damage",
+                "damage": 3,
+                "instant": True,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"], "combat_state": "attacking_or_blocking"},
+                "_rule_logical_key": "battle_rule_v1:razorgrass-test",
+                "_rule_oracle_hash": "razorgrass-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+
+            battle.apply_direct_damage(
+                active,
+                [opponent],
+                razorgrass,
+                razorgrass,
+                turn=8,
+                rng=random.Random(226),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert attacking_target not in opponent.battlefield
+        assert resting_target in opponent.battlefield
+        assert opponent.life == 20
+        assert any(
+            event == "damage_resolved"
+            and data.get("card") == "Razorgrass Ambush // Razorgrass Field"
+            and data.get("target") == "Attacking Target"
+            and data.get("result") == "creature_destroyed"
+            and data.get("rule_logical_key") == "battle_rule_v1:razorgrass-test"
+            for event, data in events
+        )
+
     def _pg200_trouble_in_pairs_rule():
         return {
             "name": "Trouble in Pairs",
@@ -17453,6 +17516,7 @@ def register_tests(battle, player):
         test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures,
         test_pg198_surly_badgersaur_discard_card_type_triggers_counter_treasure_and_fight,
         test_pg199_taii_wakeen_modifies_noncombat_damage_and_draws_on_exact_toughness,
+        test_direct_damage_combat_restriction_only_hits_attacking_or_blocking_creatures,
         test_pg200_trouble_in_pairs_draws_on_opponent_second_card_each_turn,
         test_pg200_trouble_in_pairs_draws_on_opponent_second_spell_without_tax,
         test_pg200_trouble_in_pairs_draws_when_attacked_by_two_or_more_creatures,

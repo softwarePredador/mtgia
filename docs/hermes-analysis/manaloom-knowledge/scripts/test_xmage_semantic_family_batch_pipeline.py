@@ -7529,6 +7529,44 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_razorgrass_ambush_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Razorgrass Ambush // Razorgrass Field",
+                        "severity": "high",
+                        "oracle_hash": "razorgrasshash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "RazorgrassAmbush",
+                            "path": "/xmage/RazorgrassAmbush.java",
+                            "types": ["INSTANT", "LAND"],
+                            "effect_classes": ["DamageTargetEffect", "TapSourceUnlessPaysEffect"],
+                            "ability_classes": ["AsEntersBattlefieldAbility", "WhiteManaAbility"],
+                            "target_classes": ["TargetAttackingOrBlockingCreature"],
+                            "cost_classes": ["PayLifeCost"],
+                            "primary_effect": {
+                                "effect": "direct_damage",
+                                "battle_model_scope": "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1",
+                                "instant": True,
+                                "target": "creature",
+                                "damage": 3,
+                                "land_side_pay_three_life_else_tapped": True,
+                                "land_side_add_mana": "W",
+                                "target_constraints": {"combat_state": "attacking_or_blocking"},
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_disciple_of_freyalise_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

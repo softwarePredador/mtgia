@@ -5086,6 +5086,38 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["land_side_pay_three_life_else_tapped"])
         self.assertEqual(primary["land_side_add_mana"], "U")
 
+    def test_razorgrass_ambush_maps_to_exact_attacking_blocking_damage_land_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "RazorgrassAmbush",
+                "effect_classes": ["DamageTargetEffect", "TapSourceUnlessPaysEffect"],
+                "ability_classes": ["AsEntersBattlefieldAbility", "WhiteManaAbility"],
+                "target_classes": ["TargetAttackingOrBlockingCreature"],
+                "cost_classes": ["PayLifeCost"],
+                "constructor_metadata": {"card_types": ["INSTANT", "LAND"]},
+                "raw_excerpt": (
+                    "this.getLeftHalfCard().getSpellAbility().addTarget(new TargetAttackingOrBlockingCreature()); "
+                    "this.getLeftHalfCard().getSpellAbility().addEffect(new DamageTargetEffect(3)); "
+                    "this.getRightHalfCard().addAbility(new AsEntersBattlefieldAbility(new TapSourceUnlessPaysEffect(new PayLifeCost(3)))); "
+                    "this.getRightHalfCard().addAbility(new WhiteManaAbility());"
+                ),
+            },
+            "Razorgrass Ambush deals 3 damage to target attacking or blocking creature.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "direct_damage")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1",
+        )
+        self.assertTrue(primary["instant"])
+        self.assertEqual(primary["target"], "creature")
+        self.assertEqual(primary["damage"], 3)
+        self.assertTrue(primary["land_side_pay_three_life_else_tapped"])
+        self.assertEqual(primary["land_side_add_mana"], "W")
+        self.assertEqual(primary["target_constraints"]["combat_state"], "attacking_or_blocking")
+
     def test_disciple_of_freyalise_maps_to_exact_etb_sacrifice_and_land_scope(self) -> None:
         result = hints.build_effect_hints(
             {

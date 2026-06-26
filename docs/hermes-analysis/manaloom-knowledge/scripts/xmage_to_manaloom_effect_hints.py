@@ -68,6 +68,8 @@ def _target_constraints(target_classes: set[str], filter_classes: set[str]) -> d
         constraints["zone"] = "graveyard"
     if "spell" in joined or "stack" in joined:
         constraints["zone"] = "stack"
+    if "attackingorblocking" in joined or "attacking or blocking" in joined:
+        constraints["combat_state"] = "attacking_or_blocking"
     if "anytarget" in joined:
         constraints["scope"] = "any_target"
     return constraints
@@ -3669,6 +3671,41 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        card_types == {"INSTANT", "LAND"}
+        and "DamageTargetEffect" in effect_classes
+        and {"AsEntersBattlefieldAbility", "WhiteManaAbility"}.issubset(ability_classes)
+        and "PayLifeCost" in cost_classes
+        and "TargetAttackingOrBlockingCreature" in target_classes
+    ):
+        damage = _first_int(r"damagetargeteffect\((\d+)", normalized)
+        if damage is None:
+            damage = _first_int(r"deals\s+(\d+)\s+damage\s+to\s+target\s+attacking\s+or\s+blocking\s+creature", normalized)
+        if damage is not None:
+            return {
+                "effect": "direct_damage",
+                "scope": "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1",
+                "fields": {
+                    "instant": True,
+                    "target": "creature",
+                    "damage": damage,
+                    "land_side_pay_three_life_else_tapped": True,
+                    "land_side_add_mana": "W",
+                },
+                "reason": "XMage structure matches Razorgrass Ambush fixed damage to target attacking or blocking creature plus the white land MDFC back face.",
+                "signals": [
+                    "DamageTargetEffect",
+                    "TargetAttackingOrBlockingCreature",
+                    "TapSourceUnlessPaysEffect",
+                    "WhiteManaAbility",
+                    "PayLifeCost",
+                ],
+                "target_constraints": {
+                    "card_types": ["creature"],
+                    "combat_state": "attacking_or_blocking",
+                },
+            }
+
+    if (
         card_types == {"INSTANT"}
         and {"CounterTargetEffect", "DestroyTargetEffect"}.issubset(effect_classes)
         and "blue spell" in normalized
@@ -6405,6 +6442,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 reason=str(exact_runtime_variant_fields["reason"]),
                 ability_kind=ability_kind,
                 requires_runtime_executor=True,
+                target_constraints=dict(exact_runtime_variant_fields.get("target_constraints") or {}),
                 extra_effect_fields=dict(exact_runtime_variant_fields["fields"]),
                 matched_signals=list(exact_runtime_variant_fields["signals"]),
             )
