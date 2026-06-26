@@ -25466,6 +25466,46 @@ def trigger_spell_cast_engines(
                 all_players=all_players,
             )
             continue
+        if permanent.get("trigger_effect") == "damage_each_opponent":
+            amount = int(permanent.get("trigger_damage_each_opponent") or permanent.get("damage") or 1)
+            if amount <= 0:
+                continue
+
+            def resolve_spell_cast_damage_each_opponent_trigger(
+                permanent=permanent,
+                amount=amount,
+                trigger_kind=trigger_kind,
+            ):
+                damaged = []
+                for opponent in all_players:
+                    if opponent == player or not opponent.is_alive():
+                        continue
+                    if deal_damage(opponent, amount):
+                        damaged.append({"player": opponent.name, "life_after": opponent.life})
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    effect="damage_each_opponent",
+                    amount=amount,
+                    damaged=damaged,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_spell_cast_damage_each_opponent_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         mana_amount = int(permanent.get("spell_cast_add_mana") or 0)
         if mana_amount <= 0:
             continue

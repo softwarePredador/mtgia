@@ -249,6 +249,15 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "batch_strategy": "metadata_batch_after_pg_precheck",
     },
+    "spell_cast_damage_engine": {
+        "effects": {"creature", "passive"},
+        "support_status": "runtime_supported_family",
+        "implementation_unit": "battlefield trigger on spell, noncreature-spell, or instant-sorcery casts that damages each live opponent",
+        "family_tests": [
+            "test_pg239_coruscation_mage_damages_each_opponent_only_on_noncreature_spell_cast",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
+    },
     "targeted_protection": {
         "effects": {"grant_protection_from_chosen_color"},
         "support_status": "runtime_supported_family",
@@ -369,7 +378,7 @@ def xmage_condition_classes(card: dict[str, Any]) -> set[str]:
 def family_for_effect(effect: str | None) -> str:
     effect = str(effect or "external_reference_required_manual_model")
     for family_id, definition in FAMILY_DEFINITIONS.items():
-        if family_id == "controlled_creature_etb_damage_engine":
+        if family_id in {"controlled_creature_etb_damage_engine", "spell_cast_damage_engine"}:
             continue
         if effect in definition["effects"]:
             return family_id
@@ -383,6 +392,21 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         and effect_json.get("trigger_effect") == "damage_each_opponent"
     ):
         return "controlled_creature_etb_damage_engine"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
+        in {
+            "spell_cast_damage_each_opponent_v1",
+            "noncreature_spell_cast_damage_each_opponent_v1",
+            "instant_sorcery_cast_damage_each_opponent_v1",
+        }
+        and effect_json.get("trigger") in {
+            "spell_cast",
+            "noncreature_spell_cast",
+            "instant_sorcery_cast",
+        }
+        and effect_json.get("trigger_effect") == "damage_each_opponent"
+    ):
+        return "spell_cast_damage_engine"
     if (
         str(effect_json.get("battle_model_scope") or "")
         == "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1"
@@ -1187,6 +1211,33 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("attacking_activated_draw_count") or 0) == 1
         )
 
+    if effect in {"creature", "passive"} and scope in {
+        "spell_cast_damage_each_opponent_v1",
+        "noncreature_spell_cast_damage_each_opponent_v1",
+        "instant_sorcery_cast_damage_each_opponent_v1",
+    }:
+        expected_trigger = {
+            "spell_cast_damage_each_opponent_v1": "spell_cast",
+            "noncreature_spell_cast_damage_each_opponent_v1": "noncreature_spell_cast",
+            "instant_sorcery_cast_damage_each_opponent_v1": "instant_sorcery_cast",
+        }[scope]
+        allowed_types = {
+            frozenset({"CREATURE"}),
+            frozenset({"ENCHANTMENT"}),
+            frozenset({"ARTIFACT"}),
+            frozenset({"ENCHANTMENT", "CREATURE"}),
+            frozenset({"ARTIFACT", "CREATURE"}),
+        }
+        return (
+            frozenset(types) in allowed_types
+            and "DamagePlayersEffect" in effect_classes
+            and "SpellCastControllerTriggeredAbility" in ability_classes
+            and int(effect_json.get("trigger_damage_each_opponent") or effect_json.get("damage") or 0) > 0
+            and effect_json.get("trigger") == expected_trigger
+            and effect_json.get("trigger_effect") == "damage_each_opponent"
+            and effect_json.get("target_controller") == "opponents"
+        )
+
     if effect == "token_maker" and scope == "instant_sorcery_cast_create_1_1_red_elemental_v1":
         return (
             types == {"CREATURE"}
@@ -1682,6 +1733,20 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("land_graveyard_token_colors") == ["R", "G", "W"]
             and int(effect_json.get("land_graveyard_token_power") or 0) == 1
             and int(effect_json.get("land_graveyard_token_toughness") or 0) == 1
+        )
+
+    if effect == "creature" and scope == "etb_opponent_more_lands_plains_to_battlefield_tapped_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"SearchLibraryPutInPlayEffect"}
+            and "EntersBattlefieldTriggeredAbility" in ability_classes
+            and not cost_classes
+            and int(effect_json.get("etb_land_ramp_count") or 0) == 1
+            and effect_json.get("etb_land_ramp_condition") == "opponent_controls_more_lands"
+            and bool(effect_json.get("land_enters_tapped"))
+            and effect_json.get("tutor_target") in {"plains", "basic_plains"}
+            and int(effect_json.get("power") or 0) in {2, 3}
+            and int(effect_json.get("toughness") or 0) in {1, 2}
         )
 
     if effect == "creature" and scope == "activated_land_tutor_with_land_sacrifice_and_graveyard_growth_v1":

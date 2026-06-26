@@ -359,6 +359,78 @@ def _build_controlled_creature_enters_damage_each_opponent_fields(
     }
 
 
+def _build_spell_cast_damage_each_opponent_fields(
+    *,
+    index_entry: dict[str, Any],
+    rules_text: str,
+    effect_classes: set[str],
+    ability_classes: set[str],
+) -> dict[str, Any] | None:
+    card_types = _constructor_card_types(index_entry)
+    if "DamagePlayersEffect" not in effect_classes:
+        return None
+    if "SpellCastControllerTriggeredAbility" not in ability_classes:
+        return None
+
+    normalized = _normalized_rules_text(rules_text)
+    if "targetcontroller.opponent" not in normalized and "each opponent" not in normalized:
+        return None
+    if not card_types.intersection({"CREATURE", "ENCHANTMENT", "ARTIFACT"}):
+        return None
+
+    amount = _first_int(r"damageplayerseffect\((\d+)", normalized)
+    if amount is None:
+        amount = _first_int(r"deals\s+(\d+)\s+damage\s+to\s+each\s+opponent", normalized)
+    if amount is None:
+        return None
+
+    trigger = "spell_cast"
+    scope = "spell_cast_damage_each_opponent_v1"
+    trigger_signal = "SpellCastControllerTriggeredAbility"
+    if (
+        "filter_spell_a_non_creature" in normalized
+        or _oracle_has(rules_text, "whenever you cast a noncreature spell")
+    ):
+        trigger = "noncreature_spell_cast"
+        scope = "noncreature_spell_cast_damage_each_opponent_v1"
+        trigger_signal = "FILTER_SPELL_A_NON_CREATURE"
+    elif (
+        "filter_spell_an_instant_or_sorcery" in normalized
+        or _oracle_has(rules_text, "whenever you cast an instant or sorcery spell")
+        or _oracle_has(rules_text, "whenever you cast an instant or sorcery")
+    ):
+        trigger = "instant_sorcery_cast"
+        scope = "instant_sorcery_cast_damage_each_opponent_v1"
+        trigger_signal = "FILTER_SPELL_AN_INSTANT_OR_SORCERY"
+
+    effect = "creature" if "CREATURE" in card_types else "passive"
+    fields: dict[str, Any] = {
+        "trigger": trigger,
+        "trigger_effect": "damage_each_opponent",
+        "trigger_damage_each_opponent": amount,
+        "damage": amount,
+        "target_controller": "opponents",
+    }
+    if effect == "creature":
+        fields.update(_constructor_power_toughness_fields(index_entry, rules_text))
+    return {
+        "effect": effect,
+        "scope": scope,
+        "fields": fields,
+        "reason": (
+            "XMage uses SpellCastControllerTriggeredAbility with DamagePlayersEffect "
+            "targeting opponents; ManaLoom can model this as a battlefield trigger "
+            "that damages each live opponent when the matching spell class is cast."
+        ),
+        "signals": [
+            "SpellCastControllerTriggeredAbility",
+            "DamagePlayersEffect",
+            "TargetController.OPPONENT",
+            trigger_signal,
+        ],
+    }
+
+
 def _build_copy_permanent_etb_fields(
     *,
     index_entry: dict[str, Any],
@@ -5225,6 +5297,48 @@ def _build_tutor_to_hand_fields(
             ],
         }
 
+    if (
+        card_types == {"CREATURE"}
+        and effect_classes == {"SearchLibraryPutInPlayEffect"}
+        and "EntersBattlefieldTriggeredAbility" in ability_classes
+        and not cost_classes
+        and "opponentcontrolsmorecondition(staticfilters.filter_lands)" in normalized
+        and "searchlibraryputinplayeffect" in normalized
+        and (
+            xmage_class_name == "KnightOfTheWhiteOrchid"
+            or xmage_class_name == "LoyalWarhound"
+        )
+    ):
+        tutor_target = "basic_plains" if xmage_class_name == "LoyalWarhound" else "plains"
+        power = 3 if xmage_class_name == "LoyalWarhound" else 2
+        toughness = 1 if xmage_class_name == "LoyalWarhound" else 2
+        keywords = ["vigilance"] if xmage_class_name == "LoyalWarhound" else ["first_strike"]
+        return {
+            "effect": "creature",
+            "scope": "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
+            "ability_kind": "triggered",
+            "fields": {
+                "power": power,
+                "toughness": toughness,
+                "etb_land_ramp_count": 1,
+                "etb_land_ramp_condition": "opponent_controls_more_lands",
+                "land_enters_tapped": True,
+                "tutor_target": tutor_target,
+                "keywords": keywords,
+            },
+            "reason": (
+                "XMage structure matches a white creature with an ETB trigger that checks whether an opponent "
+                "controls more lands and then tutors a Plains card onto the battlefield tapped."
+            ),
+            "signals": [
+                "EntersBattlefieldTriggeredAbility",
+                "OpponentControlsMoreCondition",
+                "SearchLibraryPutInPlayEffect",
+                "Zone.BATTLEFIELD",
+                "tapped",
+            ],
+        }
+
     if "SearchLibraryPutInHandEffect" not in effect_classes:
         return None
 
@@ -6105,6 +6219,51 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "RemoveCounterCost",
                     "FilterLandCard(Plains)",
                     "OpponentControlsMoreCondition",
+                ],
+            )
+        )
+
+    if (
+        card_types == {"CREATURE"}
+        and effect_classes == {"SearchLibraryPutInPlayEffect"}
+        and "EntersBattlefieldTriggeredAbility" in ability_classes
+        and not cost_classes
+        and "opponentcontrolsmorecondition(staticfilters.filter_lands)" in normalized_text
+        and "searchlibraryputinplayeffect" in normalized_text
+        and (
+            xmage_class_name == "KnightOfTheWhiteOrchid"
+            or xmage_class_name == "LoyalWarhound"
+        )
+    ):
+        tutor_target = "basic_plains" if xmage_class_name == "LoyalWarhound" else "plains"
+        power = 3 if xmage_class_name == "LoyalWarhound" else 2
+        toughness = 1 if xmage_class_name == "LoyalWarhound" else 2
+        keywords = ["vigilance"] if xmage_class_name == "LoyalWarhound" else ["first_strike"]
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
+                reason=(
+                    "XMage structure matches a white catch-up ramp creature whose ETB trigger checks whether an "
+                    "opponent controls more lands and then tutors a tapped Plains onto the battlefield."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "power": power,
+                    "toughness": toughness,
+                    "etb_land_ramp_count": 1,
+                    "etb_land_ramp_condition": "opponent_controls_more_lands",
+                    "land_enters_tapped": True,
+                    "tutor_target": tutor_target,
+                    "keywords": keywords,
+                },
+                matched_signals=[
+                    "EntersBattlefieldTriggeredAbility",
+                    "OpponentControlsMoreCondition",
+                    "SearchLibraryPutInPlayEffect",
+                    "Zone.BATTLEFIELD",
+                    "tapped",
                 ],
             )
         )
@@ -7567,6 +7726,25 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=False,
                 extra_effect_fields=dict(controlled_creature_enters_damage_fields["fields"]),
                 matched_signals=list(controlled_creature_enters_damage_fields["signals"]),
+            )
+        )
+
+    spell_cast_damage_fields = _build_spell_cast_damage_each_opponent_fields(
+        index_entry=index_entry,
+        rules_text=rules_text,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+    )
+    if spell_cast_damage_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(spell_cast_damage_fields["effect"]),
+                scope=str(spell_cast_damage_fields["scope"]),
+                reason=str(spell_cast_damage_fields["reason"]),
+                ability_kind="triggered",
+                requires_runtime_executor=False,
+                extra_effect_fields=dict(spell_cast_damage_fields["fields"]),
+                matched_signals=list(spell_cast_damage_fields["signals"]),
             )
         )
 

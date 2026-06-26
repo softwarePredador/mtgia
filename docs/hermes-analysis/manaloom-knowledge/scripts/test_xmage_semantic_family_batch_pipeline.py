@@ -4983,6 +4983,84 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_knight_of_the_white_orchid_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Knight of the White Orchid",
+                        "severity": "high",
+                        "oracle_hash": "knighthash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "KnightOfTheWhiteOrchid",
+                            "path": "/xmage/KnightOfTheWhiteOrchid.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                            "ability_classes": ["EntersBattlefieldTriggeredAbility", "FirstStrikeAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
+                                "power": 2,
+                                "toughness": 2,
+                                "etb_land_ramp_count": 1,
+                                "etb_land_ramp_condition": "opponent_controls_more_lands",
+                                "land_enters_tapped": True,
+                                "tutor_target": "plains",
+                                "keywords": ["first_strike"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_loyal_warhound_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Loyal Warhound",
+                        "severity": "high",
+                        "oracle_hash": "warhoundhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "LoyalWarhound",
+                            "path": "/xmage/LoyalWarhound.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                            "ability_classes": ["EntersBattlefieldTriggeredAbility", "VigilanceAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
+                                "power": 3,
+                                "toughness": 1,
+                                "etb_land_ramp_count": 1,
+                                "etb_land_ramp_condition": "opponent_controls_more_lands",
+                                "land_enters_tapped": True,
+                                "tutor_target": "basic_plains",
+                                "keywords": ["vigilance"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_rhystic_study_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -7385,6 +7463,50 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
 
         self.assertEqual(report["cards"][0]["family_id"], "controlled_creature_etb_damage_engine")
+        self.assertEqual(
+            report["cards"][0]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
+
+    def test_spell_cast_damage_family_marks_coruscation_mage_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Coruscation Mage",
+                        "severity": "high",
+                        "oracle_hash": "coruscationhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "CoruscationMage",
+                            "path": "/xmage/CoruscationMage.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["DamagePlayersEffect"],
+                            "ability_classes": ["OffspringAbility", "SpellCastControllerTriggeredAbility"],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "noncreature_spell_cast_damage_each_opponent_v1",
+                                "trigger": "noncreature_spell_cast",
+                                "trigger_effect": "damage_each_opponent",
+                                "trigger_damage_each_opponent": 1,
+                                "damage": 1,
+                                "target_controller": "opponents",
+                                "power": 2,
+                                "toughness": 2,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["family_id"], "spell_cast_damage_engine")
         self.assertEqual(
             report["cards"][0]["promotion_lane"],
             "batch_metadata_candidate_requires_pg_precheck",

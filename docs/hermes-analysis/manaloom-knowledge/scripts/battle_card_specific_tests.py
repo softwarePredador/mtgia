@@ -6219,6 +6219,113 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg238_knight_of_the_white_orchid_etb_tutors_plains_to_battlefield_when_behind():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            knight = {
+                "name": "Knight of the White Orchid",
+                "type_line": "Creature — Human Knight",
+                "effect": "creature",
+                "battle_model_scope": "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
+                "power": 2,
+                "toughness": 2,
+                "etb_land_ramp_count": 1,
+                "etb_land_ramp_condition": "opponent_controls_more_lands",
+                "land_enters_tapped": True,
+                "tutor_target": "plains",
+                "_rule_logical_key": "battle_rule_v1:pg238-knight-test",
+                "_rule_oracle_hash": "pg238-knight-test-hash",
+            }
+            active.battlefield = [
+                knight,
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+            opponent.battlefield = [
+                {"name": "Island", "cmc": 0, "type_line": "Basic Land — Island", "effect": "land"},
+                {"name": "Swamp", "cmc": 0, "type_line": "Basic Land — Swamp", "effect": "land"},
+            ]
+            active.library = [
+                {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land — Mountain Plains", "effect": "land"},
+            ]
+
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                knight,
+                knight,
+                turn=2,
+                rng=random.Random(238),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        foundry = next(card for card in active.battlefield if card.get("name") == "Sacred Foundry")
+        assert foundry["tapped"] is True
+        assert any(
+            event == "land_ramp_resolved"
+            and data.get("card") == "Knight of the White Orchid"
+            and data.get("found") == ["Sacred Foundry"]
+            and data.get("land_enters_tapped") is True
+            for event, data in events
+        )
+
+    def test_pg238_loyal_warhound_etb_respects_basic_plains_filter():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            warhound = {
+                "name": "Loyal Warhound",
+                "type_line": "Creature — Dog",
+                "effect": "creature",
+                "battle_model_scope": "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
+                "power": 3,
+                "toughness": 1,
+                "etb_land_ramp_count": 1,
+                "etb_land_ramp_condition": "opponent_controls_more_lands",
+                "land_enters_tapped": True,
+                "tutor_target": "basic_plains",
+                "_rule_logical_key": "battle_rule_v1:pg238-warhound-test",
+                "_rule_oracle_hash": "pg238-warhound-test-hash",
+            }
+            active.battlefield = [
+                warhound,
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+            opponent.battlefield = [
+                {"name": "Island", "cmc": 0, "type_line": "Basic Land — Island", "effect": "land"},
+                {"name": "Swamp", "cmc": 0, "type_line": "Basic Land — Swamp", "effect": "land"},
+            ]
+            active.library = [
+                {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land — Mountain Plains", "effect": "land"},
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+            ]
+
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                warhound,
+                warhound,
+                turn=2,
+                rng=random.Random(239),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(card.get("name") == "Plains" for card in active.battlefield)
+        assert not any(card.get("name") == "Sacred Foundry" for card in active.battlefield)
+        assert any(
+            event == "land_ramp_resolved"
+            and data.get("card") == "Loyal Warhound"
+            and data.get("found") == ["Plains"]
+            and data.get("land_enters_tapped") is True
+            for event, data in events
+        )
+
     def test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target():
         active = player("Active")
         battle.apply_effect_immediate(
@@ -15101,6 +15208,65 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg239_coruscation_mage_damages_each_opponent_only_on_noncreature_spell_cast():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent_a = player("Opponent A")
+            opponent_b = player("Opponent B")
+            active.battlefield = [
+                {
+                    "name": "Coruscation Mage",
+                    "cmc": 2,
+                    "type_line": "Creature - Otter Wizard",
+                    "effect": "creature",
+                    "battle_model_scope": "noncreature_spell_cast_damage_each_opponent_v1",
+                    "power": 2,
+                    "toughness": 2,
+                    "trigger": "noncreature_spell_cast",
+                    "trigger_effect": "damage_each_opponent",
+                    "trigger_damage_each_opponent": 1,
+                    "damage": 1,
+                    "target_controller": "opponents",
+                    "_rule_logical_key": "battle_rule_v1:pg239-coruscation-test",
+                    "_rule_oracle_hash": "pg239-coruscation-test-hash",
+                }
+            ]
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent_a, opponent_b],
+                {"name": "Big Score", "type_line": "Instant", "cmc": 4},
+                turn=5,
+                phase="precombat_main",
+            )
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent_a, opponent_b],
+                {"name": "Recruiter", "type_line": "Creature - Human", "cmc": 3, "effect": "creature"},
+                turn=5,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert opponent_a.life == 39
+        assert opponent_b.life == 39
+        trigger_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved" and data.get("card") == "Coruscation Mage"
+        ]
+        assert len(trigger_events) == 1
+        event = trigger_events[0]
+        assert event["trigger"] == "noncreature_spell_cast"
+        assert event["trigger_spell"] == "Big Score"
+        assert event["effect"] == "damage_each_opponent"
+        assert event["amount"] == 1
+        assert len(event["damaged"]) == 2
+        assert event["rule_logical_key"] == "battle_rule_v1:pg239-coruscation-test"
+
     def test_pg210_utvara_hellkite_creates_dragon_token_when_dragons_attack():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -18389,6 +18555,8 @@ def register_tests(battle, player):
         test_land_tax_skips_when_no_opponent_controls_more_lands,
         test_pg232_scholar_of_new_horizons_enters_with_counter_and_upgrades_plains_to_battlefield_when_behind,
         test_pg232_scholar_of_new_horizons_puts_plains_into_hand_when_not_behind,
+        test_pg238_knight_of_the_white_orchid_etb_tutors_plains_to_battlefield_when_behind,
+        test_pg238_loyal_warhound_etb_respects_basic_plains_filter,
         test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target,
         test_pyromancer_ascension_counts_before_copying_spell,
         test_unexpected_windfall_discards_draws_two_creates_two_treasures_with_pg069_rule_provenance,
@@ -18601,6 +18769,7 @@ def register_tests(battle, player):
         test_pg194_glint_horn_buccaneer_pays_attack_loot_and_damages_each_opponent,
         test_pg195_young_pyromancer_creates_elemental_on_instant_sorcery_cast,
         test_pg209_monastery_mentor_creates_monk_on_noncreature_spell_only,
+        test_pg239_coruscation_mage_damages_each_opponent_only_on_noncreature_spell_cast,
         test_pg210_utvara_hellkite_creates_dragon_token_when_dragons_attack,
         test_ward_cost_text_normalizes_for_runtime_replay,
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,

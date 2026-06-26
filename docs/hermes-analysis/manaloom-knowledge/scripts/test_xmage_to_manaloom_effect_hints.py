@@ -3149,6 +3149,72 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["tutor_target"], "plains")
         self.assertEqual(primary["tutor_destination"], "hand")
 
+    def test_knight_of_the_white_orchid_maps_to_etb_plains_catchup_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "FirstStrikeAbility"],
+                "condition_classes": ["OpponentControlsMoreCondition"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "KnightOfTheWhiteOrchid",
+                "raw_excerpt": (
+                    "private static final FilterCard filter = new FilterCard(SubType.PLAINS); "
+                    "private static final Condition condition = new OpponentControlsMoreCondition(StaticFilters.FILTER_LANDS); "
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                    "new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(filter), true)).setCondition(condition)); "
+                    "If an opponent controls more lands than you, you may search your library for a Plains card, "
+                    "put it onto the battlefield tapped, then shuffle."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 2)
+        self.assertEqual(primary["etb_land_ramp_count"], 1)
+        self.assertEqual(primary["etb_land_ramp_condition"], "opponent_controls_more_lands")
+        self.assertTrue(primary["land_enters_tapped"])
+        self.assertEqual(primary["tutor_target"], "plains")
+        self.assertEqual(primary["keywords"], ["first_strike"])
+
+    def test_loyal_warhound_maps_to_etb_basic_plains_catchup_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "VigilanceAbility"],
+                "condition_classes": ["OpponentControlsMoreCondition"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "LoyalWarhound",
+                "raw_excerpt": (
+                    "private static final Condition condition = new OpponentControlsMoreCondition(StaticFilters.FILTER_LANDS); "
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                    "new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(StaticFilters.FILTER_CARD_BASIC_PLAINS), true)"
+                    ").setCondition(condition)); "
+                    "If an opponent controls more lands than you, you may search your library for a basic Plains card, "
+                    "put it onto the battlefield tapped, then shuffle."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_opponent_more_lands_plains_to_battlefield_tapped_v1",
+        )
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertEqual(primary["etb_land_ramp_count"], 1)
+        self.assertEqual(primary["etb_land_ramp_condition"], "opponent_controls_more_lands")
+        self.assertTrue(primary["land_enters_tapped"])
+        self.assertEqual(primary["tutor_target"], "basic_plains")
+        self.assertEqual(primary["keywords"], ["vigilance"])
+
     def test_rhystic_study_maps_to_opponent_spell_tax_draw_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -4410,6 +4476,38 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["trigger_creature_you_control_enters"])
         self.assertFalse(primary["trigger_another_creature_you_control_enters"])
         self.assertEqual(primary["target_controller"], "opponents")
+
+    def test_coruscation_mage_maps_to_noncreature_spell_cast_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CoruscationMage",
+                "effect_classes": ["DamagePlayersEffect"],
+                "ability_classes": ["OffspringAbility", "SpellCastControllerTriggeredAbility"],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(2); this.toughness = new MageInt(2); "
+                    "this.addAbility(new SpellCastControllerTriggeredAbility("
+                    "new DamagePlayersEffect(1, TargetController.OPPONENT, \"this creature\"), "
+                    "StaticFilters.FILTER_SPELL_A_NON_CREATURE, false));"
+                ),
+            },
+            "Whenever you cast a noncreature spell, this creature deals 1 damage to each opponent.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "noncreature_spell_cast_damage_each_opponent_v1",
+        )
+        self.assertEqual(primary["trigger"], "noncreature_spell_cast")
+        self.assertEqual(primary["trigger_effect"], "damage_each_opponent")
+        self.assertEqual(primary["trigger_damage_each_opponent"], 1)
+        self.assertEqual(primary["damage"], 1)
+        self.assertEqual(primary["target_controller"], "opponents")
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 2)
 
     def test_xmage_another_predicate_marks_creature_enter_damage_as_another_only(self) -> None:
         result = hints.build_effect_hints(

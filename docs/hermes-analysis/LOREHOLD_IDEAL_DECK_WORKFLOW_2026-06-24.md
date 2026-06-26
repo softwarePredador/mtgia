@@ -51,74 +51,68 @@ It does not mutate deck rows, SQLite, or PostgreSQL.
 
 ## Current Checkpoint
 
-Post-PG234 Lorehold-focused checkpoint generated on 2026-06-26 after applying a
-single PostgreSQL batch for the remaining `package_ready_unprepared` residual
-from the post-PG233 queue (`Galvanoth`, `Velomachus Lorehold`,
-`Palantir of Orthanc`, `Scholar of New Horizons`), syncing those rules back
-into SQLite/Hermes, and regenerating the queue/audits/candidate deck from the
-live post-sync state:
+Post-PG239 Lorehold-focused rule-routing checkpoint generated on 2026-06-26
+after opening a reusable XMage/ManaLoom family for spell-cast battlefield
+engines that damage each opponent, applying the PostgreSQL batch for
+`Longshot, Rebel Bowman`, `Guttersnipe`, `Coruscation Mage`,
+`Fiery Inscription`, and `Vivi Ornitier`, syncing those rules back into
+SQLite/Hermes, and regenerating the live queue/matrix/audits from the
+post-sync state:
 
 - current matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg239_spell_cast_damage_engine_postsync_v1.json`
 - current proposal report:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg234_lorehold_ready_batch_four_postsync_v1_proposals.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg239_spell_cast_damage_engine_postsync_v1_proposals.json`
 - current effective queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
-- current strategy benchmark:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_acceleration_strategy_benchmark_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg239_spell_cast_damage_engine_postsync_v1.json`
 - current strategy audit:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
-- current generated candidate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg239_spell_cast_damage_engine_postsync_v1.json`
+- latest generated candidate still under benchmark hold:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
 - current slice evidence:
-  `docs/hermes-analysis/master_optimizer_reports/pg234_lorehold_ready_batch_four_progress_20260626.md`
+  `docs/hermes-analysis/master_optimizer_reports/pg239_spell_cast_damage_engine_progress_20260626.md`
 
 Current operational result:
 
 - effective queue:
   - `package_ready_unprepared=0`
   - `package_already_prepared=1`
-  - `manual_mapper_backlog=326`
-  - `split_scope_backlog=61`
+  - `manual_mapper_backlog=318`
+  - `split_scope_backlog=59`
   - `runtime_family_backlog=4`
   - `blocked_missing_xmage_source=4`
 - strategy consistency audit:
   - `18/18 pass`
-- strategy benchmark:
-  - `recommended_strategy_id=hybrid_effective_queue_pattern_registry`
-  - `exact_scope_cluster_first` remains the highest raw next-modeling lane,
-    but not the replacement for the hybrid operational routing
+- matrix:
+  - `battle_ready=722`
+  - `needs_rule_before_strategy=241`
+  - `watchlist_candidate=324`
 
 Key routing delta:
 
-- `Galvanoth`, `Velomachus Lorehold`, `Palantir of Orthanc`, and
-  `Scholar of New Horizons` all moved from the live `package_ready_unprepared`
-  residual into
-  `battle_ready / watchlist_candidate`.
-- the post-sync candidate deck changed hash from
-  `a6128298aafade21fd2177eccafe51d756e4b4382e0cf09ea1f7a43c8cf08dbd`
+- `Coruscation Mage` moved from
+  `needs_rule_before_strategy / mapper_manual`
   to
-  `3d827d72b023d4cceb1277c388863000794a29de0ad1c338c9d01bd8c86cac19`.
-- the new generated candidate added
-  `Exotic Orchard`, `Goblin Engineer`, `Hexing Squelcher`,
-  `Increasing Vengeance`, `Library of Leng`, `Misty Rainforest`,
-  `Polluted Delta`, `Reforge the Soul`, `Restoration Seminar`,
-  and `Underworld Breach`,
-  while removing
-  `Aetherflux Reservoir`, `Brainstone`, `Crawlspace`,
-  `Drannith Magistrate`, `Great Furnace`, `Inspiring Vantage`,
-  `Magus of the Moat`, `Silent Arbiter`, and `Sphere of Safety`.
-- the short real-opponent smoke on the new candidate was
-  `0W/3L/0S`, which is worse than the short PG233 post-sync sample.
-- the runtime-backed slot-optimizer smoke against the PG234 post-sync matrix
-  reached baseline/hash-guard and candidate selection successfully with:
-  `baseline_id=9`, `baseline_wr=12.5%`, `candidate_allowlist_size=75`,
-  `selected_candidates=15`, but the benchmark still remains blocked as final
-  optimizer evidence while
-  `mandatory_gate_divergences=["event_contract_static=review_required"]`
-  persists and the battle subprocess remains the dominant runtime cost.
-- the next highest-ROI Lorehold rule-first targets are now
-  `Blood Sun`, `Currency Converter`, and `Firesong and Sunspeaker`.
+  `battle_ready / watchlist_candidate`.
+- `Vivi Ornitier` moved from
+  `needs_rule_before_strategy / split_scope`
+  to
+  `battle_ready / watchlist_candidate`.
+- the new `spell_cast_damage_engine` family closed the live
+  `package_ready_unprepared` residual it created inside the same run:
+  `5 -> 0`.
+- scoped rule-readiness improved from:
+  - `battle_ready: 720 -> 722`
+  - `mapper_manual: 187 -> 187`
+  - `split_scope: 42 -> 42`
+  - `package_ready: 2 -> 0`
+- Lorehold-touching `needs_rule_before_strategy` improved from `70` to `69`.
+- the next highest-ROI Lorehold rule-first targets are now:
+  `Currency Converter`, `Firesong and Sunspeaker`, `Magmakin Artillerist`,
+  `Bolt Bend`, and `Penance`.
+- the benchmark/generation phase was intentionally not rerun here because the
+  workflow still prioritizes closing more Lorehold-touching
+  `needs_rule_before_strategy` rows before new slot benchmarking.
 
 ## Current Matrix Result
 
