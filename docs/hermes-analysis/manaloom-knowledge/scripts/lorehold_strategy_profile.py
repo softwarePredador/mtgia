@@ -14,7 +14,7 @@ from collections import Counter
 from typing import Any, Mapping
 
 
-STRATEGY_VERSION = "lorehold_strategy_profile_v2_2026_06_26"
+STRATEGY_VERSION = "lorehold_strategy_profile_v3_2026_06_26"
 
 COMMANDER_INTENT_MODEL = {
     "commander": "Lorehold, the Historian",
@@ -132,15 +132,19 @@ NAME_TAGS = {
     "hall of heliod's generosity": {"graveyard_recursion"},
     "heat shimmer": {"deterministic_finisher", "spell_chain_conversion"},
     "land tax": {"early_plan", "topdeck_miracle_setup", "hand_filter"},
+    "longshot, rebel bowman": {"deterministic_finisher", "early_plan", "spell_chain_conversion"},
     "lotus petal": {"early_plan", "spell_chain_conversion"},
     "magus of the moat": {"pressure_absorber", "protection_window"},
     "mana vault": {"early_plan", "spell_chain_conversion"},
     "mizzix's mastery": {"graveyard_recursion", "deterministic_finisher", "spell_chain_conversion"},
+    "molecule man": {"topdeck_miracle_setup", "spell_chain_conversion"},
     "molten duplication": {"deterministic_finisher", "spell_chain_conversion"},
     "mother of runes": {"early_plan", "protection_window"},
     "mox amber": {"early_plan", "spell_chain_conversion"},
     "orim's chant": {"protection_window", "spell_chain_conversion"},
     "past in flames": {"graveyard_recursion", "spell_chain_conversion"},
+    "penance": {"topdeck_miracle_setup", "protection_window", "pressure_absorber"},
+    "promise of loyalty": {"pressure_absorber", "protection_window"},
     "ranger-captain of eos": {"protection_window", "spell_chain_conversion"},
     "reiterate": {"spell_chain_conversion", "deterministic_finisher"},
     "reverberate": {"spell_chain_conversion"},
@@ -153,13 +157,17 @@ NAME_TAGS = {
     "silent arbiter": {"pressure_absorber", "protection_window"},
     "sphere of safety": {"pressure_absorber", "protection_window"},
     "talisman of conviction": {"early_plan"},
+    "the scarlet witch": {"early_plan", "spell_chain_conversion"},
     "the biblioplex": {"topdeck_miracle_setup", "hand_filter"},
+    "tragic arrogance": {"pressure_absorber"},
     "twinflame": {"deterministic_finisher", "spell_chain_conversion"},
     "underworld breach": {"graveyard_recursion", "spell_chain_conversion"},
     "wheel of fortune": {"hand_filter", "spell_chain_conversion"},
     "wheel of misfortune": {"hand_filter", "spell_chain_conversion"},
     "windborn muse": {"pressure_absorber", "protection_window"},
     "worldfire": {"deterministic_finisher"},
+    "guttersnipe": {"deterministic_finisher", "spell_chain_conversion"},
+    "galvanoth": {"topdeck_miracle_setup", "spell_chain_conversion"},
 }
 
 TEXT_TAG_PATTERNS = (

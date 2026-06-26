@@ -137,6 +137,29 @@ class LoreholdStrategyProfileTests(unittest.TestCase):
         self.assertIn("deck_607", profile.COMMANDER_INTENT_MODEL["validation_rule"])
         self.assertIn("Winota", profile.COMMANDER_INTENT_MODEL["validation_rule"])
 
+    def test_lorehold_specific_runtime_learnings_are_plan_aligned(self):
+        cases = {
+            "Longshot, Rebel Bowman": {"deterministic_finisher", "early_plan", "spell_chain_conversion"},
+            "Molecule Man": {"topdeck_miracle_setup", "spell_chain_conversion"},
+            "Penance": {"topdeck_miracle_setup", "protection_window", "pressure_absorber"},
+            "The Scarlet Witch": {"early_plan", "spell_chain_conversion"},
+            "Promise of Loyalty": {"pressure_absorber", "protection_window"},
+            "Tragic Arrogance": {"pressure_absorber"},
+        }
+
+        for name, expected_tags in cases.items():
+            with self.subTest(name=name):
+                tags = profile.strategy_tags_for_card(
+                    {
+                        "card_name": name,
+                        "roles": [],
+                        "type_line": "Sorcery",
+                        "oracle_text": "",
+                        "cmc": 3,
+                    }
+                )
+                self.assertTrue(expected_tags.issubset(tags))
+
 
 if __name__ == "__main__":
     unittest.main()
