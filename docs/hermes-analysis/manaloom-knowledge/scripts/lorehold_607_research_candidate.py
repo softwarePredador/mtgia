@@ -28,6 +28,22 @@ DEFAULT_SOURCE_DB = SCRIPT_DIR / "knowledge.db"
 DEFAULT_PLAN = "penance_v1"
 
 RESEARCH_PLANS = {
+    "birgi_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "added": [{"card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty", "source_deck_id": 615}],
+        "removed": ["Bender's Waterskin"],
+        "intent": (
+            "Test Birgi as a same-function mana/engine sidegrade. This keeps the "
+            "deck_607 pressure, wincon, protection, and miracle package intact while "
+            "replacing a three-mana mana artifact with a spell-chain mana engine."
+        ),
+        "external_signals": [
+            "Birgi is structurally aligned with spellslinger shells because it converts every spell cast into red mana.",
+            "Local battle_card_rules has an active auto rule for the front-face spell-cast red mana trigger.",
+            "Prior Birgi-containing packages failed, but Birgi itself has not been tested as an isolated sidegrade.",
+        ],
+    },
     "penance_v1": {
         "base_deck_id": 607,
         "candidate_deck_id": 6,

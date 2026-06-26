@@ -1,0 +1,98 @@
+{
+  "status": "active_learning_registry",
+  "protected_baseline": "deck_607",
+  "acceptance_rule": [
+    "candidate must tie or beat deck_607 on same real-opponent gate",
+    "candidate must not regress the Winota matchup",
+    "candidate must preserve or improve miracle/topdeck game frequency",
+    "candidate must not cut pressure absorption unless replacing same function"
+  ],
+  "tested": [
+    {
+      "key": "candidate_v7",
+      "swap_or_scope": "full strategy-first candidate package",
+      "status": "rejected",
+      "result": "3W/5L/1S, WR 33.33%, Winota 0W/3L",
+      "learning": "High structural score does not beat deck_607 if the shell overfills engine/ramp and loses pressure response."
+    },
+    {
+      "key": "candidate_607_bridge_v1",
+      "swap_or_scope": "+Aetherflux Reservoir, +Birgi, +Enlightened Tutor, +Gamble, +Past in Flames, +Storm-Kiln Artist; six cuts from 607",
+      "status": "rejected",
+      "result": "1W/8L/0S, WR 11.11%, Winota 0W/3L",
+      "learning": "Importing the v7 package as a bundle damages deck_607 execution; does not isolate Birgi."
+    },
+    {
+      "key": "candidate_607_bridge_v2",
+      "swap_or_scope": "+Aetherflux Reservoir, +Storm-Kiln Artist; -Molecule Man, -The Scarlet Witch",
+      "status": "rejected",
+      "result": "2W/7L/0S, WR 22.22%, Winota 0W/3L",
+      "learning": "Molecule Man and The Scarlet Witch are protected plan pieces, not easy cuts."
+    },
+    {
+      "key": "candidate_607_penance_v1",
+      "swap_or_scope": "+Penance; -Promise of Loyalty",
+      "status": "rejected",
+      "result": "3W/6L/0S, WR 33.33%, Winota 0W/3L",
+      "learning": "Penance is coherent, but cutting pressure absorption hurt the pressure matchup."
+    },
+    {
+      "key": "candidate_607_longshot_v1",
+      "swap_or_scope": "+Longshot, Rebel Bowman; -Storm Herd",
+      "status": "rejected",
+      "result": "2W/7L/0S, WR 22.22%, Winota 1W/2L",
+      "learning": "Lower-curve spell payoff did not convert better than the original high-impact finisher."
+    }
+  ],
+  "untested_queue": [
+    {
+      "key": "candidate_607_birgi_v1",
+      "priority": "P1",
+      "swap_or_scope": "+Birgi, God of Storytelling // Harnfel, Horn of Bounty; -Bender's Waterskin",
+      "status": "untested",
+      "why": "Same-function mana/engine sidegrade; Birgi has active battle rule and has not been isolated from failed v7 bundles.",
+      "risk": "Creature engine may be easier to remove than artifact mana; must not regress Winota."
+    },
+    {
+      "key": "candidate_607_reprieve_v1",
+      "priority": "P2",
+      "swap_or_scope": "+Reprieve; same-function protection/counter slot TBD",
+      "status": "untested",
+      "why": "Cheap protection/cantrip style effect may protect conversion window without cutting pressure package.",
+      "risk": "Needs careful same-function cut; do not cut board wipe or miracle payoff."
+    },
+    {
+      "key": "candidate_607_galvanoth_v1",
+      "priority": "P3",
+      "swap_or_scope": "+Galvanoth; same-function expensive topdeck/value slot TBD",
+      "status": "untested",
+      "why": "Runtime has verified topdeck free-cast rule; aligns with topdeck/miracle theme.",
+      "risk": "Five-mana creature may be too slow and could reduce current pressure density."
+    },
+    {
+      "key": "candidate_607_guttersnipe_v1",
+      "priority": "P4",
+      "swap_or_scope": "+Guttersnipe; finisher slot TBD",
+      "status": "untested",
+      "why": "Verified spell-damage payoff, but Longshot already failed a similar lane.",
+      "risk": "Likely lower priority because similar payoff lane underperformed."
+    },
+    {
+      "key": "candidate_607_ghostly_prison_v1",
+      "priority": "P4",
+      "swap_or_scope": "+Ghostly Prison; pressure-absorber slot TBD",
+      "status": "untested",
+      "why": "May improve combat pressure matchup if replacing same function only.",
+      "risk": "Can reduce spell density if cut is not same-function."
+    }
+  ],
+  "protected_cards_until_same_function_replacement_wins": [
+    "Molecule Man",
+    "The Scarlet Witch",
+    "Promise of Loyalty",
+    "Tragic Arrogance",
+    "Hexing Squelcher",
+    "Sensei's Divining Top",
+    "Scroll Rack"
+  ]
+}
