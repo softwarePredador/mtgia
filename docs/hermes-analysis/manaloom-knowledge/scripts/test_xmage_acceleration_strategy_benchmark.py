@@ -21,6 +21,13 @@ class XMageAccelerationStrategyBenchmarkTests(unittest.TestCase):
         proposals = [
             proposal("Packaged A", "batch_pg_candidate_after_precheck", "draw", "draw", "draw_v1"),
             proposal("Packaged B", "batch_pg_candidate_after_precheck", "draw", "draw", "draw_v1"),
+            proposal(
+                "Packaged Partial",
+                "partial_batch_pg_candidate_preserve_shadow_rows_after_precheck",
+                "burn_engine",
+                "damage_each_opponent",
+                "controlled_creature_enters_damage_each_opponent_v1",
+            ),
             proposal("Damage A", "split_family_scope_review_required", "targeted", "damage", "damage_v1"),
             proposal("Damage B", "split_family_scope_review_required", "targeted", "damage", "damage_v1"),
             proposal("Damage C", "split_family_scope_review_required", "targeted", "damage", "damage_v1"),
@@ -34,7 +41,7 @@ class XMageAccelerationStrategyBenchmarkTests(unittest.TestCase):
                 "effective_queue": {
                     "lane_counts": {
                         benchmark.PACKAGE_PREPARED_LANE: 2,
-                        benchmark.PACKAGE_READY_LANE: 0,
+                        benchmark.PACKAGE_READY_LANE: 1,
                     },
                     "prepared_packages": [{"deploy_id": "PGT", "cards_in_current_queue": ["Packaged A", "Packaged B"]}],
                 }

@@ -958,10 +958,19 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             "EntersBattlefieldControlledTriggeredAbility",
             "OffspringAbility",
             "UnearthAbility",
+            "SimpleActivatedAbility",
+            "SimpleStaticAbility",
+        }
+        allowed_types = {
+            frozenset({"CREATURE"}),
+            frozenset({"ENCHANTMENT"}),
+            frozenset({"ARTIFACT", "CREATURE"}),
+            frozenset({"CREATURE", "ENCHANTMENT"}),
         }
         return (
-            types in ({"CREATURE"}, {"ENCHANTMENT"}, {"ARTIFACT", "CREATURE"})
-            and effect_classes == {"DamagePlayersEffect"}
+            frozenset(types) in allowed_types
+            and "DamagePlayersEffect" in effect_classes
+            and effect_classes.issubset({"DamagePlayersEffect", "BoostControlledEffect"})
             and "EntersBattlefieldControlledTriggeredAbility" in ability_classes
             and ability_classes.issubset(allowed_abilities)
             and int(effect_json.get("trigger_damage_each_opponent") or effect_json.get("damage") or 0) > 0

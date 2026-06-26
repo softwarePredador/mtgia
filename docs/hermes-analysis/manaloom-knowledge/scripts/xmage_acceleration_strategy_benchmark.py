@@ -43,6 +43,10 @@ SPLIT_SCOPE_LANE = "split_scope_backlog"
 RUNTIME_LANE = "runtime_family_backlog"
 MANUAL_LANE = "manual_mapper_backlog"
 BLOCKED_LANE = "blocked_missing_xmage_source"
+PACKAGE_READY_STATUSES = {
+    "batch_pg_candidate_after_precheck",
+    "partial_batch_pg_candidate_preserve_shadow_rows_after_precheck",
+}
 
 
 def utc_now() -> str:
@@ -92,6 +96,10 @@ def family_groups(proposals: list[dict[str, Any]]) -> dict[tuple[str, str], list
 
 def proposals_by_status(proposals: list[dict[str, Any]], status: str) -> list[dict[str, Any]]:
     return [item for item in proposals if item.get("proposal_status") == status]
+
+
+def package_ready_proposals(proposals: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [item for item in proposals if str(item.get("proposal_status") or "") in PACKAGE_READY_STATUSES]
 
 
 def top_scope(proposals: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -186,9 +194,10 @@ def build_strategy_rows(
     lane_counts = ((effective_queue.get("effective_queue") or {}).get("lane_counts") or {})
     inventory_summary = inventory.get("summary") or {}
 
-    pg_ready_total = int(proposal_counts.get("batch_pg_candidate_after_precheck") or 0)
+    pg_ready_total = sum(int(proposal_counts.get(status) or 0) for status in PACKAGE_READY_STATUSES)
     package_prepared = int(lane_counts.get(PACKAGE_PREPARED_LANE) or 0)
     package_ready_unprepared = int(lane_counts.get(PACKAGE_READY_LANE) or 0)
+    package_ready_cards = package_ready_proposals(proposals)
     split_proposals = proposals_by_status(proposals, "split_family_scope_review_required")
     runtime_proposals = proposals_by_status(proposals, "runtime_family_implementation_required")
     manual_proposals = proposals_by_status(proposals, "mapper_metadata_or_test_scenario_required")
@@ -290,6 +299,9 @@ def build_strategy_rows(
             "pg_ready_total": pg_ready_total,
             "package_already_prepared": package_prepared,
             "package_ready_unprepared": package_ready_unprepared,
+            "package_ready_sample_cards": sorted(
+                str(card.get("card_name") or "") for card in package_ready_cards
+            )[:12],
             "prepared_package_count": len((effective_queue.get("effective_queue") or {}).get("prepared_packages") or []),
             "required_gate": "precheck, approved apply, postcheck, PG->Hermes sync, focused audit",
         },

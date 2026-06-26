@@ -3,13 +3,15 @@
 Owner: Auditor Central / single operator
 Controller: Auditor Central
 Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG217, applied, postchecked, synced from PostgreSQL to Hermes
+this thread is PG219, applied, postchecked, synced from PostgreSQL to Hermes
 SQLite/canonical snapshot, tested, strategy-audited, and documented on
-2026-06-25. PG217 promoted
+2026-06-25/2026-06-26. PG217 promoted
 `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
 `The Locust God`, and `Biotransference` to Oracle/XMage-backed Saga,
-draw-trigger token, and static artifact-spell token runtime rules. This was
-not a deck swap, learned-deck promotion, or battle rebaseline.
+draw-trigger token, and static artifact-spell token runtime rules; PG218
+promoted `Warleader's Call`; PG219 promoted the `Purphoros, God of the Forge`
+creature-enter trigger while preserving orthogonal shadow rows. This was not a
+deck swap, learned-deck promotion, or battle rebaseline.
 
 ## Purpose
 
@@ -13743,4 +13745,109 @@ Register decision:
 - Continue with `priority_benchmark_candidate` rows using baseline hash guard,
   slot optimizer, quality gate, handoff, and explicit apply approval.
 - The global non-Lorehold queue still has `runtime_family_backlog=4`.
-- Next package number is PG218.
+- Next package number is PG220.
+
+### PG218 - Warleader's Call controlled creature ETB damage
+
+Status: `applied_postchecked_sqlite_synced_matrix_validated`
+Source front: XMage batch family `controlled_creature_etb_damage_engine`
+Target table: `public.card_battle_rules`
+DB mutations executed by this checkpoint: `true`
+
+Current evidence:
+
+- Package files:
+  `docs/hermes-analysis/master_optimizer_reports/pg218_warleaders_call_creature_etb_damage_package.md`
+  and sibling `precheck/apply/postcheck/rollback.sql`.
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg218_warleaders_call_20260625.json`;
+  `selected_card_count=1`, `pg_rows_loaded=3`,
+  `sqlite_inserted_or_updated=3`.
+- Local SQLite cache:
+  `warleader's call` now has one `curated/verified/auto` row with
+  `battle_model_scope=controlled_creature_enters_damage_each_opponent_v1`;
+  the two generated rows are `deprecated/disabled`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg218_warleaders_call_postsync_v1.json`;
+  `Warleader's Call` moved from `split_scope / needs_rule_before_strategy` to
+  `battle_ready / watchlist_candidate`, and Lorehold lane counts became
+  `needs_rule_before_strategy=92`, `battle_ready=303`, `split_scope=17`.
+
+Register decision:
+
+- PG218 is applied and should not be rebuilt.
+- This closure removed `Warleader's Call` from the Lorehold rule-first lane.
+
+### PG219 - Purphoros partial trigger preserve-shadow
+
+Status: `applied_postchecked_sqlite_synced_matrix_validated`
+Source front: XMage batch family `controlled_creature_etb_damage_engine`
+with partial trigger promotion
+Target table: `public.card_battle_rules`
+DB mutations executed by this checkpoint: `true`
+
+Current evidence:
+
+- Package files:
+  `docs/hermes-analysis/master_optimizer_reports/pg219_purphoros_partial_trigger_preserve_shadow_package.md`
+  and sibling `precheck/apply/postcheck/rollback.sql`.
+- Generator/pipeline evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg219_purphoros_partial_ready_v1_proposals.json`
+  promoted `Purphoros, God of the Forge` to
+  `partial_batch_pg_candidate_preserve_shadow_rows_after_precheck` with
+  `shadow_handling=preserve_existing_rows`.
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`,
+  `shadow_handling=preserve_existing_rows`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg219_purphoros_20260626.json`;
+  `selected_card_count=1`, `pg_rows_loaded=3`,
+  `sqlite_inserted_or_updated=3`.
+- Local SQLite cache:
+  `purphoros, god of the forge` now has one `curated/verified/auto` passive
+  trigger row for
+  `controlled_creature_enters_damage_each_opponent_v1` plus the two original
+  `pump_all` shadow rows kept as `needs_review/review_only`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg219_purphoros_postsync_v1.json`;
+  `Purphoros, God of the Forge` moved from
+  `split_scope / needs_rule_before_strategy` to
+  `battle_ready / watchlist_candidate`, score `12.0 -> 35.0`,
+  `battle_rule_count=3`, and `executable_rule_count=1`.
+  Lorehold lane counts became `needs_rule_before_strategy=91`,
+  `battle_ready=304`, and `split_scope=16`.
+- Generated deck delta:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg219_v1.json`;
+  candidate hash changed from
+  `ef278cefb669df32bc6c921f422f218791252c81bc1e08abf5663f3a02f54036`
+  to
+  `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`,
+  reducing the generated candidate's novel cards from `11` to `8`.
+- Smoke evidence:
+  the new candidate opened `0W/2L/0S` versus
+  `Rograkh, Son of Rohgahh` and `Tayam, Luminous Enigma` before the third
+  matchup was interrupted due runtime cost. This is evidence of changed deck
+  composition, not proof of strategic readiness.
+
+Register decision:
+
+- PG219 is applied and should not be rebuilt.
+- The Lorehold `controlled_creature_etb_damage_engine` family is now closed in
+  the rule-first lane.
+- Remaining Lorehold `needs_rule_before_strategy` backlog is now concentrated in
+  `manual_model`, `targeted_interaction`, `static_cost_reducer`, and one
+  `creature` split-scope card.

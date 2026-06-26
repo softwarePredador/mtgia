@@ -315,6 +315,9 @@ def _build_controlled_creature_enters_damage_each_opponent_fields(
     normalized = _normalized_rules_text(rules_text)
     another_only = (
         "filter_another_creature" in normalized
+        or "anotherpredicate.instance" in normalized
+        or 'filterpermanent("another creature")' in normalized
+        or "filterpermanent( another creature )" in normalized
         or "another creature you control enters" in normalized
     )
     effect = "creature" if "CREATURE" in card_types else "passive"

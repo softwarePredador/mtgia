@@ -29,6 +29,13 @@ class XMageEffectiveQueueReportTests(unittest.TestCase):
                     "battle_model_scope": "draw_scope_v1",
                 },
                 {
+                    "card_name": "Partial Card",
+                    "proposal_status": "partial_batch_pg_candidate_preserve_shadow_rows_after_precheck",
+                    "family_id": "burn_engine",
+                    "effect": "damage_each_opponent",
+                    "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                },
+                {
                     "card_name": "Runtime Card",
                     "proposal_status": "runtime_family_implementation_required",
                     "family_id": "token_maker",
@@ -79,7 +86,7 @@ class XMageEffectiveQueueReportTests(unittest.TestCase):
 
         lane_counts = report["effective_queue"]["lane_counts"]
         self.assertEqual(lane_counts[queue_report.PACKAGE_PREPARED_LANE], 1)
-        self.assertEqual(lane_counts[queue_report.PACKAGE_READY_LANE], 1)
+        self.assertEqual(lane_counts[queue_report.PACKAGE_READY_LANE], 2)
         self.assertEqual(lane_counts[queue_report.RUNTIME_LANE], 1)
         self.assertEqual(lane_counts[queue_report.SPLIT_SCOPE_LANE], 1)
         self.assertEqual(lane_counts[queue_report.MANUAL_LANE], 1)

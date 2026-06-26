@@ -3687,6 +3687,37 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertFalse(primary["trigger_another_creature_you_control_enters"])
         self.assertEqual(primary["target_controller"], "opponents")
 
+    def test_xmage_another_predicate_marks_creature_enter_damage_as_another_only(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "PurphorosGodOfTheForge",
+                "effect_classes": ["DamagePlayersEffect", "BoostControlledEffect", "LoseCreatureTypeSourceEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldControlledTriggeredAbility",
+                    "SimpleActivatedAbility",
+                    "SimpleStaticAbility",
+                ],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT", "CREATURE"]},
+                "raw_excerpt": (
+                    'private static final FilterPermanent filter = new FilterCreaturePermanent("another creature"); '
+                    "filter.add(AnotherPredicate.instance); "
+                    "new EntersBattlefieldControlledTriggeredAbility("
+                    "new DamagePlayersEffect(2, TargetController.OPPONENT), filter)"
+                ),
+            },
+            "Whenever another creature you control enters, Purphoros deals 2 damage to each opponent.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controlled_creature_enters_damage_each_opponent_v1",
+        )
+        self.assertEqual(primary["trigger_damage_each_opponent"], 2)
+        self.assertTrue(primary["trigger_another_creature_you_control_enters"])
+
     def test_young_pyromancer_maps_to_exact_spell_cast_elemental_scope(self) -> None:
         result = hints.build_effect_hints(
             {

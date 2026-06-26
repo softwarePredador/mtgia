@@ -82,6 +82,7 @@ def values_rows(proposals: list[dict[str, Any]]) -> str:
                     sql_literal(proposal["review_status"]),
                     sql_literal(proposal["execution_status"]),
                     sql_literal(proposal["notes"]),
+                    sql_literal(proposal.get("shadow_handling") or "deprecate_nonmatching_rows"),
                 ]
             )
             + ")"
@@ -93,7 +94,7 @@ def proposed_cte(proposals: list[dict[str, Any]]) -> str:
     return (
         "proposed(normalized_name, card_name, oracle_hash, logical_rule_key, "
         "effect_json, deck_role_json, source, confidence, review_status, "
-        "execution_status, notes) AS (\n  VALUES\n    "
+        "execution_status, notes, shadow_handling) AS (\n  VALUES\n    "
         + values_rows(proposals)
         + "\n)"
     )
@@ -175,6 +176,7 @@ SELECT
   p.normalized_name,
   p.oracle_hash,
   p.logical_rule_key,
+  p.shadow_handling,
   tc.target_card_rows,
   tc.canonical_card_id,
   rr.existing_rule_rows,
@@ -244,6 +246,7 @@ deprecated AS (
         r.normalized_name = p.normalized_name
         OR r.normalized_name LIKE p.normalized_name || ' // %'
       )
+    AND p.shadow_handling <> 'preserve_existing_rows'
     AND r.logical_rule_key <> p.logical_rule_key
   RETURNING r.*
 )
@@ -284,7 +287,8 @@ canonical_target_cards AS (
     p.confidence,
     p.review_status,
     p.execution_status,
-    p.notes
+    p.notes,
+    p.shadow_handling
 ),
 upserted AS (
   INSERT INTO public.card_battle_rules (

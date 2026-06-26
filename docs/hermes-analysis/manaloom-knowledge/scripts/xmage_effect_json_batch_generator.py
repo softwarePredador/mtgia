@@ -21,6 +21,12 @@ from xmage_semantic_family_classifier import build_family_report, load_json, nor
 
 DEFAULT_REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
 
+FULL_BATCH_PG_STATUS = "batch_pg_candidate_after_precheck"
+PARTIAL_BATCH_PG_STATUS = "partial_batch_pg_candidate_preserve_shadow_rows_after_precheck"
+SAFE_BATCH_PG_STATUSES = {FULL_BATCH_PG_STATUS, PARTIAL_BATCH_PG_STATUS}
+DEFAULT_SHADOW_HANDLING = "deprecate_nonmatching_rows"
+PRESERVE_SHADOW_HANDLING = "preserve_existing_rows"
+
 
 DECK_ROLE_BY_FAMILY: dict[str, dict[str, Any]] = {
     "static_cost_reducer": {"category": "support", "effect": "static_cost_reduction", "subtype": "cost_reducer", "timing": "static"},
@@ -151,6 +157,26 @@ def runtime_effect_json(card: dict[str, Any], effect_json: dict[str, Any]) -> di
     return runtime_json
 
 
+def preserve_shadow_partial_candidate(card: dict[str, Any], effect_json: dict[str, Any]) -> bool:
+    return (
+        str(card.get("family_id") or "") == "controlled_creature_etb_damage_engine"
+        and str(card.get("promotion_lane") or "") == "split_family_scope_review_required"
+        and str(effect_json.get("battle_model_scope") or "")
+        == "controlled_creature_enters_damage_each_opponent_v1"
+        and str(effect_json.get("trigger_effect") or "") == "damage_each_opponent"
+        and int(effect_json.get("trigger_damage_each_opponent") or 0) > 0
+    )
+
+
+def partial_shadow_runtime_effect_json(effect_json: dict[str, Any]) -> dict[str, Any]:
+    runtime_json = dict(effect_json)
+    runtime_json["effect"] = "passive"
+    runtime_json.pop("power", None)
+    runtime_json.pop("toughness", None)
+    runtime_json.pop("is_creature_permanent", None)
+    return runtime_json
+
+
 def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
     role = dict(DECK_ROLE_BY_FAMILY.get(str(card.get("family_id") or ""), DECK_ROLE_BY_FAMILY["manual_model"]))
     effect = card.get("effect")
@@ -180,21 +206,35 @@ def notes_for(card: dict[str, Any]) -> str:
     )
 
 
-def proposal_status(card: dict[str, Any], oracle_hash: str | None) -> str:
+def proposal_status(
+    card: dict[str, Any],
+    oracle_hash: str | None,
+    *,
+    shadow_handling: str,
+) -> str:
+    if shadow_handling == PRESERVE_SHADOW_HANDLING:
+        if not oracle_hash:
+            return "oracle_hash_required_before_batch_pg"
+        return PARTIAL_BATCH_PG_STATUS
     if card.get("promotion_lane") != "batch_metadata_candidate_requires_pg_precheck":
         return str(card.get("promotion_lane"))
     if not oracle_hash:
         return "oracle_hash_required_before_batch_pg"
-    return "batch_pg_candidate_after_precheck"
+    return FULL_BATCH_PG_STATUS
 
 
 def build_proposal(card: dict[str, Any], external_card: dict[str, Any] | None) -> dict[str, Any]:
     effect_json = runtime_effect_json(card, merged_effect_json(card, external_card))
+    shadow_handling = DEFAULT_SHADOW_HANDLING
+    if preserve_shadow_partial_candidate(card, effect_json):
+        effect_json = partial_shadow_runtime_effect_json(effect_json)
+        shadow_handling = PRESERVE_SHADOW_HANDLING
     deck_role_json = deck_role_for(card)
     oracle_hash, oracle_hash_source = oracle_hash_for(card, external_card)
     rule = {"effect_json": effect_json, "deck_role_json": deck_role_json}
     logical_key = logical_rule_key(rule)
-    status = proposal_status(card, oracle_hash)
+    status = proposal_status(card, oracle_hash, shadow_handling=shadow_handling)
+    safe_for_batch_pg_package = status in SAFE_BATCH_PG_STATUSES
     return {
         "card_name": card.get("card_name"),
         "normalized_name": card.get("normalized_name"),
@@ -203,16 +243,17 @@ def build_proposal(card: dict[str, Any], external_card: dict[str, Any] | None) -
         "battle_model_scope": card.get("battle_model_scope"),
         "promotion_lane": card.get("promotion_lane"),
         "proposal_status": status,
-        "safe_for_batch_pg_package": status == "batch_pg_candidate_after_precheck",
+        "safe_for_batch_pg_package": safe_for_batch_pg_package,
+        "shadow_handling": shadow_handling,
         "oracle_hash": oracle_hash,
         "oracle_hash_source": oracle_hash_source,
         "logical_rule_key": logical_key,
         "effect_json": effect_json,
         "deck_role_json": deck_role_json,
-        "review_status": "verified" if status == "batch_pg_candidate_after_precheck" else "needs_review",
-        "execution_status": "auto" if status == "batch_pg_candidate_after_precheck" else "review_only",
-        "source": "curated" if status == "batch_pg_candidate_after_precheck" else "generated",
-        "confidence": 0.94 if status == "batch_pg_candidate_after_precheck" else 0.70,
+        "review_status": "verified" if safe_for_batch_pg_package else "needs_review",
+        "execution_status": "auto" if safe_for_batch_pg_package else "review_only",
+        "source": "curated" if safe_for_batch_pg_package else "generated",
+        "confidence": 0.94 if safe_for_batch_pg_package else 0.70,
         "notes": notes_for(card),
         "xmage_class": card.get("xmage_class"),
         "xmage_path": card.get("xmage_path"),

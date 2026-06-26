@@ -49,6 +49,73 @@ The script reads:
 
 It does not mutate deck rows, SQLite, or PostgreSQL.
 
+## Current Checkpoint
+
+Post-PG219 Lorehold-focused checkpoint generated on 2026-06-26 after closing
+`Warleader's Call` (PG218) and the partial trigger lane for
+`Purphoros, God of the Forge` (PG219):
+
+- current matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg219_purphoros_postsync_v1.json`
+- current proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg219_purphoros_partial_ready_v1_proposals.json`
+- current generated candidate:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg219_v1.json`
+
+Current matrix result:
+
+- total Lorehold-touching cards in matrix: `395`;
+- `core_keep`: `87`;
+- `priority_benchmark_candidate`: `44`;
+- `watchlist_candidate`: `113`;
+- `needs_rule_before_strategy`: `91`;
+- `active_low_confidence_review`: `13`;
+- `low_priority`: `45`;
+- `policy_blocked`: `2`.
+
+Current rule-readiness split:
+
+- `battle_ready`: `304`;
+- `mapper_manual`: `73`;
+- `split_scope`: `16`;
+- `blocked_missing_xmage_source`: `2`.
+
+Key routing delta:
+
+- `Warleader's Call` moved from `split_scope / needs_rule_before_strategy` to
+  `battle_ready / watchlist_candidate`.
+- `Purphoros, God of the Forge` moved from
+  `split_scope / needs_rule_before_strategy` to
+  `battle_ready / watchlist_candidate` through a partial promotion that
+  preserved orthogonal shadow rows.
+- The Lorehold `controlled_creature_etb_damage_engine` family is now closed out
+  of the rule-first lane.
+- Remaining `needs_rule_before_strategy` backlog is concentrated in
+  `manual_model (75)`, `targeted_interaction (13)`,
+  `static_cost_reducer (2)`, and `creature (1)`.
+
+Generated deck evidence:
+
+- previous PG217 candidate hash:
+  `ef278cefb669df32bc6c921f422f218791252c81bc1e08abf5663f3a02f54036`
+- current PG219 candidate hash:
+  `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`
+- current novel cards:
+  `Goblin Engineer`, `Improvisation Capstone`, `Increasing Vengeance`,
+  `Library of Leng`, `Pinnacle Monk // Mystic Peak`, `Reforge the Soul`,
+  `Restoration Seminar`, `The Biblioplex`
+- current cuts from active:
+  `Aetherflux Reservoir`, `Crawlspace`, `Drannith Magistrate`,
+  `Inspiring Vantage`, `Magus of the Moat`, `Mox Amber`,
+  `Sphere of Safety`, `Windborn Muse`
+
+Smoke note:
+
+- the PG219 generated candidate changed materially, but the short smoke was not
+  positive yet; it opened `0W/2L/0S` before the third matchup was interrupted
+  for runtime-cost reasons. This is enough to prove deck delta, not enough to
+  approve a swap.
+
 ## Current Matrix Result
 
 Initial matrix generated on 2026-06-24:

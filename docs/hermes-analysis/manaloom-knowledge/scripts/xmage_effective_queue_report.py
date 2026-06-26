@@ -34,6 +34,11 @@ LANE_ORDER = [
     BLOCKED_LANE,
 ]
 
+PACKAGE_READY_STATUSES = {
+    "batch_pg_candidate_after_precheck",
+    "partial_batch_pg_candidate_preserve_shadow_rows_after_precheck",
+}
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
@@ -90,7 +95,7 @@ def load_package_manifests(report_dir: Path) -> tuple[list[dict[str, Any]], dict
 def effective_lane(proposal: dict[str, Any], package_index: dict[str, list[dict[str, Any]]]) -> str:
     proposal_status = str(proposal.get("proposal_status") or "")
     card_name = str(proposal.get("card_name") or "")
-    if proposal_status == "batch_pg_candidate_after_precheck":
+    if proposal_status in PACKAGE_READY_STATUSES:
         if card_name in package_index:
             return PACKAGE_PREPARED_LANE
         return PACKAGE_READY_LANE

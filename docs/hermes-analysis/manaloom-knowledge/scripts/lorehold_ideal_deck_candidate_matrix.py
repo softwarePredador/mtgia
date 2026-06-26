@@ -404,7 +404,11 @@ def proposal_rule_status(proposal: dict[str, Any] | None) -> str | None:
         return "split_scope"
     if status in {"mapper_metadata_or_test_scenario_required", "manual_model_required"}:
         return "mapper_manual"
-    if status in {"batch_pg_candidate_after_precheck", "oracle_hash_required_before_batch_pg"}:
+    if status in {
+        "batch_pg_candidate_after_precheck",
+        "partial_batch_pg_candidate_preserve_shadow_rows_after_precheck",
+        "oracle_hash_required_before_batch_pg",
+    }:
         return "package_ready"
     return None
 

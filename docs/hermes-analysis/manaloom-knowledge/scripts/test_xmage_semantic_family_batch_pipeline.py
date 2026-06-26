@@ -1629,6 +1629,52 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             self.assertIn("normalized_name LIKE 'sink into stupor // %'", apply_sql)
             self.assertIn("normalized_name LIKE 'sink into stupor // %'", rollback_sql)
 
+    def test_package_builder_preserves_shadow_rows_when_proposal_requests_it(self) -> None:
+        proposal_report = {
+            "generated_at": "2026-06-24T00:00:00+00:00",
+            "proposals": [
+                {
+                    "card_name": "Purphoros, God of the Forge",
+                    "normalized_name": "purphoros, god of the forge",
+                    "oracle_hash": "purphoroshash",
+                    "logical_rule_key": "battle_rule_v1:purphoros_trigger",
+                    "effect_json": {
+                        "effect": "passive",
+                        "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                        "trigger_effect": "damage_each_opponent",
+                        "trigger_damage_each_opponent": 2,
+                    },
+                    "deck_role_json": {"category": "burn_engine", "effect": "damage_each_opponent"},
+                    "source": "curated",
+                    "confidence": 0.94,
+                    "review_status": "verified",
+                    "execution_status": "auto",
+                    "notes": "preserve shadow rows",
+                    "safe_for_batch_pg_package": True,
+                    "shadow_handling": "preserve_existing_rows",
+                    "family_id": "controlled_creature_etb_damage_engine",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            output_prefix = Path(tmp_dir) / "pg997_purphoros_partial_batch"
+            manifest = package_builder.build_package(
+                proposal_report,
+                deploy_id="PG997",
+                slug="purphoros_partial_batch",
+                output_prefix=output_prefix,
+                include_family=set(),
+                include_card={"Purphoros, God of the Forge"},
+                exclude_card=set(),
+                max_cards=None,
+            )
+
+            precheck_sql = Path(manifest["files"]["precheck"]).read_text(encoding="utf-8")
+            apply_sql = Path(manifest["files"]["apply"]).read_text(encoding="utf-8")
+            self.assertIn("shadow_handling", precheck_sql)
+            self.assertIn("p.shadow_handling <> 'preserve_existing_rows'", apply_sql)
+
     def test_classifier_marks_spell_scope_runtime_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -6438,7 +6484,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "controlled_creature_etb_damage_engine")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
-    def test_controlled_creature_etb_damage_family_rejects_cards_with_extra_static_effects(self) -> None:
+    def test_controlled_creature_etb_damage_family_accepts_static_boost_annotations(self) -> None:
         report = classifier.build_family_report(
             {
                 "cards": [
@@ -6470,6 +6516,8 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "trigger_damage_each_opponent": 1,
                                 "damage": 1,
                                 "target_controller": "opponents",
+                                "trigger_creature_you_control_enters": True,
+                                "trigger_another_creature_you_control_enters": False,
                             },
                         },
                     }
@@ -6478,7 +6526,131 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
 
         self.assertEqual(report["cards"][0]["family_id"], "controlled_creature_etb_damage_engine")
-        self.assertEqual(report["cards"][0]["promotion_lane"], "split_family_scope_review_required")
+        self.assertEqual(
+            report["cards"][0]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
+
+    def test_generator_marks_purphoros_trigger_as_partial_batch_safe_and_preserves_shadows(self) -> None:
+        report = generator.build_generator_report(
+            batch_audit={
+                "cards": [
+                    {
+                        "card_name": "Purphoros, God of the Forge",
+                        "severity": "high",
+                        "oracle_hash": "purphoroshash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "PurphorosGodOfTheForge",
+                            "path": "/xmage/PurphorosGodOfTheForge.java",
+                            "types": ["ENCHANTMENT", "CREATURE"],
+                            "effect_classes": ["DamagePlayersEffect", "BoostControlledEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldControlledTriggeredAbility",
+                                "IndestructibleAbility",
+                                "SimpleActivatedAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": ["ManaCostsImpl"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                                "trigger": "creature_you_control_enters",
+                                "trigger_effect": "damage_each_opponent",
+                                "trigger_damage_each_opponent": 2,
+                                "damage": 2,
+                                "target_controller": "opponents",
+                                "trigger_creature_you_control_enters": True,
+                                "trigger_another_creature_you_control_enters": True,
+                                "is_creature_permanent": True,
+                                "power": 6,
+                                "toughness": 5,
+                            },
+                        },
+                    }
+                ]
+            },
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Purphoros, God of the Forge",
+                        "candidate_rule": {"oracle_hash": "purphoroshash"},
+                        "external_references": {"scryfall": {"mana_cost": "{3}{R}"}},
+                    }
+                ]
+            },
+        )
+
+        proposal = report["proposals"][0]
+        self.assertEqual(
+            proposal["proposal_status"],
+            "partial_batch_pg_candidate_preserve_shadow_rows_after_precheck",
+        )
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["shadow_handling"], "preserve_existing_rows")
+        self.assertEqual(proposal["source"], "curated")
+        self.assertEqual(proposal["review_status"], "verified")
+        self.assertEqual(proposal["execution_status"], "auto")
+        self.assertEqual(proposal["effect_json"]["effect"], "passive")
+        self.assertNotIn("power", proposal["effect_json"])
+        self.assertNotIn("toughness", proposal["effect_json"])
+        self.assertNotIn("is_creature_permanent", proposal["effect_json"])
+
+    def test_controlled_creature_etb_damage_family_accepts_simple_enchantment_creature_sources(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Simple Tremor God",
+                        "severity": "high",
+                        "oracle_hash": "purphoroshash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "SimpleTremorGod",
+                            "path": "/xmage/SimpleTremorGod.java",
+                            "types": ["ENCHANTMENT", "CREATURE"],
+                            "effect_classes": ["DamagePlayersEffect", "BoostControlledEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldControlledTriggeredAbility",
+                                "SimpleActivatedAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": ["ManaCostsImpl"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                                "trigger": "creature_you_control_enters",
+                                "trigger_effect": "damage_each_opponent",
+                                "trigger_damage_each_opponent": 2,
+                                "damage": 2,
+                                "target_controller": "opponents",
+                                "trigger_creature_you_control_enters": True,
+                                "trigger_another_creature_you_control_enters": True,
+                                "is_creature_permanent": True,
+                                "power": 6,
+                                "toughness": 5,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["family_id"], "controlled_creature_etb_damage_engine")
+        self.assertEqual(
+            report["cards"][0]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
 
     def test_classifier_marks_young_pyromancer_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
