@@ -5738,6 +5738,150 @@ def register_tests(battle, player):
             for event in tapped_events
         } == {"4e62bff316f784c1b468b9e53146d2aa"}
 
+    def test_authority_of_the_consuls_taps_opponent_creatures_and_gains_life():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Authority Controller")
+            opponent = player("Opponent")
+            authority_effect = {
+                "effect": "passive",
+                "opponents_creatures_enter_tapped": True,
+                "trigger": "creature_enters_under_opponent_control",
+                "trigger_effect": "gain_life",
+                "trigger_gain_life": 1,
+                "battle_model_scope": "opponent_creature_enter_tapped_gain_life_v1",
+                "_rule_logical_key": "battle_rule_v1:authority-of-the-consuls-test",
+                "_rule_oracle_hash": "authority-of-the-consuls-hash",
+                "_rule_source": "xmage",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            battle.apply_effect_immediate(
+                controller,
+                [opponent],
+                {"name": "Authority of the Consuls", "cmc": 1, "type_line": "Enchantment"},
+                3,
+                random.Random(2201),
+                effect_data_override=authority_effect,
+            )
+            life_before = controller.life
+            battle.apply_effect_immediate(
+                opponent,
+                [controller],
+                {"name": "Opponent Bear", "cmc": 2, "type_line": "Creature — Bear"},
+                3,
+                random.Random(2202),
+                effect_data_override={
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "battle_model_scope": "test_creature_body",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        authority = next(
+            permanent
+            for permanent in controller.battlefield
+            if permanent.get("name") == "Authority of the Consuls"
+        )
+        bear = next(
+            permanent
+            for permanent in opponent.battlefield
+            if permanent.get("name") == "Opponent Bear"
+        )
+        assert not authority.get("tapped")
+        assert bear.get("tapped") is True
+        assert controller.life == life_before + 1
+        tapped_events = [
+            data
+            for event, data in events
+            if event == "static_enter_tapped_applied"
+            and data.get("source_card") == "Authority of the Consuls"
+        ]
+        assert len(tapped_events) == 1
+        assert tapped_events[0]["card"] == "Opponent Bear"
+        assert tapped_events[0]["applies_to"] == "opponent_creature"
+        life_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Authority of the Consuls"
+            and data.get("trigger") == "creature_enters_under_opponent_control"
+        ]
+        assert len(life_events) == 1
+        assert life_events[0]["entering_creature"] == "Opponent Bear"
+        assert life_events[0]["entering_controller"] == "Opponent"
+        assert life_events[0]["controller_life_after"] == life_before + 1
+
+    def test_authority_of_the_consuls_taps_opponent_tokens_and_gains_life():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            controller = player("Authority Controller")
+            opponent = player("Opponent")
+            authority_effect = {
+                "effect": "passive",
+                "opponents_creatures_enter_tapped": True,
+                "trigger": "creature_enters_under_opponent_control",
+                "trigger_effect": "gain_life",
+                "trigger_gain_life": 1,
+                "battle_model_scope": "opponent_creature_enter_tapped_gain_life_v1",
+                "_rule_logical_key": "battle_rule_v1:authority-of-the-consuls-test",
+                "_rule_oracle_hash": "authority-of-the-consuls-hash",
+                "_rule_source": "xmage",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            battle.apply_effect_immediate(
+                controller,
+                [opponent],
+                {"name": "Authority of the Consuls", "cmc": 1, "type_line": "Enchantment"},
+                3,
+                random.Random(2203),
+                effect_data_override=authority_effect,
+            )
+            life_before = controller.life
+            battle.create_creature_token(
+                opponent,
+                name="Goblin Token",
+                power=1,
+                toughness=1,
+                opponents=[controller],
+                turn=3,
+                source_event="test_token_created",
+                all_players=[opponent, controller],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        token = next(
+            permanent
+            for permanent in opponent.battlefield
+            if permanent.get("name") == "Goblin Token"
+        )
+        assert token.get("tapped") is True
+        assert controller.life == life_before + 1
+        tapped_events = [
+            data
+            for event, data in events
+            if event == "static_enter_tapped_applied"
+            and data.get("source_card") == "Authority of the Consuls"
+        ]
+        assert len(tapped_events) == 1
+        assert tapped_events[0]["card"] == "Goblin Token"
+        life_events = [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Authority of the Consuls"
+            and data.get("trigger") == "creature_enters_under_opponent_control"
+        ]
+        assert len(life_events) == 1
+        assert life_events[0]["entering_creature"] == "Goblin Token"
+
     def test_land_tax_tutors_three_basic_lands_when_opponent_has_more_lands():
         events = []
         decisions = []
@@ -9783,6 +9927,130 @@ def register_tests(battle, player):
             event == "saga_sacrificed_by_sba"
             and data.get("card") == "Urza's Saga"
             and data.get("final_chapter") == 3
+            for event, data in events
+        )
+
+    def test_blood_sun_draws_on_etb_and_enters_as_passive_enchantment():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            active.library = [{"name": "Drawn Card", "cmc": 2, "type_line": "Instant"}]
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Blood Sun", "type_line": "Enchantment", "cmc": 3},
+                turn=6,
+                rng=random.Random(1601),
+                effect_data_override={
+                    "effect": "passive",
+                    "battle_model_scope": "etb_draw_all_lands_lose_nonmana_abilities_v1",
+                    "etb_draw_count": 1,
+                    "suppresses_land_nonmana_abilities": True,
+                    "_rule_logical_key": "battle_rule_v1:blood-sun-test",
+                    "_rule_oracle_hash": "blood-sun-test-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        blood_sun = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("name") == "Blood Sun"
+        )
+        assert blood_sun.get("effect") == "passive"
+        assert blood_sun.get("suppresses_land_nonmana_abilities") is True
+        assert any(card.get("name") == "Drawn Card" for card in active.hand)
+
+    def test_blood_sun_suppresses_war_room_activation_across_table():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        commander = {
+            "name": "Lorehold, the Historian",
+            "type_line": "Legendary Creature — Elder Dragon",
+            "color_identity": ["W", "R"],
+        }
+        active.commander = commander
+        active.command_zone = [commander]
+        active.life = 12
+        active.hand = [{"name": "Keep Spell", "cmc": 2, "type_line": "Sorcery"}]
+        active.library = [{"name": "Drawn Card", "cmc": 2, "type_line": "Instant"}]
+        active.battlefield = [
+            {"name": "War Room", "effect": "land", "type_line": "Land", "produces": "C", "mana_produced": 1},
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+            {"name": "Ancient Den", "effect": "land", "type_line": "Artifact Land", "produces": "W", "mana_produced": 1},
+        ]
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Blood Sun",
+                "effect": "passive",
+                "type_line": "Enchantment",
+                "suppresses_land_nonmana_abilities": True,
+            }
+        ]
+        active.refresh_mana_sources(turn=4)
+
+        activations = battle.activate_utility_lands(
+            active,
+            4,
+            random.Random(1602),
+            all_players=[active, opponent],
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert activations == 0
+        assert not any(card.get("name") == "Drawn Card" for card in active.hand)
+        assert any(
+            event == "activated_ability_skipped"
+            and data.get("card") == "War Room"
+            and data.get("strategic_guardrail_reason") == "land_nonmana_abilities_suppressed"
+            for event, data in events
+        )
+
+    def test_blood_sun_suppresses_urzas_saga_upkeep_progression():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Active")
+        active.battlefield = [
+            {
+                "name": "Urza's Saga",
+                "effect": "land",
+                "type_line": "Enchantment Land — Urza's Saga",
+                "produces": "C",
+                "mana_produced": 1,
+                "lore_counters": 2,
+                "current_chapter": 2,
+                "final_chapter": 3,
+                "saga_last_lore_turn": 2,
+            }
+        ]
+        opponent = player("Opponent")
+        opponent.battlefield = [
+            {
+                "name": "Blood Sun",
+                "effect": "passive",
+                "type_line": "Enchantment",
+                "suppresses_land_nonmana_abilities": True,
+            }
+        ]
+
+        triggers = battle.process_upkeep_utility_lands(active, 3, all_players=[active, opponent])
+        battle.REPLAY_EVENT_HANDLER = None
+
+        saga = active.battlefield[0]
+        assert triggers == 0
+        assert saga["current_chapter"] == 2
+        assert saga["lore_counters"] == 2
+        assert not any(event == "saga_chapter_progressed" for event, _ in events)
+        assert any(
+            event == "activated_ability_skipped"
+            and data.get("card") == "Urza's Saga"
+            and data.get("strategic_guardrail_reason") == "land_nonmana_abilities_suppressed"
             for event, data in events
         )
 
@@ -18108,6 +18376,11 @@ def register_tests(battle, player):
         test_urzas_saga_enters_with_initial_chapter_state,
         test_urzas_saga_creates_construct_on_chapter_two,
         test_urzas_saga_tutors_safe_artifact_then_sacrifices,
+        test_blood_sun_draws_on_etb_and_enters_as_passive_enchantment,
+        test_blood_sun_suppresses_war_room_activation_across_table,
+        test_blood_sun_suppresses_urzas_saga_upkeep_progression,
+        test_authority_of_the_consuls_taps_opponent_creatures_and_gains_life,
+        test_authority_of_the_consuls_taps_opponent_tokens_and_gains_life,
         test_land_tutor_artifact_trace_scores_rejected_options,
         test_fetch_land_activation_filters_targets_by_subtype_and_pays_life,
         test_fetch_land_skips_when_life_payment_would_be_lethal,

@@ -1277,6 +1277,50 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["treasure_count_source"], "x_value")
         self.assertEqual(primary["treasure_count_per_x"], 1)
 
+    def test_blood_sun_maps_to_exact_etb_draw_land_suppression_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BloodSun",
+                "effect_classes": ["BloodSunEffect", "DrawCardSourceControllerEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility", "SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+            },
+            "When Blood Sun enters the battlefield, draw a card. All lands lose all abilities except mana abilities.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_draw_all_lands_lose_nonmana_abilities_v1",
+        )
+        self.assertEqual(primary["etb_draw_count"], 1)
+        self.assertTrue(primary["suppresses_land_nonmana_abilities"])
+
+    def test_authority_of_the_consuls_maps_to_exact_opponent_creature_tap_lifegain_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "AuthorityOfTheConsuls",
+                "effect_classes": ["GainLifeEffect", "PermanentsEnterBattlefieldTappedEffect"],
+                "ability_classes": ["EntersBattlefieldOpponentTriggeredAbility", "SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+            },
+            "Creatures your opponents control enter the battlefield tapped. Whenever a creature enters the battlefield under an opponent's control, you gain 1 life.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "opponent_creature_enter_tapped_gain_life_v1",
+        )
+        self.assertTrue(primary["opponents_creatures_enter_tapped"])
+        self.assertEqual(primary["trigger"], "creature_enters_under_opponent_control")
+        self.assertEqual(primary["trigger_effect"], "gain_life")
+        self.assertEqual(primary["trigger_gain_life"], 1)
+
     def test_patrol_signaler_maps_to_exact_untap_token_creature_scope(self) -> None:
         result = hints.build_effect_hints(
             {

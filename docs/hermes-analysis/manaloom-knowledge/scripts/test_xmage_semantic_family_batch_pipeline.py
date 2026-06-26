@@ -891,6 +891,78 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "treasure_maker")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_blood_sun_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Blood Sun",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "BloodSun",
+                            "path": "/xmage/BloodSun.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["BloodSunEffect", "DrawCardSourceControllerEffect"],
+                            "ability_classes": ["EntersBattlefieldTriggeredAbility", "SimpleStaticAbility"],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "etb_draw_all_lands_lose_nonmana_abilities_v1",
+                                "ability_kind": "static",
+                                "etb_draw_count": 1,
+                                "suppresses_land_nonmana_abilities": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "passive")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_authority_of_the_consuls_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Authority of the Consuls",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "AuthorityOfTheConsuls",
+                            "path": "/xmage/AuthorityOfTheConsuls.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["GainLifeEffect", "PermanentsEnterBattlefieldTappedEffect"],
+                            "ability_classes": ["EntersBattlefieldOpponentTriggeredAbility", "SimpleStaticAbility"],
+                            "primary_effect": {
+                                "effect": "passive",
+                                "battle_model_scope": "opponent_creature_enter_tapped_gain_life_v1",
+                                "ability_kind": "static",
+                                "opponents_creatures_enter_tapped": True,
+                                "trigger": "creature_enters_under_opponent_control",
+                                "trigger_effect": "gain_life",
+                                "trigger_gain_life": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "passive")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_generator_uses_treasure_role_for_treasure_vault_batch_candidate(self) -> None:
         report = generator.build_generator_report(
             batch_audit={

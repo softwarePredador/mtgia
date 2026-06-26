@@ -1,0 +1,5 @@
+        card_name         |     normalized_name      |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+--------------------------+--------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Authority of the Consuls | authority of the consuls | battle_rule_v1:9b218dccd5117a4f76319362515e4e34 |                  1 |                           1 |                         1 |           2
+(1 row)
+

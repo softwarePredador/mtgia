@@ -717,6 +717,26 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and {"HexproofFromBlueAbility", "HexproofFromBlackAbility"}.issubset(ability_classes)
         )
 
+    if effect == "passive" and scope == "etb_draw_all_lands_lose_nonmana_abilities_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {"BloodSunEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and int(effect_json.get("etb_draw_count") or 0) == 1
+            and bool(effect_json.get("suppresses_land_nonmana_abilities"))
+        )
+
+    if effect == "passive" and scope == "opponent_creature_enter_tapped_gain_life_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and {"GainLifeEffect", "PermanentsEnterBattlefieldTappedEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldOpponentTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and bool(effect_json.get("opponents_creatures_enter_tapped"))
+            and effect_json.get("trigger") == "creature_enters_under_opponent_control"
+            and effect_json.get("trigger_effect") == "gain_life"
+            and int(effect_json.get("trigger_gain_life") or 0) == 1
+        )
+
     if effect == "creature" and scope == "rishkar_counter_mana_creature_waiver_v1":
         return (
             types == {"CREATURE"}

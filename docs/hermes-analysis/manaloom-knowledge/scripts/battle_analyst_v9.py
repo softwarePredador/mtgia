@@ -10094,6 +10094,21 @@ def resolve_generic_permanent_etb(
         resolve_etb_copy_tokens(player, opponents, permanent, effect_data, turn)
 
 
+def lands_have_nonmana_abilities_suppressed(all_players=None, *, player=None):
+    participants = list(all_players or [])
+    if not participants and player is not None:
+        participants = [player]
+    for participant in participants:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if (
+                isinstance(permanent, dict)
+                and permanent.get("effect") == "passive"
+                and permanent.get("suppresses_land_nonmana_abilities")
+            ):
+                return True
+    return False
+
+
 def _eldrazi_confluence_pump_target(opponents, legal_target_ids=None):
     candidates = []
     for opponent in opponents or []:
@@ -14472,6 +14487,10 @@ def process_upkeep_utility_lands(player, turn, all_players=None):
     """Resolve low-risk beginning-of-upkeep utility effects."""
     triggers = 0
     artifact_count = controlled_artifact_count(player)
+    land_nonmana_suppressed = lands_have_nonmana_abilities_suppressed(
+        all_players,
+        player=player,
+    )
     for permanent in list(player.battlefield):
         if not is_land_tax_upkeep_permanent(permanent):
             continue
@@ -14489,6 +14508,16 @@ def process_upkeep_utility_lands(player, turn, all_players=None):
             continue
         initialize_special_land_runtime_state(permanent, turn=None)
         if is_urzas_saga(permanent):
+            if land_nonmana_suppressed:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "land_nonmana_abilities_suppressed",
+                    phase="upkeep",
+                    risk_flags=["global_land_static_suppression"],
+                )
+                continue
             current_chapter = max(
                 int(permanent.get("current_chapter") or 1),
                 int(permanent.get("lore_counters") or 0),
@@ -14617,6 +14646,16 @@ def process_upkeep_utility_lands(player, turn, all_players=None):
                 permanent["chapter_ability_pending"] = False
                 triggers += 1
         if normalize_card_name(permanent.get("name", "")) == "inventors' fair":
+            if land_nonmana_suppressed:
+                _utility_land_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "land_nonmana_abilities_suppressed",
+                    phase="upkeep",
+                    risk_flags=["global_land_static_suppression"],
+                )
+                continue
             if artifact_count >= 3:
                 gain_life(player, 1, cap=999)
                 emit_replay_event(
@@ -19416,7 +19455,7 @@ def process_lorehold_opponent_upkeep_rummage(active_player, all_players, turn, r
     return triggered
 
 
-def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
+def activate_utility_lands(player, turn, rng, *, phase="postcombat_main", all_players=None):
     """Use safe card-draw utility lands without pretending to judge every spot.
 
     This is intentionally narrow: prefer card advantage only when the hand is
@@ -19437,6 +19476,10 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
     hand_size = len(player.hand)
     land_count = len(battlefield_lands)
     activations = 0
+    land_nonmana_suppressed = lands_have_nonmana_abilities_suppressed(
+        all_players,
+        player=player,
+    )
 
     preferred_order = [
         "urza's saga",
@@ -19454,6 +19497,16 @@ def activate_utility_lands(player, turn, rng, *, phase="postcombat_main"):
     for normalized_name in preferred_order:
         permanent = permanents_by_name.get(normalized_name)
         if permanent is None or permanent.get("utility_land_used_this_turn"):
+            continue
+        if land_nonmana_suppressed:
+            _utility_land_skip_event(
+                player,
+                permanent,
+                turn,
+                "land_nonmana_abilities_suppressed",
+                phase=phase,
+                risk_flags=["global_land_static_suppression"],
+            )
             continue
 
         if normalized_name == "urza's saga":
@@ -21282,6 +21335,85 @@ def process_controlled_creature_enters_triggers(
     return resolved
 
 
+def process_opponent_controlled_creature_enters_triggers(
+    entering_controller,
+    entering_permanent,
+    turn,
+    *,
+    source_event="creature_enters_battlefield",
+    stack=None,
+    active_player=None,
+    all_players=None,
+):
+    if (
+        not isinstance(entering_permanent, dict)
+        or not is_battlefield_creature(entering_permanent)
+        or not all_players
+    ):
+        return 0
+    resolved = 0
+    for source_controller in all_players:
+        if source_controller is entering_controller:
+            continue
+        trigger_sources = [
+            permanent
+            for permanent in list(getattr(source_controller, "battlefield", []) or [])
+            if isinstance(permanent, dict)
+            and permanent.get("trigger") == "creature_enters_under_opponent_control"
+            and permanent.get("trigger_effect") == "gain_life"
+        ]
+        for permanent in trigger_sources:
+            amount = int(
+                permanent.get("trigger_gain_life")
+                or permanent.get("gain_life")
+                or permanent.get("controller_gain_life")
+                or 0
+            )
+            if amount <= 0:
+                continue
+
+            def resolve_opponent_creature_enters_gain_life_trigger(
+                source_controller=source_controller,
+                permanent=permanent,
+                amount=amount,
+            ):
+                controller_life_before = source_controller.life
+                gain_life(source_controller, amount, cap=999)
+                controller_life_after = source_controller.life
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=source_controller.name,
+                    card=permanent.get("name", "?"),
+                    trigger="creature_enters_under_opponent_control",
+                    entering_creature=entering_permanent.get("name", "?"),
+                    entering_controller=getattr(entering_controller, "name", "?"),
+                    source_event=source_event,
+                    effect="gain_life",
+                    amount=amount,
+                    controller_life_before=controller_life_before,
+                    controller_life_after=controller_life_after,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                source_controller,
+                permanent,
+                "creature_enters_under_opponent_control",
+                resolve_opponent_creature_enters_gain_life_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "entering_creature": entering_permanent.get("name", "?"),
+                    "entering_controller": getattr(entering_controller, "name", "?"),
+                    "source_event": source_event,
+                },
+            )
+            resolved += 1
+    return resolved
+
+
 def create_creature_token(
     player,
     *,
@@ -21327,11 +21459,26 @@ def create_creature_token(
         token["keywords"] = list(dict.fromkeys(token_keywords))
     if "prowess" in token_keywords:
         token["prowess"] = True
+    token = prepare_entering_permanent(
+        token,
+        controller=player,
+        all_players=all_players,
+        turn=turn,
+    )
     player.battlefield.append(token)
     if opponents is not None and turn is not None:
         process_controlled_creature_enters_triggers(
             player,
             opponents,
+            token,
+            turn,
+            source_event=source_event,
+            stack=stack,
+            active_player=active_player,
+            all_players=all_players,
+        )
+        process_opponent_controlled_creature_enters_triggers(
+            player,
             token,
             turn,
             source_event=source_event,
@@ -21360,11 +21507,26 @@ def create_creature_token(
                 "summoning_sick": True,
                 "tapped": False,
             }
+            thopter = prepare_entering_permanent(
+                thopter,
+                controller=player,
+                all_players=all_players,
+                turn=turn,
+            )
             player.battlefield.append(thopter)
             if opponents is not None and turn is not None:
                 process_controlled_creature_enters_triggers(
                     player,
                     opponents,
+                    thopter,
+                    turn,
+                    source_event="artifact_token_replacement",
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
+                )
+                process_opponent_controlled_creature_enters_triggers(
+                    player,
                     thopter,
                     turn,
                     source_event="artifact_token_replacement",
@@ -21477,11 +21639,14 @@ def opponent_enter_tapped_static_sources(permanent, controller, all_players):
         for source in getattr(source_controller, "battlefield", []) or []:
             if not isinstance(source, dict):
                 continue
+            if source.get("opponents_creatures_enter_tapped") and is_battlefield_creature(permanent):
+                sources.append((source_controller, source, "opponent_creature"))
+                continue
             if (
                 source.get("opponents_artifacts_creatures_enter_tapped")
                 or source.get("opponents_artifacts_and_creatures_enter_tapped")
             ):
-                sources.append((source_controller, source))
+                sources.append((source_controller, source, "opponent_artifact_or_creature"))
     return sources
 
 
@@ -21489,7 +21654,7 @@ def apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=
     sources = opponent_enter_tapped_static_sources(permanent, controller, all_players)
     if not sources:
         return False
-    source_controller, source = sources[0]
+    source_controller, source, applies_to = sources[0]
     permanent["enters_tapped"] = True
     permanent["tapped"] = True
     permanent["entered_tapped_by_static"] = source.get("name", "?")
@@ -21501,7 +21666,7 @@ def apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=
         type_line=permanent.get("type_line", ""),
         source_player=getattr(source_controller, "name", "?"),
         source_card=source.get("name", "?"),
-        applies_to="opponent_artifact_or_creature",
+        applies_to=applies_to,
         turn=turn,
         **replay_rule_fields(source),
     )
@@ -28648,6 +28813,15 @@ def apply_effect_immediate(
             active_player=player,
             all_players=[player, *(opponents or [])],
         )
+        process_opponent_controlled_creature_enters_triggers(
+            player,
+            permanent,
+            turn,
+            source_event="creature_spell_resolved",
+            stack=stack,
+            active_player=player,
+            all_players=[player, *(opponents or [])],
+        )
         emit_replay_event(
             "creature_to_battlefield",
             player=player.name,
@@ -28683,6 +28857,15 @@ def apply_effect_immediate(
                 active_player=player,
                 all_players=[player, *(opponents or [])],
             )
+            process_opponent_controlled_creature_enters_triggers(
+                player,
+                permanent,
+                turn,
+                source_event="copy_permanent_etb",
+                stack=stack,
+                active_player=player,
+                all_players=[player, *(opponents or [])],
+            )
             emit_replay_event(
                 "creature_to_battlefield",
                 player=player.name,
@@ -28699,6 +28882,17 @@ def apply_effect_immediate(
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
             player.battlefield.append(permanent)
+            resolve_generic_permanent_etb(
+                player,
+                opponents,
+                permanent,
+                effect_data,
+                turn,
+                rng,
+                stack=stack,
+                all_players=all_players_for_entry,
+                phase=phase or "resolution",
+            )
     elif effect == "static_cost_reduction":
         if is_instant(card) or is_sorcery(card):
             finish_resolved_spell(player, card, turn=turn)
@@ -32828,7 +33022,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         turn,
         phase="postcombat_main",
     )
-    activate_utility_lands(player, turn, rng, phase="postcombat_main")
+    activate_utility_lands(
+        player,
+        turn,
+        rng,
+        phase="postcombat_main",
+        all_players=all_players,
+    )
     if game_winner(all_players):
         return
     if check_sbas(all_players): return

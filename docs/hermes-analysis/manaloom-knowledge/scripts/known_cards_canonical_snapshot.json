@@ -1804,14 +1804,20 @@
     "battle_rule_oracle_hash": "bce631c9a75d6856dd8c0d7de442b47f"
   },
   "Authority of the Consuls": {
-    "cmc": 1.0,
-    "effect": "draw_engine",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e9a2f41b86aad0a56d142873b1267daf"
+    "ability_kind": "triggered",
+    "battle_model_scope": "opponent_creature_enter_tapped_gain_life_v1",
+    "effect": "passive",
+    "opponents_creatures_enter_tapped": true,
+    "trigger": "creature_enters_under_opponent_control",
+    "trigger_effect": "gain_life",
+    "trigger_gain_life": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9b218dccd5117a4f76319362515e4e34",
+    "battle_rule_oracle_hash": "36656d2eb48fc1caaca9e723d9010724"
   },
   "Auton Soldier": {
     "cmc": 6.0,
@@ -3173,6 +3179,20 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
+  },
+  "Blood Sun": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "etb_draw_all_lands_lose_nonmana_abilities_v1",
+    "effect": "passive",
+    "etb_draw_count": 1,
+    "suppresses_land_nonmana_abilities": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:caf72014bc4cda2cd2b0a2e7ce450a08",
+    "battle_rule_oracle_hash": "b0b6f9cdfd28c3c98f2eee7055c136c5"
   },
   "Bloodboil Sorcerer": {
     "cmc": 4.0,

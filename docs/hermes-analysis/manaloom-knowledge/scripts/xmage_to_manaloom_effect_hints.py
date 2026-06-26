@@ -1590,6 +1590,29 @@ def _build_exact_runtime_variant_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "BloodSun"
+        and {"BloodSunEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)
+        and {"EntersBattlefieldTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "passive",
+            "scope": "etb_draw_all_lands_lose_nonmana_abilities_v1",
+            "fields": {
+                "etb_draw_count": 1,
+                "suppresses_land_nonmana_abilities": True,
+            },
+            "reason": "XMage structure matches Blood Sun's enters-the-battlefield draw plus its static effect that strips all nonmana abilities from lands.",
+            "signals": [
+                "BloodSun",
+                "BloodSunEffect",
+                "DrawCardSourceControllerEffect",
+                "EntersBattlefieldTriggeredAbility",
+                "SimpleStaticAbility",
+            ],
+        }
+
+    if (
         "INSTANT" in card_types
         and "GainProtectionFromColorTargetEffect" in effect_classes
         and "TargetControlledCreaturePermanent" in target_classes
@@ -1639,6 +1662,29 @@ def _build_exact_runtime_variant_fields(
                 "PreventNextDamageFromChosenSourceEffect(Duration.EndOfTurn, true)",
                 "DeflectingPalmPreventionApplier",
                 "objectController.damage(prevented, source.getSourceId(), source, game)",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "AuthorityOfTheConsuls"
+        and {"GainLifeEffect", "PermanentsEnterBattlefieldTappedEffect"}.issubset(effect_classes)
+        and {"EntersBattlefieldOpponentTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+    ):
+        return {
+            "effect": "passive",
+            "scope": "opponent_creature_enter_tapped_gain_life_v1",
+            "fields": {
+                "opponents_creatures_enter_tapped": True,
+                "trigger": "creature_enters_under_opponent_control",
+                "trigger_effect": "gain_life",
+                "trigger_gain_life": 1,
+            },
+            "reason": "XMage structure matches Authority of the Consuls: opponents' creatures enter tapped and each creature entering under an opponent's control gains the source controller 1 life.",
+            "signals": [
+                "PermanentsEnterBattlefieldTappedEffect",
+                "EntersBattlefieldOpponentTriggeredAbility",
+                "GainLifeEffect(1)",
             ],
         }
 
