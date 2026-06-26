@@ -501,20 +501,17 @@ def build_deck_categories(rows, known_cards):
     return categories
 
 
-def _target_candidate_pool(
+def _target_candidate_pools(
     deck_categories: dict[str, list[tuple[str, float]]],
     category: str,
-) -> list[tuple[str, float]]:
+) -> list[list[tuple[str, float]]]:
     pools = [category]
     pools.extend(CATEGORY_TARGET_FALLBACKS.get(category, ()))
-    seen: set[tuple[str, float]] = set()
-    result: list[tuple[str, float]] = []
+    result: list[list[tuple[str, float]]] = []
     for pool in pools:
-        for item in deck_categories.get(pool, []):
-            if item in seen:
-                continue
-            seen.add(item)
-            result.append(item)
+        cards = list(deck_categories.get(pool, []))
+        if cards:
+            result.append(cards)
     return result
 
 
@@ -528,25 +525,33 @@ def choose_swap_targets(
     if desired_categories:
         categories.update(desired_categories)
     for category in sorted(categories):
-        cards = _target_candidate_pool(deck_categories, category)
-        if category == "unknown" or not cards:
+        pools = _target_candidate_pools(deck_categories, category)
+        if category == "unknown" or not pools:
             continue
-        if category == "land":
-            cuttable = [
-                (name, cmc)
-                for name, cmc in cards
-                if name not in protected and name not in PREMIUM_LANDS
-            ]
+        selected_target = None
+        for cards in pools:
+            if category == "land":
+                cuttable = [
+                    (name, cmc)
+                    for name, cmc in cards
+                    if name not in protected and name not in PREMIUM_LANDS
+                ]
+                if not cuttable:
+                    cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
+                if not cuttable:
+                    continue
+                cuttable.sort(key=lambda item: (LAND_CUT_PRIORITY.get(item[0], 100), item[0]))
+                selected_target = cuttable[0][0]
+                break
+
+            cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
             if not cuttable:
-                cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
-            cuttable.sort(key=lambda item: (LAND_CUT_PRIORITY.get(item[0], 100), item[0]))
-            targets[category] = cuttable[0][0]
-            continue
-        cuttable = [(name, cmc) for name, cmc in cards if name not in protected]
-        if not cuttable:
-            continue
-        cuttable.sort(key=lambda item: (-item[1], item[0]))
-        targets[category] = cuttable[0][0]
+                continue
+            cuttable.sort(key=lambda item: (-item[1], item[0]))
+            selected_target = cuttable[0][0]
+            break
+        if selected_target:
+            targets[category] = selected_target
     return targets
 
 
