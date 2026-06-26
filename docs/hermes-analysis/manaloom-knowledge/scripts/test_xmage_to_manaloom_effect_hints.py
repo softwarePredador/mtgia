@@ -280,6 +280,41 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1",
         )
 
+    def test_pyromancers_goggles_maps_to_red_mana_copy_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "PyromancersGoggles",
+                "effect_classes": ["CopyTargetStackObjectEffect"],
+                "ability_classes": ["PyromancersGogglesTriggeredAbility", "RedManaAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "Ability ability = new RedManaAbility(); "
+                    "Effect effect = new CopyTargetStackObjectEffect(true); "
+                    "this.addAbility(new PyromancersGogglesTriggeredAbility(ability.getOriginalId(), effect)); "
+                    "setTriggerPhrase(\"When that mana is used to cast a red instant or sorcery spell, \");"
+                ),
+            },
+            "Add {R}. When that mana is used to cast a red instant or sorcery spell, copy that spell and you may choose new targets for the copy.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "red_mana_rock_red_instant_sorcery_mana_spent_copy_spell_v1",
+        )
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "R")
+        self.assertEqual(primary["trigger"], "instant_sorcery_cast")
+        self.assertEqual(primary["trigger_effect"], "copy_when_mana_spent")
+        self.assertEqual(primary["target"], "own_instant_or_sorcery_on_stack")
+        self.assertTrue(primary["copy_when_mana_spent_to_cast_matching_spell"])
+        self.assertEqual(primary["copy_when_mana_spent_card_types"], ["instant", "sorcery"])
+        self.assertEqual(primary["copy_when_mana_spent_spell_colors"], ["R"])
+        self.assertTrue(primary["may_choose_new_targets"])
+
     def test_palantir_of_orthanc_maps_to_exact_end_step_choice_draw_engine_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -318,6 +353,88 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["decline_mill_count_source"], "source_named_counter_count")
         self.assertEqual(primary["decline_mill_counter_type"], "influence")
         self.assertTrue(primary["decline_opponent_life_loss_equals_milled_cards_total_mana_value"])
+
+    def test_galvanoth_maps_to_exact_upkeep_topdeck_free_cast_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Galvanoth",
+                "effect_classes": ["OneShotEffect"],
+                "ability_classes": ["BeginningOfUpkeepTriggeredAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            (
+                "public final class Galvanoth extends CardImpl { "
+                "this.addAbility(new BeginningOfUpkeepTriggeredAbility(new GalvanothEffect(), true)); "
+                "new MayCastTargetCardEffect(CastManaAdjustment.WITHOUT_PAYING_MANA_COST); "
+                "look at the top card of your library. "
+                "You may cast it without paying its mana cost if it's an instant or sorcery spell;"
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1",
+        )
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertEqual(primary["trigger"], "controller_upkeep")
+        self.assertEqual(
+            primary["trigger_effect"],
+            "look_top_card_may_cast_if_instant_or_sorcery",
+        )
+        self.assertTrue(primary["upkeep_look_top_card"])
+        self.assertTrue(primary["upkeep_may_cast_top_instant_or_sorcery_without_paying_mana"])
+        self.assertEqual(primary["upkeep_top_library_cast_types"], ["instant", "sorcery"])
+
+    def test_velomachus_lorehold_maps_to_exact_attack_top_seven_free_cast_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "VelomachusLorehold",
+                "effect_classes": ["OneShotEffect"],
+                "ability_classes": [
+                    "AttacksTriggeredAbility",
+                    "FlyingAbility",
+                    "HasteAbility",
+                    "VigilanceAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            (
+                "public final class VelomachusLorehold extends CardImpl { "
+                "this.addAbility(new AttacksTriggeredAbility(new VelomachusLoreholdEffect(), false)); "
+                "Flying Vigilance Haste. "
+                "Whenever Velomachus Lorehold attacks, look at the top seven cards of your library. "
+                "You may cast an instant or sorcery spell with mana value less than or equal to "
+                "Velomachus Lorehold's power from among them without paying its mana cost. "
+                "Put the rest on the bottom of your library in a random order."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "attack_top_seven_instant_or_sorcery_lte_power_may_cast_without_paying_mana_v1",
+        )
+        self.assertEqual(primary["power"], 5)
+        self.assertEqual(primary["toughness"], 5)
+        self.assertTrue(primary["flying"])
+        self.assertTrue(primary["vigilance"])
+        self.assertTrue(primary["haste"])
+        self.assertEqual(primary["trigger"], "attack")
+        self.assertEqual(
+            primary["trigger_effect"],
+            "look_top_seven_may_cast_instant_or_sorcery_lte_power",
+        )
+        self.assertEqual(primary["attack_look_top_count"], 7)
+        self.assertEqual(primary["attack_top_library_cast_types"], ["instant", "sorcery"])
+        self.assertTrue(primary["attack_may_cast_from_looked_cards_without_paying_mana"])
+        self.assertEqual(primary["attack_cast_mana_value_max_source"], "source_power")
+        self.assertTrue(primary["attack_put_rest_bottom_random"])
 
     def test_vanquish_the_horde_maps_to_exact_cost_reduced_board_wipe_scope(self) -> None:
         result = hints.build_effect_hints(
@@ -2920,6 +3037,43 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["activation_cost_colors"], ["W"])
         self.assertEqual(primary["activation_condition"], "opponent_controls_more_lands")
         self.assertEqual(primary["tutor_target"], "land")
+
+    def test_scholar_of_new_horizons_maps_to_counter_plains_tutor_upgrade_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["OneShotEffect", "ScholarOfNewHorizonsEffect"],
+                "ability_classes": ["EntersBattlefieldWithCountersAbility", "SimpleActivatedAbility"],
+                "condition_classes": ["OpponentControlsMoreCondition"],
+                "cost_classes": ["TapSourceCost", "RemoveCounterCost"],
+                "counter_types": ["P1P1"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "ScholarOfNewHorizons",
+                "raw_excerpt": (
+                    "this.addAbility(new EntersBattlefieldWithCountersAbility(CounterType.P1P1.createInstance(1))); "
+                    "Ability ability = new SimpleActivatedAbility(new ScholarOfNewHorizonsEffect(), new TapSourceCost()); "
+                    "ability.addCost(new RemoveCounterCost(new TargetControlledPermanent())); "
+                    'private static final FilterCard filter = new FilterLandCard("Plains card"); '
+                    "filter.add(SubType.PLAINS.getPredicate()); "
+                    "private static final Condition condition = new OpponentControlsMoreCondition(StaticFilters.FILTER_LAND); "
+                    "If an opponent controls more lands than you, you may put that card onto the battlefield tapped. "
+                    "If you don't put the card onto the battlefield, put it into your hand."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_remove_counter_plains_tutor_battlefield_tapped_if_behind_else_hand_v1",
+        )
+        self.assertEqual(primary["enters_with_plus_one_counter_count"], 1)
+        self.assertTrue(primary["land_tutor_to_hand_activated"])
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertTrue(primary["activation_requires_remove_plus_one_counter_from_controlled_permanent"])
+        self.assertTrue(primary["activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands"])
+        self.assertEqual(primary["tutor_target"], "plains")
+        self.assertEqual(primary["tutor_destination"], "hand")
 
     def test_rhystic_study_maps_to_opponent_spell_tax_draw_scope(self) -> None:
         result = hints.build_effect_hints(

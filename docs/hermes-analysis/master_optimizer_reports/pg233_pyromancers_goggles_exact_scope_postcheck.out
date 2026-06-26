@@ -1,0 +1,4 @@
+      card_name       |   normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+----------------------+----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Pyromancer's Goggles | pyromancer's goggles | battle_rule_v1:007966224685ef74fe530ed78bcb8f84 |                  1 |                           1 |                         1 |           2
+(1 row)

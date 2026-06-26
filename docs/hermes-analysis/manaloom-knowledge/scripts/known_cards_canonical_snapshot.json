@@ -11963,14 +11963,26 @@
     "battle_rule_logical_key": "battle_rule_v1:ffcb16d3b969504cbd13c8b736552a3f"
   },
   "Galvanoth": {
-    "cmc": 5.0,
-    "effect": "topdeck_manipulation",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d0505af096c10168b5ee4c6e65d71ef2"
+    "ability_kind": "triggered",
+    "battle_model_scope": "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1",
+    "effect": "creature",
+    "power": 3,
+    "toughness": 3,
+    "trigger": "controller_upkeep",
+    "trigger_effect": "look_top_card_may_cast_if_instant_or_sorcery",
+    "upkeep_look_top_card": true,
+    "upkeep_may_cast_top_instant_or_sorcery_without_paying_mana": true,
+    "upkeep_top_library_cast_types": [
+      "instant",
+      "sorcery"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b8859191e53dd38d3af9f4d8db421a83",
+    "battle_rule_oracle_hash": "7ed46e6390c4eeb8ec436a9871abcdaa"
   },
   "Gamble": {
     "battle_model_scope": "any_card_to_hand_then_random_discard_v1",
@@ -21822,15 +21834,26 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Palant\u00edr of Orthanc": {
-    "cmc": 3.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2f76bad97175d8bd361b3fd37840ffee"
+    "ability_kind": "triggered",
+    "battle_model_scope": "controller_end_step_add_influence_scry_two_target_opponent_may_draw_else_mill_and_life_loss_v1",
+    "decline_mill_count_source": "source_named_counter_count",
+    "decline_mill_counter_type": "influence",
+    "decline_opponent_life_loss_equals_milled_cards_total_mana_value": true,
+    "effect": "draw_engine",
+    "target": "opponent",
+    "target_opponent_may_have_you_draw_count": 1,
+    "trigger": "controller_end_step",
+    "trigger_counter_count": 1,
+    "trigger_counter_type": "influence",
+    "trigger_effect": "add_named_counter_scry_target_opponent_may_draw_else_mill_life_loss",
+    "trigger_scry_count": 2,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:26179de4259137dba13dc5d473b1fe72",
+    "battle_rule_oracle_hash": "a85ec353e0a18e783ae88be2f64536ec"
   },
   "Paliano, the High City": {
     "effect": "land",
@@ -23375,15 +23398,32 @@
     "battle_rule_oracle_hash": "84cc013b799522990904777d7a3e458e"
   },
   "Pyromancer's Goggles": {
-    "cmc": 5.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "red_mana_rock_red_instant_sorcery_mana_spent_copy_spell_v1",
+    "choose_new_targets_status": "may",
+    "copy_when_mana_spent_card_types": [
+      "instant",
+      "sorcery"
+    ],
+    "copy_when_mana_spent_spell_colors": [
+      "R"
+    ],
+    "copy_when_mana_spent_to_cast_matching_spell": true,
     "effect": "ramp_permanent",
+    "is_mana_source": true,
     "mana_produced": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d491eb5bd49e767cbb09724ec816c640"
+    "may_choose_new_targets": true,
+    "produces": "R",
+    "target": "own_instant_or_sorcery_on_stack",
+    "trigger": "instant_sorcery_cast",
+    "trigger_effect": "copy_when_mana_spent",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:007966224685ef74fe530ed78bcb8f84",
+    "battle_rule_oracle_hash": "a87d2dc7618186343d2ecaf662405c11"
   },
   "Quandrix Campus": {
     "effect": "land",
@@ -26105,6 +26145,28 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f04100c569e015b2f09abed12f5040fe"
+  },
+  "Scholar of New Horizons": {
+    "ability_kind": "activated",
+    "activation_cost_generic": 0,
+    "activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands": true,
+    "activation_requires_remove_plus_one_counter_from_controlled_permanent": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "activated_remove_counter_plains_tutor_battlefield_tapped_if_behind_else_hand_v1",
+    "effect": "creature",
+    "enters_with_plus_one_counter_count": 1,
+    "land_tutor_to_hand_activated": true,
+    "power": 1,
+    "toughness": 1,
+    "tutor_destination": "hand",
+    "tutor_target": "plains",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eeb6d5d36cf100b1f4136ec0b5f5d63d",
+    "battle_rule_oracle_hash": "4f089ec5603d5179130aee6db95a54bf"
   },
   "School of the Unseen": {
     "effect": "land",
@@ -34524,14 +34586,31 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Velomachus Lorehold": {
-    "cmc": 7.0,
-    "effect": "topdeck_manipulation",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:991d41722ed254d2816ac1156aff0856"
+    "ability_kind": "triggered",
+    "attack_cast_mana_value_max_source": "source_power",
+    "attack_look_top_count": 7,
+    "attack_may_cast_from_looked_cards_without_paying_mana": true,
+    "attack_put_rest_bottom_random": true,
+    "attack_top_library_cast_types": [
+      "instant",
+      "sorcery"
+    ],
+    "battle_model_scope": "attack_top_seven_instant_or_sorcery_lte_power_may_cast_without_paying_mana_v1",
+    "effect": "creature",
+    "flying": true,
+    "haste": true,
+    "power": 5,
+    "toughness": 5,
+    "trigger": "attack",
+    "trigger_effect": "look_top_seven_may_cast_instant_or_sorcery_lte_power",
+    "vigilance": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c3e60ccbaf1d57109e270f072d834a98",
+    "battle_rule_oracle_hash": "ecd723e730ac3b2cf1f68c816a17c745"
   },
   "Venser's Journal": {
     "cmc": 5.0,

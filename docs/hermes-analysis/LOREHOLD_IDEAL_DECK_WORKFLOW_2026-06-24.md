@@ -51,79 +51,74 @@ It does not mutate deck rows, SQLite, or PostgreSQL.
 
 ## Current Checkpoint
 
-Post-PG228 Lorehold-focused checkpoint generated on 2026-06-26 after promoting
-the exact XMage scope for `Primal Amulet // Primal Wellspring`, syncing Hermes
-SQLite, rerunning the batch pipeline with the expanded Lorehold plus opponent
-scope, and regenerating the matrix/audits from the live post-sync state:
+Post-PG234 Lorehold-focused checkpoint generated on 2026-06-26 after applying a
+single PostgreSQL batch for the remaining `package_ready_unprepared` residual
+from the post-PG233 queue (`Galvanoth`, `Velomachus Lorehold`,
+`Palantir of Orthanc`, `Scholar of New Horizons`), syncing those rules back
+into SQLite/Hermes, and regenerating the queue/audits/candidate deck from the
+live post-sync state:
 
 - current matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg228_primal_amulet_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
 - current proposal report:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg228_primal_amulet_postsync_v1_proposals.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg234_lorehold_ready_batch_four_postsync_v1_proposals.json`
 - current effective queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg228_primal_amulet_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
+- current strategy benchmark:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_acceleration_strategy_benchmark_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
 - current strategy audit:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg228_primal_amulet_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
 - current generated candidate:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg228_primal_amulet_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
+- current slice evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg234_lorehold_ready_batch_four_progress_20260626.md`
 
-Current matrix result:
+Current operational result:
 
-- total Lorehold-touching cards in matrix: `395`;
-- `core_keep`: `87`;
-- `priority_benchmark_candidate`: `44`;
-- `watchlist_candidate`: `119`;
-- `needs_rule_before_strategy`: `80`;
-- `active_low_confidence_review`: `13`;
-- `low_priority`: `50`;
-- `policy_blocked`: `2`.
-
-Current rule-readiness split:
-
-- `battle_ready`: `315`;
-- `mapper_manual`: `70`;
-- `split_scope`: `8`;
-- `blocked_missing_xmage_source`: `2`.
+- effective queue:
+  - `package_ready_unprepared=0`
+  - `package_already_prepared=1`
+  - `manual_mapper_backlog=326`
+  - `split_scope_backlog=61`
+  - `runtime_family_backlog=4`
+  - `blocked_missing_xmage_source=4`
+- strategy consistency audit:
+  - `18/18 pass`
+- strategy benchmark:
+  - `recommended_strategy_id=hybrid_effective_queue_pattern_registry`
+  - `exact_scope_cluster_first` remains the highest raw next-modeling lane,
+    but not the replacement for the hybrid operational routing
 
 Key routing delta:
 
-- `Primal Amulet // Primal Wellspring` moved from
-  `split_scope / needs_rule_before_strategy`
-  into
-  `battle_ready / watchlist_candidate`
-  with next action
-  `run_safe_slot_benchmark_after_baseline_hash_guard`.
-- the live effective queue returned to
-  `package_ready_unprepared=0`;
-  `Purphoros, God of the Forge` remains the only
-  `package_already_prepared` row.
-- `needs_rule_before_strategy` dropped from `84` to `80`
-  and the remaining Lorehold rule-first backlog is concentrated in the
-  unresolved split-scope families and manual mapper backlog.
-
-Generated deck evidence:
-
-- stale PG221 / PG222-v1 carry-forward hash:
+- `Galvanoth`, `Velomachus Lorehold`, `Palantir of Orthanc`, and
+  `Scholar of New Horizons` all moved from the live `package_ready_unprepared`
+  residual into
+  `battle_ready / watchlist_candidate`.
+- the post-sync candidate deck changed hash from
   `a6128298aafade21fd2177eccafe51d756e4b4382e0cf09ea1f7a43c8cf08dbd`
-- current PG228 candidate hash:
-  `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`
-- current novel cards:
-  `Goblin Engineer`, `Improvisation Capstone`, `Increasing Vengeance`,
-  `Library of Leng`, `Pinnacle Monk // Mystic Peak`, `Reforge the Soul`,
-  `Restoration Seminar`, `The Biblioplex`
-- current cuts from active:
-  `Aetherflux Reservoir`, `Crawlspace`, `Drannith Magistrate`,
-  `Inspiring Vantage`, `Magus of the Moat`, `Mox Amber`,
-  `Sphere of Safety`, `Windborn Muse`
-
-Smoke note:
-
-- the PG228 post-sync candidate regenerated to the same deck hash as the
-  earlier PG227 isolated candidate:
-  `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`.
-- that proves the `Primal Amulet // Primal Wellspring` promotion removed a
-  Lorehold rule blocker without changing the current isolated Lorehold
-  candidate composition.
+  to
+  `3d827d72b023d4cceb1277c388863000794a29de0ad1c338c9d01bd8c86cac19`.
+- the new generated candidate added
+  `Exotic Orchard`, `Goblin Engineer`, `Hexing Squelcher`,
+  `Increasing Vengeance`, `Library of Leng`, `Misty Rainforest`,
+  `Polluted Delta`, `Reforge the Soul`, `Restoration Seminar`,
+  and `Underworld Breach`,
+  while removing
+  `Aetherflux Reservoir`, `Brainstone`, `Crawlspace`,
+  `Drannith Magistrate`, `Great Furnace`, `Inspiring Vantage`,
+  `Magus of the Moat`, `Silent Arbiter`, and `Sphere of Safety`.
+- the short real-opponent smoke on the new candidate was
+  `0W/3L/0S`, which is worse than the short PG233 post-sync sample.
+- the runtime-backed slot-optimizer smoke against the PG234 post-sync matrix
+  reached baseline/hash-guard and candidate selection successfully with:
+  `baseline_id=9`, `baseline_wr=12.5%`, `candidate_allowlist_size=75`,
+  `selected_candidates=15`, but the benchmark still remains blocked as final
+  optimizer evidence while
+  `mandatory_gate_divergences=["event_contract_static=review_required"]`
+  persists and the battle subprocess remains the dominant runtime cost.
+- the next highest-ROI Lorehold rule-first targets are now
+  `Blood Sun`, `Currency Converter`, and `Firesong and Sunspeaker`.
 
 ## Current Matrix Result
 

@@ -2830,9 +2830,31 @@ def add_plus_one_counters(permanent, count=1):
     if added <= 0:
         return
     permanent["plus_one_counters"] = int(permanent.get("plus_one_counters") or 0) + added
+    counters = permanent.get("counters")
+    if isinstance(counters, dict):
+        counters["+1/+1"] = permanent["plus_one_counters"]
     if is_battlefield_creature(permanent):
         permanent["power"] = int(float(permanent.get("power") or 0)) + added
         permanent["toughness"] = int(float(permanent.get("toughness") or 0)) + added
+
+
+def remove_plus_one_counters(permanent, count=1):
+    if not isinstance(permanent, dict):
+        return 0
+    current = max(0, int(permanent.get("plus_one_counters") or 0))
+    if current <= 0:
+        return 0
+    removed = max(0, min(current, int(count or 0)))
+    if removed <= 0:
+        return 0
+    permanent["plus_one_counters"] = current - removed
+    counters = permanent.get("counters")
+    if isinstance(counters, dict):
+        counters["+1/+1"] = permanent["plus_one_counters"]
+    if is_battlefield_creature(permanent):
+        permanent["power"] = int(float(permanent.get("power") or 0)) - removed
+        permanent["toughness"] = int(float(permanent.get("toughness") or 0)) - removed
+    return removed
 
 
 def add_minus_one_counters(permanent, count=1):
@@ -9932,6 +9954,32 @@ def resolve_generic_permanent_etb(
     all_players=None,
     phase="battlefield_etb",
 ):
+    plus_one_counter_count = int(
+        effect_data.get("enters_with_plus_one_counter_count")
+        or (1 if effect_data.get("enters_with_plus_one_counter") else 0)
+        or 0
+    )
+    if plus_one_counter_count > 0 and int(permanent.get("plus_one_counters") or 0) < plus_one_counter_count:
+        power_before = int(float(permanent.get("power") or 0))
+        toughness_before = int(float(permanent.get("toughness") or 0))
+        counters_before = int(permanent.get("plus_one_counters") or 0)
+        add_plus_one_counters(permanent, plus_one_counter_count - counters_before)
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="enters_battlefield",
+            effect="add_counter",
+            counter_type="+1/+1",
+            counters_added=max(0, plus_one_counter_count - counters_before),
+            counters_after=int(permanent.get("plus_one_counters") or 0),
+            power_before=power_before,
+            power_after=int(float(permanent.get("power") or 0)),
+            toughness_before=toughness_before,
+            toughness_after=int(float(permanent.get("toughness") or 0)),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
     if effect_data.get("etb_land_ramp_count"):
         if (
             effect_data.get("etb_land_ramp_condition") == "opponent_controls_more_lands"
@@ -12259,6 +12307,348 @@ def process_graveyard_upkeep_self_return(player, turn):
             **replay_rule_fields(effect_data),
         )
     return returned
+
+
+def process_top_library_upkeep_free_cast(player, opponents, all_players, turn, rng, stack=None):
+    """Resolve low-risk upkeep triggers that may cast the top instant/sorcery for free."""
+    cast_count = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+        if (
+            effect_data.get("effect") != "creature"
+            or effect_data.get("battle_model_scope")
+            != "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1"
+            or not effect_data.get("upkeep_may_cast_top_instant_or_sorcery_without_paying_mana")
+        ):
+            continue
+        if permanent.get("controller_upkeep_top_library_free_cast_last_turn") == turn:
+            continue
+        permanent["controller_upkeep_top_library_free_cast_last_turn"] = turn
+        top_card = player.library[0] if getattr(player, "library", None) else None
+        if not isinstance(top_card, dict):
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="beginning_of_your_upkeep",
+                effect="top_library_may_cast_without_paying_mana",
+                result="no_card_to_look_at",
+                chosen=False,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+        top_effect = get_card_effect(top_card)
+        top_name = top_card.get("name", "?")
+        can_free_cast = (
+            is_instant_or_sorcery_spell(top_card)
+            and top_effect.get("effect") not in {"unknown", "land", "counter"}
+        )
+        if not can_free_cast:
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="beginning_of_your_upkeep",
+                effect="top_library_may_cast_without_paying_mana",
+                looked_card=top_name,
+                looked_type_line=top_card.get("type_line", ""),
+                looked_effect=top_effect.get("effect", "unknown"),
+                result="look_only_no_cast",
+                chosen=False,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+
+        cast_ctx = begin_cast_context(
+            player,
+            top_card,
+            "upkeep",
+            effect_data=top_effect,
+            role="top_library_free_cast",
+            modes=["cast_without_paying_mana", "top_library"],
+            alternative_cost="{0}",
+            source_zone="library",
+            alternative_cost_kind="cast_without_paying_mana",
+        )
+        cast_ctx.is_legal = True
+        cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+        store_cast_context_fields(
+            top_effect,
+            {
+                "phase": "upkeep",
+                **cast_ctx.to_replay_fields(),
+            },
+        )
+        if not commit_cast_payment(cast_ctx):
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="beginning_of_your_upkeep",
+                effect="top_library_may_cast_without_paying_mana",
+                looked_card=top_name,
+                looked_type_line=top_card.get("type_line", ""),
+                looked_effect=top_effect.get("effect", "unknown"),
+                result="cast_failed",
+                chosen=False,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+
+        player.library.pop(0)
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="beginning_of_your_upkeep",
+            effect="top_library_may_cast_without_paying_mana",
+            looked_card=top_name,
+            looked_type_line=top_card.get("type_line", ""),
+            looked_effect=top_effect.get("effect", "unknown"),
+            result="cast_without_paying_mana",
+            chosen=True,
+            cast_without_paying_mana_cost=True,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        emit_replay_event(
+            "spell_cast",
+            player=player.name,
+            card=top_name,
+            effect=top_effect.get("effect", "unknown"),
+            type_line=top_card.get("type_line", ""),
+            cmc=top_card.get("cmc", 0),
+            turn=turn,
+            phase="upkeep",
+            **cast_ctx.to_replay_fields(),
+            **replay_rule_fields(top_effect),
+        )
+        mark_cast_ledger_emitted(top_effect)
+        trigger_spell_cast_engines(
+            player,
+            all_players,
+            top_card,
+            turn,
+            "upkeep",
+            stack=stack,
+            active_player=player,
+        )
+        trigger_opponent_spell_draw_engines(
+            player,
+            opponents,
+            top_card,
+            turn,
+            "upkeep",
+            rng,
+            stack=stack,
+            active_player=player,
+            all_players=all_players,
+        )
+        apply_effect_immediate(
+            player,
+            opponents,
+            top_card,
+            turn,
+            rng,
+            effect_data_override=top_effect,
+            stack=stack,
+            phase="upkeep",
+        )
+        cast_count += 1
+    return cast_count
+
+
+def resolve_attack_top_library_free_cast_triggers(
+    player,
+    attackers,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="combat",
+    stack=None,
+):
+    """Resolve attack triggers that look at top cards and free-cast one qualifying spell."""
+    cast_count = 0
+    battlefield = getattr(player, "battlefield", []) or []
+    for permanent in list(attackers or []):
+        if not isinstance(permanent, dict) or permanent not in battlefield:
+            continue
+        effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+        if (
+            effect_data.get("effect") != "creature"
+            or effect_data.get("battle_model_scope")
+            != "attack_top_seven_instant_or_sorcery_lte_power_may_cast_without_paying_mana_v1"
+            or not effect_data.get("attack_may_cast_from_looked_cards_without_paying_mana")
+        ):
+            continue
+
+        look_count = max(1, int(effect_data.get("attack_look_top_count") or 7))
+        looked_cards = list((getattr(player, "library", None) or [])[:look_count])
+        if not looked_cards:
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="attack",
+                effect="look_top_seven_may_cast_without_paying_mana",
+                result="no_cards_to_look_at",
+                chosen=False,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+
+        power_limit = max(0, int(permanent.get("power") or effect_data.get("power") or 0))
+        eligible = []
+        for index, looked_card in enumerate(looked_cards):
+            if not isinstance(looked_card, dict):
+                continue
+            looked_effect = get_card_effect(looked_card)
+            if not is_instant_or_sorcery_spell(looked_card):
+                continue
+            if looked_effect.get("effect") in {"unknown", "land", "counter"}:
+                continue
+            mana_value = int(card_mana_value(looked_card) or 0)
+            if mana_value > power_limit:
+                continue
+            eligible.append((mana_value, -index, looked_card, looked_effect))
+
+        remaining_library = list((getattr(player, "library", None) or [])[look_count:])
+        if not eligible:
+            bottom_cards = list(looked_cards)
+            rng.shuffle(bottom_cards)
+            player.library = remaining_library + bottom_cards
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="attack",
+                effect="look_top_seven_may_cast_without_paying_mana",
+                looked_cards=[card.get("name", "?") for card in looked_cards if isinstance(card, dict)],
+                power_limit=power_limit,
+                result="look_only_no_cast",
+                chosen=False,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+
+        _mana_value, _index, chosen_card, chosen_effect = max(eligible, key=lambda row: (row[0], row[1]))
+        cast_ctx = begin_cast_context(
+            player,
+            chosen_card,
+            phase,
+            effect_data=chosen_effect,
+            role="attack_top_library_free_cast",
+            modes=["cast_without_paying_mana", "top_library"],
+            alternative_cost="{0}",
+            source_zone="library",
+            alternative_cost_kind="cast_without_paying_mana",
+        )
+        cast_ctx.is_legal = True
+        cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+        store_cast_context_fields(
+            chosen_effect,
+            {
+                "phase": phase,
+                **cast_ctx.to_replay_fields(),
+            },
+        )
+        if not commit_cast_payment(cast_ctx):
+            bottom_cards = list(looked_cards)
+            rng.shuffle(bottom_cards)
+            player.library = remaining_library + bottom_cards
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="attack",
+                effect="look_top_seven_may_cast_without_paying_mana",
+                looked_cards=[card.get("name", "?") for card in looked_cards if isinstance(card, dict)],
+                chosen_card=chosen_card.get("name", "?"),
+                power_limit=power_limit,
+                result="cast_failed",
+                chosen=False,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+
+        bottom_cards = [card for card in looked_cards if card is not chosen_card]
+        rng.shuffle(bottom_cards)
+        player.library = remaining_library + bottom_cards
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="attack",
+            effect="look_top_seven_may_cast_without_paying_mana",
+            looked_cards=[card.get("name", "?") for card in looked_cards if isinstance(card, dict)],
+            chosen_card=chosen_card.get("name", "?"),
+            chosen_mana_value=int(card_mana_value(chosen_card) or 0),
+            power_limit=power_limit,
+            result="cast_without_paying_mana",
+            chosen=True,
+            cast_without_paying_mana_cost=True,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        emit_replay_event(
+            "spell_cast",
+            player=player.name,
+            card=chosen_card.get("name", "?"),
+            effect=chosen_effect.get("effect", "unknown"),
+            type_line=chosen_card.get("type_line", ""),
+            cmc=chosen_card.get("cmc", 0),
+            turn=turn,
+            phase=phase,
+            **cast_ctx.to_replay_fields(),
+            **replay_rule_fields(chosen_effect),
+        )
+        mark_cast_ledger_emitted(chosen_effect)
+        trigger_spell_cast_engines(
+            player,
+            all_players,
+            chosen_card,
+            turn,
+            phase,
+            stack=stack,
+            active_player=player,
+        )
+        trigger_opponent_spell_draw_engines(
+            player,
+            opponents,
+            chosen_card,
+            turn,
+            phase,
+            rng,
+            stack=stack,
+            active_player=player,
+            all_players=all_players,
+        )
+        apply_effect_immediate(
+            player,
+            opponents,
+            chosen_card,
+            turn,
+            rng,
+            effect_data_override=chosen_effect,
+            stack=stack,
+            phase=phase,
+        )
+        cast_count += 1
+    return cast_count
 
 
 def resolve_top_nonland_free_cast(
@@ -19846,6 +20236,16 @@ def library_tutor_candidates(player, target_type):
                 )
             ):
                 candidates.append(candidate)
+        elif target_type == "plains":
+            type_line = str(candidate.get("type_line") or "").lower()
+            if (
+                is_effective_land(candidate)
+                and (
+                    normalize_card_name(candidate.get("name", "")) == "plains"
+                    or "plains" in type_line
+                )
+            ):
+                candidates.append(candidate)
         elif target_type == "basic_plains_or_creature_mana_value_1_or_less":
             type_line = str(candidate.get("type_line") or "").lower()
             try:
@@ -20061,6 +20461,9 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
         elif is_small_creature:
             score += 62 if lands >= 3 else 24
             reason = "find_one_drop_creature_payoff" if lands >= 3 else "keep_small_creature_fallback"
+    elif target_type == "plains":
+        score += 82 if lands < 3 else 28
+        reason = "fix_mana_with_plains_tutor" if lands < 3 else "bank_plains_option"
     elif target_type == "land" or (is_effective_land(candidate) and lands < 3):
         score += 80 if lands < 3 else 25
         reason = "fix_mana_or_land_drop"
@@ -21822,6 +22225,35 @@ def activate_land_tutor_creatures(player, turn, opponents=None):
                     **replay_rule_fields(permanent),
                 )
                 continue
+            counter_removed_from = None
+            plus_one_removed = 0
+            if permanent.get("activation_requires_remove_plus_one_counter_from_controlled_permanent"):
+                counter_candidates = []
+                if int(permanent.get("plus_one_counters") or 0) > 0:
+                    counter_candidates.append(permanent)
+                counter_candidates.extend(
+                    candidate
+                    for candidate in player.battlefield
+                    if (
+                        isinstance(candidate, dict)
+                        and candidate is not permanent
+                        and int(candidate.get("plus_one_counters") or 0) > 0
+                    )
+                )
+                if not counter_candidates:
+                    emit_replay_event(
+                        "activated_ability_skipped",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        effect="land_tutor",
+                        reason="missing_plus_one_counter_to_remove",
+                        player_land_count=player_land_count,
+                        opponent_land_counts=opponent_land_counts,
+                        turn=turn,
+                        **replay_rule_fields(permanent),
+                    )
+                    continue
+                counter_removed_from = counter_candidates[0]
             activation_colors = list(permanent.get("activation_cost_colors") or [])
             activation_cost_generic = adjusted_activated_ability_generic_cost(
                 player,
@@ -21883,12 +22315,26 @@ def activate_land_tutor_creatures(player, turn, opponents=None):
                     phase="precombat_main",
                 )
             found, found_score, found_reason = scored_candidates[0]
-            moved_cards, destination = move_library_tutor_selection(
-                player,
-                [found],
-                f"{target_type}_to_hand",
+            if counter_removed_from is not None:
+                plus_one_removed = remove_plus_one_counters(counter_removed_from, 1)
+            battlefield_upgrade = bool(
+                permanent.get("activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands")
+                and max_opponent_land_count > player_land_count
             )
-            found = moved_cards[0] if moved_cards else found
+            if battlefield_upgrade and found in player.library:
+                player.library.remove(found)
+                found = enrich_card({**found, "effect": "land", "tapped": True})
+                player.battlefield.append(found)
+                trigger_landfall(player, found, turn, "land_tutor_activated")
+                moved_cards = [found]
+                destination = "battlefield"
+            else:
+                moved_cards, destination = move_library_tutor_selection(
+                    player,
+                    [found],
+                    f"{target_type}_to_hand",
+                )
+                found = moved_cards[0] if moved_cards else found
             emit_decision_trace(
                 decision_type="utility_creature_activation",
                 player=player,
@@ -21933,21 +22379,36 @@ def activate_land_tutor_creatures(player, turn, opponents=None):
                     "player_land_count": player_land_count,
                     "opponent_land_counts": opponent_land_counts,
                     "selected_card": found.get("name", "?") if found else None,
+                    "plus_one_counter_removed_from": (
+                        counter_removed_from.get("name", "?")
+                        if counter_removed_from is not None
+                        else None
+                    ),
+                    "battlefield_upgrade": battlefield_upgrade,
                 },
                 rule_source="utility_creature_activation_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
                 confidence="medium",
                 expected_benefit_score=found_score,
-                reason="opponent_controls_more_lands",
-                strategic_principle="convert land deficit into the best land card before combat",
+                reason=(
+                    "opponent_controls_more_lands"
+                    if battlefield_upgrade
+                    else "convert_counter_into_structural_land_card"
+                ),
+                strategic_principle=(
+                    "convert land deficit into immediate battlefield mana development before combat"
+                    if battlefield_upgrade
+                    else "cash in a low-opportunity +1/+1 counter for the best Plains card before combat"
+                ),
                 heuristic_version=DECISION_STRATEGY_VERSION,
                 resource_delta={
                     "cards": len(moved_cards),
                     "mana": -(activation_cost_generic + len(activation_colors)),
                     "selected": found.get("name", "?") if found else None,
                     "destination": destination,
+                    "plus_one_counters_removed": plus_one_removed,
                 },
-                risk_flags=["tutor", "tap_creature"],
+                risk_flags=["tutor", "tap_creature", *([] if plus_one_removed <= 0 else ["remove_plus_one_counter"])],
                 rejected_reason="lower_contextual_tutor_score",
             )
             emit_replay_event(
@@ -21955,13 +22416,24 @@ def activate_land_tutor_creatures(player, turn, opponents=None):
                 player=player.name,
                 card=permanent.get("name", "?"),
                 effect="land_tutor",
-                activation_kind="conditional_tap_land_tutor_to_hand_creature",
+                activation_kind=(
+                    "conditional_counter_land_tutor_to_battlefield_or_hand_creature"
+                    if permanent.get("activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands")
+                    else "conditional_tap_land_tutor_to_hand_creature"
+                ),
                 activation_cost=activation_cost_text,
                 player_land_count=player_land_count,
                 opponent_land_counts=opponent_land_counts,
                 found=found.get("name", "?") if found else None,
                 found_cards=[item.get("name", "?") for item in moved_cards],
                 destination=destination,
+                entered_tapped=bool(destination == "battlefield" and found and found.get("tapped")),
+                removed_plus_one_counter_from=(
+                    counter_removed_from.get("name", "?")
+                    if counter_removed_from is not None
+                    else None
+                ),
+                plus_one_counters_removed=plus_one_removed,
                 turn=turn,
                 **replay_rule_fields(permanent),
             )
@@ -25039,6 +25511,13 @@ def trigger_spell_cast_engines(
                 if value
             ]
             if card_types and not _card_type_matches(spell, card_types):
+                continue
+            spell_colors = [
+                value
+                for value in _as_list(permanent.get("copy_when_mana_spent_spell_colors"))
+                if value
+            ]
+            if spell_colors and not any(_spell_has_color(spell, color) for color in spell_colors):
                 continue
 
             def resolve_spell_cast_mana_spent_copy_trigger(
@@ -31878,6 +32357,16 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         rng,
         phase="combat",
     )
+    resolve_attack_top_library_free_cast_triggers(
+        attacker,
+        attackers,
+        alive_defenders,
+        all_players,
+        turn,
+        rng,
+        phase="combat",
+        stack=stack,
+    )
     resolve_attacking_discard_draw_activations(
         attacker,
         attackers,
@@ -32071,6 +32560,14 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     process_upkeep_utility_lands(player, turn, all_players=all_players)
     process_graveyard_upkeep_self_return(player, turn)
     process_rebound_upkeep(player, opponents, all_players, turn, rng, stack=stack)
+    process_top_library_upkeep_free_cast(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        stack=stack,
+    )
 
     # The One Ring loses life on upkeep; drawing happens through its tap
     # activation, not automatically when the upkeep starts.

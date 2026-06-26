@@ -5849,6 +5849,141 @@ def register_tests(battle, player):
         assert skipped[-1]["condition_met"] is False
         assert skipped[-1]["rule_logical_key"] == "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef"
 
+    def test_pg232_scholar_of_new_horizons_enters_with_counter_and_upgrades_plains_to_battlefield_when_behind():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            scholar = {
+                "name": "Scholar of New Horizons",
+                "type_line": "Creature — Human Scout",
+                "effect": "creature",
+                "battle_model_scope": "activated_remove_counter_plains_tutor_battlefield_tapped_if_behind_else_hand_v1",
+                "power": 1,
+                "toughness": 1,
+                "enters_with_plus_one_counter_count": 1,
+                "land_tutor_to_hand_activated": True,
+                "activation_cost_generic": 0,
+                "activation_requires_tap": True,
+                "activation_requires_remove_plus_one_counter_from_controlled_permanent": True,
+                "activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands": True,
+                "tutor_target": "plains",
+                "tutor_destination": "hand",
+                "_rule_logical_key": "battle_rule_v1:scholar-test",
+                "_rule_oracle_hash": "scholar-test-hash",
+            }
+            active.battlefield = [
+                scholar,
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+            opponent.battlefield = [
+                {"name": "Island", "cmc": 0, "type_line": "Basic Land — Island", "effect": "land"},
+                {"name": "Swamp", "cmc": 0, "type_line": "Basic Land — Swamp", "effect": "land"},
+            ]
+            active.library = [
+                {"name": "Sacred Foundry", "cmc": 0, "type_line": "Land — Mountain Plains", "effect": "land"},
+            ]
+
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                scholar,
+                scholar,
+                turn=2,
+                rng=random.Random(232),
+            )
+            scholar["summoning_sick"] = False
+            battle.activate_land_tutor_creatures(active, 3, [opponent])
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert scholar["plus_one_counters"] == 0
+        assert scholar["power"] == 1
+        assert scholar["toughness"] == 1
+        assert scholar["tapped"] is True
+        assert not any(card.get("name") == "Sacred Foundry" for card in active.hand)
+        foundry = next(card for card in active.battlefield if card.get("name") == "Sacred Foundry")
+        assert foundry["tapped"] is True
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Scholar of New Horizons"
+            and data.get("trigger") == "enters_battlefield"
+            and data.get("counter_type") == "+1/+1"
+            and data.get("counters_after") == 1
+            for event, data in events
+        )
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Scholar of New Horizons"
+            and data.get("activation_kind") == "conditional_counter_land_tutor_to_battlefield_or_hand_creature"
+            and data.get("found") == "Sacred Foundry"
+            and data.get("destination") == "battlefield"
+            and data.get("entered_tapped") is True
+            and data.get("removed_plus_one_counter_from") == "Scholar of New Horizons"
+            and data.get("plus_one_counters_removed") == 1
+            and data.get("rule_logical_key") == "battle_rule_v1:scholar-test"
+            for event, data in events
+        )
+
+    def test_pg232_scholar_of_new_horizons_puts_plains_into_hand_when_not_behind():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            scholar = {
+                "name": "Scholar of New Horizons",
+                "type_line": "Creature — Human Scout",
+                "effect": "creature",
+                "battle_model_scope": "activated_remove_counter_plains_tutor_battlefield_tapped_if_behind_else_hand_v1",
+                "power": 1,
+                "toughness": 1,
+                "plus_one_counters": 1,
+                "land_tutor_to_hand_activated": True,
+                "activation_cost_generic": 0,
+                "activation_requires_tap": True,
+                "activation_requires_remove_plus_one_counter_from_controlled_permanent": True,
+                "activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands": True,
+                "tutor_target": "plains",
+                "tutor_destination": "hand",
+                "_rule_logical_key": "battle_rule_v1:scholar-test",
+                "_rule_oracle_hash": "scholar-test-hash",
+            }
+            active.battlefield = [
+                scholar,
+                {"name": "Plains", "cmc": 0, "type_line": "Basic Land — Plains", "effect": "land"},
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+            ]
+            opponent.battlefield = [
+                {"name": "Island", "cmc": 0, "type_line": "Basic Land — Island", "effect": "land"},
+                {"name": "Swamp", "cmc": 0, "type_line": "Basic Land — Swamp", "effect": "land"},
+            ]
+            active.library = [
+                {"name": "Elegant Parlor", "cmc": 0, "type_line": "Land — Mountain Plains", "effect": "land"},
+            ]
+            scholar["summoning_sick"] = False
+            scholar["power"] = 2
+            scholar["toughness"] = 2
+
+            battle.activate_land_tutor_creatures(active, 4, [opponent])
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert scholar["plus_one_counters"] == 0
+        assert scholar["power"] == 1
+        assert scholar["toughness"] == 1
+        assert any(card.get("name") == "Elegant Parlor" for card in active.hand)
+        assert not any(card.get("name") == "Elegant Parlor" for card in active.battlefield)
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Scholar of New Horizons"
+            and data.get("found") == "Elegant Parlor"
+            and data.get("destination") == "hand"
+            and data.get("plus_one_counters_removed") == 1
+            for event, data in events
+        )
+
     def test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target():
         active = player("Active")
         battle.apply_effect_immediate(
@@ -12683,6 +12818,173 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg230_galvanoth_upkeep_casts_top_instant_without_paying_mana():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            galvanoth = {
+                "name": "Galvanoth",
+                "cmc": 5,
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "trigger": "controller_upkeep",
+                "trigger_effect": "look_top_card_may_cast_if_instant_or_sorcery",
+                "upkeep_look_top_card": True,
+                "upkeep_may_cast_top_instant_or_sorcery_without_paying_mana": True,
+                "upkeep_top_library_cast_types": ["instant", "sorcery"],
+                "battle_model_scope": "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1",
+                "_rule_logical_key": "battle_rule_v1:galvanoth-test",
+                "_rule_oracle_hash": "galvanoth-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            active.battlefield = [galvanoth]
+            active.library = [
+                {
+                    "name": "Lightning Bolt",
+                    "cmc": 1,
+                    "type_line": "Instant",
+                },
+                {"name": "Library Filler", "cmc": 4, "type_line": "Sorcery", "effect": "draw_cards", "count": 1},
+            ]
+
+            cast_count = battle.process_top_library_upkeep_free_cast(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=8,
+                rng=random.Random(230),
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert cast_count == 1
+        assert [card.get("name") for card in active.graveyard] == ["Lightning Bolt"]
+        assert [card.get("name") for card in active.library] == ["Library Filler"]
+        assert opponent.life == 37
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Galvanoth"
+            and data.get("trigger") == "beginning_of_your_upkeep"
+            and data.get("looked_card") == "Lightning Bolt"
+            and data.get("result") == "cast_without_paying_mana"
+            and data.get("cast_without_paying_mana_cost") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:galvanoth-test"
+            for event, data in events
+        )
+        assert any(
+            event == "spell_cast"
+            and data.get("card") == "Lightning Bolt"
+            and data.get("source_zone") == "library"
+            and data.get("alternative_cost_kind") == "cast_without_paying_mana"
+            and data.get("rule_logical_key") == "battle_rule_v1:a939ce51bf83fe086fc16a40d344752d"
+            for event, data in events
+        )
+        assert any(
+            event == "damage_resolved"
+            and data.get("card") == "Lightning Bolt"
+            and data.get("amount") == 3
+            and data.get("target_player") == "Opponent"
+            and data.get("rule_oracle_hash") == "d6688e11f8fab7ac055bb72239825ab3"
+            for event, data in events
+        )
+
+    def test_pg231_velomachus_attack_casts_best_eligible_top_seven_spell_without_paying_mana():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            velomachus = {
+                "name": "Velomachus Lorehold",
+                "cmc": 7,
+                "type_line": "Legendary Creature — Elder Dragon",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "flying": True,
+                "vigilance": True,
+                "haste": True,
+                "trigger": "attack",
+                "trigger_effect": "look_top_seven_may_cast_instant_or_sorcery_lte_power",
+                "attack_look_top_count": 7,
+                "attack_top_library_cast_types": ["instant", "sorcery"],
+                "attack_may_cast_from_looked_cards_without_paying_mana": True,
+                "attack_cast_mana_value_max_source": "source_power",
+                "attack_put_rest_bottom_random": True,
+                "battle_model_scope": "attack_top_seven_instant_or_sorcery_lte_power_may_cast_without_paying_mana_v1",
+                "_rule_logical_key": "battle_rule_v1:velomachus-test",
+                "_rule_oracle_hash": "velomachus-test-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+            active.battlefield = [velomachus]
+            active.library = [
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land — Mountain", "effect": "land"},
+                {"name": "Approach of the Second Sun", "cmc": 7, "type_line": "Sorcery"},
+                {"name": "Lightning Helix", "cmc": 2, "type_line": "Instant"},
+                {"name": "Invoke Calamity", "cmc": 5, "type_line": "Instant"},
+                {"name": "Library Filler A", "cmc": 2, "type_line": "Creature", "effect": "creature", "power": 2, "toughness": 2},
+                {"name": "Seething Song", "cmc": 3, "type_line": "Instant"},
+                {"name": "Faithless Looting", "cmc": 1, "type_line": "Sorcery"},
+                {"name": "After Seven", "cmc": 2, "type_line": "Sorcery"},
+            ]
+
+            cast_count = battle.resolve_attack_top_library_free_cast_triggers(
+                active,
+                [velomachus],
+                [opponent],
+                [active, opponent],
+                turn=9,
+                rng=random.Random(231),
+                phase="combat",
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert cast_count == 1
+        assert any(card.get("name") == "Invoke Calamity" for card in active.exile)
+        assert active.library[0].get("name") == "After Seven"
+        assert {card.get("name") for card in active.library[1:]} == {
+            "Mountain",
+            "Approach of the Second Sun",
+            "Lightning Helix",
+            "Library Filler A",
+            "Seething Song",
+            "Faithless Looting",
+        }
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Velomachus Lorehold"
+            and data.get("trigger") == "attack"
+            and data.get("chosen_card") == "Invoke Calamity"
+            and data.get("chosen_mana_value") == 5
+            and data.get("power_limit") == 5
+            and data.get("result") == "cast_without_paying_mana"
+            and data.get("cast_without_paying_mana_cost") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:velomachus-test"
+            for event, data in events
+        )
+        assert any(
+            event == "spell_cast"
+            and data.get("card") == "Invoke Calamity"
+            and data.get("source_zone") == "library"
+            and data.get("alternative_cost_kind") == "cast_without_paying_mana"
+            for event, data in events
+        )
+        assert any(
+            event == "spell_resolved"
+            and data.get("card") == "Invoke Calamity"
+            and data.get("locked_cost", {}).get("spend_tags") == ["cast_without_paying_mana_cost"]
+            for event, data in events
+        )
+
     def test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -13177,6 +13479,133 @@ def register_tests(battle, player):
             event == "activated_ability"
             and data.get("card") == "Primal Wellspring"
             and data.get("activation_kind") == "mana_spent_copy_spell"
+            for event, data in events
+        )
+
+    def _pyromancers_goggles_rule():
+        return {
+            "name": "Pyromancer's Goggles",
+            "cmc": 5,
+            "type_line": "Legendary Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "red_mana_rock_red_instant_sorcery_mana_spent_copy_spell_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "R",
+            "trigger": "instant_sorcery_cast",
+            "trigger_effect": "copy_when_mana_spent",
+            "target": "own_instant_or_sorcery_on_stack",
+            "copy_when_mana_spent_to_cast_matching_spell": True,
+            "copy_when_mana_spent_card_types": ["instant", "sorcery"],
+            "copy_when_mana_spent_spell_colors": ["R"],
+            "may_choose_new_targets": True,
+            "choose_new_targets_status": "may",
+            "_rule_logical_key": "battle_rule_v1:pyromancers-goggles-test",
+            "_rule_oracle_hash": "pyromancers-goggles-test-hash",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+        }
+
+    def test_pyromancers_goggles_copies_red_instant_when_its_mana_is_spent():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            goggles = _pyromancers_goggles_rule()
+            support_land = {
+                "name": "Support Land",
+                "type_line": "Land",
+                "effect": "land",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "R",
+            }
+            active.battlefield = [goggles, support_land]
+            stack = battle.Stack()
+            draw_effect = {
+                "effect": "draw_cards",
+                "count": 1,
+                "instant": True,
+                "battle_model_scope": "test_draw_one_spell",
+            }
+            spell = {"name": "Chaos Warp", "type_line": "Instant", "mana_cost": "{2}{R}", "cmc": 3}
+
+            active.record_spell_cast(41, card=spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                spell,
+                turn=41,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(spell, active, draw_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 41, random.Random(618), phase="precombat_main")
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert goggles.get("tapped") is True
+        copied_events = [
+            data
+            for event, data in events
+            if event == "spell_copied" and data.get("card") == "Pyromancer's Goggles"
+        ]
+        assert len(copied_events) == 1
+        assert copied_events[0]["trigger_spell"] == "Chaos Warp"
+        assert any(
+            event == "activated_ability"
+            and data.get("card") == "Pyromancer's Goggles"
+            and data.get("activation_kind") == "mana_spent_copy_spell"
+            for event, data in events
+        )
+
+    def test_pyromancers_goggles_skips_nonred_spell_even_when_untapped():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            goggles = _pyromancers_goggles_rule()
+            support_land = {
+                "name": "Support Land",
+                "type_line": "Land",
+                "effect": "land",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "W",
+            }
+            active.battlefield = [goggles, support_land]
+            stack = battle.Stack()
+            draw_effect = {
+                "effect": "draw_cards",
+                "count": 1,
+                "instant": True,
+                "battle_model_scope": "test_draw_one_spell",
+            }
+            spell = {"name": "Swords to Plowshares", "type_line": "Instant", "mana_cost": "{W}", "cmc": 1}
+
+            active.record_spell_cast(42, card=spell)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                spell,
+                turn=42,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(spell, active, draw_effect)
+            while not stack.empty() or getattr(battle, "_pending_triggers", []):
+                battle.priority_round(active, [active, opponent], stack, 42, random.Random(619), phase="precombat_main")
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert not goggles.get("tapped")
+        assert not any(
+            event == "spell_copied" and data.get("card") == "Pyromancer's Goggles"
             for event, data in events
         )
 
@@ -17599,6 +18028,8 @@ def register_tests(battle, player):
         test_blind_obedience_taps_opponent_artifacts_and_creatures_on_entry,
         test_land_tax_tutors_three_basic_lands_when_opponent_has_more_lands,
         test_land_tax_skips_when_no_opponent_controls_more_lands,
+        test_pg232_scholar_of_new_horizons_enters_with_counter_and_upgrades_plains_to_battlefield_when_behind,
+        test_pg232_scholar_of_new_horizons_puts_plains_into_hand_when_not_behind,
         test_instant_copy_spell_does_not_become_permanent_engine_without_stack_target,
         test_pyromancer_ascension_counts_before_copying_spell,
         test_unexpected_windfall_discards_draws_two_creates_two_treasures_with_pg069_rule_provenance,
@@ -17786,12 +18217,16 @@ def register_tests(battle, player):
         test_pg203_recursion_rules_resolve_from_sqlite_cache,
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
         test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep,
+        test_pg230_galvanoth_upkeep_casts_top_instant_without_paying_mana,
+        test_pg231_velomachus_attack_casts_best_eligible_top_seven_spell_without_paying_mana,
         test_pg197_goldspan_attack_and_spell_target_create_double_mana_treasures,
         test_pg198_surly_badgersaur_discard_card_type_triggers_counter_treasure_and_fight,
         test_pg199_taii_wakeen_modifies_noncombat_damage_and_draws_on_exact_toughness,
         test_direct_damage_combat_restriction_only_hits_attacking_or_blocking_creatures,
         test_primal_amulet_reduces_instant_cost_and_transforms_after_four_spells,
         test_primal_wellspring_copies_spell_when_its_mana_is_spent,
+        test_pyromancers_goggles_copies_red_instant_when_its_mana_is_spent,
+        test_pyromancers_goggles_skips_nonred_spell_even_when_untapped,
         test_pg200_trouble_in_pairs_draws_on_opponent_second_card_each_turn,
         test_pg200_trouble_in_pairs_draws_on_opponent_second_spell_without_tax,
         test_pg200_trouble_in_pairs_draws_when_attacked_by_two_or_more_creatures,

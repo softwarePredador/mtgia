@@ -505,6 +505,52 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "treasure_maker")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_pyromancers_goggles_copy_mana_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Pyromancer's Goggles",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "PyromancersGoggles",
+                            "path": "/xmage/PyromancersGoggles.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["CopyTargetStackObjectEffect"],
+                            "ability_classes": [
+                                "PyromancersGogglesTriggeredAbility",
+                                "RedManaAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "red_mana_rock_red_instant_sorcery_mana_spent_copy_spell_v1",
+                                "is_mana_source": True,
+                                "mana_produced": 1,
+                                "produces": "R",
+                                "trigger": "instant_sorcery_cast",
+                                "trigger_effect": "copy_when_mana_spent",
+                                "target": "own_instant_or_sorcery_on_stack",
+                                "copy_when_mana_spent_to_cast_matching_spell": True,
+                                "copy_when_mana_spent_card_types": ["instant", "sorcery"],
+                                "copy_when_mana_spent_spell_colors": ["R"],
+                                "may_choose_new_targets": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "ramp_permanent")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_redress_fate_recursion_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -4778,6 +4824,51 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
 
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_scholar_of_new_horizons_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Scholar of New Horizons",
+                        "severity": "high",
+                        "oracle_hash": "scholarhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ScholarOfNewHorizons",
+                            "path": "/xmage/ScholarOfNewHorizons.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["OneShotEffect", "ScholarOfNewHorizonsEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldWithCountersAbility",
+                                "SimpleActivatedAbility",
+                            ],
+                            "cost_classes": ["TapSourceCost", "RemoveCounterCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "activated_remove_counter_plains_tutor_battlefield_tapped_if_behind_else_hand_v1",
+                                "power": 1,
+                                "toughness": 1,
+                                "enters_with_plus_one_counter_count": 1,
+                                "land_tutor_to_hand_activated": True,
+                                "activation_cost_generic": 0,
+                                "activation_requires_tap": True,
+                                "activation_requires_remove_plus_one_counter_from_controlled_permanent": True,
+                                "activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands": True,
+                                "tutor_target": "plains",
+                                "tutor_destination": "hand",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_rhystic_study_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -8497,6 +8588,100 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["family_id"], "draw_engine")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_galvanoth_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Galvanoth",
+                        "severity": "high",
+                        "oracle_hash": "galvanothhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Galvanoth",
+                            "path": "/xmage/Galvanoth.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["OneShotEffect"],
+                            "ability_classes": ["BeginningOfUpkeepTriggeredAbility"],
+                            "target_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1",
+                                "power": 3,
+                                "toughness": 3,
+                                "trigger": "controller_upkeep",
+                                "trigger_effect": "look_top_card_may_cast_if_instant_or_sorcery",
+                                "upkeep_look_top_card": True,
+                                "upkeep_may_cast_top_instant_or_sorcery_without_paying_mana": True,
+                                "upkeep_top_library_cast_types": ["instant", "sorcery"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "creature")
+        self.assertEqual(
+            report["cards"][0]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
+
+    def test_classifier_marks_velomachus_lorehold_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Velomachus Lorehold",
+                        "severity": "high",
+                        "oracle_hash": "velomachushash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "VelomachusLorehold",
+                            "path": "/xmage/VelomachusLorehold.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["OneShotEffect"],
+                            "ability_classes": [
+                                "AttacksTriggeredAbility",
+                                "FlyingAbility",
+                                "HasteAbility",
+                                "VigilanceAbility",
+                            ],
+                            "target_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "attack_top_seven_instant_or_sorcery_lte_power_may_cast_without_paying_mana_v1",
+                                "power": 5,
+                                "toughness": 5,
+                                "flying": True,
+                                "vigilance": True,
+                                "haste": True,
+                                "trigger": "attack",
+                                "trigger_effect": "look_top_seven_may_cast_instant_or_sorcery_lte_power",
+                                "attack_look_top_count": 7,
+                                "attack_top_library_cast_types": ["instant", "sorcery"],
+                                "attack_may_cast_from_looked_cards_without_paying_mana": True,
+                                "attack_cast_mana_value_max_source": "source_power",
+                                "attack_put_rest_bottom_random": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "creature")
+        self.assertEqual(
+            report["cards"][0]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
 
     def test_classifier_marks_deflecting_palm_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(

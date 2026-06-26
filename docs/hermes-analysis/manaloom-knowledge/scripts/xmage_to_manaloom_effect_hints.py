@@ -1780,6 +1780,37 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "PyromancersGoggles"
+        and card_types == {"ARTIFACT"}
+        and effect_classes == {"CopyTargetStackObjectEffect"}
+        and ability_classes == {"PyromancersGogglesTriggeredAbility", "RedManaAbility"}
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "red_mana_rock_red_instant_sorcery_mana_spent_copy_spell_v1",
+            "fields": {
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "R",
+                "trigger": "instant_sorcery_cast",
+                "trigger_effect": "copy_when_mana_spent",
+                "target": "own_instant_or_sorcery_on_stack",
+                "copy_when_mana_spent_to_cast_matching_spell": True,
+                "copy_when_mana_spent_card_types": ["instant", "sorcery"],
+                "copy_when_mana_spent_spell_colors": ["R"],
+                "may_choose_new_targets": True,
+                "choose_new_targets_status": "may",
+            },
+            "reason": "XMage structure matches Pyromancer's Goggles: a legendary red mana rock whose mana copies a red instant or sorcery spell it helps cast.",
+            "signals": [
+                "RedManaAbility",
+                "PyromancersGogglesTriggeredAbility",
+                "CopyTargetStackObjectEffect",
+                "red_instant_sorcery_mana_copy",
+            ],
+        }
+
+    if (
         xmage_class_name == "PalantirOfOrthanc"
         and card_types == {"ARTIFACT"}
         and {
@@ -1812,6 +1843,77 @@ def _build_exact_runtime_variant_fields(
                 "ScryEffect",
                 "TargetOpponent",
                 "OneShotEffect",
+            ],
+        }
+
+    if (
+        xmage_class_name == "Galvanoth"
+        and card_types == {"CREATURE"}
+        and "OneShotEffect" in effect_classes
+        and "BeginningOfUpkeepTriggeredAbility" in ability_classes
+        and "MayCastTargetCardEffect" in rules_text
+        and "look at the top card of your library" in normalized
+        and "cast it without paying its mana cost" in normalized
+        and "instant or sorcery" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1",
+            "fields": {
+                "power": 3,
+                "toughness": 3,
+                "trigger": "controller_upkeep",
+                "trigger_effect": "look_top_card_may_cast_if_instant_or_sorcery",
+                "upkeep_look_top_card": True,
+                "upkeep_may_cast_top_instant_or_sorcery_without_paying_mana": True,
+                "upkeep_top_library_cast_types": ["instant", "sorcery"],
+            },
+            "reason": "XMage structure matches Galvanoth: a 3/3 creature with a beginning-of-upkeep trigger that looks at the top card of your library and may cast it without paying its mana cost if it is an instant or sorcery.",
+            "signals": [
+                "BeginningOfUpkeepTriggeredAbility",
+                "OneShotEffect",
+                "MayCastTargetCardEffect(WITHOUT_PAYING_MANA_COST)",
+                "look at the top card of your library",
+                "instant or sorcery",
+            ],
+        }
+
+    if (
+        xmage_class_name == "VelomachusLorehold"
+        and card_types == {"CREATURE"}
+        and "OneShotEffect" in effect_classes
+        and "AttacksTriggeredAbility" in ability_classes
+        and "look at the top seven cards of your library" in normalized
+        and "cast an instant or sorcery spell" in normalized
+        and "without paying its mana cost" in normalized
+        and "mana value less than or equal to" in normalized
+        and "put the rest on the bottom of your library in a random order" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "attack_top_seven_instant_or_sorcery_lte_power_may_cast_without_paying_mana_v1",
+            "fields": {
+                "power": 5,
+                "toughness": 5,
+                "flying": True,
+                "vigilance": True,
+                "haste": True,
+                "trigger": "attack",
+                "trigger_effect": "look_top_seven_may_cast_instant_or_sorcery_lte_power",
+                "attack_look_top_count": 7,
+                "attack_top_library_cast_types": ["instant", "sorcery"],
+                "attack_may_cast_from_looked_cards_without_paying_mana": True,
+                "attack_cast_mana_value_max_source": "source_power",
+                "attack_put_rest_bottom_random": True,
+            },
+            "reason": "XMage structure matches Velomachus Lorehold: a 5/5 flying vigilance haste creature whose attack trigger looks at the top seven cards, may cast one instant or sorcery with mana value less than or equal to its power without paying mana, then puts the rest on the bottom randomly.",
+            "signals": [
+                "AttacksTriggeredAbility",
+                "OneShotEffect",
+                "look at the top seven cards of your library",
+                "instant or sorcery",
+                "mana value less than or equal to source power",
+                "without paying its mana cost",
             ],
         }
 
@@ -5002,7 +5104,51 @@ def _build_tutor_to_hand_fields(
 
         return None
 
-    if card_types != {"CREATURE"} or "SearchLibraryPutInHandEffect" not in effect_classes:
+    if card_types != {"CREATURE"}:
+        return None
+
+    if (
+        xmage_class_name == "ScholarOfNewHorizons"
+        and "SimpleActivatedAbility" in ability_classes
+        and {"OneShotEffect", "ScholarOfNewHorizonsEffect"}.issubset(effect_classes)
+        and {"TapSourceCost", "RemoveCounterCost"}.issubset(cost_classes)
+        and "entersbattlefieldwithcountersability(countertype.p1p1.createinstance(1))" in normalized
+        and "new filterlandcard(" in normalized
+        and "plains card" in normalized
+        and "subtype.plains.getpredicate()" in normalized
+        and "opponentcontrolsmorecondition(staticfilters.filter_land)" in normalized
+        and "onto the battlefield tapped" in normalized
+        and "put it into your hand" in normalized
+    ):
+        return {
+            "effect": "creature",
+            "scope": "activated_remove_counter_plains_tutor_battlefield_tapped_if_behind_else_hand_v1",
+            "ability_kind": "activated",
+            "fields": {
+                "power": 1,
+                "toughness": 1,
+                "enters_with_plus_one_counter_count": 1,
+                "land_tutor_to_hand_activated": True,
+                "activation_cost_generic": 0,
+                "activation_requires_tap": True,
+                "activation_requires_remove_plus_one_counter_from_controlled_permanent": True,
+                "activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands": True,
+                "tutor_target": "plains",
+                "tutor_destination": "hand",
+            },
+            "reason": "XMage structure matches Scholar of New Horizons: ETB +1/+1 counter, tap and remove a counter from a controlled permanent, then tutor a Plains card to hand or directly onto the battlefield tapped when behind on lands.",
+            "signals": [
+                "ScholarOfNewHorizonsEffect",
+                "EntersBattlefieldWithCountersAbility(+1/+1)",
+                "RemoveCounterCost",
+                "FilterLandCard(Plains)",
+                "OpponentControlsMoreCondition",
+                "Zone.BATTLEFIELD",
+                "Zone.HAND",
+            ],
+        }
+
+    if "SearchLibraryPutInHandEffect" not in effect_classes:
         return None
 
     if (
@@ -5836,6 +5982,52 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "CardsDrawnThisTurnWatcher",
                     "CastSpellLastTurnWatcher",
                     "DrawCardSourceControllerEffect",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "ScholarOfNewHorizons"
+        and card_types == {"CREATURE"}
+        and "SimpleActivatedAbility" in ability_classes
+        and {"OneShotEffect", "ScholarOfNewHorizonsEffect"}.issubset(effect_classes)
+        and {"TapSourceCost", "RemoveCounterCost"}.issubset(cost_classes)
+        and "entersbattlefieldwithcountersability(countertype.p1p1.createinstance(1))" in normalized_text
+        and "plains card" in normalized_text
+        and "subtype.plains.getpredicate()" in normalized_text
+        and "opponentcontrolsmorecondition(staticfilters.filter_land)" in normalized_text
+        and "onto the battlefield tapped" in normalized_text
+        and "put it into your hand" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="activated_remove_counter_plains_tutor_battlefield_tapped_if_behind_else_hand_v1",
+                reason=(
+                    "XMage structure matches Scholar of New Horizons: ETB +1/+1 counter, tap and remove a "
+                    "counter from a controlled permanent, then tutor a Plains card to hand or directly onto "
+                    "the battlefield tapped when behind on lands."
+                ),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 1,
+                    "toughness": 1,
+                    "enters_with_plus_one_counter_count": 1,
+                    "land_tutor_to_hand_activated": True,
+                    "activation_cost_generic": 0,
+                    "activation_requires_tap": True,
+                    "activation_requires_remove_plus_one_counter_from_controlled_permanent": True,
+                    "activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands": True,
+                    "tutor_target": "plains",
+                    "tutor_destination": "hand",
+                },
+                matched_signals=[
+                    "ScholarOfNewHorizonsEffect",
+                    "EntersBattlefieldWithCountersAbility(+1/+1)",
+                    "RemoveCounterCost",
+                    "FilterLandCard(Plains)",
+                    "OpponentControlsMoreCondition",
                 ],
             )
         )

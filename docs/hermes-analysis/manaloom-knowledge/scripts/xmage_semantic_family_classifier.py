@@ -774,6 +774,46 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("graveyard_upkeep_trigger_controller") == "source_controller"
         )
 
+    if (
+        effect == "creature"
+        and scope == "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and "OneShotEffect" in effect_classes
+            and "BeginningOfUpkeepTriggeredAbility" in ability_classes
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 3
+            and effect_json.get("trigger") == "controller_upkeep"
+            and effect_json.get("trigger_effect") == "look_top_card_may_cast_if_instant_or_sorcery"
+            and bool(effect_json.get("upkeep_look_top_card"))
+            and bool(effect_json.get("upkeep_may_cast_top_instant_or_sorcery_without_paying_mana"))
+            and effect_json.get("upkeep_top_library_cast_types") == ["instant", "sorcery"]
+        )
+
+    if (
+        effect == "creature"
+        and scope == "attack_top_seven_instant_or_sorcery_lte_power_may_cast_without_paying_mana_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and "OneShotEffect" in effect_classes
+            and "AttacksTriggeredAbility" in ability_classes
+            and int(effect_json.get("power") or 0) == 5
+            and int(effect_json.get("toughness") or 0) == 5
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("vigilance"))
+            and bool(effect_json.get("haste"))
+            and effect_json.get("trigger") == "attack"
+            and effect_json.get("trigger_effect")
+            == "look_top_seven_may_cast_instant_or_sorcery_lte_power"
+            and int(effect_json.get("attack_look_top_count") or 0) == 7
+            and effect_json.get("attack_top_library_cast_types") == ["instant", "sorcery"]
+            and bool(effect_json.get("attack_may_cast_from_looked_cards_without_paying_mana"))
+            and effect_json.get("attack_cast_mana_value_max_source") == "source_power"
+            and bool(effect_json.get("attack_put_rest_bottom_random"))
+        )
+
     if effect == "creature" and scope == "goldspan_dragon_attack_or_target_treasure_double_mana_v1":
         return (
             types == {"CREATURE"}
@@ -1579,6 +1619,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("activation_requires_tap"))
             and effect_json.get("activation_condition") == "opponent_controls_more_lands"
             and effect_json.get("tutor_target") == "land"
+            and effect_json.get("tutor_destination") == "hand"
+        )
+
+    if effect == "creature" and scope == "activated_remove_counter_plains_tutor_battlefield_tapped_if_behind_else_hand_v1":
+        return (
+            types == {"CREATURE"}
+            and {"OneShotEffect", "ScholarOfNewHorizonsEffect"}.issubset(effect_classes)
+            and "EntersBattlefieldWithCountersAbility" in ability_classes
+            and "SimpleActivatedAbility" in ability_classes
+            and {"TapSourceCost", "RemoveCounterCost"}.issubset(cost_classes)
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 1
+            and int(effect_json.get("enters_with_plus_one_counter_count") or 0) == 1
+            and bool(effect_json.get("land_tutor_to_hand_activated"))
+            and int(effect_json.get("activation_cost_generic") or 0) == 0
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("activation_requires_remove_plus_one_counter_from_controlled_permanent"))
+            and bool(effect_json.get("activation_put_tutored_land_onto_battlefield_tapped_if_opponent_more_lands"))
+            and effect_json.get("tutor_target") == "plains"
             and effect_json.get("tutor_destination") == "hand"
         )
 
@@ -2409,6 +2468,23 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("mana_produced") or 0) == 1
             and effect_json.get("produces") in {"UR", "GU"}
             and int(effect_json.get("activation_cost_generic") or 0) == 1
+        )
+
+    if effect == "ramp_permanent" and scope == "red_mana_rock_red_instant_sorcery_mana_spent_copy_spell_v1":
+        return (
+            types == {"ARTIFACT"}
+            and effect_classes == {"CopyTargetStackObjectEffect"}
+            and ability_classes == {"PyromancersGogglesTriggeredAbility", "RedManaAbility"}
+            and bool(effect_json.get("is_mana_source"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "R"
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and effect_json.get("trigger_effect") == "copy_when_mana_spent"
+            and effect_json.get("target") == "own_instant_or_sorcery_on_stack"
+            and bool(effect_json.get("copy_when_mana_spent_to_cast_matching_spell"))
+            and effect_json.get("copy_when_mana_spent_card_types") == ["instant", "sorcery"]
+            and effect_json.get("copy_when_mana_spent_spell_colors") == ["R"]
+            and bool(effect_json.get("may_choose_new_targets"))
         )
 
     if effect == "creature" and scope == "credit_counter_upkeep_growth_sacrifice_for_life_v1":

@@ -1,0 +1,4 @@
+      card_name       |   normalized_name    |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+----------------------+----------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Pyromancer's Goggles | pyromancer's goggles | a87d2dc7618186343d2ecaf662405c11 | battle_rule_v1:007966224685ef74fe530ed78bcb8f84 | deprecate_nonmatching_rows |                1 | 1b8fafad-c156-4c2b-bd10-7e6c1ca45d7a |                  2 |                         0 |                           2
+(1 row)
