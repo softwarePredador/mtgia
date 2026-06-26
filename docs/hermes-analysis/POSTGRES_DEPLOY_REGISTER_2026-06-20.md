@@ -13916,3 +13916,264 @@ Register decision:
 - The next package-ready follow-up from this destroy-scope refinement is
   `Vandalblast`; `Star of Extinction` remains split-scope and still needs an
   exact runtime/model split before promotion.
+
+### PG221 - Star of Extinction exact land-destroy plus planeswalker wipe scope
+
+Status: applied, postchecked, synced to Hermes SQLite, and reflected in the
+Lorehold matrix reroute on 2026-06-26.
+
+Scope:
+
+- Exact XMage scope promoted:
+  `destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1`.
+- Promoted card:
+  - `Star of Extinction`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_rollback.sql`.
+
+Execution evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_precheck.out`;
+  `target_card_rows=1`, `existing_rule_rows=2`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=2`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_apply.out`;
+  `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_postcheck.out`;
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg221_star_scope_exact_20260626.json`;
+  `selected_card_count=1`, `pg_rows_loaded=3`,
+  `sqlite_inserted_or_updated=3`, `generated_rows=1`.
+
+Post-sync routing evidence:
+
+- Proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg221_star_scope_presync_v1_proposals.json`;
+  `Star of Extinction` reached `batch_pg_candidate_after_precheck` before PG apply.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg221_star_scope_postsync_v1.json`;
+  `Star of Extinction` is now `battle_ready / low_priority`,
+  and the matrix summary moved to
+  `battle_ready=306`, `needs_rule_before_strategy=43`.
+
+Register decision:
+
+- PG221 is applied and should not be rebuilt.
+- `Star of Extinction` is removed from the Lorehold rule-first lane.
+- Next package number is PG222.
+
+### PG223 - Vanquish the Horde and Explosive Singularity exact cost scopes
+
+Status: applied, postchecked, synced to Hermes SQLite, and reflected in the
+Lorehold matrix reroute on 2026-06-26.
+
+Scope:
+
+- Exact XMage scopes promoted:
+  `destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1` and
+  `damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1`.
+- Promoted cards:
+  - `Vanquish the Horde`
+  - `Explosive Singularity`
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_rollback.sql`.
+
+Execution evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_precheck.out`;
+  both cards returned `target_card_rows=1`,
+  `expected_rule_rows_before=0`, and
+  `would_deprecate_shadow_rows=2`.
+- Shadow inspection before apply showed only stale generated rows:
+  `Explosive Singularity` had two `needs_review/review_only remove_creature`
+  rows, and `Vanquish the Horde` had two
+  `needs_review/review_only board_wipe` generic rows.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_apply.out`;
+  `deprecated_shadow_rows=4`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_postcheck.out`;
+  both cards now have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `backup_rows=4`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg223_cost_scope_exact_lorehold_20260626.json`;
+  `selected_card_count=2`, `pg_rows_loaded=6`,
+  `generated_rows=2`, `sqlite_inserted_or_updated=6`.
+
+Post-sync routing evidence:
+
+- Presync proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_presync_v2_proposals.json`;
+  both cards reached `batch_pg_candidate_after_precheck`.
+- Post-sync proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_postsync_v1_proposals.json`;
+  the package-ready backlog dropped back to `1`, confirming PG223 cleared its
+  own two-card presync queue.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg223_cost_scope_postsync_v1.json`;
+  `Vanquish the Horde` and `Explosive Singularity` are now
+  `battle_ready / low_priority`, and the matrix moved to
+  `battle_ready=311`, `needs_rule_before_strategy=84`, `split_scope=12`.
+
+Register decision:
+
+- PG223 is applied and should not be rebuilt.
+- `Vanquish the Horde` and `Explosive Singularity` are removed from the Lorehold
+  rule-first lane.
+- Next package number is PG224.
+
+### PG224 - Vandalblast exact overload annotation scope
+
+Status: applied, postchecked, synced to Hermes SQLite, and reflected in the
+Lorehold matrix reroute on 2026-06-26.
+
+Scope:
+
+- Exact XMage scope promoted:
+  `destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1`.
+- Promoted card:
+  - `Vandalblast`
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_rollback.sql`.
+
+Execution evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_precheck.out`;
+  `target_card_rows=1`, `expected_rule_rows_before=0`,
+  `would_deprecate_shadow_rows=2`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_apply.out`;
+  `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_postcheck.out`;
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg224_vandalblast_exact_scope_20260626.json`;
+  `selected_card_count=1`, `pg_rows_loaded=3`,
+  `generated_rows=1`, `sqlite_inserted_or_updated=3`.
+
+Post-sync routing evidence:
+
+- Presync proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_postsync_v1_proposals.json`;
+  `Vandalblast` was the only remaining
+  `batch_pg_candidate_after_precheck` row.
+- Post-sync proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg224_vandalblast_postsync_v1_proposals.json`;
+  the package-ready backlog is now `0`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg224_vandalblast_postsync_v1.json`;
+  `Vandalblast` remains `battle_ready / watchlist_candidate` and the unresolved
+  Lorehold rule-first lane is now concentrated in
+  `needs_rule_before_strategy=40` rows with `no_rule_signal`.
+
+Register decision:
+
+- PG224 is applied and should not be rebuilt.
+- `Vandalblast` no longer blocks the package-ready queue.
+- Next package number is PG225.
+
+### PG225 - Starfield Shepherd exact ETB tutor scope
+
+Status: applied, postchecked, synced to Hermes SQLite, and reflected in the
+Lorehold matrix reroute on 2026-06-26.
+
+Scope:
+
+- Exact XMage scope promoted:
+  `starfield_shepherd_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_v1`.
+- Promoted card:
+  - `Starfield Shepherd`
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_rollback.sql`.
+
+Execution evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_precheck.out`;
+  `target_card_rows=1`, `existing_rule_rows=0`,
+  `expected_rule_rows_before=0`, `would_deprecate_shadow_rows=0`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_apply.out`;
+  `deprecated_shadow_rows=0`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_postcheck.out`;
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `backup_rows=0`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg225_starfield_shepherd_exact_scope_20260626.json`;
+  `selected_card_count=1`, `pg_rows_loaded=1`,
+  `sqlite_inserted_or_updated=1`.
+
+Post-sync routing evidence:
+
+- Presync proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg224_starfield_runtime_v1_proposals.json`;
+  `Starfield Shepherd` was the only
+  `batch_pg_candidate_after_precheck` row.
+- Post-sync proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg225_starfield_postsync_v1_proposals.json`;
+  the package-ready backlog returned to `0`.
+- Post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg225_starfield_postsync_v1.json`;
+  `Starfield Shepherd` is now
+  `battle_ready / watchlist_candidate`
+  with score `38.0`.
+
+Register decision:
+
+- PG225 is applied and should not be rebuilt.
+- `Starfield Shepherd` no longer belongs to the Lorehold rule-first lane.
+- Next package number is PG226.

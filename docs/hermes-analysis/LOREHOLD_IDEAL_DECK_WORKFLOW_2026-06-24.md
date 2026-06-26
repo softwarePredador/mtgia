@@ -51,54 +51,63 @@ It does not mutate deck rows, SQLite, or PostgreSQL.
 
 ## Current Checkpoint
 
-Post-PG219 Lorehold-focused checkpoint generated on 2026-06-26 after closing
-`Warleader's Call` (PG218) and the partial trigger lane for
-`Purphoros, God of the Forge` (PG219):
+Post-PG223 Lorehold-focused checkpoint generated on 2026-06-26 after promoting
+the exact scopes for `Vanquish the Horde` and `Explosive Singularity` into
+PostgreSQL, syncing Hermes SQLite, and regenerating the matrix from the live
+post-sync state:
 
 - current matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg219_purphoros_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg223_cost_scope_postsync_v1.json`
 - current proposal report:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg219_purphoros_partial_ready_v1_proposals.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_postsync_v1_proposals.json`
 - current generated candidate:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg219_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg222_v2.json`
 
 Current matrix result:
 
 - total Lorehold-touching cards in matrix: `395`;
 - `core_keep`: `87`;
 - `priority_benchmark_candidate`: `44`;
-- `watchlist_candidate`: `113`;
-- `needs_rule_before_strategy`: `91`;
+- `watchlist_candidate`: `115`;
+- `needs_rule_before_strategy`: `84`;
 - `active_low_confidence_review`: `13`;
-- `low_priority`: `45`;
+- `low_priority`: `50`;
 - `policy_blocked`: `2`.
 
 Current rule-readiness split:
 
-- `battle_ready`: `304`;
-- `mapper_manual`: `73`;
-- `split_scope`: `16`;
+- `battle_ready`: `311`;
+- `mapper_manual`: `70`;
+- `split_scope`: `12`;
 - `blocked_missing_xmage_source`: `2`.
 
 Key routing delta:
 
-- `Warleader's Call` moved from `split_scope / needs_rule_before_strategy` to
-  `battle_ready / watchlist_candidate`.
-- `Purphoros, God of the Forge` moved from
-  `split_scope / needs_rule_before_strategy` to
-  `battle_ready / watchlist_candidate` through a partial promotion that
-  preserved orthogonal shadow rows.
-- The Lorehold `controlled_creature_etb_damage_engine` family is now closed out
-  of the rule-first lane.
-- Remaining `needs_rule_before_strategy` backlog is concentrated in
-  `manual_model (75)`, `targeted_interaction (13)`,
-  `static_cost_reducer (2)`, and `creature (1)`.
+- `Vanquish the Horde` is now
+  `battle_ready / low_priority`
+  with scope
+  `destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1`.
+- `Explosive Singularity` is now
+  `battle_ready / low_priority`
+  with scope
+  `damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1`.
+- `Open the Vaults` moved from stale `no_rule_signal / needs_rule_before_strategy`
+  into `battle_ready / watchlist_candidate`.
+- `Roar of Reclamation` moved from stale
+  `no_rule_signal / needs_rule_before_strategy` into
+  `battle_ready / low_priority`.
+- `Triumphant Reckoning` moved from stale
+  `no_rule_signal / needs_rule_before_strategy` into
+  `battle_ready / low_priority`.
+- There are no remaining `no_rule_signal` rows in the live PG222 matrix; the
+  backlog is now purely `mapper_manual`, `split_scope`, or
+  `blocked_missing_xmage_source`.
 
 Generated deck evidence:
 
-- previous PG217 candidate hash:
-  `ef278cefb669df32bc6c921f422f218791252c81bc1e08abf5663f3a02f54036`
-- current PG219 candidate hash:
+- stale PG221 / PG222-v1 carry-forward hash:
+  `a6128298aafade21fd2177eccafe51d756e4b4382e0cf09ea1f7a43c8cf08dbd`
+- current PG222 candidate hash:
   `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`
 - current novel cards:
   `Goblin Engineer`, `Improvisation Capstone`, `Increasing Vengeance`,
@@ -111,10 +120,15 @@ Generated deck evidence:
 
 Smoke note:
 
-- the PG219 generated candidate changed materially, but the short smoke was not
-  positive yet; it opened `0W/2L/0S` before the third matchup was interrupted
-  for runtime-cost reasons. This is enough to prove deck delta, not enough to
-  approve a swap.
+- the matrix-fixed PG222 v2 candidate changed materially from the stale
+  PG221/PG222-v1 carry-forward and finished the same short real-opponent sample
+  at `1W/2L/0S`, beating `Thrasios, Triton Hero #115` while losing to
+  `Rograkh, Son of Rohgahh #118` and `Tayam, Luminous Enigma #116`. This is
+  enough to prove deck delta and replay viability, not enough to approve a
+  swap.
+- PG223 did not trigger a new candidate generation pass because both promoted
+  cards landed in `low_priority`; the benchmark lane remained
+  `priority_benchmark_candidate=44`.
 
 ## Current Matrix Result
 
@@ -1622,3 +1636,265 @@ Next operational order:
    exact-scope card if it outranks it by routing value.
 3. Re-run candidate hash/smoke only after the next rule-first closure that
    materially touches `priority_benchmark_candidate` or defensive core cuts.
+
+## Post-PG221 Star of Extinction exact-scope checkpoint
+
+Post-PG221 Lorehold-focused checkpoint generated on 2026-06-26 after promoting
+`Star of Extinction` from the generic split-scope destroy bucket into an exact
+XMage-derived scope that destroys target land and then deals 20 damage to each
+creature and each planeswalker:
+
+- proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg221_star_scope_presync_v1_proposals.json`;
+  `Star of Extinction` reached
+  `batch_pg_candidate_after_precheck`.
+- package/apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg221_star_scope_exact_package.md`,
+  `..._precheck.out`, `..._apply.out`, and `..._postcheck.out`.
+- sync evidence:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg221_star_scope_exact_20260626.json`.
+- post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg221_star_scope_postsync_v1_manifest.json`.
+- post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg221_star_scope_postsync_v1.json`.
+
+Routing impact:
+
+- `Star of Extinction` moved from
+  `split_scope / needs_rule_before_strategy`
+  to
+  `battle_ready / low_priority`.
+- post-sync matrix counts changed to:
+  `needs_rule_before_strategy=43`,
+  `low_priority=90`,
+  `battle_ready=306`,
+  `package_already_prepared=46`,
+  `no_rule_signal=43`.
+
+Runtime/test impact:
+
+- battle runtime now supports the exact `Star of Extinction` sequence:
+  destroy target land, then apply 20 damage to each creature and planeswalker.
+- focused tests passed for:
+  `test_star_of_extinction_exact_scope_destroys_target_land_then_damages_creatures_and_planeswalkers`,
+  plus the exact-scope regressions for `Erode` and
+  `Sundering Eruption // Volcanic Fissure`.
+
+## Post-PG222 recursion-mass matrix rehydration checkpoint
+
+Post-PG222 Lorehold-focused checkpoint generated on 2026-06-26 after promoting
+the exact recursion family for `Open the Vaults`, `Roar of Reclamation`, and
+`Triumphant Reckoning`, syncing those rules back into SQLite, and then
+regenerating the matrix from the live current script/runtime instead of
+trusting the stale first post-sync artifact:
+
+- proposal report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg222_recursion_mass_postsync_v1_proposals.json`.
+- package/apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg222_recursion_mass_lorehold_package.md`,
+  `..._precheck.out`, `..._apply.out`, and `..._postcheck.out`.
+- sync evidence:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg222_recursion_mass_lorehold_20260626.json`.
+- regenerated post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg222_recursion_mass_postsync_v2.json`.
+- regenerated candidate:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg222_v2.json`.
+- smoke checkpoint:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg222_v2_smoke.md`.
+
+Routing impact:
+
+- `Open the Vaults` is now `battle_ready / watchlist_candidate` with scope
+  `return_all_artifact_enchantment_cards_from_all_graveyards_to_battlefield_v1`.
+- `Roar of Reclamation` is now `battle_ready / low_priority` with scope
+  `return_all_artifact_cards_from_all_graveyards_to_battlefield_v1`.
+- `Triumphant Reckoning` is now `battle_ready / low_priority` with scope
+  `return_all_artifact_enchantment_planeswalker_cards_from_graveyard_to_battlefield_v1`.
+- live post-sync matrix counts changed to:
+  `needs_rule_before_strategy=86`,
+  `priority_benchmark_candidate=44`,
+  `watchlist_candidate=115`,
+  `battle_ready=309`,
+  `mapper_manual=70`,
+  `split_scope=14`,
+  `blocked_missing_xmage_source=2`.
+
+Candidate impact:
+
+- the stale first PG222 candidate was still identical to PG221 with hash
+  `a6128298aafade21fd2177eccafe51d756e4b4382e0cf09ea1f7a43c8cf08dbd`.
+- the regenerated PG222 candidate changed to hash
+  `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`.
+- the real deck delta against the stale carry-forward was:
+  returned `Ancient Den`, `City of Brass`, `Gemstone Caverns`,
+  `Hall of Heliod's Generosity`, and `Mana Confluence`;
+  dropped `Boseiju, Who Shelters All`, `Eiganjo, Seat of the Empire`,
+  `Glittering Massif`, `Radiant Summit`, `Reckless Handling`, and
+  `Reliquary Tower`.
+- the short real-opponent smoke completed at `1W/2L/0S`, which proves the
+  matrix rehydration produced a playable isolated candidate and not just another
+  stale carry-forward.
+
+## PG223 static cost exact-scope presync checkpoint
+
+Post-PG223 Lorehold-focused presync checkpoint generated on 2026-06-26 after
+fixing the XMage matcher to use the real local Java structure for
+`Vanquish the Horde` and `Explosive Singularity` instead of relying on full
+oracle-like source text inside the raw excerpt:
+
+- rerun pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_presync_v2_manifest.json`.
+- validity evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_presync_v2_validity.json`.
+- family routing evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_presync_v2_families.json`.
+- proposal evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_presync_v2_proposals.json`.
+- XMage index evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_presync_v2_xmage_index.json`.
+
+Routing impact:
+
+- `Vanquish the Horde` now resolves to exact scope
+  `destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1`
+  instead of the generic
+  `static_self_spell_cost_reduction_variant_v1`.
+- `Explosive Singularity` now resolves to exact scope
+  `damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1`
+  instead of the generic
+  `static_self_spell_cost_reduction_variant_v1`.
+- both cards are now
+  `ready_for_structured_xmage_pull_review_required` in the validity audit and
+  `batch_pg_candidate_after_precheck` in the proposal report.
+- proposal summary changed from
+  `batch_pg_candidate_after_precheck=1` / `split_family_scope_review_required=27`
+  in the stale presync v1 run to
+  `batch_pg_candidate_after_precheck=3` / `split_family_scope_review_required=25`
+  in the corrected presync v2 run.
+
+Operational interpretation:
+
+- this closes the XMage-to-ManaLoom mapper gap for these two Lorehold-touching
+  cards at the mapper level;
+- the PostgreSQL package was then applied and synced, so these rows are no
+  longer pending presync promotion;
+- the next useful rule-first target should come from the remaining
+  `split_scope=12` or from the highest-value `mapper_manual` Lorehold rows.
+
+## PG223 static cost exact-scope post-sync checkpoint
+
+Post-PG223 Lorehold-focused post-sync checkpoint generated on 2026-06-26 after
+applying the two-card package, confirming the promoted rows in PostgreSQL, and
+mirroring them into Hermes SQLite:
+
+- package/apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg223_cost_scope_exact_lorehold_package_package.md`,
+  `..._precheck.out`, `..._apply.out`, and `..._postcheck.out`.
+- SQLite sync evidence:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg223_cost_scope_exact_lorehold_20260626.json`.
+- post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg223_cost_scope_postsync_v1_manifest.json`.
+- post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg223_cost_scope_postsync_v1.json`.
+
+Routing impact:
+
+- post-sync matrix counts changed from
+  `needs_rule_before_strategy=86`, `battle_ready=309`, `split_scope=14`
+  to
+  `needs_rule_before_strategy=84`, `battle_ready=311`, `split_scope=12`.
+- `Vanquish the Horde` and `Explosive Singularity` are now `battle_ready` in
+  the live SQLite-backed matrix rather than merely package-ready in the
+  presync proposal report.
+- the post-sync proposal queue dropped back to
+  `batch_pg_candidate_after_precheck=1`, proving PG223 cleared its own two-card
+  presync backlog.
+
+## PG224 Vandalblast exact-scope post-sync checkpoint
+
+Post-PG224 Lorehold-focused post-sync checkpoint generated on 2026-06-26 after
+promoting the exact `Vandalblast` overload annotation scope into PostgreSQL,
+syncing Hermes SQLite, and rerunning the Lorehold matrix:
+
+- package/apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg224_vandalblast_exact_scope_package.md`,
+  `..._precheck.out`, `..._apply.out`, and `..._postcheck.out`.
+- SQLite sync evidence:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg224_vandalblast_exact_scope_20260626.json`.
+- post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg224_vandalblast_postsync_v1_manifest.json`.
+- post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg224_vandalblast_postsync_v1.json`.
+
+Routing impact:
+
+- `Vandalblast` keeps the exact scope
+  `destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1`
+  and remains
+  `battle_ready / watchlist_candidate`
+  with `next_action=run_safe_slot_benchmark_after_baseline_hash_guard`.
+- the post-sync proposal queue removed the final
+  `batch_pg_candidate_after_precheck` row; it is now `0`.
+- the matrix now reports:
+  `battle_ready=311`,
+  `package_already_prepared=44`,
+  `needs_rule_before_strategy=40`,
+  `watchlist_candidate=117`,
+  `priority_benchmark_candidate=44`.
+
+Operational interpretation:
+
+- PG224 did not change benchmark priority counts, but it removed the last
+  package-ready residue from the Lorehold-facing queue.
+- the unresolved Lorehold backlog is now concentrated in
+  `no_rule_signal` cards rather than PG-ready exact-scope promotions, so the
+  next step should be mapper/runtime family closure on the top unresolved rows
+  before any wider benchmark cycle.
+
+## PG225 Starfield Shepherd exact-scope post-sync checkpoint
+
+Post-PG225 Lorehold-focused post-sync checkpoint generated on 2026-06-26 after
+closing the XMage mapper/runtime gap for `Starfield Shepherd`, applying the new
+PostgreSQL package, syncing Hermes SQLite, and rerunning the Lorehold matrix:
+
+- package/apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg225_starfield_shepherd_exact_scope_package.md`,
+  `..._precheck.out`, `..._apply.out`, and `..._postcheck.out`.
+- SQLite sync evidence:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg225_starfield_shepherd_exact_scope_20260626.json`.
+- post-sync pipeline:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg225_starfield_postsync_v1_manifest.json`.
+- post-sync matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg225_starfield_postsync_v1.json`.
+
+Routing impact:
+
+- `Starfield Shepherd` moved from
+  `needs_rule_before_strategy / no_rule_signal`
+  to
+  `battle_ready / watchlist_candidate`
+  with score `38.0` and
+  `next_action=run_safe_slot_benchmark_after_baseline_hash_guard`.
+- post-sync pipeline counts improved from
+  `severity_counts={"critical":1,"high":256,"medium":60,"pass":487}`
+  to
+  `{"critical":1,"high":255,"medium":60,"pass":488}`.
+- post-sync matrix counts moved to:
+  `battle_ready=312`,
+  `watchlist_candidate=116`,
+  `priority_benchmark_candidate=44`.
+- the next Lorehold rule-first cluster is now led by split-scope rows rather
+  than package-ready rows, with the top unresolved names in the current matrix
+  including:
+  `Primal Amulet // Primal Wellspring`,
+  `Bedlam Reveler`,
+  `Blood Sun`,
+  and `Palantír of Orthanc`.
+
+Operational interpretation:
+
+- PG225 converted a real Lorehold blocker into a live `battle_ready` rule, not
+  just a presync proposal.
+- the remaining unresolved Lorehold-facing work is now concentrated in
+  `split_scope` and `mapper_manual` rows; the next efficient move is to close a
+  split-scope exact family before spending another package number.

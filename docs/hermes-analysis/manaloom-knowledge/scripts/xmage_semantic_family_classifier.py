@@ -383,6 +383,13 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         and effect_json.get("trigger_effect") == "damage_each_opponent"
     ):
         return "controlled_creature_etb_damage_engine"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
+        == "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1"
+        and effect_json.get("effect")
+        == "destroy_target_land_then_damage_all_creatures_and_planeswalkers"
+    ):
+        return "targeted_interaction"
     return family_for_effect(effect_json.get("effect"))
 
 
@@ -434,6 +441,9 @@ GENERIC_BATCH_SAFE_SCOPES = {
     ("recursion", "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_miracle_v1"),
     ("recursion", "return_all_artifact_enchantment_cards_from_graveyard_to_battlefield_v1"),
     ("recursion", "return_all_artifact_cards_from_graveyard_to_battlefield_haste_eot_v1"),
+    ("recursion", "return_all_artifact_enchantment_cards_from_all_graveyards_to_battlefield_v1"),
+    ("recursion", "return_all_artifact_cards_from_all_graveyards_to_battlefield_v1"),
+    ("recursion", "return_all_artifact_enchantment_planeswalker_cards_from_graveyard_to_battlefield_v1"),
     ("sweeper_damage", "damage_all_variant_v1"),
 }
 MANA_ROCK_BATCH_SAFE_SCOPE = (
@@ -554,6 +564,38 @@ def generic_runtime_batch_safe(card: dict[str, Any]) -> bool:
                 and bool(effect_json.get("return_all_matching"))
                 and bool(effect_json.get("grants_haste_until_eot"))
             )
+        if scope == "return_all_artifact_enchantment_cards_from_all_graveyards_to_battlefield_v1":
+            return (
+                types == {"SORCERY"}
+                and effect_classes == {"OneShotEffect", "OpenTheVaultsEffect"}
+                and not ability_classes
+                and str(effect_json.get("target") or "") == "artifact_or_enchantment"
+                and str(effect_json.get("target_controller") or "") == "each_player"
+                and str(effect_json.get("destination") or "") == "battlefield"
+                and bool(effect_json.get("return_all_matching"))
+                and effect_json.get("target_card_types") == ["artifact", "enchantment"]
+            )
+        if scope == "return_all_artifact_cards_from_all_graveyards_to_battlefield_v1":
+            return (
+                types == {"SORCERY"}
+                and effect_classes == {"OneShotEffect", "RoarOfReclamationEffect"}
+                and not ability_classes
+                and str(effect_json.get("target") or "") == "artifact"
+                and str(effect_json.get("target_controller") or "") == "each_player"
+                and str(effect_json.get("destination") or "") == "battlefield"
+                and bool(effect_json.get("return_all_matching"))
+                and effect_json.get("target_card_types") == ["artifact"]
+            )
+        if scope == "return_all_artifact_enchantment_planeswalker_cards_from_graveyard_to_battlefield_v1":
+            return (
+                types == {"SORCERY"}
+                and effect_classes == {"ReturnFromYourGraveyardToBattlefieldAllEffect"}
+                and not ability_classes
+                and str(effect_json.get("target") or "") == "artifact_or_enchantment_or_planeswalker"
+                and str(effect_json.get("destination") or "") == "battlefield"
+                and bool(effect_json.get("return_all_matching"))
+                and effect_json.get("target_card_types") == ["artifact", "enchantment", "planeswalker"]
+            )
         if "ReturnFromGraveyardToBattlefieldTargetEffect" not in effect_classes:
             return False
     else:
@@ -610,6 +652,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
     effect_classes = xmage_effect_classes(card)
     cost_classes = xmage_cost_classes(card)
     target_classes = xmage_target_classes(card)
+    filter_classes = set((card.get("xmage") or {}).get("filter_classes") or [])
 
     if effect == "draw_cards" and scope == "veil_of_summer_draw_and_protection_waiver_v1":
         return (
@@ -951,6 +994,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("end_the_turn"))
             and effect_json.get("turn_end_scope") == "current_turn_after_resolution"
             and bool(effect_json.get("sorcery"))
+        )
+
+    if effect == "board_wipe" and scope == "destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1":
+        return (
+            types == {"SORCERY"}
+            and {"DestroyAllEffect", "SpellCostReductionSourceEffect"}.issubset(effect_classes)
+            and ability_classes == {"SimpleStaticAbility"}
+            and not cost_classes
+            and effect_json.get("destroy_card_types") == ["creature"]
+            and bool(effect_json.get("destroy_all_creatures"))
+            and effect_json.get("destination") == "graveyard"
+            and bool(effect_json.get("sorcery"))
+            and effect_json.get("cost_reduction_applies_to") == "this_spell"
+            and int(effect_json.get("cost_reduction_generic") or 0) == 1
+            and effect_json.get("cost_reduction_amount_source") == "creature_count_on_battlefield"
         )
 
     if effect in {"creature", "passive"} and scope == "controlled_creature_enters_damage_each_opponent_v1":
@@ -1420,6 +1478,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("power") or 0) == 2
             and int(effect_json.get("toughness") or 0) == 2
             and effect_json.get("etb_tutor_target") == "artifact_mana_value_3"
+            and effect_json.get("etb_tutor_status") == "runtime_library_to_hand"
+        )
+
+    if effect == "creature" and scope == "starfield_shepherd_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_v1":
+        return (
+            types == {"CREATURE"}
+            and effect_classes == {"SearchLibraryPutInHandEffect"}
+            and ability_classes == {"EntersBattlefieldTriggeredAbility", "FlyingAbility", "WarpAbility"}
+            and not cost_classes
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 2
+            and effect_json.get("etb_tutor_target") == "basic_plains_or_creature_mana_value_1_or_less"
             and effect_json.get("etb_tutor_status") == "runtime_library_to_hand"
         )
 
@@ -2739,6 +2809,22 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("instant")) == ("INSTANT" in types)
         )
 
+    if effect == "direct_damage" and scope == "damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1":
+        return (
+            types == {"SORCERY"}
+            and "DamageTargetEffect" in effect_classes
+            and "SimpleStaticAbility" in ability_classes
+            and cost_classes == {"TapVariableTargetCost"}
+            and effect_json.get("target") == "any_target"
+            and int(effect_json.get("damage") or 0) == 10
+            and bool(effect_json.get("sorcery"))
+            and effect_json.get("cost_reduction_applies_to") == "this_spell"
+            and int(effect_json.get("cost_reduction_generic") or 0) == 1
+            and effect_json.get("cost_reduction_amount_source")
+            == "creatures_tapped_as_additional_cost_while_casting"
+            and bool(effect_json.get("cost_reduction_counts_additional_tapped_creatures_while_casting"))
+        )
+
     if effect == "creature" and scope == "magda_dwarf_tap_treasure_and_five_treasure_tutor_v1":
         return (
             types == {"CREATURE"}
@@ -2964,6 +3050,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("cant_block_target_restriction") == "creatures_without_flying"
             and bool(effect_json.get("land_side_pay_three_life_else_tapped"))
             and effect_json.get("land_side_add_mana") == "R"
+        )
+
+    if effect == "destroy_target_land_then_damage_all_creatures_and_planeswalkers" and scope == "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1":
+        return (
+            types == {"SORCERY"}
+            and effect_classes == {"DamageAllEffect", "DestroyTargetEffect"}
+            and not ability_classes
+            and "TargetLandPermanent" in target_classes
+            and bool(effect_json.get("sorcery"))
+            and effect_json.get("target") == "land"
+            and int(effect_json.get("damage") or 0) == 20
+            and effect_json.get("damage_scope") == "each_creature_and_planeswalker"
         )
 
     if effect == "remove_permanent" and scope == "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1":

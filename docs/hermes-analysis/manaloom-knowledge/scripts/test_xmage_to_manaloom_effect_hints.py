@@ -121,6 +121,59 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             primary["cost_reduction_counts_additional_sacrifices_paid_while_casting"]
         )
 
+    def test_vanquish_the_horde_maps_to_exact_cost_reduced_board_wipe_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "VanquishTheHorde",
+                "effect_classes": ["DestroyAllEffect", "SpellCostReductionSourceEffect"],
+                "ability_classes": ["SimpleStaticAbility"],
+                "dynamic_value_classes": ["PermanentsOnBattlefieldCount"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+            },
+            "",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "board_wipe")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1",
+        )
+        self.assertTrue(primary["destroy_all_creatures"])
+        self.assertEqual(primary["cost_reduction_applies_to"], "this_spell")
+        self.assertEqual(primary["cost_reduction_amount_source"], "creature_count_on_battlefield")
+
+    def test_explosive_singularity_maps_to_exact_cost_reduced_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ExplosiveSingularity",
+                "effect_classes": ["DamageTargetEffect", "ExplosiveSingularityCostReductionEffect"],
+                "ability_classes": ["SimpleStaticAbility", "SpellAbility"],
+                "cost_classes": ["TapVariableTargetCost"],
+                "target_classes": ["TargetAnyTarget"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "custom_inner_classes": [
+                    {"class_name": "ExplosiveSingularityCostReductionEffect", "extends": "CostModificationEffectImpl"}
+                ],
+            },
+            "",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "direct_damage")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1",
+        )
+        self.assertEqual(primary["target"], "any_target")
+        self.assertEqual(primary["damage"], 10)
+        self.assertEqual(
+            primary["additional_cost_kind"],
+            "tap_any_number_untapped_creatures_you_control",
+        )
+
     def test_oracle_text_can_trigger_gift_destroy_all_hint(self) -> None:
         result = hints.build_effect_hints(
             {"effect_classes": ["DestroyAllEffect"], "ability_classes": [], "condition_classes": []},
@@ -607,6 +660,87 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["return_all_matching"])
         self.assertEqual(primary["target_card_types"], ["artifact"])
         self.assertTrue(primary["grants_haste_until_eot"])
+
+    def test_open_the_vaults_maps_to_all_graveyards_artifact_enchantment_recursion_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "OpenTheVaults",
+                "effect_classes": ["OneShotEffect", "OpenTheVaultsEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    'super(ownerId,setInfo,new CardType[]{CardType.SORCERY},"{4}{W}{W}"); '
+                    "this.getSpellAbility().addEffect(new OpenTheVaultsEffect());"
+                ),
+            },
+            "Return all artifact and enchantment cards from all graveyards to the battlefield under their owners' control.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "recursion")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_all_artifact_enchantment_cards_from_all_graveyards_to_battlefield_v1",
+        )
+        self.assertEqual(primary["target"], "artifact_or_enchantment")
+        self.assertEqual(primary["target_controller"], "each_player")
+        self.assertEqual(primary["destination"], "battlefield")
+        self.assertTrue(primary["return_all_matching"])
+        self.assertEqual(primary["target_card_types"], ["artifact", "enchantment"])
+
+    def test_roar_of_reclamation_maps_to_all_graveyards_artifact_recursion_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "RoarOfReclamation",
+                "effect_classes": ["OneShotEffect", "RoarOfReclamationEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{5}{W}{W}"); '
+                    "this.getSpellAbility().addEffect(new RoarOfReclamationEffect());"
+                ),
+            },
+            "Each player returns all artifact cards from their graveyard to the battlefield.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "recursion")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_all_artifact_cards_from_all_graveyards_to_battlefield_v1",
+        )
+        self.assertEqual(primary["target"], "artifact")
+        self.assertEqual(primary["target_controller"], "each_player")
+        self.assertEqual(primary["destination"], "battlefield")
+        self.assertTrue(primary["return_all_matching"])
+        self.assertEqual(primary["target_card_types"], ["artifact"])
+
+    def test_triumphant_reckoning_maps_to_artifact_enchantment_planeswalker_recursion_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TriumphantReckoning",
+                "effect_classes": ["ReturnFromYourGraveyardToBattlefieldAllEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    'super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{6}{W}{W}{W}"); '
+                    "this.getSpellAbility().addEffect(new ReturnFromYourGraveyardToBattlefieldAllEffect(filter));"
+                ),
+            },
+            "Return all artifact, enchantment, and planeswalker cards from your graveyard to the battlefield.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "recursion")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "return_all_artifact_enchantment_planeswalker_cards_from_graveyard_to_battlefield_v1",
+        )
+        self.assertEqual(primary["target"], "artifact_or_enchantment_or_planeswalker")
+        self.assertEqual(primary["target_controller"], "self")
+        self.assertEqual(primary["destination"], "battlefield")
+        self.assertTrue(primary["return_all_matching"])
+        self.assertEqual(primary["target_card_types"], ["artifact", "enchantment", "planeswalker"])
 
     def test_moonsnare_prototype_maps_to_artifact_or_creature_support_colorless_scope(self) -> None:
         result = hints.build_effect_hints(
@@ -1358,6 +1492,37 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["cant_block_mode_status"], "annotation_only")
         self.assertTrue(primary["land_side_pay_three_life_else_tapped"])
         self.assertEqual(primary["land_side_add_mana"], "R")
+
+    def test_star_of_extinction_maps_to_exact_land_destroy_then_damage_wipe_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DamageAllEffect", "DestroyTargetEffect"],
+                "filter_classes": ["FilterCreatureOrPlaneswalkerPermanent"],
+                "target_classes": ["TargetLandPermanent"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect()); "
+                    "this.getSpellAbility().addEffect(new DamageAllEffect(20, "
+                    "new FilterCreatureOrPlaneswalkerPermanent(\"creature and each planeswalker\"))); "
+                    "this.getSpellAbility().addTarget(new TargetLandPermanent());"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(
+            primary["effect"],
+            "destroy_target_land_then_damage_all_creatures_and_planeswalkers",
+        )
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1",
+        )
+        self.assertEqual(primary["target"], "land")
+        self.assertEqual(primary["damage"], 20)
+        self.assertEqual(primary["damage_scope"], "each_creature_and_planeswalker")
+        self.assertTrue(primary["sorcery"])
 
     def test_vandalblast_maps_to_exact_artifact_overload_annotation_scope(self) -> None:
         result = hints.build_effect_hints(
@@ -3180,6 +3345,44 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["battle_model_scope"], "trophy_mage_etb_artifact_mana_value_3_to_hand_v1")
         self.assertEqual(primary["etb_tutor_target"], "artifact_mana_value_3")
         self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 2)
+
+    def test_starfield_shepherd_maps_to_basic_plains_or_small_creature_tutor_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["SearchLibraryPutInHandEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldTriggeredAbility",
+                    "FlyingAbility",
+                    "WarpAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "xmage_class_name": "StarfieldShepherd",
+                "raw_excerpt": (
+                    'private static final FilterCard filter = new FilterCard("a basic Plains card or a creature card with mana value 1 or less"); '
+                    "filter.add(Predicates.or("
+                    "Predicates.and(SuperType.BASIC.getPredicate(), SubType.PLAINS.getPredicate()), "
+                    "Predicates.and(CardType.CREATURE.getPredicate(), new ManaValuePredicate(ComparisonType.FEWER_THAN, 2))"
+                    ")); "
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                    "new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true)"
+                    ")); this.addAbility(new WarpAbility(this, \"{1}{W}\"));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "starfield_shepherd_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_v1",
+        )
+        self.assertEqual(
+            primary["etb_tutor_target"],
+            "basic_plains_or_creature_mana_value_1_or_less",
+        )
+        self.assertEqual(primary["etb_tutor_status"], "runtime_library_to_hand")
+        self.assertEqual(primary["power"], 3)
         self.assertEqual(primary["toughness"], 2)
 
     def test_carrion_feeder_maps_to_exact_sacrifice_self_growth_scope(self) -> None:

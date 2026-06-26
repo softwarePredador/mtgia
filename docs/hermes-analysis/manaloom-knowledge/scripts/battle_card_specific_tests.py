@@ -876,6 +876,102 @@ def register_tests(battle, player):
         assert removal_event["target_type"] == "land"
         assert removal_event["basic_land_compensation_status"] == "annotation_only"
 
+    def test_star_of_extinction_exact_scope_destroys_target_land_then_damages_creatures_and_planeswalkers():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            target_land = {
+                "name": "Ancient Tomb",
+                "cmc": 0,
+                "type_line": "Land",
+                "effect": "land",
+            }
+            own_small_creature = {
+                "name": "Own Small Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 2,
+                "toughness": 2,
+            }
+            opposing_small_creature = {
+                "name": "Opposing Small Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            opposing_huge_creature = {
+                "name": "Opposing Huge Creature",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 21,
+                "toughness": 21,
+            }
+            opposing_planeswalker = {
+                "name": "Opposing Walker",
+                "effect": "planeswalker",
+                "type_line": "Legendary Planeswalker",
+                "loyalty": 5,
+            }
+            active.battlefield = [own_small_creature]
+            opponent.battlefield = [
+                target_land,
+                opposing_small_creature,
+                opposing_huge_creature,
+                opposing_planeswalker,
+            ]
+            effect_data = {
+                "effect": "destroy_target_land_then_damage_all_creatures_and_planeswalkers",
+                "battle_model_scope": "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1",
+                "target": "land",
+                "damage": 20,
+                "damage_scope": "each_creature_and_planeswalker",
+                "sorcery": True,
+                "_rule_logical_key": "battle_rule_v1:star-of-extinction-test",
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+            }
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Star of Extinction", "cmc": 7, "type_line": "Sorcery"},
+                turn=8,
+                rng=random.Random(260629),
+                effect_data_override=effect_data,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target_land not in opponent.battlefield
+        assert target_land in opponent.graveyard
+        assert own_small_creature not in active.battlefield
+        assert own_small_creature in active.graveyard
+        assert opposing_small_creature not in opponent.battlefield
+        assert opposing_small_creature in opponent.graveyard
+        assert opposing_huge_creature in opponent.battlefield
+        assert opposing_planeswalker not in opponent.battlefield
+        assert opposing_planeswalker in opponent.graveyard
+        removal_event = next(
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Star of Extinction"
+        )
+        damage_event = next(data for event, data in events if event == "damage_wipe_resolved")
+        assert removal_event["target"] == "Ancient Tomb"
+        assert removal_event["target_type"] == "land"
+        assert damage_event["damage"] == 20
+        assert damage_event["damage_scope"] == "each_creature_and_planeswalker"
+        assert damage_event["creatures_destroyed"] == 3
+        assert damage_event["planeswalkers_destroyed"] == 1
+        destroyed_names = {entry["name"] for entry in damage_event["destroyed"]}
+        assert "Own Small Creature" in destroyed_names
+        assert "Opposing Small Creature" in destroyed_names
+        assert "Opposing Walker" in destroyed_names
+
     def test_teferis_protection_phases_all_permanents_locks_life_and_exiles_self_with_pg041_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -10627,6 +10723,119 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_starfield_shepherd_etb_prefers_basic_plains_when_mana_light_then_one_drop_creature():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            mana_light = player("Lorehold")
+            opponent = player("Opponent")
+            mana_light.battlefield = [
+                {"name": "Plateau", "cmc": 0, "type_line": "Land", "effect": "land"},
+                {"name": "Mountain", "cmc": 0, "type_line": "Basic Land - Mountain", "effect": "land"},
+            ]
+            plains = {
+                "name": "Plains",
+                "cmc": 0,
+                "type_line": "Basic Land - Plains",
+                "effect": "land",
+            }
+            sentinel = {
+                "name": "Esper Sentinel",
+                "cmc": 1,
+                "type_line": "Artifact Creature - Human Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            }
+            mana_light.library = [sentinel, plains]
+
+            battle.apply_effect_immediate(
+                mana_light,
+                [opponent],
+                {
+                    "name": "Starfield Shepherd",
+                    "cmc": 5,
+                    "type_line": "Creature - Angel",
+                    "power": 3,
+                    "toughness": 2,
+                },
+                turn=3,
+                rng=random.Random(6086),
+                effect_data_override={
+                    "effect": "creature",
+                    "is_creature_permanent": True,
+                    "power": 3,
+                    "toughness": 2,
+                    "etb_tutor_target": "basic_plains_or_creature_mana_value_1_or_less",
+                    "etb_tutor_status": "runtime_library_to_hand",
+                    "battle_model_scope": "starfield_shepherd_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_v1",
+                },
+            )
+
+            mana_stable = player("Lorehold Stable")
+            mana_stable.battlefield = [
+                {"name": "Plains A", "cmc": 0, "type_line": "Basic Land - Plains", "effect": "land"},
+                {"name": "Plains B", "cmc": 0, "type_line": "Basic Land - Plains", "effect": "land"},
+                {"name": "Mountain A", "cmc": 0, "type_line": "Basic Land - Mountain", "effect": "land"},
+                {"name": "Mountain B", "cmc": 0, "type_line": "Basic Land - Mountain", "effect": "land"},
+            ]
+            stable_plains = {
+                "name": "Plains",
+                "cmc": 0,
+                "type_line": "Basic Land - Plains",
+                "effect": "land",
+            }
+            stable_sentinel = {
+                "name": "Esper Sentinel",
+                "cmc": 1,
+                "type_line": "Artifact Creature - Human Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            }
+            mana_stable.library = [stable_plains, stable_sentinel]
+
+            battle.apply_effect_immediate(
+                mana_stable,
+                [opponent],
+                {
+                    "name": "Starfield Shepherd",
+                    "cmc": 5,
+                    "type_line": "Creature - Angel",
+                    "power": 3,
+                    "toughness": 2,
+                },
+                turn=5,
+                rng=random.Random(6087),
+                effect_data_override={
+                    "effect": "creature",
+                    "is_creature_permanent": True,
+                    "power": 3,
+                    "toughness": 2,
+                    "etb_tutor_target": "basic_plains_or_creature_mana_value_1_or_less",
+                    "etb_tutor_status": "runtime_library_to_hand",
+                    "battle_model_scope": "starfield_shepherd_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_v1",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert plains in mana_light.hand
+        assert plains not in mana_light.library
+        assert sentinel in mana_light.library
+        assert stable_sentinel in mana_stable.hand
+        assert stable_sentinel not in mana_stable.library
+        assert stable_plains in mana_stable.library
+        starfield_events = [
+            data
+            for event, data in events
+            if event == "tutor_resolved" and data.get("card") == "Starfield Shepherd"
+        ]
+        assert len(starfield_events) == 2
+        assert starfield_events[0]["target_type"] == "basic_plains_or_creature_mana_value_1_or_less"
+        assert starfield_events[0]["found"] == "Plains"
+        assert starfield_events[1]["found"] == "Esper Sentinel"
+
     def test_natural_order_sacrifices_green_creature_for_green_battlefield_tutor():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -12054,6 +12263,214 @@ def register_tests(battle, player):
             and data.get("grants_haste_until_eot") is True
             and data.get("rule_logical_key") == "battle_rule_v1:wake-the-past-test"
             and data.get("rule_oracle_hash") == "wake-the-past-test-hash"
+            for event, data in events
+        )
+
+    def test_pg222_open_the_vaults_returns_artifact_enchantment_cards_from_each_graveyard():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            effect_data = {
+                "effect": "recursion",
+                "target": "artifact_or_enchantment",
+                "target_zone": "graveyard",
+                "target_controller": "each_player",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact", "enchantment"],
+                "battle_model_scope": "return_all_artifact_enchantment_cards_from_all_graveyards_to_battlefield_v1",
+                "_rule_logical_key": "battle_rule_v1:open-the-vaults-test",
+                "_rule_oracle_hash": "open-the-vaults-test-hash",
+            }
+            spell = {
+                "name": "Open the Vaults",
+                "cmc": 6,
+                "type_line": "Sorcery",
+                **effect_data,
+            }
+            active.graveyard = [
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Smothering Tithe", "cmc": 4, "type_line": "Enchantment", "effect": "ramp_engine"},
+                {"name": "Lightning Bolt", "cmc": 1, "type_line": "Instant", "effect": "direct_damage"},
+            ]
+            opponent.graveyard = [
+                {"name": "Mind Stone", "cmc": 2, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Rhystic Study", "cmc": 3, "type_line": "Enchantment", "effect": "draw_engine"},
+                {"name": "Counterspell", "cmc": 2, "type_line": "Instant", "effect": "counter_spell"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=6,
+                rng=random.Random(222),
+                effect_data_override=dict(effect_data),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in active.battlefield] == ["Sol Ring", "Smothering Tithe"]
+        assert [card.get("name") for card in opponent.battlefield] == ["Mind Stone", "Rhystic Study"]
+        assert [card.get("name") for card in active.graveyard] == ["Lightning Bolt", "Open the Vaults"]
+        assert [card.get("name") for card in opponent.graveyard] == ["Counterspell"]
+        assert any(
+            event == "recursion_resolved"
+            and data.get("card") == "Open the Vaults"
+            and data.get("recovered") == ["Sol Ring", "Smothering Tithe", "Mind Stone", "Rhystic Study"]
+            and data.get("recovered_count") == 4
+            and data.get("target_type") == "artifact_or_enchantment"
+            and data.get("target_controller") == "each_player"
+            and data.get("recovered_by_player")
+            == {
+                "Lorehold": ["Sol Ring", "Smothering Tithe"],
+                "Opponent": ["Mind Stone", "Rhystic Study"],
+            }
+            and data.get("destination") == "battlefield"
+            and data.get("return_all_matching") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:open-the-vaults-test"
+            and data.get("rule_oracle_hash") == "open-the-vaults-test-hash"
+            for event, data in events
+        )
+
+    def test_pg222_roar_of_reclamation_returns_artifact_cards_from_each_graveyard():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            effect_data = {
+                "effect": "recursion",
+                "target": "artifact",
+                "target_zone": "graveyard",
+                "target_controller": "each_player",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact"],
+                "battle_model_scope": "return_all_artifact_cards_from_all_graveyards_to_battlefield_v1",
+                "_rule_logical_key": "battle_rule_v1:roar-of-reclamation-test",
+                "_rule_oracle_hash": "roar-of-reclamation-test-hash",
+            }
+            spell = {
+                "name": "Roar of Reclamation",
+                "cmc": 7,
+                "type_line": "Sorcery",
+                **effect_data,
+            }
+            active.graveyard = [
+                {"name": "Solemn Simulacrum", "cmc": 4, "type_line": "Artifact Creature - Golem", "effect": "creature", "power": 2, "toughness": 2},
+                {"name": "Smothering Tithe", "cmc": 4, "type_line": "Enchantment", "effect": "ramp_engine"},
+            ]
+            opponent.graveyard = [
+                {"name": "Mind Stone", "cmc": 2, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Counterspell", "cmc": 2, "type_line": "Instant", "effect": "counter_spell"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=6,
+                rng=random.Random(223),
+                effect_data_override=dict(effect_data),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in active.battlefield] == ["Solemn Simulacrum"]
+        assert [card.get("name") for card in opponent.battlefield] == ["Mind Stone"]
+        assert [card.get("name") for card in active.graveyard] == ["Smothering Tithe", "Roar of Reclamation"]
+        assert [card.get("name") for card in opponent.graveyard] == ["Counterspell"]
+        assert any(
+            event == "recursion_resolved"
+            and data.get("card") == "Roar of Reclamation"
+            and data.get("recovered") == ["Solemn Simulacrum", "Mind Stone"]
+            and data.get("recovered_count") == 2
+            and data.get("target_type") == "artifact"
+            and data.get("target_controller") == "each_player"
+            and data.get("recovered_by_player")
+            == {
+                "Lorehold": ["Solemn Simulacrum"],
+                "Opponent": ["Mind Stone"],
+            }
+            and data.get("destination") == "battlefield"
+            and data.get("return_all_matching") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:roar-of-reclamation-test"
+            and data.get("rule_oracle_hash") == "roar-of-reclamation-test-hash"
+            for event, data in events
+        )
+
+    def test_pg222_triumphant_reckoning_returns_artifact_enchantment_planeswalker_cards():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            effect_data = {
+                "effect": "recursion",
+                "target": "artifact_or_enchantment_or_planeswalker",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact", "enchantment", "planeswalker"],
+                "battle_model_scope": "return_all_artifact_enchantment_planeswalker_cards_from_graveyard_to_battlefield_v1",
+                "_rule_logical_key": "battle_rule_v1:triumphant-reckoning-test",
+                "_rule_oracle_hash": "triumphant-reckoning-test-hash",
+            }
+            spell = {
+                "name": "Triumphant Reckoning",
+                "cmc": 9,
+                "type_line": "Sorcery",
+                **effect_data,
+            }
+            active.graveyard = [
+                {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+                {"name": "Smothering Tithe", "cmc": 4, "type_line": "Enchantment", "effect": "ramp_engine"},
+                {"name": "Karn, Scion of Urza", "cmc": 4, "type_line": "Legendary Planeswalker - Karn", "effect": "planeswalker", "loyalty": 5},
+                {"name": "Esper Sentinel", "cmc": 1, "type_line": "Artifact Creature - Human Soldier", "effect": "creature", "power": 1, "toughness": 1},
+                {"name": "Lightning Bolt", "cmc": 1, "type_line": "Instant", "effect": "direct_damage"},
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                spell,
+                turn=6,
+                rng=random.Random(224),
+                effect_data_override=dict(effect_data),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert [card.get("name") for card in active.battlefield] == [
+            "Sol Ring",
+            "Smothering Tithe",
+            "Karn, Scion of Urza",
+            "Esper Sentinel",
+        ]
+        assert [card.get("name") for card in active.graveyard] == ["Lightning Bolt", "Triumphant Reckoning"]
+        assert any(
+            event == "recursion_resolved"
+            and data.get("card") == "Triumphant Reckoning"
+            and data.get("recovered") == [
+                "Sol Ring",
+                "Smothering Tithe",
+                "Karn, Scion of Urza",
+                "Esper Sentinel",
+            ]
+            and data.get("recovered_count") == 4
+            and data.get("target_type") == "artifact_or_enchantment_or_planeswalker"
+            and data.get("target_controller") == "self"
+            and data.get("destination") == "battlefield"
+            and data.get("return_all_matching") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:triumphant-reckoning-test"
+            and data.get("rule_oracle_hash") == "triumphant-reckoning-test-hash"
             for event, data in events
         )
 
@@ -16749,6 +17166,7 @@ def register_tests(battle, player):
         test_lightning_greaves_grants_haste_and_shroud_without_indestructible,
         test_static_equipment_applies_boost_and_keywords_to_best_creature,
         test_artifact_etb_tutors_two_basic_plains_to_hand_and_stays_on_battlefield,
+        test_starfield_shepherd_etb_prefers_basic_plains_when_mana_light_then_one_drop_creature,
         test_archaeomancers_map_opponent_land_trigger_requires_controller_behind_on_lands,
         test_archaeomancers_map_opponent_land_trigger_skips_when_controller_not_behind,
         test_blind_obedience_taps_opponent_artifacts_and_creatures_on_entry,
@@ -16770,6 +17188,9 @@ def register_tests(battle, player):
         test_pg077_mizzixs_mastery_exiles_graveyard_spell_and_resolves_copy,
         test_pg106_mizzixs_mastery_copy_declares_target_before_removal_resolution,
         test_runtime_alias_force_of_vigor_destroys_artifacts_or_enchantments_only,
+        test_exact_erode_scope_can_target_planeswalker_and_preserves_basic_land_annotation,
+        test_exact_land_removal_scope_can_target_land,
+        test_star_of_extinction_exact_scope_destroys_target_land_then_damages_creatures_and_planeswalkers,
         test_runtime_alias_calamity_of_cinders_damages_only_untapped_creatures,
         test_pg073_esper_sentinel_draws_on_first_noncreature_spell_with_power_tax,
         test_pg073_wheel_of_misfortune_uses_secret_number_compact_runtime,
@@ -16929,6 +17350,9 @@ def register_tests(battle, player):
         test_pg202_redress_fate_rule_resolves_from_sqlite_cache,
         test_pg203_brilliant_restoration_returns_all_artifact_enchantment_cards,
         test_pg203_wake_the_past_returns_artifacts_and_grants_haste_until_eot,
+        test_pg222_open_the_vaults_returns_artifact_enchantment_cards_from_each_graveyard,
+        test_pg222_roar_of_reclamation_returns_artifact_cards_from_each_graveyard,
+        test_pg222_triumphant_reckoning_returns_artifact_enchantment_planeswalker_cards,
         test_pg203_recursion_rules_resolve_from_sqlite_cache,
         test_pg193_sun_titan_returns_mv_three_or_less_permanent_on_etb_and_attack,
         test_pg196_squee_returns_from_graveyard_to_hand_on_upkeep,

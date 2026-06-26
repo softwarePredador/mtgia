@@ -498,6 +498,126 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "recursion")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_open_the_vaults_recursion_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Open the Vaults",
+                        "severity": "high",
+                        "oracle_hash": "open-the-vaults-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "OpenTheVaults",
+                            "path": "/xmage/OpenTheVaults.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["OneShotEffect", "OpenTheVaultsEffect"],
+                            "ability_classes": [],
+                            "primary_effect": {
+                                "effect": "recursion",
+                                "battle_model_scope": "return_all_artifact_enchantment_cards_from_all_graveyards_to_battlefield_v1",
+                                "ability_kind": "one_shot",
+                                "target": "artifact_or_enchantment",
+                                "target_zone": "graveyard",
+                                "target_controller": "each_player",
+                                "destination": "battlefield",
+                                "return_all_matching": True,
+                                "target_card_types": ["artifact", "enchantment"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "recursion")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_roar_of_reclamation_recursion_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Roar of Reclamation",
+                        "severity": "high",
+                        "oracle_hash": "roar-of-reclamation-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "RoarOfReclamation",
+                            "path": "/xmage/RoarOfReclamation.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["OneShotEffect", "RoarOfReclamationEffect"],
+                            "ability_classes": [],
+                            "primary_effect": {
+                                "effect": "recursion",
+                                "battle_model_scope": "return_all_artifact_cards_from_all_graveyards_to_battlefield_v1",
+                                "ability_kind": "one_shot",
+                                "target": "artifact",
+                                "target_zone": "graveyard",
+                                "target_controller": "each_player",
+                                "destination": "battlefield",
+                                "return_all_matching": True,
+                                "target_card_types": ["artifact"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "recursion")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_triumphant_reckoning_recursion_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Triumphant Reckoning",
+                        "severity": "high",
+                        "oracle_hash": "triumphant-reckoning-hash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "TriumphantReckoning",
+                            "path": "/xmage/TriumphantReckoning.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["ReturnFromYourGraveyardToBattlefieldAllEffect"],
+                            "ability_classes": [],
+                            "primary_effect": {
+                                "effect": "recursion",
+                                "battle_model_scope": "return_all_artifact_enchantment_planeswalker_cards_from_graveyard_to_battlefield_v1",
+                                "ability_kind": "one_shot",
+                                "target": "artifact_or_enchantment_or_planeswalker",
+                                "target_zone": "graveyard",
+                                "target_controller": "self",
+                                "destination": "battlefield",
+                                "return_all_matching": True,
+                                "target_card_types": ["artifact", "enchantment", "planeswalker"],
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "recursion")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_generator_uses_recursion_role_for_redress_fate_batch_candidate(self) -> None:
         report = generator.build_generator_report(
             batch_audit={
@@ -1895,6 +2015,44 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "cant_block_target_restriction": "creatures_without_flying",
                                 "land_side_pay_three_life_else_tapped": True,
                                 "land_side_add_mana": "R",
+                                "sorcery": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_star_of_extinction_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Star of Extinction",
+                        "severity": "high",
+                        "oracle_hash": "starhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "StarOfExtinction",
+                            "path": "/xmage/StarOfExtinction.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["DamageAllEffect", "DestroyTargetEffect"],
+                            "ability_classes": [],
+                            "filter_classes": ["FilterCreatureOrPlaneswalkerPermanent"],
+                            "target_classes": ["TargetLandPermanent"],
+                            "primary_effect": {
+                                "effect": "destroy_target_land_then_damage_all_creatures_and_planeswalkers",
+                                "battle_model_scope": "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1",
+                                "target": "land",
+                                "damage": 20,
+                                "damage_scope": "each_creature_and_planeswalker",
                                 "sorcery": True,
                             },
                         },
@@ -3611,6 +3769,84 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "target": "spell",
                                 "instant": True,
                                 "cost_reduction_generic_if_control_wizard": 1,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_vanquish_the_horde_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Vanquish the Horde",
+                        "severity": "high",
+                        "oracle_hash": "vanquishhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "VanquishTheHorde",
+                            "path": "/xmage/VanquishTheHorde.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["DestroyAllEffect", "SpellCostReductionSourceEffect"],
+                            "ability_classes": ["SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "board_wipe",
+                                "battle_model_scope": "destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1",
+                                "destroy_card_types": ["creature"],
+                                "destroy_all_creatures": True,
+                                "destination": "graveyard",
+                                "sorcery": True,
+                                "cost_reduction_applies_to": "this_spell",
+                                "cost_reduction_generic": 1,
+                                "cost_reduction_amount_source": "creature_count_on_battlefield",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_explosive_singularity_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Explosive Singularity",
+                        "severity": "high",
+                        "oracle_hash": "explosivehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "ExplosiveSingularity",
+                            "path": "/xmage/ExplosiveSingularity.java",
+                            "types": ["SORCERY"],
+                            "effect_classes": ["DamageTargetEffect", "ExplosiveSingularityCostReductionEffect"],
+                            "ability_classes": ["SimpleStaticAbility", "SpellAbility"],
+                            "cost_classes": ["TapVariableTargetCost"],
+                            "primary_effect": {
+                                "effect": "direct_damage",
+                                "battle_model_scope": "damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1",
+                                "target": "any_target",
+                                "damage": 10,
+                                "sorcery": True,
+                                "cost_reduction_applies_to": "this_spell",
+                                "cost_reduction_generic": 1,
+                                "cost_reduction_amount_source": "creatures_tapped_as_additional_cost_while_casting",
+                                "cost_reduction_counts_additional_tapped_creatures_while_casting": True,
                             },
                         },
                     }
@@ -5355,6 +5591,46 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "power": 2,
                                 "toughness": 2,
                                 "etb_tutor_target": "artifact_mana_value_3",
+                                "etb_tutor_status": "runtime_library_to_hand",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_starfield_shepherd_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Starfield Shepherd",
+                        "severity": "high",
+                        "oracle_hash": "starfieldshepherdhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "StarfieldShepherd",
+                            "path": "/xmage/StarfieldShepherd.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["SearchLibraryPutInHandEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldTriggeredAbility",
+                                "FlyingAbility",
+                                "WarpAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "starfield_shepherd_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_v1",
+                                "power": 3,
+                                "toughness": 2,
+                                "etb_tutor_target": "basic_plains_or_creature_mana_value_1_or_less",
                                 "etb_tutor_status": "runtime_library_to_hand",
                             },
                         },

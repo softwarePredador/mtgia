@@ -19580,6 +19580,25 @@ def library_tutor_candidates(player, target_type):
                 )
             ):
                 candidates.append(candidate)
+        elif target_type == "basic_plains_or_creature_mana_value_1_or_less":
+            type_line = str(candidate.get("type_line") or "").lower()
+            try:
+                candidate_cmc = int(float(candidate.get("cmc") or candidate.get("mana_value")))
+            except (TypeError, ValueError):
+                candidate_cmc = None
+            if (
+                is_effective_land(candidate)
+                and "basic" in type_line
+                and (
+                    normalize_card_name(candidate.get("name", "")) == "plains"
+                    or "plains" in type_line
+                )
+            ) or (
+                is_creature_card(candidate)
+                and candidate_cmc is not None
+                and candidate_cmc <= 1
+            ):
+                candidates.append(candidate)
         elif target_type in ("graveyard", "graveyard_nonlegendary"):
             if target_type == "graveyard" or "legendary" not in str(candidate.get("type_line") or "").lower():
                 candidates.append(candidate)
@@ -19759,7 +19778,24 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     )
     score = threat_score(effect, candidate.get("name", ""), player, [player] + list(opponents), turn)
     reason = "highest_contextual_value"
-    if target_type == "land" or (is_effective_land(candidate) and lands < 3):
+    type_line = str(candidate.get("type_line") or "").lower()
+    if target_type == "basic_plains_or_creature_mana_value_1_or_less":
+        is_basic_plains = (
+            is_effective_land(candidate)
+            and "basic" in type_line
+            and (
+                normalize_card_name(candidate.get("name", "")) == "plains"
+                or "plains" in type_line
+            )
+        )
+        is_small_creature = is_creature_card(candidate) and cmc <= 1
+        if is_basic_plains:
+            score += 85 if lands < 3 else 18
+            reason = "fix_mana_with_basic_plains_tutor" if lands < 3 else "bank_basic_plains_option"
+        elif is_small_creature:
+            score += 62 if lands >= 3 else 24
+            reason = "find_one_drop_creature_payoff" if lands >= 3 else "keep_small_creature_fallback"
+    elif target_type == "land" or (is_effective_land(candidate) and lands < 3):
         score += 80 if lands < 3 else 25
         reason = "fix_mana_or_land_drop"
     elif effect in ("ramp_permanent", "land_ramp", "ramp_engine") and lands < 4:
@@ -21189,6 +21225,16 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "enchantment" in type_line
     if target in ("artifact_or_enchantment", "artifact_enchantment", "artifact_or_enchantment_card"):
         return "artifact" in type_line or "enchantment" in type_line
+    if target in (
+        "artifact_or_enchantment_or_planeswalker",
+        "artifact_enchantment_planeswalker",
+        "artifact_or_enchantment_or_planeswalker_card",
+    ):
+        return (
+            "artifact" in type_line
+            or "enchantment" in type_line
+            or "planeswalker" in type_line
+        )
     if target in ("instant", "instant_card"):
         return is_instant(card)
     if target in ("sorcery", "sorcery_card"):
@@ -23248,7 +23294,7 @@ def damage_wipe_amount(player, card, effect_data):
         return 0
 
 
-def apply_damage_wipe(player, opponents, card, effect_data, turn):
+def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spell=True):
     amount = damage_wipe_amount(player, card, effect_data)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
@@ -23272,65 +23318,104 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn):
     protected = []
     survived_damage = []
     creatures_seen = 0
+    planeswalkers_seen = 0
     own_creatures_destroyed = 0
     opponent_creatures_destroyed = 0
     live_opponent_creatures_destroyed = 0
+    planeswalkers_destroyed = 0
     for participant in affected_players:
         is_self = participant is player
         is_live_opponent = (not is_self) and participant.is_alive()
         for permanent in list(participant.battlefield):
-            if not is_battlefield_creature(permanent):
-                continue
-            if damage_scope == "each_untapped_creature" and bool(permanent.get("tapped")):
-                continue
-            creatures_seen += 1
-            if permanent.get("indestructible"):
-                protected.append(
-                    {
-                        "controller": participant.name,
-                        "name": permanent.get("name", "?"),
-                    }
+            if is_battlefield_creature(permanent):
+                if damage_scope == "each_untapped_creature" and bool(permanent.get("tapped")):
+                    continue
+                creatures_seen += 1
+                if permanent.get("indestructible"):
+                    protected.append(
+                        {
+                            "controller": participant.name,
+                            "name": permanent.get("name", "?"),
+                        }
+                    )
+                    continue
+                toughness = _damage_sweep_creature_toughness(permanent)
+                if toughness > amount:
+                    survived_damage.append(
+                        {
+                            "controller": participant.name,
+                            "name": permanent.get("name", "?"),
+                            "toughness": toughness,
+                        }
+                    )
+                    continue
+                process_taii_wakeen_noncombat_damage_to_creature(
+                    player,
+                    participant,
+                    card,
+                    permanent,
+                    amount,
+                    turn=turn,
+                    phase="resolution",
                 )
-                continue
-            toughness = _damage_sweep_creature_toughness(permanent)
-            if toughness > amount:
-                survived_damage.append(
+                destination = move_creature_from_battlefield(
+                    participant,
+                    permanent,
+                    reason="damage_wipe",
+                    source=card,
+                )
+                destroyed.append(
                     {
                         "controller": participant.name,
                         "name": permanent.get("name", "?"),
+                        "permanent_type": "creature",
                         "toughness": toughness,
+                        "destination": destination,
                     }
                 )
+                if is_self:
+                    own_creatures_destroyed += 1
+                else:
+                    opponent_creatures_destroyed += 1
+                    if is_live_opponent:
+                        live_opponent_creatures_destroyed += 1
                 continue
-            process_taii_wakeen_noncombat_damage_to_creature(
-                player,
-                participant,
-                card,
-                permanent,
-                amount,
-                turn=turn,
-                phase="resolution",
-            )
-            destination = move_creature_from_battlefield(
-                participant,
-                permanent,
-                reason="damage_wipe",
-                source=card,
-            )
-            destroyed.append(
-                {
-                    "controller": participant.name,
-                    "name": permanent.get("name", "?"),
-                    "toughness": toughness,
-                    "destination": destination,
-                }
-            )
-            if is_self:
-                own_creatures_destroyed += 1
-            else:
-                opponent_creatures_destroyed += 1
-                if is_live_opponent:
-                    live_opponent_creatures_destroyed += 1
+
+            if (
+                damage_scope == "each_creature_and_planeswalker"
+                and is_planeswalker_permanent(permanent)
+            ):
+                planeswalkers_seen += 1
+                loyalty_before = int(permanent.get("loyalty", 0) or 0)
+                if not damage_to_planeswalker(card, permanent, amount):
+                    continue
+                loyalty_after = int(permanent.get("loyalty", 0) or 0)
+                if loyalty_after > 0:
+                    survived_damage.append(
+                        {
+                            "controller": participant.name,
+                            "name": permanent.get("name", "?"),
+                            "loyalty_after": loyalty_after,
+                        }
+                    )
+                    continue
+                move_permanent_from_battlefield(
+                    participant,
+                    permanent,
+                    reason="damage_wipe",
+                    source=card,
+                )
+                destroyed.append(
+                    {
+                        "controller": participant.name,
+                        "name": permanent.get("name", "?"),
+                        "permanent_type": "planeswalker",
+                        "loyalty_before": loyalty_before,
+                        "loyalty_after": loyalty_after,
+                        "destination": "graveyard",
+                    }
+                )
+                planeswalkers_destroyed += 1
 
     emit_replay_event(
         "damage_wipe_resolved",
@@ -23348,17 +23433,157 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn):
         cascade_instances=effect_data.get("cascade_instances"),
         cascade_execution_status=effect_data.get("cascade_execution_status"),
         creatures_seen=creatures_seen,
+        planeswalkers_seen=planeswalkers_seen,
         creatures_destroyed=len(destroyed),
         own_creatures_destroyed=own_creatures_destroyed,
         opponent_creatures_destroyed=opponent_creatures_destroyed,
         live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
+        planeswalkers_destroyed=planeswalkers_destroyed,
         protected=protected[:20],
         survived_damage=survived_damage[:20],
         destroyed=destroyed[:20],
         turn=turn,
         **replay_rule_fields(effect_data),
     )
+    if finish_spell:
+        finish_resolved_spell(player, card, turn=turn)
+
+
+def resolve_star_of_extinction(player, opponents, card, effect_data, turn, rng):
+    removal_effect = dict(effect_data or {})
+    removal_effect["effect"] = "remove_permanent"
+    removal_effect["target"] = "land"
+    if not removal_effect.get("declared_targets"):
+        removal_effect, _declared_replay = prepare_declared_removal_targets(
+            player,
+            opponents,
+            card,
+            removal_effect,
+        )
+    declared_targets = removal_effect.get("declared_targets") or []
+    if len(declared_targets) != 1:
+        emit_replay_event(
+            "removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=None,
+            target=None,
+            available_targets=0,
+            result="no_legal_target",
+            turn=turn,
+            target_type="land",
+            target_legal=False,
+            target_controller=None,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+        return True
+
+    entry = declared_targets[0]
+    target = entry.get("target") if isinstance(entry, dict) else entry
+    players = [player] + list(opponents)
+    entry_controller = entry.get("controller") if isinstance(entry, dict) else None
+    target_controller = declared_target_controller(
+        players,
+        target,
+        entry_controller=entry_controller,
+    )
+    live_target = (
+        battlefield_object_for_target(target_controller, target)
+        if target_controller is not None
+        else None
+    )
+    if live_target is not None:
+        target = live_target
+    decision = targeting_decision(
+        card,
+        target,
+        player,
+        target_controller=target_controller,
+        target_type="land",
+    )
+    target_name = decision.get("target_name") or "?"
+    target_still_present = target_controller is not None and live_target is not None
+    if not decision["target_legal"] or not target_still_present:
+        emit_replay_event(
+            "removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=getattr(target_controller, "name", None),
+            target=target_name,
+            available_targets=1,
+            result="no_legal_target",
+            turn=turn,
+            **decision,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+        return True
+
+    resolve_spell_target_treasure_trigger(
+        target_controller,
+        target,
+        card,
+        turn,
+        phase="resolution",
+    )
+
+    if check_ward(target, card, player, rng):
+        emit_replay_event(
+            "removal_countered_by_ward",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=target_controller.name,
+            target=target_name,
+            turn=turn,
+            **decision,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn)
+        return True
+
+    emit_replay_event(
+        "removal_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=target_controller.name,
+        target=target_name,
+        target_effect=get_card_effect(target).get("effect", target.get("effect")),
+        target_power=target.get("power"),
+        target_toughness=target.get("toughness"),
+        target_is_creature=is_battlefield_creature(target),
+        target_type_line=target.get("type_line", ""),
+        available_targets=1,
+        destination="graveyard",
+        turn=turn,
+        **decision,
+        **replay_rule_fields(effect_data),
+    )
+    move_removed_permanent_to_destination(
+        target_controller,
+        target,
+        card,
+        removal_effect,
+        turn,
+        rng,
+        all_players=players,
+    )
+    wipe_effect = dict(effect_data or {})
+    wipe_effect["effect"] = "damage_wipe"
+    wipe_effect["damage"] = int(wipe_effect.get("damage") or 20)
+    wipe_effect["damage_scope"] = (
+        wipe_effect.get("damage_scope") or "each_creature_and_planeswalker"
+    )
+    apply_damage_wipe(
+        player,
+        opponents,
+        card,
+        wipe_effect,
+        turn,
+        finish_spell=False,
+    )
     finish_resolved_spell(player, card, turn=turn)
+    return True
 
 
 def choose_airbend_spared_creature(player):
@@ -28028,6 +28253,8 @@ def apply_effect_immediate(
         apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, effect_data, turn)
     elif effect == "damage_player_and_creatures":
         apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng)
+    elif effect == "destroy_target_land_then_damage_all_creatures_and_planeswalkers":
+        resolve_star_of_extinction(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_wipe":
         apply_damage_wipe(player, opponents, card, effect_data, turn)
     elif effect == "airbend_other_creatures":
@@ -28741,51 +28968,72 @@ def apply_effect_immediate(
         )
     elif effect == "recursion":
         return_all_matching = bool(effect_data.get("return_all_matching"))
-        count = len(player.graveyard) if return_all_matching else int(effect_data.get("count") or 2)
         target_type = effect_data.get("target")
         mana_value_max = recursion_mana_value_max(effect_data)
-        candidates = [
-            grave_card
-            for grave_card in player.graveyard
-            if graveyard_card_matches_recursion_target(
-                grave_card,
-                target_type,
-                mana_value_max=mana_value_max,
-            )
-        ]
-        recovered = candidates[:count]
         destination = effect_data.get("destination", "hand")
-        for recovered_card in remove_cards_from_graveyard(
-            player,
-            recovered,
-            turn=turn,
-            source_event="recursion",
-        ):
-                if destination == "battlefield":
-                    permanent_effect = get_card_effect(recovered_card)
-                    permanent = prepare_entering_permanent(
-                        enrich_card({**recovered_card, **permanent_effect}),
-                        controller=player,
-                        all_players=[player] + list(opponents or []),
-                        turn=turn,
-                    )
-                    if effect_data.get("grants_haste_until_eot"):
-                        set_until_eot(permanent, "haste", True)
-                    if is_creature_card(recovered_card):
-                        permanent["effect"] = "creature"
-                        permanent["haste"] = has_haste(permanent)
-                        permanent["summoning_sick"] = not permanent["haste"]
-                        permanent["tapped"] = False
-                    player.battlefield.append(permanent)
-                else:
-                    player.hand.append(recovered_card)
+        target_controller = str(effect_data.get("target_controller") or "self")
+        if target_controller == "each_player":
+            participants = [player] + list(opponents or [])
+        else:
+            participants = [player]
+        recovered = []
+        recovered_by_player = {}
+        for participant in participants:
+            count = (
+                len(participant.graveyard)
+                if return_all_matching
+                else int(effect_data.get("count") or 2)
+            )
+            candidates = [
+                grave_card
+                for grave_card in participant.graveyard
+                if graveyard_card_matches_recursion_target(
+                    grave_card,
+                    target_type,
+                    mana_value_max=mana_value_max,
+                )
+            ]
+            participant_recovered = candidates[:count]
+            if participant_recovered:
+                recovered_by_player[participant.name] = [
+                    recovered_card.get("name", "?")
+                    for recovered_card in participant_recovered
+                    if isinstance(recovered_card, dict)
+                ]
+            for recovered_card in remove_cards_from_graveyard(
+                participant,
+                participant_recovered,
+                turn=turn,
+                source_event="recursion",
+            ):
+                    recovered.append(recovered_card)
+                    if destination == "battlefield":
+                        permanent_effect = get_card_effect(recovered_card)
+                        permanent = prepare_entering_permanent(
+                            enrich_card({**recovered_card, **permanent_effect}),
+                            controller=participant,
+                            all_players=[player] + list(opponents or []),
+                            turn=turn,
+                        )
+                        if effect_data.get("grants_haste_until_eot"):
+                            set_until_eot(permanent, "haste", True)
+                        if is_creature_card(recovered_card):
+                            permanent["effect"] = "creature"
+                            permanent["haste"] = has_haste(permanent)
+                            permanent["summoning_sick"] = not permanent["haste"]
+                            permanent["tapped"] = False
+                        participant.battlefield.append(permanent)
+                    else:
+                        participant.hand.append(recovered_card)
         emit_replay_event(
             "recursion_resolved",
             player=player.name,
             card=card.get("name", "?"),
             recovered=[recovered_card.get("name", "?") for recovered_card in recovered],
             recovered_count=len(recovered),
+            recovered_by_player=recovered_by_player,
             target_type=target_type,
+            target_controller=target_controller,
             destination=destination,
             mana_value_max=mana_value_max,
             return_all_matching=return_all_matching,

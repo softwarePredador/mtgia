@@ -3194,6 +3194,96 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "OpenTheVaults"
+        or (
+            card_types == {"SORCERY"}
+            and effect_classes == {"OneShotEffect", "OpenTheVaultsEffect"}
+            and not ability_classes
+            and _oracle_has(
+                rules_text,
+                "return all artifact and enchantment cards from all graveyards to the battlefield",
+            )
+        )
+    ):
+        return {
+            "effect": "recursion",
+            "scope": "return_all_artifact_enchantment_cards_from_all_graveyards_to_battlefield_v1",
+            "fields": {
+                "target": "artifact_or_enchantment",
+                "target_zone": "graveyard",
+                "target_controller": "each_player",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact", "enchantment"],
+            },
+            "reason": "XMage structure matches Open the Vaults returning all artifact and enchantment cards from each player's graveyard to the battlefield under their owners' control.",
+            "signals": [
+                "OpenTheVaultsEffect",
+                "OneShotEffect",
+            ],
+        }
+
+    if (
+        xmage_class_name == "RoarOfReclamation"
+        or (
+            card_types == {"SORCERY"}
+            and effect_classes == {"OneShotEffect", "RoarOfReclamationEffect"}
+            and not ability_classes
+            and _oracle_has(
+                rules_text,
+                "each player returns all artifact cards from their graveyard to the battlefield",
+            )
+        )
+    ):
+        return {
+            "effect": "recursion",
+            "scope": "return_all_artifact_cards_from_all_graveyards_to_battlefield_v1",
+            "fields": {
+                "target": "artifact",
+                "target_zone": "graveyard",
+                "target_controller": "each_player",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact"],
+            },
+            "reason": "XMage structure matches Roar of Reclamation returning all artifact cards from each player's graveyard to the battlefield.",
+            "signals": [
+                "RoarOfReclamationEffect",
+                "OneShotEffect",
+            ],
+        }
+
+    if (
+        xmage_class_name == "TriumphantReckoning"
+        or (
+            card_types == {"SORCERY"}
+            and effect_classes == {"ReturnFromYourGraveyardToBattlefieldAllEffect"}
+            and not ability_classes
+            and _oracle_has(
+                rules_text,
+                "return all artifact, enchantment, and planeswalker cards from your graveyard to the battlefield",
+            )
+        )
+    ):
+        return {
+            "effect": "recursion",
+            "scope": "return_all_artifact_enchantment_planeswalker_cards_from_graveyard_to_battlefield_v1",
+            "fields": {
+                "target": "artifact_or_enchantment_or_planeswalker",
+                "target_zone": "graveyard",
+                "target_controller": "self",
+                "destination": "battlefield",
+                "return_all_matching": True,
+                "target_card_types": ["artifact", "enchantment", "planeswalker"],
+            },
+            "reason": "XMage structure matches Triumphant Reckoning returning all artifact, enchantment, and planeswalker cards from your graveyard to the battlefield.",
+            "signals": [
+                "ReturnFromYourGraveyardToBattlefieldAllEffect",
+                "artifact_enchantment_planeswalker_graveyard_mass_recursion",
+            ],
+        }
+
+    if (
         xmage_class_name == "DoubleVision"
         or (
             card_types == {"ENCHANTMENT"}
@@ -3464,6 +3554,34 @@ def _build_exact_runtime_variant_fields(
                 "CantBlockAllEffect",
                 "TargetLandPermanent",
                 "RedManaAbility",
+            ],
+        }
+
+    if (
+        card_types == {"SORCERY"}
+        and effect_classes == {"DamageAllEffect", "DestroyTargetEffect"}
+        and not ability_classes
+        and "FilterCreatureOrPlaneswalkerPermanent" in filter_classes
+        and "TargetLandPermanent" in target_classes
+    ):
+        return {
+            "effect": "destroy_target_land_then_damage_all_creatures_and_planeswalkers",
+            "scope": "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1",
+            "fields": {
+                "sorcery": True,
+                "target": "land",
+                "damage": 20,
+                "damage_scope": "each_creature_and_planeswalker",
+            },
+            "reason": (
+                "XMage structure matches Star of Extinction destroying target land "
+                "and then dealing 20 damage to each creature and each planeswalker."
+            ),
+            "signals": [
+                "DestroyTargetEffect",
+                "DamageAllEffect",
+                "FilterCreatureOrPlaneswalkerPermanent",
+                "TargetLandPermanent",
             ],
         }
 
@@ -4863,6 +4981,45 @@ def _build_tutor_to_hand_fields(
         }
 
     if (
+        xmage_class_name == "StarfieldShepherd"
+        or (
+            "supertype.basic.getpredicate()" in normalized
+            and "subtype.plains.getpredicate()" in normalized
+            and "cardtype.creature.getpredicate()" in normalized
+            and "manavaluepredicate(comparisontype.fewer_than,2)" in normalized
+            and "warpability" in normalized
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "starfield_shepherd_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_v1",
+            "ability_kind": "triggered",
+            "fields": {
+                "power": 3,
+                "toughness": 2,
+                "etb_tutor_target": "basic_plains_or_creature_mana_value_1_or_less",
+                "etb_tutor_status": "runtime_library_to_hand",
+                "oracle_runtime_scope": (
+                    "creature_etb_basic_plains_or_creature_mana_value_1_or_less_to_hand_runtime"
+                ),
+            },
+            "reason": (
+                "XMage structure matches Starfield Shepherd's ETB tutor for a basic Plains card "
+                "or a creature card with mana value 1 or less into hand while preserving its "
+                "Flying and Warp static abilities."
+            ),
+            "signals": [
+                "EntersBattlefieldTriggeredAbility",
+                "SearchLibraryPutInHandEffect",
+                "SuperType.BASIC",
+                "SubType.PLAINS",
+                "CardType.CREATURE",
+                "ManaValuePredicate(<2)",
+                "WarpAbility",
+            ],
+        }
+
+    if (
         "EntersBattlefieldTriggeredAbility" in ability_classes
         and effect_classes == {"SearchLibraryPutInHandEffect"}
         and not cost_classes
@@ -5486,6 +5643,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     condition_classes = _as_set(index_entry.get("condition_classes"))
     counter_types = _as_set(index_entry.get("counter_types"))
     cost_classes = _as_set(index_entry.get("cost_classes"))
+    dynamic_value_classes = _as_set(index_entry.get("dynamic_value_classes"))
     inner_extends = _inner_extends(index_entry)
     ability_kind = _ability_kind(ability_classes)
     target_constraints = _target_constraints(target_classes, filter_classes)
@@ -5567,6 +5725,89 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 ability_kind=ability_kind,
                 requires_runtime_executor=True,
                 matched_signals=["gift", "destroy_all", "return_destroyed_this_way"],
+            )
+        )
+
+    if (
+        xmage_class_name == "VanquishTheHorde"
+        and card_types == {"SORCERY"}
+        and "DestroyAllEffect" in effect_classes
+        and "SpellCostReductionSourceEffect" in effect_classes
+        and "SimpleStaticAbility" in ability_classes
+        and (
+            "PermanentsOnBattlefieldCount" in dynamic_value_classes
+            or "creatures on the battlefield" in normalized_text
+            or "filter_permanent_creature" in normalized_text
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="board_wipe",
+                scope="destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1",
+                reason=(
+                    "XMage structure matches Vanquish the Horde destroying all creatures while carrying "
+                    "a self-only cost reduction based on creatures on the battlefield."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "destroy_card_types": ["creature"],
+                    "destroy_all_creatures": True,
+                    "destination": "graveyard",
+                    "sorcery": True,
+                    "cost_reduction_applies_to": "this_spell",
+                    "cost_reduction_generic": 1,
+                    "cost_reduction_amount_source": "creature_count_on_battlefield",
+                },
+                matched_signals=[
+                    "DestroyAllEffect",
+                    "SpellCostReductionSourceEffect",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "ExplosiveSingularity"
+        and card_types == {"SORCERY"}
+        and "DamageTargetEffect" in effect_classes
+        and "TapVariableTargetCost" in cost_classes
+        and any(ext == "CostModificationEffectImpl" for ext in inner_extends)
+        and "SimpleStaticAbility" in ability_classes
+        and (
+            "TargetAnyTarget" in target_classes
+            or _oracle_has(
+                rules_text,
+                "deals 10 damage to any target",
+                "you may tap any number of untapped creatures you control",
+                "costs {1} less to cast for each creature tapped this way",
+            )
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="direct_damage",
+                scope="damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1",
+                reason=(
+                    "XMage structure matches Explosive Singularity dealing 10 damage to any target while "
+                    "using an additional tap-creatures cost that reduces only this spell's generic cost."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "target": "any_target",
+                    "damage": 10,
+                    "sorcery": True,
+                    "cost_reduction_applies_to": "this_spell",
+                    "cost_reduction_generic": 1,
+                    "cost_reduction_amount_source": "creatures_tapped_as_additional_cost_while_casting",
+                    "additional_cost_kind": "tap_any_number_untapped_creatures_you_control",
+                    "cost_reduction_counts_additional_tapped_creatures_while_casting": True,
+                },
+                matched_signals=[
+                    "DamageTargetEffect",
+                    "TapVariableTargetCost",
+                    "CostModificationEffectImpl",
+                ],
             )
         )
 
