@@ -470,5 +470,21 @@
       "scryfall_name": "Wooded Foothills",
       "legal_commander": "legal"
     }
-  ]
+  ],
+  "supplemental_named_fuzzy_validation": [
+    {
+      "input": "Emeria's Call",
+      "scryfall_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "legal_commander": "legal"
+    },
+    {
+      "input": "Pinnacle Monk",
+      "scryfall_name": "Pinnacle Monk // Mystic Peak",
+      "legal_commander": "legal"
+    }
+  ],
+  "effective_found_count": 94,
+  "effective_missing_count": 0,
+  "effective_missing": [],
+  "notes": "cards/collection did not resolve two MDFC face-name inputs; Scryfall named fuzzy validated both as legal Commander cards."
 }
