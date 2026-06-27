@@ -122,6 +122,19 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Storm-Kiln Artist"],
         "cuts": ["Arcane Signet"],
     },
+    "brass_bounty_cut_boros_signet": {
+        "family": "spellchain_mana",
+        "hypothesis": (
+            "Brass's Bounty is shared by six Lorehold variants and now has a "
+            "reviewed runtime model that creates Treasure equal to lands "
+            "controlled. This tests whether a late ritual/treasure burst is "
+            "better than the least-blocked two-mana Boros rock without cutting "
+            "Sol Ring, Bender's Waterskin, medallions, Victory Chimes, or the "
+            "protection/finisher shell."
+        ),
+        "adds": ["Brass's Bounty"],
+        "cuts": ["Boros Signet"],
+    },
     "runaway_steamkin_cut_talisman": {
         "family": "spellchain_mana",
         "hypothesis": (
@@ -908,6 +921,21 @@ def role_category_for_effect(effect_data: dict[str, Any]) -> str:
     return "synergy"
 
 
+def battle_rule_runtime_priority(rule: dict[str, Any]) -> tuple[int, str]:
+    try:
+        effect_data = json.loads(str(rule.get("effect_json") or "{}"))
+    except Exception:
+        effect_data = {}
+    scope = str(effect_data.get("battle_model_scope") or "")
+    if scope == "lands_controlled_treasure_count_v1":
+        return (0, str(rule.get("logical_rule_key") or ""))
+    if scope == "single_treasure_creation_v1":
+        return (50, str(rule.get("logical_rule_key") or ""))
+    if rule.get("review_status") == "verified" and rule.get("execution_status") == "auto":
+        return (10, str(rule.get("logical_rule_key") or ""))
+    return (20, str(rule.get("logical_rule_key") or ""))
+
+
 def active_rules_for_card(conn: sqlite3.Connection, card_name: str) -> list[dict[str, Any]]:
     table = conn.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='battle_card_rules'"
@@ -926,7 +954,9 @@ def active_rules_for_card(conn: sqlite3.Connection, card_name: str) -> list[dict
             (normalize_name(card_name),),
         ).fetchall()
         if rows:
-            return [dict(row) for row in rows]
+            rules = [dict(row) for row in rows]
+            rules.sort(key=battle_rule_runtime_priority)
+            return rules
 
     canonical = CANONICAL_RULES.get(normalize_name(card_name))
     if not canonical:

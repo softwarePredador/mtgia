@@ -1,4 +1,5 @@
 import unittest
+import json
 from pathlib import Path
 from unittest.mock import patch
 
@@ -27,6 +28,35 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertIn("--no-game-checkpoint", cmd)
         self.assertEqual(kwargs["env"]["PYTHONHASHSEED"], "0")
         self.assertEqual(kwargs["cwd"], str(gate.SCRIPT_DIR))
+
+    def test_runtime_rule_priority_prefers_land_scaled_treasure_model(self):
+        generic = {
+            "logical_rule_key": "battle_rule_v1:generic",
+            "effect_json": json.dumps(
+                {
+                    "effect": "treasure_maker",
+                    "battle_model_scope": "single_treasure_creation_v1",
+                }
+            ),
+            "review_status": "verified",
+            "execution_status": "auto",
+        }
+        scaled = {
+            "logical_rule_key": "battle_rule_v1:scaled",
+            "effect_json": json.dumps(
+                {
+                    "effect": "treasure_maker",
+                    "battle_model_scope": "lands_controlled_treasure_count_v1",
+                }
+            ),
+            "review_status": "verified",
+            "execution_status": "auto",
+        }
+
+        self.assertEqual(
+            sorted([generic, scaled], key=gate.battle_rule_runtime_priority)[0],
+            scaled,
+        )
 
     def test_package_definitions_include_topdeck_and_squee_enabler_lanes(self):
         self.assertEqual(
@@ -138,6 +168,14 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(
             gate.PACKAGE_DEFINITIONS["storm_kiln_artist_cut_arcane_signet"]["cuts"],
             ["Arcane Signet"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["brass_bounty_cut_boros_signet"]["adds"],
+            ["Brass's Bounty"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["brass_bounty_cut_boros_signet"]["cuts"],
+            ["Boros Signet"],
         )
         self.assertEqual(
             gate.PACKAGE_DEFINITIONS["runaway_steamkin_cut_talisman"]["cuts"],
@@ -259,6 +297,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "birgi_spellchain_cut_jeskas_will",
             "seething_song_cut_fellwar_stone",
             "storm_kiln_artist_cut_arcane_signet",
+            "brass_bounty_cut_boros_signet",
             "runaway_steamkin_cut_talisman",
             "boros_charm_pressure_cut_avatar_wrath",
             "overmaster_protect_draw_cut_tibalts_trickery",

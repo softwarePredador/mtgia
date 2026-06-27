@@ -589,6 +589,27 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: additional discard cost, draw two, create two Treasure tokens. Runtime uses the existing treasure-maker executor instead of passive/ramp-engine fallback."
   },
+  "Brass's Bounty": {
+    "effect_json": {
+      "cmc": 7.0,
+      "effect": "treasure_maker",
+      "sorcery": true,
+      "treasure_count_from_lands_controlled": true,
+      "battle_model_scope": "lands_controlled_treasure_count_v1"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "treasure_maker",
+      "timing": "sorcery"
+    },
+    "logical_rule_key": "battle_rule_v1:da9de027d7238a22376c00db758f8f85",
+    "source": "curated",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "oracle_hash": "beb029ff5233032656034de922a112f0",
+    "notes": "Oracle-reviewed on 2026-06-27 against local oracle cache: creates one Treasure token for each land controlled. Runtime computes the treasure count from the controller battlefield land count."
+  },
   "Spelltwine": {
     "effect_json": {
       "cmc": 6.0,

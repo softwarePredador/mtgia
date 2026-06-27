@@ -30065,7 +30065,10 @@ def apply_effect_immediate(
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
             return
-        treasure_count = int(effect_data.get("treasure_count") or 1)
+        if effect_data.get("treasure_count_from_lands_controlled"):
+            treasure_count = controlled_land_count(player)
+        else:
+            treasure_count = int(effect_data.get("treasure_count") or 1)
         player.treasures += treasure_count
         draw_count = int(effect_data.get("draw_count") or 0)
         if draw_count > 0:

@@ -19,6 +19,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from reviewed_battle_card_rules import DEFAULT_REVIEWED_RULES_PATH, load_reviewed_rule_rows
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
@@ -188,6 +190,52 @@ def load_deck_metadata(conn: sqlite3.Connection, deck_ids: Iterable[int]) -> dic
     }
 
 
+def empty_rule_entry(card_name: str) -> dict[str, Any]:
+    return {
+        "card_name": card_name,
+        "active_rule_count": 0,
+        "rule_count": 0,
+        "review_only_rule_count": 0,
+        "disabled_rule_count": 0,
+        "effects": Counter(),
+        "battle_model_scopes": Counter(),
+        "execution_statuses": Counter(),
+        "review_statuses": Counter(),
+        "reviewed_rule_override_count": 0,
+    }
+
+
+def add_rule_to_index(
+    index: dict[str, dict[str, Any]],
+    *,
+    card_name: str,
+    execution_status: str,
+    review_status: str,
+    effect_json: object,
+    reviewed_override: bool = False,
+) -> None:
+    key = normalize_key(card_name)
+    entry = index.setdefault(key, empty_rule_entry(card_name))
+    entry["rule_count"] += 1
+    entry["execution_statuses"][execution_status] += 1
+    entry["review_statuses"][review_status] += 1
+    effect_data = effect_json if isinstance(effect_json, dict) else json_dict(effect_json)
+    effect = effect_data.get("effect")
+    if effect:
+        entry["effects"][str(effect)] += 1
+    scope = effect_data.get("battle_model_scope")
+    if scope:
+        entry["battle_model_scopes"][str(scope)] += 1
+    if execution_status == "review_only":
+        entry["review_only_rule_count"] += 1
+    if execution_status == "disabled":
+        entry["disabled_rule_count"] += 1
+    if execution_status in ACTIVE_EXECUTION_STATUSES and review_status in ACTIVE_REVIEW_STATUSES:
+        entry["active_rule_count"] += 1
+    if reviewed_override:
+        entry["reviewed_rule_override_count"] += 1
+
+
 def load_rule_index(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
     rows = conn.execute(
         """
@@ -198,39 +246,22 @@ def load_rule_index(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
     ).fetchall()
     index: dict[str, dict[str, Any]] = {}
     for row in rows:
-        key = normalize_key(row["normalized_name"] or row["card_name"])
-        entry = index.setdefault(
-            key,
-            {
-                "card_name": row["card_name"],
-                "active_rule_count": 0,
-                "rule_count": 0,
-                "review_only_rule_count": 0,
-                "disabled_rule_count": 0,
-                "effects": Counter(),
-                "battle_model_scopes": Counter(),
-                "execution_statuses": Counter(),
-                "review_statuses": Counter(),
-            },
+        add_rule_to_index(
+            index,
+            card_name=row["normalized_name"] or row["card_name"],
+            execution_status=str(row["execution_status"] or ""),
+            review_status=str(row["review_status"] or ""),
+            effect_json=row["effect_json"],
         )
-        entry["rule_count"] += 1
-        execution_status = str(row["execution_status"] or "")
-        review_status = str(row["review_status"] or "")
-        entry["execution_statuses"][execution_status] += 1
-        entry["review_statuses"][review_status] += 1
-        effect_data = json_dict(row["effect_json"])
-        effect = effect_data.get("effect")
-        if effect:
-            entry["effects"][str(effect)] += 1
-        scope = effect_data.get("battle_model_scope")
-        if scope:
-            entry["battle_model_scopes"][str(scope)] += 1
-        if execution_status == "review_only":
-            entry["review_only_rule_count"] += 1
-        if execution_status == "disabled":
-            entry["disabled_rule_count"] += 1
-        if execution_status in ACTIVE_EXECUTION_STATUSES and review_status in ACTIVE_REVIEW_STATUSES:
-            entry["active_rule_count"] += 1
+    for row in load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH):
+        add_rule_to_index(
+            index,
+            card_name=row["card_name"],
+            execution_status=str(row.get("execution_status") or ""),
+            review_status=str(row.get("review_status") or ""),
+            effect_json=row.get("effect_json") or {},
+            reviewed_override=True,
+        )
     for entry in index.values():
         entry["effects"] = dict(sorted(entry["effects"].items()))
         entry["battle_model_scopes"] = dict(sorted(entry["battle_model_scopes"].items()))
@@ -243,10 +274,10 @@ def rule_quality_flags(card_name: str, rule: dict[str, Any]) -> list[str]:
     scopes = set((rule.get("battle_model_scopes") or {}).keys())
     effects = set((rule.get("effects") or {}).keys())
     flags: list[str] = []
+    if "treasure_maker" in effects and "lands_controlled_treasure_count_v1" in scopes:
+        return []
     if "single_treasure_creation_v1" in scopes:
         flags.append("single_treasure_model_review_required")
-    if "treasure_maker" in effects and "lands_controlled_treasure_count_v1" in scopes:
-        return flags
     if normalize_key(card_name) == normalize_key("Brass's Bounty") and "treasure_maker" in effects:
         flags.append("brass_bounty_should_scale_with_lands_controlled")
     return sorted(set(flags))
@@ -478,6 +509,7 @@ def mine_variant_candidates(
                 "rule_count": int(rule.get("rule_count") or 0),
                 "review_only_rule_count": int(rule.get("review_only_rule_count") or 0),
                 "disabled_rule_count": int(rule.get("disabled_rule_count") or 0),
+                "reviewed_rule_override_count": int(rule.get("reviewed_rule_override_count") or 0),
                 "effects": sorted((rule.get("effects") or {}).keys()),
                 "battle_model_scopes": sorted((rule.get("battle_model_scopes") or {}).keys()),
                 "rule_quality_flags": quality_flags,
@@ -695,12 +727,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append(f"- {key}: `{value}`")
     lines.extend(["", "## Top Variant Candidates", ""])
     lines.append(
-        "| Rank | Card | Status | Score | Decks | Lane | Active Rules | Effects | Rule Quality Flags | Prior Negative Adds |"
+        "| Rank | Card | Status | Score | Decks | Lane | Active Rules | Reviewed Overrides | Effects | Rule Quality Flags | Prior Negative Adds |"
     )
-    lines.append("| ---: | --- | --- | ---: | --- | --- | ---: | --- | --- | ---: |")
+    lines.append("| ---: | --- | --- | ---: | --- | --- | ---: | ---: | --- | --- | ---: |")
     for index, row in enumerate(payload["top_variant_candidates"][:30], start=1):
         lines.append(
-            "| {rank} | `{card}` | `{status}` | {score} | {decks} | `{lane}` | {rules} | {effects} | {flags} | {negative} |".format(
+            "| {rank} | `{card}` | `{status}` | {score} | {decks} | `{lane}` | {rules} | {overrides} | {effects} | {flags} | {negative} |".format(
                 rank=index,
                 card=row["card_name"],
                 status=row["status"],
@@ -708,6 +740,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 decks=", ".join(str(deck_id) for deck_id in row["variant_decks"]),
                 lane=row["lane"],
                 rules=row["active_rule_count"],
+                overrides=row.get("reviewed_rule_override_count") or 0,
                 effects=", ".join(row["effects"]) or "none",
                 flags=", ".join(row.get("rule_quality_flags") or []) or "none",
                 negative=row["negative_add_count"],
