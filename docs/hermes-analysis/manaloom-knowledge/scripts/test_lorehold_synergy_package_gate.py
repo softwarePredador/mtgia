@@ -86,6 +86,21 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             ["Pearl Medallion", "Ruby Medallion"],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["gamble_approach_access_cut_creative"]["family"],
+            "tutor_access",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["gamble_approach_access_cut_creative"]["adds"],
+            ["Gamble"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["gamble_approach_access_cut_creative"]["cuts"],
+            ["Creative Technique"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["gamble_approach_access_cut_creative"]["allow_miracle_core_cuts"],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )
@@ -104,6 +119,8 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                         "topdeck_manipulation_activated": 2,
                         "hand_to_topdeck_activation": 1,
                         "birgi_spell_cast_mana": 0,
+                        "tutor_resolved": 1,
+                        "random_discard_after_tutor": 1,
                         "discard_to_top_replacement": 1,
                         "lorehold_rummage_discard_to_top": 2,
                         "lorehold_spell_rummage_discard_to_top": 0,
@@ -121,6 +138,8 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                         "topdeck_manipulation_activated": 5,
                         "hand_to_topdeck_activation": 4,
                         "birgi_spell_cast_mana": 2,
+                        "tutor_resolved": 4,
+                        "random_discard_after_tutor": 3,
                         "discard_to_top_replacement": 5,
                         "lorehold_rummage_discard_to_top": 5,
                         "lorehold_spell_rummage_discard_to_top": 3,
@@ -136,6 +155,8 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(delta["hand_to_topdeck_activation"], 3)
         self.assertEqual(delta["birgi_spell_cast_mana"], 2)
         self.assertEqual(delta["ritual_mana_added"], 3)
+        self.assertEqual(delta["tutor_resolved"], 3)
+        self.assertEqual(delta["random_discard_after_tutor"], 2)
         self.assertEqual(delta["discard_to_top_replacement"], 4)
         self.assertEqual(delta["lorehold_rummage_discard_to_top"], 3)
         self.assertEqual(delta["lorehold_spell_rummage_discard_to_top"], 3)
@@ -143,6 +164,8 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(delta["squee_upkeep_return"], 3)
         self.assertIn("squee gy +3", gate.strategic_delta_text(payload))
         self.assertIn("ritual +3", gate.strategic_delta_text(payload))
+        self.assertIn("tutor +3", gate.strategic_delta_text(payload))
+        self.assertIn("random discard +2", gate.strategic_delta_text(payload))
         self.assertIn("hand to top +3", gate.strategic_delta_text(payload))
         self.assertIn("discard-to-top +4", gate.strategic_delta_text(payload))
         self.assertIn("rummage-to-top +3", gate.strategic_delta_text(payload))

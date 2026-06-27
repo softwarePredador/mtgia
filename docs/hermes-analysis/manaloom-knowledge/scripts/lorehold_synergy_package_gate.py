@@ -83,6 +83,19 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty", "Seething Song"],
         "cuts": ["Pearl Medallion", "Ruby Medallion"],
     },
+    "gamble_approach_access_cut_creative": {
+        "family": "tutor_access",
+        "hypothesis": (
+            "The loss classifier shows topdeck/miracle turns failing to find or "
+            "recast Approach before combat pressure. Gamble tests a cheap universal "
+            "tutor over a five-mana demonstrate/free-cast slot while preserving the "
+            "existing protection, ramp, medallion, Bender's Waterskin, Hexing "
+            "Squelcher, and Storm Herd shell."
+        ),
+        "adds": ["Gamble"],
+        "cuts": ["Creative Technique"],
+        "allow_miracle_core_cuts": True,
+    },
     "galvanoth_topdeck_freecast": {
         "family": "topdeck_freecast",
         "hypothesis": (
@@ -357,6 +370,8 @@ STRATEGIC_METRICS = (
     "birgi_spell_cast_mana",
     "ritual_mana_added",
     "miracle_cast",
+    "tutor_resolved",
+    "random_discard_after_tutor",
     "topdeck_manipulation_activated",
     "discard_to_top_replacement",
     "lorehold_rummage_discard_to_top",
@@ -730,6 +745,8 @@ def strategic_delta_text(gate: dict[str, Any]) -> str:
         "birgi_spell_cast_mana": "birgi mana",
         "ritual_mana_added": "ritual",
         "miracle_cast": "miracle",
+        "tutor_resolved": "tutor",
+        "random_discard_after_tutor": "random discard",
         "topdeck_manipulation_activated": "topdeck",
         "discard_to_top_replacement": "discard-to-top",
         "lorehold_rummage_discard_to_top": "rummage-to-top",
