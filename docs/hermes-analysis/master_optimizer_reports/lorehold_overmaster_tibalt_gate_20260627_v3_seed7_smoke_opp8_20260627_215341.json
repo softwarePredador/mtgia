@@ -1,0 +1,4386 @@
+{
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260627_v3.json",
+  "cut_safety_summary": {
+    "blocked_cut_count": 11,
+    "status_counts": {
+      "locked_do_not_cut": 9,
+      "risky_cut_only_same_lane": 2
+    },
+    "tested_cut_count": 11,
+    "untested_flex_pool_count": 6
+  },
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-27T21:53:54.307663+00:00",
+  "opponent_limit": 8,
+  "opponent_seed": 20260626,
+  "package_status_counts": {
+    "gated": 1
+  },
+  "packages": [
+    {
+      "adds": [
+        "Overmaster"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v3_seed7_smoke_opp8_20260627_215341_overmaster_protect_draw_cut_tibalts_trickery/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Overmaster": 1
+        },
+        "adds": [
+          "Overmaster"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Tibalt's Trickery"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "reviewed_rule_upserts": {},
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Tibalt's Trickery"
+      ],
+      "family": "spell_protection",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v3_seed7_smoke_opp8_20260627_215341_overmaster_protect_draw_cut_tibalts_trickery.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v3_seed7_smoke_opp8_20260627_215341_overmaster_protect_draw_cut_tibalts_trickery.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 8 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=8\nrunning synergy_overmaster_protect_draw_cut_tibalts_trickery games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v3_seed7_smoke_opp8_20260627_215341_overmaster_protect_draw_cut_tibalts_trickery.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v3_seed7_smoke_opp8_20260627_215341_overmaster_protect_draw_cut_tibalts_trickery.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 13.0,
+          "losses": 7,
+          "stalls": 0,
+          "telemetry": {
+            "card_event_counts": {
+              "board_wipe_resolved:Farewell": 1,
+              "board_wipe_resolved:Tragic Arrogance": 1,
+              "cost_paid:Arcane Signet": 2,
+              "cost_paid:Artist's Talent": 2,
+              "cost_paid:Bender's Waterskin": 2,
+              "cost_paid:Big Score": 1,
+              "cost_paid:Esper Sentinel": 2,
+              "cost_paid:Fated Clash": 1,
+              "cost_paid:Fellwar Stone": 3,
+              "cost_paid:Generous Gift": 1,
+              "cost_paid:Giver of Runes": 3,
+              "cost_paid:Hexing Squelcher": 2,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Jeska's Will": 1,
+              "cost_paid:Library of Leng": 3,
+              "cost_paid:Lightning Greaves": 1,
+              "cost_paid:Lorehold, the Historian": 8,
+              "cost_paid:Monument to Endurance": 2,
+              "cost_paid:Path to Exile": 2,
+              "cost_paid:Pearl Medallion": 1,
+              "cost_paid:Ruby Medallion": 1,
+              "cost_paid:Scroll Rack": 2,
+              "cost_paid:Sensei's Divining Top": 2,
+              "cost_paid:Smothering Tithe": 1,
+              "cost_paid:Squee, Goblin Nabob": 3,
+              "cost_paid:Swiftfoot Boots": 1,
+              "cost_paid:Swords to Plowshares": 1,
+              "cost_paid:Talisman of Conviction": 1,
+              "cost_paid:Tempt with Bunnies": 1,
+              "cost_paid:The Mind Stone": 1,
+              "cost_paid:The Scarlet Witch": 1,
+              "cost_paid:Tragic Arrogance": 1,
+              "cost_paid:Victory Chimes": 2,
+              "miracle_cast:Approach of the Second Sun": 2,
+              "miracle_cast:Farewell": 1,
+              "miracle_cast:Furygale Flocking": 1,
+              "miracle_cast:Mizzix's Mastery": 1,
+              "miracle_cast:Stroke of Midnight": 3,
+              "miracle_cast:Tempt with Bunnies": 1,
+              "removal_resolved:Generous Gift": 1,
+              "removal_resolved:Path to Exile": 2,
+              "removal_resolved:Stroke of Midnight": 3,
+              "removal_resolved:Swords to Plowshares": 2,
+              "spell_cast:Arcane Signet": 2,
+              "spell_cast:Artist's Talent": 2,
+              "spell_cast:Bender's Waterskin": 2,
+              "spell_cast:Big Score": 1,
+              "spell_cast:Dawn's Truce": 2,
+              "spell_cast:Deflecting Swat": 2,
+              "spell_cast:Esper Sentinel": 2,
+              "spell_cast:Fated Clash": 1,
+              "spell_cast:Fellwar Stone": 3,
+              "spell_cast:Generous Gift": 1,
+              "spell_cast:High Noon": 1,
+              "spell_cast:Jeska's Will": 1,
+              "spell_cast:Library of Leng": 3,
+              "spell_cast:Lightning Greaves": 1,
+              "spell_cast:Monument to Endurance": 2,
+              "spell_cast:Path to Exile": 2,
+              "spell_cast:Pearl Medallion": 1,
+              "spell_cast:Ruby Medallion": 1,
+              "spell_cast:Scroll Rack": 2,
+              "spell_cast:Sensei's Divining Top": 2,
+              "spell_cast:Smothering Tithe": 1,
+              "spell_cast:Swiftfoot Boots": 1,
+              "spell_cast:Swords to Plowshares": 1,
+              "spell_cast:Talisman of Conviction": 1,
+              "spell_cast:Tempt with Bunnies": 1,
+              "spell_cast:The Mind Stone": 1,
+              "spell_cast:The Scarlet Witch": 1,
+              "spell_cast:Tragic Arrogance": 1,
+              "spell_cast:Victory Chimes": 2,
+              "spell_resolved:Approach of the Second Sun": 2,
+              "spell_resolved:Artist's Talent": 2,
+              "spell_resolved:Big Score": 1,
+              "spell_resolved:Dawn's Truce": 2,
+              "spell_resolved:Esper Sentinel": 2,
+              "spell_resolved:Farewell": 1,
+              "spell_resolved:Furygale Flocking": 1,
+              "spell_resolved:Generous Gift": 1,
+              "spell_resolved:High Noon": 1,
+              "spell_resolved:Jeska's Will": 1,
+              "spell_resolved:Library of Leng": 3,
+              "spell_resolved:Lightning Greaves": 1,
+              "spell_resolved:Mizzix's Mastery": 1,
+              "spell_resolved:Monument to Endurance": 2,
+              "spell_resolved:Path to Exile": 2,
+              "spell_resolved:Pearl Medallion": 1,
+              "spell_resolved:Ruby Medallion": 1,
+              "spell_resolved:Scroll Rack": 2,
+              "spell_resolved:Sensei's Divining Top": 2,
+              "spell_resolved:Stroke of Midnight": 3,
+              "spell_resolved:Swiftfoot Boots": 1,
+              "spell_resolved:Swords to Plowshares": 2,
+              "spell_resolved:Tempt with Bunnies": 2,
+              "spell_resolved:The Scarlet Witch": 1,
+              "spell_resolved:Tragic Arrogance": 1,
+              "topdeck_manipulation_activated:Scroll Rack": 3,
+              "topdeck_manipulation_activated:Sensei's Divining Top": 2,
+              "treasure_created:Big Score": 1,
+              "trigger_resolved:Artist's Talent": 9,
+              "trigger_resolved:Smothering Tithe": 2,
+              "trigger_resolved:Squee, Goblin Nabob": 2
+            },
+            "card_event_counts_by_game": {
+              "deck_6:Aang, at the Crossroads #106 (real):0": {
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Scroll Rack": 1,
+                "cost_paid:Swiftfoot Boots": 1,
+                "cost_paid:The Mind Stone": 1,
+                "cost_paid:Victory Chimes": 1,
+                "miracle_cast:Stroke of Midnight": 1,
+                "removal_resolved:Stroke of Midnight": 1,
+                "spell_cast:Dawn's Truce": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Scroll Rack": 1,
+                "spell_cast:Swiftfoot Boots": 1,
+                "spell_cast:The Mind Stone": 1,
+                "spell_cast:Victory Chimes": 1,
+                "spell_resolved:Dawn's Truce": 1,
+                "spell_resolved:Scroll Rack": 1,
+                "spell_resolved:Stroke of Midnight": 1,
+                "spell_resolved:Swiftfoot Boots": 1,
+                "topdeck_manipulation_activated:Scroll Rack": 2
+              },
+              "deck_6:Kenrith, the Returned King #113 (real):0": {
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:High Noon": 1,
+                "cost_paid:Library of Leng": 1,
+                "cost_paid:Monument to Endurance": 1,
+                "spell_cast:High Noon": 1,
+                "spell_cast:Library of Leng": 1,
+                "spell_cast:Monument to Endurance": 1,
+                "spell_resolved:High Noon": 1,
+                "spell_resolved:Library of Leng": 1,
+                "spell_resolved:Monument to Endurance": 1
+              },
+              "deck_6:Rograkh, Son of Rohgahh #62 (real):0": {
+                "board_wipe_resolved:Tragic Arrogance": 1,
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Fated Clash": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Jeska's Will": 1,
+                "cost_paid:Library of Leng": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "cost_paid:Tragic Arrogance": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Deflecting Swat": 1,
+                "spell_cast:Fated Clash": 1,
+                "spell_cast:Jeska's Will": 1,
+                "spell_cast:Library of Leng": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_cast:Tragic Arrogance": 1,
+                "spell_resolved:Jeska's Will": 1,
+                "spell_resolved:Library of Leng": 1,
+                "spell_resolved:Sensei's Divining Top": 1,
+                "spell_resolved:Tragic Arrogance": 1
+              },
+              "deck_6:Sisay, Weatherlight Captain #61 (real):0": {
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Smothering Tithe": 1,
+                "removal_resolved:Swords to Plowshares": 1,
+                "spell_cast:Smothering Tithe": 1,
+                "spell_resolved:Swords to Plowshares": 1,
+                "trigger_resolved:Smothering Tithe": 2,
+                "trigger_resolved:Squee, Goblin Nabob": 1
+              },
+              "deck_6:Tannuk, Memorial Ensign #40 (real):0": {
+                "cost_paid:Artist's Talent": 1,
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "cost_paid:Squee, Goblin Nabob": 2,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Artist's Talent": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_resolved:Artist's Talent": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Sensei's Divining Top": 1,
+                "topdeck_manipulation_activated:Sensei's Divining Top": 2,
+                "trigger_resolved:Squee, Goblin Nabob": 1
+              },
+              "deck_6:Umbris, Fear Manifest #114 (real):0": {
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Artist's Talent": 1,
+                "cost_paid:Bender's Waterskin": 1,
+                "cost_paid:Big Score": 1,
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:Library of Leng": 1,
+                "cost_paid:Lightning Greaves": 1,
+                "cost_paid:Lorehold, the Historian": 2,
+                "cost_paid:Monument to Endurance": 1,
+                "cost_paid:Pearl Medallion": 1,
+                "cost_paid:Scroll Rack": 1,
+                "cost_paid:Talisman of Conviction": 1,
+                "miracle_cast:Approach of the Second Sun": 2,
+                "miracle_cast:Furygale Flocking": 1,
+                "miracle_cast:Mizzix's Mastery": 1,
+                "miracle_cast:Stroke of Midnight": 1,
+                "removal_resolved:Generous Gift": 1,
+                "removal_resolved:Stroke of Midnight": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Artist's Talent": 1,
+                "spell_cast:Bender's Waterskin": 1,
+                "spell_cast:Big Score": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:Library of Leng": 1,
+                "spell_cast:Lightning Greaves": 1,
+                "spell_cast:Monument to Endurance": 1,
+                "spell_cast:Pearl Medallion": 1,
+                "spell_cast:Scroll Rack": 1,
+                "spell_cast:Talisman of Conviction": 1,
+                "spell_resolved:Approach of the Second Sun": 2,
+                "spell_resolved:Artist's Talent": 1,
+                "spell_resolved:Big Score": 1,
+                "spell_resolved:Furygale Flocking": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Library of Leng": 1,
+                "spell_resolved:Lightning Greaves": 1,
+                "spell_resolved:Mizzix's Mastery": 1,
+                "spell_resolved:Monument to Endurance": 1,
+                "spell_resolved:Pearl Medallion": 1,
+                "spell_resolved:Scroll Rack": 1,
+                "spell_resolved:Stroke of Midnight": 1,
+                "topdeck_manipulation_activated:Scroll Rack": 1,
+                "treasure_created:Big Score": 1,
+                "trigger_resolved:Artist's Talent": 9
+              },
+              "deck_6:Vivi Ornitier #99 (real):0": {
+                "board_wipe_resolved:Farewell": 1,
+                "cost_paid:Esper Sentinel": 1,
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Lorehold, the Historian": 2,
+                "cost_paid:Swords to Plowshares": 1,
+                "cost_paid:Tempt with Bunnies": 1,
+                "cost_paid:Victory Chimes": 1,
+                "miracle_cast:Farewell": 1,
+                "miracle_cast:Stroke of Midnight": 1,
+                "removal_resolved:Stroke of Midnight": 1,
+                "removal_resolved:Swords to Plowshares": 1,
+                "spell_cast:Esper Sentinel": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Swords to Plowshares": 1,
+                "spell_cast:Tempt with Bunnies": 1,
+                "spell_cast:Victory Chimes": 1,
+                "spell_resolved:Esper Sentinel": 1,
+                "spell_resolved:Farewell": 1,
+                "spell_resolved:Stroke of Midnight": 1,
+                "spell_resolved:Swords to Plowshares": 1,
+                "spell_resolved:Tempt with Bunnies": 1
+              },
+              "deck_6:Winota, Joiner of Forces #39 (real):0": {
+                "cost_paid:Bender's Waterskin": 1,
+                "cost_paid:Esper Sentinel": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:Squee, Goblin Nabob": 1,
+                "cost_paid:The Scarlet Witch": 1,
+                "miracle_cast:Tempt with Bunnies": 1,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Bender's Waterskin": 1,
+                "spell_cast:Dawn's Truce": 1,
+                "spell_cast:Deflecting Swat": 1,
+                "spell_cast:Esper Sentinel": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_resolved:Dawn's Truce": 1,
+                "spell_resolved:Esper Sentinel": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Tempt with Bunnies": 1,
+                "spell_resolved:The Scarlet Witch": 1
+              }
+            },
+            "card_strategy_counts": {
+              "cost_paid:Arcane Signet": 2,
+              "cost_paid:Artist's Talent": 2,
+              "cost_paid:Bender's Waterskin": 2,
+              "cost_paid:Big Score": 1,
+              "cost_paid:Esper Sentinel": 2,
+              "cost_paid:Fated Clash": 1,
+              "cost_paid:Fellwar Stone": 3,
+              "cost_paid:Generous Gift": 1,
+              "cost_paid:Giver of Runes": 3,
+              "cost_paid:Hexing Squelcher": 2,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Jeska's Will": 1,
+              "cost_paid:Library of Leng": 3,
+              "cost_paid:Lightning Greaves": 1,
+              "cost_paid:Lorehold, the Historian": 8,
+              "cost_paid:Monument to Endurance": 2,
+              "cost_paid:Path to Exile": 2,
+              "cost_paid:Pearl Medallion": 1,
+              "cost_paid:Ruby Medallion": 1,
+              "cost_paid:Scroll Rack": 2,
+              "cost_paid:Sensei's Divining Top": 2,
+              "cost_paid:Smothering Tithe": 1,
+              "cost_paid:Squee, Goblin Nabob": 3,
+              "cost_paid:Swiftfoot Boots": 1,
+              "cost_paid:Swords to Plowshares": 1,
+              "cost_paid:Talisman of Conviction": 1,
+              "cost_paid:Tempt with Bunnies": 1,
+              "cost_paid:The Mind Stone": 1,
+              "cost_paid:The Scarlet Witch": 1,
+              "cost_paid:Tragic Arrogance": 1,
+              "cost_paid:Victory Chimes": 2,
+              "discard_to_top:Generous Gift": 2,
+              "discard_to_top:Mizzix's Mastery": 6,
+              "discard_to_top:Teferi's Protection": 9,
+              "graveyard_return:Squee, Goblin Nabob": 2,
+              "lorehold_rummage_to_top:Generous Gift": 2,
+              "lorehold_rummage_to_top:Mizzix's Mastery": 3,
+              "lorehold_rummage_to_top:Teferi's Protection": 3,
+              "miracle:Approach of the Second Sun": 2,
+              "miracle:Farewell": 1,
+              "miracle:Furygale Flocking": 1,
+              "miracle:Mizzix's Mastery": 1,
+              "miracle:Stroke of Midnight": 3,
+              "miracle:Tempt with Bunnies": 1,
+              "spell_rummage_to_top:Mizzix's Mastery": 3,
+              "spell_rummage_to_top:Teferi's Protection": 6,
+              "squee_to_graveyard:permanent_moved_from_battlefield": 2,
+              "topdeck:Scroll Rack": 3,
+              "topdeck:Sensei's Divining Top": 2
+            },
+            "event_counts": {
+              "activated_ability": 8,
+              "activated_ability_skipped": 40,
+              "additional_cost_paid": 8,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "board_wipe_resolved": 3,
+              "cast_announced": 248,
+              "chaos_warp_reveal_resolved": 2,
+              "combat": 112,
+              "combat_result": 120,
+              "combat_step": 654,
+              "commander_cast": 36,
+              "compensation_tokens_created": 4,
+              "composite_rule_component_resolved": 4,
+              "composite_rule_resolved": 2,
+              "cost_paid": 248,
+              "countered_spell_moved_to_graveyard": 3,
+              "creature_cast": 58,
+              "creature_to_battlefield": 4,
+              "damage_resolved": 4,
+              "discard_modal_trigger_resolved": 6,
+              "draw_cards_resolved": 5,
+              "end_step_instant": 3,
+              "equipment_attached": 1,
+              "equipment_unattached": 1,
+              "game_won": 1,
+              "imprint_resolved": 1,
+              "jeskas_will_resolved": 1,
+              "land_played": 161,
+              "land_ramp_resolved": 5,
+              "lorehold_upkeep_rummage": 26,
+              "lorehold_upkeep_rummage_skipped": 16,
+              "mana_refreshed": 219,
+              "mill_resolved": 2,
+              "miracle_cast": 9,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 6,
+              "permanent_moved_from_battlefield": 47,
+              "player_eliminated": 9,
+              "priority_pass": 2180,
+              "protection_from_everything_granted": 1,
+              "protection_resolved": 2,
+              "random_discard_after_tutor": 1,
+              "recursion_resolved": 4,
+              "redirect_removal_resolved": 4,
+              "removal_resolved": 19,
+              "replacement_applied": 28,
+              "ritual_mana_added": 1,
+              "saga_chapter_progressed": 6,
+              "saga_chapter_resolved": 3,
+              "saga_sacrificed_by_sba": 3,
+              "self_exiled_on_resolution": 1,
+              "spell_cast": 160,
+              "spell_countered": 3,
+              "spell_resolved": 120,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 5,
+              "treasure_created": 2,
+              "trigger_put_on_stack": 29,
+              "trigger_resolved": 31,
+              "trigger_skipped": 6,
+              "turn_end": 206,
+              "turn_start": 219,
+              "tutor_life_loss_resolved": 3,
+              "tutor_resolved": 25,
+              "utility_artifact_activated": 1,
+              "utility_land_activated": 11
+            },
+            "event_counts_by_game": {
+              "deck_6:Aang, at the Crossroads #106 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 9,
+                "cast_announced": 29,
+                "combat": 15,
+                "combat_result": 16,
+                "combat_step": 84,
+                "commander_cast": 3,
+                "compensation_tokens_created": 1,
+                "cost_paid": 29,
+                "creature_cast": 6,
+                "creature_to_battlefield": 1,
+                "draw_cards_resolved": 1,
+                "equipment_unattached": 1,
+                "imprint_resolved": 1,
+                "land_played": 17,
+                "lorehold_upkeep_rummage": 4,
+                "lorehold_upkeep_rummage_skipped": 7,
+                "mana_refreshed": 27,
+                "miracle_cast": 1,
+                "multi_defender_attack": 1,
+                "permanent_moved_from_battlefield": 5,
+                "player_eliminated": 1,
+                "priority_pass": 252,
+                "protection_resolved": 1,
+                "recursion_resolved": 1,
+                "removal_resolved": 3,
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 1,
+                "saga_sacrificed_by_sba": 1,
+                "spell_cast": 21,
+                "spell_resolved": 15,
+                "topdeck_manipulation_activated": 2,
+                "turn_end": 25,
+                "turn_start": 27,
+                "tutor_resolved": 4,
+                "utility_land_activated": 1
+              },
+              "deck_6:Kenrith, the Returned King #113 (real):0": {
+                "activated_ability": 2,
+                "additional_cost_paid": 1,
+                "cast_announced": 27,
+                "combat": 11,
+                "combat_result": 11,
+                "combat_step": 64,
+                "commander_cast": 3,
+                "cost_paid": 27,
+                "creature_cast": 7,
+                "creature_to_battlefield": 1,
+                "damage_resolved": 1,
+                "end_step_instant": 1,
+                "land_played": 20,
+                "mana_refreshed": 24,
+                "permanent_moved_from_battlefield": 4,
+                "player_eliminated": 1,
+                "priority_pass": 264,
+                "recursion_resolved": 1,
+                "removal_resolved": 1,
+                "replacement_applied": 1,
+                "spell_cast": 17,
+                "spell_resolved": 17,
+                "trigger_put_on_stack": 4,
+                "trigger_resolved": 4,
+                "turn_end": 23,
+                "turn_start": 24,
+                "tutor_life_loss_resolved": 1,
+                "tutor_resolved": 6
+              },
+              "deck_6:Rograkh, Son of Rohgahh #62 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 2,
+                "additional_cost_paid": 1,
+                "board_wipe_resolved": 1,
+                "cast_announced": 33,
+                "chaos_warp_reveal_resolved": 1,
+                "combat": 18,
+                "combat_result": 18,
+                "combat_step": 105,
+                "commander_cast": 2,
+                "cost_paid": 33,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 9,
+                "damage_resolved": 1,
+                "jeskas_will_resolved": 1,
+                "land_played": 19,
+                "land_ramp_resolved": 1,
+                "mana_refreshed": 30,
+                "permanent_moved_from_battlefield": 11,
+                "player_eliminated": 1,
+                "priority_pass": 288,
+                "recursion_resolved": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 2,
+                "spell_cast": 23,
+                "spell_countered": 1,
+                "spell_resolved": 15,
+                "turn_end": 29,
+                "turn_start": 30,
+                "tutor_life_loss_resolved": 1,
+                "tutor_resolved": 4,
+                "utility_artifact_activated": 1
+              },
+              "deck_6:Sisay, Weatherlight Captain #61 (real):0": {
+                "activated_ability": 2,
+                "activated_ability_skipped": 5,
+                "additional_cost_paid": 1,
+                "attachment_sba": 1,
+                "cast_announced": 29,
+                "chaos_warp_reveal_resolved": 1,
+                "combat": 14,
+                "combat_result": 14,
+                "combat_step": 77,
+                "commander_cast": 6,
+                "cost_paid": 29,
+                "creature_cast": 10,
+                "end_step_instant": 1,
+                "land_played": 19,
+                "land_ramp_resolved": 2,
+                "lorehold_upkeep_rummage_skipped": 1,
+                "mana_refreshed": 26,
+                "permanent_moved_from_battlefield": 5,
+                "player_eliminated": 1,
+                "priority_pass": 232,
+                "random_discard_after_tutor": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 4,
+                "replacement_applied": 3,
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 1,
+                "saga_sacrificed_by_sba": 1,
+                "spell_cast": 14,
+                "spell_resolved": 10,
+                "trigger_put_on_stack": 3,
+                "trigger_resolved": 4,
+                "trigger_skipped": 4,
+                "turn_end": 24,
+                "turn_start": 26,
+                "tutor_resolved": 4,
+                "utility_land_activated": 3
+              },
+              "deck_6:Tannuk, Memorial Ensign #40 (real):0": {
+                "activated_ability_skipped": 3,
+                "cast_announced": 28,
+                "combat": 12,
+                "combat_result": 13,
+                "combat_step": 72,
+                "commander_cast": 4,
+                "cost_paid": 28,
+                "creature_cast": 10,
+                "creature_to_battlefield": 2,
+                "draw_cards_resolved": 1,
+                "land_played": 23,
+                "land_ramp_resolved": 1,
+                "lorehold_upkeep_rummage": 4,
+                "lorehold_upkeep_rummage_skipped": 3,
+                "mana_refreshed": 26,
+                "multi_defender_attack": 1,
+                "permanent_moved_from_battlefield": 4,
+                "player_eliminated": 1,
+                "priority_pass": 252,
+                "removal_resolved": 2,
+                "spell_cast": 14,
+                "spell_resolved": 12,
+                "topdeck_manipulation_activated": 2,
+                "trigger_resolved": 1,
+                "turn_end": 25,
+                "turn_start": 26,
+                "tutor_resolved": 1
+              },
+              "deck_6:Umbris, Fear Manifest #114 (real):0": {
+                "activated_ability_skipped": 16,
+                "additional_cost_paid": 3,
+                "approach_cast_tracked": 2,
+                "approach_first_resolution": 1,
+                "board_wipe_resolved": 1,
+                "cast_announced": 37,
+                "combat": 14,
+                "combat_result": 17,
+                "combat_step": 90,
+                "commander_cast": 6,
+                "compensation_tokens_created": 2,
+                "cost_paid": 37,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 6,
+                "discard_modal_trigger_resolved": 6,
+                "equipment_attached": 1,
+                "game_won": 1,
+                "land_played": 24,
+                "land_ramp_resolved": 1,
+                "lorehold_upkeep_rummage": 8,
+                "mana_refreshed": 34,
+                "miracle_cast": 5,
+                "mizzix_mastery_resolved": 1,
+                "multi_defender_attack": 2,
+                "permanent_moved_from_battlefield": 6,
+                "player_eliminated": 2,
+                "priority_pass": 328,
+                "protection_from_everything_granted": 1,
+                "recursion_resolved": 1,
+                "removal_resolved": 2,
+                "replacement_applied": 18,
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 1,
+                "saga_sacrificed_by_sba": 1,
+                "self_exiled_on_resolution": 1,
+                "spell_cast": 25,
+                "spell_countered": 1,
+                "spell_resolved": 19,
+                "tokens_created": 1,
+                "topdeck_manipulation_activated": 1,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 9,
+                "trigger_resolved": 9,
+                "turn_end": 30,
+                "turn_start": 34,
+                "tutor_life_loss_resolved": 1,
+                "tutor_resolved": 2,
+                "utility_land_activated": 2
+              },
+              "deck_6:Vivi Ornitier #99 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 4,
+                "additional_cost_paid": 1,
+                "board_wipe_resolved": 1,
+                "cast_announced": 40,
+                "combat": 15,
+                "combat_result": 16,
+                "combat_step": 88,
+                "commander_cast": 8,
+                "compensation_tokens_created": 1,
+                "composite_rule_component_resolved": 2,
+                "composite_rule_resolved": 1,
+                "cost_paid": 40,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 4,
+                "damage_resolved": 2,
+                "draw_cards_resolved": 3,
+                "end_step_instant": 1,
+                "land_played": 22,
+                "lorehold_upkeep_rummage": 3,
+                "lorehold_upkeep_rummage_skipped": 5,
+                "mana_refreshed": 30,
+                "mill_resolved": 1,
+                "miracle_cast": 2,
+                "multi_defender_attack": 1,
+                "permanent_moved_from_battlefield": 10,
+                "player_eliminated": 1,
+                "priority_pass": 356,
+                "removal_resolved": 3,
+                "replacement_applied": 5,
+                "ritual_mana_added": 1,
+                "spell_cast": 28,
+                "spell_countered": 1,
+                "spell_resolved": 21,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 13,
+                "trigger_resolved": 13,
+                "trigger_skipped": 2,
+                "turn_end": 29,
+                "turn_start": 30,
+                "tutor_resolved": 2,
+                "utility_land_activated": 1
+              },
+              "deck_6:Winota, Joiner of Forces #39 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 1,
+                "additional_cost_paid": 1,
+                "cast_announced": 25,
+                "combat": 13,
+                "combat_result": 15,
+                "combat_step": 74,
+                "commander_cast": 4,
+                "composite_rule_component_resolved": 2,
+                "composite_rule_resolved": 1,
+                "cost_paid": 25,
+                "creature_cast": 6,
+                "land_played": 17,
+                "lorehold_upkeep_rummage": 7,
+                "mana_refreshed": 22,
+                "mill_resolved": 1,
+                "miracle_cast": 1,
+                "multi_defender_attack": 1,
+                "permanent_moved_from_battlefield": 2,
+                "player_eliminated": 1,
+                "priority_pass": 208,
+                "protection_resolved": 1,
+                "redirect_removal_resolved": 2,
+                "removal_resolved": 2,
+                "replacement_applied": 1,
+                "spell_cast": 18,
+                "spell_resolved": 11,
+                "turn_end": 21,
+                "turn_start": 22,
+                "tutor_resolved": 2,
+                "utility_land_activated": 4
+              }
+            },
+            "squee_anomalies": [],
+            "squee_game_traces": {
+              "deck_6:Sisay, Weatherlight Captain #61 (real):0": [
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "source": "Chaos Warp",
+                    "turn": 6
+                  },
+                  "event": "chaos_warp_reveal_resolved",
+                  "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1281,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 6
+                  },
+                  "event": "combat",
+                  "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1329,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "destination": "graveyard",
+                    "from_zone": "battlefield",
+                    "player": "Lorehold",
+                    "reason": "combat_damage",
+                    "source": null,
+                    "to_zone": "graveyard",
+                    "turn": 6
+                  },
+                  "event": "permanent_moved_from_battlefield",
+                  "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "graveyard_entry"
+                  ],
+                  "seq": 1331,
+                  "squee_known_graveyard_balance_after": 1,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "destination": "hand",
+                    "effect": "graveyard_upkeep_return_self_to_hand",
+                    "player": "Lorehold",
+                    "trigger": "beginning_of_your_upkeep",
+                    "turn": 7
+                  },
+                  "event": "trigger_resolved",
+                  "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "upkeep_return"
+                  ],
+                  "seq": 1341,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 1
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1360,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                }
+              ],
+              "deck_6:Tannuk, Memorial Ensign #40 (real):0": [
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 3
+                  },
+                  "event": "cast_announced",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 4736,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 3
+                  },
+                  "event": "cost_paid",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 4737,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 3
+                  },
+                  "event": "creature_cast",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 4738,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 3
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 4748,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Plaza of Heroes",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 4
+                  },
+                  "event": "land_played",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 4804,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 4
+                  },
+                  "event": "combat_step",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 4819,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 4
+                  },
+                  "event": "combat",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 4821,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "destination": "graveyard",
+                    "from_zone": "battlefield",
+                    "player": "Lorehold",
+                    "reason": "combat_damage",
+                    "source": null,
+                    "to_zone": "graveyard",
+                    "turn": 4
+                  },
+                  "event": "permanent_moved_from_battlefield",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "graveyard_entry"
+                  ],
+                  "seq": 4823,
+                  "squee_known_graveyard_balance_after": 1,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "destination": "hand",
+                    "effect": "graveyard_upkeep_return_self_to_hand",
+                    "player": "Lorehold",
+                    "trigger": "beginning_of_your_upkeep",
+                    "turn": 5
+                  },
+                  "event": "trigger_resolved",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "upkeep_return"
+                  ],
+                  "seq": 4903,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 1
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 5
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 4923,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "turn_start",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5013,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "cast_announced",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5017,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "cost_paid",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5018,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "creature_cast",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5019,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5035,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 7
+                  },
+                  "event": "combat_step",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5127,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 7
+                  },
+                  "event": "multi_defender_attack",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5128,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 7
+                  },
+                  "event": "combat",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5131,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5141,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                }
+              ],
+              "deck_6:Winota, Joiner of Forces #39 (real):0": [
+                {
+                  "data": {
+                    "discard_destination": "graveyard",
+                    "discarded": "Call Forth the Tempest",
+                    "player": "Lorehold",
+                    "reason": "pitch_dead_high_cmc_spell",
+                    "turn": 5
+                  },
+                  "event": "lorehold_upkeep_rummage",
+                  "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1763,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "turn_start",
+                  "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1833,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "cast_announced",
+                  "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1844,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "cost_paid",
+                  "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1845,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "creature_cast",
+                  "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1846,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1869,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Dawn's Truce",
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "protection_resolved",
+                  "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1883,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                }
+              ]
+            },
+            "squee_known_graveyard_balance_by_game": {
+              "deck_6:Sisay, Weatherlight Captain #61 (real):0": 0,
+              "deck_6:Tannuk, Memorial Ensign #40 (real):0": 0
+            },
+            "squee_trace_samples": [
+              {
+                "data": {
+                  "player": "Lorehold",
+                  "source": "Chaos Warp",
+                  "turn": 6
+                },
+                "event": "chaos_warp_reveal_resolved",
+                "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1281,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 6
+                },
+                "event": "combat",
+                "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1329,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "destination": "graveyard",
+                  "from_zone": "battlefield",
+                  "player": "Lorehold",
+                  "reason": "combat_damage",
+                  "source": null,
+                  "to_zone": "graveyard",
+                  "turn": 6
+                },
+                "event": "permanent_moved_from_battlefield",
+                "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "graveyard_entry"
+                ],
+                "seq": 1331,
+                "squee_known_graveyard_balance_after": 1,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "destination": "hand",
+                  "effect": "graveyard_upkeep_return_self_to_hand",
+                  "player": "Lorehold",
+                  "trigger": "beginning_of_your_upkeep",
+                  "turn": 7
+                },
+                "event": "trigger_resolved",
+                "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "upkeep_return"
+                ],
+                "seq": 1341,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 1
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 7
+                },
+                "event": "turn_end",
+                "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1360,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discard_destination": "graveyard",
+                  "discarded": "Call Forth the Tempest",
+                  "player": "Lorehold",
+                  "reason": "pitch_dead_high_cmc_spell",
+                  "turn": 5
+                },
+                "event": "lorehold_upkeep_rummage",
+                "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1763,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "player": "Lorehold",
+                  "turn": 6
+                },
+                "event": "turn_start",
+                "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1833,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 6
+                },
+                "event": "cast_announced",
+                "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1844,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 6
+                },
+                "event": "cost_paid",
+                "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1845,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 6
+                },
+                "event": "creature_cast",
+                "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1846,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 6
+                },
+                "event": "turn_end",
+                "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1869,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Dawn's Truce",
+                  "player": "Lorehold",
+                  "turn": 6
+                },
+                "event": "protection_resolved",
+                "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1883,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 3
+                },
+                "event": "cast_announced",
+                "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 4736,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 3
+                },
+                "event": "cost_paid",
+                "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 4737,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 3
+                },
+                "event": "creature_cast",
+                "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 4738,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 3
+                },
+                "event": "turn_end",
+                "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 4748,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Plaza of Heroes",
+                  "effect": "land",
+                  "player": "Lorehold",
+                  "turn": 4
+                },
+                "event": "land_played",
+                "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 4804,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 4
+                },
+                "event": "combat_step",
+                "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 4819,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 4
+                },
+                "event": "combat",
+                "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 4821,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "destination": "graveyard",
+                  "from_zone": "battlefield",
+                  "player": "Lorehold",
+                  "reason": "combat_damage",
+                  "source": null,
+                  "to_zone": "graveyard",
+                  "turn": 4
+                },
+                "event": "permanent_moved_from_battlefield",
+                "game_id": "deck_6:Tannuk, Memorial Ensign #40 (real):0",
+                "markers": [
+                  "graveyard_entry"
+                ],
+                "seq": 4823,
+                "squee_known_graveyard_balance_after": 1,
+                "squee_known_graveyard_balance_before": 0
+              }
+            ],
+            "strategic_event_counts": {
+              "discard_to_top_replacement": 17,
+              "graveyard_upkeep_return_self_to_hand": 2,
+              "lorehold_cost_paid": 56,
+              "lorehold_rummage_discard_to_top": 8,
+              "lorehold_spell_cast": 44,
+              "lorehold_spell_rummage": 9,
+              "lorehold_spell_rummage_discard_to_top": 9,
+              "lorehold_upkeep_rummage": 26,
+              "miracle_cast": 9,
+              "squee_return_after_known_graveyard_entry": 2,
+              "squee_to_graveyard": 2,
+              "squee_upkeep_return": 2,
+              "topdeck_manipulation_activated": 5
+            },
+            "strategic_event_counts_by_game": {
+              "deck_6:Aang, at the Crossroads #106 (real):0": {
+                "lorehold_cost_paid": 7,
+                "lorehold_spell_cast": 6,
+                "lorehold_upkeep_rummage": 4,
+                "miracle_cast": 1,
+                "topdeck_manipulation_activated": 2
+              },
+              "deck_6:Kenrith, the Returned King #113 (real):0": {
+                "lorehold_cost_paid": 4,
+                "lorehold_spell_cast": 3
+              },
+              "deck_6:Rograkh, Son of Rohgahh #62 (real):0": {
+                "lorehold_cost_paid": 7,
+                "lorehold_spell_cast": 7
+              },
+              "deck_6:Sisay, Weatherlight Captain #61 (real):0": {
+                "graveyard_upkeep_return_self_to_hand": 1,
+                "lorehold_cost_paid": 2,
+                "lorehold_spell_cast": 1,
+                "squee_return_after_known_graveyard_entry": 1,
+                "squee_to_graveyard": 1,
+                "squee_upkeep_return": 1
+              },
+              "deck_6:Tannuk, Memorial Ensign #40 (real):0": {
+                "graveyard_upkeep_return_self_to_hand": 1,
+                "lorehold_cost_paid": 8,
+                "lorehold_spell_cast": 4,
+                "lorehold_upkeep_rummage": 4,
+                "squee_return_after_known_graveyard_entry": 1,
+                "squee_to_graveyard": 1,
+                "squee_upkeep_return": 1,
+                "topdeck_manipulation_activated": 2
+              },
+              "deck_6:Umbris, Fear Manifest #114 (real):0": {
+                "discard_to_top_replacement": 17,
+                "lorehold_cost_paid": 14,
+                "lorehold_rummage_discard_to_top": 8,
+                "lorehold_spell_cast": 12,
+                "lorehold_spell_rummage": 9,
+                "lorehold_spell_rummage_discard_to_top": 9,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 5,
+                "topdeck_manipulation_activated": 1
+              },
+              "deck_6:Vivi Ornitier #99 (real):0": {
+                "lorehold_cost_paid": 8,
+                "lorehold_spell_cast": 5,
+                "lorehold_upkeep_rummage": 3,
+                "miracle_cast": 2
+              },
+              "deck_6:Winota, Joiner of Forces #39 (real):0": {
+                "lorehold_cost_paid": 6,
+                "lorehold_spell_cast": 6,
+                "lorehold_upkeep_rummage": 7,
+                "miracle_cast": 1
+              }
+            },
+            "strategic_games": {
+              "birgi_spell_cast_mana": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "discard_to_top_replacement": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "graveyard_upkeep_return_self_to_hand": {
+                "games": 2,
+                "rate": 0.25
+              },
+              "hand_to_topdeck_activation": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_cost_paid": {
+                "games": 8,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discard_to_top": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "lorehold_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_cast": {
+                "games": 8,
+                "rate": 1.0
+              },
+              "lorehold_spell_rummage": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "lorehold_spell_rummage_discard_to_top": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "lorehold_spell_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_upkeep_rummage": {
+                "games": 5,
+                "rate": 0.625
+              },
+              "miracle_cast": {
+                "games": 4,
+                "rate": 0.5
+              },
+              "spell_cast_mana_trigger": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_after_known_graveyard_entry": {
+                "games": 2,
+                "rate": 0.25
+              },
+              "squee_return_without_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_to_graveyard": {
+                "games": 2,
+                "rate": 0.25
+              },
+              "squee_upkeep_return": {
+                "games": 2,
+                "rate": 0.25
+              },
+              "thor_cost_paid": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage_amount": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_spell_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 3,
+                "rate": 0.375
+              }
+            },
+            "top_cards": [
+              {
+                "count": 9,
+                "key": "discard_to_top:Teferi's Protection"
+              },
+              {
+                "count": 8,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 6,
+                "key": "discard_to_top:Mizzix's Mastery"
+              },
+              {
+                "count": 6,
+                "key": "spell_rummage_to_top:Teferi's Protection"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Fellwar Stone"
+              },
+              {
+                "count": 3,
+                "key": "miracle:Stroke of Midnight"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Squee, Goblin Nabob"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Library of Leng"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Giver of Runes"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Scroll Rack"
+              },
+              {
+                "count": 3,
+                "key": "lorehold_rummage_to_top:Mizzix's Mastery"
+              },
+              {
+                "count": 3,
+                "key": "spell_rummage_to_top:Mizzix's Mastery"
+              }
+            ]
+          },
+          "win_rate": 12.5,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 13.67,
+          "losses": 5,
+          "stalls": 0,
+          "telemetry": {
+            "card_event_counts": {
+              "board_wipe_resolved:Everything Comes to Dust": 2,
+              "board_wipe_resolved:Farewell": 1,
+              "board_wipe_resolved:Promise of Loyalty": 2,
+              "board_wipe_resolved:Tragic Arrogance": 2,
+              "cost_paid:Approach of the Second Sun": 3,
+              "cost_paid:Arcane Signet": 2,
+              "cost_paid:Artist's Talent": 3,
+              "cost_paid:Avatar's Wrath": 2,
+              "cost_paid:Bender's Waterskin": 2,
+              "cost_paid:Big Score": 1,
+              "cost_paid:Boros Signet": 3,
+              "cost_paid:Esper Sentinel": 4,
+              "cost_paid:Fellwar Stone": 3,
+              "cost_paid:Furygale Flocking": 1,
+              "cost_paid:Generous Gift": 4,
+              "cost_paid:Giver of Runes": 1,
+              "cost_paid:Hexing Squelcher": 6,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Hit the Mother Lode": 1,
+              "cost_paid:Improvisation Capstone": 2,
+              "cost_paid:Jeska's Will": 1,
+              "cost_paid:Land Tax": 4,
+              "cost_paid:Lorehold, the Historian": 7,
+              "cost_paid:Molecule Man": 1,
+              "cost_paid:Monument to Endurance": 1,
+              "cost_paid:Mother of Runes": 3,
+              "cost_paid:Overmaster": 2,
+              "cost_paid:Path to Exile": 1,
+              "cost_paid:Pearl Medallion": 1,
+              "cost_paid:Prismari Pianist": 2,
+              "cost_paid:Promise of Loyalty": 1,
+              "cost_paid:Reforge the Soul": 2,
+              "cost_paid:Ruby Medallion": 3,
+              "cost_paid:Sensei's Divining Top": 8,
+              "cost_paid:Sol Ring": 4,
+              "cost_paid:Squee, Goblin Nabob": 5,
+              "cost_paid:Stroke of Midnight": 1,
+              "cost_paid:Swiftfoot Boots": 4,
+              "cost_paid:Swords to Plowshares": 1,
+              "cost_paid:Talisman of Conviction": 3,
+              "cost_paid:Tempt with Bunnies": 1,
+              "cost_paid:The Mind Stone": 4,
+              "cost_paid:The Scarlet Witch": 3,
+              "cost_paid:Unexpected Windfall": 1,
+              "cost_paid:Victory Chimes": 1,
+              "cost_paid:Winds of Abandon": 2,
+              "draw_cards_resolved:Overmaster": 3,
+              "miracle_cast:Emeria's Call // Emeria, Shattered Skyclave": 1,
+              "miracle_cast:Everything Comes to Dust": 2,
+              "miracle_cast:Farewell": 1,
+              "miracle_cast:Furygale Flocking": 1,
+              "miracle_cast:Generous Gift": 2,
+              "miracle_cast:Hit the Mother Lode": 1,
+              "miracle_cast:Improvisation Capstone": 1,
+              "miracle_cast:Overmaster": 1,
+              "miracle_cast:Path to Exile": 1,
+              "miracle_cast:Surge to Victory": 1,
+              "miracle_cast:Tempt with Bunnies": 1,
+              "miracle_cast:Tragic Arrogance": 2,
+              "removal_resolved:Generous Gift": 6,
+              "removal_resolved:Path to Exile": 2,
+              "removal_resolved:Stroke of Midnight": 1,
+              "removal_resolved:Swords to Plowshares": 1,
+              "removal_resolved:Winds of Abandon": 2,
+              "spell_cast:Approach of the Second Sun": 3,
+              "spell_cast:Arcane Signet": 2,
+              "spell_cast:Artist's Talent": 3,
+              "spell_cast:Avatar's Wrath": 2,
+              "spell_cast:Bender's Waterskin": 2,
+              "spell_cast:Big Score": 1,
+              "spell_cast:Boros Signet": 3,
+              "spell_cast:Deflecting Swat": 1,
+              "spell_cast:Esper Sentinel": 4,
+              "spell_cast:Fellwar Stone": 3,
+              "spell_cast:Flawless Maneuver": 3,
+              "spell_cast:Furygale Flocking": 1,
+              "spell_cast:Generous Gift": 4,
+              "spell_cast:High Noon": 1,
+              "spell_cast:Hit the Mother Lode": 1,
+              "spell_cast:Improvisation Capstone": 2,
+              "spell_cast:Jeska's Will": 1,
+              "spell_cast:Land Tax": 4,
+              "spell_cast:Molecule Man": 1,
+              "spell_cast:Monument to Endurance": 1,
+              "spell_cast:Overmaster": 2,
+              "spell_cast:Path to Exile": 1,
+              "spell_cast:Pearl Medallion": 1,
+              "spell_cast:Prismari Pianist": 2,
+              "spell_cast:Promise of Loyalty": 2,
+              "spell_cast:Redirect Lightning": 1,
+              "spell_cast:Reforge the Soul": 2,
+              "spell_cast:Ruby Medallion": 3,
+              "spell_cast:Sensei's Divining Top": 8,
+              "spell_cast:Sol Ring": 4,
+              "spell_cast:Stroke of Midnight": 1,
+              "spell_cast:Swiftfoot Boots": 4,
+              "spell_cast:Swords to Plowshares": 1,
+              "spell_cast:Talisman of Conviction": 3,
+              "spell_cast:Teferi's Protection": 2,
+              "spell_cast:Tempt with Bunnies": 1,
+              "spell_cast:The Mind Stone": 4,
+              "spell_cast:The Scarlet Witch": 2,
+              "spell_cast:Unexpected Windfall": 1,
+              "spell_cast:Victory Chimes": 1,
+              "spell_cast:Winds of Abandon": 2,
+              "spell_resolved:Approach of the Second Sun": 2,
+              "spell_resolved:Artist's Talent": 3,
+              "spell_resolved:Avatar's Wrath": 2,
+              "spell_resolved:Big Score": 1,
+              "spell_resolved:Emeria's Call // Emeria, Shattered Skyclave": 1,
+              "spell_resolved:Esper Sentinel": 4,
+              "spell_resolved:Everything Comes to Dust": 2,
+              "spell_resolved:Farewell": 1,
+              "spell_resolved:Flawless Maneuver": 3,
+              "spell_resolved:Furygale Flocking": 2,
+              "spell_resolved:Generous Gift": 6,
+              "spell_resolved:High Noon": 1,
+              "spell_resolved:Hit the Mother Lode": 2,
+              "spell_resolved:Improvisation Capstone": 3,
+              "spell_resolved:Jeska's Will": 1,
+              "spell_resolved:Land Tax": 4,
+              "spell_resolved:Molecule Man": 1,
+              "spell_resolved:Monument to Endurance": 1,
+              "spell_resolved:Overmaster": 3,
+              "spell_resolved:Path to Exile": 2,
+              "spell_resolved:Pearl Medallion": 1,
+              "spell_resolved:Prismari Pianist": 2,
+              "spell_resolved:Promise of Loyalty": 2,
+              "spell_resolved:Reforge the Soul": 2,
+              "spell_resolved:Ruby Medallion": 3,
+              "spell_resolved:Sensei's Divining Top": 8,
+              "spell_resolved:Stroke of Midnight": 1,
+              "spell_resolved:Surge to Victory": 1,
+              "spell_resolved:Swiftfoot Boots": 4,
+              "spell_resolved:Swords to Plowshares": 1,
+              "spell_resolved:Teferi's Protection": 2,
+              "spell_resolved:Tempt with Bunnies": 2,
+              "spell_resolved:The Scarlet Witch": 2,
+              "spell_resolved:Tragic Arrogance": 2,
+              "spell_resolved:Unexpected Windfall": 1,
+              "spell_resolved:Winds of Abandon": 2,
+              "topdeck_manipulation_activated:Sensei's Divining Top": 14,
+              "treasure_created:Big Score": 1,
+              "treasure_created:Unexpected Windfall": 1,
+              "trigger_resolved:Artist's Talent": 11,
+              "trigger_resolved:Esper Sentinel": 11,
+              "trigger_resolved:Prismari Pianist": 3,
+              "trigger_resolved:Squee, Goblin Nabob": 2,
+              "trigger_resolved:Surge to Victory": 1
+            },
+            "card_event_counts_by_game": {
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Aang, at the Crossroads #106 (real):0": {
+                "cost_paid:Bender's Waterskin": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:High Noon": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Talisman of Conviction": 1,
+                "cost_paid:Unexpected Windfall": 1,
+                "draw_cards_resolved:Overmaster": 1,
+                "miracle_cast:Overmaster": 1,
+                "removal_resolved:Generous Gift": 1,
+                "spell_cast:Bender's Waterskin": 1,
+                "spell_cast:Flawless Maneuver": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:High Noon": 1,
+                "spell_cast:Talisman of Conviction": 1,
+                "spell_cast:Unexpected Windfall": 1,
+                "spell_resolved:Flawless Maneuver": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:High Noon": 1,
+                "spell_resolved:Overmaster": 1,
+                "spell_resolved:Unexpected Windfall": 1,
+                "treasure_created:Unexpected Windfall": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Kenrith, the Returned King #113 (real):0": {
+                "cost_paid:Artist's Talent": 1,
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Land Tax": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Swiftfoot Boots": 1,
+                "cost_paid:The Mind Stone": 1,
+                "removal_resolved:Generous Gift": 1,
+                "spell_cast:Artist's Talent": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:Land Tax": 1,
+                "spell_cast:Swiftfoot Boots": 1,
+                "spell_cast:The Mind Stone": 1,
+                "spell_resolved:Artist's Talent": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Land Tax": 1,
+                "spell_resolved:Swiftfoot Boots": 1,
+                "trigger_resolved:Artist's Talent": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Rograkh, Son of Rohgahh #62 (real):0": {
+                "board_wipe_resolved:Tragic Arrogance": 1,
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:Land Tax": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Mother of Runes": 1,
+                "cost_paid:Overmaster": 1,
+                "cost_paid:Prismari Pianist": 1,
+                "cost_paid:Reforge the Soul": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "cost_paid:Swiftfoot Boots": 1,
+                "cost_paid:Tempt with Bunnies": 1,
+                "draw_cards_resolved:Overmaster": 1,
+                "miracle_cast:Emeria's Call // Emeria, Shattered Skyclave": 1,
+                "miracle_cast:Improvisation Capstone": 1,
+                "miracle_cast:Tragic Arrogance": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Deflecting Swat": 1,
+                "spell_cast:Land Tax": 1,
+                "spell_cast:Overmaster": 1,
+                "spell_cast:Prismari Pianist": 1,
+                "spell_cast:Reforge the Soul": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_cast:Swiftfoot Boots": 1,
+                "spell_cast:Tempt with Bunnies": 1,
+                "spell_resolved:Emeria's Call // Emeria, Shattered Skyclave": 1,
+                "spell_resolved:Improvisation Capstone": 1,
+                "spell_resolved:Land Tax": 1,
+                "spell_resolved:Overmaster": 1,
+                "spell_resolved:Prismari Pianist": 1,
+                "spell_resolved:Reforge the Soul": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Sensei's Divining Top": 1,
+                "spell_resolved:Swiftfoot Boots": 1,
+                "spell_resolved:Tempt with Bunnies": 1,
+                "spell_resolved:Tragic Arrogance": 1,
+                "topdeck_manipulation_activated:Sensei's Divining Top": 3,
+                "trigger_resolved:Prismari Pianist": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0": {
+                "board_wipe_resolved:Everything Comes to Dust": 1,
+                "board_wipe_resolved:Farewell": 1,
+                "cost_paid:Boros Signet": 1,
+                "cost_paid:Esper Sentinel": 1,
+                "cost_paid:Furygale Flocking": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Overmaster": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Sol Ring": 1,
+                "cost_paid:Squee, Goblin Nabob": 1,
+                "cost_paid:Stroke of Midnight": 1,
+                "cost_paid:Swiftfoot Boots": 1,
+                "cost_paid:Swords to Plowshares": 1,
+                "cost_paid:The Mind Stone": 1,
+                "cost_paid:The Scarlet Witch": 1,
+                "cost_paid:Winds of Abandon": 1,
+                "draw_cards_resolved:Overmaster": 1,
+                "miracle_cast:Everything Comes to Dust": 1,
+                "miracle_cast:Farewell": 1,
+                "miracle_cast:Generous Gift": 1,
+                "miracle_cast:Path to Exile": 1,
+                "removal_resolved:Generous Gift": 1,
+                "removal_resolved:Path to Exile": 1,
+                "removal_resolved:Stroke of Midnight": 1,
+                "removal_resolved:Swords to Plowshares": 1,
+                "removal_resolved:Winds of Abandon": 1,
+                "spell_cast:Boros Signet": 1,
+                "spell_cast:Esper Sentinel": 1,
+                "spell_cast:Furygale Flocking": 1,
+                "spell_cast:Overmaster": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Sol Ring": 1,
+                "spell_cast:Stroke of Midnight": 1,
+                "spell_cast:Swiftfoot Boots": 1,
+                "spell_cast:Swords to Plowshares": 1,
+                "spell_cast:Teferi's Protection": 1,
+                "spell_cast:The Mind Stone": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_cast:Winds of Abandon": 1,
+                "spell_resolved:Esper Sentinel": 1,
+                "spell_resolved:Everything Comes to Dust": 1,
+                "spell_resolved:Farewell": 1,
+                "spell_resolved:Furygale Flocking": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Overmaster": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Stroke of Midnight": 1,
+                "spell_resolved:Swiftfoot Boots": 1,
+                "spell_resolved:Swords to Plowshares": 1,
+                "spell_resolved:Teferi's Protection": 1,
+                "spell_resolved:The Scarlet Witch": 1,
+                "spell_resolved:Winds of Abandon": 1,
+                "trigger_resolved:Esper Sentinel": 8
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0": {
+                "board_wipe_resolved:Tragic Arrogance": 1,
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Artist's Talent": 1,
+                "cost_paid:Avatar's Wrath": 1,
+                "cost_paid:Big Score": 1,
+                "cost_paid:Boros Signet": 1,
+                "cost_paid:Esper Sentinel": 1,
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:Hexing Squelcher": 2,
+                "cost_paid:Hit the Mother Lode": 1,
+                "cost_paid:Improvisation Capstone": 1,
+                "cost_paid:Land Tax": 1,
+                "cost_paid:Lorehold, the Historian": 2,
+                "cost_paid:Molecule Man": 1,
+                "cost_paid:Monument to Endurance": 1,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:Pearl Medallion": 1,
+                "cost_paid:Prismari Pianist": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "cost_paid:Sol Ring": 1,
+                "cost_paid:Squee, Goblin Nabob": 1,
+                "cost_paid:Talisman of Conviction": 1,
+                "cost_paid:The Mind Stone": 1,
+                "cost_paid:The Scarlet Witch": 2,
+                "cost_paid:Winds of Abandon": 1,
+                "miracle_cast:Furygale Flocking": 1,
+                "miracle_cast:Tempt with Bunnies": 1,
+                "miracle_cast:Tragic Arrogance": 1,
+                "removal_resolved:Generous Gift": 1,
+                "removal_resolved:Path to Exile": 1,
+                "removal_resolved:Winds of Abandon": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Artist's Talent": 1,
+                "spell_cast:Avatar's Wrath": 1,
+                "spell_cast:Big Score": 1,
+                "spell_cast:Boros Signet": 1,
+                "spell_cast:Esper Sentinel": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Flawless Maneuver": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:Hit the Mother Lode": 1,
+                "spell_cast:Improvisation Capstone": 1,
+                "spell_cast:Land Tax": 1,
+                "spell_cast:Molecule Man": 1,
+                "spell_cast:Monument to Endurance": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:Pearl Medallion": 1,
+                "spell_cast:Prismari Pianist": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_cast:Sol Ring": 1,
+                "spell_cast:Talisman of Conviction": 1,
+                "spell_cast:The Mind Stone": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_cast:Winds of Abandon": 1,
+                "spell_resolved:Artist's Talent": 1,
+                "spell_resolved:Avatar's Wrath": 1,
+                "spell_resolved:Big Score": 1,
+                "spell_resolved:Esper Sentinel": 1,
+                "spell_resolved:Flawless Maneuver": 1,
+                "spell_resolved:Furygale Flocking": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Hit the Mother Lode": 1,
+                "spell_resolved:Improvisation Capstone": 1,
+                "spell_resolved:Land Tax": 1,
+                "spell_resolved:Molecule Man": 1,
+                "spell_resolved:Monument to Endurance": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Pearl Medallion": 1,
+                "spell_resolved:Prismari Pianist": 1,
+                "spell_resolved:Sensei's Divining Top": 1,
+                "spell_resolved:Tempt with Bunnies": 1,
+                "spell_resolved:The Scarlet Witch": 1,
+                "spell_resolved:Tragic Arrogance": 1,
+                "spell_resolved:Winds of Abandon": 1,
+                "topdeck_manipulation_activated:Sensei's Divining Top": 2,
+                "treasure_created:Big Score": 1,
+                "trigger_resolved:Artist's Talent": 6,
+                "trigger_resolved:Esper Sentinel": 3,
+                "trigger_resolved:Prismari Pianist": 2
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0": {
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "cost_paid:Squee, Goblin Nabob": 1,
+                "removal_resolved:Generous Gift": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Sensei's Divining Top": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Vivi Ornitier #99 (real):0": {
+                "cost_paid:Approach of the Second Sun": 1,
+                "cost_paid:Esper Sentinel": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Sol Ring": 1,
+                "cost_paid:Swiftfoot Boots": 1,
+                "cost_paid:Victory Chimes": 1,
+                "spell_cast:Approach of the Second Sun": 1,
+                "spell_cast:Esper Sentinel": 1,
+                "spell_cast:Sol Ring": 1,
+                "spell_cast:Swiftfoot Boots": 1,
+                "spell_cast:Victory Chimes": 1,
+                "spell_resolved:Esper Sentinel": 1,
+                "spell_resolved:Swiftfoot Boots": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0": {
+                "board_wipe_resolved:Everything Comes to Dust": 1,
+                "board_wipe_resolved:Promise of Loyalty": 2,
+                "cost_paid:Approach of the Second Sun": 2,
+                "cost_paid:Artist's Talent": 1,
+                "cost_paid:Avatar's Wrath": 1,
+                "cost_paid:Bender's Waterskin": 1,
+                "cost_paid:Boros Signet": 1,
+                "cost_paid:Esper Sentinel": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Improvisation Capstone": 1,
+                "cost_paid:Jeska's Will": 1,
+                "cost_paid:Land Tax": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Mother of Runes": 2,
+                "cost_paid:Promise of Loyalty": 1,
+                "cost_paid:Reforge the Soul": 1,
+                "cost_paid:Sensei's Divining Top": 5,
+                "cost_paid:Sol Ring": 1,
+                "cost_paid:Squee, Goblin Nabob": 2,
+                "cost_paid:Talisman of Conviction": 1,
+                "cost_paid:The Mind Stone": 1,
+                "miracle_cast:Everything Comes to Dust": 1,
+                "miracle_cast:Generous Gift": 1,
+                "miracle_cast:Hit the Mother Lode": 1,
+                "miracle_cast:Surge to Victory": 1,
+                "removal_resolved:Generous Gift": 1,
+                "spell_cast:Approach of the Second Sun": 2,
+                "spell_cast:Artist's Talent": 1,
+                "spell_cast:Avatar's Wrath": 1,
+                "spell_cast:Bender's Waterskin": 1,
+                "spell_cast:Boros Signet": 1,
+                "spell_cast:Esper Sentinel": 1,
+                "spell_cast:Flawless Maneuver": 1,
+                "spell_cast:Improvisation Capstone": 1,
+                "spell_cast:Jeska's Will": 1,
+                "spell_cast:Land Tax": 1,
+                "spell_cast:Promise of Loyalty": 2,
+                "spell_cast:Redirect Lightning": 1,
+                "spell_cast:Reforge the Soul": 1,
+                "spell_cast:Sensei's Divining Top": 5,
+                "spell_cast:Sol Ring": 1,
+                "spell_cast:Talisman of Conviction": 1,
+                "spell_cast:Teferi's Protection": 1,
+                "spell_cast:The Mind Stone": 1,
+                "spell_resolved:Approach of the Second Sun": 2,
+                "spell_resolved:Artist's Talent": 1,
+                "spell_resolved:Avatar's Wrath": 1,
+                "spell_resolved:Esper Sentinel": 1,
+                "spell_resolved:Everything Comes to Dust": 1,
+                "spell_resolved:Flawless Maneuver": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Hit the Mother Lode": 1,
+                "spell_resolved:Improvisation Capstone": 1,
+                "spell_resolved:Jeska's Will": 1,
+                "spell_resolved:Land Tax": 1,
+                "spell_resolved:Promise of Loyalty": 2,
+                "spell_resolved:Reforge the Soul": 1,
+                "spell_resolved:Sensei's Divining Top": 5,
+                "spell_resolved:Surge to Victory": 1,
+                "spell_resolved:Teferi's Protection": 1,
+                "topdeck_manipulation_activated:Sensei's Divining Top": 9,
+                "trigger_resolved:Artist's Talent": 4,
+                "trigger_resolved:Squee, Goblin Nabob": 2,
+                "trigger_resolved:Surge to Victory": 1
+              }
+            },
+            "card_strategy_counts": {
+              "cost_paid:Approach of the Second Sun": 3,
+              "cost_paid:Arcane Signet": 2,
+              "cost_paid:Artist's Talent": 3,
+              "cost_paid:Avatar's Wrath": 2,
+              "cost_paid:Bender's Waterskin": 2,
+              "cost_paid:Big Score": 1,
+              "cost_paid:Boros Signet": 3,
+              "cost_paid:Esper Sentinel": 4,
+              "cost_paid:Fellwar Stone": 3,
+              "cost_paid:Furygale Flocking": 1,
+              "cost_paid:Generous Gift": 4,
+              "cost_paid:Giver of Runes": 1,
+              "cost_paid:Hexing Squelcher": 6,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Hit the Mother Lode": 1,
+              "cost_paid:Improvisation Capstone": 2,
+              "cost_paid:Jeska's Will": 1,
+              "cost_paid:Land Tax": 4,
+              "cost_paid:Lorehold, the Historian": 7,
+              "cost_paid:Molecule Man": 1,
+              "cost_paid:Monument to Endurance": 1,
+              "cost_paid:Mother of Runes": 3,
+              "cost_paid:Overmaster": 2,
+              "cost_paid:Path to Exile": 1,
+              "cost_paid:Pearl Medallion": 1,
+              "cost_paid:Prismari Pianist": 2,
+              "cost_paid:Promise of Loyalty": 1,
+              "cost_paid:Reforge the Soul": 2,
+              "cost_paid:Ruby Medallion": 3,
+              "cost_paid:Sensei's Divining Top": 8,
+              "cost_paid:Sol Ring": 4,
+              "cost_paid:Squee, Goblin Nabob": 5,
+              "cost_paid:Stroke of Midnight": 1,
+              "cost_paid:Swiftfoot Boots": 4,
+              "cost_paid:Swords to Plowshares": 1,
+              "cost_paid:Talisman of Conviction": 3,
+              "cost_paid:Tempt with Bunnies": 1,
+              "cost_paid:The Mind Stone": 4,
+              "cost_paid:The Scarlet Witch": 3,
+              "cost_paid:Unexpected Windfall": 1,
+              "cost_paid:Victory Chimes": 1,
+              "cost_paid:Winds of Abandon": 2,
+              "discard_to_top:Swords to Plowshares": 1,
+              "graveyard_return:Squee, Goblin Nabob": 2,
+              "miracle:Emeria's Call // Emeria, Shattered Skyclave": 1,
+              "miracle:Everything Comes to Dust": 2,
+              "miracle:Farewell": 1,
+              "miracle:Furygale Flocking": 1,
+              "miracle:Generous Gift": 2,
+              "miracle:Hit the Mother Lode": 1,
+              "miracle:Improvisation Capstone": 1,
+              "miracle:Overmaster": 1,
+              "miracle:Path to Exile": 1,
+              "miracle:Surge to Victory": 1,
+              "miracle:Tempt with Bunnies": 1,
+              "miracle:Tragic Arrogance": 2,
+              "spell_rummage_to_top:Swords to Plowshares": 1,
+              "squee_to_graveyard:permanent_moved_from_battlefield": 2,
+              "topdeck:Sensei's Divining Top": 14
+            },
+            "event_counts": {
+              "activated_ability": 9,
+              "activated_ability_skipped": 52,
+              "additional_cost_paid": 10,
+              "airbend_creature_cast_from_exile": 6,
+              "airbend_other_creatures_resolved": 2,
+              "approach_cast_tracked": 3,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "board_wipe_resolved": 8,
+              "cast_announced": 279,
+              "cast_illegal": 6,
+              "combat": 130,
+              "combat_result": 146,
+              "combat_step": 761,
+              "commander_cast": 38,
+              "compensation_tokens_created": 7,
+              "composite_rule_component_resolved": 8,
+              "composite_rule_resolved": 4,
+              "cost_paid": 273,
+              "countered_spell_moved_to_graveyard": 3,
+              "creature_cast": 46,
+              "creature_to_battlefield": 4,
+              "damage_resolved": 4,
+              "draw_cards_resolved": 10,
+              "end_step_instant": 1,
+              "equipment_attached": 4,
+              "extra_turn_scheduled": 2,
+              "extra_turn_taken": 2,
+              "game_lost": 2,
+              "game_won": 1,
+              "jeskas_will_resolved": 1,
+              "land_played": 175,
+              "land_ramp_resolved": 6,
+              "land_tax_trigger_skipped": 16,
+              "lorehold_upkeep_rummage": 33,
+              "lorehold_upkeep_rummage_skipped": 32,
+              "mana_refreshed": 225,
+              "miracle_cast": 15,
+              "multi_defender_attack": 13,
+              "permanent_moved_from_battlefield": 57,
+              "phase_out_resolved": 2,
+              "player_eliminated": 12,
+              "priority_pass": 2321,
+              "protection_from_everything_granted": 1,
+              "protection_resolved": 4,
+              "random_discard_after_tutor": 2,
+              "recursion_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 17,
+              "replacement_applied": 18,
+              "saga_chapter_progressed": 2,
+              "saga_chapter_resolved": 1,
+              "saga_sacrificed_by_sba": 1,
+              "self_exiled_on_resolution": 4,
+              "spell_cast": 191,
+              "spell_copied": 1,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 143,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 3,
+              "topdeck_manipulation_activated": 14,
+              "treasure_created": 4,
+              "trigger_put_on_stack": 49,
+              "trigger_resolved": 52,
+              "trigger_skipped": 17,
+              "turn_end": 212,
+              "turn_start": 225,
+              "tutor_life_loss_resolved": 2,
+              "tutor_resolved": 14,
+              "utility_land_activated": 2,
+              "wheel_resolved": 2
+            },
+            "event_counts_by_game": {
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Aang, at the Crossroads #106 (real):0": {
+                "activated_ability_skipped": 2,
+                "additional_cost_paid": 3,
+                "cast_announced": 25,
+                "combat": 19,
+                "combat_result": 21,
+                "combat_step": 107,
+                "commander_cast": 3,
+                "compensation_tokens_created": 1,
+                "cost_paid": 25,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 3,
+                "creature_to_battlefield": 1,
+                "draw_cards_resolved": 1,
+                "land_played": 23,
+                "land_ramp_resolved": 1,
+                "lorehold_upkeep_rummage": 3,
+                "lorehold_upkeep_rummage_skipped": 8,
+                "mana_refreshed": 31,
+                "miracle_cast": 1,
+                "multi_defender_attack": 2,
+                "permanent_moved_from_battlefield": 2,
+                "player_eliminated": 1,
+                "priority_pass": 312,
+                "protection_resolved": 1,
+                "removal_resolved": 1,
+                "spell_cast": 20,
+                "spell_countered": 1,
+                "spell_resolved": 11,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 7,
+                "trigger_resolved": 7,
+                "turn_end": 30,
+                "turn_start": 31,
+                "tutor_life_loss_resolved": 1,
+                "tutor_resolved": 2
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Kenrith, the Returned King #113 (real):0": {
+                "activated_ability": 2,
+                "activated_ability_skipped": 10,
+                "cast_announced": 23,
+                "combat": 13,
+                "combat_result": 13,
+                "combat_step": 72,
+                "commander_cast": 5,
+                "compensation_tokens_created": 1,
+                "cost_paid": 23,
+                "creature_cast": 3,
+                "creature_to_battlefield": 1,
+                "equipment_attached": 1,
+                "land_played": 19,
+                "lorehold_upkeep_rummage": 3,
+                "lorehold_upkeep_rummage_skipped": 4,
+                "mana_refreshed": 22,
+                "permanent_moved_from_battlefield": 3,
+                "player_eliminated": 1,
+                "priority_pass": 208,
+                "random_discard_after_tutor": 1,
+                "removal_resolved": 1,
+                "replacement_applied": 1,
+                "spell_cast": 15,
+                "spell_resolved": 8,
+                "trigger_put_on_stack": 2,
+                "trigger_resolved": 2,
+                "trigger_skipped": 2,
+                "turn_end": 21,
+                "turn_start": 22,
+                "tutor_resolved": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Rograkh, Son of Rohgahh #62 (real):0": {
+                "activated_ability": 1,
+                "board_wipe_resolved": 1,
+                "cast_announced": 42,
+                "combat": 21,
+                "combat_result": 25,
+                "combat_step": 124,
+                "commander_cast": 7,
+                "composite_rule_component_resolved": 2,
+                "composite_rule_resolved": 1,
+                "cost_paid": 42,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 12,
+                "creature_to_battlefield": 1,
+                "damage_resolved": 1,
+                "draw_cards_resolved": 1,
+                "equipment_attached": 1,
+                "land_played": 26,
+                "lorehold_upkeep_rummage": 8,
+                "lorehold_upkeep_rummage_skipped": 5,
+                "mana_refreshed": 30,
+                "miracle_cast": 3,
+                "multi_defender_attack": 3,
+                "permanent_moved_from_battlefield": 15,
+                "player_eliminated": 1,
+                "priority_pass": 344,
+                "protection_resolved": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 1,
+                "replacement_applied": 3,
+                "spell_cast": 24,
+                "spell_countered": 1,
+                "spell_resolved": 18,
+                "tokens_created": 1,
+                "topdeck_manipulation_activated": 3,
+                "trigger_put_on_stack": 11,
+                "trigger_resolved": 11,
+                "turn_end": 29,
+                "turn_start": 30,
+                "tutor_life_loss_resolved": 1,
+                "tutor_resolved": 2,
+                "wheel_resolved": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 7,
+                "additional_cost_paid": 3,
+                "board_wipe_resolved": 2,
+                "cast_announced": 34,
+                "combat": 16,
+                "combat_result": 20,
+                "combat_step": 98,
+                "commander_cast": 6,
+                "compensation_tokens_created": 2,
+                "cost_paid": 34,
+                "creature_cast": 4,
+                "creature_to_battlefield": 1,
+                "damage_resolved": 1,
+                "draw_cards_resolved": 1,
+                "equipment_attached": 1,
+                "land_played": 21,
+                "land_ramp_resolved": 3,
+                "lorehold_upkeep_rummage": 6,
+                "lorehold_upkeep_rummage_skipped": 3,
+                "mana_refreshed": 26,
+                "miracle_cast": 4,
+                "multi_defender_attack": 4,
+                "permanent_moved_from_battlefield": 8,
+                "phase_out_resolved": 1,
+                "player_eliminated": 3,
+                "priority_pass": 293,
+                "removal_resolved": 5,
+                "replacement_applied": 5,
+                "self_exiled_on_resolution": 1,
+                "spell_cast": 25,
+                "spell_resolved": 21,
+                "tokens_created": 1,
+                "trigger_put_on_stack": 11,
+                "trigger_resolved": 11,
+                "turn_end": 23,
+                "turn_start": 26,
+                "tutor_resolved": 1,
+                "utility_land_activated": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0": {
+                "activated_ability": 3,
+                "activated_ability_skipped": 14,
+                "additional_cost_paid": 4,
+                "airbend_creature_cast_from_exile": 2,
+                "airbend_other_creatures_resolved": 1,
+                "board_wipe_resolved": 2,
+                "cast_announced": 50,
+                "cast_illegal": 1,
+                "combat": 18,
+                "combat_result": 23,
+                "combat_step": 115,
+                "commander_cast": 6,
+                "compensation_tokens_created": 1,
+                "composite_rule_component_resolved": 4,
+                "composite_rule_resolved": 2,
+                "cost_paid": 49,
+                "creature_cast": 3,
+                "extra_turn_scheduled": 1,
+                "extra_turn_taken": 1,
+                "game_lost": 1,
+                "land_played": 24,
+                "land_ramp_resolved": 2,
+                "land_tax_trigger_skipped": 6,
+                "lorehold_upkeep_rummage": 9,
+                "lorehold_upkeep_rummage_skipped": 4,
+                "mana_refreshed": 38,
+                "miracle_cast": 3,
+                "multi_defender_attack": 3,
+                "permanent_moved_from_battlefield": 13,
+                "player_eliminated": 3,
+                "priority_pass": 385,
+                "protection_resolved": 1,
+                "random_discard_after_tutor": 1,
+                "recursion_resolved": 1,
+                "removal_resolved": 5,
+                "replacement_applied": 4,
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 1,
+                "saga_sacrificed_by_sba": 1,
+                "self_exiled_on_resolution": 1,
+                "spell_cast": 39,
+                "spell_resolved": 29,
+                "tokens_created": 1,
+                "topdeck_manipulation_activated": 2,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 11,
+                "trigger_resolved": 11,
+                "trigger_skipped": 7,
+                "turn_end": 35,
+                "turn_start": 38,
+                "tutor_resolved": 4,
+                "utility_land_activated": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 4,
+                "cast_announced": 22,
+                "combat": 11,
+                "combat_result": 11,
+                "combat_step": 64,
+                "commander_cast": 3,
+                "compensation_tokens_created": 1,
+                "cost_paid": 22,
+                "creature_cast": 7,
+                "damage_resolved": 1,
+                "draw_cards_resolved": 2,
+                "end_step_instant": 1,
+                "land_played": 16,
+                "mana_refreshed": 20,
+                "permanent_moved_from_battlefield": 1,
+                "player_eliminated": 1,
+                "priority_pass": 188,
+                "removal_resolved": 1,
+                "spell_cast": 12,
+                "spell_resolved": 10,
+                "turn_end": 19,
+                "turn_start": 20,
+                "tutor_resolved": 2
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Vivi Ornitier #99 (real):0": {
+                "activated_ability_skipped": 7,
+                "approach_cast_tracked": 1,
+                "attachment_sba": 1,
+                "cast_announced": 25,
+                "combat": 15,
+                "combat_result": 15,
+                "combat_step": 80,
+                "commander_cast": 3,
+                "cost_paid": 25,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 4,
+                "damage_resolved": 1,
+                "draw_cards_resolved": 2,
+                "equipment_attached": 1,
+                "land_played": 19,
+                "mana_refreshed": 24,
+                "permanent_moved_from_battlefield": 2,
+                "player_eliminated": 1,
+                "priority_pass": 244,
+                "spell_cast": 18,
+                "spell_countered": 1,
+                "spell_resolved": 13,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 3,
+                "trigger_resolved": 3,
+                "turn_end": 22,
+                "turn_start": 24,
+                "tutor_resolved": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 8,
+                "airbend_creature_cast_from_exile": 4,
+                "airbend_other_creatures_resolved": 1,
+                "approach_cast_tracked": 2,
+                "approach_first_resolution": 1,
+                "board_wipe_resolved": 3,
+                "cast_announced": 58,
+                "cast_illegal": 5,
+                "combat": 17,
+                "combat_result": 18,
+                "combat_step": 101,
+                "commander_cast": 5,
+                "compensation_tokens_created": 1,
+                "composite_rule_component_resolved": 2,
+                "composite_rule_resolved": 1,
+                "cost_paid": 53,
+                "creature_cast": 10,
+                "draw_cards_resolved": 3,
+                "extra_turn_scheduled": 1,
+                "extra_turn_taken": 1,
+                "game_lost": 1,
+                "game_won": 1,
+                "jeskas_will_resolved": 1,
+                "land_played": 27,
+                "land_tax_trigger_skipped": 10,
+                "lorehold_upkeep_rummage": 4,
+                "lorehold_upkeep_rummage_skipped": 8,
+                "mana_refreshed": 34,
+                "miracle_cast": 4,
+                "multi_defender_attack": 1,
+                "permanent_moved_from_battlefield": 13,
+                "phase_out_resolved": 1,
+                "player_eliminated": 1,
+                "priority_pass": 347,
+                "protection_from_everything_granted": 1,
+                "protection_resolved": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 3,
+                "replacement_applied": 5,
+                "self_exiled_on_resolution": 2,
+                "spell_cast": 38,
+                "spell_copied": 1,
+                "spell_copy_ceased_to_exist": 1,
+                "spell_resolved": 33,
+                "surge_to_victory_resolved": 1,
+                "topdeck_manipulation_activated": 9,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 4,
+                "trigger_resolved": 7,
+                "trigger_skipped": 8,
+                "turn_end": 33,
+                "turn_start": 34,
+                "tutor_resolved": 1,
+                "wheel_resolved": 1
+              }
+            },
+            "squee_anomalies": [],
+            "squee_game_traces": {
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0": [
+                {
+                  "data": {
+                    "discard_destination": "graveyard",
+                    "discarded": "Plains // Plains",
+                    "player": "Lorehold",
+                    "reason": "discard_excess_land_for_new_draw",
+                    "turn": 5
+                  },
+                  "event": "lorehold_upkeep_rummage",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1036,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 6
+                  },
+                  "event": "turn_start",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1156,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "turn_start",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1186,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "cast_announced",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1202,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "cost_paid",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1203,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "creature_cast",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1204,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1223,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Teferi's Protection",
+                    "player": "Lorehold",
+                    "turn": 8
+                  },
+                  "event": "phase_out_resolved",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1229,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Everything Comes to Dust",
+                    "destination": "exile",
+                    "player": "Lorehold",
+                    "turn": 9
+                  },
+                  "event": "board_wipe_resolved",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1253,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 9
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1258,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 9
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1260,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 10
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1270,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 10
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1272,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1278,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Windswept Heath",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 11
+                  },
+                  "event": "land_played",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1281,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 11
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1285,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 11
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1287,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                }
+              ],
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0": [
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "cast_announced",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5599,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "cost_paid",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5600,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "creature_cast",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5601,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5605,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Elegant Parlor",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 11
+                  },
+                  "event": "land_played",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5609,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 11
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5614,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 11
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5616,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Flooded Strand",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 12
+                  },
+                  "event": "land_played",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5624,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 12
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5628,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 12
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5630,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 12
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5636,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Urza's Saga",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 13
+                  },
+                  "event": "land_played",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5640,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 13
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5663,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 13
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5665,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 13
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5672,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Spectator Seating",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 14
+                  },
+                  "event": "land_played",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5677,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 14
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5681,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 14
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5683,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 14
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5690,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Sunbaked Canyon",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 16
+                  },
+                  "event": "land_played",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5700,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 16
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5714,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 16
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 5716,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                }
+              ],
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0": [
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 1
+                  },
+                  "event": "turn_start",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3438,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 1
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3452,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 2
+                  },
+                  "event": "turn_start",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3517,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 2
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3532,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 3
+                  },
+                  "event": "turn_start",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3598,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 3
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3625,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 4
+                  },
+                  "event": "turn_start",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3700,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 4
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3722,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 5
+                  },
+                  "event": "turn_start",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3788,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 5
+                  },
+                  "event": "cast_announced",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3790,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 5
+                  },
+                  "event": "cost_paid",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3791,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 5
+                  },
+                  "event": "creature_cast",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3792,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 5
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3802,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                }
+              ],
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0": [
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1862,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 8
+                  },
+                  "event": "turn_start",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 1999,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 8
+                  },
+                  "event": "cast_announced",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2004,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 8
+                  },
+                  "event": "cost_paid",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2005,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 8
+                  },
+                  "event": "creature_cast",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2006,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 8
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2014,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Plains // Plains",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 9
+                  },
+                  "event": "land_played",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2028,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "destination": "graveyard",
+                    "from_zone": "battlefield",
+                    "player": "Lorehold",
+                    "reason": "promise_of_loyalty",
+                    "source": "Promise of Loyalty",
+                    "to_zone": "graveyard",
+                    "turn": 9
+                  },
+                  "event": "permanent_moved_from_battlefield",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "graveyard_entry"
+                  ],
+                  "seq": 2047,
+                  "squee_known_graveyard_balance_after": 1,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Promise of Loyalty",
+                    "player": "Lorehold",
+                    "turn": 9
+                  },
+                  "event": "board_wipe_resolved",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2053,
+                  "squee_known_graveyard_balance_after": 1,
+                  "squee_known_graveyard_balance_before": 1
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "destination": "hand",
+                    "effect": "graveyard_upkeep_return_self_to_hand",
+                    "player": "Lorehold",
+                    "trigger": "beginning_of_your_upkeep",
+                    "turn": 10
+                  },
+                  "event": "trigger_resolved",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "upkeep_return"
+                  ],
+                  "seq": 2071,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 1
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "cast_announced",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2119,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "cost_paid",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2120,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "creature_cast",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2121,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 10
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2123,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Plaza of Heroes",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 11
+                  },
+                  "event": "land_played",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2134,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 11
+                  },
+                  "event": "combat_step",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2161,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 11
+                  },
+                  "event": "combat",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2163,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "destination": "graveyard",
+                    "from_zone": "battlefield",
+                    "player": "Lorehold",
+                    "reason": "promise_of_loyalty",
+                    "source": "Promise of Loyalty",
+                    "to_zone": "graveyard",
+                    "turn": 11
+                  },
+                  "event": "permanent_moved_from_battlefield",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "graveyard_entry"
+                  ],
+                  "seq": 2171,
+                  "squee_known_graveyard_balance_after": 1,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Promise of Loyalty",
+                    "player": "Lorehold",
+                    "turn": 11
+                  },
+                  "event": "board_wipe_resolved",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 2172,
+                  "squee_known_graveyard_balance_after": 1,
+                  "squee_known_graveyard_balance_before": 1
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "destination": "hand",
+                    "effect": "graveyard_upkeep_return_self_to_hand",
+                    "player": "Lorehold",
+                    "trigger": "beginning_of_your_upkeep",
+                    "turn": 12
+                  },
+                  "event": "trigger_resolved",
+                  "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                  "markers": [
+                    "upkeep_return"
+                  ],
+                  "seq": 2206,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 1
+                }
+              ]
+            },
+            "squee_known_graveyard_balance_by_game": {
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0": 0
+            },
+            "squee_trace_samples": [
+              {
+                "data": {
+                  "discard_destination": "graveyard",
+                  "discarded": "Plains // Plains",
+                  "player": "Lorehold",
+                  "reason": "discard_excess_land_for_new_draw",
+                  "turn": 5
+                },
+                "event": "lorehold_upkeep_rummage",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1036,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "player": "Lorehold",
+                  "turn": 6
+                },
+                "event": "turn_start",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1156,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "player": "Lorehold",
+                  "turn": 7
+                },
+                "event": "turn_start",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1186,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 7
+                },
+                "event": "cast_announced",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1202,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 7
+                },
+                "event": "cost_paid",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1203,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 7
+                },
+                "event": "creature_cast",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1204,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 7
+                },
+                "event": "turn_end",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1223,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Teferi's Protection",
+                  "player": "Lorehold",
+                  "turn": 8
+                },
+                "event": "phase_out_resolved",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1229,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Everything Comes to Dust",
+                  "destination": "exile",
+                  "player": "Lorehold",
+                  "turn": 9
+                },
+                "event": "board_wipe_resolved",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1253,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 9
+                },
+                "event": "combat_step",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1258,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 9
+                },
+                "event": "combat",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1260,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 10
+                },
+                "event": "combat_step",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1270,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 10
+                },
+                "event": "combat",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1272,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 10
+                },
+                "event": "turn_end",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1278,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Windswept Heath",
+                  "effect": "land",
+                  "player": "Lorehold",
+                  "turn": 11
+                },
+                "event": "land_played",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1281,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 11
+                },
+                "event": "combat_step",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1285,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 11
+                },
+                "event": "combat",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1287,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 7
+                },
+                "event": "turn_end",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1862,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "player": "Lorehold",
+                  "turn": 8
+                },
+                "event": "turn_start",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 1999,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 8
+                },
+                "event": "cast_announced",
+                "game_id": "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 2004,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              }
+            ],
+            "strategic_event_counts": {
+              "discard_to_top_replacement": 1,
+              "graveyard_upkeep_return_self_to_hand": 2,
+              "lorehold_cost_paid": 106,
+              "lorehold_spell_cast": 91,
+              "lorehold_spell_rummage": 11,
+              "lorehold_spell_rummage_discard_to_top": 1,
+              "lorehold_upkeep_rummage": 33,
+              "miracle_cast": 15,
+              "squee_return_after_known_graveyard_entry": 2,
+              "squee_to_graveyard": 2,
+              "squee_upkeep_return": 2,
+              "topdeck_manipulation_activated": 14
+            },
+            "strategic_event_counts_by_game": {
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Aang, at the Crossroads #106 (real):0": {
+                "lorehold_cost_paid": 7,
+                "lorehold_spell_cast": 6,
+                "lorehold_upkeep_rummage": 3,
+                "miracle_cast": 1
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Kenrith, the Returned King #113 (real):0": {
+                "lorehold_cost_paid": 8,
+                "lorehold_spell_cast": 6,
+                "lorehold_spell_rummage": 1,
+                "lorehold_upkeep_rummage": 3
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Rograkh, Son of Rohgahh #62 (real):0": {
+                "lorehold_cost_paid": 12,
+                "lorehold_spell_cast": 10,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 3,
+                "topdeck_manipulation_activated": 3
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Sisay, Weatherlight Captain #61 (real):0": {
+                "lorehold_cost_paid": 14,
+                "lorehold_spell_cast": 13,
+                "lorehold_upkeep_rummage": 6,
+                "miracle_cast": 4
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0": {
+                "discard_to_top_replacement": 1,
+                "lorehold_cost_paid": 28,
+                "lorehold_spell_cast": 23,
+                "lorehold_spell_rummage": 6,
+                "lorehold_spell_rummage_discard_to_top": 1,
+                "lorehold_upkeep_rummage": 9,
+                "miracle_cast": 3,
+                "topdeck_manipulation_activated": 2
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Umbris, Fear Manifest #114 (real):0": {
+                "lorehold_cost_paid": 5,
+                "lorehold_spell_cast": 4
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Vivi Ornitier #99 (real):0": {
+                "lorehold_cost_paid": 6,
+                "lorehold_spell_cast": 5
+              },
+              "synergy_overmaster_protect_draw_cut_tibalts_trickery:Winota, Joiner of Forces #39 (real):0": {
+                "graveyard_upkeep_return_self_to_hand": 2,
+                "lorehold_cost_paid": 26,
+                "lorehold_spell_cast": 24,
+                "lorehold_spell_rummage": 4,
+                "lorehold_upkeep_rummage": 4,
+                "miracle_cast": 4,
+                "squee_return_after_known_graveyard_entry": 2,
+                "squee_to_graveyard": 2,
+                "squee_upkeep_return": 2,
+                "topdeck_manipulation_activated": 9
+              }
+            },
+            "strategic_games": {
+              "birgi_spell_cast_mana": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "discard_to_top_replacement": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "graveyard_upkeep_return_self_to_hand": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "hand_to_topdeck_activation": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_cost_paid": {
+                "games": 8,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_cast": {
+                "games": 8,
+                "rate": 1.0
+              },
+              "lorehold_spell_rummage": {
+                "games": 3,
+                "rate": 0.375
+              },
+              "lorehold_spell_rummage_discard_to_top": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "lorehold_spell_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_upkeep_rummage": {
+                "games": 6,
+                "rate": 0.75
+              },
+              "miracle_cast": {
+                "games": 5,
+                "rate": 0.625
+              },
+              "spell_cast_mana_trigger": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_after_known_graveyard_entry": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "squee_return_without_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_to_graveyard": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "squee_upkeep_return": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "thor_cost_paid": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage_amount": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_spell_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 3,
+                "rate": 0.375
+              }
+            },
+            "top_cards": [
+              {
+                "count": 14,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 8,
+                "key": "cost_paid:Sensei's Divining Top"
+              },
+              {
+                "count": 7,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 6,
+                "key": "cost_paid:Hexing Squelcher"
+              },
+              {
+                "count": 5,
+                "key": "cost_paid:Squee, Goblin Nabob"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Swiftfoot Boots"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:The Mind Stone"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Generous Gift"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Approach of the Second Sun"
+              }
+            ]
+          },
+          "win_rate": 37.5,
+          "wins": 3
+        },
+        "delta_pp": 25.0
+      },
+      "hypothesis": "Overmaster protects a decisive instant or sorcery and replaces itself. This tests the spell-protection lane while keeping Hexing Squelcher and the known protection shell intact, comparing against a swingy protection/counter slot instead.",
+      "package_key": "overmaster_protect_draw_cut_tibalts_trickery",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "prior package evidence disabled",
+        "status": "not_checked"
+      },
+      "status": "gated"
+    }
+  ],
+  "preflight_only": false,
+  "prior_package_reports": [],
+  "prior_package_summary": {
+    "loaded_report_count": 0,
+    "missing_report_count": 0,
+    "package_key_count": 0
+  },
+  "simulation_seed": 7,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}
