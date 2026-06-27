@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T17:28:10Z`
+- Generated at: `2026-06-27T17:45:06Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -30,6 +30,8 @@ Operationally, a better deck must increase at least one of these without breakin
 - Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, and Penance against the Squee champion. Best aggregate was `galvanoth_topdeck_freecast` at `9-18` vs baseline `8-19` (`+3.70` pp), but seed 42 moved `-44.45` pp, so it is not an automatic deck promotion.
 - Birgi is now instrumented and produced `+13` spell-cast mana triggers, but its aggregate result was `7-20` vs baseline `8-19` (`-3.70` pp); mana telemetry alone is not enough to promote it.
 - Penance is not a proven topdeck engine yet: observed `hand_to_topdeck_activation` delta was `+0` and the package lost `-7.41` pp aggregate.
+- Library of Leng / discard-to-top telemetry is now visible in gates: seed 42 went `8-1` with `16` discard-to-top replacements, `30` topdeck activations, and `33` miracle casts.
+- Failure seeds split into two problems: seed 7 had `0` discard-to-top replacements, while seed 20260625 had `14` replacements but still went `0-9`; the issue is not only finding Library of Leng, but converting the topdecked card into survival or a second Approach window.
 
 ## Squee Vs 607 Battle Evidence
 
@@ -90,6 +92,20 @@ Interpretation: under fixed hash-seed, process-isolated, timeout-bounded conditi
 | 42 | win | 8 | 15.12 | 33 | 30 | 113 | 6 | 5 | 5 | 3 |
 | 20260625 | loss | 9 | 7.00 | 4 | 3 | 48 | 0 | 0 | 1 | 0 |
 | 7 | loss | 9 | 6.33 | 4 | 2 | 42 | 0 | 0 | 1 | 0 |
+
+## Library of Leng / Discard-To-Top Telemetry
+
+These gates rerun the Squee champion with the battle gate instrumented for discard-to-top replacement. The goal is to separate three questions: whether Library of Leng appears, whether it places a meaningful card on top, and whether the deck converts that into miracle/survival before combat pressure kills it.
+
+| Seed | W | L | S | WR | Miracle | Topdeck | Discard-To-Top | Rummage-To-Top | Spell-Rummage-To-Top | Rummage | Spell Rummage | Squee GY | Squee Return | Discard-To-Top Games | Topdeck Games | Miracle Games |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 7 | 0 | 9 | 0 | 0.00% | 4 | 2 | 0 | 0 | 0 | 27 | 2 | 0 | 0 | 0 | 1 | 4 |
+| 42 | 8 | 1 | 0 | 88.89% | 33 | 30 | 16 | 13 | 3 | 41 | 19 | 7 | 5 | 3 | 5 | 8 |
+| 20260625 | 0 | 9 | 0 | 0.00% | 4 | 3 | 14 | 14 | 0 | 38 | 2 | 0 | 0 | 3 | 1 | 2 |
+
+Aggregate read: `8-19-0` over `27` games, with `30` discard-to-top replacements, `35` topdeck activations, and `41` miracle casts.
+Top discard-to-top signals: `discard_to_top:Deflecting Swat`=7, `lorehold_rummage_to_top:Approach of the Second Sun`=7, `discard_to_top:Approach of the Second Sun`=7, `lorehold_rummage_to_top:Deflecting Swat`=6, `lorehold_rummage_to_top:Dawn's Truce`=3, `discard_to_top:Dawn's Truce`=3.
+Interpretation: Library of Leng is not a missing runtime feature anymore; it is a measurable engine. Seed 42 shows the intended conversion pattern, seed 7 lacks the engine almost entirely, and seed 20260625 proves that repeated Approach-to-top loops can still fail under fast life-total pressure. The next deck work should pair topdeck consistency with either faster protection/pressure absorption or a cleaner second-Approach/finisher conversion, rather than treating discard-to-top alone as the solution.
 
 ## Squee Rule Materialization Audit
 
@@ -220,11 +236,13 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - Separate finalizer slots from engine slots: Dance with Calamity and Aetherflux Reservoir have now failed the Storm Herd slot benchmark; remaining finalizer work should focus on other closing packages or different cuts, not repeating those two swaps.
 - Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.
 - Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.
+- Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.
 
 ## Next Gates
 
 - Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.
-- Build one topdeck consistency package against the 607+Squee champion, because seed 42 wins with topdeck=30/miracle=33 while the failure seeds are topdeck-poor.
+- Build one Library/topdeck conversion package against the 607+Squee champion: it must increase discard-to-top plus miracle conversion or second-Approach completion without increasing early life-zero losses.
+- Build one pressure-absorber package against the 607+Squee champion, because seed 20260625 can loop Approach to top but still dies before conversion.
 - Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.
 - Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.
 - Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.
@@ -238,3 +256,5 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - [EDHREC spellslinger Commander guide](https://edhrec.com/guides/edhrec-guide-to-spellslinger-in-commander): spellslinger criteria: card flow, cheap interaction, protection, recursion, payoffs.
 - [EDHREC Commander deckbuilding guide](https://edhrec.com/articles/how-to-build-a-commander-deck): baseline structure guardrails for lands, ramp, draw, removal, and focused packages.
 - [Archidekt Lorehold corpus](https://archidekt.com/commanders/Lorehold%2C%20the%20Historian): user-built Lorehold shells and recurring package choices.
+- [Card Kingdom Lorehold synergy article](https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/): external confirmation that Library of Leng and topdeck/discard loops are a commander-specific synergy lane.
+- [Draftsim Lorehold EDH deck tech](https://draftsim.com/lorehold-the-historian-edh-deck/): external deck-tech framing for miracle setup, draw timing, and support packages.

@@ -354,8 +354,8 @@
         "card_name": "Library of Leng",
         "db_role": "engine",
         "decision": "core_engine_or_probation",
-        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
-        "effective_role": "engine",
+        "decision_reason": "discard-to-top replacement is now measured in the Squee champion; do not cut without a direct conversion/survival benchmark",
+        "effective_role": "topdeck_miracle_engine",
         "package_lane": "topdeck_miracle_setup",
         "quantity": 1,
         "rule_materialized_in_equal_gate_candidate": false,
@@ -19384,6 +19384,16 @@
       "name": "Archidekt Lorehold corpus",
       "url": "https://archidekt.com/commanders/Lorehold%2C%20the%20Historian",
       "use": "user-built Lorehold shells and recurring package choices"
+    },
+    {
+      "name": "Card Kingdom Lorehold synergy article",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/",
+      "use": "external confirmation that Library of Leng and topdeck/discard loops are a commander-specific synergy lane"
+    },
+    {
+      "name": "Draftsim Lorehold EDH deck tech",
+      "url": "https://draftsim.com/lorehold-the-historian-edh-deck/",
+      "use": "external deck-tech framing for miracle setup, draw timing, and support packages"
     }
   ],
   "general_synergy_confirm": [
@@ -19446,7 +19456,124 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T17:28:10Z",
+  "generated_at": "2026-06-27T17:45:06Z",
+  "library_leng_telemetry_gates": {
+    "paths": [
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed42_squee_v1.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed20260625_squee_v1.json"
+    ],
+    "rows": [
+      {
+        "deck_key": "deck_6",
+        "discard_to_top_games": 0,
+        "discard_to_top_replacement": 0,
+        "lorehold_rummage_discard_to_top": 0,
+        "lorehold_spell_rummage": 2,
+        "lorehold_spell_rummage_discard_to_top": 0,
+        "lorehold_upkeep_rummage": 27,
+        "losses": 9,
+        "miracle_cast": 4,
+        "miracle_games": 4,
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "topdeck_games": 1,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      {
+        "deck_key": "deck_6",
+        "discard_to_top_games": 3,
+        "discard_to_top_replacement": 16,
+        "lorehold_rummage_discard_to_top": 13,
+        "lorehold_spell_rummage": 19,
+        "lorehold_spell_rummage_discard_to_top": 3,
+        "lorehold_upkeep_rummage": 41,
+        "losses": 1,
+        "miracle_cast": 33,
+        "miracle_games": 8,
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed42_squee_v1.json",
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "topdeck_games": 5,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      {
+        "deck_key": "deck_6",
+        "discard_to_top_games": 3,
+        "discard_to_top_replacement": 14,
+        "lorehold_rummage_discard_to_top": 14,
+        "lorehold_spell_rummage": 2,
+        "lorehold_spell_rummage_discard_to_top": 0,
+        "lorehold_upkeep_rummage": 38,
+        "losses": 9,
+        "miracle_cast": 4,
+        "miracle_games": 2,
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed20260625_squee_v1.json",
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "topdeck_games": 1,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 0.0,
+        "wins": 0
+      }
+    ],
+    "summary": {
+      "discard_to_top_games": 6,
+      "discard_to_top_replacement": 30,
+      "games": 27,
+      "lorehold_rummage_discard_to_top": 27,
+      "lorehold_spell_rummage": 23,
+      "lorehold_spell_rummage_discard_to_top": 3,
+      "lorehold_upkeep_rummage": 106,
+      "losses": 19,
+      "miracle_cast": 41,
+      "miracle_games": 14,
+      "squee_to_graveyard": 7,
+      "squee_upkeep_return": 5,
+      "stalls": 0,
+      "topdeck_games": 7,
+      "topdeck_manipulation_activated": 35,
+      "win_rate": 29.63,
+      "wins": 8
+    },
+    "top_discard_to_top_cards": [
+      {
+        "count": 7,
+        "key": "discard_to_top:Deflecting Swat"
+      },
+      {
+        "count": 7,
+        "key": "lorehold_rummage_to_top:Approach of the Second Sun"
+      },
+      {
+        "count": 7,
+        "key": "discard_to_top:Approach of the Second Sun"
+      },
+      {
+        "count": 6,
+        "key": "lorehold_rummage_to_top:Deflecting Swat"
+      },
+      {
+        "count": 3,
+        "key": "lorehold_rummage_to_top:Dawn's Truce"
+      },
+      {
+        "count": 3,
+        "key": "discard_to_top:Dawn's Truce"
+      }
+    ]
+  },
   "matrix_generated_at": "2026-06-26T17:59:59.926705+00:00",
   "matrix_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json",
   "matrix_ranked": [
@@ -26204,7 +26331,8 @@
   ],
   "next_gates": [
     "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
-    "Build one topdeck consistency package against the 607+Squee champion, because seed 42 wins with topdeck=30/miracle=33 while the failure seeds are topdeck-poor.",
+    "Build one Library/topdeck conversion package against the 607+Squee champion: it must increase discard-to-top plus miracle conversion or second-Approach completion without increasing early life-zero losses.",
+    "Build one pressure-absorber package against the 607+Squee champion, because seed 20260625 can loop Approach to top but still dies before conversion.",
     "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
     "Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.",
     "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
@@ -26220,7 +26348,8 @@
     "`Thor, God of Thunder` now has a local reviewed runtime rule and one natural synced-rule battle exposure for 7 damage, but the checked 21-game candidate sample had +0.00 pp win-rate delta; keep it as modeled-but-not-proven until a stratified or larger gate proves deck value.",
     "Separate finalizer slots from engine slots: Dance with Calamity and Aetherflux Reservoir have now failed the Storm Herd slot benchmark; remaining finalizer work should focus on other closing packages or different cuts, not repeating those two swaps.",
     "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
-    "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family."
+    "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.",
+    "Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure."
   ],
   "post_squee_package_gates": {
     "paths": [

@@ -43,6 +43,15 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
             },
         )
         telemetry.record(
+            "lorehold_upkeep_rummage",
+            {
+                "player": "Lorehold",
+                "discarded": "Storm Herd",
+                "discard_destination": "top_of_library",
+                "replacement_used": True,
+            },
+        )
+        telemetry.record(
             "trigger_resolved",
             {
                 "player": "Lorehold",
@@ -50,6 +59,7 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
                 "effect": "rummage",
                 "discarded": "Squee, Goblin Nabob",
                 "discarded_to_graveyard": ["Squee, Goblin Nabob"],
+                "discarded_to_top": ["Rise of the Eldrazi"],
             },
         )
         telemetry.record(
@@ -89,9 +99,12 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["strategic_event_counts"]["spell_cast_mana_trigger"], 1)
         self.assertEqual(payload["strategic_event_counts"]["birgi_spell_cast_mana"], 1)
         self.assertEqual(payload["strategic_event_counts"]["hand_to_topdeck_activation"], 1)
-        self.assertEqual(payload["strategic_event_counts"]["lorehold_upkeep_rummage"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["lorehold_upkeep_rummage"], 2)
+        self.assertEqual(payload["strategic_event_counts"]["discard_to_top_replacement"], 2)
+        self.assertEqual(payload["strategic_event_counts"]["lorehold_rummage_discard_to_top"], 1)
         self.assertEqual(payload["strategic_event_counts"]["lorehold_rummage_discards_squee"], 1)
         self.assertEqual(payload["strategic_event_counts"]["lorehold_spell_rummage"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["lorehold_spell_rummage_discard_to_top"], 1)
         self.assertEqual(payload["strategic_event_counts"]["lorehold_spell_rummage_discards_squee"], 1)
         self.assertEqual(payload["strategic_event_counts"]["squee_to_graveyard"], 3)
         self.assertEqual(payload["strategic_event_counts"]["squee_upkeep_return"], 2)
@@ -111,6 +124,9 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["strategic_games"]["lorehold_spell_cast"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["birgi_spell_cast_mana"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["hand_to_topdeck_activation"]["games"], 1)
+        self.assertEqual(payload["strategic_games"]["discard_to_top_replacement"]["games"], 1)
+        self.assertEqual(payload["strategic_games"]["lorehold_rummage_discard_to_top"]["games"], 1)
+        self.assertEqual(payload["strategic_games"]["lorehold_spell_rummage_discard_to_top"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["thor_cost_paid"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["thor_spell_cast"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["squee_upkeep_return"]["games"], 2)

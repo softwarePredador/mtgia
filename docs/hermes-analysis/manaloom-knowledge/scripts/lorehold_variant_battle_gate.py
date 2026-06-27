@@ -199,9 +199,12 @@ class GateTelemetry:
             "spell_cast_mana_trigger": set(),
             "birgi_spell_cast_mana": set(),
             "lorehold_upkeep_rummage": set(),
+            "discard_to_top_replacement": set(),
+            "lorehold_rummage_discard_to_top": set(),
             "hand_to_topdeck_activation": set(),
             "lorehold_rummage_discards_squee": set(),
             "lorehold_spell_rummage": set(),
+            "lorehold_spell_rummage_discard_to_top": set(),
             "lorehold_spell_rummage_discards_squee": set(),
             "squee_to_graveyard": set(),
             "squee_return_after_known_graveyard_entry": set(),
@@ -247,6 +250,18 @@ class GateTelemetry:
             for key in ("destination", "to_zone", "zone_after", "discard_destination", "final_to_zone")
             if data.get(key)
         }
+
+    def _discard_to_top_names(self, data: Mapping[str, Any]) -> list[str]:
+        names = self._payload_names(data, ("discarded_to_top", "to_top", "cards_to_top"))
+        destinations = self._payload_destinations(data)
+        if destinations & {"library_top", "top_of_library"}:
+            names.extend(
+                self._payload_names(
+                    data,
+                    ("discarded", "discarded_card", "card", "card_name"),
+                )
+            )
+        return [name for name in names if name]
 
     def _squee_in_graveyard_payload(self, event: str, data: Mapping[str, Any]) -> bool:
         graveyard_list_names = self._payload_names(
@@ -420,6 +435,14 @@ class GateTelemetry:
             self.strategic_events["lorehold_upkeep_rummage"] += 1
             self.games_with["lorehold_upkeep_rummage"].add(self.current_game)
             discarded = str(data.get("discarded") or "")
+            if self._discard_to_top_names(data) or bool(data.get("replacement_used")):
+                self.strategic_events["discard_to_top_replacement"] += 1
+                self.strategic_events["lorehold_rummage_discard_to_top"] += 1
+                self.games_with["discard_to_top_replacement"].add(self.current_game)
+                self.games_with["lorehold_rummage_discard_to_top"].add(self.current_game)
+                if discarded:
+                    self.cards[f"lorehold_rummage_to_top:{discarded}"] += 1
+                    self.cards[f"discard_to_top:{discarded}"] += 1
             if discarded == "Squee, Goblin Nabob":
                 self.strategic_events["lorehold_rummage_discards_squee"] += 1
                 self.games_with["lorehold_rummage_discards_squee"].add(self.current_game)
@@ -427,6 +450,15 @@ class GateTelemetry:
         elif event == "trigger_resolved" and player == "Lorehold" and data.get("effect") == "rummage":
             self.strategic_events["lorehold_spell_rummage"] += 1
             self.games_with["lorehold_spell_rummage"].add(self.current_game)
+            top_names = self._discard_to_top_names(data)
+            if top_names:
+                self.strategic_events["discard_to_top_replacement"] += len(top_names)
+                self.strategic_events["lorehold_spell_rummage_discard_to_top"] += len(top_names)
+                self.games_with["discard_to_top_replacement"].add(self.current_game)
+                self.games_with["lorehold_spell_rummage_discard_to_top"].add(self.current_game)
+                for top_name in top_names:
+                    self.cards[f"spell_rummage_to_top:{top_name}"] += 1
+                    self.cards[f"discard_to_top:{top_name}"] += 1
             if "Squee, Goblin Nabob" in self._payload_names(data, ("discarded_to_graveyard", "discarded")):
                 self.strategic_events["lorehold_spell_rummage_discards_squee"] += 1
                 self.games_with["lorehold_spell_rummage_discards_squee"].add(self.current_game)
@@ -776,14 +808,15 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         "",
         "## Battle Ranking",
         "",
-        "| Battle Rank | Structural Rank | Deck | Archetype | Games | W | L | S | WR | Avg Win Turn | Miracle Games | Topdeck Games | Squee GY Games | Squee Return Games | Explained Return Games | Unexplained Return Games | Rummage Games | Main Risks |",
-        "| ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+        "| Battle Rank | Structural Rank | Deck | Archetype | Games | W | L | S | WR | Avg Win Turn | Miracle Games | Topdeck Games | Discard-To-Top Games | Squee GY Games | Squee Return Games | Explained Return Games | Unexplained Return Games | Rummage Games | Main Risks |",
+        "| ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
     ]
     for row in rows:
         telemetry = row.get("telemetry") or {}
         strategic_games = telemetry.get("strategic_games") or {}
         miracle_games = (strategic_games.get("miracle_cast") or {}).get("games", 0)
         topdeck_games = (strategic_games.get("topdeck_manipulation_activated") or {}).get("games", 0)
+        discard_to_top_games = (strategic_games.get("discard_to_top_replacement") or {}).get("games", 0)
         squee_graveyard_games = (strategic_games.get("squee_to_graveyard") or {}).get("games", 0)
         squee_return_games = (strategic_games.get("squee_upkeep_return") or {}).get("games", 0)
         explained_return_games = (
@@ -799,7 +832,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
             f"{row.get('deck_name')} (`{row.get('deck_key')}`) | {row.get('archetype')} | "
             f"{row.get('games')} | {row.get('wins')} | {row.get('losses')} | {row.get('stalls')} | "
             f"{float(row.get('win_rate') or 0):.2f}% | {float(row.get('avg_win_turn') or 0):.2f} | "
-            f"{miracle_games} | {topdeck_games} | {squee_graveyard_games} | {squee_return_games} | "
+            f"{miracle_games} | {topdeck_games} | {discard_to_top_games} | {squee_graveyard_games} | {squee_return_games} | "
             f"{explained_return_games} | {unexplained_return_games} | {rummage_games} | {risks} |"
         )
 

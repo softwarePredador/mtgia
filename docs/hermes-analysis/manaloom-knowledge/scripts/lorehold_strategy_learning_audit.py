@@ -67,6 +67,11 @@ DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
     REPORT_DIR / "lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
 ]
+DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
+    REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
+    REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed42_squee_v1.json",
+    REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed20260625_squee_v1.json",
+]
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
 EXTERNAL_METHOD_SOURCES = [
@@ -89,6 +94,16 @@ EXTERNAL_METHOD_SOURCES = [
         "name": "Archidekt Lorehold corpus",
         "url": "https://archidekt.com/commanders/Lorehold%2C%20the%20Historian",
         "use": "user-built Lorehold shells and recurring package choices",
+    },
+    {
+        "name": "Card Kingdom Lorehold synergy article",
+        "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/",
+        "use": "external confirmation that Library of Leng and topdeck/discard loops are a commander-specific synergy lane",
+    },
+    {
+        "name": "Draftsim Lorehold EDH deck tech",
+        "url": "https://draftsim.com/lorehold-the-historian-edh-deck/",
+        "use": "external deck-tech framing for miracle setup, draw timing, and support packages",
     },
 ]
 
@@ -116,6 +131,7 @@ CARD_REASON_OVERRIDES = {
     "Dawn's Truce": "protects the decisive turn and can preserve the board",
     "Fated Clash": "instant-speed threat answer with clash/topdeck relevance",
     "Hit the Mother Lode": "big-spell mana/value payoff that can chain into more resources",
+    "Library of Leng": "core discard-to-top replacement engine; new gate telemetry proves it fires naturally but still needs conversion/survival support",
     "Molecule Man": "miracle-cost modifier hypothesis; keep runtime evidence explicit",
     "Promise of Loyalty": "political wipe that reduces combat pressure on Lorehold",
     "Redirect Lightning": "damage redirection/removal slot, not a mana engine",
@@ -136,6 +152,7 @@ CARD_ROLE_OVERRIDES = {
     "Deflecting Swat": "protection",
     "Dawn's Truce": "protection",
     "Fated Clash": "removal",
+    "Library of Leng": "topdeck_miracle_engine",
     "Molecule Man": "miracle_engine",
     "Promise of Loyalty": "board_wipe",
     "Redirect Lightning": "removal",
@@ -162,6 +179,10 @@ CARD_DECISION_OVERRIDES = {
     "Hexing Squelcher": (
         "flex_cut_tested_negative",
         "multiple packages tried this cut and lost aggregate or the known strong seed",
+    ),
+    "Library of Leng": (
+        "core_engine_or_probation",
+        "discard-to-top replacement is now measured in the Squee champion; do not cut without a direct conversion/survival benchmark",
     ),
     "Squee, Goblin Nabob": (
         "probation_engine",
@@ -513,6 +534,80 @@ def aggregate_post_squee_package_gates(paths: list[Path]) -> dict[str, Any]:
     return {"paths": [str(path) for path in paths], "rows": rows, "per_seed": per_seed}
 
 
+def aggregate_library_leng_telemetry_gates(paths: list[Path]) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    aggregate = Counter()
+    per_card = Counter()
+    for path in paths:
+        payload = read_json(path)
+        if not payload:
+            continue
+        seed = payload.get("simulation_seed")
+        for result in payload.get("results") or []:
+            telemetry = result.get("telemetry") or {}
+            events = telemetry.get("strategic_event_counts") or {}
+            games = telemetry.get("strategic_games") or {}
+            top_cards = telemetry.get("top_cards") or []
+            row = {
+                "source": str(path),
+                "seed": seed,
+                "deck_key": result.get("deck_key"),
+                "wins": int(result.get("wins") or 0),
+                "losses": int(result.get("losses") or 0),
+                "stalls": int(result.get("stalls") or 0),
+                "win_rate": float(result.get("win_rate") or 0),
+                "miracle_cast": int(events.get("miracle_cast") or 0),
+                "topdeck_manipulation_activated": int(events.get("topdeck_manipulation_activated") or 0),
+                "discard_to_top_replacement": int(events.get("discard_to_top_replacement") or 0),
+                "lorehold_rummage_discard_to_top": int(events.get("lorehold_rummage_discard_to_top") or 0),
+                "lorehold_spell_rummage_discard_to_top": int(events.get("lorehold_spell_rummage_discard_to_top") or 0),
+                "lorehold_upkeep_rummage": int(events.get("lorehold_upkeep_rummage") or 0),
+                "lorehold_spell_rummage": int(events.get("lorehold_spell_rummage") or 0),
+                "squee_to_graveyard": int(events.get("squee_to_graveyard") or 0),
+                "squee_upkeep_return": int(events.get("squee_upkeep_return") or 0),
+                "discard_to_top_games": int((games.get("discard_to_top_replacement") or {}).get("games") or 0),
+                "topdeck_games": int((games.get("topdeck_manipulation_activated") or {}).get("games") or 0),
+                "miracle_games": int((games.get("miracle_cast") or {}).get("games") or 0),
+            }
+            rows.append(row)
+            for key in (
+                "wins",
+                "losses",
+                "stalls",
+                "miracle_cast",
+                "topdeck_manipulation_activated",
+                "discard_to_top_replacement",
+                "lorehold_rummage_discard_to_top",
+                "lorehold_spell_rummage_discard_to_top",
+                "lorehold_upkeep_rummage",
+                "lorehold_spell_rummage",
+                "squee_to_graveyard",
+                "squee_upkeep_return",
+                "discard_to_top_games",
+                "topdeck_games",
+                "miracle_games",
+            ):
+                aggregate[key] += row[key]
+            for item in top_cards:
+                key = str(item.get("key") or "")
+                if key.startswith(("discard_to_top:", "lorehold_rummage_to_top:", "spell_rummage_to_top:")):
+                    per_card[key] += int(item.get("count") or 0)
+    games = max(1, aggregate["wins"] + aggregate["losses"] + aggregate["stalls"])
+    return {
+        "paths": [str(path) for path in paths],
+        "rows": rows,
+        "summary": {
+            **dict(aggregate),
+            "games": games,
+            "win_rate": round(100.0 * aggregate["wins"] / games, 2),
+        },
+        "top_discard_to_top_cards": [
+            {"key": key, "count": count}
+            for key, count in per_card.most_common(12)
+        ],
+    }
+
+
 def compare_decks(conn: sqlite3.Connection, a: int, b: int) -> dict[str, Any]:
     def card_set(deck_id: int) -> set[str]:
         return {
@@ -542,6 +637,8 @@ def current_champion_key(squee_summary: dict[str, Any]) -> str:
 
 
 def render_markdown(report: dict[str, Any]) -> str:
+    library_leng = report.get("library_leng_telemetry_gates") or {}
+    library_leng_rows = library_leng.get("rows") or []
     lines: list[str] = []
     lines.append("# Lorehold Strategy Learning Audit - 2026-06-27")
     lines.append("")
@@ -629,6 +726,22 @@ def render_markdown(report: dict[str, Any]) -> str:
                 f"- Penance is not a proven topdeck engine yet: observed `hand_to_topdeck_activation` delta was `{int(delta.get('hand_to_topdeck_activation') or 0):+d}` "
                 f"and the package lost `{penance['delta_pp']:+.2f}` pp aggregate."
             )
+    if library_leng_rows:
+        seed42 = next((row for row in library_leng_rows if row.get("seed") == 42), None)
+        seed7 = next((row for row in library_leng_rows if row.get("seed") == 7), None)
+        seed20260625 = next((row for row in library_leng_rows if row.get("seed") == 20260625), None)
+        if seed42:
+            lines.append(
+                f"- Library of Leng / discard-to-top telemetry is now visible in gates: seed 42 went "
+                f"`{seed42['wins']}-{seed42['losses']}` with `{seed42['discard_to_top_replacement']}` discard-to-top replacements, "
+                f"`{seed42['topdeck_manipulation_activated']}` topdeck activations, and `{seed42['miracle_cast']}` miracle casts."
+            )
+        if seed7 and seed20260625:
+            lines.append(
+                f"- Failure seeds split into two problems: seed 7 had `{seed7['discard_to_top_replacement']}` discard-to-top replacements, "
+                f"while seed 20260625 had `{seed20260625['discard_to_top_replacement']}` replacements but still went "
+                f"`{seed20260625['wins']}-{seed20260625['losses']}`; the issue is not only finding Library of Leng, but converting the topdecked card into survival or a second Approach window."
+            )
     lines.append("")
     lines.append("## Squee Vs 607 Battle Evidence")
     lines.append("")
@@ -694,6 +807,41 @@ def render_markdown(report: dict[str, Any]) -> str:
                     f"{ev.get('squee_to_graveyard', 0)} | {ev.get('squee_upkeep_return', 0)} | "
                     f"{games_with.get('topdeck_manipulation_activated', 0)} | {games_with.get('squee_to_graveyard', 0)} |"
                 )
+        lines.append("")
+    if library_leng_rows:
+        lines.append("## Library of Leng / Discard-To-Top Telemetry")
+        lines.append("")
+        lines.append(
+            "These gates rerun the Squee champion with the battle gate instrumented for discard-to-top replacement. "
+            "The goal is to separate three questions: whether Library of Leng appears, whether it places a meaningful card on top, and whether the deck converts that into miracle/survival before combat pressure kills it."
+        )
+        lines.append("")
+        lines.append("| Seed | W | L | S | WR | Miracle | Topdeck | Discard-To-Top | Rummage-To-Top | Spell-Rummage-To-Top | Rummage | Spell Rummage | Squee GY | Squee Return | Discard-To-Top Games | Topdeck Games | Miracle Games |")
+        lines.append("| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
+        for row in sorted(library_leng_rows, key=lambda item: int(item.get("seed") or 0)):
+            lines.append(
+                f"| {row.get('seed')} | {row['wins']} | {row['losses']} | {row['stalls']} | {row['win_rate']:.2f}% | "
+                f"{row['miracle_cast']} | {row['topdeck_manipulation_activated']} | {row['discard_to_top_replacement']} | "
+                f"{row['lorehold_rummage_discard_to_top']} | {row['lorehold_spell_rummage_discard_to_top']} | "
+                f"{row['lorehold_upkeep_rummage']} | {row['lorehold_spell_rummage']} | {row['squee_to_graveyard']} | "
+                f"{row['squee_upkeep_return']} | {row['discard_to_top_games']} | {row['topdeck_games']} | {row['miracle_games']} |"
+            )
+        lines.append("")
+        summary = library_leng.get("summary") or {}
+        top_cards = library_leng.get("top_discard_to_top_cards") or []
+        lines.append(
+            f"Aggregate read: `{summary.get('wins', 0)}-{summary.get('losses', 0)}-{summary.get('stalls', 0)}` over "
+            f"`{summary.get('games', 0)}` games, with `{summary.get('discard_to_top_replacement', 0)}` discard-to-top replacements, "
+            f"`{summary.get('topdeck_manipulation_activated', 0)}` topdeck activations, and `{summary.get('miracle_cast', 0)}` miracle casts."
+        )
+        if top_cards:
+            cards = ", ".join(f"`{item['key']}`={item['count']}" for item in top_cards[:8])
+            lines.append(f"Top discard-to-top signals: {cards}.")
+        lines.append(
+            "Interpretation: Library of Leng is not a missing runtime feature anymore; it is a measurable engine. "
+            "Seed 42 shows the intended conversion pattern, seed 7 lacks the engine almost entirely, and seed 20260625 proves that repeated Approach-to-top loops can still fail under fast life-total pressure. "
+            "The next deck work should pair topdeck consistency with either faster protection/pressure absorption or a cleaner second-Approach/finisher conversion, rather than treating discard-to-top alone as the solution."
+        )
         lines.append("")
     if materialization:
         lines.append("## Squee Rule Materialization Audit")
@@ -1019,7 +1167,7 @@ def card_status(
         return "manual_role_review"
     if role in {"land", "ramp", "protection", "removal", "board_wipe", "tutor"}:
         return "core_support"
-    if role in {"draw", "engine", "wincon"}:
+    if role in {"draw", "engine", "wincon", "topdeck_miracle_engine", "miracle_engine", "recursion_engine"}:
         return "core_or_flex_engine"
     return "flex_or_contextual"
 
@@ -1033,6 +1181,8 @@ def card_package_lane(card: dict[str, Any]) -> str:
         return "commander_engine"
     if role == "land":
         return "mana_base"
+    if role in {"topdeck_miracle_engine", "miracle_engine"}:
+        return "topdeck_miracle_setup"
     if "topdeck_miracle_setup" in tags:
         return "topdeck_miracle_setup"
     if "hand_filter" in tags:
@@ -1238,6 +1388,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     thor_rule_runtime_audit = read_json(args.thor_rule_runtime_audit)
     thor_rule_gate_audit = read_json(args.thor_rule_gate_audit)
     post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
+    library_leng_telemetry_gates = aggregate_library_leng_telemetry_gates(args.library_leng_telemetry_gate)
     card_decision_manifest = build_card_decision_manifest(
         deck_summaries.get("6") or {},
         unresolved_rule_rows_audit,
@@ -1254,10 +1405,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Separate finalizer slots from engine slots: Dance with Calamity and Aetherflux Reservoir have now failed the Storm Herd slot benchmark; remaining finalizer work should focus on other closing packages or different cuts, not repeating those two swaps.",
         "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
         "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.",
+        "Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.",
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
-        "Build one topdeck consistency package against the 607+Squee champion, because seed 42 wins with topdeck=30/miracle=33 while the failure seeds are topdeck-poor.",
+        "Build one Library/topdeck conversion package against the 607+Squee champion: it must increase discard-to-top plus miracle conversion or second-Approach completion without increasing early life-zero losses.",
+        "Build one pressure-absorber package against the 607+Squee champion, because seed 20260625 can loop Approach to top but still dies before conversion.",
         "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
         "Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.",
         "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
@@ -1291,6 +1444,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "thor_rule_gate_audit": thor_rule_gate_audit,
         "general_synergy_confirm": general_confirm,
         "post_squee_package_gates": post_squee_package_gates,
+        "library_leng_telemetry_gates": library_leng_telemetry_gates,
         "card_decision_manifest": card_decision_manifest,
         "open_questions": open_questions,
         "next_gates": next_gates,
@@ -1325,6 +1479,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
     parser.add_argument("--post-squee-package-gate", type=Path, action="append")
+    parser.add_argument("--library-leng-telemetry-gate", type=Path, action="append")
     parser.add_argument("--deck-ids", default=",".join(str(value) for value in DEFAULT_DECK_IDS))
     parser.add_argument("--stem", default="lorehold_strategy_learning_audit_20260627_v1")
     return parser.parse_args()
@@ -1337,6 +1492,8 @@ def main() -> int:
         args.squee_gates = DEFAULT_SQUEE_GATES
     if not args.post_squee_package_gate:
         args.post_squee_package_gate = DEFAULT_POST_SQUEE_PACKAGE_GATES
+    if not args.library_leng_telemetry_gate:
+        args.library_leng_telemetry_gate = DEFAULT_LIBRARY_LENG_TELEMETRY_GATES
 
     report = build_report(args)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
