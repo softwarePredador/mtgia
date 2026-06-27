@@ -2466,7 +2466,33 @@ def create_map_token(player, name="Map Token"):
 
 
 def finish_countered_spell(player, card):
-    return _finish_countered_spell(player, card, move_to_exile_func=move_to_exile)
+    graveyard_before = len(getattr(player, "graveyard", []) or [])
+    exile_before = len(getattr(player, "exile", []) or [])
+    result = _finish_countered_spell(player, card, move_to_exile_func=move_to_exile)
+    if isinstance(card, dict):
+        graveyard_after = len(getattr(player, "graveyard", []) or [])
+        exile_after = len(getattr(player, "exile", []) or [])
+        if graveyard_after > graveyard_before and card in getattr(player, "graveyard", []):
+            emit_replay_event(
+                "countered_spell_moved_to_graveyard",
+                player=getattr(player, "name", "?"),
+                card=card.get("name", "?"),
+                from_zone="stack",
+                to_zone="graveyard",
+                destination="graveyard",
+                turn=CURRENT_REPLAY_TURN,
+            )
+        elif exile_after > exile_before and card in getattr(player, "exile", []):
+            emit_replay_event(
+                "countered_spell_moved_to_exile",
+                player=getattr(player, "name", "?"),
+                card=card.get("name", "?"),
+                from_zone="stack",
+                to_zone="exile",
+                destination="exile",
+                turn=CURRENT_REPLAY_TURN,
+            )
+    return result
 
 
 def finish_resolved_spell(player, card, turn=None, effect_data=None):
@@ -4362,7 +4388,6 @@ def replay_rule_fields(effect_data):
             "_rule_oracle_normalized_target_to"
         ),
         "variant_kind": effect_data.get("variant_kind"),
-        "source_zone": effect_data.get("source_zone"),
         "alternative_cost_kind": effect_data.get("alternative_cost_kind")
         or effect_data.get("alternate_cost_kind"),
     }
@@ -10544,6 +10569,19 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         replacement_registry=ReplacementRegistry,
         replacement_event_cls=ReplacementEvent,
     )
+    if isinstance(creature, dict) and destination != "none":
+        emit_replay_event(
+            "permanent_moved_from_battlefield",
+            player=getattr(owner, "name", "?"),
+            card=creature.get("name", "?"),
+            permanent_type="creature",
+            from_zone="battlefield",
+            to_zone=destination,
+            destination=destination,
+            reason=reason,
+            source=source.get("name", "?") if isinstance(source, dict) else source,
+            turn=CURRENT_REPLAY_TURN,
+        )
     resolve_leave_battlefield_treasure_trigger(
         owner,
         creature,
@@ -10566,6 +10604,19 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         replacement_registry=ReplacementRegistry,
         replacement_event_cls=ReplacementEvent,
     )
+    if isinstance(permanent, dict) and destination != "none":
+        emit_replay_event(
+            "permanent_moved_from_battlefield",
+            player=getattr(owner, "name", "?"),
+            card=permanent.get("name", "?"),
+            permanent_type="permanent",
+            from_zone="battlefield",
+            to_zone=destination,
+            destination=destination,
+            reason=reason,
+            source=source.get("name", "?") if isinstance(source, dict) else source,
+            turn=CURRENT_REPLAY_TURN,
+        )
     resolve_leave_battlefield_treasure_trigger(
         owner,
         permanent,
@@ -21748,12 +21799,18 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         permanent["haste"] = has_haste(permanent)
         permanent["summoning_sick"] = not permanent["haste"]
         permanent["tapped"] = enters_tapped
+        power_value = permanent.get("power")
         try:
-            permanent["power"] = int(permanent.get("power") or 1)
+            permanent["power"] = 1 if power_value in (None, "") else int(power_value)
         except (TypeError, ValueError):
             permanent["power"] = 1
+        toughness_value = permanent.get("toughness")
         try:
-            permanent["toughness"] = int(permanent.get("toughness") or permanent["power"] or 1)
+            permanent["toughness"] = (
+                permanent["power"] or 1
+                if toughness_value in (None, "")
+                else int(toughness_value)
+            )
         except (TypeError, ValueError):
             permanent["toughness"] = permanent["power"] or 1
     elif enters_tapped:

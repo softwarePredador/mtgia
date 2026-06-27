@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import multiprocessing as mp
 import os
 import random
 import signal
@@ -54,6 +55,16 @@ def parse_deck_ids(raw: str | None) -> list[int]:
 def set_battle_db(path: Path) -> None:
     os.environ["MANALOOM_KNOWLEDGE_DB"] = str(path)
     battle.DB = str(path)
+
+
+def reset_battle_runtime_state() -> None:
+    battle.CURRENT_REPLAY_TURN = None
+    if hasattr(battle, "clear_pending_triggers"):
+        battle.clear_pending_triggers()
+    if hasattr(battle, "reset_decision_trace_counter"):
+        battle.reset_decision_trace_counter()
+    if hasattr(battle, "clear_engine_metrics"):
+        battle.clear_engine_metrics()
 
 
 def load_deck_metadata(db: Path, deck_ids: list[int]) -> dict[str, dict[str, Any]]:
@@ -136,8 +147,8 @@ def load_opponents(db: Path, *, opponent_limit: int, opponent_seed: int) -> tupl
     os.environ["MANALOOM_BATTLE_REAL_OPPONENT_LIMIT"] = str(opponent_limit)
     os.environ["MANALOOM_BATTLE_REAL_OPPONENT_SEED"] = str(opponent_seed)
     opponents = battle.load_learned_opponents()
-    if opponents and len(opponents) >= 3:
-        return "real", opponents
+    if opponents:
+        return "real", opponents[:opponent_limit]
     return "generic", list(battle.OPPONENT_ARCHETYPES[:opponent_limit])
 
 
@@ -185,16 +196,172 @@ class GateTelemetry:
             "topdeck_manipulation_activated": set(),
             "lorehold_cost_paid": set(),
             "lorehold_spell_cast": set(),
+            "lorehold_upkeep_rummage": set(),
+            "lorehold_rummage_discards_squee": set(),
+            "lorehold_spell_rummage": set(),
+            "lorehold_spell_rummage_discards_squee": set(),
+            "squee_to_graveyard": set(),
+            "squee_return_after_known_graveyard_entry": set(),
+            "squee_return_without_known_graveyard_entry": set(),
+            "squee_upkeep_return": set(),
         }
         self.cards: Counter[str] = Counter()
+        self.squee_graveyard_entries_by_game: Counter[str] = Counter()
+        self.squee_known_graveyard_balance_by_game: Counter[str] = Counter()
+        self.squee_game_traces: dict[str, list[dict[str, Any]]] = {}
+        self.squee_anomalies: list[dict[str, Any]] = []
+        self.squee_trace_samples: list[dict[str, Any]] = []
+        self.event_sequence = 0
 
     def begin(self, game_id: str) -> None:
         self.current_game = game_id
 
+    def _payload_names(self, data: Mapping[str, Any], keys: tuple[str, ...]) -> list[str]:
+        names: list[str] = []
+        for key in keys:
+            value = data.get(key)
+            if isinstance(value, dict):
+                names.append(str(value.get("name") or value.get("card") or value.get("card_name") or ""))
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, dict):
+                        names.append(str(item.get("name") or item.get("card") or item.get("card_name") or ""))
+                    else:
+                        names.append(str(item or ""))
+            else:
+                names.append(str(value or ""))
+        return names
+
+    def _payload_destinations(self, data: Mapping[str, Any]) -> set[str]:
+        return {
+            str(data.get(key) or "").lower()
+            for key in ("destination", "to_zone", "zone_after", "discard_destination", "final_to_zone")
+            if data.get(key)
+        }
+
+    def _squee_in_graveyard_payload(self, event: str, data: Mapping[str, Any]) -> bool:
+        graveyard_list_names = self._payload_names(
+            data,
+            (
+                "discarded_to_graveyard",
+                "moved_to_graveyard",
+                "to_graveyard",
+                "milled",
+                "milled_cards",
+                "milled_to_graveyard",
+                "cards_to_graveyard",
+                "land_cards_entered_graveyard",
+            ),
+        )
+        if "Squee, Goblin Nabob" in graveyard_list_names:
+            return True
+        if event == "turn_end" and "Squee, Goblin Nabob" in self._payload_names(data, ("discarded_cards",)):
+            return True
+        names = self._payload_names(
+            data,
+            (
+                "card",
+                "card_name",
+                "discarded",
+                "discarded_card",
+                "stack_object",
+                "permanent",
+                "source_card",
+                "object",
+                "zone_object",
+                "creature",
+            ),
+        )
+        return "Squee, Goblin Nabob" in names and "graveyard" in self._payload_destinations(data)
+
+    def _record_squee_graveyard_entry(self, event: str) -> None:
+        self.strategic_events["squee_to_graveyard"] += 1
+        self.games_with["squee_to_graveyard"].add(self.current_game)
+        self.squee_graveyard_entries_by_game[self.current_game] += 1
+        self.squee_known_graveyard_balance_by_game[self.current_game] += 1
+        self.cards[f"squee_to_graveyard:{event}"] += 1
+
+    def _squee_trace_payload(
+        self,
+        event: str,
+        data: Mapping[str, Any],
+        *,
+        markers: list[str],
+        balance_before: int,
+        balance_after: int,
+    ) -> dict[str, Any]:
+        keep_keys = (
+            "player",
+            "card",
+            "effect",
+            "trigger",
+            "from_zone",
+            "to_zone",
+            "destination",
+            "discard_destination",
+            "discarded",
+            "discarded_to_graveyard",
+            "discarded_cards",
+            "moved_to_graveyard",
+            "to_graveyard",
+            "milled",
+            "milled_cards",
+            "milled_to_graveyard",
+            "cards_to_graveyard",
+            "cards_milled",
+            "target_player",
+            "reason",
+            "source",
+            "turn",
+        )
+        return {
+            "seq": self.event_sequence,
+            "game_id": self.current_game,
+            "event": event,
+            "markers": list(markers),
+            "squee_known_graveyard_balance_before": balance_before,
+            "squee_known_graveyard_balance_after": balance_after,
+            "data": {key: data.get(key) for key in keep_keys if key in data},
+        }
+
+    def _record_squee_trace(
+        self,
+        event: str,
+        data: Mapping[str, Any],
+        *,
+        markers: list[str],
+        balance_before: int,
+        balance_after: int,
+    ) -> None:
+        trace = self._squee_trace_payload(
+            event,
+            data,
+            markers=markers,
+            balance_before=balance_before,
+            balance_after=balance_after,
+        )
+        traces = self.squee_game_traces.setdefault(self.current_game, [])
+        if len(traces) < 80:
+            traces.append(trace)
+        if len(self.squee_trace_samples) >= 20:
+            return
+        self.squee_trace_samples.append(trace)
+
     def record(self, event: str, data: Mapping[str, Any]) -> None:
+        self.event_sequence += 1
         self.events[event] += 1
         player = str(data.get("player") or "")
         card = str(data.get("card") or "")
+        squee_mentioned = "Squee, Goblin Nabob" in json.dumps(data, sort_keys=True, default=str)
+        squee_entry = self._squee_in_graveyard_payload(event, data)
+        squee_return = (
+            event == "trigger_resolved"
+            and player == "Lorehold"
+            and data.get("effect") == "graveyard_upkeep_return_self_to_hand"
+            and card == "Squee, Goblin Nabob"
+        )
+        squee_balance_before = self.squee_known_graveyard_balance_by_game[self.current_game]
+        squee_markers: list[str] = []
         if event == "miracle_cast" and player == "Lorehold":
             self.strategic_events[event] += 1
             self.games_with[event].add(self.current_game)
@@ -213,6 +380,64 @@ class GateTelemetry:
         elif event == "spell_cast" and player == "Lorehold":
             self.strategic_events["lorehold_spell_cast"] += 1
             self.games_with["lorehold_spell_cast"].add(self.current_game)
+        elif event == "lorehold_upkeep_rummage" and player == "Lorehold":
+            self.strategic_events["lorehold_upkeep_rummage"] += 1
+            self.games_with["lorehold_upkeep_rummage"].add(self.current_game)
+            discarded = str(data.get("discarded") or "")
+            if discarded == "Squee, Goblin Nabob":
+                self.strategic_events["lorehold_rummage_discards_squee"] += 1
+                self.games_with["lorehold_rummage_discards_squee"].add(self.current_game)
+                self.cards["rummage_discard:Squee, Goblin Nabob"] += 1
+        elif event == "trigger_resolved" and player == "Lorehold" and data.get("effect") == "rummage":
+            self.strategic_events["lorehold_spell_rummage"] += 1
+            self.games_with["lorehold_spell_rummage"].add(self.current_game)
+            if "Squee, Goblin Nabob" in self._payload_names(data, ("discarded_to_graveyard", "discarded")):
+                self.strategic_events["lorehold_spell_rummage_discards_squee"] += 1
+                self.games_with["lorehold_spell_rummage_discards_squee"].add(self.current_game)
+                self.cards["spell_rummage_discard:Squee, Goblin Nabob"] += 1
+        elif (
+            event == "trigger_resolved"
+            and player == "Lorehold"
+            and data.get("effect") == "graveyard_upkeep_return_self_to_hand"
+        ):
+            self.strategic_events["graveyard_upkeep_return_self_to_hand"] += 1
+            self.games_with.setdefault("graveyard_upkeep_return_self_to_hand", set()).add(self.current_game)
+            if card == "Squee, Goblin Nabob":
+                self.strategic_events["squee_upkeep_return"] += 1
+                self.games_with["squee_upkeep_return"].add(self.current_game)
+                self.cards["graveyard_return:Squee, Goblin Nabob"] += 1
+                squee_markers.append("upkeep_return")
+                if squee_balance_before > 0:
+                    self.strategic_events["squee_return_after_known_graveyard_entry"] += 1
+                    self.games_with["squee_return_after_known_graveyard_entry"].add(self.current_game)
+                    self.squee_known_graveyard_balance_by_game[self.current_game] = max(
+                        0,
+                        self.squee_known_graveyard_balance_by_game[self.current_game] - 1,
+                    )
+                else:
+                    self.strategic_events["squee_return_without_known_graveyard_entry"] += 1
+                    self.games_with["squee_return_without_known_graveyard_entry"].add(self.current_game)
+                    self.squee_anomalies.append(
+                        {
+                            "kind": "squee_return_without_known_graveyard_entry",
+                            "game_id": self.current_game,
+                            "seq": self.event_sequence,
+                            "event": event,
+                            "turn": data.get("turn"),
+                            "recent_trace": list(self.squee_game_traces.get(self.current_game, [])[-12:]),
+                        }
+                    )
+        if squee_entry:
+            self._record_squee_graveyard_entry(event)
+            squee_markers.append("graveyard_entry")
+        if squee_mentioned or squee_entry or squee_return:
+            self._record_squee_trace(
+                event,
+                data,
+                markers=squee_markers or ["mentions_squee"],
+                balance_before=squee_balance_before,
+                balance_after=self.squee_known_graveyard_balance_by_game[self.current_game],
+            )
 
     def as_json(self, total_games: int) -> dict[str, Any]:
         games = max(1, total_games)
@@ -230,6 +455,13 @@ class GateTelemetry:
                 {"key": key, "count": count}
                 for key, count in self.cards.most_common(12)
             ],
+            "squee_trace_samples": list(self.squee_trace_samples),
+            "squee_game_traces": {
+                key: value
+                for key, value in sorted(self.squee_game_traces.items())
+            },
+            "squee_anomalies": list(self.squee_anomalies),
+            "squee_known_graveyard_balance_by_game": dict(self.squee_known_graveyard_balance_by_game),
         }
 
 
@@ -244,6 +476,7 @@ def run_deck_gate(
 ) -> dict[str, Any]:
     source_db = Path(str(spec["source_db"]))
     set_battle_db(source_db)
+    reset_battle_runtime_state()
     commander, deck, construction_report = battle.load_deck_with_construction_report(
         int(spec["load_deck_id"])
     )
@@ -272,7 +505,7 @@ def run_deck_gate(
             for game_index in range(games_per_opponent):
                 game_id = f"{spec['deck_key']}:{profile.get('name', '?')}:{game_index}"
                 telemetry.begin(game_id)
-                battle.CURRENT_REPLAY_TURN = None
+                reset_battle_runtime_state()
                 others = [item for item in opponents if item is not profile]
                 picked = [profile] + rng.sample(others, min(2, len(others)))
                 try:
@@ -364,6 +597,57 @@ def run_deck_gate(
     }
 
 
+def _run_deck_gate_process_entry(queue: Any, kwargs: dict[str, Any]) -> None:
+    try:
+        result = run_deck_gate(**kwargs)
+        queue.put({"ok": True, "result": result})
+    except Exception as exc:
+        queue.put(
+            {
+                "ok": False,
+                "error": str(exc),
+                "traceback": traceback.format_exc(limit=8),
+            }
+        )
+
+
+def run_deck_gate_in_process(
+    *,
+    spec: Mapping[str, Any],
+    opponents: list[dict[str, Any]],
+    games_per_opponent: int,
+    simulation_seed: int,
+    game_timeout_seconds: float,
+) -> dict[str, Any]:
+    ctx = mp.get_context("spawn")
+    queue: Any = ctx.Queue()
+    kwargs = {
+        "spec": dict(spec),
+        "opponents": opponents,
+        "games_per_opponent": games_per_opponent,
+        "simulation_seed": simulation_seed,
+        "game_timeout_seconds": game_timeout_seconds,
+        "progress_callback": None,
+    }
+    process = ctx.Process(target=_run_deck_gate_process_entry, args=(queue, kwargs))
+    process.start()
+    total_games = max(1, games_per_opponent) * max(1, len(opponents))
+    timeout = max(120.0, total_games * max(5.0, float(game_timeout_seconds or 0.0)) + 120.0)
+    process.join(timeout)
+    if process.is_alive():
+        process.terminate()
+        process.join(10)
+        raise RuntimeError(f"isolated deck process timed out after {timeout:.1f}s")
+    if process.exitcode != 0 and queue.empty():
+        raise RuntimeError(f"isolated deck process exited with code {process.exitcode}")
+    payload = queue.get()
+    if not payload.get("ok"):
+        raise RuntimeError(payload.get("error") or payload.get("traceback") or "isolated deck process failed")
+    result = payload["result"]
+    result["process_isolated"] = True
+    return result
+
+
 def merge_structural_context(
     results: list[dict[str, Any]],
     matrix_scores: Mapping[str, Mapping[str, Any]],
@@ -399,6 +683,8 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- opponent_kind: `{report['opponent_kind']}`",
         f"- opponent_seed: `{report['opponent_seed']}`",
         f"- simulation_seed: `{report['simulation_seed']}`",
+        f"- python_hash_seed: `{report.get('python_hash_seed', 'unset')}`",
+        f"- deck_process_isolation: `{report.get('deck_process_isolation', False)}`",
         f"- game_timeout_seconds: `{report.get('game_timeout_seconds', 0)}`",
         f"- game_checkpoint_json: `{report.get('game_checkpoint_json')}`",
         f"- opponents: `{', '.join(report.get('opponents') or [])}`",
@@ -407,21 +693,31 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         "",
         "## Battle Ranking",
         "",
-        "| Battle Rank | Structural Rank | Deck | Archetype | Games | W | L | S | WR | Avg Win Turn | Miracle Games | Topdeck Games | Main Risks |",
-        "| ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+        "| Battle Rank | Structural Rank | Deck | Archetype | Games | W | L | S | WR | Avg Win Turn | Miracle Games | Topdeck Games | Squee GY Games | Squee Return Games | Explained Return Games | Unexplained Return Games | Rummage Games | Main Risks |",
+        "| ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
     ]
     for row in rows:
         telemetry = row.get("telemetry") or {}
         strategic_games = telemetry.get("strategic_games") or {}
         miracle_games = (strategic_games.get("miracle_cast") or {}).get("games", 0)
         topdeck_games = (strategic_games.get("topdeck_manipulation_activated") or {}).get("games", 0)
+        squee_graveyard_games = (strategic_games.get("squee_to_graveyard") or {}).get("games", 0)
+        squee_return_games = (strategic_games.get("squee_upkeep_return") or {}).get("games", 0)
+        explained_return_games = (
+            strategic_games.get("squee_return_after_known_graveyard_entry") or {}
+        ).get("games", 0)
+        unexplained_return_games = (
+            strategic_games.get("squee_return_without_known_graveyard_entry") or {}
+        ).get("games", 0)
+        rummage_games = (strategic_games.get("lorehold_upkeep_rummage") or {}).get("games", 0)
         risks = ", ".join(row.get("primary_risks") or []) or "none"
         lines.append(
             f"| {row.get('battle_rank')} | {row.get('structural_rank') or ''} | "
             f"{row.get('deck_name')} (`{row.get('deck_key')}`) | {row.get('archetype')} | "
             f"{row.get('games')} | {row.get('wins')} | {row.get('losses')} | {row.get('stalls')} | "
             f"{float(row.get('win_rate') or 0):.2f}% | {float(row.get('avg_win_turn') or 0):.2f} | "
-            f"{miracle_games} | {topdeck_games} | {risks} |"
+            f"{miracle_games} | {topdeck_games} | {squee_graveyard_games} | {squee_return_games} | "
+            f"{explained_return_games} | {unexplained_return_games} | {rummage_games} | {risks} |"
         )
 
     lines.extend(["", "## Deck Detail", ""])
@@ -550,6 +846,11 @@ def main() -> int:
     parser.add_argument("--checkpoint-stem", default=None)
     parser.add_argument("--checkpoint-history-limit", type=int, default=200)
     parser.add_argument("--no-game-checkpoint", action="store_true")
+    parser.add_argument(
+        "--isolate-deck-process",
+        action="store_true",
+        help="Run each deck/candidate in a fresh Python process to avoid battle runtime global-state bleed.",
+    )
     parser.add_argument("--stem", default="lorehold_variant_battle_gate_20260626_v1")
     args = parser.parse_args()
 
@@ -593,6 +894,7 @@ def main() -> int:
             "opponent_kind": opponent_kind,
             "opponent_seed": args.opponent_seed,
             "simulation_seed": args.simulation_seed,
+            "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
             "game_timeout_seconds": float(args.game_timeout_seconds or 0),
             "completed_games": latest.get("completed_games", 0),
             "total_games": latest.get("total_games", 0),
@@ -604,14 +906,23 @@ def main() -> int:
     for spec in specs:
         print(f"running {spec['deck_key']} games={args.games} opponents={len(opponents)}", flush=True)
         try:
-            result = run_deck_gate(
-                spec=spec,
-                opponents=opponents,
-                games_per_opponent=max(1, args.games),
-                simulation_seed=args.simulation_seed,
-                game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
-                progress_callback=progress_callback,
-            )
+            if args.isolate_deck_process:
+                result = run_deck_gate_in_process(
+                    spec=spec,
+                    opponents=opponents,
+                    games_per_opponent=max(1, args.games),
+                    simulation_seed=args.simulation_seed,
+                    game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
+                )
+            else:
+                result = run_deck_gate(
+                    spec=spec,
+                    opponents=opponents,
+                    games_per_opponent=max(1, args.games),
+                    simulation_seed=args.simulation_seed,
+                    game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
+                    progress_callback=progress_callback,
+                )
         except Exception as exc:
             result = {
                 **spec,
@@ -637,6 +948,8 @@ def main() -> int:
             "opponent_kind": opponent_kind,
             "opponent_seed": args.opponent_seed,
             "simulation_seed": args.simulation_seed,
+            "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
+            "deck_process_isolation": bool(args.isolate_deck_process),
             "game_timeout_seconds": float(args.game_timeout_seconds or 0),
             "game_checkpoint_json": None if args.no_game_checkpoint else str(checkpoint_json),
             "game_checkpoint_markdown": None if args.no_game_checkpoint else str(checkpoint_md),
@@ -655,6 +968,8 @@ def main() -> int:
         "opponent_kind": opponent_kind,
         "opponent_seed": args.opponent_seed,
         "simulation_seed": args.simulation_seed,
+        "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
+        "deck_process_isolation": bool(args.isolate_deck_process),
         "game_timeout_seconds": float(args.game_timeout_seconds or 0),
         "game_checkpoint_json": None if args.no_game_checkpoint else str(checkpoint_json),
         "game_checkpoint_markdown": None if args.no_game_checkpoint else str(checkpoint_md),
@@ -675,6 +990,8 @@ def main() -> int:
                 "opponent_kind": opponent_kind,
                 "opponent_seed": args.opponent_seed,
                 "simulation_seed": args.simulation_seed,
+                "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
+                "deck_process_isolation": bool(args.isolate_deck_process),
                 "game_timeout_seconds": float(args.game_timeout_seconds or 0),
                 "completed_games": (recent_events[-1].get("completed_games", 0) if recent_events else 0),
                 "total_games": (recent_events[-1].get("total_games", 0) if recent_events else 0),

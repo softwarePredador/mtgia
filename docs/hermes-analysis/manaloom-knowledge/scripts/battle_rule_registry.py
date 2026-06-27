@@ -410,34 +410,44 @@ def _invalidate_rule_caches_for_connection(conn: sqlite3.Connection) -> None:
     _RULE_LIST_CACHE.clear()
 
 
-def load_active_battle_card_rule_lists(
+def _rule_cache_key(
+    db_path: Path,
+    *,
+    include_review_only: bool,
+    runtime_safe_only: bool,
+) -> str:
+    return (
+        f"{db_path}|include_review_only={int(include_review_only)}|"
+        f"runtime_safe_only={int(runtime_safe_only)}"
+    )
+
+
+def _load_active_battle_card_rule_lists_cached(
     db_path: str | Path = DEFAULT_DB,
     *,
     include_review_only: bool = True,
     runtime_safe_only: bool = False,
-) -> dict[str, list[dict[str, Any]]]:
+) -> tuple[int | None, dict[str, list[dict[str, Any]]]]:
     path = Path(db_path)
     mtime = _db_mtime(path)
-    cache_key = (
-        f"{path}|include_review_only={int(include_review_only)}|"
-        f"runtime_safe_only={int(runtime_safe_only)}"
+    cache_key = _rule_cache_key(
+        path,
+        include_review_only=include_review_only,
+        runtime_safe_only=runtime_safe_only,
     )
     cached = _RULE_LIST_CACHE.get(cache_key)
     if cached and cached[0] == mtime:
-        return {
-            key: [dict(rule) for rule in value]
-            for key, value in cached[1].items()
-        }
+        return cached
     if not path.exists():
         _RULE_LIST_CACHE[cache_key] = (mtime, {})
-        return {}
+        return mtime, {}
 
     try:
         with closing(sqlite3.connect(path)) as conn:
             conn.row_factory = sqlite3.Row
             if not table_exists(conn, "battle_card_rules"):
                 _RULE_LIST_CACHE[cache_key] = (mtime, {})
-                return {}
+                return mtime, {}
             rows = conn.execute(
                 """
                 SELECT normalized_name, logical_rule_key, card_name, effect_json, deck_role_json,
@@ -449,7 +459,7 @@ def load_active_battle_card_rule_lists(
             ).fetchall()
     except sqlite3.Error:
         _RULE_LIST_CACHE[cache_key] = (mtime, {})
-        return {}
+        return mtime, {}
 
     rules: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
@@ -475,10 +485,24 @@ def load_active_battle_card_rule_lists(
             continue
         rules.setdefault(row["normalized_name"], []).append(rule)
 
-    for normalized_name, values in rules.items():
+    for values in rules.values():
         values.sort(key=_rule_rank)
 
     _RULE_LIST_CACHE[cache_key] = (mtime, rules)
+    return mtime, rules
+
+
+def load_active_battle_card_rule_lists(
+    db_path: str | Path = DEFAULT_DB,
+    *,
+    include_review_only: bool = True,
+    runtime_safe_only: bool = False,
+) -> dict[str, list[dict[str, Any]]]:
+    _mtime, rules = _load_active_battle_card_rule_lists_cached(
+        db_path,
+        include_review_only=include_review_only,
+        runtime_safe_only=runtime_safe_only,
+    )
     return {
         key: [dict(rule) for rule in value]
         for key, value in rules.items()
@@ -493,15 +517,16 @@ def load_active_battle_card_rules(
 ) -> dict[str, dict[str, Any]]:
     path = Path(db_path)
     mtime = _db_mtime(path)
-    cache_key = (
-        f"{path}|include_review_only={int(include_review_only)}|"
-        f"runtime_safe_only={int(runtime_safe_only)}"
+    cache_key = _rule_cache_key(
+        path,
+        include_review_only=include_review_only,
+        runtime_safe_only=runtime_safe_only,
     )
     cached = _RULE_CACHE.get(cache_key)
     if cached and cached[0] == mtime:
         return {key: dict(value) for key, value in cached[1].items()}
 
-    rule_lists = load_active_battle_card_rule_lists(
+    _mtime, rule_lists = _load_active_battle_card_rule_lists_cached(
         path,
         include_review_only=include_review_only,
         runtime_safe_only=runtime_safe_only,
@@ -522,11 +547,22 @@ def lookup_battle_card_rule(
     include_review_only: bool = True,
     runtime_safe_only: bool = False,
 ) -> dict[str, Any] | None:
-    rules = load_active_battle_card_rules(
-        db_path,
+    path = Path(db_path)
+    mtime = _db_mtime(path)
+    cache_key = _rule_cache_key(
+        path,
         include_review_only=include_review_only,
         runtime_safe_only=runtime_safe_only,
     )
+    cached = _RULE_CACHE.get(cache_key)
+    if not cached or cached[0] != mtime:
+        load_active_battle_card_rules(
+            path,
+            include_review_only=include_review_only,
+            runtime_safe_only=runtime_safe_only,
+        )
+        cached = _RULE_CACHE.get(cache_key)
+    rules = cached[1] if cached else {}
     normalized = normalize_card_name(card_name)
     rule = rules.get(normalized)
     if rule:
@@ -546,7 +582,7 @@ def lookup_battle_card_rule_list(
     include_review_only: bool = True,
     runtime_safe_only: bool = False,
 ) -> list[dict[str, Any]]:
-    rules = load_active_battle_card_rule_lists(
+    _mtime, rules = _load_active_battle_card_rule_lists_cached(
         db_path,
         include_review_only=include_review_only,
         runtime_safe_only=runtime_safe_only,
