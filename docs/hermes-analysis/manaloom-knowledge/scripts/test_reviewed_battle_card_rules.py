@@ -251,6 +251,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Inventors' Fair", by_name)
         self.assertIn("Izzet Signet", by_name)
         self.assertIn("Kraum, Ludevic's Opus", by_name)
+        self.assertIn("Lapse of Certainty", by_name)
         self.assertIn("Library of Leng", by_name)
         self.assertIn("Lightning Greaves", by_name)
         self.assertIn("Lorehold, the Historian", by_name)
@@ -539,6 +540,15 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(
             by_name["Inventors' Fair"]["effect_json"]["utility_land_profile"],
             "inventors_fair_v1",
+        )
+        self.assertEqual(by_name["Lapse of Certainty"]["source"], "curated")
+        self.assertEqual(by_name["Lapse of Certainty"]["review_status"], "active")
+        self.assertEqual(by_name["Lapse of Certainty"]["execution_status"], "auto")
+        self.assertTrue(
+            by_name["Lapse of Certainty"]["effect_json"]["countered_spell_to_top_library"]
+        )
+        self.assertTrue(
+            by_name["Lapse of Certainty"]["effect_json"]["counter_own_approach_to_top"]
         )
         self.assertEqual(by_name["Library of Leng"]["source"], "curated")
         self.assertEqual(by_name["Library of Leng"]["review_status"], "active")

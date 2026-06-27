@@ -926,6 +926,28 @@
     "review_status": "active",
     "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: {T}: Add one mana of any type that a land you control could produce; with a +1/+1 counter it adds three instead; {3}{G}{G}: Adapt 3. Runtime models only the baseline mana-dork mode with summoning sickness. Adapt and triple-mana replacement remain tracked gaps."
   },
+  "Lapse of Certainty": {
+    "effect_json": {
+      "cmc": 3.0,
+      "effect": "counter",
+      "instant": true,
+      "target": "spell",
+      "countered_spell_to_top_library": true,
+      "counter_own_approach_to_top": true,
+      "battle_model_scope": "counter_spell_to_top_library_approach_combo_v1"
+    },
+    "deck_role_json": {
+      "category": "protection",
+      "effect": "counter",
+      "subtype": "approach_topdeck_combo",
+      "timing": "instant"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-27 against local oracle cache and external Lorehold deck-tech usage: counters target spell and puts it on top of its owner's library if countered this way. Runtime executes the counter baseline, top-library destination, and the Lorehold-specific line of countering the controller's first Approach of the Second Sun to set up the next first-draw/miracle window."
+  },
   "Library of Leng": {
     "effect_json": {
       "cmc": 1.0,

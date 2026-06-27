@@ -465,6 +465,18 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Overmaster"],
         "cuts": ["Tibalt's Trickery"],
     },
+    "lapse_approach_topdeck_cut_tibalts_trickery": {
+        "family": "approach_topdeck_combo",
+        "hypothesis": (
+            "Lapse of Certainty is an external Lorehold/Approach line: counter "
+            "the first Approach of the Second Sun and put it on top, then use "
+            "Lorehold's first-draw miracle window for the second cast. Tibalt's "
+            "Trickery is the comparison slot because it is the existing swingy "
+            "counter/protection card."
+        ),
+        "adds": ["Lapse of Certainty"],
+        "cuts": ["Tibalt's Trickery"],
+    },
     "ghostly_prison_pressure_cut_promise": {
         "family": "pressure_absorber",
         "hypothesis": (

@@ -2549,6 +2549,22 @@ def create_map_token(player, name="Map Token"):
 
 
 def finish_countered_spell(player, card):
+    if isinstance(card, dict) and card.get("_countered_to_top_library"):
+        counter_source = card.get("_countered_to_top_library_by")
+        card.pop("_countered_to_top_library", None)
+        card.pop("_countered_to_top_library_by", None)
+        player.library.insert(0, card)
+        emit_replay_event(
+            "countered_spell_moved_to_library_top",
+            player=getattr(player, "name", "?"),
+            card=card.get("name", "?"),
+            from_zone="stack",
+            to_zone="library",
+            destination="library_top",
+            counter_source=counter_source,
+            turn=CURRENT_REPLAY_TURN,
+        )
+        return
     if isinstance(card, dict) and card.get("_exile_on_resolution"):
         reason = card.get("_exile_on_resolution_reason") or "replacement_exile_countered"
         move_to_exile(player, card, reason=reason, turn=CURRENT_REPLAY_TURN)
@@ -5898,6 +5914,7 @@ class Player:
         stack_depth=None,
         phase=None,
         priority_window=None,
+        preferred_counter=None,
     ):
         counters = self.counterspell_cards(
             castable_only=True,
@@ -5907,7 +5924,12 @@ class Player:
         if not counters:
             self.counters_available = len(self.counterspell_cards())
             return None
-        counter = min(counters, key=lambda card: card.get("cmc", 0))
+        if preferred_counter is not None:
+            if preferred_counter not in counters:
+                return None
+            counter = preferred_counter
+        else:
+            counter = min(counters, key=lambda card: card.get("cmc", 0))
         cost = counter.get("cmc", 0)
         if not self.spend_card_mana(counter):
             return None
@@ -5918,6 +5940,10 @@ class Player:
         draw_count = int(effect.get("draw_on_counter") or 0)
         if draw_count:
             self.draw(draw_count, random.Random(turn or 0))
+        countered_to_top = bool(effect.get("countered_spell_to_top_library"))
+        if countered_to_top and isinstance(target_card, dict):
+            target_card["_countered_to_top_library"] = True
+            target_card["_countered_to_top_library_by"] = counter.get("name", "?")
         target_name = (target_card or {}).get("name", "?")
         target_controller_obj = getattr(stack_item, "controller", None)
         target_controller = getattr(target_controller_obj, "name", None)
@@ -5943,6 +5969,7 @@ class Player:
             stack_depth=stack_depth,
             phase=phase,
             priority_window=priority_window or "stack_response",
+            countered_spell_to_top_library=countered_to_top,
             cost=cost,
             cards_drawn=draw_count,
             turn=turn,
@@ -8392,6 +8419,34 @@ def describe_pass_no_action(player, phase):
     }
 
 
+def own_approach_to_top_counters(player, top_item):
+    if top_item is None or getattr(top_item, "controller", None) is not player:
+        return []
+    return [
+        counter
+        for counter in player.counterspell_cards(
+            castable_only=True,
+            target_card=getattr(top_item, "card", None),
+            stack_item=top_item,
+        )
+        if get_card_effect(counter).get("counter_own_approach_to_top")
+        and get_card_effect(counter).get("countered_spell_to_top_library")
+    ]
+
+
+def should_lapse_own_approach_to_top(player, top_item):
+    if top_item is None or getattr(top_item, "controller", None) is not player:
+        return False
+    if not is_approach_of_the_second_sun(
+        getattr(top_item, "card", None),
+        getattr(top_item, "effect_data", None),
+    ):
+        return False
+    if int(getattr(player, "approach_count", 0) or 0) != 1:
+        return False
+    return bool(own_approach_to_top_counters(player, top_item))
+
+
 def priority_round(active_player, all_players, stack, turn, rng, phase=None):
     """v9: Priority round with optional empty-stack window during main phases."""
     record_engine_metric("priority_rounds")
@@ -8465,6 +8520,53 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
     for player in order:
         if not player.is_alive():
             continue
+        if player == top_item.controller and should_lapse_own_approach_to_top(player, top_item):
+            counters = own_approach_to_top_counters(player, top_item)
+            counter = counters[0] if counters else None
+            if counter is not None:
+                used_counter = player.use_counterspell(
+                    turn,
+                    top_item.card,
+                    stack_item=top_item,
+                    stack_depth=len(stack.items),
+                    phase=phase,
+                    priority_window="own_approach_topdeck_combo",
+                    preferred_counter=counter,
+                )
+                if used_counter:
+                    fields = replay_rule_fields(get_card_effect(used_counter))
+                    emit_decision_trace(
+                        decision_type="response",
+                        player=player,
+                        turn=turn,
+                        phase=phase,
+                        available_options=[
+                            decision_card_option(
+                                option_card,
+                                get_card_effect(option_card),
+                                action="counter_own_approach_to_top",
+                            )
+                            for option_card in counters[:8]
+                        ],
+                        chosen_option=decision_card_option(
+                            used_counter,
+                            get_card_effect(used_counter),
+                            action="counter_own_approach_to_top",
+                        ),
+                        rejected_options=[],
+                        score_components={
+                            "approach_count": getattr(player, "approach_count", 0),
+                            "available_own_approach_top_counters": len(counters),
+                        },
+                        rule_source=fields.get("rule_source", "battle_heuristic"),
+                        rule_status=fields.get("rule_review_status", "heuristic"),
+                        confidence="medium",
+                        expected_benefit_score=85,
+                        actual_outcome="own_approach_countered_to_top",
+                        reason="counter_first_approach_to_setup_second_cast_miracle",
+                    )
+                    stack.items[-1].countered = True
+                    return True
         if player != top_item.controller and (
             top_item.controller.silenced_opponents
             or top_item.controller.silenced_opponents_until_eot

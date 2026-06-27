@@ -33,6 +33,7 @@ DEFAULT_PACKAGE_GATE_REPORTS = [
     REPORT_DIR / "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_silence_fixed.json",
     REPORT_DIR / "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
     REPORT_DIR / "lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json",
+    REPORT_DIR / "lorehold_lapse_approach_gate_20260627_v1_fixed.json",
 ]
 
 
@@ -158,6 +159,24 @@ PACKAGE_IDEAS = [
         "required_telemetry": [
             "graveyard spell reuse or lifegain must appear in natural exposure",
             "no promotion if runtime/model evidence is missing",
+        ],
+    },
+    {
+        "package_key": "lapse_approach_topdeck_cut_tibalts_trickery",
+        "source_decks": ["external_lorehold_deck_tech"],
+        "family": "approach_topdeck_combo",
+        "adds": ["Lapse of Certainty"],
+        "cuts": ["Tibalt's Trickery"],
+        "lane": "deterministic_finishers",
+        "targets": ["second_approach_window", "topdeck_miracle_setup"],
+        "hypothesis": (
+            "External Lorehold tech uses Lapse of Certainty to counter the first Approach of the Second Sun, "
+            "putting it on top for the commander's first-draw miracle window. Tibalt's Trickery is the same "
+            "counter/protection slot but has a random replacement drawback."
+        ),
+        "required_telemetry": [
+            "own_approach_countered_to_top or countered_spell_moved_to_library_top must appear in exposure",
+            "second Approach conversion must improve without reducing seed-42 miracle/topdeck density",
         ],
     },
 ]

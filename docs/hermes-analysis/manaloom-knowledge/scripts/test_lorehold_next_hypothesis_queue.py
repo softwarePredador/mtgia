@@ -123,6 +123,7 @@ def test_gate_runner_contains_queue_ready_package_definitions():
         "dragon_rage_channeler_cut_scarlet_witch",
         "grand_abolisher_cut_mother_of_runes",
         "reprieve_cut_avatar_wrath",
+        "lapse_approach_topdeck_cut_tibalts_trickery",
     ]:
         assert package_key in gate.PACKAGE_DEFINITIONS
         assert gate.PACKAGE_DEFINITIONS[package_key]["adds"]
