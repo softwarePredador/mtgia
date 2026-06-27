@@ -1,0 +1,2086 @@
+{
+  "candidate_db": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "deck_process_isolation": true,
+  "game_checkpoint_json": null,
+  "game_checkpoint_markdown": null,
+  "game_timeout_seconds": 20.0,
+  "games_per_opponent": 3,
+  "generated_at": "2026-06-27T15:28:28Z",
+  "matrix": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v1.json",
+  "opponent_kind": "real",
+  "opponent_seed": 20260626,
+  "opponents": [
+    "Vivi Ornitier #99 (real)",
+    "Sisay, Weatherlight Captain #61 (real)",
+    "Winota, Joiner of Forces #39 (real)"
+  ],
+  "python_hash_seed": "0",
+  "results": [
+    {
+      "archetype": "unknown",
+      "avg_win_turn": 15.0,
+      "battle_rank": 2,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": 6,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "deck_size": 100,
+      "games": 9,
+      "lands": 33,
+      "load_deck_id": 6,
+      "losses": 8,
+      "objective": "Miracle spellslinger shell that uses topdeck setup and hand filtering to turn Lorehold's commander text into discounted spell chains.",
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 15.0,
+          "losses": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "tribal",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        }
+      ],
+      "primary_risks": [
+        "wincon_role"
+      ],
+      "process_isolated": true,
+      "ramp": 51,
+      "removal": 10,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": 138.25,
+      "structural_rank": 2,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 10,
+          "activated_ability_skipped": 85,
+          "additional_cost_paid": 4,
+          "aetherflux_reservoir_resolved": 1,
+          "attachment_sba": 2,
+          "cast_announced": 300,
+          "cast_illegal": 7,
+          "chaos_warp_reveal_resolved": 1,
+          "combat": 131,
+          "combat_result": 146,
+          "combat_step": 769,
+          "commander_cast": 42,
+          "compensation_tokens_created": 1,
+          "copy_creature_token_created": 6,
+          "copy_creature_token_failed": 2,
+          "copy_spell_no_stack_target": 1,
+          "cost_paid": 293,
+          "countered_spell_moved_to_graveyard": 6,
+          "creature_cast": 52,
+          "damage_wipe_resolved": 1,
+          "draw_cards_resolved": 12,
+          "end_step_token_exiled": 2,
+          "end_step_token_sacrificed": 4,
+          "equipment_attached": 1,
+          "equipment_unattached": 1,
+          "extra_turn_scheduled": 1,
+          "extra_turn_taken": 1,
+          "flashback_cast": 3,
+          "flashback_exiled": 3,
+          "game_lost": 1,
+          "graveyard_flashback_granted": 3,
+          "hand_filter_resolved": 4,
+          "imprint_resolved": 3,
+          "jeskas_will_resolved": 4,
+          "land_played": 178,
+          "land_tax_trigger_skipped": 4,
+          "loot_resolved": 1,
+          "lorehold_upkeep_rummage": 19,
+          "lorehold_upkeep_rummage_skipped": 53,
+          "mana_refreshed": 247,
+          "mill_resolved": 1,
+          "miracle_cast": 13,
+          "mizzix_mastery_copy_cast": 1,
+          "mizzix_mastery_resolved": 1,
+          "modal_boros_charm_resolved": 1,
+          "multi_defender_attack": 13,
+          "one_ring_burden_life_loss": 1,
+          "permanent_moved_from_battlefield": 41,
+          "player_eliminated": 11,
+          "priority_pass": 2640,
+          "protection_from_everything_granted": 3,
+          "protection_resolved": 1,
+          "random_discard_after_tutor": 2,
+          "redirect_removal_resolved": 3,
+          "removal_resolved": 20,
+          "replacement_applied": 26,
+          "ritual_mana_added": 1,
+          "self_exiled_on_resolution": 1,
+          "spell_cast": 205,
+          "spell_copied": 4,
+          "spell_copy_ceased_to_exist": 4,
+          "spell_countered": 6,
+          "spell_exiled_from_stack": 1,
+          "spell_resolved": 150,
+          "topdeck_manipulation_activated": 14,
+          "treasure_created": 5,
+          "trigger_put_on_stack": 67,
+          "trigger_resolved": 67,
+          "trigger_skipped": 10,
+          "turn_end": 237,
+          "turn_start": 247,
+          "tutor_life_loss_resolved": 2,
+          "tutor_resolved": 13,
+          "utility_artifact_activated": 1,
+          "utility_land_activated": 13,
+          "wheel_resolved": 2
+        },
+        "squee_anomalies": [],
+        "squee_game_traces": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "squee_trace_samples": [],
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 90,
+          "lorehold_spell_cast": 72,
+          "lorehold_upkeep_rummage": 19,
+          "miracle_cast": 13,
+          "topdeck_manipulation_activated": 14
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_spell_cast": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_spell_rummage": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_spell_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_upkeep_rummage": {
+            "games": 4,
+            "rate": 0.4444
+          },
+          "miracle_cast": {
+            "games": 7,
+            "rate": 0.7778
+          },
+          "squee_return_after_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_return_without_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_to_graveyard": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_upkeep_return": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "topdeck_manipulation_activated": {
+            "games": 5,
+            "rate": 0.5556
+          }
+        },
+        "top_cards": [
+          {
+            "count": 12,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 11,
+            "key": "topdeck:Sensei's Divining Top"
+          },
+          {
+            "count": 5,
+            "key": "cost_paid:Sensei's Divining Top"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Molten Duplication"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Mox Amber"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Arcane Signet"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Drannith Magistrate"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Storm-Kiln Artist"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Valakut Awakening // Valakut Stoneforge"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Brainstone"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Jeska's Will"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Lotus Petal"
+          }
+        ]
+      },
+      "win_rate": 11.11,
+      "win_reasons": {
+        "elimination": 1
+      },
+      "wins": 1
+    },
+    {
+      "archetype": "battle-variant",
+      "avg_win_turn": 0,
+      "battle_rank": 3,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": 607,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "deck_size": 100,
+      "games": 9,
+      "lands": 34,
+      "load_deck_id": 607,
+      "losses": 9,
+      "objective": "Miracle spellslinger shell that uses topdeck setup and hand filtering to turn Lorehold's commander text into discounted spell chains.",
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "tribal",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        }
+      ],
+      "primary_risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "process_isolated": true,
+      "ramp": 18,
+      "removal": 16,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": 135.635,
+      "structural_rank": 6,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 5,
+          "activated_ability_skipped": 65,
+          "additional_cost_failed": 1,
+          "additional_cost_paid": 10,
+          "airbend_creature_cast_from_exile": 4,
+          "airbend_other_creatures_resolved": 1,
+          "approach_cast_tracked": 3,
+          "approach_first_resolution": 1,
+          "attachment_sba": 2,
+          "cast_announced": 282,
+          "cast_illegal": 1,
+          "combat": 141,
+          "combat_result": 153,
+          "combat_step": 807,
+          "commander_cast": 48,
+          "compensation_tokens_created": 4,
+          "composite_rule_component_resolved": 2,
+          "composite_rule_resolved": 1,
+          "cost_paid": 281,
+          "countered_spell_moved_to_graveyard": 11,
+          "creature_cast": 57,
+          "damage_resolved": 2,
+          "draw_cards_resolved": 11,
+          "end_step_instant": 5,
+          "equipment_attached": 2,
+          "equipment_unattached": 1,
+          "imprint_resolved": 2,
+          "jeskas_will_resolved": 1,
+          "land_played": 179,
+          "land_ramp_resolved": 2,
+          "land_tax_trigger_skipped": 1,
+          "lorehold_upkeep_rummage": 27,
+          "lorehold_upkeep_rummage_skipped": 44,
+          "mana_refreshed": 250,
+          "mill_resolved": 1,
+          "miracle_cast": 11,
+          "multi_defender_attack": 11,
+          "one_ring_burden_life_loss": 7,
+          "permanent_moved_from_battlefield": 27,
+          "player_eliminated": 9,
+          "priority_pass": 2640,
+          "protection_from_everything_granted": 5,
+          "protection_resolved": 4,
+          "random_discard_after_tutor": 3,
+          "redirect_removal_resolved": 2,
+          "removal_resolved": 21,
+          "replacement_applied": 18,
+          "ritual_mana_added": 4,
+          "self_exiled_on_resolution": 1,
+          "spell_cast": 176,
+          "spell_countered": 11,
+          "spell_exiled_from_stack": 1,
+          "spell_resolved": 125,
+          "topdeck_manipulation_activated": 8,
+          "treasure_created": 5,
+          "trigger_put_on_stack": 62,
+          "trigger_resolved": 62,
+          "trigger_skipped": 8,
+          "turn_end": 241,
+          "turn_start": 250,
+          "tutor_life_loss_resolved": 2,
+          "tutor_resolved": 12,
+          "utility_artifact_activated": 6,
+          "utility_land_activated": 6
+        },
+        "squee_anomalies": [],
+        "squee_game_traces": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "squee_trace_samples": [],
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 74,
+          "lorehold_spell_cast": 57,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 27,
+          "miracle_cast": 11,
+          "topdeck_manipulation_activated": 8
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_spell_cast": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_spell_rummage": {
+            "games": 1,
+            "rate": 0.1111
+          },
+          "lorehold_spell_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_upkeep_rummage": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "miracle_cast": {
+            "games": 7,
+            "rate": 0.7778
+          },
+          "squee_return_after_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_return_without_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_to_graveyard": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_upkeep_return": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "topdeck_manipulation_activated": {
+            "games": 3,
+            "rate": 0.3333
+          }
+        },
+        "top_cards": [
+          {
+            "count": 12,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 8,
+            "key": "topdeck:Sensei's Divining Top"
+          },
+          {
+            "count": 5,
+            "key": "cost_paid:Sensei's Divining Top"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Smothering Tithe"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Fellwar Stone"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Mother of Runes"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Giver of Runes"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Pearl Medallion"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Artist's Talent"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Arcane Signet"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Prismari Pianist"
+          },
+          {
+            "count": 2,
+            "key": "miracle:Farewell"
+          }
+        ]
+      },
+      "win_rate": 0.0,
+      "win_reasons": {},
+      "wins": 0
+    },
+    {
+      "archetype": "strategy-first-squee-cached-timeout",
+      "avg_win_turn": 14.5,
+      "battle_rank": 1,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": null,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "deck_size": 100,
+      "games": 9,
+      "lands": 34,
+      "load_deck_id": 6,
+      "losses": 7,
+      "objective": null,
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 16.0,
+          "losses": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "tribal",
+          "avg_win_turn": 13.0,
+          "losses": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        }
+      ],
+      "primary_risks": [],
+      "process_isolated": true,
+      "ramp": 18,
+      "removal": 16,
+      "source_db": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": null,
+      "structural_rank": null,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 7,
+          "activated_ability_skipped": 86,
+          "additional_cost_paid": 4,
+          "airbend_creature_cast_from_exile": 2,
+          "airbend_other_creatures_resolved": 2,
+          "approach_cast_tracked": 2,
+          "approach_first_resolution": 1,
+          "attachment_sba": 1,
+          "board_wipe_resolved": 4,
+          "cast_announced": 314,
+          "combat": 151,
+          "combat_result": 173,
+          "combat_step": 870,
+          "commander_cast": 48,
+          "compensation_tokens_created": 3,
+          "composite_rule_component_resolved": 18,
+          "composite_rule_resolved": 8,
+          "cost_paid": 314,
+          "countered_spell_moved_to_graveyard": 10,
+          "creature_cast": 64,
+          "damage_resolved": 2,
+          "damage_wipe_resolved": 1,
+          "draw_cards_resolved": 6,
+          "end_step_instant": 7,
+          "equipment_attached": 2,
+          "equipment_unattached": 1,
+          "etb_removal_resolved": 1,
+          "extra_turn_scheduled": 2,
+          "extra_turn_taken": 4,
+          "game_lost": 2,
+          "imprint_resolved": 1,
+          "jeskas_will_resolved": 2,
+          "land_played": 193,
+          "land_ramp_resolved": 1,
+          "land_tax_trigger_resolved": 1,
+          "land_tax_trigger_skipped": 6,
+          "lorehold_upkeep_rummage": 41,
+          "lorehold_upkeep_rummage_skipped": 37,
+          "mana_refreshed": 255,
+          "miracle_cast": 14,
+          "multi_defender_attack": 16,
+          "one_ring_burden_life_loss": 3,
+          "permanent_moved_from_battlefield": 45,
+          "phase_out_resolved": 1,
+          "player_eliminated": 13,
+          "priority_pass": 2742,
+          "protection_from_everything_granted": 2,
+          "protection_resolved": 2,
+          "random_discard_after_tutor": 3,
+          "redirect_removal_resolved": 1,
+          "removal_resolved": 28,
+          "replacement_applied": 29,
+          "ritual_mana_added": 1,
+          "saga_chapter_progressed": 2,
+          "saga_chapter_resolved": 1,
+          "saga_sacrificed_by_sba": 1,
+          "self_exiled_on_resolution": 3,
+          "spell_cast": 210,
+          "spell_copied": 6,
+          "spell_copy_ceased_to_exist": 6,
+          "spell_countered": 10,
+          "spell_exiled_from_stack": 1,
+          "spell_resolved": 148,
+          "surge_to_victory_resolved": 2,
+          "tokens_created": 5,
+          "topdeck_manipulation_activated": 13,
+          "treasure_created": 2,
+          "trigger_put_on_stack": 108,
+          "trigger_resolved": 115,
+          "trigger_skipped": 6,
+          "turn_end": 241,
+          "turn_start": 255,
+          "tutor_life_loss_resolved": 2,
+          "tutor_resolved": 14,
+          "utility_artifact_activated": 3,
+          "utility_land_activated": 13,
+          "wheel_resolved": 1
+        },
+        "squee_anomalies": [],
+        "squee_game_traces": {
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0": [
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 9
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2626,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 10
+              },
+              "event": "turn_start",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2627,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 10
+              },
+              "event": "cast_announced",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2638,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 10
+              },
+              "event": "cost_paid",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2639,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 10
+              },
+              "event": "creature_cast",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2640,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Flooded Strand",
+                "effect": "land",
+                "player": "Lorehold",
+                "turn": 11
+              },
+              "event": "land_played",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2665,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "destination": "graveyard",
+                "from_zone": "battlefield",
+                "player": "Lorehold",
+                "reason": "tragic_arrogance",
+                "source": "Tragic Arrogance",
+                "to_zone": "graveyard",
+                "turn": 11
+              },
+              "event": "permanent_moved_from_battlefield",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "graveyard_entry"
+              ],
+              "seq": 2698,
+              "squee_known_graveyard_balance_after": 1,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Tragic Arrogance",
+                "player": "Lorehold",
+                "turn": 11
+              },
+              "event": "board_wipe_resolved",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2699,
+              "squee_known_graveyard_balance_after": 1,
+              "squee_known_graveyard_balance_before": 1
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "destination": "hand",
+                "effect": "graveyard_upkeep_return_self_to_hand",
+                "player": "Lorehold",
+                "trigger": "beginning_of_your_upkeep",
+                "turn": 11
+              },
+              "event": "trigger_resolved",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "upkeep_return"
+              ],
+              "seq": 2716,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 1
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 11
+              },
+              "event": "cast_announced",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2719,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 11
+              },
+              "event": "cost_paid",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2720,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 11
+              },
+              "event": "creature_cast",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2721,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 1,
+                "discarded_cards": [
+                  "Scalding Tarn"
+                ],
+                "player": "Lorehold",
+                "turn": 11
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2734,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Plains // Plains",
+                "effect": "land",
+                "player": "Lorehold",
+                "turn": 12
+              },
+              "event": "land_played",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2737,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 12
+              },
+              "event": "combat_step",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2764,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 12
+              },
+              "event": "combat",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2766,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 1,
+                "discarded_cards": [
+                  "Blasphemous Act"
+                ],
+                "player": "Lorehold",
+                "turn": 12
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2796,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Turbulent Steppe",
+                "effect": "land",
+                "player": "Lorehold",
+                "turn": 13
+              },
+              "event": "land_played",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2799,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 13
+              },
+              "event": "combat_step",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2837,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 13
+              },
+              "event": "combat",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2839,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Avatar's Wrath",
+                "player": "Lorehold",
+                "turn": 13
+              },
+              "event": "airbend_other_creatures_resolved",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2867,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 13
+              },
+              "event": "cast_announced",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2869,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 13
+              },
+              "event": "cost_paid",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2870,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "player": "Lorehold",
+                "turn": 13
+              },
+              "event": "airbend_creature_cast_from_exile",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2871,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 13
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2873,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Arid Mesa",
+                "effect": "land",
+                "player": "Lorehold",
+                "turn": 14
+              },
+              "event": "land_played",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2881,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 14
+              },
+              "event": "combat_step",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2892,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 14
+              },
+              "event": "combat",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2894,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 14
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2901,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Plaza of Heroes",
+                "effect": "land",
+                "player": "Lorehold",
+                "turn": 15
+              },
+              "event": "land_played",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2904,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Everything Comes to Dust",
+                "destination": "exile",
+                "player": "Lorehold",
+                "turn": 15
+              },
+              "event": "board_wipe_resolved",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2917,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 15
+              },
+              "event": "combat_step",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2921,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 15
+              },
+              "event": "combat",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 2923,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            }
+          ],
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2": [
+            {
+              "data": {
+                "discard_destination": "graveyard",
+                "discarded": "Molecule Man",
+                "player": "Lorehold",
+                "reason": "pitch_slow_noncritical_spell",
+                "turn": 4
+              },
+              "event": "lorehold_upkeep_rummage",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1608,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 5
+              },
+              "event": "turn_start",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1626,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 5
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1674,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 5
+              },
+              "event": "turn_start",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1676,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 5
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1726,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "turn_start",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1814,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "cast_announced",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1819,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "cost_paid",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1820,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "creature_cast",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1821,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1846,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 7
+              },
+              "event": "combat_step",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1939,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 7
+              },
+              "event": "multi_defender_attack",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1940,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 7
+              },
+              "event": "combat",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1944,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 7
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 1957,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            }
+          ],
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0": [
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 3
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4423,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 4
+              },
+              "event": "turn_start",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4478,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 4
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4499,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 5
+              },
+              "event": "turn_start",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4593,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 5
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4631,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "turn_start",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4774,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "cast_announced",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4800,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "cost_paid",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4801,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "creature_cast",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4802,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4819,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Ancient Tomb",
+                "effect": "land",
+                "player": "Lorehold",
+                "turn": 7
+              },
+              "event": "land_played",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 5078,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 7
+              },
+              "event": "combat_step",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 5088,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "turn": 7
+              },
+              "event": "combat",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 5090,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 7
+              },
+              "event": "turn_end",
+              "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 5102,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            }
+          ]
+        },
+        "squee_known_graveyard_balance_by_game": {
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0": 0
+        },
+        "squee_trace_samples": [
+          {
+            "data": {
+              "discard_destination": "graveyard",
+              "discarded": "Molecule Man",
+              "player": "Lorehold",
+              "reason": "pitch_slow_noncritical_spell",
+              "turn": 4
+            },
+            "event": "lorehold_upkeep_rummage",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1608,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 5
+            },
+            "event": "turn_start",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1626,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 5
+            },
+            "event": "turn_end",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1674,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 5
+            },
+            "event": "turn_start",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1676,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 5
+            },
+            "event": "turn_end",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1726,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 6
+            },
+            "event": "turn_start",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1814,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 6
+            },
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1819,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 6
+            },
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1820,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 6
+            },
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1821,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 6
+            },
+            "event": "turn_end",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1846,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "turn": 7
+            },
+            "event": "combat_step",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1939,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "turn": 7
+            },
+            "event": "multi_defender_attack",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1940,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "turn": 7
+            },
+            "event": "combat",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1944,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 7
+            },
+            "event": "turn_end",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 1957,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 9
+            },
+            "event": "turn_end",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 2626,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 10
+            },
+            "event": "turn_start",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 2627,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 10
+            },
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 2638,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 10
+            },
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 2639,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 10
+            },
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 2640,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Flooded Strand",
+              "effect": "land",
+              "player": "Lorehold",
+              "turn": 11
+            },
+            "event": "land_played",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 2665,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          }
+        ],
+        "strategic_event_counts": {
+          "graveyard_upkeep_return_self_to_hand": 1,
+          "lorehold_cost_paid": 103,
+          "lorehold_spell_cast": 84,
+          "lorehold_spell_rummage": 21,
+          "lorehold_upkeep_rummage": 41,
+          "miracle_cast": 14,
+          "squee_return_after_known_graveyard_entry": 1,
+          "squee_to_graveyard": 1,
+          "squee_upkeep_return": 1,
+          "topdeck_manipulation_activated": 13
+        },
+        "strategic_games": {
+          "graveyard_upkeep_return_self_to_hand": {
+            "games": 1,
+            "rate": 0.1111
+          },
+          "lorehold_cost_paid": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_spell_cast": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_spell_rummage": {
+            "games": 1,
+            "rate": 0.1111
+          },
+          "lorehold_spell_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_upkeep_rummage": {
+            "games": 8,
+            "rate": 0.8889
+          },
+          "miracle_cast": {
+            "games": 6,
+            "rate": 0.6667
+          },
+          "squee_return_after_known_graveyard_entry": {
+            "games": 1,
+            "rate": 0.1111
+          },
+          "squee_return_without_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_to_graveyard": {
+            "games": 1,
+            "rate": 0.1111
+          },
+          "squee_upkeep_return": {
+            "games": 1,
+            "rate": 0.1111
+          },
+          "topdeck_manipulation_activated": {
+            "games": 3,
+            "rate": 0.3333
+          }
+        },
+        "top_cards": [
+          {
+            "count": 13,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 8,
+            "key": "topdeck:Sensei's Divining Top"
+          },
+          {
+            "count": 5,
+            "key": "cost_paid:Squee, Goblin Nabob"
+          },
+          {
+            "count": 5,
+            "key": "topdeck:Scroll Rack"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Fellwar Stone"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Bender's Waterskin"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Ruby Medallion"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Prismari Pianist"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Talisman of Conviction"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Mother of Runes"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Sol Ring"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Sensei's Divining Top"
+          }
+        ]
+      },
+      "win_rate": 22.22,
+      "win_reasons": {
+        "elimination": 2
+      },
+      "wins": 2
+    }
+  ],
+  "simulation_seed": 99,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "ready"
+}
