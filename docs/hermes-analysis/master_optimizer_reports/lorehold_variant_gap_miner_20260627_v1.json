@@ -1408,7 +1408,7 @@
       "total_cards": 100
     }
   },
-  "generated_at": "2026-06-27T21:06:05Z",
+  "generated_at": "2026-06-27T21:10:19Z",
   "method_notes": [
     "SQLite/Hermes was read as an audit cache only; no PostgreSQL write was performed.",
     "Battle rules were aggregated by card name before deck comparison to avoid multi-rule fanout.",
@@ -1651,39 +1651,6 @@
       "status": "needs_cut_model_before_gate"
     },
     {
-      "candidate": "Brass's Bounty",
-      "candidate_score": 84,
-      "candidate_status": "high_frequency_runtime_ready_unexplored",
-      "cut_options": [
-        {
-          "card_name": "The Mind Stone",
-          "lane": "early_mana",
-          "negative_cut_count": 0,
-          "status": "manual_review_needed"
-        },
-        {
-          "card_name": "Bender's Waterskin",
-          "lane": "early_mana",
-          "negative_cut_count": 0,
-          "status": "risky_same_lane_only"
-        },
-        {
-          "card_name": "Boros Signet",
-          "lane": "early_mana",
-          "negative_cut_count": 0,
-          "status": "untested_flex_candidate"
-        },
-        {
-          "card_name": "Sol Ring",
-          "lane": "early_mana",
-          "negative_cut_count": 0,
-          "status": "untested_flex_candidate"
-        }
-      ],
-      "lane": "early_mana",
-      "status": "gate_candidate_requires_manual_review"
-    },
-    {
       "candidate": "Clifftop Retreat",
       "candidate_score": 84,
       "candidate_status": "high_frequency_runtime_ready_unexplored",
@@ -1793,6 +1760,21 @@
       ],
       "lane": "early_mana",
       "status": "gate_candidate_requires_manual_review"
+    },
+    {
+      "candidate": "Insurrection",
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_options": [
+        {
+          "card_name": "Creative Technique",
+          "lane": "finisher_or_big_spell",
+          "negative_cut_count": 0,
+          "status": "risky_same_lane_only"
+        }
+      ],
+      "lane": "finisher_or_big_spell",
+      "status": "gate_candidate_requires_manual_review"
     }
   ],
   "prior_gate_reports": [
@@ -1807,7 +1789,8 @@
     "blocked_runtime_rule_gap_count": 62,
     "candidate_status_counts": {
       "blocked_runtime_rule_gap": 62,
-      "high_frequency_runtime_ready_unexplored": 22,
+      "high_frequency_runtime_ready_unexplored": 21,
+      "runtime_partial_needs_model_review": 1,
       "runtime_ready_unexplored": 172,
       "tested_negative_add_requires_new_cut": 14
     },
@@ -1821,7 +1804,7 @@
       "untested_flex_candidate": 2
     },
     "pairing_count": 12,
-    "runtime_ready_unexplored_count": 194,
+    "runtime_ready_unexplored_count": 193,
     "tested_negative_add_count": 14,
     "tested_negative_cut_count": 10,
     "variant_only_card_count": 270
@@ -1829,6 +1812,7 @@
   "top_variant_candidates": [
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Plateau",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -1843,6 +1827,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 94,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Land \u2014 Mountain Plains",
@@ -1860,6 +1845,9 @@
     },
     {
       "active_rule_count": 2,
+      "battle_model_scopes": [
+        "impulse_top_seven_plus_hand_cast_mana_annotation_v1"
+      ],
       "card_name": "Apex of Power",
       "cmc": 10.0,
       "disabled_rule_count": 0,
@@ -1877,6 +1865,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 88,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -1893,39 +1882,9 @@
     },
     {
       "active_rule_count": 1,
-      "card_name": "Brass's Bounty",
-      "cmc": 7.0,
-      "disabled_rule_count": 1,
-      "effects": [
-        "ramp_engine",
-        "treasure_maker"
+      "battle_model_scopes": [
+        "check_land_dual_source_etb_annotation_v1"
       ],
-      "functional_tags": {
-        "ramp": 6,
-        "token_maker": 6,
-        "wincon": 12
-      },
-      "lane": "early_mana",
-      "negative_add_count": 0,
-      "negative_add_packages": [],
-      "review_only_rule_count": 0,
-      "rule_count": 2,
-      "score": 84,
-      "status": "high_frequency_runtime_ready_unexplored",
-      "type_line": "Sorcery",
-      "variant_deck_count": 6,
-      "variant_decks": [
-        609,
-        611,
-        612,
-        613,
-        614,
-        615
-      ],
-      "variant_total_quantity": 6
-    },
-    {
-      "active_rule_count": 1,
       "card_name": "Clifftop Retreat",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -1940,6 +1899,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 84,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Land",
@@ -1956,6 +1916,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "artifact_enchantment_tutor_to_library_top_v1"
+      ],
       "card_name": "Enlightened Tutor",
       "cmc": 1.0,
       "disabled_rule_count": 1,
@@ -1970,6 +1933,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 84,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Instant",
@@ -1986,6 +1950,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "any_card_to_hand_then_random_discard_v1"
+      ],
       "card_name": "Gamble",
       "cmc": 1.0,
       "disabled_rule_count": 1,
@@ -2000,6 +1967,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 74,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -2015,6 +1983,9 @@
     },
     {
       "active_rule_count": 2,
+      "battle_model_scopes": [
+        "instant_sorcery_recursion_with_opponent_creature_damage_annotation_v1"
+      ],
       "card_name": "Volcanic Vision",
       "cmc": 7.0,
       "disabled_rule_count": 0,
@@ -2029,6 +2000,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 68,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -2043,6 +2015,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "austere_command_choose_two_destroy_modes_v1"
+      ],
       "card_name": "Austere Command",
       "cmc": 6.0,
       "disabled_rule_count": 1,
@@ -2058,6 +2033,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -2072,6 +2048,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Boseiju, Who Shelters All",
       "cmc": 0.0,
       "disabled_rule_count": 0,
@@ -2086,6 +2063,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Legendary Land",
@@ -2100,6 +2078,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Dance with Calamity",
       "cmc": 8.0,
       "disabled_rule_count": 0,
@@ -2117,6 +2096,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -2131,6 +2111,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1"
+      ],
       "card_name": "Galvanoth",
       "cmc": 5.0,
       "disabled_rule_count": 0,
@@ -2145,6 +2128,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Creature \u2014 Beast",
@@ -2159,6 +2143,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "goldspan_dragon_attack_or_target_treasure_double_mana_v1"
+      ],
       "card_name": "Goldspan Dragon",
       "cmc": 5.0,
       "disabled_rule_count": 0,
@@ -2173,6 +2160,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Creature \u2014 Dragon",
@@ -2187,6 +2175,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "steal_all_creatures_until_eot_haste_attack_projection_v1"
+      ],
       "card_name": "Insurrection",
       "cmc": 8.0,
       "disabled_rule_count": 1,
@@ -2202,6 +2193,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -2216,6 +2208,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "cast_up_to_two_instant_sorcery_hand_graveyard_total_mv_lte_6_exile_replacement_v1"
+      ],
       "card_name": "Invoke Calamity",
       "cmc": 5.0,
       "disabled_rule_count": 2,
@@ -2231,6 +2226,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Instant",
@@ -2245,6 +2241,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "noncreature_spell_cast_damage_each_opponent_v1"
+      ],
       "card_name": "Longshot, Rebel Bowman",
       "cmc": 4.0,
       "disabled_rule_count": 0,
@@ -2261,6 +2260,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Legendary Creature \u2014 Human Rebel Ally",
@@ -2275,6 +2275,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "each_opponent_greatest_power_edict_single_target_baseline_v1"
+      ],
       "card_name": "Ol\u00f3rin's Searing Light",
       "cmc": 4.0,
       "disabled_rule_count": 2,
@@ -2291,6 +2294,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Instant",
@@ -2305,6 +2309,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1"
+      ],
       "card_name": "Penance",
       "cmc": 3.0,
       "disabled_rule_count": 0,
@@ -2319,6 +2326,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Enchantment",
@@ -2333,6 +2341,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "nonland_permanent_graveyard_to_battlefield_paradigm_v1"
+      ],
       "card_name": "Restoration Seminar",
       "cmc": 0.0,
       "disabled_rule_count": 2,
@@ -2347,6 +2358,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Sorcery \u2014 Lesson",
@@ -2361,6 +2373,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "filter_land_flexible_mana_annotation_v1"
+      ],
       "card_name": "Rugged Prairie",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -2375,6 +2390,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Land",
@@ -2389,6 +2405,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "slowland_dual_source_etb_annotation_v1"
+      ],
       "card_name": "Sundown Pass",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -2403,6 +2422,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Land",
@@ -2417,6 +2437,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "bottom_then_draw_plus_one_mdfc_land_v1"
+      ],
       "card_name": "Valakut Awakening // Valakut Stoneforge",
       "cmc": 3.0,
       "disabled_rule_count": 1,
@@ -2433,6 +2456,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Instant",
@@ -2447,6 +2471,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "multiplayer_discard_draw_v1"
+      ],
       "card_name": "Wheel of Fortune",
       "cmc": 3.0,
       "disabled_rule_count": 1,
@@ -2461,6 +2488,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 64,
       "status": "high_frequency_runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -2475,6 +2503,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "create_four_birds_gift_phase_all_life_lock_protection_exile_self_v1"
+      ],
       "card_name": "Perch Protection",
       "cmc": 6.0,
       "disabled_rule_count": 2,
@@ -2492,6 +2523,7 @@
       ],
       "review_only_rule_count": 0,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 54,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Instant",
@@ -2508,6 +2540,49 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "single_treasure_creation_v1"
+      ],
+      "card_name": "Brass's Bounty",
+      "cmc": 7.0,
+      "disabled_rule_count": 1,
+      "effects": [
+        "ramp_engine",
+        "treasure_maker"
+      ],
+      "functional_tags": {
+        "ramp": 6,
+        "token_maker": 6,
+        "wincon": 12
+      },
+      "lane": "early_mana",
+      "negative_add_count": 0,
+      "negative_add_packages": [],
+      "review_only_rule_count": 0,
+      "rule_count": 2,
+      "rule_quality_flags": [
+        "brass_bounty_should_scale_with_lands_controlled",
+        "single_treasure_model_review_required"
+      ],
+      "score": 49,
+      "status": "runtime_partial_needs_model_review",
+      "type_line": "Sorcery",
+      "variant_deck_count": 6,
+      "variant_decks": [
+        609,
+        611,
+        612,
+        613,
+        614,
+        615
+      ],
+      "variant_total_quantity": 6
+    },
+    {
+      "active_rule_count": 1,
+      "battle_model_scopes": [
+        "boros_charm_choose_one_damage_indestructible_double_strike_v1"
+      ],
       "card_name": "Boros Charm",
       "cmc": 2.0,
       "disabled_rule_count": 1,
@@ -2526,6 +2601,7 @@
       ],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 44,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Instant",
@@ -2541,6 +2617,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "silence_until_eot_v1"
+      ],
       "card_name": "Silence",
       "cmc": 1.0,
       "disabled_rule_count": 1,
@@ -2560,6 +2639,7 @@
       ],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 44,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Instant",
@@ -2575,6 +2655,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "creature_body_artifact_power_magecraft_treasure_annotation_v1"
+      ],
       "card_name": "Storm-Kiln Artist",
       "cmc": 4.0,
       "disabled_rule_count": 1,
@@ -2594,6 +2677,7 @@
       ],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 44,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Creature \u2014 Dwarf Shaman",
@@ -2609,6 +2693,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Boros Garrison",
       "cmc": 0.0,
       "disabled_rule_count": 0,
@@ -2623,6 +2708,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Land",
@@ -2636,6 +2722,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Cavern of Souls",
       "cmc": 0.0,
       "disabled_rule_count": 0,
@@ -2650,6 +2737,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Land",
@@ -2663,6 +2751,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1"
+      ],
       "card_name": "Chaos Warp",
       "cmc": 3.0,
       "disabled_rule_count": 1,
@@ -2680,6 +2771,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Instant",
@@ -2693,6 +2785,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1"
+      ],
       "card_name": "Deflecting Palm",
       "cmc": 2.0,
       "disabled_rule_count": 0,
@@ -2707,6 +2802,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Instant",
@@ -2720,6 +2816,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "creature_etb_copy_stack_instant_or_sorcery_v1"
+      ],
       "card_name": "Dualcaster Mage",
       "cmc": 3.0,
       "disabled_rule_count": 1,
@@ -2736,6 +2835,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Creature \u2014 Human Wizard",
@@ -2749,6 +2849,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "goblin_engineer_etb_artifact_to_graveyard_v1"
+      ],
       "card_name": "Goblin Engineer",
       "cmc": 2.0,
       "disabled_rule_count": 1,
@@ -2766,6 +2869,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Creature \u2014 Goblin Artificer",
@@ -2779,6 +2883,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Helm of Awakening",
       "cmc": 2.0,
       "disabled_rule_count": 0,
@@ -2794,6 +2899,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Artifact",
@@ -2807,6 +2913,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "fast_mana_artifact_partial_v1"
+      ],
       "card_name": "Mana Vault",
       "cmc": 1.0,
       "disabled_rule_count": 1,
@@ -2821,6 +2930,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Artifact",
@@ -2834,6 +2944,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "counter_target_blue_spell_or_destroy_target_blue_permanent_v1"
+      ],
       "card_name": "Red Elemental Blast",
       "cmc": 1.0,
       "disabled_rule_count": 1,
@@ -2851,6 +2964,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Instant",
@@ -2864,6 +2978,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "multi_target_exile_damage_average_single_target_v1"
+      ],
       "card_name": "Soulfire Eruption",
       "cmc": 9.0,
       "disabled_rule_count": 2,
@@ -2881,6 +2998,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -2894,6 +3012,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "the_one_ring_etb_protection_burden_draw_v1"
+      ],
       "card_name": "The One Ring",
       "cmc": 4.0,
       "disabled_rule_count": 1,
@@ -2910,6 +3031,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Legendary Artifact",
@@ -2923,6 +3045,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "own_creature_single_copy_haste_exile_eot_v1"
+      ],
       "card_name": "Twinflame",
       "cmc": 2.0,
       "disabled_rule_count": 1,
@@ -2941,6 +3066,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -2954,6 +3080,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "attack_top_seven_instant_or_sorcery_lte_power_may_cast_without_paying_mana_v1"
+      ],
       "card_name": "Velomachus Lorehold",
       "cmc": 7.0,
       "disabled_rule_count": 0,
@@ -2968,6 +3097,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 34,
       "status": "runtime_ready_unexplored",
       "type_line": "Legendary Creature \u2014 Elder Dragon",
@@ -2981,6 +3111,9 @@
     },
     {
       "active_rule_count": 2,
+      "battle_model_scopes": [
+        "artifact_land_colored_source_v1"
+      ],
       "card_name": "Ancient Den",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -2995,6 +3128,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 28,
       "status": "runtime_ready_unexplored",
       "type_line": "Artifact Land",
@@ -3007,6 +3141,9 @@
     },
     {
       "active_rule_count": 2,
+      "battle_model_scopes": [
+        "imprint_fast_mana_v1"
+      ],
       "card_name": "Chrome Mox",
       "cmc": 0.0,
       "disabled_rule_count": 0,
@@ -3021,6 +3158,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 28,
       "status": "runtime_ready_unexplored",
       "type_line": "Artifact",
@@ -3033,6 +3171,9 @@
     },
     {
       "active_rule_count": 2,
+      "battle_model_scopes": [
+        "pregame_fixing_land_partial_v1"
+      ],
       "card_name": "Gemstone Caverns",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -3047,6 +3188,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 28,
       "status": "runtime_ready_unexplored",
       "type_line": "Legendary Land",
@@ -3059,6 +3201,9 @@
     },
     {
       "active_rule_count": 2,
+      "battle_model_scopes": [
+        "artifact_land_colored_source_v1"
+      ],
       "card_name": "Great Furnace",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -3073,6 +3218,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 3,
+      "rule_quality_flags": [],
       "score": 28,
       "status": "runtime_ready_unexplored",
       "type_line": "Artifact Land",
@@ -3085,6 +3231,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "spell_cast_red_mana_trigger_v1"
+      ],
       "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
       "cmc": 3.0,
       "disabled_rule_count": 1,
@@ -3104,6 +3253,7 @@
       ],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Legendary Creature \u2014 God",
@@ -3117,6 +3267,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Dragon's Rage Channeler",
       "cmc": 1.0,
       "disabled_rule_count": 0,
@@ -3136,6 +3287,7 @@
       ],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Creature \u2014 Human Shaman",
@@ -3149,6 +3301,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "static_opponent_spell_lock_activated_ability_lock_annotation_v1"
+      ],
       "card_name": "Grand Abolisher",
       "cmc": 2.0,
       "disabled_rule_count": 1,
@@ -3165,6 +3320,7 @@
       ],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Creature \u2014 Human Cleric",
@@ -3178,6 +3334,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Reprieve",
       "cmc": 2.0,
       "disabled_rule_count": 0,
@@ -3194,6 +3351,7 @@
       ],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Instant",
@@ -3207,6 +3365,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "single_shot_red_ritual_v1"
+      ],
       "card_name": "Seething Song",
       "cmc": 3.0,
       "disabled_rule_count": 1,
@@ -3223,6 +3384,7 @@
       ],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "tested_negative_add_requires_new_cut",
       "type_line": "Instant",
@@ -3236,6 +3398,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "opponent_creature_enter_tapped_gain_life_v1"
+      ],
       "card_name": "Authority of the Consuls",
       "cmc": 1.0,
       "disabled_rule_count": 0,
@@ -3250,6 +3415,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Enchantment",
@@ -3262,6 +3428,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "three_colorless_monolith_mana_rock_v1"
+      ],
       "card_name": "Basalt Monolith",
       "cmc": 3.0,
       "disabled_rule_count": 1,
@@ -3276,6 +3445,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Artifact",
@@ -3288,6 +3458,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
+      ],
       "card_name": "Bolt Bend",
       "cmc": 4.0,
       "disabled_rule_count": 0,
@@ -3302,6 +3475,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Instant",
@@ -3314,6 +3488,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "five_color_tap_damage_land_annotation_v1"
+      ],
       "card_name": "City of Brass",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -3328,6 +3505,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Land",
@@ -3340,6 +3518,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "cool_but_rude_class_attack_rummage_level_damage_tutor_v1"
+      ],
       "card_name": "Cool but Rude",
       "cmc": 2.0,
       "disabled_rule_count": 0,
@@ -3354,6 +3535,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 1,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Enchantment \u2014 Class",
@@ -3366,6 +3548,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "first_instant_sorcery_cast_each_turn_copy_own_spell_v1"
+      ],
       "card_name": "Double Vision",
       "cmc": 5.0,
       "disabled_rule_count": 1,
@@ -3381,6 +3566,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Enchantment",
@@ -3393,6 +3579,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "draw_two_discard_two_flashback_annotation_v1"
+      ],
       "card_name": "Faithless Looting",
       "cmc": 1.0,
       "disabled_rule_count": 1,
@@ -3410,6 +3599,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -3422,6 +3612,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "copy_target_instant_or_sorcery_stack_spell_alt_cost_annotation_v1"
+      ],
       "card_name": "Flare of Duplication",
       "cmc": 3.0,
       "disabled_rule_count": 1,
@@ -3437,6 +3630,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Instant",
@@ -3449,6 +3643,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "targeted_damage_variant_v1"
+      ],
       "card_name": "Lightning Bolt",
       "cmc": 1.0,
       "disabled_rule_count": 1,
@@ -3466,6 +3663,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Instant",
@@ -3478,6 +3676,9 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [
+        "zero_mana_artifact_sacrifice_one_mana_one_shot_runtime_v1"
+      ],
       "card_name": "Lotus Petal",
       "cmc": 0.0,
       "disabled_rule_count": 1,
@@ -3492,6 +3693,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 0,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Artifact",
@@ -3504,6 +3706,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Mana Geyser",
       "cmc": 5.0,
       "disabled_rule_count": 0,
@@ -3518,6 +3721,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Sorcery",
@@ -3530,6 +3734,7 @@
     },
     {
       "active_rule_count": 1,
+      "battle_model_scopes": [],
       "card_name": "Myriad Landscape",
       "cmc": 0.0,
       "disabled_rule_count": 0,
@@ -3544,6 +3749,7 @@
       "negative_add_packages": [],
       "review_only_rule_count": 1,
       "rule_count": 2,
+      "rule_quality_flags": [],
       "score": 24,
       "status": "runtime_ready_unexplored",
       "type_line": "Land",

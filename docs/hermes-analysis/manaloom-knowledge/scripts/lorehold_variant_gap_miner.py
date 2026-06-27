@@ -208,6 +208,7 @@ def load_rule_index(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
                 "review_only_rule_count": 0,
                 "disabled_rule_count": 0,
                 "effects": Counter(),
+                "battle_model_scopes": Counter(),
                 "execution_statuses": Counter(),
                 "review_statuses": Counter(),
             },
@@ -217,9 +218,13 @@ def load_rule_index(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
         review_status = str(row["review_status"] or "")
         entry["execution_statuses"][execution_status] += 1
         entry["review_statuses"][review_status] += 1
-        effect = json_dict(row["effect_json"]).get("effect")
+        effect_data = json_dict(row["effect_json"])
+        effect = effect_data.get("effect")
         if effect:
             entry["effects"][str(effect)] += 1
+        scope = effect_data.get("battle_model_scope")
+        if scope:
+            entry["battle_model_scopes"][str(scope)] += 1
         if execution_status == "review_only":
             entry["review_only_rule_count"] += 1
         if execution_status == "disabled":
@@ -228,9 +233,23 @@ def load_rule_index(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
             entry["active_rule_count"] += 1
     for entry in index.values():
         entry["effects"] = dict(sorted(entry["effects"].items()))
+        entry["battle_model_scopes"] = dict(sorted(entry["battle_model_scopes"].items()))
         entry["execution_statuses"] = dict(sorted(entry["execution_statuses"].items()))
         entry["review_statuses"] = dict(sorted(entry["review_statuses"].items()))
     return index
+
+
+def rule_quality_flags(card_name: str, rule: dict[str, Any]) -> list[str]:
+    scopes = set((rule.get("battle_model_scopes") or {}).keys())
+    effects = set((rule.get("effects") or {}).keys())
+    flags: list[str] = []
+    if "single_treasure_creation_v1" in scopes:
+        flags.append("single_treasure_model_review_required")
+    if "treasure_maker" in effects and "lands_controlled_treasure_count_v1" in scopes:
+        return flags
+    if normalize_key(card_name) == normalize_key("Brass's Bounty") and "treasure_maker" in effects:
+        flags.append("brass_bounty_should_scale_with_lands_controlled")
+    return sorted(set(flags))
 
 
 def strategy_lookups(strategy_audit: dict[str, Any]) -> tuple[
@@ -423,9 +442,12 @@ def mine_variant_candidates(
     for key, card in variant_presence.items():
         rule = rule_index.get(key, {})
         active_rules = int(rule.get("active_rule_count") or 0)
+        quality_flags = rule_quality_flags(card["card_name"], rule)
         negative_evidence = gate_history["negative_adds"].get(key, [])
         if active_rules <= 0:
             status = "blocked_runtime_rule_gap"
+        elif quality_flags:
+            status = "runtime_partial_needs_model_review"
         elif negative_evidence:
             status = "tested_negative_add_requires_new_cut"
         elif int(card["variant_deck_count"]) >= 4:
@@ -437,6 +459,7 @@ def mine_variant_candidates(
             + active_rules * 4
             + (20 if status == "high_frequency_runtime_ready_unexplored" else 0)
             + (-20 if status.startswith("blocked") else 0)
+            + (-15 if quality_flags else 0)
             + (-10 if negative_evidence else 0)
         )
         rows.append(
@@ -456,6 +479,8 @@ def mine_variant_candidates(
                 "review_only_rule_count": int(rule.get("review_only_rule_count") or 0),
                 "disabled_rule_count": int(rule.get("disabled_rule_count") or 0),
                 "effects": sorted((rule.get("effects") or {}).keys()),
+                "battle_model_scopes": sorted((rule.get("battle_model_scopes") or {}).keys()),
+                "rule_quality_flags": quality_flags,
                 "negative_add_count": len(negative_evidence),
                 "negative_add_packages": [
                     evidence.get("package_key") for evidence in negative_evidence
@@ -670,12 +695,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append(f"- {key}: `{value}`")
     lines.extend(["", "## Top Variant Candidates", ""])
     lines.append(
-        "| Rank | Card | Status | Score | Decks | Lane | Active Rules | Effects | Prior Negative Adds |"
+        "| Rank | Card | Status | Score | Decks | Lane | Active Rules | Effects | Rule Quality Flags | Prior Negative Adds |"
     )
-    lines.append("| ---: | --- | --- | ---: | --- | --- | ---: | --- | ---: |")
+    lines.append("| ---: | --- | --- | ---: | --- | --- | ---: | --- | --- | ---: |")
     for index, row in enumerate(payload["top_variant_candidates"][:30], start=1):
         lines.append(
-            "| {rank} | `{card}` | `{status}` | {score} | {decks} | `{lane}` | {rules} | {effects} | {negative} |".format(
+            "| {rank} | `{card}` | `{status}` | {score} | {decks} | `{lane}` | {rules} | {effects} | {flags} | {negative} |".format(
                 rank=index,
                 card=row["card_name"],
                 status=row["status"],
@@ -684,6 +709,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 lane=row["lane"],
                 rules=row["active_rule_count"],
                 effects=", ".join(row["effects"]) or "none",
+                flags=", ".join(row.get("rule_quality_flags") or []) or "none",
                 negative=row["negative_add_count"],
             )
         )

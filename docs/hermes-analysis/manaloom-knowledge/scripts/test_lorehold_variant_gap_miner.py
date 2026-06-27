@@ -58,8 +58,10 @@ def memory_db():
             (6, "Prismari Pianist", 1, "wincon", 5, "Creature", '["wincon"]', 0),
             (608, "Candidate Ramp", 1, "ramp", 7, "Sorcery", '["ramp"]', 0),
             (608, "Candidate Bad", 1, "draw", 3, "Sorcery", '["draw"]', 0),
+            (608, "Candidate Partial", 1, "ramp", 7, "Sorcery", '["ramp"]', 0),
             (608, "Needs Rule", 1, "draw", 3, "Creature", '["draw"]', 0),
             (609, "Candidate Ramp", 1, "ramp", 7, "Sorcery", '["ramp"]', 0),
+            (609, "Candidate Partial", 1, "ramp", 7, "Sorcery", '["ramp"]', 0),
         ],
     )
     conn.executemany(
@@ -85,6 +87,19 @@ def memory_db():
                 "review_only",
                 "needs_review",
                 json.dumps({"effect": "draw_cards"}),
+            ),
+            (
+                "Candidate Partial",
+                "candidate partial",
+                "auto",
+                "verified",
+                json.dumps(
+                    {
+                        "effect": "treasure_maker",
+                        "battle_model_scope": "single_treasure_creation_v1",
+                        "treasure_count": 1,
+                    }
+                ),
             ),
         ],
     )
@@ -169,6 +184,10 @@ def test_variant_gap_miner_blocks_review_only_and_marks_prior_negative(tmp_path)
     assert by_card["Candidate Ramp"]["status"] == "runtime_ready_unexplored"
     assert by_card["Candidate Ramp"]["active_rule_count"] == 1
     assert by_card["Candidate Bad"]["status"] == "tested_negative_add_requires_new_cut"
+    assert by_card["Candidate Partial"]["status"] == "runtime_partial_needs_model_review"
+    assert "single_treasure_model_review_required" in by_card["Candidate Partial"][
+        "rule_quality_flags"
+    ]
     assert by_card["Needs Rule"]["status"] == "blocked_runtime_rule_gap"
 
     cuts = {row["card_name"]: row for row in payload["cut_inventory"]}
@@ -178,3 +197,6 @@ def test_variant_gap_miner_blocks_review_only_and_marks_prior_negative(tmp_path)
 
     assert payload["pairing_hypotheses"][0]["candidate"] == "Candidate Ramp"
     assert payload["pairing_hypotheses"][0]["cut_options"][0]["card_name"] == "Safe Rock"
+    assert "Candidate Partial" not in {
+        row["candidate"] for row in payload["pairing_hypotheses"]
+    }
