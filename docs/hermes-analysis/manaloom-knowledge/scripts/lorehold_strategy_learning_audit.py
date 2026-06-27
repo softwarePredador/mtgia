@@ -75,6 +75,9 @@ DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1.json",
     REPORT_DIR / "lorehold_spellchain_conversion_gate_20260627_seed7_v1_spellchain_v1.json",
     REPORT_DIR / "lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1.json",
+    REPORT_DIR / "lorehold_topfreecast_conversion_gate_20260627_seed42_v1_topfreecast_v1.json",
+    REPORT_DIR / "lorehold_topfreecast_conversion_gate_20260627_seed7_v1_topfreecast_v1.json",
+    REPORT_DIR / "lorehold_topfreecast_conversion_gate_20260627_seed20260625_v1_topfreecast_v1.json",
 ]
 DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
@@ -82,7 +85,7 @@ DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed20260625_squee_v1.json",
 ]
 DEFAULT_LOSS_FAILURE_CLASSIFIER = (
-    REPORT_DIR / "lorehold_loss_failure_classifier_20260627_conversion_pressure_v2.json"
+    REPORT_DIR / "lorehold_loss_failure_classifier_20260627_conversion_pressure_v3.json"
 )
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
@@ -800,6 +803,18 @@ def render_markdown(report: dict[str, Any]) -> str:
                 f"`{angel['baseline_wins']}-{angel['baseline_losses']}` (`{angel['delta_pp']:+.2f}` pp) "
                 f"and seed 42 moved `{angel['strong_seed_delta_pp']:+.2f}` pp."
             )
+        primal = next((row for row in post_squee_rows if row["package_key"] == "primal_amulet_spell_engine"), None)
+        if primal:
+            delta = primal.get("strategic_delta") or {}
+            lines.append(
+                "- Primal Amulet over Bender's Waterskin closes the revised top-freecast test from 615 as a reject/rework: "
+                f"`{primal['candidate_wins']}-{primal['candidate_losses']}` vs "
+                f"`{primal['baseline_wins']}-{primal['baseline_losses']}` (`{primal['delta_pp']:+.2f}` pp), "
+                f"seed 42 `{primal['strong_seed_delta_pp']:+.2f}` pp, "
+                f"spell delta `{int(delta.get('lorehold_spell_cast') or 0):+d}`, "
+                f"miracle delta `{int(delta.get('miracle_cast') or 0):+d}`. "
+                "It helps low-performing seeds but again breaks the known strong conversion pattern."
+            )
     if loss_summary_rows:
         baseline_7 = next(
             (
@@ -1157,7 +1172,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                 )
             )
         lines.append("")
-        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results alone. Birgi + Seething Song over both medallions improves the weak seeds while losing badly on seed 42, so medallions are part of the strong-seed conversion pattern and the ritual lane needs a different cut before any promotion. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
+        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Primal Amulet over Bender's Waterskin repeats the same weak-seed improvement and strong-seed collapse pattern, so Bender is not a free cut. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results alone. Birgi + Seething Song over both medallions improves the weak seeds while losing badly on seed 42, so medallions are part of the strong-seed conversion pattern and the ritual lane needs a different cut before any promotion. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
         lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")
@@ -1549,6 +1564,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "The first Library/pressure retest rejected Brainstone, Ghostly Prison, and The One Ring over Hexing Squelcher; future tests need a new cut logic or a narrower per-game failure target.",
         "Angel's Grace over Dawn's Truce confirms that one-mana life-floor protection can improve a weak seed but is not free; cutting the existing protection shell breaks seed 42 completely.",
         "Birgi + Seething Song over Pearl/Ruby Medallion confirms the ritual lane can help weak seeds, but cutting both medallions breaks seed 42; treat medallions as protected until a same-lane benchmark proves a safer cut.",
+        "Primal Amulet over Bender's Waterskin confirms the revised top-freecast/cost-reduction lane can help weak seeds, but the Bender cut still breaks seed 42; treat Bender as protected until a same-slot benchmark preserves the strong seed.",
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
@@ -1558,7 +1574,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
         "Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.",
         "Do not promote Birgi + Seething Song over Pearl/Ruby Medallion; any future ritual package must preserve at least one medallion or prove the medallion cut with a stronger seed-42 result.",
-        "Build the remaining revised topdeck-freecast package from 615 as a narrow one- or two-card test against the Squee champion.",
+        "Do not promote Primal Amulet over Bender's Waterskin; future topdeck/freecast work needs a different cut or a deeper Galvanoth-style exposure gate that preserves seed 42.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
         "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.",
