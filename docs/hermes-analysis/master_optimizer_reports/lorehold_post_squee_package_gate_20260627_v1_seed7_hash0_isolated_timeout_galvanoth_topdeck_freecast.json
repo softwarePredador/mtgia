@@ -1,0 +1,2812 @@
+{
+  "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout_galvanoth_topdeck_freecast/knowledge_candidate.db",
+  "deck_process_isolation": true,
+  "game_checkpoint_json": null,
+  "game_checkpoint_markdown": null,
+  "game_timeout_seconds": 20.0,
+  "games_per_opponent": 3,
+  "generated_at": "2026-06-27T15:56:50Z",
+  "matrix": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v1.json",
+  "opponent_kind": "real",
+  "opponent_seed": 20260626,
+  "opponents": [
+    "Vivi Ornitier #99 (real)",
+    "Sisay, Weatherlight Captain #61 (real)",
+    "Winota, Joiner of Forces #39 (real)"
+  ],
+  "python_hash_seed": "0",
+  "results": [
+    {
+      "archetype": "unknown",
+      "avg_win_turn": 0,
+      "battle_rank": 2,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": 6,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "deck_size": 100,
+      "game_results": [
+        {
+          "event_counts": {
+            "activated_ability_skipped": 2,
+            "cast_announced": 25,
+            "combat": 14,
+            "combat_result": 14,
+            "combat_step": 76,
+            "commander_cast": 3,
+            "cost_paid": 25,
+            "creature_cast": 7,
+            "damage_resolved": 1,
+            "draw_cards_resolved": 2,
+            "imprint_resolved": 1,
+            "land_played": 17,
+            "lorehold_upkeep_rummage": 3,
+            "mana_refreshed": 24,
+            "permanent_moved_from_battlefield": 2,
+            "player_eliminated": 1,
+            "priority_pass": 228,
+            "protection_resolved": 1,
+            "removal_resolved": 3,
+            "spell_cast": 15,
+            "spell_resolved": 11,
+            "treasure_created": 1,
+            "trigger_put_on_stack": 1,
+            "trigger_resolved": 1,
+            "turn_end": 23,
+            "turn_start": 24,
+            "tutor_resolved": 1
+          },
+          "game_id": "deck_6:Vivi Ornitier #99 (real):0",
+          "game_index": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "opponent_archetype": "combo",
+          "picked_opponents": [
+            "Vivi Ornitier #99 (real)",
+            "Winota, Joiner of Forces #39 (real)",
+            "Sisay, Weatherlight Captain #61 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 7,
+            "additional_cost_paid": 1,
+            "cast_announced": 25,
+            "combat": 14,
+            "combat_result": 16,
+            "combat_step": 83,
+            "commander_cast": 6,
+            "cost_paid": 25,
+            "countered_spell_moved_to_graveyard": 2,
+            "creature_cast": 3,
+            "draw_cards_resolved": 1,
+            "land_played": 21,
+            "land_ramp_resolved": 1,
+            "lorehold_upkeep_rummage": 2,
+            "lorehold_upkeep_rummage_skipped": 9,
+            "mana_refreshed": 27,
+            "miracle_cast": 1,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 3,
+            "player_eliminated": 1,
+            "priority_pass": 244,
+            "random_discard_after_tutor": 1,
+            "replacement_applied": 2,
+            "ritual_mana_added": 1,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 16,
+            "spell_countered": 2,
+            "spell_resolved": 7,
+            "topdeck_manipulation_activated": 2,
+            "trigger_put_on_stack": 4,
+            "trigger_resolved": 4,
+            "turn_end": 25,
+            "turn_start": 27,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "deck_6:Vivi Ornitier #99 (real):1",
+          "game_index": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "opponent_archetype": "combo",
+          "picked_opponents": [
+            "Vivi Ornitier #99 (real)",
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "topdeck_manipulation_activated": 2
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "activated_ability_skipped": 6,
+            "cast_announced": 30,
+            "combat": 12,
+            "combat_result": 12,
+            "combat_step": 67,
+            "commander_cast": 5,
+            "cost_paid": 30,
+            "creature_cast": 4,
+            "draw_cards_resolved": 1,
+            "jeskas_will_resolved": 1,
+            "land_played": 20,
+            "lorehold_upkeep_rummage": 3,
+            "lorehold_upkeep_rummage_skipped": 3,
+            "mana_refreshed": 23,
+            "miracle_cast": 1,
+            "permanent_moved_from_battlefield": 2,
+            "player_eliminated": 1,
+            "priority_pass": 236,
+            "random_discard_after_tutor": 1,
+            "removal_resolved": 3,
+            "replacement_applied": 1,
+            "spell_cast": 22,
+            "spell_exiled_from_stack": 1,
+            "spell_resolved": 13,
+            "trigger_put_on_stack": 2,
+            "trigger_resolved": 2,
+            "turn_end": 22,
+            "turn_start": 23,
+            "tutor_resolved": 2
+          },
+          "game_id": "deck_6:Vivi Ornitier #99 (real):2",
+          "game_index": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "opponent_archetype": "combo",
+          "picked_opponents": [
+            "Vivi Ornitier #99 (real)",
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 5,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "activated_ability_skipped": 2,
+            "cast_announced": 27,
+            "combat": 12,
+            "combat_result": 12,
+            "combat_step": 71,
+            "commander_cast": 3,
+            "composite_rule_component_resolved": 2,
+            "composite_rule_resolved": 1,
+            "cost_paid": 27,
+            "countered_spell_moved_to_graveyard": 1,
+            "creature_cast": 7,
+            "damage_resolved": 1,
+            "draw_cards_resolved": 1,
+            "end_step_instant": 1,
+            "land_played": 15,
+            "lorehold_upkeep_rummage": 3,
+            "mana_refreshed": 24,
+            "permanent_moved_from_battlefield": 4,
+            "player_eliminated": 1,
+            "priority_pass": 220,
+            "removal_resolved": 2,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 17,
+            "spell_countered": 1,
+            "spell_resolved": 10,
+            "trigger_put_on_stack": 3,
+            "trigger_resolved": 3,
+            "turn_end": 22,
+            "turn_start": 24,
+            "tutor_resolved": 1
+          },
+          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+          "game_index": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "opponent_archetype": "control",
+          "picked_opponents": [
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "activated_ability": 2,
+            "activated_ability_skipped": 5,
+            "cast_announced": 22,
+            "combat": 14,
+            "combat_result": 14,
+            "combat_step": 82,
+            "commander_cast": 4,
+            "cost_paid": 22,
+            "creature_cast": 6,
+            "land_played": 21,
+            "lorehold_upkeep_rummage": 4,
+            "lorehold_upkeep_rummage_skipped": 3,
+            "mana_refreshed": 26,
+            "permanent_moved_from_battlefield": 1,
+            "phase_out_resolved": 1,
+            "player_eliminated": 1,
+            "priority_pass": 240,
+            "removal_resolved": 2,
+            "replacement_applied": 3,
+            "ritual_mana_added": 1,
+            "self_exiled_on_resolution": 1,
+            "spell_cast": 13,
+            "spell_resolved": 8,
+            "trigger_put_on_stack": 3,
+            "trigger_resolved": 3,
+            "turn_end": 25,
+            "turn_start": 26,
+            "utility_land_activated": 1
+          },
+          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):1",
+          "game_index": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "opponent_archetype": "control",
+          "picked_opponents": [
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 7,
+            "lorehold_upkeep_rummage": 4
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "activated_ability_skipped": 1,
+            "cast_announced": 20,
+            "combat": 14,
+            "combat_result": 15,
+            "combat_step": 78,
+            "commander_cast": 4,
+            "cost_paid": 20,
+            "countered_spell_moved_to_graveyard": 1,
+            "creature_cast": 5,
+            "imprint_resolved": 1,
+            "land_played": 15,
+            "lorehold_upkeep_rummage": 3,
+            "mana_refreshed": 20,
+            "multi_defender_attack": 1,
+            "player_eliminated": 1,
+            "priority_pass": 180,
+            "protection_from_everything_granted": 1,
+            "random_discard_after_tutor": 1,
+            "spell_cast": 11,
+            "spell_countered": 1,
+            "spell_resolved": 6,
+            "turn_end": 19,
+            "turn_start": 20,
+            "tutor_resolved": 1
+          },
+          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):2",
+          "game_index": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "opponent_archetype": "control",
+          "picked_opponents": [
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 3,
+            "lorehold_spell_cast": 1,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 5
+        },
+        {
+          "event_counts": {
+            "activated_ability": 2,
+            "additional_cost_paid": 2,
+            "airbend_creature_cast_from_exile": 6,
+            "airbend_other_creatures_resolved": 1,
+            "cast_announced": 38,
+            "combat": 14,
+            "combat_result": 14,
+            "combat_step": 83,
+            "commander_cast": 5,
+            "cost_paid": 38,
+            "countered_spell_moved_to_graveyard": 3,
+            "creature_cast": 8,
+            "draw_cards_resolved": 3,
+            "equipment_unattached": 1,
+            "etb_removal_resolved": 1,
+            "land_played": 22,
+            "lorehold_upkeep_rummage": 2,
+            "lorehold_upkeep_rummage_skipped": 4,
+            "mana_refreshed": 31,
+            "miracle_cast": 1,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 292,
+            "removal_resolved": 2,
+            "replacement_applied": 3,
+            "ritual_mana_added": 1,
+            "self_exiled_on_resolution": 1,
+            "spell_cast": 19,
+            "spell_countered": 3,
+            "spell_resolved": 12,
+            "treasure_created": 1,
+            "trigger_put_on_stack": 4,
+            "trigger_resolved": 4,
+            "turn_end": 30,
+            "turn_start": 31,
+            "tutor_resolved": 1
+          },
+          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+          "game_index": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "opponent_archetype": "tribal",
+          "picked_opponents": [
+            "Winota, Joiner of Forces #39 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Sisay, Weatherlight Captain #61 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1
+          },
+          "turns": 8
+        },
+        {
+          "event_counts": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 3,
+            "additional_cost_paid": 1,
+            "cast_announced": 25,
+            "combat": 15,
+            "combat_result": 16,
+            "combat_step": 80,
+            "commander_cast": 4,
+            "cost_paid": 25,
+            "countered_spell_moved_to_graveyard": 2,
+            "creature_cast": 8,
+            "draw_cards_resolved": 1,
+            "etb_removal_resolved": 1,
+            "land_played": 19,
+            "land_ramp_resolved": 1,
+            "lorehold_upkeep_rummage": 3,
+            "lorehold_upkeep_rummage_skipped": 4,
+            "mana_refreshed": 22,
+            "miracle_cast": 1,
+            "multi_defender_attack": 1,
+            "player_eliminated": 1,
+            "priority_pass": 192,
+            "removal_resolved": 1,
+            "ritual_mana_added": 1,
+            "spell_cast": 14,
+            "spell_countered": 2,
+            "spell_exiled_from_stack": 1,
+            "spell_resolved": 4,
+            "trigger_put_on_stack": 2,
+            "trigger_resolved": 2,
+            "turn_end": 21,
+            "turn_start": 22
+          },
+          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):1",
+          "game_index": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "opponent_archetype": "tribal",
+          "picked_opponents": [
+            "Winota, Joiner of Forces #39 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Sisay, Weatherlight Captain #61 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "activated_ability": 2,
+            "activated_ability_skipped": 8,
+            "attachment_sba": 1,
+            "cast_announced": 29,
+            "combat": 15,
+            "combat_result": 15,
+            "combat_step": 79,
+            "commander_cast": 4,
+            "composite_rule_component_resolved": 2,
+            "composite_rule_resolved": 1,
+            "cost_paid": 29,
+            "creature_cast": 7,
+            "draw_cards_resolved": 1,
+            "equipment_attached": 1,
+            "equipment_unattached": 1,
+            "land_played": 18,
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 3,
+            "lorehold_upkeep_rummage": 4,
+            "lorehold_upkeep_rummage_skipped": 4,
+            "mana_refreshed": 23,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 272,
+            "protection_resolved": 1,
+            "redirect_removal_resolved": 1,
+            "removal_resolved": 1,
+            "ritual_mana_added": 1,
+            "spell_cast": 20,
+            "spell_resolved": 14,
+            "treasure_created": 1,
+            "trigger_put_on_stack": 12,
+            "trigger_resolved": 12,
+            "turn_end": 22,
+            "turn_start": 23
+          },
+          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):2",
+          "game_index": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "opponent_archetype": "tribal",
+          "picked_opponents": [
+            "Winota, Joiner of Forces #39 (real)",
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Vivi Ornitier #99 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 9,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 4
+          },
+          "turns": 6
+        }
+      ],
+      "games": 9,
+      "lands": 34,
+      "load_deck_id": 6,
+      "losses": 9,
+      "objective": "Miracle spellslinger shell that uses topdeck setup and hand filtering to turn Lorehold's commander text into discounted spell chains.",
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "tribal",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        }
+      ],
+      "primary_risks": [
+        "wincon_role"
+      ],
+      "process_isolated": true,
+      "ramp": 18,
+      "removal": 16,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": 138.25,
+      "structural_rank": 2,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 8,
+          "activated_ability_skipped": 34,
+          "additional_cost_paid": 4,
+          "airbend_creature_cast_from_exile": 6,
+          "airbend_other_creatures_resolved": 1,
+          "attachment_sba": 1,
+          "cast_announced": 241,
+          "combat": 124,
+          "combat_result": 128,
+          "combat_step": 699,
+          "commander_cast": 38,
+          "composite_rule_component_resolved": 4,
+          "composite_rule_resolved": 2,
+          "cost_paid": 241,
+          "countered_spell_moved_to_graveyard": 9,
+          "creature_cast": 55,
+          "damage_resolved": 2,
+          "draw_cards_resolved": 10,
+          "end_step_instant": 1,
+          "equipment_attached": 1,
+          "equipment_unattached": 2,
+          "etb_removal_resolved": 2,
+          "imprint_resolved": 2,
+          "jeskas_will_resolved": 1,
+          "land_played": 168,
+          "land_ramp_resolved": 2,
+          "land_tax_trigger_resolved": 1,
+          "land_tax_trigger_skipped": 3,
+          "lorehold_upkeep_rummage": 27,
+          "lorehold_upkeep_rummage_skipped": 27,
+          "mana_refreshed": 220,
+          "miracle_cast": 4,
+          "multi_defender_attack": 4,
+          "permanent_moved_from_battlefield": 14,
+          "phase_out_resolved": 1,
+          "player_eliminated": 9,
+          "priority_pass": 2104,
+          "protection_from_everything_granted": 1,
+          "protection_resolved": 2,
+          "random_discard_after_tutor": 3,
+          "redirect_removal_resolved": 1,
+          "removal_resolved": 14,
+          "replacement_applied": 9,
+          "ritual_mana_added": 5,
+          "saga_chapter_progressed": 4,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "self_exiled_on_resolution": 2,
+          "spell_cast": 147,
+          "spell_countered": 9,
+          "spell_exiled_from_stack": 2,
+          "spell_resolved": 85,
+          "topdeck_manipulation_activated": 2,
+          "treasure_created": 3,
+          "trigger_put_on_stack": 31,
+          "trigger_resolved": 31,
+          "turn_end": 209,
+          "turn_start": 220,
+          "tutor_resolved": 7,
+          "utility_land_activated": 2
+        },
+        "event_counts_by_game": {
+          "deck_6:Sisay, Weatherlight Captain #61 (real):0": {
+            "activated_ability_skipped": 2,
+            "cast_announced": 27,
+            "combat": 12,
+            "combat_result": 12,
+            "combat_step": 71,
+            "commander_cast": 3,
+            "composite_rule_component_resolved": 2,
+            "composite_rule_resolved": 1,
+            "cost_paid": 27,
+            "countered_spell_moved_to_graveyard": 1,
+            "creature_cast": 7,
+            "damage_resolved": 1,
+            "draw_cards_resolved": 1,
+            "end_step_instant": 1,
+            "land_played": 15,
+            "lorehold_upkeep_rummage": 3,
+            "mana_refreshed": 24,
+            "permanent_moved_from_battlefield": 4,
+            "player_eliminated": 1,
+            "priority_pass": 220,
+            "removal_resolved": 2,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 17,
+            "spell_countered": 1,
+            "spell_resolved": 10,
+            "trigger_put_on_stack": 3,
+            "trigger_resolved": 3,
+            "turn_end": 22,
+            "turn_start": 24,
+            "tutor_resolved": 1
+          },
+          "deck_6:Sisay, Weatherlight Captain #61 (real):1": {
+            "activated_ability": 2,
+            "activated_ability_skipped": 5,
+            "cast_announced": 22,
+            "combat": 14,
+            "combat_result": 14,
+            "combat_step": 82,
+            "commander_cast": 4,
+            "cost_paid": 22,
+            "creature_cast": 6,
+            "land_played": 21,
+            "lorehold_upkeep_rummage": 4,
+            "lorehold_upkeep_rummage_skipped": 3,
+            "mana_refreshed": 26,
+            "permanent_moved_from_battlefield": 1,
+            "phase_out_resolved": 1,
+            "player_eliminated": 1,
+            "priority_pass": 240,
+            "removal_resolved": 2,
+            "replacement_applied": 3,
+            "ritual_mana_added": 1,
+            "self_exiled_on_resolution": 1,
+            "spell_cast": 13,
+            "spell_resolved": 8,
+            "trigger_put_on_stack": 3,
+            "trigger_resolved": 3,
+            "turn_end": 25,
+            "turn_start": 26,
+            "utility_land_activated": 1
+          },
+          "deck_6:Sisay, Weatherlight Captain #61 (real):2": {
+            "activated_ability_skipped": 1,
+            "cast_announced": 20,
+            "combat": 14,
+            "combat_result": 15,
+            "combat_step": 78,
+            "commander_cast": 4,
+            "cost_paid": 20,
+            "countered_spell_moved_to_graveyard": 1,
+            "creature_cast": 5,
+            "imprint_resolved": 1,
+            "land_played": 15,
+            "lorehold_upkeep_rummage": 3,
+            "mana_refreshed": 20,
+            "multi_defender_attack": 1,
+            "player_eliminated": 1,
+            "priority_pass": 180,
+            "protection_from_everything_granted": 1,
+            "random_discard_after_tutor": 1,
+            "spell_cast": 11,
+            "spell_countered": 1,
+            "spell_resolved": 6,
+            "turn_end": 19,
+            "turn_start": 20,
+            "tutor_resolved": 1
+          },
+          "deck_6:Vivi Ornitier #99 (real):0": {
+            "activated_ability_skipped": 2,
+            "cast_announced": 25,
+            "combat": 14,
+            "combat_result": 14,
+            "combat_step": 76,
+            "commander_cast": 3,
+            "cost_paid": 25,
+            "creature_cast": 7,
+            "damage_resolved": 1,
+            "draw_cards_resolved": 2,
+            "imprint_resolved": 1,
+            "land_played": 17,
+            "lorehold_upkeep_rummage": 3,
+            "mana_refreshed": 24,
+            "permanent_moved_from_battlefield": 2,
+            "player_eliminated": 1,
+            "priority_pass": 228,
+            "protection_resolved": 1,
+            "removal_resolved": 3,
+            "spell_cast": 15,
+            "spell_resolved": 11,
+            "treasure_created": 1,
+            "trigger_put_on_stack": 1,
+            "trigger_resolved": 1,
+            "turn_end": 23,
+            "turn_start": 24,
+            "tutor_resolved": 1
+          },
+          "deck_6:Vivi Ornitier #99 (real):1": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 7,
+            "additional_cost_paid": 1,
+            "cast_announced": 25,
+            "combat": 14,
+            "combat_result": 16,
+            "combat_step": 83,
+            "commander_cast": 6,
+            "cost_paid": 25,
+            "countered_spell_moved_to_graveyard": 2,
+            "creature_cast": 3,
+            "draw_cards_resolved": 1,
+            "land_played": 21,
+            "land_ramp_resolved": 1,
+            "lorehold_upkeep_rummage": 2,
+            "lorehold_upkeep_rummage_skipped": 9,
+            "mana_refreshed": 27,
+            "miracle_cast": 1,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 3,
+            "player_eliminated": 1,
+            "priority_pass": 244,
+            "random_discard_after_tutor": 1,
+            "replacement_applied": 2,
+            "ritual_mana_added": 1,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 16,
+            "spell_countered": 2,
+            "spell_resolved": 7,
+            "topdeck_manipulation_activated": 2,
+            "trigger_put_on_stack": 4,
+            "trigger_resolved": 4,
+            "turn_end": 25,
+            "turn_start": 27,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "deck_6:Vivi Ornitier #99 (real):2": {
+            "activated_ability_skipped": 6,
+            "cast_announced": 30,
+            "combat": 12,
+            "combat_result": 12,
+            "combat_step": 67,
+            "commander_cast": 5,
+            "cost_paid": 30,
+            "creature_cast": 4,
+            "draw_cards_resolved": 1,
+            "jeskas_will_resolved": 1,
+            "land_played": 20,
+            "lorehold_upkeep_rummage": 3,
+            "lorehold_upkeep_rummage_skipped": 3,
+            "mana_refreshed": 23,
+            "miracle_cast": 1,
+            "permanent_moved_from_battlefield": 2,
+            "player_eliminated": 1,
+            "priority_pass": 236,
+            "random_discard_after_tutor": 1,
+            "removal_resolved": 3,
+            "replacement_applied": 1,
+            "spell_cast": 22,
+            "spell_exiled_from_stack": 1,
+            "spell_resolved": 13,
+            "trigger_put_on_stack": 2,
+            "trigger_resolved": 2,
+            "turn_end": 22,
+            "turn_start": 23,
+            "tutor_resolved": 2
+          },
+          "deck_6:Winota, Joiner of Forces #39 (real):0": {
+            "activated_ability": 2,
+            "additional_cost_paid": 2,
+            "airbend_creature_cast_from_exile": 6,
+            "airbend_other_creatures_resolved": 1,
+            "cast_announced": 38,
+            "combat": 14,
+            "combat_result": 14,
+            "combat_step": 83,
+            "commander_cast": 5,
+            "cost_paid": 38,
+            "countered_spell_moved_to_graveyard": 3,
+            "creature_cast": 8,
+            "draw_cards_resolved": 3,
+            "equipment_unattached": 1,
+            "etb_removal_resolved": 1,
+            "land_played": 22,
+            "lorehold_upkeep_rummage": 2,
+            "lorehold_upkeep_rummage_skipped": 4,
+            "mana_refreshed": 31,
+            "miracle_cast": 1,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 292,
+            "removal_resolved": 2,
+            "replacement_applied": 3,
+            "ritual_mana_added": 1,
+            "self_exiled_on_resolution": 1,
+            "spell_cast": 19,
+            "spell_countered": 3,
+            "spell_resolved": 12,
+            "treasure_created": 1,
+            "trigger_put_on_stack": 4,
+            "trigger_resolved": 4,
+            "turn_end": 30,
+            "turn_start": 31,
+            "tutor_resolved": 1
+          },
+          "deck_6:Winota, Joiner of Forces #39 (real):1": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 3,
+            "additional_cost_paid": 1,
+            "cast_announced": 25,
+            "combat": 15,
+            "combat_result": 16,
+            "combat_step": 80,
+            "commander_cast": 4,
+            "cost_paid": 25,
+            "countered_spell_moved_to_graveyard": 2,
+            "creature_cast": 8,
+            "draw_cards_resolved": 1,
+            "etb_removal_resolved": 1,
+            "land_played": 19,
+            "land_ramp_resolved": 1,
+            "lorehold_upkeep_rummage": 3,
+            "lorehold_upkeep_rummage_skipped": 4,
+            "mana_refreshed": 22,
+            "miracle_cast": 1,
+            "multi_defender_attack": 1,
+            "player_eliminated": 1,
+            "priority_pass": 192,
+            "removal_resolved": 1,
+            "ritual_mana_added": 1,
+            "spell_cast": 14,
+            "spell_countered": 2,
+            "spell_exiled_from_stack": 1,
+            "spell_resolved": 4,
+            "trigger_put_on_stack": 2,
+            "trigger_resolved": 2,
+            "turn_end": 21,
+            "turn_start": 22
+          },
+          "deck_6:Winota, Joiner of Forces #39 (real):2": {
+            "activated_ability": 2,
+            "activated_ability_skipped": 8,
+            "attachment_sba": 1,
+            "cast_announced": 29,
+            "combat": 15,
+            "combat_result": 15,
+            "combat_step": 79,
+            "commander_cast": 4,
+            "composite_rule_component_resolved": 2,
+            "composite_rule_resolved": 1,
+            "cost_paid": 29,
+            "creature_cast": 7,
+            "draw_cards_resolved": 1,
+            "equipment_attached": 1,
+            "equipment_unattached": 1,
+            "land_played": 18,
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 3,
+            "lorehold_upkeep_rummage": 4,
+            "lorehold_upkeep_rummage_skipped": 4,
+            "mana_refreshed": 23,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 272,
+            "protection_resolved": 1,
+            "redirect_removal_resolved": 1,
+            "removal_resolved": 1,
+            "ritual_mana_added": 1,
+            "spell_cast": 20,
+            "spell_resolved": 14,
+            "treasure_created": 1,
+            "trigger_put_on_stack": 12,
+            "trigger_resolved": 12,
+            "turn_end": 22,
+            "turn_start": 23
+          }
+        },
+        "squee_anomalies": [],
+        "squee_game_traces": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "squee_trace_samples": [],
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 53,
+          "lorehold_spell_cast": 42,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 27,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 2
+        },
+        "strategic_event_counts_by_game": {
+          "deck_6:Sisay, Weatherlight Captain #61 (real):0": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 3
+          },
+          "deck_6:Sisay, Weatherlight Captain #61 (real):1": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 7,
+            "lorehold_upkeep_rummage": 4
+          },
+          "deck_6:Sisay, Weatherlight Captain #61 (real):2": {
+            "lorehold_cost_paid": 3,
+            "lorehold_spell_cast": 1,
+            "lorehold_upkeep_rummage": 3
+          },
+          "deck_6:Vivi Ornitier #99 (real):0": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 3
+          },
+          "deck_6:Vivi Ornitier #99 (real):1": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "topdeck_manipulation_activated": 2
+          },
+          "deck_6:Vivi Ornitier #99 (real):2": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 5,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "deck_6:Winota, Joiner of Forces #39 (real):0": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1
+          },
+          "deck_6:Winota, Joiner of Forces #39 (real):1": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "deck_6:Winota, Joiner of Forces #39 (real):2": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 9,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 4
+          }
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_spell_cast": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_spell_rummage": {
+            "games": 1,
+            "rate": 0.1111
+          },
+          "lorehold_spell_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_upkeep_rummage": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "miracle_cast": {
+            "games": 4,
+            "rate": 0.4444
+          },
+          "squee_return_after_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_return_without_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_to_graveyard": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_upkeep_return": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "topdeck_manipulation_activated": {
+            "games": 1,
+            "rate": 0.1111
+          }
+        },
+        "top_cards": [
+          {
+            "count": 10,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Victory Chimes"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:High Noon"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Swords to Plowshares"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Bender's Waterskin"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Sol Ring"
+          },
+          {
+            "count": 2,
+            "key": "topdeck:Scroll Rack"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Talisman of Conviction"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Tempt with Bunnies"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Fellwar Stone"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Monument to Endurance"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Giver of Runes"
+          }
+        ]
+      },
+      "win_rate": 0.0,
+      "win_reasons": {},
+      "wins": 0
+    },
+    {
+      "archetype": "synergy-package",
+      "avg_win_turn": 10.0,
+      "battle_rank": 1,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": null,
+      "deck_key": "synergy_galvanoth_topdeck_freecast",
+      "deck_name": "Lorehold synergy package: galvanoth_topdeck_freecast",
+      "deck_size": 100,
+      "game_results": [
+        {
+          "event_counts": {
+            "activated_ability_skipped": 1,
+            "approach_cast_tracked": 1,
+            "approach_first_resolution": 1,
+            "cast_announced": 27,
+            "combat": 16,
+            "combat_result": 18,
+            "combat_step": 88,
+            "commander_cast": 4,
+            "cost_paid": 27,
+            "creature_cast": 7,
+            "damage_resolved": 1,
+            "draw_cards_resolved": 2,
+            "imprint_resolved": 1,
+            "land_played": 18,
+            "lorehold_upkeep_rummage": 4,
+            "lorehold_upkeep_rummage_skipped": 5,
+            "mana_refreshed": 24,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 2,
+            "player_eliminated": 1,
+            "priority_pass": 224,
+            "protection_resolved": 1,
+            "removal_resolved": 3,
+            "replacement_applied": 1,
+            "spell_cast": 16,
+            "spell_resolved": 11,
+            "treasure_created": 1,
+            "turn_end": 23,
+            "turn_start": 24,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):0",
+          "game_index": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "opponent_archetype": "combo",
+          "picked_opponents": [
+            "Vivi Ornitier #99 (real)",
+            "Winota, Joiner of Forces #39 (real)",
+            "Sisay, Weatherlight Captain #61 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 4
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 7,
+            "additional_cost_paid": 1,
+            "cast_announced": 25,
+            "combat": 14,
+            "combat_result": 16,
+            "combat_step": 83,
+            "commander_cast": 6,
+            "cost_paid": 25,
+            "countered_spell_moved_to_graveyard": 2,
+            "creature_cast": 3,
+            "draw_cards_resolved": 1,
+            "land_played": 21,
+            "land_ramp_resolved": 1,
+            "lorehold_upkeep_rummage": 2,
+            "lorehold_upkeep_rummage_skipped": 9,
+            "mana_refreshed": 27,
+            "miracle_cast": 1,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 3,
+            "player_eliminated": 1,
+            "priority_pass": 244,
+            "random_discard_after_tutor": 1,
+            "replacement_applied": 2,
+            "ritual_mana_added": 1,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 16,
+            "spell_countered": 2,
+            "spell_resolved": 7,
+            "topdeck_manipulation_activated": 2,
+            "trigger_put_on_stack": 4,
+            "trigger_resolved": 4,
+            "turn_end": 25,
+            "turn_start": 27,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):1",
+          "game_index": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "opponent_archetype": "combo",
+          "picked_opponents": [
+            "Vivi Ornitier #99 (real)",
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "topdeck_manipulation_activated": 2
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "activated_ability_skipped": 6,
+            "cast_announced": 30,
+            "combat": 12,
+            "combat_result": 12,
+            "combat_step": 67,
+            "commander_cast": 4,
+            "cost_paid": 30,
+            "countered_spell_moved_to_graveyard": 2,
+            "creature_cast": 5,
+            "draw_cards_resolved": 1,
+            "jeskas_will_resolved": 1,
+            "land_played": 19,
+            "lorehold_upkeep_rummage": 2,
+            "lorehold_upkeep_rummage_skipped": 2,
+            "mana_refreshed": 23,
+            "miracle_cast": 1,
+            "permanent_moved_from_battlefield": 2,
+            "player_eliminated": 1,
+            "priority_pass": 240,
+            "random_discard_after_tutor": 1,
+            "removal_resolved": 3,
+            "replacement_applied": 1,
+            "spell_cast": 21,
+            "spell_countered": 2,
+            "spell_resolved": 13,
+            "trigger_put_on_stack": 3,
+            "trigger_resolved": 3,
+            "turn_end": 22,
+            "turn_start": 23,
+            "tutor_resolved": 2
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):2",
+          "game_index": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "opponent_archetype": "combo",
+          "picked_opponents": [
+            "Vivi Ornitier #99 (real)",
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "activated_ability": 2,
+            "activated_ability_skipped": 14,
+            "cast_announced": 25,
+            "combat": 13,
+            "combat_result": 15,
+            "combat_step": 79,
+            "commander_cast": 6,
+            "compensation_tokens_created": 1,
+            "cost_paid": 25,
+            "creature_cast": 7,
+            "draw_cards_resolved": 1,
+            "etb_removal_resolved": 1,
+            "imprint_resolved": 1,
+            "land_played": 22,
+            "lorehold_upkeep_rummage_skipped": 6,
+            "mana_refreshed": 28,
+            "miracle_cast": 1,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 236,
+            "removal_resolved": 3,
+            "replacement_applied": 2,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 12,
+            "spell_resolved": 7,
+            "topdeck_manipulation_activated": 1,
+            "treasure_created": 1,
+            "turn_end": 26,
+            "turn_start": 28,
+            "utility_land_activated": 2
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):0",
+          "game_index": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "opponent_archetype": "control",
+          "picked_opponents": [
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 3,
+            "lorehold_spell_cast": 2,
+            "miracle_cast": 1,
+            "topdeck_manipulation_activated": 1
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "activated_ability_skipped": 3,
+            "cast_announced": 27,
+            "combat": 12,
+            "combat_result": 13,
+            "combat_step": 69,
+            "commander_cast": 3,
+            "cost_paid": 27,
+            "countered_spell_moved_to_graveyard": 1,
+            "creature_cast": 8,
+            "draw_cards_resolved": 2,
+            "imprint_resolved": 1,
+            "land_played": 15,
+            "lorehold_upkeep_rummage": 3,
+            "mana_refreshed": 20,
+            "multi_defender_attack": 1,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 188,
+            "removal_resolved": 1,
+            "spell_cast": 16,
+            "spell_countered": 1,
+            "spell_resolved": 8,
+            "trigger_put_on_stack": 3,
+            "trigger_resolved": 3,
+            "turn_end": 19,
+            "turn_start": 20
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):1",
+          "game_index": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "opponent_archetype": "control",
+          "picked_opponents": [
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Winota, Joiner of Forces #39 (real)",
+            "Vivi Ornitier #99 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 2,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 5
+        },
+        {
+          "event_counts": {
+            "activated_ability_skipped": 4,
+            "airbend_creature_cast_from_exile": 5,
+            "airbend_other_creatures_resolved": 1,
+            "cast_announced": 39,
+            "combat": 17,
+            "combat_result": 17,
+            "combat_step": 95,
+            "commander_cast": 8,
+            "cost_paid": 39,
+            "creature_cast": 6,
+            "draw_cards_resolved": 1,
+            "equipment_unattached": 1,
+            "land_played": 24,
+            "lorehold_upkeep_rummage": 8,
+            "lorehold_upkeep_rummage_skipped": 3,
+            "mana_refreshed": 31,
+            "miracle_cast": 1,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 324,
+            "protection_resolved": 1,
+            "random_discard_after_tutor": 1,
+            "redirect_removal_resolved": 1,
+            "removal_resolved": 2,
+            "replacement_applied": 4,
+            "self_exiled_on_resolution": 1,
+            "spell_cast": 22,
+            "spell_resolved": 17,
+            "trigger_put_on_stack": 7,
+            "trigger_resolved": 7,
+            "turn_end": 30,
+            "turn_start": 31,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+          "game_index": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "opponent_archetype": "control",
+          "picked_opponents": [
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Winota, Joiner of Forces #39 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 7,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 7,
+            "lorehold_upkeep_rummage": 8,
+            "miracle_cast": 1
+          },
+          "turns": 8
+        },
+        {
+          "event_counts": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 12,
+            "additional_cost_paid": 2,
+            "approach_cast_tracked": 2,
+            "approach_first_resolution": 1,
+            "board_wipe_resolved": 1,
+            "cast_announced": 22,
+            "combat": 9,
+            "combat_result": 14,
+            "combat_step": 58,
+            "commander_cast": 3,
+            "composite_rule_component_resolved": 4,
+            "composite_rule_resolved": 2,
+            "cost_paid": 22,
+            "creature_cast": 3,
+            "etb_recursion_resolved": 1,
+            "extra_turn_scheduled": 1,
+            "extra_turn_taken": 1,
+            "game_lost": 1,
+            "game_won": 1,
+            "land_played": 14,
+            "mana_refreshed": 17,
+            "miracle_cast": 1,
+            "multi_defender_attack": 5,
+            "permanent_moved_from_battlefield": 6,
+            "player_eliminated": 1,
+            "priority_pass": 150,
+            "spell_cast": 16,
+            "spell_resolved": 11,
+            "treasure_created": 1,
+            "trigger_put_on_stack": 1,
+            "trigger_resolved": 1,
+            "turn_end": 16,
+            "turn_start": 17
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):0",
+          "game_index": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "opponent_archetype": "tribal",
+          "picked_opponents": [
+            "Winota, Joiner of Forces #39 (real)",
+            "Sisay, Weatherlight Captain #61 (real)",
+            "Vivi Ornitier #99 (real)"
+          ],
+          "reason": "approach",
+          "result": "win",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 12,
+            "lorehold_spell_cast": 10,
+            "miracle_cast": 1
+          },
+          "turns": 10
+        },
+        {
+          "event_counts": {
+            "activated_ability": 3,
+            "activated_ability_skipped": 2,
+            "cast_announced": 28,
+            "combat": 11,
+            "combat_result": 11,
+            "combat_step": 64,
+            "commander_cast": 3,
+            "cost_paid": 28,
+            "creature_cast": 4,
+            "draw_cards_resolved": 1,
+            "equipment_unattached": 2,
+            "land_played": 19,
+            "mana_refreshed": 24,
+            "permanent_moved_from_battlefield": 3,
+            "player_eliminated": 1,
+            "priority_pass": 248,
+            "removal_resolved": 3,
+            "ritual_mana_added": 1,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 21,
+            "spell_resolved": 16,
+            "trigger_put_on_stack": 2,
+            "trigger_resolved": 2,
+            "turn_end": 22,
+            "turn_start": 24,
+            "tutor_resolved": 2
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+          "game_index": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "opponent_archetype": "tribal",
+          "picked_opponents": [
+            "Winota, Joiner of Forces #39 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Sisay, Weatherlight Captain #61 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 11,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 5
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 2,
+            "additional_cost_paid": 2,
+            "cast_announced": 27,
+            "combat": 13,
+            "combat_result": 15,
+            "combat_step": 80,
+            "commander_cast": 4,
+            "cost_paid": 27,
+            "countered_spell_moved_to_graveyard": 1,
+            "creature_cast": 7,
+            "damage_resolved": 1,
+            "land_played": 18,
+            "lorehold_upkeep_rummage": 4,
+            "lorehold_upkeep_rummage_skipped": 8,
+            "mana_refreshed": 28,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 3,
+            "player_eliminated": 1,
+            "priority_pass": 240,
+            "removal_resolved": 1,
+            "ritual_mana_added": 1,
+            "spell_cast": 16,
+            "spell_countered": 1,
+            "spell_resolved": 7,
+            "treasure_created": 1,
+            "trigger_resolved": 2,
+            "turn_end": 27,
+            "turn_start": 28,
+            "tutor_life_loss_resolved": 1,
+            "tutor_resolved": 2,
+            "utility_land_activated": 1
+          },
+          "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):2",
+          "game_index": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "opponent_archetype": "tribal",
+          "picked_opponents": [
+            "Winota, Joiner of Forces #39 (real)",
+            "Vivi Ornitier #99 (real)",
+            "Sisay, Weatherlight Captain #61 (real)"
+          ],
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_anomaly_count": 0,
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 4
+          },
+          "turns": 7
+        }
+      ],
+      "games": 9,
+      "lands": 34,
+      "load_deck_id": 6,
+      "losses": 8,
+      "objective": null,
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "tribal",
+          "avg_win_turn": 10.0,
+          "losses": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "approach": 1
+          },
+          "wins": 1
+        }
+      ],
+      "primary_risks": [],
+      "process_isolated": true,
+      "ramp": 17,
+      "removal": 16,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout_galvanoth_topdeck_freecast/knowledge_candidate.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": null,
+      "structural_rank": null,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 8,
+          "activated_ability_skipped": 51,
+          "additional_cost_paid": 5,
+          "airbend_creature_cast_from_exile": 5,
+          "airbend_other_creatures_resolved": 1,
+          "approach_cast_tracked": 3,
+          "approach_first_resolution": 2,
+          "board_wipe_resolved": 1,
+          "cast_announced": 250,
+          "combat": 117,
+          "combat_result": 131,
+          "combat_step": 683,
+          "commander_cast": 41,
+          "compensation_tokens_created": 1,
+          "composite_rule_component_resolved": 4,
+          "composite_rule_resolved": 2,
+          "cost_paid": 250,
+          "countered_spell_moved_to_graveyard": 6,
+          "creature_cast": 50,
+          "damage_resolved": 2,
+          "draw_cards_resolved": 9,
+          "equipment_unattached": 3,
+          "etb_recursion_resolved": 1,
+          "etb_removal_resolved": 1,
+          "extra_turn_scheduled": 1,
+          "extra_turn_taken": 1,
+          "game_lost": 1,
+          "game_won": 1,
+          "imprint_resolved": 3,
+          "jeskas_will_resolved": 1,
+          "land_played": 170,
+          "land_ramp_resolved": 1,
+          "lorehold_upkeep_rummage": 23,
+          "lorehold_upkeep_rummage_skipped": 33,
+          "mana_refreshed": 222,
+          "miracle_cast": 5,
+          "multi_defender_attack": 14,
+          "permanent_moved_from_battlefield": 22,
+          "player_eliminated": 9,
+          "priority_pass": 2094,
+          "protection_resolved": 2,
+          "random_discard_after_tutor": 3,
+          "redirect_removal_resolved": 1,
+          "removal_resolved": 16,
+          "replacement_applied": 10,
+          "ritual_mana_added": 3,
+          "saga_chapter_progressed": 6,
+          "saga_chapter_resolved": 3,
+          "saga_sacrificed_by_sba": 3,
+          "self_exiled_on_resolution": 1,
+          "spell_cast": 156,
+          "spell_countered": 6,
+          "spell_resolved": 97,
+          "topdeck_manipulation_activated": 3,
+          "treasure_created": 4,
+          "trigger_put_on_stack": 20,
+          "trigger_resolved": 22,
+          "turn_end": 210,
+          "turn_start": 222,
+          "tutor_life_loss_resolved": 1,
+          "tutor_resolved": 9,
+          "utility_land_activated": 6
+        },
+        "event_counts_by_game": {
+          "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):0": {
+            "activated_ability": 2,
+            "activated_ability_skipped": 14,
+            "cast_announced": 25,
+            "combat": 13,
+            "combat_result": 15,
+            "combat_step": 79,
+            "commander_cast": 6,
+            "compensation_tokens_created": 1,
+            "cost_paid": 25,
+            "creature_cast": 7,
+            "draw_cards_resolved": 1,
+            "etb_removal_resolved": 1,
+            "imprint_resolved": 1,
+            "land_played": 22,
+            "lorehold_upkeep_rummage_skipped": 6,
+            "mana_refreshed": 28,
+            "miracle_cast": 1,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 236,
+            "removal_resolved": 3,
+            "replacement_applied": 2,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 12,
+            "spell_resolved": 7,
+            "topdeck_manipulation_activated": 1,
+            "treasure_created": 1,
+            "turn_end": 26,
+            "turn_start": 28,
+            "utility_land_activated": 2
+          },
+          "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):1": {
+            "activated_ability_skipped": 3,
+            "cast_announced": 27,
+            "combat": 12,
+            "combat_result": 13,
+            "combat_step": 69,
+            "commander_cast": 3,
+            "cost_paid": 27,
+            "countered_spell_moved_to_graveyard": 1,
+            "creature_cast": 8,
+            "draw_cards_resolved": 2,
+            "imprint_resolved": 1,
+            "land_played": 15,
+            "lorehold_upkeep_rummage": 3,
+            "mana_refreshed": 20,
+            "multi_defender_attack": 1,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 188,
+            "removal_resolved": 1,
+            "spell_cast": 16,
+            "spell_countered": 1,
+            "spell_resolved": 8,
+            "trigger_put_on_stack": 3,
+            "trigger_resolved": 3,
+            "turn_end": 19,
+            "turn_start": 20
+          },
+          "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2": {
+            "activated_ability_skipped": 4,
+            "airbend_creature_cast_from_exile": 5,
+            "airbend_other_creatures_resolved": 1,
+            "cast_announced": 39,
+            "combat": 17,
+            "combat_result": 17,
+            "combat_step": 95,
+            "commander_cast": 8,
+            "cost_paid": 39,
+            "creature_cast": 6,
+            "draw_cards_resolved": 1,
+            "equipment_unattached": 1,
+            "land_played": 24,
+            "lorehold_upkeep_rummage": 8,
+            "lorehold_upkeep_rummage_skipped": 3,
+            "mana_refreshed": 31,
+            "miracle_cast": 1,
+            "permanent_moved_from_battlefield": 1,
+            "player_eliminated": 1,
+            "priority_pass": 324,
+            "protection_resolved": 1,
+            "random_discard_after_tutor": 1,
+            "redirect_removal_resolved": 1,
+            "removal_resolved": 2,
+            "replacement_applied": 4,
+            "self_exiled_on_resolution": 1,
+            "spell_cast": 22,
+            "spell_resolved": 17,
+            "trigger_put_on_stack": 7,
+            "trigger_resolved": 7,
+            "turn_end": 30,
+            "turn_start": 31,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):0": {
+            "activated_ability_skipped": 1,
+            "approach_cast_tracked": 1,
+            "approach_first_resolution": 1,
+            "cast_announced": 27,
+            "combat": 16,
+            "combat_result": 18,
+            "combat_step": 88,
+            "commander_cast": 4,
+            "cost_paid": 27,
+            "creature_cast": 7,
+            "damage_resolved": 1,
+            "draw_cards_resolved": 2,
+            "imprint_resolved": 1,
+            "land_played": 18,
+            "lorehold_upkeep_rummage": 4,
+            "lorehold_upkeep_rummage_skipped": 5,
+            "mana_refreshed": 24,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 2,
+            "player_eliminated": 1,
+            "priority_pass": 224,
+            "protection_resolved": 1,
+            "removal_resolved": 3,
+            "replacement_applied": 1,
+            "spell_cast": 16,
+            "spell_resolved": 11,
+            "treasure_created": 1,
+            "turn_end": 23,
+            "turn_start": 24,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):1": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 7,
+            "additional_cost_paid": 1,
+            "cast_announced": 25,
+            "combat": 14,
+            "combat_result": 16,
+            "combat_step": 83,
+            "commander_cast": 6,
+            "cost_paid": 25,
+            "countered_spell_moved_to_graveyard": 2,
+            "creature_cast": 3,
+            "draw_cards_resolved": 1,
+            "land_played": 21,
+            "land_ramp_resolved": 1,
+            "lorehold_upkeep_rummage": 2,
+            "lorehold_upkeep_rummage_skipped": 9,
+            "mana_refreshed": 27,
+            "miracle_cast": 1,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 3,
+            "player_eliminated": 1,
+            "priority_pass": 244,
+            "random_discard_after_tutor": 1,
+            "replacement_applied": 2,
+            "ritual_mana_added": 1,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 16,
+            "spell_countered": 2,
+            "spell_resolved": 7,
+            "topdeck_manipulation_activated": 2,
+            "trigger_put_on_stack": 4,
+            "trigger_resolved": 4,
+            "turn_end": 25,
+            "turn_start": 27,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):2": {
+            "activated_ability_skipped": 6,
+            "cast_announced": 30,
+            "combat": 12,
+            "combat_result": 12,
+            "combat_step": 67,
+            "commander_cast": 4,
+            "cost_paid": 30,
+            "countered_spell_moved_to_graveyard": 2,
+            "creature_cast": 5,
+            "draw_cards_resolved": 1,
+            "jeskas_will_resolved": 1,
+            "land_played": 19,
+            "lorehold_upkeep_rummage": 2,
+            "lorehold_upkeep_rummage_skipped": 2,
+            "mana_refreshed": 23,
+            "miracle_cast": 1,
+            "permanent_moved_from_battlefield": 2,
+            "player_eliminated": 1,
+            "priority_pass": 240,
+            "random_discard_after_tutor": 1,
+            "removal_resolved": 3,
+            "replacement_applied": 1,
+            "spell_cast": 21,
+            "spell_countered": 2,
+            "spell_resolved": 13,
+            "trigger_put_on_stack": 3,
+            "trigger_resolved": 3,
+            "turn_end": 22,
+            "turn_start": 23,
+            "tutor_resolved": 2
+          },
+          "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):0": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 12,
+            "additional_cost_paid": 2,
+            "approach_cast_tracked": 2,
+            "approach_first_resolution": 1,
+            "board_wipe_resolved": 1,
+            "cast_announced": 22,
+            "combat": 9,
+            "combat_result": 14,
+            "combat_step": 58,
+            "commander_cast": 3,
+            "composite_rule_component_resolved": 4,
+            "composite_rule_resolved": 2,
+            "cost_paid": 22,
+            "creature_cast": 3,
+            "etb_recursion_resolved": 1,
+            "extra_turn_scheduled": 1,
+            "extra_turn_taken": 1,
+            "game_lost": 1,
+            "game_won": 1,
+            "land_played": 14,
+            "mana_refreshed": 17,
+            "miracle_cast": 1,
+            "multi_defender_attack": 5,
+            "permanent_moved_from_battlefield": 6,
+            "player_eliminated": 1,
+            "priority_pass": 150,
+            "spell_cast": 16,
+            "spell_resolved": 11,
+            "treasure_created": 1,
+            "trigger_put_on_stack": 1,
+            "trigger_resolved": 1,
+            "turn_end": 16,
+            "turn_start": 17
+          },
+          "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1": {
+            "activated_ability": 3,
+            "activated_ability_skipped": 2,
+            "cast_announced": 28,
+            "combat": 11,
+            "combat_result": 11,
+            "combat_step": 64,
+            "commander_cast": 3,
+            "cost_paid": 28,
+            "creature_cast": 4,
+            "draw_cards_resolved": 1,
+            "equipment_unattached": 2,
+            "land_played": 19,
+            "mana_refreshed": 24,
+            "permanent_moved_from_battlefield": 3,
+            "player_eliminated": 1,
+            "priority_pass": 248,
+            "removal_resolved": 3,
+            "ritual_mana_added": 1,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "spell_cast": 21,
+            "spell_resolved": 16,
+            "trigger_put_on_stack": 2,
+            "trigger_resolved": 2,
+            "turn_end": 22,
+            "turn_start": 24,
+            "tutor_resolved": 2
+          },
+          "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):2": {
+            "activated_ability": 1,
+            "activated_ability_skipped": 2,
+            "additional_cost_paid": 2,
+            "cast_announced": 27,
+            "combat": 13,
+            "combat_result": 15,
+            "combat_step": 80,
+            "commander_cast": 4,
+            "cost_paid": 27,
+            "countered_spell_moved_to_graveyard": 1,
+            "creature_cast": 7,
+            "damage_resolved": 1,
+            "land_played": 18,
+            "lorehold_upkeep_rummage": 4,
+            "lorehold_upkeep_rummage_skipped": 8,
+            "mana_refreshed": 28,
+            "multi_defender_attack": 2,
+            "permanent_moved_from_battlefield": 3,
+            "player_eliminated": 1,
+            "priority_pass": 240,
+            "removal_resolved": 1,
+            "ritual_mana_added": 1,
+            "spell_cast": 16,
+            "spell_countered": 1,
+            "spell_resolved": 7,
+            "treasure_created": 1,
+            "trigger_resolved": 2,
+            "turn_end": 27,
+            "turn_start": 28,
+            "tutor_life_loss_resolved": 1,
+            "tutor_resolved": 2,
+            "utility_land_activated": 1
+          }
+        },
+        "squee_anomalies": [],
+        "squee_game_traces": {
+          "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2": [
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 7
+              },
+              "event": "turn_end",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3295,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 8
+              },
+              "event": "turn_start",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3373,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 8
+              },
+              "event": "cast_announced",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3412,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 8
+              },
+              "event": "cost_paid",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3413,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Squee, Goblin Nabob",
+                "effect": "creature",
+                "player": "Lorehold",
+                "turn": 8
+              },
+              "event": "creature_cast",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3414,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 8
+              },
+              "event": "turn_end",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3426,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "card": "Flawless Maneuver",
+                "player": "Lorehold",
+                "turn": 8
+              },
+              "event": "protection_resolved",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3441,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            }
+          ],
+          "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1": [
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 1
+              },
+              "event": "turn_start",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3912,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 1
+              },
+              "event": "turn_end",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3923,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 2
+              },
+              "event": "turn_start",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3967,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 2
+              },
+              "event": "turn_end",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 3983,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 3
+              },
+              "event": "turn_start",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4054,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 3
+              },
+              "event": "turn_end",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4077,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 4
+              },
+              "event": "turn_start",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4152,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 5
+              },
+              "event": "turn_start",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4235,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 5
+              },
+              "event": "turn_end",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4256,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "turn_start",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4338,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            },
+            {
+              "data": {
+                "discarded": 0,
+                "discarded_cards": [],
+                "player": "Lorehold",
+                "turn": 6
+              },
+              "event": "turn_end",
+              "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+              "markers": [
+                "mentions_squee"
+              ],
+              "seq": 4367,
+              "squee_known_graveyard_balance_after": 0,
+              "squee_known_graveyard_balance_before": 0
+            }
+          ]
+        },
+        "squee_known_graveyard_balance_by_game": {},
+        "squee_trace_samples": [
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 7
+            },
+            "event": "turn_end",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3295,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 8
+            },
+            "event": "turn_start",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3373,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 8
+            },
+            "event": "cast_announced",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3412,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 8
+            },
+            "event": "cost_paid",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3413,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Squee, Goblin Nabob",
+              "effect": "creature",
+              "player": "Lorehold",
+              "turn": 8
+            },
+            "event": "creature_cast",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3414,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 8
+            },
+            "event": "turn_end",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3426,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "card": "Flawless Maneuver",
+              "player": "Lorehold",
+              "turn": 8
+            },
+            "event": "protection_resolved",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3441,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 1
+            },
+            "event": "turn_start",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3912,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 1
+            },
+            "event": "turn_end",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3923,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 2
+            },
+            "event": "turn_start",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3967,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 2
+            },
+            "event": "turn_end",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 3983,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 3
+            },
+            "event": "turn_start",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 4054,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 3
+            },
+            "event": "turn_end",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 4077,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 4
+            },
+            "event": "turn_start",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 4152,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 5
+            },
+            "event": "turn_start",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 4235,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 5
+            },
+            "event": "turn_end",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 4256,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "player": "Lorehold",
+              "turn": 6
+            },
+            "event": "turn_start",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 4338,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          },
+          {
+            "data": {
+              "discarded": 0,
+              "discarded_cards": [],
+              "player": "Lorehold",
+              "turn": 6
+            },
+            "event": "turn_end",
+            "game_id": "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "seq": 4367,
+            "squee_known_graveyard_balance_after": 0,
+            "squee_known_graveyard_balance_before": 0
+          }
+        ],
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 60,
+          "lorehold_spell_cast": 46,
+          "lorehold_upkeep_rummage": 23,
+          "miracle_cast": 5,
+          "topdeck_manipulation_activated": 3
+        },
+        "strategic_event_counts_by_game": {
+          "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):0": {
+            "lorehold_cost_paid": 3,
+            "lorehold_spell_cast": 2,
+            "miracle_cast": 1,
+            "topdeck_manipulation_activated": 1
+          },
+          "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):1": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 2,
+            "lorehold_upkeep_rummage": 3
+          },
+          "synergy_galvanoth_topdeck_freecast:Sisay, Weatherlight Captain #61 (real):2": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 7,
+            "lorehold_upkeep_rummage": 8,
+            "miracle_cast": 1
+          },
+          "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):0": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 4
+          },
+          "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):1": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "topdeck_manipulation_activated": 2
+          },
+          "synergy_galvanoth_topdeck_freecast:Vivi Ornitier #99 (real):2": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1
+          },
+          "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):0": {
+            "lorehold_cost_paid": 12,
+            "lorehold_spell_cast": 10,
+            "miracle_cast": 1
+          },
+          "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):1": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 5
+          },
+          "synergy_galvanoth_topdeck_freecast:Winota, Joiner of Forces #39 (real):2": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 4
+          }
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_spell_cast": {
+            "games": 9,
+            "rate": 1.0
+          },
+          "lorehold_spell_rummage": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_spell_rummage_discards_squee": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "lorehold_upkeep_rummage": {
+            "games": 6,
+            "rate": 0.6667
+          },
+          "miracle_cast": {
+            "games": 5,
+            "rate": 0.5556
+          },
+          "squee_return_after_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_return_without_known_graveyard_entry": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_to_graveyard": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "squee_upkeep_return": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "topdeck_manipulation_activated": {
+            "games": 2,
+            "rate": 0.2222
+          }
+        },
+        "top_cards": [
+          {
+            "count": 9,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Swords to Plowshares"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:Sol Ring"
+          },
+          {
+            "count": 4,
+            "key": "cost_paid:High Noon"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Fellwar Stone"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Arcane Signet"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Victory Chimes"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Approach of the Second Sun"
+          },
+          {
+            "count": 2,
+            "key": "topdeck:Scroll Rack"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Prismari Pianist"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Improvisation Capstone"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Mother of Runes"
+          }
+        ]
+      },
+      "win_rate": 11.11,
+      "win_reasons": {
+        "approach": 1
+      },
+      "wins": 1
+    }
+  ],
+  "simulation_seed": 7,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "status": "ready"
+}

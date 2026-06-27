@@ -17827,7 +17827,7 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T15:48:12Z",
+  "generated_at": "2026-06-27T16:01:34Z",
   "matrix_generated_at": "2026-06-26T17:59:59.926705+00:00",
   "matrix_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json",
   "matrix_ranked": [
@@ -24586,8 +24586,9 @@
   "next_gates": [
     "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
     "Build one topdeck consistency package against the 607+Squee champion, because seed 42 wins with topdeck=30/miracle=33 while the failure seeds are topdeck-poor.",
-    "Build one explicit Squee-enabler package with discard/rummage access, because the proven recurrence is real but the intended discard-fuel loop is still not observed.",
-    "Build two narrow packages from 615: one Birgi/ritual package and one topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
+    "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
+    "Retest Galvanoth only as a probation topdeck-freecast hypothesis with a better cut than Bender's Waterskin, because the current gate is aggregate-positive but breaks seed 42.",
+    "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
     "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
     "If a candidate uses a rule missing from aggregated deck rows, run the battle-card-specific test plus one replay trace before trusting the battle result."
   ],
@@ -24600,6 +24601,623 @@
     "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
     "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family."
   ],
+  "post_squee_package_gates": {
+    "paths": [
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json"
+    ],
+    "per_seed": [
+      {
+        "adds": [
+          "Brainstone"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 4,
+        "candidate_wins": 5,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "delta_pp": -33.33,
+        "family": "topdeck_setup",
+        "package_key": "brainstone_topdeck_miracle",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": -6,
+          "lorehold_spell_cast": 28,
+          "lorehold_spell_rummage": -7,
+          "lorehold_upkeep_rummage": 7,
+          "miracle_cast": -9,
+          "squee_return_after_known_graveyard_entry": -5,
+          "squee_to_graveyard": -7,
+          "squee_upkeep_return": -5,
+          "topdeck_manipulation_activated": 3
+        }
+      },
+      {
+        "adds": [
+          "Faithless Looting"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": -66.67,
+        "family": "discard_rummage_recursion",
+        "package_key": "faithless_looting_squee_enabler",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": -50,
+          "lorehold_spell_cast": -30,
+          "lorehold_spell_rummage": -10,
+          "lorehold_upkeep_rummage": 4,
+          "miracle_cast": -14,
+          "squee_return_after_known_graveyard_entry": -4,
+          "squee_to_graveyard": -6,
+          "squee_upkeep_return": -4,
+          "topdeck_manipulation_activated": -13
+        }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 5,
+        "candidate_wins": 4,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "delta_pp": -44.45,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": -15,
+          "lorehold_spell_cast": -6,
+          "lorehold_spell_rummage": -11,
+          "lorehold_upkeep_rummage": -6,
+          "miracle_cast": -6,
+          "squee_return_after_known_graveyard_entry": -4,
+          "squee_to_graveyard": -5,
+          "squee_upkeep_return": -4,
+          "topdeck_manipulation_activated": 0
+        }
+      },
+      {
+        "adds": [
+          "Brainstone"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 9,
+        "candidate_wins": 0,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "delta_pp": 0.0,
+        "family": "topdeck_setup",
+        "package_key": "brainstone_topdeck_miracle",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": 3,
+          "lorehold_spell_cast": 2,
+          "lorehold_spell_rummage": -2,
+          "lorehold_upkeep_rummage": -2,
+          "miracle_cast": 0,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1
+        }
+      },
+      {
+        "adds": [
+          "Faithless Looting"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 8,
+        "candidate_wins": 1,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": 11.11,
+        "family": "discard_rummage_recursion",
+        "package_key": "faithless_looting_squee_enabler",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": 16,
+          "lorehold_spell_cast": 22,
+          "lorehold_spell_rummage": 1,
+          "lorehold_upkeep_rummage": -1,
+          "miracle_cast": 2,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 4
+        }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 8,
+        "candidate_wins": 1,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "delta_pp": 11.11,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": 7,
+          "lorehold_spell_cast": 4,
+          "lorehold_spell_rummage": -2,
+          "lorehold_upkeep_rummage": -4,
+          "miracle_cast": 1,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1
+        }
+      },
+      {
+        "adds": [
+          "Brainstone"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 8,
+        "candidate_wins": 1,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "delta_pp": 11.11,
+        "family": "topdeck_setup",
+        "package_key": "brainstone_topdeck_miracle",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": 13,
+          "lorehold_spell_cast": 13,
+          "lorehold_spell_rummage": -2,
+          "lorehold_upkeep_rummage": -11,
+          "miracle_cast": 3,
+          "squee_return_after_known_graveyard_entry": 2,
+          "squee_to_graveyard": 2,
+          "squee_upkeep_return": 3,
+          "topdeck_manipulation_activated": -2
+        }
+      },
+      {
+        "adds": [
+          "Faithless Looting"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 8,
+        "candidate_wins": 1,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": 11.11,
+        "family": "discard_rummage_recursion",
+        "package_key": "faithless_looting_squee_enabler",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": 35,
+          "lorehold_spell_cast": 33,
+          "lorehold_spell_rummage": 0,
+          "lorehold_upkeep_rummage": 17,
+          "miracle_cast": 16,
+          "squee_return_after_known_graveyard_entry": 1,
+          "squee_to_graveyard": 1,
+          "squee_upkeep_return": 1,
+          "topdeck_manipulation_activated": 15
+        }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 5,
+        "candidate_wins": 4,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "delta_pp": 44.44,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "lorehold_cost_paid": 48,
+          "lorehold_spell_cast": 38,
+          "lorehold_spell_rummage": 15,
+          "lorehold_upkeep_rummage": -21,
+          "miracle_cast": 17,
+          "squee_return_after_known_graveyard_entry": 2,
+          "squee_to_graveyard": 5,
+          "squee_upkeep_return": 2,
+          "topdeck_manipulation_activated": 11
+        }
+      }
+    ],
+    "rows": [
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 18,
+        "candidate_win_rate": 33.33,
+        "candidate_wins": 9,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "decision": "probation_deeper_gate_only",
+        "delta_pp": 3.7,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast",
+        "seed_rows": [
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 5,
+            "candidate_wins": 4,
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "delta_pp": -44.45,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": -15,
+              "lorehold_spell_cast": -6,
+              "lorehold_spell_rummage": -11,
+              "lorehold_upkeep_rummage": -6,
+              "miracle_cast": -6,
+              "squee_return_after_known_graveyard_entry": -4,
+              "squee_to_graveyard": -5,
+              "squee_upkeep_return": -4,
+              "topdeck_manipulation_activated": 0
+            }
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 8,
+            "candidate_wins": 1,
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "delta_pp": 11.11,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": 7,
+              "lorehold_spell_cast": 4,
+              "lorehold_spell_rummage": -2,
+              "lorehold_upkeep_rummage": -4,
+              "miracle_cast": 1,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 1
+            }
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 5,
+            "candidate_wins": 4,
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "delta_pp": 44.44,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": 48,
+              "lorehold_spell_cast": 38,
+              "lorehold_spell_rummage": 15,
+              "lorehold_upkeep_rummage": -21,
+              "miracle_cast": 17,
+              "squee_return_after_known_graveyard_entry": 2,
+              "squee_to_graveyard": 5,
+              "squee_upkeep_return": 2,
+              "topdeck_manipulation_activated": 11
+            }
+          }
+        ],
+        "strategic_delta": {
+          "lorehold_cost_paid": 40,
+          "lorehold_spell_cast": 36,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": -31,
+          "miracle_cast": 12,
+          "squee_return_after_known_graveyard_entry": -2,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": -2,
+          "topdeck_manipulation_activated": 12
+        },
+        "strong_seed_delta_pp": -44.45
+      },
+      {
+        "adds": [
+          "Brainstone"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 21,
+        "candidate_win_rate": 22.22,
+        "candidate_wins": 6,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -7.41,
+        "family": "topdeck_setup",
+        "package_key": "brainstone_topdeck_miracle",
+        "seed_rows": [
+          {
+            "adds": [
+              "Brainstone"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 4,
+            "candidate_wins": 5,
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "delta_pp": -33.33,
+            "family": "topdeck_setup",
+            "package_key": "brainstone_topdeck_miracle",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": -6,
+              "lorehold_spell_cast": 28,
+              "lorehold_spell_rummage": -7,
+              "lorehold_upkeep_rummage": 7,
+              "miracle_cast": -9,
+              "squee_return_after_known_graveyard_entry": -5,
+              "squee_to_graveyard": -7,
+              "squee_upkeep_return": -5,
+              "topdeck_manipulation_activated": 3
+            }
+          },
+          {
+            "adds": [
+              "Brainstone"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 9,
+            "candidate_wins": 0,
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "delta_pp": 0.0,
+            "family": "topdeck_setup",
+            "package_key": "brainstone_topdeck_miracle",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": 3,
+              "lorehold_spell_cast": 2,
+              "lorehold_spell_rummage": -2,
+              "lorehold_upkeep_rummage": -2,
+              "miracle_cast": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 1
+            }
+          },
+          {
+            "adds": [
+              "Brainstone"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 8,
+            "candidate_wins": 1,
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "delta_pp": 11.11,
+            "family": "topdeck_setup",
+            "package_key": "brainstone_topdeck_miracle",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": 13,
+              "lorehold_spell_cast": 13,
+              "lorehold_spell_rummage": -2,
+              "lorehold_upkeep_rummage": -11,
+              "miracle_cast": 3,
+              "squee_return_after_known_graveyard_entry": 2,
+              "squee_to_graveyard": 2,
+              "squee_upkeep_return": 3,
+              "topdeck_manipulation_activated": -2
+            }
+          }
+        ],
+        "strategic_delta": {
+          "lorehold_cost_paid": 10,
+          "lorehold_spell_cast": 43,
+          "lorehold_spell_rummage": -11,
+          "lorehold_upkeep_rummage": -6,
+          "miracle_cast": -6,
+          "squee_return_after_known_graveyard_entry": -3,
+          "squee_to_graveyard": -5,
+          "squee_upkeep_return": -2,
+          "topdeck_manipulation_activated": 2
+        },
+        "strong_seed_delta_pp": -33.33
+      },
+      {
+        "adds": [
+          "Faithless Looting"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 23,
+        "candidate_win_rate": 14.81,
+        "candidate_wins": 4,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -14.82,
+        "family": "discard_rummage_recursion",
+        "package_key": "faithless_looting_squee_enabler",
+        "seed_rows": [
+          {
+            "adds": [
+              "Faithless Looting"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": -66.67,
+            "family": "discard_rummage_recursion",
+            "package_key": "faithless_looting_squee_enabler",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": -50,
+              "lorehold_spell_cast": -30,
+              "lorehold_spell_rummage": -10,
+              "lorehold_upkeep_rummage": 4,
+              "miracle_cast": -14,
+              "squee_return_after_known_graveyard_entry": -4,
+              "squee_to_graveyard": -6,
+              "squee_upkeep_return": -4,
+              "topdeck_manipulation_activated": -13
+            }
+          },
+          {
+            "adds": [
+              "Faithless Looting"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 8,
+            "candidate_wins": 1,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": 11.11,
+            "family": "discard_rummage_recursion",
+            "package_key": "faithless_looting_squee_enabler",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": 16,
+              "lorehold_spell_cast": 22,
+              "lorehold_spell_rummage": 1,
+              "lorehold_upkeep_rummage": -1,
+              "miracle_cast": 2,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 4
+            }
+          },
+          {
+            "adds": [
+              "Faithless Looting"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 8,
+            "candidate_wins": 1,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": 11.11,
+            "family": "discard_rummage_recursion",
+            "package_key": "faithless_looting_squee_enabler",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "lorehold_cost_paid": 35,
+              "lorehold_spell_cast": 33,
+              "lorehold_spell_rummage": 0,
+              "lorehold_upkeep_rummage": 17,
+              "miracle_cast": 16,
+              "squee_return_after_known_graveyard_entry": 1,
+              "squee_to_graveyard": 1,
+              "squee_upkeep_return": 1,
+              "topdeck_manipulation_activated": 15
+            }
+          }
+        ],
+        "strategic_delta": {
+          "lorehold_cost_paid": 1,
+          "lorehold_spell_cast": 25,
+          "lorehold_spell_rummage": -9,
+          "lorehold_upkeep_rummage": 20,
+          "miracle_cast": 4,
+          "squee_return_after_known_graveyard_entry": -3,
+          "squee_to_graveyard": -5,
+          "squee_upkeep_return": -3,
+          "topdeck_manipulation_activated": 6
+        },
+        "strong_seed_delta_pp": -66.67
+      }
+    ]
+  },
   "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
   "squee_gates": {
     "rows": [

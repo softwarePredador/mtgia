@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T15:48:12Z`
+- Generated at: `2026-06-27T16:01:34Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -24,6 +24,7 @@ Operationally, a better deck must increase at least one of these without breakin
 - The per-game seed diagnostic shows the real failure mode: Squee is not yet self-sufficient. Seed 42 wins when topdeck/miracle/spell volume is high; seeds 7 and 20260625 go `0W/9L` with no Squee graveyard/return events and very low topdeck/miracle conversion.
 - `Squee` still has an aggregate-loader gap: the verified runtime rule exists in `battle_card_rules`, but the candidate snapshot row keeps `deck_cards.battle_rules_json=[]` for that card.
 - The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.
+- Post-Squee package gates now cover Brainstone, Faithless Looting, and Galvanoth against the Squee champion. Best aggregate was `galvanoth_topdeck_freecast` at `9-18` vs baseline `8-19` (`+3.70` pp), but seed 42 moved `-44.45` pp, so it is not an automatic deck promotion.
 
 ## Squee Vs 607 Battle Evidence
 
@@ -114,6 +115,18 @@ Main read: 607 is the best structural shell because it is closest to the command
 | `overmaster_protect_draw` | Overmaster | Hexing Squelcher | 3-0-0 | 1-2-0 | -66.67 | reject_or_rework |
 | `past_overmaster_spellchain` | Past in Flames, Overmaster | Bender's Waterskin, Hexing Squelcher | 3-0-0 | 0-3-0 | -100.0 | reject_or_rework |
 
+## Post-Squee Package Gates
+
+These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=0`, process isolation, and per-game timeout. The promotion bar is stricter than a single positive seed: the package must improve aggregate results without breaking the known strong seed.
+
+| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Spell | Squee GY | Squee Return | Decision |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `galvanoth_topdeck_freecast` | Galvanoth | Bender's Waterskin | 8-19 | 9-18 | +3.70 | -44.45 | +12 | +12 | +36 | +0 | -2 | probation_deeper_gate_only |
+| `brainstone_topdeck_miracle` | Brainstone | Bender's Waterskin | 8-19 | 6-21 | -7.41 | -33.33 | -6 | +2 | +43 | -5 | -2 | reject_or_rework |
+| `faithless_looting_squee_enabler` | Faithless Looting | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -66.67 | +4 | +6 | +25 | -5 | -3 | reject_or_rework |
+
+Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. Galvanoth is the only positive aggregate signal, but it loses the strong seed 42; it should be retested as a probation hypothesis with a better cut, not inserted into the best deck yet.
+
 ## Current Champion Card-Role Coverage
 
 - Quantity: `100` across `94` rows.
@@ -135,8 +148,9 @@ Main read: 607 is the best structural shell because it is closest to the command
 
 - Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.
 - Build one topdeck consistency package against the 607+Squee champion, because seed 42 wins with topdeck=30/miracle=33 while the failure seeds are topdeck-poor.
-- Build one explicit Squee-enabler package with discard/rummage access, because the proven recurrence is real but the intended discard-fuel loop is still not observed.
-- Build two narrow packages from 615: one Birgi/ritual package and one topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.
+- Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.
+- Retest Galvanoth only as a probation topdeck-freecast hypothesis with a better cut than Bender's Waterskin, because the current gate is aggregate-positive but breaks seed 42.
+- Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.
 - Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.
 - If a candidate uses a rule missing from aggregated deck rows, run the battle-card-specific test plus one replay trace before trusting the battle result.
 

@@ -45,6 +45,11 @@ DEFAULT_GENERAL_SYNERGY_CONFIRM = (
     REPORT_DIR / "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
 )
 DEFAULT_SQUEE_SEED_DIAGNOSTIC = REPORT_DIR / "lorehold_squee_seed_diagnostic_20260627_v1.json"
+DEFAULT_POST_SQUEE_PACKAGE_GATES = [
+    REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+    REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+    REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+]
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
 EXTERNAL_METHOD_SOURCES = [
@@ -351,6 +356,107 @@ def load_general_synergy_confirm(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def post_squee_package_decision(row: dict[str, Any]) -> str:
+    if row["candidate_wins"] <= row["baseline_wins"]:
+        return "reject_or_rework"
+    if row["delta_pp"] <= 0:
+        return "reject_or_rework"
+    if row["strong_seed_delta_pp"] < 0:
+        return "probation_deeper_gate_only"
+    return "promote_to_deeper_gate"
+
+
+def aggregate_post_squee_package_gates(paths: list[Path]) -> dict[str, Any]:
+    per_seed: list[dict[str, Any]] = []
+    aggregate: dict[str, dict[str, Any]] = {}
+    metrics = [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "lorehold_spell_rummage",
+        "lorehold_upkeep_rummage",
+        "miracle_cast",
+        "topdeck_manipulation_activated",
+        "squee_to_graveyard",
+        "squee_upkeep_return",
+        "squee_return_after_known_graveyard_entry",
+    ]
+    for path in paths:
+        payload = read_json(path)
+        if not payload:
+            continue
+        seed = payload.get("simulation_seed")
+        for package in payload.get("packages") or []:
+            key = str(package.get("package_key") or "")
+            gate = package.get("gate_summary") or {}
+            baseline = gate.get("baseline") or {}
+            candidate = gate.get("candidate") or {}
+            baseline_events = (baseline.get("telemetry") or {}).get("strategic_event_counts") or {}
+            candidate_events = (candidate.get("telemetry") or {}).get("strategic_event_counts") or {}
+            seed_row = {
+                "source": str(path),
+                "seed": seed,
+                "package_key": key,
+                "family": package.get("family"),
+                "adds": package.get("adds") or [],
+                "cuts": package.get("cuts") or [],
+                "baseline_wins": int(baseline.get("wins") or 0),
+                "baseline_losses": int(baseline.get("losses") or 0),
+                "candidate_wins": int(candidate.get("wins") or 0),
+                "candidate_losses": int(candidate.get("losses") or 0),
+                "delta_pp": float(gate.get("delta_pp") or 0.0),
+                "strategic_delta": {
+                    metric: int(candidate_events.get(metric) or 0) - int(baseline_events.get(metric) or 0)
+                    for metric in metrics
+                },
+            }
+            per_seed.append(seed_row)
+            entry = aggregate.setdefault(
+                key,
+                {
+                    "package_key": key,
+                    "family": package.get("family"),
+                    "adds": package.get("adds") or [],
+                    "cuts": package.get("cuts") or [],
+                    "baseline_wins": 0,
+                    "baseline_losses": 0,
+                    "candidate_wins": 0,
+                    "candidate_losses": 0,
+                    "strong_seed_delta_pp": 0.0,
+                    "strategic_delta": {metric: 0 for metric in metrics},
+                    "seed_rows": [],
+                },
+            )
+            entry["baseline_wins"] += seed_row["baseline_wins"]
+            entry["baseline_losses"] += seed_row["baseline_losses"]
+            entry["candidate_wins"] += seed_row["candidate_wins"]
+            entry["candidate_losses"] += seed_row["candidate_losses"]
+            if seed == 42:
+                entry["strong_seed_delta_pp"] = seed_row["delta_pp"]
+            for metric, value in seed_row["strategic_delta"].items():
+                entry["strategic_delta"][metric] += value
+            entry["seed_rows"].append(seed_row)
+
+    rows = []
+    for entry in aggregate.values():
+        baseline_games = max(1, entry["baseline_wins"] + entry["baseline_losses"])
+        candidate_games = max(1, entry["candidate_wins"] + entry["candidate_losses"])
+        baseline_wr = round(100.0 * entry["baseline_wins"] / baseline_games, 2)
+        candidate_wr = round(100.0 * entry["candidate_wins"] / candidate_games, 2)
+        row = {
+            **entry,
+            "baseline_games": baseline_games,
+            "candidate_games": candidate_games,
+            "baseline_win_rate": baseline_wr,
+            "candidate_win_rate": candidate_wr,
+            "delta_pp": round(candidate_wr - baseline_wr, 2),
+        }
+        row["decision"] = post_squee_package_decision(row)
+        rows.append(row)
+
+    rows.sort(key=lambda item: (item["decision"] == "reject_or_rework", -item["delta_pp"], item["package_key"]))
+    return {"paths": [str(path) for path in paths], "rows": rows, "per_seed": per_seed}
+
+
 def compare_decks(conn: sqlite3.Connection, a: int, b: int) -> dict[str, Any]:
     def card_set(deck_id: int) -> set[str]:
         return {
@@ -407,6 +513,16 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append("- The per-game seed diagnostic shows the real failure mode: Squee is not yet self-sufficient. Seed 42 wins when topdeck/miracle/spell volume is high; seeds 7 and 20260625 go `0W/9L` with no Squee graveyard/return events and very low topdeck/miracle conversion.")
     lines.append("- `Squee` still has an aggregate-loader gap: the verified runtime rule exists in `battle_card_rules`, but the candidate snapshot row keeps `deck_cards.battle_rules_json=[]` for that card.")
     lines.append("- The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.")
+    post_squee = report.get("post_squee_package_gates") or {}
+    post_squee_rows = post_squee.get("rows") or []
+    if post_squee_rows:
+        best = post_squee_rows[0]
+        lines.append(
+            "- Post-Squee package gates now cover Brainstone, Faithless Looting, and Galvanoth against the Squee champion. "
+            f"Best aggregate was `{best['package_key']}` at `{best['candidate_wins']}-{best['candidate_losses']}` "
+            f"vs baseline `{best['baseline_wins']}-{best['baseline_losses']}` (`{best['delta_pp']:+.2f}` pp), "
+            f"but seed 42 moved `{best['strong_seed_delta_pp']:+.2f}` pp, so it is not an automatic deck promotion."
+        )
     lines.append("")
     lines.append("## Squee Vs 607 Battle Evidence")
     lines.append("")
@@ -502,6 +618,37 @@ def render_markdown(report: dict[str, Any]) -> str:
             )
         )
     lines.append("")
+    if post_squee_rows:
+        lines.append("## Post-Squee Package Gates")
+        lines.append("")
+        lines.append("These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=0`, process isolation, and per-game timeout. The promotion bar is stricter than a single positive seed: the package must improve aggregate results without breaking the known strong seed.")
+        lines.append("")
+        lines.append("| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Spell | Squee GY | Squee Return | Decision |")
+        lines.append("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+        for row in post_squee_rows:
+            delta = row.get("strategic_delta") or {}
+            lines.append(
+                "| `{package}` | {adds} | {cuts} | {base_w}-{base_l} | {cand_w}-{cand_l} | {delta_pp:+.2f} | {strong:+.2f} | {miracle:+d} | {topdeck:+d} | {spell:+d} | {squee_gy:+d} | {squee_return:+d} | {decision} |".format(
+                    package=row["package_key"],
+                    adds=", ".join(row["adds"]),
+                    cuts=", ".join(row["cuts"]),
+                    base_w=row["baseline_wins"],
+                    base_l=row["baseline_losses"],
+                    cand_w=row["candidate_wins"],
+                    cand_l=row["candidate_losses"],
+                    delta_pp=float(row["delta_pp"]),
+                    strong=float(row["strong_seed_delta_pp"]),
+                    miracle=int(delta.get("miracle_cast") or 0),
+                    topdeck=int(delta.get("topdeck_manipulation_activated") or 0),
+                    spell=int(delta.get("lorehold_spell_cast") or 0),
+                    squee_gy=int(delta.get("squee_to_graveyard") or 0),
+                    squee_return=int(delta.get("squee_upkeep_return") or 0),
+                    decision=row["decision"],
+                )
+            )
+        lines.append("")
+        lines.append("Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. Galvanoth is the only positive aggregate signal, but it loses the strong seed 42; it should be retested as a probation hypothesis with a better cut, not inserted into the best deck yet.")
+        lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")
     champion = report["deck_summaries"].get("6") or {}
@@ -650,6 +797,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     squee_gates = aggregate_squee_gates(args.squee_gates)
     general_confirm = load_general_synergy_confirm(args.general_synergy_confirm)
     squee_seed_diagnostic = read_json(args.squee_seed_diagnostic)
+    post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
 
     open_questions = [
         "Use the per-game Squee diagnostic to decide whether the next improvement is topdeck consistency, explicit discard/rummage enablement, or a different closing package.",
@@ -663,8 +811,9 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
         "Build one topdeck consistency package against the 607+Squee champion, because seed 42 wins with topdeck=30/miracle=33 while the failure seeds are topdeck-poor.",
-        "Build one explicit Squee-enabler package with discard/rummage access, because the proven recurrence is real but the intended discard-fuel loop is still not observed.",
-        "Build two narrow packages from 615: one Birgi/ritual package and one topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
+        "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
+        "Retest Galvanoth only as a probation topdeck-freecast hypothesis with a better cut than Bender's Waterskin, because the current gate is aggregate-positive but breaks seed 42.",
+        "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "If a candidate uses a rule missing from aggregated deck rows, run the battle-card-specific test plus one replay trace before trusting the battle result.",
     ]
@@ -685,6 +834,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "squee_seed_diagnostic_path": str(args.squee_seed_diagnostic),
         "squee_seed_diagnostic": squee_seed_diagnostic,
         "general_synergy_confirm": general_confirm,
+        "post_squee_package_gates": post_squee_package_gates,
         "open_questions": open_questions,
         "next_gates": next_gates,
     }
@@ -697,6 +847,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--squee-gate", dest="squee_gates", type=Path, action="append")
     parser.add_argument("--squee-seed-diagnostic", type=Path, default=DEFAULT_SQUEE_SEED_DIAGNOSTIC)
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
+    parser.add_argument("--post-squee-package-gate", type=Path, action="append")
     parser.add_argument("--deck-ids", default=",".join(str(value) for value in DEFAULT_DECK_IDS))
     parser.add_argument("--stem", default="lorehold_strategy_learning_audit_20260627_v1")
     return parser.parse_args()
@@ -707,6 +858,8 @@ def main() -> int:
     args.deck_ids = [int(part.strip()) for part in args.deck_ids.split(",") if part.strip()]
     if not args.squee_gates:
         args.squee_gates = DEFAULT_SQUEE_GATES
+    if not args.post_squee_package_gate:
+        args.post_squee_package_gate = DEFAULT_POST_SQUEE_PACKAGE_GATES
 
     report = build_report(args)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
