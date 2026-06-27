@@ -23,6 +23,9 @@ def package_payload(seed, package_key, baseline_wins, baseline_losses, candidate
                             "strategic_event_counts": {
                                 "miracle_cast": 10,
                                 "topdeck_manipulation_activated": 5,
+                                "spell_cast_mana_trigger": 0,
+                                "birgi_spell_cast_mana": 0,
+                                "hand_to_topdeck_activation": 0,
                                 "squee_to_graveyard": 2,
                                 "squee_upkeep_return": 1,
                             }
@@ -35,6 +38,9 @@ def package_payload(seed, package_key, baseline_wins, baseline_losses, candidate
                             "strategic_event_counts": {
                                 "miracle_cast": 14,
                                 "topdeck_manipulation_activated": 9,
+                                "spell_cast_mana_trigger": 3,
+                                "birgi_spell_cast_mana": 3,
+                                "hand_to_topdeck_activation": 1,
                                 "squee_to_graveyard": 2,
                                 "squee_upkeep_return": 1,
                             }
@@ -73,6 +79,9 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
         self.assertEqual(row["strong_seed_delta_pp"], -44.45)
         self.assertEqual(row["decision"], "probation_deeper_gate_only")
         self.assertEqual(row["strategic_delta"]["miracle_cast"], 12)
+        self.assertEqual(row["strategic_delta"]["spell_cast_mana_trigger"], 9)
+        self.assertEqual(row["strategic_delta"]["birgi_spell_cast_mana"], 9)
+        self.assertEqual(row["strategic_delta"]["hand_to_topdeck_activation"], 3)
 
 
 if __name__ == "__main__":

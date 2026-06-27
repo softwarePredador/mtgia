@@ -41,6 +41,14 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             gate.PACKAGE_DEFINITIONS["faithless_looting_squee_enabler"]["adds"],
             ["Faithless Looting"],
         )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["galvanoth_topdeck_freecast_cut_squelcher"]["cuts"],
+            ["Hexing Squelcher"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["penance_topdeck_protection_cut_squelcher"]["family"],
+            "topdeck_protection",
+        )
 
     def test_strategic_delta_includes_squee_metrics(self):
         payload = {
@@ -48,6 +56,8 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 "telemetry": {
                     "strategic_event_counts": {
                         "topdeck_manipulation_activated": 2,
+                        "hand_to_topdeck_activation": 1,
+                        "birgi_spell_cast_mana": 0,
                         "squee_to_graveyard": 1,
                         "squee_upkeep_return": 0,
                     }
@@ -57,6 +67,8 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 "telemetry": {
                     "strategic_event_counts": {
                         "topdeck_manipulation_activated": 5,
+                        "hand_to_topdeck_activation": 4,
+                        "birgi_spell_cast_mana": 2,
                         "squee_to_graveyard": 4,
                         "squee_upkeep_return": 3,
                     }
@@ -66,9 +78,12 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         delta = gate.strategic_delta(payload)
 
         self.assertEqual(delta["topdeck_manipulation_activated"], 3)
+        self.assertEqual(delta["hand_to_topdeck_activation"], 3)
+        self.assertEqual(delta["birgi_spell_cast_mana"], 2)
         self.assertEqual(delta["squee_to_graveyard"], 3)
         self.assertEqual(delta["squee_upkeep_return"], 3)
         self.assertIn("squee gy +3", gate.strategic_delta_text(payload))
+        self.assertIn("hand to top +3", gate.strategic_delta_text(payload))
 
 
 if __name__ == "__main__":

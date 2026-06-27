@@ -70,6 +70,16 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Galvanoth"],
         "cuts": ["Bender's Waterskin"],
     },
+    "galvanoth_topdeck_freecast_cut_squelcher": {
+        "family": "topdeck_freecast",
+        "hypothesis": (
+            "Galvanoth was aggregate-positive but failed the seed-42 success case "
+            "when it cut Bender's Waterskin. This retest preserves the ramp shell "
+            "and cuts the narrower anti-counter creature instead."
+        ),
+        "adds": ["Galvanoth"],
+        "cuts": ["Hexing Squelcher"],
+    },
     "brainstone_topdeck_miracle": {
         "family": "topdeck_setup",
         "hypothesis": (
@@ -88,6 +98,16 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
             "topdeck/miracle engine can convert."
         ),
         "adds": ["Faithless Looting"],
+        "cuts": ["Hexing Squelcher"],
+    },
+    "penance_topdeck_protection_cut_squelcher": {
+        "family": "topdeck_protection",
+        "hypothesis": (
+            "Penance gives an executable hand-to-library topdeck line plus combat "
+            "damage prevention. It tests topdeck consistency without relying on "
+            "land-only placeholder rules such as The Biblioplex or Mirrorpool."
+        ),
+        "adds": ["Penance"],
         "cuts": ["Hexing Squelcher"],
     },
     "primal_amulet_spell_engine": {
@@ -256,8 +276,11 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
 STRATEGIC_METRICS = (
     "lorehold_cost_paid",
     "lorehold_spell_cast",
+    "spell_cast_mana_trigger",
+    "birgi_spell_cast_mana",
     "miracle_cast",
     "topdeck_manipulation_activated",
+    "hand_to_topdeck_activation",
     "lorehold_spell_rummage",
     "squee_to_graveyard",
     "squee_upkeep_return",
@@ -618,8 +641,11 @@ def strategic_delta_text(gate: dict[str, Any]) -> str:
     labels = {
         "lorehold_cost_paid": "cost",
         "lorehold_spell_cast": "spell",
+        "spell_cast_mana_trigger": "spell mana",
+        "birgi_spell_cast_mana": "birgi mana",
         "miracle_cast": "miracle",
         "topdeck_manipulation_activated": "topdeck",
+        "hand_to_topdeck_activation": "hand to top",
         "lorehold_spell_rummage": "spell rummage",
         "squee_to_graveyard": "squee gy",
         "squee_upkeep_return": "squee return",

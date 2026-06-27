@@ -49,6 +49,9 @@ DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+    REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+    REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+    REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
 ]
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
@@ -372,10 +375,13 @@ def aggregate_post_squee_package_gates(paths: list[Path]) -> dict[str, Any]:
     metrics = [
         "lorehold_cost_paid",
         "lorehold_spell_cast",
+        "spell_cast_mana_trigger",
+        "birgi_spell_cast_mana",
         "lorehold_spell_rummage",
         "lorehold_upkeep_rummage",
         "miracle_cast",
         "topdeck_manipulation_activated",
+        "hand_to_topdeck_activation",
         "squee_to_graveyard",
         "squee_upkeep_return",
         "squee_return_after_known_graveyard_entry",
@@ -518,11 +524,30 @@ def render_markdown(report: dict[str, Any]) -> str:
     if post_squee_rows:
         best = post_squee_rows[0]
         lines.append(
-            "- Post-Squee package gates now cover Brainstone, Faithless Looting, and Galvanoth against the Squee champion. "
+            "- Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, and Penance against the Squee champion. "
             f"Best aggregate was `{best['package_key']}` at `{best['candidate_wins']}-{best['candidate_losses']}` "
             f"vs baseline `{best['baseline_wins']}-{best['baseline_losses']}` (`{best['delta_pp']:+.2f}` pp), "
             f"but seed 42 moved `{best['strong_seed_delta_pp']:+.2f}` pp, so it is not an automatic deck promotion."
         )
+        birgi = next((row for row in post_squee_rows if row["package_key"] == "birgi_spellchain_cut_squelcher"), None)
+        penance = next(
+            (row for row in post_squee_rows if row["package_key"] == "penance_topdeck_protection_cut_squelcher"),
+            None,
+        )
+        if birgi:
+            delta = birgi.get("strategic_delta") or {}
+            lines.append(
+                f"- Birgi is now instrumented and produced `{int(delta.get('birgi_spell_cast_mana') or 0):+d}` spell-cast mana triggers, "
+                f"but its aggregate result was `{birgi['candidate_wins']}-{birgi['candidate_losses']}` "
+                f"vs baseline `{birgi['baseline_wins']}-{birgi['baseline_losses']}` (`{birgi['delta_pp']:+.2f}` pp); "
+                "mana telemetry alone is not enough to promote it."
+            )
+        if penance:
+            delta = penance.get("strategic_delta") or {}
+            lines.append(
+                f"- Penance is not a proven topdeck engine yet: observed `hand_to_topdeck_activation` delta was `{int(delta.get('hand_to_topdeck_activation') or 0):+d}` "
+                f"and the package lost `{penance['delta_pp']:+.2f}` pp aggregate."
+            )
     lines.append("")
     lines.append("## Squee Vs 607 Battle Evidence")
     lines.append("")
@@ -623,12 +648,12 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.append("")
         lines.append("These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=0`, process isolation, and per-game timeout. The promotion bar is stricter than a single positive seed: the package must improve aggregate results without breaking the known strong seed.")
         lines.append("")
-        lines.append("| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Spell | Squee GY | Squee Return | Decision |")
-        lines.append("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+        lines.append("| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Hand-Top | Spell | Mana | Birgi Mana | Squee GY | Squee Return | Decision |")
+        lines.append("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
         for row in post_squee_rows:
             delta = row.get("strategic_delta") or {}
             lines.append(
-                "| `{package}` | {adds} | {cuts} | {base_w}-{base_l} | {cand_w}-{cand_l} | {delta_pp:+.2f} | {strong:+.2f} | {miracle:+d} | {topdeck:+d} | {spell:+d} | {squee_gy:+d} | {squee_return:+d} | {decision} |".format(
+                "| `{package}` | {adds} | {cuts} | {base_w}-{base_l} | {cand_w}-{cand_l} | {delta_pp:+.2f} | {strong:+.2f} | {miracle:+d} | {topdeck:+d} | {hand_top:+d} | {spell:+d} | {mana:+d} | {birgi_mana:+d} | {squee_gy:+d} | {squee_return:+d} | {decision} |".format(
                     package=row["package_key"],
                     adds=", ".join(row["adds"]),
                     cuts=", ".join(row["cuts"]),
@@ -640,14 +665,17 @@ def render_markdown(report: dict[str, Any]) -> str:
                     strong=float(row["strong_seed_delta_pp"]),
                     miracle=int(delta.get("miracle_cast") or 0),
                     topdeck=int(delta.get("topdeck_manipulation_activated") or 0),
+                    hand_top=int(delta.get("hand_to_topdeck_activation") or 0),
                     spell=int(delta.get("lorehold_spell_cast") or 0),
+                    mana=int(delta.get("spell_cast_mana_trigger") or 0),
+                    birgi_mana=int(delta.get("birgi_spell_cast_mana") or 0),
                     squee_gy=int(delta.get("squee_to_graveyard") or 0),
                     squee_return=int(delta.get("squee_upkeep_return") or 0),
                     decision=row["decision"],
                 )
             )
         lines.append("")
-        lines.append("Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. Galvanoth is the only positive aggregate signal, but it loses the strong seed 42; it should be retested as a probation hypothesis with a better cut, not inserted into the best deck yet.")
+        lines.append("Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-up Galvanoth/Hexing Squelcher swap is worse, so Galvanoth stays a probation hypothesis, not a deck insert. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
         lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")

@@ -196,7 +196,10 @@ class GateTelemetry:
             "topdeck_manipulation_activated": set(),
             "lorehold_cost_paid": set(),
             "lorehold_spell_cast": set(),
+            "spell_cast_mana_trigger": set(),
+            "birgi_spell_cast_mana": set(),
             "lorehold_upkeep_rummage": set(),
+            "hand_to_topdeck_activation": set(),
             "lorehold_rummage_discards_squee": set(),
             "lorehold_spell_rummage": set(),
             "lorehold_spell_rummage_discards_squee": set(),
@@ -384,6 +387,24 @@ class GateTelemetry:
         elif event == "spell_cast" and player == "Lorehold":
             self.strategic_events["lorehold_spell_cast"] += 1
             self.games_with["lorehold_spell_cast"].add(self.current_game)
+        elif event == "trigger_resolved" and player == "Lorehold" and data.get("effect") == "add_mana":
+            mana_added = max(1, int(data.get("mana_added") or 1))
+            self.strategic_events["spell_cast_mana_trigger"] += mana_added
+            self.games_with["spell_cast_mana_trigger"].add(self.current_game)
+            if card:
+                self.cards[f"spell_cast_mana:{card}"] += mana_added
+            if card == "Birgi, God of Storytelling // Harnfel, Horn of Bounty":
+                self.strategic_events["birgi_spell_cast_mana"] += mana_added
+                self.games_with["birgi_spell_cast_mana"].add(self.current_game)
+        elif (
+            event == "activated_ability"
+            and player == "Lorehold"
+            and data.get("activation_kind") == "put_card_from_hand_on_top_library_prevent_chosen_source_damage"
+        ):
+            self.strategic_events["hand_to_topdeck_activation"] += 1
+            self.games_with["hand_to_topdeck_activation"].add(self.current_game)
+            if card:
+                self.cards[f"hand_to_topdeck:{card}"] += 1
         elif event == "lorehold_upkeep_rummage" and player == "Lorehold":
             self.strategic_events["lorehold_upkeep_rummage"] += 1
             self.games_with["lorehold_upkeep_rummage"].add(self.current_game)

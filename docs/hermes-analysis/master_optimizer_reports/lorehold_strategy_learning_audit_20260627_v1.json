@@ -17827,7 +17827,7 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T16:01:34Z",
+  "generated_at": "2026-06-27T16:13:08Z",
   "matrix_generated_at": "2026-06-26T17:59:59.926705+00:00",
   "matrix_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json",
   "matrix_ranked": [
@@ -24605,7 +24605,10 @@
     "paths": [
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
-      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json"
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json"
     ],
     "per_seed": [
       {
@@ -24625,11 +24628,14 @@
         "seed": 42,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": -6,
           "lorehold_spell_cast": 28,
           "lorehold_spell_rummage": -7,
           "lorehold_upkeep_rummage": 7,
           "miracle_cast": -9,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": -5,
           "squee_to_graveyard": -7,
           "squee_upkeep_return": -5,
@@ -24653,11 +24659,14 @@
         "seed": 42,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": -50,
           "lorehold_spell_cast": -30,
           "lorehold_spell_rummage": -10,
           "lorehold_upkeep_rummage": 4,
           "miracle_cast": -14,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": -4,
           "squee_to_graveyard": -6,
           "squee_upkeep_return": -4,
@@ -24681,11 +24690,14 @@
         "seed": 42,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": -15,
           "lorehold_spell_cast": -6,
           "lorehold_spell_rummage": -11,
           "lorehold_upkeep_rummage": -6,
           "miracle_cast": -6,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": -4,
           "squee_to_graveyard": -5,
           "squee_upkeep_return": -4,
@@ -24709,11 +24721,14 @@
         "seed": 7,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 3,
           "lorehold_spell_cast": 2,
           "lorehold_spell_rummage": -2,
           "lorehold_upkeep_rummage": -2,
           "miracle_cast": 0,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": 0,
           "squee_to_graveyard": 0,
           "squee_upkeep_return": 0,
@@ -24737,11 +24752,14 @@
         "seed": 7,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 16,
           "lorehold_spell_cast": 22,
           "lorehold_spell_rummage": 1,
           "lorehold_upkeep_rummage": -1,
           "miracle_cast": 2,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": 0,
           "squee_to_graveyard": 0,
           "squee_upkeep_return": 0,
@@ -24765,11 +24783,14 @@
         "seed": 7,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 7,
           "lorehold_spell_cast": 4,
           "lorehold_spell_rummage": -2,
           "lorehold_upkeep_rummage": -4,
           "miracle_cast": 1,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": 0,
           "squee_to_graveyard": 0,
           "squee_upkeep_return": 0,
@@ -24793,11 +24814,14 @@
         "seed": 20260625,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 13,
           "lorehold_spell_cast": 13,
           "lorehold_spell_rummage": -2,
           "lorehold_upkeep_rummage": -11,
           "miracle_cast": 3,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": 2,
           "squee_to_graveyard": 2,
           "squee_upkeep_return": 3,
@@ -24821,11 +24845,14 @@
         "seed": 20260625,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 35,
           "lorehold_spell_cast": 33,
           "lorehold_spell_rummage": 0,
           "lorehold_upkeep_rummage": 17,
           "miracle_cast": 16,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": 1,
           "squee_to_graveyard": 1,
           "squee_upkeep_return": 1,
@@ -24849,15 +24876,297 @@
         "seed": 20260625,
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 48,
           "lorehold_spell_cast": 38,
           "lorehold_spell_rummage": 15,
           "lorehold_upkeep_rummage": -21,
           "miracle_cast": 17,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": 2,
           "squee_to_graveyard": 5,
           "squee_upkeep_return": 2,
           "topdeck_manipulation_activated": 11
+        }
+      },
+      {
+        "adds": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 6,
+        "candidate_wins": 3,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": -55.56,
+        "family": "spellchain_mana",
+        "package_key": "birgi_spellchain_cut_squelcher",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 7,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -44,
+          "lorehold_spell_cast": -43,
+          "lorehold_spell_rummage": -9,
+          "lorehold_upkeep_rummage": -4,
+          "miracle_cast": -16,
+          "spell_cast_mana_trigger": 7,
+          "squee_return_after_known_graveyard_entry": -2,
+          "squee_to_graveyard": -3,
+          "squee_upkeep_return": -2,
+          "topdeck_manipulation_activated": -19
+        }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": -66.67,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -48,
+          "lorehold_spell_cast": -36,
+          "lorehold_spell_rummage": -12,
+          "lorehold_upkeep_rummage": 9,
+          "miracle_cast": -16,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -4,
+          "squee_to_graveyard": -4,
+          "squee_upkeep_return": -4,
+          "topdeck_manipulation_activated": -9
+        }
+      },
+      {
+        "adds": [
+          "Penance"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 5,
+        "candidate_wins": 4,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": -44.45,
+        "family": "topdeck_protection",
+        "package_key": "penance_topdeck_protection_cut_squelcher",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -18,
+          "lorehold_spell_cast": -1,
+          "lorehold_spell_rummage": 0,
+          "lorehold_upkeep_rummage": 13,
+          "miracle_cast": -6,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -5,
+          "squee_to_graveyard": -6,
+          "squee_upkeep_return": -5,
+          "topdeck_manipulation_activated": -16
+        }
+      },
+      {
+        "adds": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": 22.22,
+        "family": "spellchain_mana",
+        "package_key": "birgi_spellchain_cut_squelcher",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 1,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 25,
+          "lorehold_spell_cast": 21,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 7,
+          "miracle_cast": 5,
+          "spell_cast_mana_trigger": 1,
+          "squee_return_after_known_graveyard_entry": 1,
+          "squee_to_graveyard": 1,
+          "squee_upkeep_return": 1,
+          "topdeck_manipulation_activated": 3
+        }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": 22.22,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 36,
+          "lorehold_spell_cast": 34,
+          "lorehold_spell_rummage": 3,
+          "lorehold_upkeep_rummage": 14,
+          "miracle_cast": 12,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1
+        }
+      },
+      {
+        "adds": [
+          "Penance"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 9,
+        "candidate_wins": 0,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": 0.0,
+        "family": "topdeck_protection",
+        "package_key": "penance_topdeck_protection_cut_squelcher",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 24,
+          "lorehold_spell_cast": 21,
+          "lorehold_spell_rummage": 0,
+          "lorehold_upkeep_rummage": 9,
+          "miracle_cast": 6,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 5
+        }
+      },
+      {
+        "adds": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": 22.22,
+        "family": "spellchain_mana",
+        "package_key": "birgi_spellchain_cut_squelcher",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 5,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 1,
+          "lorehold_spell_cast": 0,
+          "lorehold_spell_rummage": 3,
+          "lorehold_upkeep_rummage": -16,
+          "miracle_cast": -2,
+          "spell_cast_mana_trigger": 5,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 1,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 2
+        }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": 22.22,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 31,
+          "lorehold_spell_cast": 30,
+          "lorehold_spell_rummage": -1,
+          "lorehold_upkeep_rummage": 9,
+          "miracle_cast": 9,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 5
+        }
+      },
+      {
+        "adds": [
+          "Penance"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "delta_pp": 22.22,
+        "family": "topdeck_protection",
+        "package_key": "penance_topdeck_protection_cut_squelcher",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 17,
+          "lorehold_spell_cast": 16,
+          "lorehold_spell_rummage": -2,
+          "lorehold_upkeep_rummage": -10,
+          "miracle_cast": 9,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 1,
+          "squee_to_graveyard": 1,
+          "squee_upkeep_return": 1,
+          "topdeck_manipulation_activated": 10
         }
       }
     ],
@@ -24899,11 +25208,14 @@
             "seed": 42,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": -15,
               "lorehold_spell_cast": -6,
               "lorehold_spell_rummage": -11,
               "lorehold_upkeep_rummage": -6,
               "miracle_cast": -6,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": -4,
               "squee_to_graveyard": -5,
               "squee_upkeep_return": -4,
@@ -24927,11 +25239,14 @@
             "seed": 7,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": 7,
               "lorehold_spell_cast": 4,
               "lorehold_spell_rummage": -2,
               "lorehold_upkeep_rummage": -4,
               "miracle_cast": 1,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": 0,
               "squee_to_graveyard": 0,
               "squee_upkeep_return": 0,
@@ -24955,11 +25270,14 @@
             "seed": 20260625,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": 48,
               "lorehold_spell_cast": 38,
               "lorehold_spell_rummage": 15,
               "lorehold_upkeep_rummage": -21,
               "miracle_cast": 17,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": 2,
               "squee_to_graveyard": 5,
               "squee_upkeep_return": 2,
@@ -24968,17 +25286,150 @@
           }
         ],
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 40,
           "lorehold_spell_cast": 36,
           "lorehold_spell_rummage": 2,
           "lorehold_upkeep_rummage": -31,
           "miracle_cast": 12,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": -2,
           "squee_to_graveyard": 0,
           "squee_upkeep_return": -2,
           "topdeck_manipulation_activated": 12
         },
         "strong_seed_delta_pp": -44.45
+      },
+      {
+        "adds": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 20,
+        "candidate_win_rate": 25.93,
+        "candidate_wins": 7,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -3.7,
+        "family": "spellchain_mana",
+        "package_key": "birgi_spellchain_cut_squelcher",
+        "seed_rows": [
+          {
+            "adds": [
+              "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": -55.56,
+            "family": "spellchain_mana",
+            "package_key": "birgi_spellchain_cut_squelcher",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 7,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -44,
+              "lorehold_spell_cast": -43,
+              "lorehold_spell_rummage": -9,
+              "lorehold_upkeep_rummage": -4,
+              "miracle_cast": -16,
+              "spell_cast_mana_trigger": 7,
+              "squee_return_after_known_graveyard_entry": -2,
+              "squee_to_graveyard": -3,
+              "squee_upkeep_return": -2,
+              "topdeck_manipulation_activated": -19
+            }
+          },
+          {
+            "adds": [
+              "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": 22.22,
+            "family": "spellchain_mana",
+            "package_key": "birgi_spellchain_cut_squelcher",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 1,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 25,
+              "lorehold_spell_cast": 21,
+              "lorehold_spell_rummage": 2,
+              "lorehold_upkeep_rummage": 7,
+              "miracle_cast": 5,
+              "spell_cast_mana_trigger": 1,
+              "squee_return_after_known_graveyard_entry": 1,
+              "squee_to_graveyard": 1,
+              "squee_upkeep_return": 1,
+              "topdeck_manipulation_activated": 3
+            }
+          },
+          {
+            "adds": [
+              "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": 22.22,
+            "family": "spellchain_mana",
+            "package_key": "birgi_spellchain_cut_squelcher",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 5,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 1,
+              "lorehold_spell_cast": 0,
+              "lorehold_spell_rummage": 3,
+              "lorehold_upkeep_rummage": -16,
+              "miracle_cast": -2,
+              "spell_cast_mana_trigger": 5,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 2
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 13,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -18,
+          "lorehold_spell_cast": -22,
+          "lorehold_spell_rummage": -4,
+          "lorehold_upkeep_rummage": -13,
+          "miracle_cast": -13,
+          "spell_cast_mana_trigger": 13,
+          "squee_return_after_known_graveyard_entry": -1,
+          "squee_to_graveyard": -1,
+          "squee_upkeep_return": -1,
+          "topdeck_manipulation_activated": -14
+        },
+        "strong_seed_delta_pp": -55.56
       },
       {
         "adds": [
@@ -25017,11 +25468,14 @@
             "seed": 42,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": -6,
               "lorehold_spell_cast": 28,
               "lorehold_spell_rummage": -7,
               "lorehold_upkeep_rummage": 7,
               "miracle_cast": -9,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": -5,
               "squee_to_graveyard": -7,
               "squee_upkeep_return": -5,
@@ -25045,11 +25499,14 @@
             "seed": 7,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": 3,
               "lorehold_spell_cast": 2,
               "lorehold_spell_rummage": -2,
               "lorehold_upkeep_rummage": -2,
               "miracle_cast": 0,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": 0,
               "squee_to_graveyard": 0,
               "squee_upkeep_return": 0,
@@ -25073,11 +25530,14 @@
             "seed": 20260625,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": 13,
               "lorehold_spell_cast": 13,
               "lorehold_spell_rummage": -2,
               "lorehold_upkeep_rummage": -11,
               "miracle_cast": 3,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": 2,
               "squee_to_graveyard": 2,
               "squee_upkeep_return": 3,
@@ -25086,17 +25546,280 @@
           }
         ],
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 10,
           "lorehold_spell_cast": 43,
           "lorehold_spell_rummage": -11,
           "lorehold_upkeep_rummage": -6,
           "miracle_cast": -6,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": -3,
           "squee_to_graveyard": -5,
           "squee_upkeep_return": -2,
           "topdeck_manipulation_activated": 2
         },
         "strong_seed_delta_pp": -33.33
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 21,
+        "candidate_win_rate": 22.22,
+        "candidate_wins": 6,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -7.41,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+        "seed_rows": [
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": -66.67,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -48,
+              "lorehold_spell_cast": -36,
+              "lorehold_spell_rummage": -12,
+              "lorehold_upkeep_rummage": 9,
+              "miracle_cast": -16,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -4,
+              "squee_to_graveyard": -4,
+              "squee_upkeep_return": -4,
+              "topdeck_manipulation_activated": -9
+            }
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": 22.22,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 36,
+              "lorehold_spell_cast": 34,
+              "lorehold_spell_rummage": 3,
+              "lorehold_upkeep_rummage": 14,
+              "miracle_cast": 12,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 1
+            }
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": 22.22,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 31,
+              "lorehold_spell_cast": 30,
+              "lorehold_spell_rummage": -1,
+              "lorehold_upkeep_rummage": 9,
+              "miracle_cast": 9,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 5
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 19,
+          "lorehold_spell_cast": 28,
+          "lorehold_spell_rummage": -10,
+          "lorehold_upkeep_rummage": 32,
+          "miracle_cast": 5,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -4,
+          "squee_to_graveyard": -4,
+          "squee_upkeep_return": -4,
+          "topdeck_manipulation_activated": -3
+        },
+        "strong_seed_delta_pp": -66.67
+      },
+      {
+        "adds": [
+          "Penance"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 21,
+        "candidate_win_rate": 22.22,
+        "candidate_wins": 6,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -7.41,
+        "family": "topdeck_protection",
+        "package_key": "penance_topdeck_protection_cut_squelcher",
+        "seed_rows": [
+          {
+            "adds": [
+              "Penance"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 5,
+            "candidate_wins": 4,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": -44.45,
+            "family": "topdeck_protection",
+            "package_key": "penance_topdeck_protection_cut_squelcher",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -18,
+              "lorehold_spell_cast": -1,
+              "lorehold_spell_rummage": 0,
+              "lorehold_upkeep_rummage": 13,
+              "miracle_cast": -6,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -5,
+              "squee_to_graveyard": -6,
+              "squee_upkeep_return": -5,
+              "topdeck_manipulation_activated": -16
+            }
+          },
+          {
+            "adds": [
+              "Penance"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 9,
+            "candidate_wins": 0,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": 0.0,
+            "family": "topdeck_protection",
+            "package_key": "penance_topdeck_protection_cut_squelcher",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 24,
+              "lorehold_spell_cast": 21,
+              "lorehold_spell_rummage": 0,
+              "lorehold_upkeep_rummage": 9,
+              "miracle_cast": 6,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 5
+            }
+          },
+          {
+            "adds": [
+              "Penance"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "delta_pp": 22.22,
+            "family": "topdeck_protection",
+            "package_key": "penance_topdeck_protection_cut_squelcher",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 17,
+              "lorehold_spell_cast": 16,
+              "lorehold_spell_rummage": -2,
+              "lorehold_upkeep_rummage": -10,
+              "miracle_cast": 9,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 1,
+              "squee_to_graveyard": 1,
+              "squee_upkeep_return": 1,
+              "topdeck_manipulation_activated": 10
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 23,
+          "lorehold_spell_cast": 36,
+          "lorehold_spell_rummage": -2,
+          "lorehold_upkeep_rummage": 12,
+          "miracle_cast": 9,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -4,
+          "squee_to_graveyard": -5,
+          "squee_upkeep_return": -4,
+          "topdeck_manipulation_activated": -1
+        },
+        "strong_seed_delta_pp": -44.45
       },
       {
         "adds": [
@@ -25135,11 +25858,14 @@
             "seed": 42,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": -50,
               "lorehold_spell_cast": -30,
               "lorehold_spell_rummage": -10,
               "lorehold_upkeep_rummage": 4,
               "miracle_cast": -14,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": -4,
               "squee_to_graveyard": -6,
               "squee_upkeep_return": -4,
@@ -25163,11 +25889,14 @@
             "seed": 7,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": 16,
               "lorehold_spell_cast": 22,
               "lorehold_spell_rummage": 1,
               "lorehold_upkeep_rummage": -1,
               "miracle_cast": 2,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": 0,
               "squee_to_graveyard": 0,
               "squee_upkeep_return": 0,
@@ -25191,11 +25920,14 @@
             "seed": 20260625,
             "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
             "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
               "lorehold_cost_paid": 35,
               "lorehold_spell_cast": 33,
               "lorehold_spell_rummage": 0,
               "lorehold_upkeep_rummage": 17,
               "miracle_cast": 16,
+              "spell_cast_mana_trigger": 0,
               "squee_return_after_known_graveyard_entry": 1,
               "squee_to_graveyard": 1,
               "squee_upkeep_return": 1,
@@ -25204,11 +25936,14 @@
           }
         ],
         "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
           "lorehold_cost_paid": 1,
           "lorehold_spell_cast": 25,
           "lorehold_spell_rummage": -9,
           "lorehold_upkeep_rummage": 20,
           "miracle_cast": 4,
+          "spell_cast_mana_trigger": 0,
           "squee_return_after_known_graveyard_entry": -3,
           "squee_to_graveyard": -5,
           "squee_upkeep_return": -3,

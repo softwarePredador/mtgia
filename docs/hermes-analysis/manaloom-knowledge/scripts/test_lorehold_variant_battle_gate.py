@@ -14,6 +14,25 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         telemetry.record("spell_cast", {"player": "Opponent", "card": "Counterspell"})
         telemetry.record("topdeck_manipulation_activated", {"player": "Lorehold", "card": "Scroll Rack"})
         telemetry.record(
+            "trigger_resolved",
+            {
+                "player": "Lorehold",
+                "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "trigger": "spell_cast",
+                "effect": "add_mana",
+                "mana_added": 1,
+            },
+        )
+        telemetry.record(
+            "activated_ability",
+            {
+                "player": "Lorehold",
+                "card": "Penance",
+                "activation_kind": "put_card_from_hand_on_top_library_prevent_chosen_source_damage",
+                "topdecked_card": "Rise of the Eldrazi",
+            },
+        )
+        telemetry.record(
             "lorehold_upkeep_rummage",
             {
                 "player": "Lorehold",
@@ -62,6 +81,9 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         payload = telemetry.as_json(2)
 
         self.assertEqual(payload["strategic_event_counts"]["miracle_cast"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["spell_cast_mana_trigger"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["birgi_spell_cast_mana"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["hand_to_topdeck_activation"], 1)
         self.assertEqual(payload["strategic_event_counts"]["lorehold_upkeep_rummage"], 1)
         self.assertEqual(payload["strategic_event_counts"]["lorehold_rummage_discards_squee"], 1)
         self.assertEqual(payload["strategic_event_counts"]["lorehold_spell_rummage"], 1)
@@ -81,6 +103,8 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(telemetry.game_summary("game-2")["squee_anomaly_count"], 1)
         self.assertEqual(payload["strategic_games"]["miracle_cast"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["miracle_cast"]["rate"], 0.5)
+        self.assertEqual(payload["strategic_games"]["birgi_spell_cast_mana"]["games"], 1)
+        self.assertEqual(payload["strategic_games"]["hand_to_topdeck_activation"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["squee_upkeep_return"]["games"], 2)
         self.assertEqual(payload["strategic_games"]["squee_to_graveyard"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["squee_return_after_known_graveyard_entry"]["games"], 1)
