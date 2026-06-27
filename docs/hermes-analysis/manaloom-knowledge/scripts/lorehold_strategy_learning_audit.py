@@ -66,6 +66,9 @@ DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
     REPORT_DIR / "lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
     REPORT_DIR / "lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+    REPORT_DIR / "lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+    REPORT_DIR / "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json",
+    REPORT_DIR / "lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1.json",
 ]
 DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
@@ -452,6 +455,9 @@ def aggregate_post_squee_package_gates(paths: list[Path]) -> dict[str, Any]:
         "lorehold_upkeep_rummage",
         "miracle_cast",
         "topdeck_manipulation_activated",
+        "discard_to_top_replacement",
+        "lorehold_rummage_discard_to_top",
+        "lorehold_spell_rummage_discard_to_top",
         "hand_to_topdeck_activation",
         "squee_to_graveyard",
         "squee_upkeep_return",
@@ -726,6 +732,26 @@ def render_markdown(report: dict[str, Any]) -> str:
                 f"- Penance is not a proven topdeck engine yet: observed `hand_to_topdeck_activation` delta was `{int(delta.get('hand_to_topdeck_activation') or 0):+d}` "
                 f"and the package lost `{penance['delta_pp']:+.2f}` pp aggregate."
             )
+        library_pressure_keys = [
+            "brainstone_topdeck_miracle_cut_squelcher",
+            "ghostly_prison_pressure_cut_squelcher",
+            "one_ring_protection_draw_cut_squelcher",
+        ]
+        library_pressure_rows = {
+            row["package_key"]: row for row in post_squee_rows if row["package_key"] in library_pressure_keys
+        }
+        if len(library_pressure_rows) == len(library_pressure_keys):
+            brainstone = library_pressure_rows["brainstone_topdeck_miracle_cut_squelcher"]
+            ghostly = library_pressure_rows["ghostly_prison_pressure_cut_squelcher"]
+            one_ring = library_pressure_rows["one_ring_protection_draw_cut_squelcher"]
+            lines.append(
+                "- Library/pressure conversion retest is now closed for the first pass: "
+                f"`Brainstone` over Hexing Squelcher finished `{brainstone['candidate_wins']}-{brainstone['candidate_losses']}` "
+                f"vs `{brainstone['baseline_wins']}-{brainstone['baseline_losses']}` (`{brainstone['delta_pp']:+.2f}` pp) "
+                f"but broke seed 42 by `{brainstone['strong_seed_delta_pp']:+.2f}` pp; "
+                f"`Ghostly Prison` was `{ghostly['delta_pp']:+.2f}` pp and "
+                f"`The One Ring` was `{one_ring['delta_pp']:+.2f}` pp. None promotes from this evidence."
+            )
     if library_leng_rows:
         seed42 = next((row for row in library_leng_rows if row.get("seed") == 42), None)
         seed7 = next((row for row in library_leng_rows if row.get("seed") == 7), None)
@@ -991,12 +1017,12 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.append("")
         lines.append("These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=0`, process isolation, and per-game timeout. The promotion bar is stricter than a single positive seed: the package must improve aggregate results without breaking the known strong seed.")
         lines.append("")
-        lines.append("| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Hand-Top | Spell | Mana | Birgi Mana | Squee GY | Squee Return | Decision |")
-        lines.append("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+        lines.append("| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Discard-Top | Rummage-Top | Spell-Rummage-Top | Hand-Top | Spell | Mana | Birgi Mana | Squee GY | Squee Return | Decision |")
+        lines.append("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
         for row in post_squee_rows:
             delta = row.get("strategic_delta") or {}
             lines.append(
-                "| `{package}` | {adds} | {cuts} | {base_w}-{base_l} | {cand_w}-{cand_l} | {delta_pp:+.2f} | {strong:+.2f} | {miracle:+d} | {topdeck:+d} | {hand_top:+d} | {spell:+d} | {mana:+d} | {birgi_mana:+d} | {squee_gy:+d} | {squee_return:+d} | {decision} |".format(
+                "| `{package}` | {adds} | {cuts} | {base_w}-{base_l} | {cand_w}-{cand_l} | {delta_pp:+.2f} | {strong:+.2f} | {miracle:+d} | {topdeck:+d} | {discard_top:+d} | {rummage_top:+d} | {spell_rummage_top:+d} | {hand_top:+d} | {spell:+d} | {mana:+d} | {birgi_mana:+d} | {squee_gy:+d} | {squee_return:+d} | {decision} |".format(
                     package=row["package_key"],
                     adds=", ".join(row["adds"]),
                     cuts=", ".join(row["cuts"]),
@@ -1008,6 +1034,9 @@ def render_markdown(report: dict[str, Any]) -> str:
                     strong=float(row["strong_seed_delta_pp"]),
                     miracle=int(delta.get("miracle_cast") or 0),
                     topdeck=int(delta.get("topdeck_manipulation_activated") or 0),
+                    discard_top=int(delta.get("discard_to_top_replacement") or 0),
+                    rummage_top=int(delta.get("lorehold_rummage_discard_to_top") or 0),
+                    spell_rummage_top=int(delta.get("lorehold_spell_rummage_discard_to_top") or 0),
                     hand_top=int(delta.get("hand_to_topdeck_activation") or 0),
                     spell=int(delta.get("lorehold_spell_cast") or 0),
                     mana=int(delta.get("spell_cast_mana_trigger") or 0),
@@ -1018,7 +1047,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                 )
             )
         lines.append("")
-        lines.append("Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
+        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
         lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")
@@ -1406,11 +1435,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
         "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.",
         "Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.",
+        "The first Library/pressure retest rejected Brainstone, Ghostly Prison, and The One Ring over Hexing Squelcher; future tests need a new cut logic or a narrower per-game failure target.",
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
-        "Build one Library/topdeck conversion package against the 607+Squee champion: it must increase discard-to-top plus miracle conversion or second-Approach completion without increasing early life-zero losses.",
-        "Build one pressure-absorber package against the 607+Squee champion, because seed 20260625 can loop Approach to top but still dies before conversion.",
+        "Run a per-game failure classifier for seeds 7 and 20260625: classify losses as missing Library/topdeck, topdeck without miracle conversion, second-Approach blocked, combat-pressure death, or mana bottleneck before choosing the next swap.",
+        "Do not repeat Brainstone, Ghostly Prison, or The One Ring over Hexing Squelcher from the current evidence; only retest them if the failure classifier identifies a different cut or a narrower matchup-specific role.",
         "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
         "Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.",
         "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",

@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T17:45:06Z`
+- Generated at: `2026-06-27T17:56:05Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -30,6 +30,7 @@ Operationally, a better deck must increase at least one of these without breakin
 - Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, and Penance against the Squee champion. Best aggregate was `galvanoth_topdeck_freecast` at `9-18` vs baseline `8-19` (`+3.70` pp), but seed 42 moved `-44.45` pp, so it is not an automatic deck promotion.
 - Birgi is now instrumented and produced `+13` spell-cast mana triggers, but its aggregate result was `7-20` vs baseline `8-19` (`-3.70` pp); mana telemetry alone is not enough to promote it.
 - Penance is not a proven topdeck engine yet: observed `hand_to_topdeck_activation` delta was `+0` and the package lost `-7.41` pp aggregate.
+- Library/pressure conversion retest is now closed for the first pass: `Brainstone` over Hexing Squelcher finished `8-19` vs `8-19` (`+0.00` pp) but broke seed 42 by `-77.78` pp; `Ghostly Prison` was `-3.70` pp and `The One Ring` was `-14.82` pp. None promotes from this evidence.
 - Library of Leng / discard-to-top telemetry is now visible in gates: seed 42 went `8-1` with `16` discard-to-top replacements, `30` topdeck activations, and `33` miracle casts.
 - Failure seeds split into two problems: seed 7 had `0` discard-to-top replacements, while seed 20260625 had `14` replacements but still went `0-9`; the issue is not only finding Library of Leng, but converting the topdecked card into survival or a second Approach window.
 
@@ -197,19 +198,22 @@ Main read: 607 is the best structural shell because it is closest to the command
 
 These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=0`, process isolation, and per-game timeout. The promotion bar is stricter than a single positive seed: the package must improve aggregate results without breaking the known strong seed.
 
-| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Hand-Top | Spell | Mana | Birgi Mana | Squee GY | Squee Return | Decision |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| `galvanoth_topdeck_freecast` | Galvanoth | Bender's Waterskin | 8-19 | 9-18 | +3.70 | -44.45 | +12 | +12 | +0 | +36 | +0 | +0 | +0 | -2 | probation_deeper_gate_only |
-| `birgi_spellchain_cut_squelcher` | Birgi, God of Storytelling // Harnfel, Horn of Bounty | Hexing Squelcher | 8-19 | 7-20 | -3.70 | -55.56 | -13 | -14 | +0 | -22 | +13 | +13 | -1 | -1 | reject_or_rework |
-| `core_challenge_dance_over_storm` | Dance with Calamity | Storm Herd | 8-19 | 7-20 | -3.70 | -88.89 | +18 | +25 | +0 | +37 | +0 | +0 | -3 | -2 | reject_or_rework |
-| `galvanoth_topdeck_freecast_cut_chimes` | Galvanoth | Victory Chimes | 8-19 | 7-20 | -3.70 | -55.56 | +9 | +7 | +0 | +24 | +0 | +0 | +3 | +4 | reject_or_rework |
-| `brainstone_topdeck_miracle` | Brainstone | Bender's Waterskin | 8-19 | 6-21 | -7.41 | -33.33 | -6 | +2 | +0 | +43 | +0 | +0 | -5 | -2 | reject_or_rework |
-| `galvanoth_topdeck_freecast_cut_squelcher` | Galvanoth | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -66.67 | +5 | -3 | +0 | +28 | +0 | +0 | -4 | -4 | reject_or_rework |
-| `penance_topdeck_protection_cut_squelcher` | Penance | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -44.45 | +9 | -1 | +0 | +36 | +0 | +0 | -5 | -4 | reject_or_rework |
-| `core_challenge_aetherflux_over_storm` | Aetherflux Reservoir | Storm Herd | 8-19 | 5-22 | -11.11 | -66.67 | -3 | -14 | +0 | +9 | +0 | +0 | -4 | -3 | reject_or_rework |
-| `faithless_looting_squee_enabler` | Faithless Looting | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -66.67 | +4 | +6 | +0 | +25 | +0 | +0 | -5 | -3 | reject_or_rework |
+| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Discard-Top | Rummage-Top | Spell-Rummage-Top | Hand-Top | Spell | Mana | Birgi Mana | Squee GY | Squee Return | Decision |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `galvanoth_topdeck_freecast` | Galvanoth | Bender's Waterskin | 8-19 | 9-18 | +3.70 | -44.45 | +12 | +12 | +0 | +0 | +0 | +0 | +36 | +0 | +0 | +0 | -2 | probation_deeper_gate_only |
+| `brainstone_topdeck_miracle_cut_squelcher` | Brainstone | Hexing Squelcher | 8-19 | 8-19 | +0.00 | -77.78 | +7 | +4 | -1 | -4 | +3 | +0 | +24 | +0 | +0 | +8 | +3 | reject_or_rework |
+| `birgi_spellchain_cut_squelcher` | Birgi, God of Storytelling // Harnfel, Horn of Bounty | Hexing Squelcher | 8-19 | 7-20 | -3.70 | -55.56 | -13 | -14 | +0 | +0 | +0 | +0 | -22 | +13 | +13 | -1 | -1 | reject_or_rework |
+| `core_challenge_dance_over_storm` | Dance with Calamity | Storm Herd | 8-19 | 7-20 | -3.70 | -88.89 | +18 | +25 | +0 | +0 | +0 | +0 | +37 | +0 | +0 | -3 | -2 | reject_or_rework |
+| `galvanoth_topdeck_freecast_cut_chimes` | Galvanoth | Victory Chimes | 8-19 | 7-20 | -3.70 | -55.56 | +9 | +7 | +0 | +0 | +0 | +0 | +24 | +0 | +0 | +3 | +4 | reject_or_rework |
+| `ghostly_prison_pressure_cut_squelcher` | Ghostly Prison | Hexing Squelcher | 8-19 | 7-20 | -3.70 | -55.56 | +3 | -13 | -22 | -19 | -3 | +0 | +37 | +0 | +0 | -5 | -4 | reject_or_rework |
+| `brainstone_topdeck_miracle` | Brainstone | Bender's Waterskin | 8-19 | 6-21 | -7.41 | -33.33 | -6 | +2 | +0 | +0 | +0 | +0 | +43 | +0 | +0 | -5 | -2 | reject_or_rework |
+| `galvanoth_topdeck_freecast_cut_squelcher` | Galvanoth | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -66.67 | +5 | -3 | +0 | +0 | +0 | +0 | +28 | +0 | +0 | -4 | -4 | reject_or_rework |
+| `penance_topdeck_protection_cut_squelcher` | Penance | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -44.45 | +9 | -1 | +0 | +0 | +0 | +0 | +36 | +0 | +0 | -5 | -4 | reject_or_rework |
+| `core_challenge_aetherflux_over_storm` | Aetherflux Reservoir | Storm Herd | 8-19 | 5-22 | -11.11 | -66.67 | -3 | -14 | +0 | +0 | +0 | +0 | +9 | +0 | +0 | -4 | -3 | reject_or_rework |
+| `faithless_looting_squee_enabler` | Faithless Looting | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -66.67 | +4 | +6 | +0 | +0 | +0 | +0 | +25 | +0 | +0 | -5 | -3 | reject_or_rework |
+| `one_ring_protection_draw_cut_squelcher` | The One Ring | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -77.78 | -9 | -17 | -30 | -27 | -3 | +0 | -7 | +0 | +0 | -3 | -2 | reject_or_rework |
 
-Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.
+Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.
 
 ## Current Champion Card-Role Coverage
 
@@ -237,12 +241,13 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.
 - Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.
 - Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.
+- The first Library/pressure retest rejected Brainstone, Ghostly Prison, and The One Ring over Hexing Squelcher; future tests need a new cut logic or a narrower per-game failure target.
 
 ## Next Gates
 
 - Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.
-- Build one Library/topdeck conversion package against the 607+Squee champion: it must increase discard-to-top plus miracle conversion or second-Approach completion without increasing early life-zero losses.
-- Build one pressure-absorber package against the 607+Squee champion, because seed 20260625 can loop Approach to top but still dies before conversion.
+- Run a per-game failure classifier for seeds 7 and 20260625: classify losses as missing Library/topdeck, topdeck without miracle conversion, second-Approach blocked, combat-pressure death, or mana bottleneck before choosing the next swap.
+- Do not repeat Brainstone, Ghostly Prison, or The One Ring over Hexing Squelcher from the current evidence; only retest them if the failure classifier identifies a different cut or a narrower matchup-specific role.
 - Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.
 - Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.
 - Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.

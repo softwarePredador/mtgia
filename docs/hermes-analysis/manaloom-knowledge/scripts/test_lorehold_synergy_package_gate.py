@@ -54,6 +54,18 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "topdeck_protection",
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["brainstone_topdeck_miracle_cut_squelcher"]["cuts"],
+            ["Hexing Squelcher"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["one_ring_protection_draw_cut_squelcher"]["family"],
+            "draw_protection",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["ghostly_prison_pressure_cut_squelcher"]["family"],
+            "pressure_absorber",
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )
@@ -69,6 +81,9 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                         "topdeck_manipulation_activated": 2,
                         "hand_to_topdeck_activation": 1,
                         "birgi_spell_cast_mana": 0,
+                        "discard_to_top_replacement": 1,
+                        "lorehold_rummage_discard_to_top": 2,
+                        "lorehold_spell_rummage_discard_to_top": 0,
                         "squee_to_graveyard": 1,
                         "squee_upkeep_return": 0,
                     }
@@ -80,6 +95,9 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                         "topdeck_manipulation_activated": 5,
                         "hand_to_topdeck_activation": 4,
                         "birgi_spell_cast_mana": 2,
+                        "discard_to_top_replacement": 5,
+                        "lorehold_rummage_discard_to_top": 5,
+                        "lorehold_spell_rummage_discard_to_top": 3,
                         "squee_to_graveyard": 4,
                         "squee_upkeep_return": 3,
                     }
@@ -91,10 +109,16 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(delta["topdeck_manipulation_activated"], 3)
         self.assertEqual(delta["hand_to_topdeck_activation"], 3)
         self.assertEqual(delta["birgi_spell_cast_mana"], 2)
+        self.assertEqual(delta["discard_to_top_replacement"], 4)
+        self.assertEqual(delta["lorehold_rummage_discard_to_top"], 3)
+        self.assertEqual(delta["lorehold_spell_rummage_discard_to_top"], 3)
         self.assertEqual(delta["squee_to_graveyard"], 3)
         self.assertEqual(delta["squee_upkeep_return"], 3)
         self.assertIn("squee gy +3", gate.strategic_delta_text(payload))
         self.assertIn("hand to top +3", gate.strategic_delta_text(payload))
+        self.assertIn("discard-to-top +4", gate.strategic_delta_text(payload))
+        self.assertIn("rummage-to-top +3", gate.strategic_delta_text(payload))
+        self.assertIn("spell-rummage-to-top +3", gate.strategic_delta_text(payload))
 
 
 if __name__ == "__main__":

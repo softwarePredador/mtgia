@@ -43,6 +43,16 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["The One Ring"],
         "cuts": ["Bender's Waterskin"],
     },
+    "one_ring_protection_draw_cut_squelcher": {
+        "family": "draw_protection",
+        "hypothesis": (
+            "The One Ring may buy the exact turn seed 20260625 lacks while adding "
+            "repeatable draw. This preserves the three-mana ramp shell and cuts "
+            "the narrower anti-counter creature instead."
+        ),
+        "adds": ["The One Ring"],
+        "cuts": ["Hexing Squelcher"],
+    },
     "birgi_spellchain_cut_squelcher": {
         "family": "spellchain_mana",
         "hypothesis": (
@@ -101,6 +111,16 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Brainstone"],
         "cuts": ["Bender's Waterskin"],
     },
+    "brainstone_topdeck_miracle_cut_squelcher": {
+        "family": "topdeck_setup",
+        "hypothesis": (
+            "Brainstone failed when it cut Bender's Waterskin; this variant "
+            "preserves ramp and tests whether a cheap one-shot topdeck engine "
+            "can help seed 7 find the Library/topdeck conversion line."
+        ),
+        "adds": ["Brainstone"],
+        "cuts": ["Hexing Squelcher"],
+    },
     "faithless_looting_squee_enabler": {
         "family": "discard_rummage_recursion",
         "hypothesis": (
@@ -120,6 +140,16 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
             "land-only placeholder rules such as The Biblioplex or Mirrorpool."
         ),
         "adds": ["Penance"],
+        "cuts": ["Hexing Squelcher"],
+    },
+    "ghostly_prison_pressure_cut_squelcher": {
+        "family": "pressure_absorber",
+        "hypothesis": (
+            "Ghostly Prison directly attacks the seed-20260625 failure mode: "
+            "the deck can put Approach on top but dies to combat pressure before "
+            "conversion. This retest avoids the prior bad High Noon cut."
+        ),
+        "adds": ["Ghostly Prison"],
         "cuts": ["Hexing Squelcher"],
     },
     "primal_amulet_spell_engine": {
@@ -303,6 +333,9 @@ STRATEGIC_METRICS = (
     "birgi_spell_cast_mana",
     "miracle_cast",
     "topdeck_manipulation_activated",
+    "discard_to_top_replacement",
+    "lorehold_rummage_discard_to_top",
+    "lorehold_spell_rummage_discard_to_top",
     "hand_to_topdeck_activation",
     "lorehold_spell_rummage",
     "squee_to_graveyard",
@@ -668,6 +701,9 @@ def strategic_delta_text(gate: dict[str, Any]) -> str:
         "birgi_spell_cast_mana": "birgi mana",
         "miracle_cast": "miracle",
         "topdeck_manipulation_activated": "topdeck",
+        "discard_to_top_replacement": "discard-to-top",
+        "lorehold_rummage_discard_to_top": "rummage-to-top",
+        "lorehold_spell_rummage_discard_to_top": "spell-rummage-to-top",
         "hand_to_topdeck_activation": "hand to top",
         "lorehold_spell_rummage": "spell rummage",
         "squee_to_graveyard": "squee gy",
