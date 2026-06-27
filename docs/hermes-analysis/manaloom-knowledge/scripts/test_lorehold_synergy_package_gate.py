@@ -50,6 +50,21 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             ["Victory Chimes"],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["galvanoth_topdeck_freecast_cut_thor"]["family"],
+            "topdeck_freecast",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["galvanoth_topdeck_freecast_cut_thor"]["adds"],
+            ["Galvanoth"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["galvanoth_topdeck_freecast_cut_thor"]["cuts"],
+            ["Thor, God of Thunder"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["galvanoth_topdeck_freecast_cut_thor"]["allow_miracle_core_cuts"],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["penance_topdeck_protection_cut_squelcher"]["family"],
             "topdeck_protection",
         )

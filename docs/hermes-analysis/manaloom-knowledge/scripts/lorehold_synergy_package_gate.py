@@ -153,6 +153,19 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Galvanoth"],
         "cuts": ["Victory Chimes"],
     },
+    "galvanoth_topdeck_freecast_cut_thor": {
+        "family": "topdeck_freecast",
+        "hypothesis": (
+            "Galvanoth is the current topdeck/freecast lane with a weak-seed "
+            "signal but bad prior cuts. This retest preserves Bender's Waterskin, "
+            "Hexing Squelcher, Victory Chimes, the protection shell, and the "
+            "medallions, cutting Thor only as a same-plan diagnostic because "
+            "Thor has local runtime exposure but no proven win-rate lift yet."
+        ),
+        "adds": ["Galvanoth"],
+        "cuts": ["Thor, God of Thunder"],
+        "allow_miracle_core_cuts": True,
+    },
     "brainstone_topdeck_miracle": {
         "family": "topdeck_setup",
         "hypothesis": (

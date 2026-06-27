@@ -21,7 +21,7 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_OUTPUT_STEM = "lorehold_loss_failure_classifier_20260627_conversion_pressure_v5"
+DEFAULT_OUTPUT_STEM = "lorehold_loss_failure_classifier_20260627_conversion_pressure_v6"
 
 
 CAUSE_LABELS = {
@@ -51,7 +51,7 @@ def default_gate_paths() -> list[Path]:
         "lorehold_library_pressure_conversion_gate_20260627_seed*_v1_library_pressure_v1_*.json",
         "lorehold_life_floor_conversion_gate_20260627_seed*_v1_life_floor_v1_*.json",
         "lorehold_spellchain_conversion_gate_20260627_seed*_v1_spellchain_v1_*.json",
-        "lorehold_topfreecast_conversion_gate_20260627_seed*_v1_topfreecast_v1_*.json",
+        "lorehold_topfreecast_conversion_gate_20260627_seed*_v*_topfreecast_v*_*.json",
         "lorehold_tutor_access_conversion_gate_20260627_seed*_v*_tutor_access_v*_*.json",
     ]
     paths: list[Path] = []
@@ -318,7 +318,7 @@ def build_report(paths: list[Path]) -> dict[str, Any]:
 
 def render_markdown(report: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Loss Failure Classifier - 2026-06-27 v5",
+        "# Lorehold Loss Failure Classifier - 2026-06-27 v6",
         "",
         f"- Generated at: `{report['generated_at']}`",
         "- PostgreSQL writes: `false`",

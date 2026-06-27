@@ -117,6 +117,27 @@ class LoreholdLossFailureClassifierTest(unittest.TestCase):
             ["a", "b", "baseline_squee_champion"],
         )
 
+    def test_default_gate_paths_include_versioned_topfreecast_details_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            detailed_v1 = tmp_path / "lorehold_topfreecast_conversion_gate_20260627_seed42_v1_topfreecast_v1_galvanoth.json"
+            detailed_v2 = tmp_path / "lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2_galvanoth.json"
+            summary_v2 = tmp_path / "lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2.json"
+            detailed_v1.write_text("{}", encoding="utf-8")
+            detailed_v2.write_text("{}", encoding="utf-8")
+            summary_v2.write_text("{}", encoding="utf-8")
+
+            original = classifier.REPORT_DIR
+            classifier.REPORT_DIR = tmp_path
+            try:
+                paths = classifier.default_gate_paths()
+            finally:
+                classifier.REPORT_DIR = original
+
+        self.assertIn(detailed_v1, paths)
+        self.assertIn(detailed_v2, paths)
+        self.assertNotIn(summary_v2, paths)
+
 
 if __name__ == "__main__":
     unittest.main()
