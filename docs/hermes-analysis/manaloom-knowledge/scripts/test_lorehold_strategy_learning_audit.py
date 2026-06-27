@@ -54,6 +54,22 @@ def package_payload(seed, package_key, baseline_wins, baseline_losses, candidate
 
 
 class LoreholdStrategyLearningAuditTest(unittest.TestCase):
+    def test_card_status_separates_materialization_gap_from_missing_model(self):
+        card = {
+            "card_name": "Molecule Man",
+            "primary_role": "draw",
+            "battle_rule_keys": [],
+        }
+
+        self.assertEqual(
+            audit.card_status(card, {"decision": "deck_rule_materialization_gap"}),
+            "materialization_gap_ready_rule",
+        )
+        self.assertEqual(
+            audit.card_status(card, {"decision": "missing_battle_rule_model"}),
+            "missing_battle_rule_model",
+        )
+
     def test_post_squee_gate_keeps_positive_aggregate_on_probation_when_seed_42_breaks(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)

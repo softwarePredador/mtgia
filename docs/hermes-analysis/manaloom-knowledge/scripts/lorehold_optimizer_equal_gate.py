@@ -136,6 +136,56 @@ def tags_from_rules(base_tag: str | None, rules: list[dict[str, Any]]) -> list[s
     return tags or ["candidate"]
 
 
+def materialize_active_rules_for_deck(
+    conn: sqlite3.Connection,
+    *,
+    deck_id: int,
+) -> dict[str, Any]:
+    columns = [row[1] for row in conn.execute("PRAGMA table_info(deck_cards)")]
+    if "battle_rules_json" not in columns:
+        return {
+            "enabled": False,
+            "deck_id": deck_id,
+            "materialized_row_count": 0,
+            "materialized_card_count": 0,
+            "cards": [],
+        }
+
+    rows = conn.execute(
+        """
+        SELECT id, card_name
+        FROM deck_cards
+        WHERE deck_id=?
+        ORDER BY card_name
+        """,
+        (deck_id,),
+    ).fetchall()
+    materialized_rows: list[dict[str, Any]] = []
+    for row in rows:
+        rules = active_rules_for_card(conn, str(row["card_name"]))
+        if not rules:
+            continue
+        conn.execute(
+            "UPDATE deck_cards SET battle_rules_json=? WHERE id=?",
+            (json.dumps(rules, ensure_ascii=True, sort_keys=True), row["id"]),
+        )
+        materialized_rows.append(
+            {
+                "card_name": row["card_name"],
+                "battle_rule_count": len(rules),
+                "battle_rule_keys": [str(rule.get("logical_rule_key")) for rule in rules],
+            }
+        )
+
+    return {
+        "enabled": True,
+        "deck_id": deck_id,
+        "materialized_row_count": len(materialized_rows),
+        "materialized_card_count": len({row["card_name"] for row in materialized_rows}),
+        "cards": materialized_rows,
+    }
+
+
 def replace_candidate_deck(
     conn: sqlite3.Connection,
     *,
@@ -202,6 +252,10 @@ def replace_candidate_deck(
             f"INSERT INTO deck_cards ({','.join(columns)}) VALUES ({placeholders})",
             [row.get(column) for column in columns],
         )
+    rule_materialization = materialize_active_rules_for_deck(
+        conn,
+        deck_id=candidate_deck_id,
+    )
     conn.commit()
 
     total_cards = sum(int(row.get("quantity") or 1) for row in candidate_rows)
@@ -212,6 +266,7 @@ def replace_candidate_deck(
         "source_deck_id": source_deck_id,
         "card_added": card_added,
         "card_removed": card_removed,
+        "rule_materialization": rule_materialization,
     }
 
 

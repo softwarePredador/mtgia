@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T16:27:15Z`
+- Generated at: `2026-06-27T16:38:33Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -23,6 +23,7 @@ Operationally, a better deck must increase at least one of these without breakin
 - Important caveat: the trace gate still did not show `Squee` being discarded by Lorehold rummage or spell-rummage. Treat the discard-fuel loop as a hypothesis; the proven loop is graveyard recurrence after observed zone entries.
 - The per-game seed diagnostic shows the real failure mode: Squee is not yet self-sufficient. Seed 42 wins when topdeck/miracle/spell volume is high; seeds 7 and 20260625 go `0W/9L` with no Squee graveyard/return events and very low topdeck/miracle conversion.
 - Squee rule materialization is now fixed in the equal-gate loader evidence: Squee now materializes one verified/auto graveyard-recursion rule in the equal-gate candidate; across seeds 42, 7, and 20260625 candidate is 8/19 versus deck_607 10/17, so the fix improves rule evidence but does not prove a stronger deck by itself.
+- Remaining rule-row audit now separates aggregate sync gaps from real model gaps: `5` deck materialization gaps and `1` missing battle-rule/model gap.
 - The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.
 - Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, and Penance against the Squee champion. Best aggregate was `galvanoth_topdeck_freecast` at `9-18` vs baseline `8-19` (`+3.70` pp), but seed 42 moved `-44.45` pp, so it is not an automatic deck promotion.
 - Birgi is now instrumented and produced `+13` spell-cast mana triggers, but its aggregate result was `7-20` vs baseline `8-19` (`-3.70` pp); mana telemetry alone is not enough to promote it.
@@ -103,6 +104,20 @@ Interpretation: under fixed hash-seed, process-isolated, timeout-bounded conditi
 | 20260625 | `deck_607` | 4 | 5 | 0 | 44.44% | 25 | 17 | 0 | 0 | 0 |  |  |
 | 20260625 | `candidate_607_squee_goblin_nabob_equal_gate` | 0 | 9 | 0 | 0.00% | 4 | 3 | 0 | 0 | 1 | battle_rule_v1:4565272d5decc69322e01a4f919df77e | graveyard_recursion, engine, board_presence, wincon |
 
+## Remaining Rule Row Audit
+
+- Source: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_unresolved_rule_rows_audit_20260627_v1.json`
+- Read: cards marked `deck_rule_materialization_gap` already have active reviewed `battle_card_rules`; future equal gates now materialize those rows deck-wide. Cards marked `missing_battle_rule_model` need a new rule/runtime family before battle evidence is trusted.
+
+| Card | Deck Rule Count | Active Rule Count | Decision | Action | Rule Keys |
+| --- | ---: | ---: | --- | --- | --- |
+| The Scarlet Witch | 0 | 1 | `deck_rule_materialization_gap` | `fixed_for_future_equal_gates_by_deck_rule_materialization_sweep` | battle_rule_v1:0b23c5f26d2bc884b7f506cdd9d422fc |
+| Molecule Man | 0 | 1 | `deck_rule_materialization_gap` | `fixed_for_future_equal_gates_by_deck_rule_materialization_sweep` | battle_rule_v1:752f8cfd0a44d1889ffdb40610847374 |
+| The Mind Stone | 0 | 1 | `deck_rule_materialization_gap` | `fixed_for_future_equal_gates_by_deck_rule_materialization_sweep` | battle_rule_v1:57bb1f91d9eea2ad14a8e8d24d2f8d53 |
+| Thor, God of Thunder | 0 | 0 | `missing_battle_rule_model` | `create_reviewed_battle_card_rule_and_runtime_family_before_trusting_gate_result` | none |
+| Emeria's Call // Emeria, Shattered Skyclave | 0 | 1 | `deck_rule_materialization_gap` | `fixed_for_future_equal_gates_by_deck_rule_materialization_sweep` | battle_rule_v1:ae4a933d873bec332ec2a46106b79277 |
+| Tragic Arrogance | 0 | 1 | `deck_rule_materialization_gap` | `fixed_for_future_equal_gates_by_deck_rule_materialization_sweep` | battle_rule_v1:d4d676e6ecea500f7aca4cbc7f7ae04a |
+
 ## Variant Learning
 
 | Rank | Deck | Score | Intent | Lands | Rule Ready | Main Risks |
@@ -153,7 +168,9 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - Primary role counts: `{"board_wipe": 6, "creature": 2, "draw": 12, "engine": 3, "land": 34, "protection": 9, "ramp": 15, "removal": 7, "tutor": 1, "unknown": 2, "wincon": 9}`
 - Missing aggregated battle-rule rows in the legacy champion DB: `7` cards: The Scarlet Witch, Molecule Man, The Mind Stone, Thor, God of Thunder, Emeria's Call // Emeria, Shattered Skyclave, Tragic Arrogance, Squee, Goblin Nabob.
 - Superseded by rule-materialization audit: `Squee, Goblin Nabob` now has materialized rule evidence in the equal-gate candidate.
-- Effective unresolved rule rows after that audit: `6` cards: The Scarlet Witch, Molecule Man, The Mind Stone, Thor, God of Thunder, Emeria's Call // Emeria, Shattered Skyclave, Tragic Arrogance.
+- Effective unresolved rule rows after that audit: `1` cards: Thor, God of Thunder.
+- Reclassified by remaining-row audit as deck materialization gaps: `Emeria's Call // Emeria, Shattered Skyclave, Molecule Man, The Mind Stone, The Scarlet Witch, Tragic Arrogance`.
+- Effective unresolved rule/model rows after all current materialization evidence: `1` cards: Thor, God of Thunder.
 - Full per-card role, tags, and rule keys are in the companion JSON under `deck_summaries.6.cards`.
 
 ## What Still Must Be Understood
@@ -162,6 +179,7 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - Treat Squee as a provisional micro-upgrade, not a promoted final deck slot, until a support package or alternative cut shows a larger reproducible edge.
 - Make all decisive battle gates run with `PYTHONHASHSEED=0`, `--isolate-deck-process`, and per-game timeout; same simulation seed without fixed hash seed/process isolation is not enough for deck promotion.
 - Review DB-role versus effective-role divergences surfaced by the card-role manifest, especially cards stored as `draw` or `unknown` while functioning as protection, removal, miracle engine, or board wipe.
+- `Thor, God of Thunder` is the remaining real rule/model gap in the six-row unresolved audit; it needs ETB graveyard impulse-recast and noncreature-spell damage trigger modeling before strategic rejection or promotion.
 - Separate finalizer slots from engine slots: Insurrection, Storm Herd, Approach, Rise of the Eldrazi, and Aetherflux Reservoir should be benchmarked as closing packages, not generic wincon labels.
 - Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.
 - Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.
@@ -174,7 +192,7 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - Retest Galvanoth only as a probation topdeck-freecast hypothesis with a better cut than Bender's Waterskin, because the current gate is aggregate-positive but breaks seed 42.
 - Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.
 - Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.
-- If a candidate uses a rule missing from aggregated deck rows, run the battle-card-specific test plus one replay trace before trusting the battle result.
+- Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active `battle_card_rules` row.
 
 ## External Method Sources
 

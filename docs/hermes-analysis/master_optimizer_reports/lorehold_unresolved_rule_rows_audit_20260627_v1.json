@@ -1,0 +1,309 @@
+{
+  "code_fix": "lorehold_optimizer_equal_gate.materialize_active_rules_for_deck fills battle_rules_json for all candidate deck rows from active battle_card_rules rows",
+  "deck_id": 6,
+  "generated_at": "2026-06-27T16:35:21.416075+00:00",
+  "postgres_writes": false,
+  "rows": [
+    {
+      "action": "fixed_for_future_equal_gates_by_deck_rule_materialization_sweep",
+      "battle_rule_count": 1,
+      "battle_rule_keys": [
+        "battle_rule_v1:0b23c5f26d2bc884b7f506cdd9d422fc"
+      ],
+      "battle_rule_sources": [
+        "curated"
+      ],
+      "battle_rule_statuses": [
+        "verified/auto"
+      ],
+      "canonical_snapshot_found": true,
+      "canonical_snapshot_rule_count": 0,
+      "card": "The Scarlet Witch",
+      "decision": "deck_rule_materialization_gap",
+      "deck_id": 6,
+      "deck_role": "creature",
+      "deck_row_found": true,
+      "deck_rule_count": 0,
+      "oracle_excerpt": "Instant and sorcery spells you cast with mana value 4 or greater cost {X} less to cast, where X is The Scarlet Witch's power.",
+      "reason": "The reviewed rule exists in battle_card_rules but the deck_cards aggregate row is empty in the legacy candidate DB.",
+      "rules": [
+        {
+          "confidence": 0.96,
+          "deck_role": {
+            "category": "support",
+            "effect": "static_cost_reduction",
+            "subtype": "cost_reducer",
+            "timing": "static"
+          },
+          "effect": {
+            "ability_kind": "static",
+            "applies_to_card_types": [
+              "instant",
+              "sorcery"
+            ],
+            "applies_to_controller": "source_controller",
+            "battle_model_scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+            "cmc": 3.0,
+            "cost_reduction_amount_source": "source_power",
+            "cost_reduction_applies_to": "instant_sorcery_spells_you_cast",
+            "effect": "static_cost_reduction",
+            "minimum_mana_value": 4
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0b23c5f26d2bc884b7f506cdd9d422fc",
+          "review_status": "verified",
+          "source": "curated"
+        }
+      ],
+      "type_line": "Legendary Creature — Mutant Warlock Hero"
+    },
+    {
+      "action": "fixed_for_future_equal_gates_by_deck_rule_materialization_sweep",
+      "battle_rule_count": 1,
+      "battle_rule_keys": [
+        "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374"
+      ],
+      "battle_rule_sources": [
+        "curated"
+      ],
+      "battle_rule_statuses": [
+        "verified/auto"
+      ],
+      "canonical_snapshot_found": false,
+      "canonical_snapshot_rule_count": 0,
+      "card": "Molecule Man",
+      "decision": "deck_rule_materialization_gap",
+      "deck_id": 6,
+      "deck_role": "draw",
+      "deck_row_found": true,
+      "deck_rule_count": 0,
+      "oracle_excerpt": "Nonland cards in your hand have miracle {0}. (You may cast a card for its miracle cost when you draw it if it's the first card you drew this turn.)",
+      "reason": "The reviewed rule exists in battle_card_rules but the deck_cards aggregate row is empty in the legacy candidate DB.",
+      "rules": [
+        {
+          "confidence": 0.96,
+          "deck_role": {
+            "category": "topdeck_miracle_setup",
+            "commander_fit": "core_ceiling_piece",
+            "strategy_role": "miracle_zero_engine"
+          },
+          "effect": {
+            "ability_kind": "static",
+            "battle_model_scope": "nonland_hand_miracle_zero_static_v1",
+            "effect": "passive",
+            "grants_miracle_card_scope": "nonland",
+            "grants_miracle_cost": 0,
+            "grants_miracle_nonland": true,
+            "is_creature_permanent": true,
+            "oracle_runtime_scope": "nonland_cards_in_controller_hand_have_miracle_zero"
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
+          "review_status": "verified",
+          "source": "curated"
+        }
+      ],
+      "type_line": "Legendary Creature — Human Villain"
+    },
+    {
+      "action": "fixed_for_future_equal_gates_by_deck_rule_materialization_sweep",
+      "battle_rule_count": 1,
+      "battle_rule_keys": [
+        "battle_rule_v1:57bb1f91d9eea2ad14a8e8d24d2f8d53"
+      ],
+      "battle_rule_sources": [
+        "curated"
+      ],
+      "battle_rule_statuses": [
+        "verified/auto"
+      ],
+      "canonical_snapshot_found": true,
+      "canonical_snapshot_rule_count": 0,
+      "card": "The Mind Stone",
+      "decision": "deck_rule_materialization_gap",
+      "deck_id": 6,
+      "deck_role": "ramp",
+      "deck_row_found": true,
+      "deck_rule_count": 0,
+      "oracle_excerpt": "Indestructible {T}: Add {W}. {5}{W}, {T}: Harness The Mind Stone. (Once harnessed, its ∞ ability is active.) ∞ — At the beginning of your end step, exile up to one other target non...",
+      "reason": "The reviewed rule exists in battle_card_rules but the deck_cards aggregate row is empty in the legacy candidate DB.",
+      "rules": [
+        {
+          "confidence": 0.95,
+          "deck_role": {
+            "category": "ramp",
+            "effect": "ramp_permanent",
+            "subtype": "mana_rock_with_harnessed_blink",
+            "timing": "persistent"
+          },
+          "effect": {
+            "battle_model_scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+            "cmc": 2.0,
+            "effect": "ramp_permanent",
+            "harness_activation_cost": "{5}{W}",
+            "harness_activation_requires_tap": true,
+            "harnessed_blink_target_scope": "other_nonland_permanent_you_control",
+            "harnessed_end_step_blink": true,
+            "indestructible": true,
+            "mana_produced": 1,
+            "produces": "W"
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:57bb1f91d9eea2ad14a8e8d24d2f8d53",
+          "review_status": "verified",
+          "source": "curated"
+        }
+      ],
+      "type_line": "Legendary Artifact — Infinity Stone"
+    },
+    {
+      "action": "create_reviewed_battle_card_rule_and_runtime_family_before_trusting_gate_result",
+      "battle_rule_count": 0,
+      "battle_rule_keys": [],
+      "battle_rule_sources": [],
+      "battle_rule_statuses": [],
+      "canonical_snapshot_found": false,
+      "canonical_snapshot_rule_count": 0,
+      "card": "Thor, God of Thunder",
+      "decision": "missing_battle_rule_model",
+      "deck_id": 6,
+      "deck_role": "removal",
+      "deck_row_found": true,
+      "deck_rule_count": 0,
+      "oracle_excerpt": "Flying When Thor enters, exile target Equipment, instant, or sorcery card from your graveyard. Until the end of your next turn, you may play that card. Whenever you cast a noncreat...",
+      "reason": "No active local battle_card_rules row was found, so the battle model cannot evaluate the card function from this DB.",
+      "rules": [],
+      "type_line": "Legendary Creature — God Warrior Hero"
+    },
+    {
+      "action": "fixed_for_future_equal_gates_by_deck_rule_materialization_sweep",
+      "battle_rule_count": 1,
+      "battle_rule_keys": [
+        "battle_rule_v1:ae4a933d873bec332ec2a46106b79277"
+      ],
+      "battle_rule_sources": [
+        "curated"
+      ],
+      "battle_rule_statuses": [
+        "verified/auto"
+      ],
+      "canonical_snapshot_found": true,
+      "canonical_snapshot_rule_count": 0,
+      "card": "Emeria's Call // Emeria, Shattered Skyclave",
+      "decision": "deck_rule_materialization_gap",
+      "deck_id": 6,
+      "deck_role": "unknown",
+      "deck_row_found": true,
+      "deck_rule_count": 0,
+      "oracle_excerpt": "Create two 4/4 white Angel Warrior creature tokens with flying. Non-Angel creatures you control gain indestructible until your next turn.",
+      "reason": "The reviewed rule exists in battle_card_rules but the deck_cards aggregate row is empty in the legacy candidate DB.",
+      "rules": [
+        {
+          "confidence": 0.96,
+          "deck_role": {
+            "category": "board_development",
+            "effect": "token_maker",
+            "subtype": "angel_token_protection",
+            "timing": "sorcery"
+          },
+          "effect": {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1",
+            "cmc": 7.0,
+            "effect": "token_maker",
+            "grant_non_angel_creatures_indestructible_until_next_turn": true,
+            "protection_duration": "until_your_next_turn",
+            "protection_filter": "non_angel_creatures_you_control",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 2,
+            "token_flying": true,
+            "token_name": "Angel Warrior Token",
+            "token_power": 4,
+            "token_subtype": "Angel Warrior",
+            "token_toughness": 4
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae4a933d873bec332ec2a46106b79277",
+          "review_status": "verified",
+          "source": "curated"
+        }
+      ],
+      "type_line": "Sorcery"
+    },
+    {
+      "action": "fixed_for_future_equal_gates_by_deck_rule_materialization_sweep",
+      "battle_rule_count": 1,
+      "battle_rule_keys": [
+        "battle_rule_v1:d4d676e6ecea500f7aca4cbc7f7ae04a"
+      ],
+      "battle_rule_sources": [
+        "curated"
+      ],
+      "battle_rule_statuses": [
+        "verified/auto"
+      ],
+      "canonical_snapshot_found": true,
+      "canonical_snapshot_rule_count": 0,
+      "card": "Tragic Arrogance",
+      "decision": "deck_rule_materialization_gap",
+      "deck_id": 6,
+      "deck_role": "unknown",
+      "deck_row_found": true,
+      "deck_rule_count": 0,
+      "oracle_excerpt": "For each player, you choose from among the permanents that player controls an artifact, a creature, an enchantment, and a planeswalker. Then each player sacrifices all other nonlan...",
+      "reason": "The reviewed rule exists in battle_card_rules but the deck_cards aggregate row is empty in the legacy candidate DB.",
+      "rules": [
+        {
+          "confidence": 0.96,
+          "deck_role": {
+            "category": "interaction",
+            "effect": "selective_nonland_sacrifice",
+            "subtype": "selective_nonland_wipe",
+            "timing": "sorcery"
+          },
+          "effect": {
+            "battle_model_scope": "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1",
+            "choice_types": [
+              "artifact",
+              "creature",
+              "enchantment",
+              "planeswalker"
+            ],
+            "cmc": 5.0,
+            "controller_chooses_for_each_player": true,
+            "effect": "selective_nonland_sacrifice",
+            "sacrifice_scope": "other_nonland_permanents"
+          },
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4d676e6ecea500f7aca4cbc7f7ae04a",
+          "review_status": "verified",
+          "source": "curated"
+        }
+      ],
+      "type_line": "Sorcery"
+    }
+  ],
+  "scope": "effective unresolved rule rows after Squee materialization audit",
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "summary": {
+    "deck_rule_materialization_gap": 5,
+    "missing_battle_rule_model": 1,
+    "ready_in_deck_aggregate": 0,
+    "total_cards": 6
+  },
+  "temp_materialization_verification": {
+    "materialized_row_count": 93,
+    "six_card_rule_counts_after_temp_materialization": {
+      "Emeria's Call // Emeria, Shattered Skyclave": 1,
+      "Molecule Man": 1,
+      "The Mind Stone": 1,
+      "The Scarlet Witch": 1,
+      "Thor, God of Thunder": 0,
+      "Tragic Arrogance": 1
+    },
+    "source_db_mutated": false
+  }
+}

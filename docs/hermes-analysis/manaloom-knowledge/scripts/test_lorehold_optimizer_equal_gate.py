@@ -115,6 +115,20 @@ class LoreholdOptimizerEqualGateTests(unittest.TestCase):
         )
         self.conn.execute(
             """
+            INSERT INTO battle_card_rules (
+                normalized_name, logical_rule_key, card_name, effect_json,
+                deck_role_json, source, confidence, review_status,
+                execution_status, rule_version, oracle_hash
+            )
+            VALUES (
+                'lorehold, the historian', 'rule:lorehold', 'Lorehold, the Historian',
+                '{"effect":"miracle_discount"}', '{"category":"commander","effect":"miracle"}',
+                'test', 0.95, 'verified', 'auto', 1, 'hash-2'
+            )
+            """
+        )
+        self.conn.execute(
+            """
             INSERT INTO swap_benchmarks (deck_id, baseline_id, card_added, card_removed, add_tag, phase)
             VALUES (607, 11, 'Flashback', 'Emeria''s Call // Emeria, Shattered Skyclave', 'engine', 'confirmation')
             """
@@ -156,6 +170,7 @@ class LoreholdOptimizerEqualGateTests(unittest.TestCase):
         )
 
         self.assertEqual(meta["total_cards"], 100)
+        self.assertEqual(meta["rule_materialization"]["materialized_card_count"], 2)
         rows = self.conn.execute(
             "SELECT card_name, quantity, functional_tag, functional_tags_json, battle_rules_json FROM deck_cards WHERE deck_id=6 ORDER BY card_name"
         ).fetchall()
@@ -169,6 +184,10 @@ class LoreholdOptimizerEqualGateTests(unittest.TestCase):
         rules = json.loads(flashback["battle_rules_json"])
         self.assertEqual(len(rules), 1)
         self.assertEqual(rules[0]["logical_rule_key"], "rule:flashback")
+        lorehold = next(row for row in rows if row["card_name"] == "Lorehold, the Historian")
+        lorehold_rules = json.loads(lorehold["battle_rules_json"])
+        self.assertEqual(len(lorehold_rules), 1)
+        self.assertEqual(lorehold_rules[0]["logical_rule_key"], "rule:lorehold")
 
     def test_load_swap_row_filters_by_deck_phase_and_card(self) -> None:
         row = gate.load_swap_row(

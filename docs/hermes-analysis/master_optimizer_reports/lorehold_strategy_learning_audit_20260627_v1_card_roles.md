@@ -14,14 +14,14 @@
 | Fated Clash | 1 | board_wipe | removal | core_support | ready | instant-speed threat answer with clash/topdeck relevance |
 | Starfall Invocation | 1 | board_wipe | board_wipe | core_support | ready | board wipe with gift/draw context; pressure control first |
 | Hexing Squelcher | 1 | creature | creature | flex_or_contextual | ready | creature utility; verify it advances the spell plan |
-| The Scarlet Witch | 1 | creature | creature | unresolved_rule_or_aggregate_gap | missing_aggregate | accelerates commander, setup, and big-spell turns |
+| The Scarlet Witch | 1 | creature | creature | materialization_gap_ready_rule | source_rule_ready_needs_materialization | accelerates commander, setup, and big-spell turns |
 | Artist's Talent | 1 | draw | draw | core_or_flex_engine | ready | accelerates commander, setup, and big-spell turns |
 | Creative Technique | 1 | draw | big_spell_value | flex_or_contextual | ready | big-spell value line with copy/demonstrate upside |
 | Deflecting Swat | 1 | draw | protection | core_support | ready | free stack protection while Lorehold is online |
 | Esper Sentinel | 1 | draw | draw | core_or_flex_engine | ready | filters hands and turns dead expensive cards into new looks |
 | Hit the Mother Lode | 1 | draw | draw | core_or_flex_engine | ready | big-spell mana/value payoff that can chain into more resources |
 | Improvisation Capstone | 1 | draw | draw | core_or_flex_engine | ready | accelerates commander, setup, and big-spell turns |
-| Molecule Man | 1 | draw | miracle_engine | unresolved_rule_or_aggregate_gap | missing_aggregate | miracle-cost modifier hypothesis; keep runtime evidence explicit |
+| Molecule Man | 1 | draw | miracle_engine | materialization_gap_ready_rule | source_rule_ready_needs_materialization | miracle-cost modifier hypothesis; keep runtime evidence explicit |
 | Promise of Loyalty | 1 | draw | board_wipe | core_support | ready | political wipe that reduces combat pressure on Lorehold |
 | Redirect Lightning | 1 | draw | removal | core_support | ready | damage redirection/removal slot, not a mana engine |
 | Reforge the Soul | 1 | draw | draw | core_or_flex_engine | ready | accelerates commander, setup, and big-spell turns |
@@ -79,7 +79,7 @@
 | Smothering Tithe | 1 | ramp | ramp | core_support | ready | treasure engine that turns table draw into big-spell mana |
 | Sol Ring | 1 | ramp | ramp | core_support | ready | accelerates commander, setup, and big-spell turns |
 | Talisman of Conviction | 1 | ramp | ramp | core_support | ready | accelerates commander, setup, and big-spell turns |
-| The Mind Stone | 1 | ramp | ramp | unresolved_rule_or_aggregate_gap | missing_aggregate | two-mana rock that can cash in for a card later |
+| The Mind Stone | 1 | ramp | ramp | materialization_gap_ready_rule | source_rule_ready_needs_materialization | white Infinity Stone ramp/protection engine; not the classic Mind Stone draw rock |
 | Unexpected Windfall | 1 | ramp | ramp | core_support | ready | accelerates commander, setup, and big-spell turns |
 | Victory Chimes | 1 | ramp | ramp | core_support | ready | accelerates commander, setup, and big-spell turns |
 | Generous Gift | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
@@ -87,11 +87,11 @@
 | Path to Exile | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
 | Stroke of Midnight | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
 | Swords to Plowshares | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
-| Thor, God of Thunder | 1 | removal | removal | unresolved_rule_or_aggregate_gap | missing_aggregate | answers pressure so Lorehold reaches the miracle/combo window |
+| Thor, God of Thunder | 1 | removal | spell_damage_engine | missing_battle_rule_model | missing_battle_rule_model | graveyard impulse-recast plus noncreature-spell damage payoff; rule modeling pending |
 | Winds of Abandon | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
 | Land Tax | 1 | tutor | tutor | core_support | ready | finds setup, protection, or closing pieces |
-| Emeria's Call // Emeria, Shattered Skyclave | 1 | unknown | unknown | unresolved_rule_or_aggregate_gap | missing_aggregate | buys time or protects the decisive spell turn |
-| Tragic Arrogance | 1 | unknown | board_wipe | unresolved_rule_or_aggregate_gap | missing_aggregate | selective board wipe; unresolved aggregate rule status matters |
+| Emeria's Call // Emeria, Shattered Skyclave | 1 | unknown | unknown | materialization_gap_ready_rule | source_rule_ready_needs_materialization | buys time or protects the decisive spell turn |
+| Tragic Arrogance | 1 | unknown | board_wipe | materialization_gap_ready_rule | source_rule_ready_needs_materialization | selective board wipe; active rule exists and only needed deck-row materialization |
 | Approach of the Second Sun | 1 | wincon | wincon | core_or_flex_engine | ready | miracle payoff or closing spell |
 | Furygale Flocking | 1 | wincon | wincon | core_or_flex_engine | ready | accelerates commander, setup, and big-spell turns |
 | Mizzix's Mastery | 1 | wincon | wincon | core_or_flex_engine | ready | copies high-impact instant/sorcery spells or combo pieces |
@@ -104,10 +104,10 @@
 
 ## Unresolved Rows
 
-- The Scarlet Witch
-- Molecule Man
-- The Mind Stone
-- Thor, God of Thunder
-- Emeria's Call // Emeria, Shattered Skyclave
-- Tragic Arrogance
-- Squee, Goblin Nabob
+- The Scarlet Witch: `deck_rule_materialization_gap`
+- Molecule Man: `deck_rule_materialization_gap`
+- The Mind Stone: `deck_rule_materialization_gap`
+- Thor, God of Thunder: `missing_battle_rule_model`
+- Emeria's Call // Emeria, Shattered Skyclave: `deck_rule_materialization_gap`
+- Tragic Arrogance: `deck_rule_materialization_gap`
+- Squee, Goblin Nabob: `unclassified`
