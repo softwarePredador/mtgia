@@ -19466,7 +19466,7 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T18:59:19Z",
+  "generated_at": "2026-06-27T19:05:29Z",
   "library_leng_telemetry_gates": {
     "paths": [
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
@@ -19591,7 +19591,7 @@
       "Life-zero losses with combat/player-elimination events receive a combat-pressure flag.",
       "Low spell volume is only primary when no Library/topdeck/miracle engine appeared."
     ],
-    "generated_at": "2026-06-27T18:59:19Z",
+    "generated_at": "2026-06-27T19:05:29Z",
     "input_paths": [
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1_brainstone_topdeck_miracle_cut_squelcher.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1_ghostly_prison_pressure_cut_squelcher.json",
@@ -19605,6 +19605,7 @@
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed20260625_v1_life_floor_v1_angel_grace_life_floor_cut_dawn.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1_angel_grace_life_floor_cut_dawn.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed7_v1_life_floor_v1_angel_grace_life_floor_cut_dawn.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed7_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json",
@@ -23476,6 +23477,304 @@
         },
         "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json",
         "turns": 8
+      },
+      {
+        "deck_key": "synergy_boseiju_spell_protection_land",
+        "flags": [
+          "combat_pressure_death",
+          "approach_seen",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_seen",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_boseiju_spell_protection_land:Vivi Ornitier #99 (real):0",
+        "game_index": 0,
+        "opponent": "Vivi Ornitier #99 (real)",
+        "opponent_archetype": "combo",
+        "package_key": "boseiju_spell_protection_land",
+        "picked_opponents": [
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "primary_cause": "second_approach_window_failed_under_pressure",
+        "primary_cause_label": "Approach seen, second window failed under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 1,
+          "approach_first_resolution": 0,
+          "combat": 16,
+          "combat_result": 16,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 10,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 7,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 8,
+          "low_spell_volume": false,
+          "miracle_cast": 3,
+          "multi_defender_attack": 0,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 8
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+        "turns": 8
+      },
+      {
+        "deck_key": "synergy_boseiju_spell_protection_land",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_missing",
+          "low_spell_volume",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_boseiju_spell_protection_land:Vivi Ornitier #99 (real):1",
+        "game_index": 1,
+        "opponent": "Vivi Ornitier #99 (real)",
+        "opponent_archetype": "combo",
+        "package_key": "boseiju_spell_protection_land",
+        "picked_opponents": [
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "primary_cause": "mana_spell_bottleneck_under_pressure",
+        "primary_cause_label": "Low spell volume before combat-pressure death",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 10,
+          "combat_result": 10,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 1,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 1,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 0,
+          "low_spell_volume": true,
+          "miracle_cast": 0,
+          "multi_defender_attack": 0,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 7
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+        "turns": 7
+      },
+      {
+        "deck_key": "synergy_boseiju_spell_protection_land",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_missing",
+          "low_spell_volume",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_boseiju_spell_protection_land:Vivi Ornitier #99 (real):2",
+        "game_index": 2,
+        "opponent": "Vivi Ornitier #99 (real)",
+        "opponent_archetype": "combo",
+        "package_key": "boseiju_spell_protection_land",
+        "picked_opponents": [
+          "Vivi Ornitier #99 (real)",
+          "Winota, Joiner of Forces #39 (real)",
+          "Sisay, Weatherlight Captain #61 (real)"
+        ],
+        "primary_cause": "mana_spell_bottleneck_under_pressure",
+        "primary_cause_label": "Low spell volume before combat-pressure death",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 14,
+          "combat_result": 14,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 4,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 3,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 2,
+          "low_spell_volume": true,
+          "miracle_cast": 0,
+          "multi_defender_attack": 0,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+        "turns": 6
+      },
+      {
+        "deck_key": "synergy_boseiju_spell_protection_land",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_missing",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_boseiju_spell_protection_land:Winota, Joiner of Forces #39 (real):0",
+        "game_index": 0,
+        "opponent": "Winota, Joiner of Forces #39 (real)",
+        "opponent_archetype": "tribal",
+        "package_key": "boseiju_spell_protection_land",
+        "picked_opponents": [
+          "Winota, Joiner of Forces #39 (real)",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)"
+        ],
+        "primary_cause": "missing_engine_under_combat_pressure",
+        "primary_cause_label": "No Library/topdeck/miracle engine before combat-pressure death",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 15,
+          "combat_result": 17,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 8,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 6,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 4,
+          "low_spell_volume": false,
+          "miracle_cast": 0,
+          "multi_defender_attack": 2,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 7
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+        "turns": 7
+      },
+      {
+        "deck_key": "synergy_boseiju_spell_protection_land",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_missing",
+          "low_spell_volume",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_boseiju_spell_protection_land:Winota, Joiner of Forces #39 (real):1",
+        "game_index": 1,
+        "opponent": "Winota, Joiner of Forces #39 (real)",
+        "opponent_archetype": "tribal",
+        "package_key": "boseiju_spell_protection_land",
+        "picked_opponents": [
+          "Winota, Joiner of Forces #39 (real)",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)"
+        ],
+        "primary_cause": "mana_spell_bottleneck_under_pressure",
+        "primary_cause_label": "Low spell volume before combat-pressure death",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 16,
+          "combat_result": 21,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 7,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 4,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 4,
+          "low_spell_volume": true,
+          "miracle_cast": 0,
+          "multi_defender_attack": 4,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+        "turns": 6
+      },
+      {
+        "deck_key": "synergy_boseiju_spell_protection_land",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_seen",
+          "miracle_seen",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_boseiju_spell_protection_land:Winota, Joiner of Forces #39 (real):2",
+        "game_index": 2,
+        "opponent": "Winota, Joiner of Forces #39 (real)",
+        "opponent_archetype": "tribal",
+        "package_key": "boseiju_spell_protection_land",
+        "picked_opponents": [
+          "Winota, Joiner of Forces #39 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Vivi Ornitier #99 (real)"
+        ],
+        "primary_cause": "topdeck_miracle_without_approach_under_pressure",
+        "primary_cause_label": "Topdeck/miracle happened but no Approach conversion under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 17,
+          "combat_result": 19,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 9,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 7,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 4,
+          "low_spell_volume": false,
+          "miracle_cast": 1,
+          "multi_defender_attack": 2,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1,
+          "turns": 7
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+        "turns": 7
       },
       {
         "deck_key": "synergy_brainstone_topdeck_miracle_cut_squelcher",
@@ -28456,13 +28755,13 @@
     ],
     "postgres_writes": false,
     "primary_cause_counts": {
-      "mana_spell_bottleneck_under_pressure": 44,
-      "missing_engine_under_combat_pressure": 37,
-      "second_approach_window_failed_under_pressure": 18,
-      "topdeck_miracle_without_approach_under_pressure": 65,
+      "mana_spell_bottleneck_under_pressure": 47,
+      "missing_engine_under_combat_pressure": 38,
+      "second_approach_window_failed_under_pressure": 19,
+      "topdeck_miracle_without_approach_under_pressure": 66,
       "topdeck_without_miracle_conversion_under_pressure": 15
     },
-    "scope": "losses from Library/pressure, life-floor, spellchain, top-freecast, and tutor-access conversion detailed gates",
+    "scope": "losses from Library/pressure, life-floor, spellchain, top-freecast, tutor-access, and spell-protection-land conversion detailed gates",
     "source_db_mutated": false,
     "summary_rows": [
       {
@@ -29009,6 +29308,56 @@
           "squee_upkeep_return": 0,
           "topdeck_manipulation_activated": 5,
           "turns": 45
+        }
+      },
+      {
+        "avg_loss_turn": 6.83,
+        "deck_key": "synergy_boseiju_spell_protection_land",
+        "flag_counts": {
+          "approach_seen": 1,
+          "combat_pressure_death": 6,
+          "discard_to_top_missing": 6,
+          "low_spell_volume": 3,
+          "miracle_missing": 4,
+          "miracle_seen": 2,
+          "squee_loop_absent": 6,
+          "topdeck_missing": 5,
+          "topdeck_seen": 1
+        },
+        "losses": 6,
+        "opponent_counts": {
+          "Vivi Ornitier #99 (real)": 3,
+          "Winota, Joiner of Forces #39 (real)": 3
+        },
+        "package_key": "boseiju_spell_protection_land",
+        "primary_cause_counts": {
+          "mana_spell_bottleneck_under_pressure": 3,
+          "missing_engine_under_combat_pressure": 1,
+          "second_approach_window_failed_under_pressure": 1,
+          "topdeck_miracle_without_approach_under_pressure": 1
+        },
+        "seed": 42,
+        "signal_totals": {
+          "approach_cast_tracked": 1,
+          "approach_first_resolution": 0,
+          "combat": 88,
+          "combat_result": 97,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 39,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 28,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 22,
+          "low_spell_volume": 3,
+          "miracle_cast": 4,
+          "multi_defender_attack": 8,
+          "player_eliminated": 6,
+          "pressure_death": 6,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1,
+          "turns": 41
         }
       },
       {
@@ -29820,9 +30169,9 @@
         }
       }
     ],
-    "total_loss_games": 179
+    "total_loss_games": 185
   },
-  "loss_failure_classifier_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_loss_failure_classifier_20260627_conversion_pressure_v6.json",
+  "loss_failure_classifier_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_loss_failure_classifier_20260627_conversion_pressure_v7.json",
   "matrix_generated_at": "2026-06-26T17:59:59.926705+00:00",
   "matrix_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json",
   "matrix_ranked": [
@@ -36590,6 +36939,7 @@
     "Do not promote Gamble over Creative Technique from the current gate; if continuing tutor access, preserve seed 42 and test a different cut or a narrower access package rather than assuming the tutor lane is solved.",
     "Do not continue tutor-access testing by cutting Thor unless a new hypothesis explains why the seed-42 collapse would not repeat.",
     "Do not continue topdeck/freecast testing by cutting Thor unless a new hypothesis explains why the seed-42 collapse would not repeat.",
+    "Do not promote Boseiju over Reliquary Tower from the current land-slot gate; future spell-protection work should include pressure absorption or a conversion-speed gain, not only anti-counter text.",
     "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
     "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
     "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap."
@@ -36610,7 +36960,8 @@
     "Primal Amulet over Bender's Waterskin confirms the revised top-freecast/cost-reduction lane can help weak seeds, but the Bender cut still breaks seed 42; treat Bender as protected until a same-slot benchmark preserves the strong seed.",
     "Gamble over Creative Technique is now a resolved probation clue: it improves aggregate and weak seeds but breaks seed 42, so the tutor lane needs a different cut or stronger exposure before promotion.",
     "Gamble or Enlightened Tutor over Thor failed seed-42 triage; do not treat Thor as the obvious tutor-access cut just because Thor is not deck-proven yet.",
-    "Galvanoth over Thor also failed seed-42 triage; Thor is not a clean cut for either the tutor-access lane or the topdeck/freecast lane from current evidence."
+    "Galvanoth over Thor also failed seed-42 triage; Thor is not a clean cut for either the tutor-access lane or the topdeck/freecast lane from current evidence.",
+    "Boseiju, Who Shelters All over Reliquary Tower failed seed-42 triage; anti-counter land-slot protection does not address the observed life-zero combat-pressure losses by itself."
   ],
   "post_squee_package_gates": {
     "paths": [
@@ -36643,7 +36994,8 @@
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed7_v1_tutor_access_v1.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed20260625_v1_tutor_access_v1.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2.json",
-      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json"
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json"
     ],
     "per_seed": [
       {
@@ -38537,6 +38889,43 @@
           "squee_upkeep_return": -1,
           "topdeck_manipulation_activated": -21,
           "tutor_resolved": -2
+        }
+      },
+      {
+        "adds": [
+          "Boseiju, Who Shelters All"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 6,
+        "candidate_wins": 3,
+        "cuts": [
+          "Reliquary Tower"
+        ],
+        "delta_pp": -55.56,
+        "family": "spell_protection_land",
+        "package_key": "boseiju_spell_protection_land",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": -16,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -69,
+          "lorehold_rummage_discard_to_top": -13,
+          "lorehold_spell_cast": -58,
+          "lorehold_spell_rummage": -18,
+          "lorehold_spell_rummage_discard_to_top": -3,
+          "lorehold_upkeep_rummage": -15,
+          "miracle_cast": -21,
+          "random_discard_after_tutor": 1,
+          "ritual_mana_added": -2,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -3,
+          "squee_to_graveyard": -5,
+          "squee_upkeep_return": -3,
+          "topdeck_manipulation_activated": -22,
+          "tutor_resolved": -1
         }
       }
     ],
@@ -41092,6 +41481,86 @@
           "tutor_resolved": -3
         },
         "strong_seed_delta_pp": -44.45
+      },
+      {
+        "adds": [
+          "Boseiju, Who Shelters All"
+        ],
+        "baseline_games": 9,
+        "baseline_losses": 1,
+        "baseline_win_rate": 88.89,
+        "baseline_wins": 8,
+        "candidate_games": 9,
+        "candidate_losses": 6,
+        "candidate_win_rate": 33.33,
+        "candidate_wins": 3,
+        "cuts": [
+          "Reliquary Tower"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -55.56,
+        "family": "spell_protection_land",
+        "package_key": "boseiju_spell_protection_land",
+        "seed_rows": [
+          {
+            "adds": [
+              "Boseiju, Who Shelters All"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "cuts": [
+              "Reliquary Tower"
+            ],
+            "delta_pp": -55.56,
+            "family": "spell_protection_land",
+            "package_key": "boseiju_spell_protection_land",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "discard_to_top_replacement": -16,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -69,
+              "lorehold_rummage_discard_to_top": -13,
+              "lorehold_spell_cast": -58,
+              "lorehold_spell_rummage": -18,
+              "lorehold_spell_rummage_discard_to_top": -3,
+              "lorehold_upkeep_rummage": -15,
+              "miracle_cast": -21,
+              "random_discard_after_tutor": 1,
+              "ritual_mana_added": -2,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -3,
+              "squee_to_graveyard": -5,
+              "squee_upkeep_return": -3,
+              "topdeck_manipulation_activated": -22,
+              "tutor_resolved": -1
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": -16,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -69,
+          "lorehold_rummage_discard_to_top": -13,
+          "lorehold_spell_cast": -58,
+          "lorehold_spell_rummage": -18,
+          "lorehold_spell_rummage_discard_to_top": -3,
+          "lorehold_upkeep_rummage": -15,
+          "miracle_cast": -21,
+          "random_discard_after_tutor": 1,
+          "ritual_mana_added": -2,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -3,
+          "squee_to_graveyard": -5,
+          "squee_upkeep_return": -3,
+          "topdeck_manipulation_activated": -22,
+          "tutor_resolved": -1
+        },
+        "strong_seed_delta_pp": -55.56
       },
       {
         "adds": [

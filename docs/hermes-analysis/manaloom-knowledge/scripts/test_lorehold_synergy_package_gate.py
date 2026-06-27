@@ -65,6 +65,18 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             gate.PACKAGE_DEFINITIONS["galvanoth_topdeck_freecast_cut_thor"]["allow_miracle_core_cuts"],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["boseiju_spell_protection_land"]["family"],
+            "spell_protection_land",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["boseiju_spell_protection_land"]["adds"],
+            ["Boseiju, Who Shelters All"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["boseiju_spell_protection_land"]["cuts"],
+            ["Reliquary Tower"],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["penance_topdeck_protection_cut_squelcher"]["family"],
             "topdeck_protection",
         )

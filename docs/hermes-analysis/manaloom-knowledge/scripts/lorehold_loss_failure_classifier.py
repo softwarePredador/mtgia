@@ -21,7 +21,7 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_OUTPUT_STEM = "lorehold_loss_failure_classifier_20260627_conversion_pressure_v6"
+DEFAULT_OUTPUT_STEM = "lorehold_loss_failure_classifier_20260627_conversion_pressure_v7"
 
 
 CAUSE_LABELS = {
@@ -53,6 +53,7 @@ def default_gate_paths() -> list[Path]:
         "lorehold_spellchain_conversion_gate_20260627_seed*_v1_spellchain_v1_*.json",
         "lorehold_topfreecast_conversion_gate_20260627_seed*_v*_topfreecast_v*_*.json",
         "lorehold_tutor_access_conversion_gate_20260627_seed*_v*_tutor_access_v*_*.json",
+        "lorehold_spell_protection_land_gate_20260627_seed*_v*_spell_protection_land_v*_*.json",
     ]
     paths: list[Path] = []
     for pattern in patterns:
@@ -293,7 +294,7 @@ def build_report(paths: list[Path]) -> dict[str, Any]:
     aggregate = aggregate_rows(rows)
     return {
         "generated_at": utc_now(),
-        "scope": "losses from Library/pressure, life-floor, spellchain, top-freecast, and tutor-access conversion detailed gates",
+        "scope": "losses from Library/pressure, life-floor, spellchain, top-freecast, tutor-access, and spell-protection-land conversion detailed gates",
         "postgres_writes": False,
         "source_db_mutated": False,
         "input_paths": [str(path) for path in paths],
@@ -318,7 +319,7 @@ def build_report(paths: list[Path]) -> dict[str, Any]:
 
 def render_markdown(report: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Loss Failure Classifier - 2026-06-27 v6",
+        "# Lorehold Loss Failure Classifier - 2026-06-27 v7",
         "",
         f"- Generated at: `{report['generated_at']}`",
         "- PostgreSQL writes: `false`",

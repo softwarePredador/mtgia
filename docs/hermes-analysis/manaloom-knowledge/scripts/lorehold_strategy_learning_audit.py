@@ -84,6 +84,7 @@ DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_tutor_access_conversion_gate_20260627_seed20260625_v1_tutor_access_v1.json",
     REPORT_DIR / "lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2.json",
     REPORT_DIR / "lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json",
+    REPORT_DIR / "lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json",
 ]
 DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
@@ -91,7 +92,7 @@ DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed20260625_squee_v1.json",
 ]
 DEFAULT_LOSS_FAILURE_CLASSIFIER = (
-    REPORT_DIR / "lorehold_loss_failure_classifier_20260627_conversion_pressure_v6.json"
+    REPORT_DIR / "lorehold_loss_failure_classifier_20260627_conversion_pressure_v7.json"
 )
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
@@ -874,6 +875,15 @@ def render_markdown(report: dict[str, Any]) -> str:
                 f"topdeck delta `{int(delta.get('topdeck_manipulation_activated') or 0):+d}`."
                 " This was only run as a seed-42 triage because it failed the strong-seed promotion filter."
             )
+        boseiju_land = next((row for row in post_squee_rows if row["package_key"] == "boseiju_spell_protection_land"), None)
+        if boseiju_land:
+            lines.append(
+                "- Boseiju, Who Shelters All over Reliquary Tower was the land-slot spell-protection test: "
+                f"`{boseiju_land['candidate_wins']}-{boseiju_land['candidate_losses']}` vs "
+                f"`{boseiju_land['baseline_wins']}-{boseiju_land['baseline_losses']}` (`{boseiju_land['delta_pp']:+.2f}` pp), "
+                f"seed 42 `{boseiju_land['strong_seed_delta_pp']:+.2f}` pp. "
+                "It preserves land count and has active rules, but the losses still show life-zero combat pressure rather than counterspell denial."
+            )
     if loss_summary_rows:
         baseline_7 = next(
             (
@@ -1231,7 +1241,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                 )
             )
         lines.append("")
-        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher, Victory Chimes, or Thor are worse on seed 42, so Galvanoth stays a probation hypothesis, not a deck insert. Primal Amulet over Bender's Waterskin repeats the same weak-seed improvement and strong-seed collapse pattern, so Bender is not a free cut. Gamble over Creative Technique shows that cheap universal access can help weak seeds, but the current result still breaks seed 42, so it is probation/rework rather than a deck change. The Thor-cut access retests were worse on seed 42, so Thor is not the clean cut for tutor access despite being modeled-not-deck-proven. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results alone. Birgi + Seething Song over both medallions improves the weak seeds while losing badly on seed 42, so medallions are part of the strong-seed conversion pattern and the ritual lane needs a different cut before any promotion. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
+        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher, Victory Chimes, or Thor are worse on seed 42, so Galvanoth stays a probation hypothesis, not a deck insert. Primal Amulet over Bender's Waterskin repeats the same weak-seed improvement and strong-seed collapse pattern, so Bender is not a free cut. Gamble over Creative Technique shows that cheap universal access can help weak seeds, but the current result still breaks seed 42, so it is probation/rework rather than a deck change. The Thor-cut access retests were worse on seed 42, so Thor is not the clean cut for tutor access despite being modeled-not-deck-proven. Boseiju over Reliquary Tower preserves land count and spell-protection rules but still collapses seed 42, so land-slot anti-counter protection is not the current missing piece. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results alone. Birgi + Seething Song over both medallions improves the weak seeds while losing badly on seed 42, so medallions are part of the strong-seed conversion pattern and the ritual lane needs a different cut before any promotion. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
         lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")
@@ -1627,6 +1637,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Gamble over Creative Technique is now a resolved probation clue: it improves aggregate and weak seeds but breaks seed 42, so the tutor lane needs a different cut or stronger exposure before promotion.",
         "Gamble or Enlightened Tutor over Thor failed seed-42 triage; do not treat Thor as the obvious tutor-access cut just because Thor is not deck-proven yet.",
         "Galvanoth over Thor also failed seed-42 triage; Thor is not a clean cut for either the tutor-access lane or the topdeck/freecast lane from current evidence.",
+        "Boseiju, Who Shelters All over Reliquary Tower failed seed-42 triage; anti-counter land-slot protection does not address the observed life-zero combat-pressure losses by itself.",
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
@@ -1640,6 +1651,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Do not promote Gamble over Creative Technique from the current gate; if continuing tutor access, preserve seed 42 and test a different cut or a narrower access package rather than assuming the tutor lane is solved.",
         "Do not continue tutor-access testing by cutting Thor unless a new hypothesis explains why the seed-42 collapse would not repeat.",
         "Do not continue topdeck/freecast testing by cutting Thor unless a new hypothesis explains why the seed-42 collapse would not repeat.",
+        "Do not promote Boseiju over Reliquary Tower from the current land-slot gate; future spell-protection work should include pressure absorption or a conversion-speed gain, not only anti-counter text.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
         "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.",
