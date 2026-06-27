@@ -36,6 +36,30 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
             },
         )
         telemetry.record(
+            "combat_step",
+            {
+                "step": "declare_attackers",
+                "attacker": "Opponent",
+                "target": "Lorehold",
+                "attack_restrictions": [
+                    {
+                        "attack_restriction_sources": ["Ghostly Prison"],
+                        "attackers_before": 3,
+                        "attackers_after": 1,
+                        "attackers_restricted": 2,
+                        "tax_paid": 2,
+                    },
+                    {
+                        "attack_tax_sources": [{"card": "Sphere of Safety"}],
+                        "attackers_before": 2,
+                        "attackers_after": 2,
+                        "attackers_restricted": 0,
+                        "tax_paid": 6,
+                    },
+                ],
+            },
+        )
+        telemetry.record(
             "lorehold_upkeep_rummage",
             {
                 "player": "Lorehold",
@@ -118,6 +142,25 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["card_strategy_counts"]["topdeck:Scroll Rack"], 1)
         self.assertEqual(payload["card_strategy_counts"]["discard_to_top:Storm Herd"], 1)
         self.assertEqual(payload["card_strategy_counts"]["spell_rummage_to_top:Rise of the Eldrazi"], 1)
+        self.assertEqual(payload["lorehold_attack_restrictions"]["events"], 2)
+        self.assertEqual(payload["lorehold_attack_restrictions"]["attackers_before"], 5)
+        self.assertEqual(payload["lorehold_attack_restrictions"]["attackers_after"], 3)
+        self.assertEqual(payload["lorehold_attack_restrictions"]["attackers_restricted"], 2)
+        self.assertEqual(payload["lorehold_attack_restrictions"]["tax_paid"], 8)
+        self.assertEqual(payload["lorehold_attack_restriction_source_events"]["Ghostly Prison"], 1)
+        self.assertEqual(payload["lorehold_attack_restriction_source_events"]["Sphere of Safety"], 1)
+        self.assertEqual(
+            payload["lorehold_attack_restriction_source_attackers_restricted"]["Ghostly Prison"],
+            2,
+        )
+        self.assertEqual(
+            payload["lorehold_attack_restriction_source_tax_paid"]["Sphere of Safety"],
+            6,
+        )
+        self.assertEqual(
+            payload["lorehold_attack_restrictions_by_game"]["game-1"]["attackers_restricted"],
+            2,
+        )
         self.assertEqual(
             payload["card_event_counts_by_game"]["game-1"]["treasure_created:Brass's Bounty"],
             1,
@@ -128,6 +171,14 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         )
         self.assertEqual(payload["strategic_event_counts_by_game"]["game-1"]["squee_to_graveyard"], 3)
         self.assertEqual(payload["strategic_event_counts_by_game"]["game-1"]["squee_upkeep_return"], 1)
+        self.assertEqual(
+            telemetry.game_summary("game-1")["lorehold_attack_restrictions"]["tax_paid"],
+            8,
+        )
+        self.assertEqual(
+            telemetry.game_summary("game-1")["lorehold_attack_restriction_source_events"]["Ghostly Prison"],
+            1,
+        )
         self.assertEqual(
             payload["strategic_event_counts_by_game"]["game-2"]["squee_return_without_known_graveyard_entry"],
             1,

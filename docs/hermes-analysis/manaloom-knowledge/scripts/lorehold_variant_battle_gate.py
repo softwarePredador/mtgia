@@ -234,6 +234,12 @@ class GateTelemetry:
         self.card_event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.strategic_event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
+        self.lorehold_attack_restriction_totals: Counter[str] = Counter()
+        self.lorehold_attack_restriction_totals_by_game: dict[str, Counter[str]] = defaultdict(Counter)
+        self.lorehold_attack_restriction_source_events: Counter[str] = Counter()
+        self.lorehold_attack_restriction_source_events_by_game: dict[str, Counter[str]] = defaultdict(Counter)
+        self.lorehold_attack_restriction_source_attackers_restricted: Counter[str] = Counter()
+        self.lorehold_attack_restriction_source_tax_paid: Counter[str] = Counter()
         self.squee_graveyard_entries_by_game: Counter[str] = Counter()
         self.squee_known_graveyard_balance_by_game: Counter[str] = Counter()
         self.squee_game_traces: dict[str, list[dict[str, Any]]] = {}
@@ -313,6 +319,54 @@ class GateTelemetry:
             ),
         )
         return "Squee, Goblin Nabob" in names and "graveyard" in self._payload_destinations(data)
+
+    def _restriction_sources(self, detail: Mapping[str, Any]) -> list[str]:
+        raw_sources = detail.get("attack_restriction_sources") or []
+        sources: list[str] = []
+        if isinstance(raw_sources, str):
+            sources.append(raw_sources)
+        elif isinstance(raw_sources, list):
+            sources.extend(str(source or "") for source in raw_sources)
+        for source in detail.get("attack_tax_sources") or []:
+            if isinstance(source, dict):
+                sources.append(str(source.get("card") or ""))
+        if detail.get("source"):
+            sources.append(str(detail.get("source") or ""))
+        cleaned = []
+        for source in sources:
+            source = source.strip()
+            if source and source not in cleaned:
+                cleaned.append(source)
+        return cleaned or ["unattributed"]
+
+    def _record_lorehold_attack_restrictions(self, event: str, data: Mapping[str, Any]) -> None:
+        if event != "combat_step" or data.get("target") != "Lorehold":
+            return
+        for detail in data.get("attack_restrictions") or []:
+            if not isinstance(detail, Mapping):
+                continue
+            attackers_restricted = int(detail.get("attackers_restricted") or 0)
+            tax_paid = int(detail.get("tax_paid") or 0)
+            attackers_before = int(detail.get("attackers_before") or 0)
+            attackers_after = int(detail.get("attackers_after") or 0)
+            if attackers_restricted <= 0 and tax_paid <= 0:
+                continue
+            self.lorehold_attack_restriction_totals["events"] += 1
+            self.lorehold_attack_restriction_totals["attackers_before"] += attackers_before
+            self.lorehold_attack_restriction_totals["attackers_after"] += attackers_after
+            self.lorehold_attack_restriction_totals["attackers_restricted"] += attackers_restricted
+            self.lorehold_attack_restriction_totals["tax_paid"] += tax_paid
+            game_totals = self.lorehold_attack_restriction_totals_by_game[self.current_game]
+            game_totals["events"] += 1
+            game_totals["attackers_before"] += attackers_before
+            game_totals["attackers_after"] += attackers_after
+            game_totals["attackers_restricted"] += attackers_restricted
+            game_totals["tax_paid"] += tax_paid
+            for source in self._restriction_sources(detail):
+                self.lorehold_attack_restriction_source_events[source] += 1
+                self.lorehold_attack_restriction_source_events_by_game[self.current_game][source] += 1
+                self.lorehold_attack_restriction_source_attackers_restricted[source] += attackers_restricted
+                self.lorehold_attack_restriction_source_tax_paid[source] += tax_paid
 
     def _record_squee_graveyard_entry(self, event: str) -> None:
         self.strategic_events["squee_to_graveyard"] += 1
@@ -394,6 +448,7 @@ class GateTelemetry:
         strategic_before = self.strategic_events.copy()
         player = str(data.get("player") or "")
         card = str(data.get("card") or "")
+        self._record_lorehold_attack_restrictions(event, data)
         if player == "Lorehold" and card and event in CARD_EXPOSURE_EVENTS:
             card_event_key = f"{event}:{card}"
             self.card_event_counts[card_event_key] += 1
@@ -544,6 +599,12 @@ class GateTelemetry:
             "event_counts": dict(self.event_counts_by_game.get(game_id, {})),
             "strategic_event_counts": dict(self.strategic_event_counts_by_game.get(game_id, {})),
             "card_event_counts": dict(self.card_event_counts_by_game.get(game_id, {})),
+            "lorehold_attack_restrictions": dict(
+                self.lorehold_attack_restriction_totals_by_game.get(game_id, {})
+            ),
+            "lorehold_attack_restriction_source_events": dict(
+                self.lorehold_attack_restriction_source_events_by_game.get(game_id, {})
+            ),
             "squee_known_graveyard_balance": int(self.squee_known_graveyard_balance_by_game.get(game_id, 0)),
             "squee_trace_count": len(self.squee_game_traces.get(game_id, [])),
             "squee_anomaly_count": sum(
@@ -569,6 +630,24 @@ class GateTelemetry:
                 key: dict(value)
                 for key, value in sorted(self.card_event_counts_by_game.items())
             },
+            "lorehold_attack_restrictions": dict(self.lorehold_attack_restriction_totals),
+            "lorehold_attack_restrictions_by_game": {
+                key: dict(value)
+                for key, value in sorted(self.lorehold_attack_restriction_totals_by_game.items())
+            },
+            "lorehold_attack_restriction_source_events": dict(
+                sorted(self.lorehold_attack_restriction_source_events.items())
+            ),
+            "lorehold_attack_restriction_source_events_by_game": {
+                key: dict(value)
+                for key, value in sorted(self.lorehold_attack_restriction_source_events_by_game.items())
+            },
+            "lorehold_attack_restriction_source_attackers_restricted": dict(
+                sorted(self.lorehold_attack_restriction_source_attackers_restricted.items())
+            ),
+            "lorehold_attack_restriction_source_tax_paid": dict(
+                sorted(self.lorehold_attack_restriction_source_tax_paid.items())
+            ),
             "strategic_games": {
                 key: {
                     "games": len(value),
@@ -816,6 +895,21 @@ def merge_structural_context(
 
 def render_markdown(report: Mapping[str, Any]) -> str:
     rows = sorted(report.get("results") or [], key=lambda row: int(row.get("battle_rank") or 999))
+
+    def pressure_source_summary(telemetry: Mapping[str, Any]) -> str:
+        source_events = telemetry.get("lorehold_attack_restriction_source_events") or {}
+        source_restricted = (
+            telemetry.get("lorehold_attack_restriction_source_attackers_restricted") or {}
+        )
+        source_tax = telemetry.get("lorehold_attack_restriction_source_tax_paid") or {}
+        if not source_events:
+            return "none"
+        return ", ".join(
+            f"{source}: events={source_events.get(source, 0)}, "
+            f"restricted={source_restricted.get(source, 0)}, tax={source_tax.get(source, 0)}"
+            for source in sorted(source_events)
+        )
+
     lines = [
         "# Lorehold Equal Battle Gate",
         "",
@@ -835,12 +929,13 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         "",
         "## Battle Ranking",
         "",
-        "| Battle Rank | Structural Rank | Deck | Archetype | Games | W | L | S | WR | Avg Win Turn | Miracle Games | Topdeck Games | Discard-To-Top Games | Squee GY Games | Squee Return Games | Explained Return Games | Unexplained Return Games | Rummage Games | Main Risks |",
-        "| ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+        "| Battle Rank | Structural Rank | Deck | Archetype | Games | W | L | S | WR | Avg Win Turn | Miracle Games | Topdeck Games | Discard-To-Top Games | Squee GY Games | Squee Return Games | Explained Return Games | Unexplained Return Games | Rummage Games | Lorehold Attackers Restricted | Attack Tax Paid | Restriction Sources | Main Risks |",
+        "| ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |",
     ]
     for row in rows:
         telemetry = row.get("telemetry") or {}
         strategic_games = telemetry.get("strategic_games") or {}
+        pressure_totals = telemetry.get("lorehold_attack_restrictions") or {}
         miracle_games = (strategic_games.get("miracle_cast") or {}).get("games", 0)
         topdeck_games = (strategic_games.get("topdeck_manipulation_activated") or {}).get("games", 0)
         discard_to_top_games = (strategic_games.get("discard_to_top_replacement") or {}).get("games", 0)
@@ -860,7 +955,9 @@ def render_markdown(report: Mapping[str, Any]) -> str:
             f"{row.get('games')} | {row.get('wins')} | {row.get('losses')} | {row.get('stalls')} | "
             f"{float(row.get('win_rate') or 0):.2f}% | {float(row.get('avg_win_turn') or 0):.2f} | "
             f"{miracle_games} | {topdeck_games} | {discard_to_top_games} | {squee_graveyard_games} | {squee_return_games} | "
-            f"{explained_return_games} | {unexplained_return_games} | {rummage_games} | {risks} |"
+            f"{explained_return_games} | {unexplained_return_games} | {rummage_games} | "
+            f"{pressure_totals.get('attackers_restricted', 0)} | "
+            f"{pressure_totals.get('tax_paid', 0)} | {pressure_source_summary(telemetry)} | {risks} |"
         )
 
     lines.extend(["", "## Deck Detail", ""])
@@ -888,6 +985,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
                 f"{float(opponent.get('avg_win_turn') or 0):.2f} | {reasons} |"
             )
         telemetry = row.get("telemetry") or {}
+        pressure_totals = telemetry.get("lorehold_attack_restrictions") or {}
         lines.extend(
             [
                 "",
@@ -899,6 +997,14 @@ def render_markdown(report: Mapping[str, Any]) -> str:
                     )
                     or "none"
                 ),
+                "",
+                "**Lorehold attack restriction telemetry:** "
+                f"events={pressure_totals.get('events', 0)}, "
+                f"attackers_before={pressure_totals.get('attackers_before', 0)}, "
+                f"attackers_after={pressure_totals.get('attackers_after', 0)}, "
+                f"attackers_restricted={pressure_totals.get('attackers_restricted', 0)}, "
+                f"tax_paid={pressure_totals.get('tax_paid', 0)}, "
+                f"sources={pressure_source_summary(telemetry)}",
                 "",
             ]
         )
