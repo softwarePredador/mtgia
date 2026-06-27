@@ -238,6 +238,23 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             gate.PACKAGE_DEFINITIONS["ghostly_prison_pressure_cut_promise"]["cuts"],
             ["Promise of Loyalty"],
         )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["austere_command_wipe_over_emeria_tradeoff"]["family"],
+            "pressure_reset_tradeoff",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["austere_command_wipe_over_emeria_tradeoff"]["adds"],
+            ["Austere Command"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["austere_command_wipe_over_emeria_tradeoff"]["cuts"],
+            ["Emeria's Call // Emeria, Shattered Skyclave"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["austere_command_wipe_over_emeria_tradeoff"][
+                "allow_miracle_core_cuts"
+            ],
+        )
         self.assertTrue(
             gate.PACKAGE_DEFINITIONS["ghostly_prison_pressure_cut_promise"]["allow_miracle_core_cuts"],
         )

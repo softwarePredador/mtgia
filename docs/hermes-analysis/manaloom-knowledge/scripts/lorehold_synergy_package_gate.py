@@ -431,6 +431,19 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "cuts": ["The Scarlet Witch"],
         "allow_miracle_core_cuts": True,
     },
+    "austere_command_wipe_over_emeria_tradeoff": {
+        "family": "pressure_reset_tradeoff",
+        "hypothesis": (
+            "Austere Command is a flexible board reset with active runtime rules, "
+            "but Emeria's Call now has measured token/protection exposure. This "
+            "gate is therefore an explicit wipe-over-rebuild tradeoff: it must "
+            "prove that extra board-reset control beats losing Emeria's rebuild "
+            "tokens, protection window, and miracle hit density."
+        ),
+        "adds": ["Austere Command"],
+        "cuts": ["Emeria's Call // Emeria, Shattered Skyclave"],
+        "allow_miracle_core_cuts": True,
+    },
     "past_in_flames_cut_squelcher": {
         "family": "graveyard_recast",
         "hypothesis": (
@@ -1437,7 +1450,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 "",
             ]
         )
-    return "\n".join(lines) + "\n"
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def main() -> int:

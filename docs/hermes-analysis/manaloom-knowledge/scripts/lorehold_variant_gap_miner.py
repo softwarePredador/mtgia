@@ -387,6 +387,7 @@ def default_prior_gate_report_paths() -> list[Path]:
         "lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
         "lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725.json",
         "lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848.json",
+        "lorehold_austere_emeria_tradeoff_gate_20260627_v1_20260627_232955.json",
         "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
         "lorehold_lapse_approach_gate_20260627_v1_fixed.json",
         "lorehold_next_hypothesis_queue_20260627_v9.json",
