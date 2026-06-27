@@ -78,6 +78,72 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
             "local_runtime_rule_added_pending_sync",
         )
 
+    def test_card_decision_manifest_marks_core_flex_and_probation_slots(self):
+        deck = {
+            "cards": [
+                {
+                    "card_name": "Lorehold, the Historian",
+                    "primary_role": "engine",
+                    "battle_rule_keys": ["rule"],
+                    "tags": ["topdeck_miracle_setup"],
+                    "quantity": 1,
+                    "cmc": 5,
+                    "type_line": "Legendary Creature",
+                },
+                {
+                    "card_name": "Squee, Goblin Nabob",
+                    "primary_role": "wincon",
+                    "battle_rule_keys": [],
+                    "tags": ["graveyard_recursion", "wincon"],
+                    "quantity": 1,
+                    "cmc": 3,
+                    "type_line": "Legendary Creature",
+                },
+                {
+                    "card_name": "Victory Chimes",
+                    "primary_role": "ramp",
+                    "battle_rule_keys": ["rule"],
+                    "tags": ["ramp"],
+                    "quantity": 1,
+                    "cmc": 3,
+                    "type_line": "Artifact",
+                },
+                {
+                    "card_name": "Command Tower",
+                    "primary_role": "land",
+                    "battle_rule_keys": [],
+                    "tags": ["land"],
+                    "quantity": 1,
+                    "cmc": 0,
+                    "type_line": "Land",
+                },
+            ]
+        }
+
+        manifest = audit.build_card_decision_manifest(
+            deck,
+            {},
+            {},
+            {
+                "rows": [
+                    {
+                        "materialized_squee": {
+                            "card_name": "Squee, Goblin Nabob",
+                            "battle_rule_count": 1,
+                        }
+                    }
+                ]
+            },
+        )
+        by_name = {row["card_name"]: row for row in manifest["cards"]}
+
+        self.assertEqual(by_name["Lorehold, the Historian"]["decision"], "locked_core")
+        self.assertEqual(by_name["Squee, Goblin Nabob"]["decision"], "probation_engine")
+        self.assertEqual(by_name["Squee, Goblin Nabob"]["status"], "materialized_rule_in_equal_gate_candidate")
+        self.assertEqual(by_name["Victory Chimes"]["decision"], "flex_cut_tested_negative")
+        self.assertEqual(by_name["Command Tower"]["decision"], "mana_base_core")
+        self.assertEqual(manifest["summary"]["decision_counts"]["probation_engine"], 1)
+
     def test_post_squee_gate_keeps_positive_aggregate_on_probation_when_seed_42_breaks(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)

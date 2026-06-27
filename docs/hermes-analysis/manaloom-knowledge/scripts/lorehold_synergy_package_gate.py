@@ -80,6 +80,18 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Galvanoth"],
         "cuts": ["Hexing Squelcher"],
     },
+    "galvanoth_topdeck_freecast_cut_chimes": {
+        "family": "topdeck_freecast",
+        "hypothesis": (
+            "Galvanoth was the only aggregate-positive topdeck package, but the "
+            "Bender's Waterskin cut broke the seed-42 success case and the "
+            "Hexing Squelcher cut was worse. This retest preserves both colored "
+            "ramp and anti-counter pressure, cutting the more generic colorless "
+            "three-mana ramp slot instead."
+        ),
+        "adds": ["Galvanoth"],
+        "cuts": ["Victory Chimes"],
+    },
     "brainstone_topdeck_miracle": {
         "family": "topdeck_setup",
         "hypothesis": (

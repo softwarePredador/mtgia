@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T17:09:17Z`
+- Generated at: `2026-06-27T17:21:02Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -185,17 +185,20 @@ These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | `galvanoth_topdeck_freecast` | Galvanoth | Bender's Waterskin | 8-19 | 9-18 | +3.70 | -44.45 | +12 | +12 | +0 | +36 | +0 | +0 | +0 | -2 | probation_deeper_gate_only |
 | `birgi_spellchain_cut_squelcher` | Birgi, God of Storytelling // Harnfel, Horn of Bounty | Hexing Squelcher | 8-19 | 7-20 | -3.70 | -55.56 | -13 | -14 | +0 | -22 | +13 | +13 | -1 | -1 | reject_or_rework |
+| `galvanoth_topdeck_freecast_cut_chimes` | Galvanoth | Victory Chimes | 8-19 | 7-20 | -3.70 | -55.56 | +9 | +7 | +0 | +24 | +0 | +0 | +3 | +4 | reject_or_rework |
 | `brainstone_topdeck_miracle` | Brainstone | Bender's Waterskin | 8-19 | 6-21 | -7.41 | -33.33 | -6 | +2 | +0 | +43 | +0 | +0 | -5 | -2 | reject_or_rework |
 | `galvanoth_topdeck_freecast_cut_squelcher` | Galvanoth | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -66.67 | +5 | -3 | +0 | +28 | +0 | +0 | -4 | -4 | reject_or_rework |
 | `penance_topdeck_protection_cut_squelcher` | Penance | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -44.45 | +9 | -1 | +0 | +36 | +0 | +0 | -5 | -4 | reject_or_rework |
 | `faithless_looting_squee_enabler` | Faithless Looting | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -66.67 | +4 | +6 | +0 | +25 | +0 | +0 | -5 | -3 | reject_or_rework |
 
-Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-up Galvanoth/Hexing Squelcher swap is worse, so Galvanoth stays a probation hypothesis, not a deck insert. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.
+Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.
 
 ## Current Champion Card-Role Coverage
 
 - Quantity: `100` across `94` rows.
 - Primary role counts: `{"board_wipe": 6, "creature": 2, "draw": 12, "engine": 3, "land": 34, "protection": 9, "ramp": 15, "removal": 7, "tutor": 1, "unknown": 2, "wincon": 9}`
+- Slot decision counts: `{"core_engine_or_probation": 22, "core_finisher": 1, "core_support": 21, "finisher_benchmark_lane": 2, "flex_but_cut_risky": 1, "flex_cut_tested_negative": 2, "locked_core": 1, "mana_base_core": 28, "manual_review": 1, "modeled_not_deck_proven": 1, "modeled_pending_durable_sync": 5, "probation_engine": 1, "support_flex": 8}`
+- Package lane counts: `{"commander_engine": 1, "contextual": 1, "early_mana": 14, "finisher_or_big_spell": 4, "graveyard_recursion": 7, "hand_filter": 11, "interaction": 8, "mana_base": 28, "pressure_absorber_or_protection": 12, "selection": 1, "topdeck_miracle_setup": 7}`
 - Missing aggregated battle-rule rows in the legacy champion DB: `7` cards: The Scarlet Witch, Molecule Man, The Mind Stone, Thor, God of Thunder, Emeria's Call // Emeria, Shattered Skyclave, Tragic Arrogance, Squee, Goblin Nabob.
 - Superseded by rule-materialization audit: `Squee, Goblin Nabob` now has materialized rule evidence in the equal-gate candidate.
 - Effective unresolved rule rows after that audit: `0` cards: none.
@@ -203,7 +206,7 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - Effective unresolved rule/model rows after all current materialization evidence: `0` cards: none.
 - Reclassified by Thor runtime audit as local reviewed rule added pending durable sync: `Thor, God of Thunder`.
 - Effective unresolved local runtime/model rows after Thor audit: `0` cards: none.
-- Full per-card role, tags, and rule keys are in the companion JSON under `deck_summaries.6.cards`.
+- Full per-card role, tags, rule keys, package lane, and slot decision are in the companion JSON under `deck_summaries.6.cards` and `card_decision_manifest.cards`.
 
 ## What Still Must Be Understood
 

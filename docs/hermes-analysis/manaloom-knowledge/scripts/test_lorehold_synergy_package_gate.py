@@ -46,6 +46,10 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             ["Hexing Squelcher"],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["galvanoth_topdeck_freecast_cut_chimes"]["cuts"],
+            ["Victory Chimes"],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["penance_topdeck_protection_cut_squelcher"]["family"],
             "topdeck_protection",
         )

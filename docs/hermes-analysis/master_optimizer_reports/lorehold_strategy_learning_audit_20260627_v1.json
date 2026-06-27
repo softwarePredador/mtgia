@@ -1,4 +1,1623 @@
 {
+  "card_decision_manifest": {
+    "cards": [
+      {
+        "battle_rule_count": 3,
+        "card_name": "Farewell",
+        "db_role": "board_wipe",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "board_wipe",
+        "package_lane": "graveyard_recursion",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "board_wipe",
+          "graveyard_recursion",
+          "instant_sorcery",
+          "wipe"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Furygale Flocking",
+        "db_role": "wincon",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "wincon",
+        "package_lane": "graveyard_recursion",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "graveyard_recursion",
+          "instant_sorcery",
+          "mana_engine",
+          "token_maker",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Mizzix's Mastery",
+        "db_role": "wincon",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "wincon",
+        "package_lane": "graveyard_recursion",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "graveyard_recursion",
+          "instant_sorcery",
+          "overload_recursion",
+          "spell_copy",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Pinnacle Monk // Mystic Peak",
+        "db_role": "engine",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "engine",
+        "package_lane": "graveyard_recursion",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "engine",
+          "graveyard_recursion",
+          "removal"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Surge to Victory",
+        "db_role": "wincon",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "wincon",
+        "package_lane": "graveyard_recursion",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "graveyard_recursion",
+          "instant_sorcery",
+          "pump_all",
+          "removal",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Artist's Talent",
+        "db_role": "draw",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "draw",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "draw",
+          "hand_filter",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Big Score",
+        "db_role": "ramp",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "ramp",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "instant_sorcery",
+          "mana_engine",
+          "ramp",
+          "treasure_maker"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Dawn's Truce",
+        "db_role": "protection",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "protection",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "instant_sorcery",
+          "pressure_absorber",
+          "protection"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Esper Sentinel",
+        "db_role": "draw",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "draw",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "draw",
+          "hand_filter"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Monument to Endurance",
+        "db_role": "ramp",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "ramp",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "mana_engine",
+          "passive",
+          "ramp",
+          "unknown"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Rise of the Eldrazi",
+        "db_role": "wincon",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "wincon",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "hand_filter",
+          "instant_sorcery",
+          "removal",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Sensei's Divining Top",
+        "db_role": "draw",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "draw",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "draw",
+          "hand_filter"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Smothering Tithe",
+        "db_role": "ramp",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "ramp",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Starfall Invocation",
+        "db_role": "board_wipe",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "board_wipe",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "board_wipe",
+          "graveyard_recursion",
+          "hand_filter",
+          "instant_sorcery",
+          "wipe"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Tempt with Bunnies",
+        "db_role": "wincon",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "wincon",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "hand_filter",
+          "instant_sorcery",
+          "token_maker",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Unexpected Windfall",
+        "db_role": "ramp",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "ramp",
+        "package_lane": "hand_filter",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "instant_sorcery",
+          "mana_engine",
+          "ramp",
+          "treasure_maker"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Call Forth the Tempest",
+        "db_role": "board_wipe",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "board_wipe",
+        "package_lane": "topdeck_miracle_setup",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "board_wipe",
+          "damage_wipe",
+          "instant_sorcery",
+          "mana_engine",
+          "topdeck_miracle_setup",
+          "wipe"
+        ]
+      },
+      {
+        "battle_rule_count": 4,
+        "card_name": "Hit the Mother Lode",
+        "db_role": "draw",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "draw",
+        "package_lane": "topdeck_miracle_setup",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "draw",
+          "instant_sorcery",
+          "mana_engine",
+          "ramp",
+          "topdeck_miracle_setup",
+          "treasure_maker"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Improvisation Capstone",
+        "db_role": "draw",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "draw",
+        "package_lane": "topdeck_miracle_setup",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "draw",
+          "exile_value",
+          "instant_sorcery",
+          "mana_engine",
+          "spell_copy",
+          "topdeck_miracle_setup"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Library of Leng",
+        "db_role": "engine",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "engine",
+        "package_lane": "topdeck_miracle_setup",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "engine",
+          "graveyard_recursion",
+          "hand_filter",
+          "passive",
+          "ramp",
+          "topdeck_miracle_setup"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Reforge the Soul",
+        "db_role": "draw",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "draw",
+        "package_lane": "topdeck_miracle_setup",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "draw",
+          "hand_filter",
+          "instant_sorcery",
+          "mana_engine",
+          "topdeck_miracle_setup"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Scroll Rack",
+        "db_role": "draw",
+        "decision": "core_engine_or_probation",
+        "decision_reason": "engine lane supports the current best shell; cut only with direct package evidence",
+        "effective_role": "draw",
+        "package_lane": "topdeck_miracle_setup",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "draw",
+          "ramp",
+          "topdeck_miracle_setup"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Approach of the Second Sun",
+        "db_role": "wincon",
+        "decision": "core_finisher",
+        "decision_reason": "deterministic win line; benchmark other finishers against it rather than cutting blindly",
+        "effective_role": "wincon",
+        "package_lane": "finisher_or_big_spell",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "approach",
+          "instant_sorcery",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Blasphemous Act",
+        "db_role": "board_wipe",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "board_wipe",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "board_wipe",
+          "damage_wipe",
+          "instant_sorcery",
+          "mana_engine",
+          "wipe"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Redirect Lightning",
+        "db_role": "draw",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "removal",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "draw",
+          "instant_sorcery",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Everything Comes to Dust",
+        "db_role": "board_wipe",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "board_wipe",
+        "package_lane": "interaction",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "board_wipe",
+          "instant_sorcery",
+          "wipe"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Generous Gift",
+        "db_role": "removal",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "removal",
+        "package_lane": "interaction",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "removal"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "High Noon",
+        "db_role": "removal",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "removal",
+        "package_lane": "interaction",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "removal"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Path to Exile",
+        "db_role": "removal",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "removal",
+        "package_lane": "interaction",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "removal"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Stroke of Midnight",
+        "db_role": "removal",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "removal",
+        "package_lane": "interaction",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "removal"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Swords to Plowshares",
+        "db_role": "removal",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "removal",
+        "package_lane": "interaction",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "removal"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Winds of Abandon",
+        "db_role": "removal",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "removal",
+        "package_lane": "interaction",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "removal"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Avatar's Wrath",
+        "db_role": "protection",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "protection"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Deflecting Swat",
+        "db_role": "draw",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "draw",
+          "instant_sorcery",
+          "protection",
+          "redirect_removal"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Fated Clash",
+        "db_role": "board_wipe",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "removal",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "board_wipe",
+          "instant_sorcery",
+          "pressure_absorber",
+          "wipe"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Flawless Maneuver",
+        "db_role": "protection",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "pressure_absorber",
+          "protection"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Giver of Runes",
+        "db_role": "protection",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "creature",
+          "pressure_absorber",
+          "protection",
+          "unknown"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Lightning Greaves",
+        "db_role": "protection",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "equipment_haste_shroud",
+          "protection"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Mother of Runes",
+        "db_role": "protection",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "creature",
+          "pressure_absorber",
+          "protection",
+          "unknown"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Promise of Loyalty",
+        "db_role": "draw",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "board_wipe",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "draw",
+          "instant_sorcery",
+          "pressure_absorber"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Swiftfoot Boots",
+        "db_role": "protection",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "equipment_static_attachment",
+          "protection"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Teferi's Protection",
+        "db_role": "protection",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "pressure_absorber",
+          "protection"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Tibalt's Trickery",
+        "db_role": "protection",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "protection",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "protection"
+        ]
+      },
+      {
+        "battle_rule_count": 3,
+        "card_name": "Land Tax",
+        "db_role": "tutor",
+        "decision": "core_support",
+        "decision_reason": "support lane keeps Lorehold alive through setup and closing turns",
+        "effective_role": "tutor",
+        "package_lane": "selection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land_tax",
+          "mana_development",
+          "passive",
+          "tutor",
+          "unknown"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Prismari Pianist",
+        "db_role": "wincon",
+        "decision": "finisher_benchmark_lane",
+        "decision_reason": "evaluate as a closing package, not as an isolated card cut",
+        "effective_role": "wincon",
+        "package_lane": "finisher_or_big_spell",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "token_maker",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Storm Herd",
+        "db_role": "wincon",
+        "decision": "finisher_benchmark_lane",
+        "decision_reason": "expensive token finisher; compare against alternate finishers as a package, not as generic filler",
+        "effective_role": "wincon",
+        "package_lane": "finisher_or_big_spell",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_or_flex_engine",
+        "tags": [
+          "instant_sorcery",
+          "token_maker",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Bender's Waterskin",
+        "db_role": "ramp",
+        "decision": "flex_but_cut_risky",
+        "decision_reason": "Galvanoth improved aggregate when cutting this slot but broke the seed-42 success case",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Hexing Squelcher",
+        "db_role": "creature",
+        "decision": "flex_cut_tested_negative",
+        "decision_reason": "multiple packages tried this cut and lost aggregate or the known strong seed",
+        "effective_role": "creature",
+        "package_lane": "contextual",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "flex_or_contextual",
+        "tags": [
+          "creature",
+          "unknown"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Victory Chimes",
+        "db_role": "ramp",
+        "decision": "flex_cut_tested_negative",
+        "decision_reason": "Galvanoth over this generic colorless ramp slot lost aggregate and broke seed 42",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Lorehold, the Historian",
+        "db_role": "engine",
+        "decision": "locked_core",
+        "decision_reason": "commander defines the whole miracle/topdeck plan",
+        "effective_role": "engine",
+        "package_lane": "commander_engine",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_commander",
+        "tags": [
+          "draw",
+          "engine",
+          "hand_filter",
+          "mana_engine",
+          "passive",
+          "topdeck_miracle_setup"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Ancient Tomb",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Arid Mesa",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Battlefield Forge",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Bloodstained Mire",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Command Beacon",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Command Tower",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Eiganjo, Seat of the Empire",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Elegant Parlor",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "graveyard_recursion",
+          "land",
+          "mana_engine",
+          "topdeck_miracle_setup"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Exotic Orchard",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Flooded Strand",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Glittering Massif",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Marsh Flats",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land"
+        ]
+      },
+      {
+        "battle_rule_count": 1,
+        "card_name": "Mountain // Mountain",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 4,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 1,
+        "card_name": "Plains // Plains",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 4,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Plaza of Heroes",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine",
+          "pressure_absorber"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Prismatic Vista",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Radiant Summit",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Reliquary Tower",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Sacred Foundry",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Scalding Tarn",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Spectator Seating",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Sunbaked Canyon",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Sunbillow Verge",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Turbulent Steppe",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Urza's Saga",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "War Room",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "hand_filter",
+          "land",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Windswept Heath",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Wooded Foothills",
+        "db_role": "land",
+        "decision": "mana_base_core",
+        "decision_reason": "land slots are tuned as a package and should not be one-off cuts",
+        "effective_role": "land",
+        "package_lane": "mana_base",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "land"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Creative Technique",
+        "db_role": "draw",
+        "decision": "manual_review",
+        "decision_reason": "role is contextual or weakly classified",
+        "effective_role": "big_spell_value",
+        "package_lane": "finisher_or_big_spell",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "flex_or_contextual",
+        "tags": [
+          "draw",
+          "instant_sorcery",
+          "spell_copy"
+        ]
+      },
+      {
+        "battle_rule_count": 0,
+        "card_name": "Thor, God of Thunder",
+        "db_role": "removal",
+        "decision": "modeled_not_deck_proven",
+        "decision_reason": "local runtime rule and one natural 7-damage exposure exist, but 21-game synced gate showed +0.00 pp",
+        "effective_role": "spell_damage_engine",
+        "package_lane": "graveyard_recursion",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "local_runtime_rule_added_pending_sync",
+        "tags": [
+          "graveyard_recursion",
+          "removal"
+        ]
+      },
+      {
+        "battle_rule_count": 0,
+        "card_name": "The Mind Stone",
+        "db_role": "ramp",
+        "decision": "modeled_pending_durable_sync",
+        "decision_reason": "local evidence exists but durable source sync still matters before final promotion",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "materialization_gap_ready_rule",
+        "tags": [
+          "mana_engine",
+          "pressure_absorber",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 0,
+        "card_name": "The Scarlet Witch",
+        "db_role": "creature",
+        "decision": "modeled_pending_durable_sync",
+        "decision_reason": "local evidence exists but durable source sync still matters before final promotion",
+        "effective_role": "creature",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "materialization_gap_ready_rule",
+        "tags": [
+          "creature",
+          "mana_engine"
+        ]
+      },
+      {
+        "battle_rule_count": 0,
+        "card_name": "Tragic Arrogance",
+        "db_role": "unknown",
+        "decision": "modeled_pending_durable_sync",
+        "decision_reason": "local evidence exists but durable source sync still matters before final promotion",
+        "effective_role": "board_wipe",
+        "package_lane": "interaction",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "materialization_gap_ready_rule",
+        "tags": [
+          "instant_sorcery",
+          "unknown"
+        ]
+      },
+      {
+        "battle_rule_count": 0,
+        "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+        "db_role": "unknown",
+        "decision": "modeled_pending_durable_sync",
+        "decision_reason": "local evidence exists but durable source sync still matters before final promotion",
+        "effective_role": "unknown",
+        "package_lane": "pressure_absorber_or_protection",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "materialization_gap_ready_rule",
+        "tags": [
+          "instant_sorcery",
+          "pressure_absorber",
+          "unknown"
+        ]
+      },
+      {
+        "battle_rule_count": 0,
+        "card_name": "Molecule Man",
+        "db_role": "draw",
+        "decision": "modeled_pending_durable_sync",
+        "decision_reason": "local evidence exists but durable source sync still matters before final promotion",
+        "effective_role": "miracle_engine",
+        "package_lane": "topdeck_miracle_setup",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "materialization_gap_ready_rule",
+        "tags": [
+          "draw",
+          "hand_filter",
+          "mana_engine",
+          "topdeck_miracle_setup"
+        ]
+      },
+      {
+        "battle_rule_count": 0,
+        "card_name": "Squee, Goblin Nabob",
+        "db_role": "wincon",
+        "decision": "probation_engine",
+        "decision_reason": "10-seed suite keeps Squee narrowly ahead and proves clean graveyard returns, but not a self-sufficient discard loop",
+        "effective_role": "recursion_engine",
+        "package_lane": "graveyard_recursion",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": true,
+        "status": "materialized_rule_in_equal_gate_candidate",
+        "tags": [
+          "graveyard_recursion",
+          "wincon"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Arcane Signet",
+        "db_role": "ramp",
+        "decision": "support_flex",
+        "decision_reason": "ramp slot can be challenged only by same-speed mana or stronger engine evidence",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Boros Signet",
+        "db_role": "ramp",
+        "decision": "support_flex",
+        "decision_reason": "ramp slot can be challenged only by same-speed mana or stronger engine evidence",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Fellwar Stone",
+        "db_role": "ramp",
+        "decision": "support_flex",
+        "decision_reason": "ramp slot can be challenged only by same-speed mana or stronger engine evidence",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Jeska's Will",
+        "db_role": "ramp",
+        "decision": "support_flex",
+        "decision_reason": "ramp slot can be challenged only by same-speed mana or stronger engine evidence",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "instant_sorcery",
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Pearl Medallion",
+        "db_role": "ramp",
+        "decision": "support_flex",
+        "decision_reason": "ramp slot can be challenged only by same-speed mana or stronger engine evidence",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Ruby Medallion",
+        "db_role": "ramp",
+        "decision": "support_flex",
+        "decision_reason": "ramp slot can be challenged only by same-speed mana or stronger engine evidence",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Sol Ring",
+        "db_role": "ramp",
+        "decision": "support_flex",
+        "decision_reason": "ramp slot can be challenged only by same-speed mana or stronger engine evidence",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "mana_engine",
+          "ramp"
+        ]
+      },
+      {
+        "battle_rule_count": 2,
+        "card_name": "Talisman of Conviction",
+        "db_role": "ramp",
+        "decision": "support_flex",
+        "decision_reason": "ramp slot can be challenged only by same-speed mana or stronger engine evidence",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "quantity": 1,
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "core_support",
+        "tags": [
+          "mana_engine",
+          "ramp"
+        ]
+      }
+    ],
+    "summary": {
+      "decision_counts": {
+        "core_engine_or_probation": 22,
+        "core_finisher": 1,
+        "core_support": 21,
+        "finisher_benchmark_lane": 2,
+        "flex_but_cut_risky": 1,
+        "flex_cut_tested_negative": 2,
+        "locked_core": 1,
+        "mana_base_core": 28,
+        "manual_review": 1,
+        "modeled_not_deck_proven": 1,
+        "modeled_pending_durable_sync": 5,
+        "probation_engine": 1,
+        "support_flex": 8
+      },
+      "package_lane_counts": {
+        "commander_engine": 1,
+        "contextual": 1,
+        "early_mana": 14,
+        "finisher_or_big_spell": 4,
+        "graveyard_recursion": 7,
+        "hand_filter": 11,
+        "interaction": 8,
+        "mana_base": 28,
+        "pressure_absorber_or_protection": 12,
+        "selection": 1,
+        "topdeck_miracle_setup": 7
+      }
+    }
+  },
   "commander_intent": "Use topdeck setup, hand filtering, and Lorehold's miracle discount to cast high-impact instant/sorcery spells ahead of curve, then convert that window into a deterministic finisher while surviving fast combat pressure.",
   "comparison_6_607": {
     "left_deck_id": 6,
@@ -17827,7 +19446,7 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T17:09:17Z",
+  "generated_at": "2026-06-27T17:21:02Z",
   "matrix_generated_at": "2026-06-26T17:59:59.926705+00:00",
   "matrix_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json",
   "matrix_ranked": [
@@ -24610,7 +26229,10 @@
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
-      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json"
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed20260625_hash0_isolated_timeout_galvanoth_cut_chimes.json"
     ],
     "per_seed": [
       {
@@ -25170,6 +26792,99 @@
           "squee_upkeep_return": 1,
           "topdeck_manipulation_activated": 10
         }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 6,
+        "candidate_wins": 3,
+        "cuts": [
+          "Victory Chimes"
+        ],
+        "delta_pp": -55.56,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -34,
+          "lorehold_spell_cast": -33,
+          "lorehold_spell_rummage": 4,
+          "lorehold_upkeep_rummage": 5,
+          "miracle_cast": -11,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -2,
+          "squee_to_graveyard": -3,
+          "squee_upkeep_return": -2,
+          "topdeck_manipulation_activated": -6
+        }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 8,
+        "candidate_wins": 1,
+        "cuts": [
+          "Victory Chimes"
+        ],
+        "delta_pp": 11.11,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 30,
+          "lorehold_spell_cast": 24,
+          "lorehold_spell_rummage": -2,
+          "lorehold_upkeep_rummage": 9,
+          "miracle_cast": 8,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 3
+        }
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 6,
+        "candidate_wins": 3,
+        "cuts": [
+          "Victory Chimes"
+        ],
+        "delta_pp": 33.33,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed20260625_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 36,
+          "lorehold_spell_cast": 33,
+          "lorehold_spell_rummage": 14,
+          "lorehold_upkeep_rummage": -12,
+          "miracle_cast": 12,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 6,
+          "squee_to_graveyard": 6,
+          "squee_upkeep_return": 6,
+          "topdeck_manipulation_activated": 10
+        }
       }
     ],
     "rows": [
@@ -25430,6 +27145,136 @@
           "squee_to_graveyard": -1,
           "squee_upkeep_return": -1,
           "topdeck_manipulation_activated": -14
+        },
+        "strong_seed_delta_pp": -55.56
+      },
+      {
+        "adds": [
+          "Galvanoth"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 20,
+        "candidate_win_rate": 25.93,
+        "candidate_wins": 7,
+        "cuts": [
+          "Victory Chimes"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -3.7,
+        "family": "topdeck_freecast",
+        "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+        "seed_rows": [
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "cuts": [
+              "Victory Chimes"
+            ],
+            "delta_pp": -55.56,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -34,
+              "lorehold_spell_cast": -33,
+              "lorehold_spell_rummage": 4,
+              "lorehold_upkeep_rummage": 5,
+              "miracle_cast": -11,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -2,
+              "squee_to_graveyard": -3,
+              "squee_upkeep_return": -2,
+              "topdeck_manipulation_activated": -6
+            }
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 8,
+            "candidate_wins": 1,
+            "cuts": [
+              "Victory Chimes"
+            ],
+            "delta_pp": 11.11,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 30,
+              "lorehold_spell_cast": 24,
+              "lorehold_spell_rummage": -2,
+              "lorehold_upkeep_rummage": 9,
+              "miracle_cast": 8,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 3
+            }
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "cuts": [
+              "Victory Chimes"
+            ],
+            "delta_pp": 33.33,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed20260625_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 36,
+              "lorehold_spell_cast": 33,
+              "lorehold_spell_rummage": 14,
+              "lorehold_upkeep_rummage": -12,
+              "miracle_cast": 12,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 6,
+              "squee_to_graveyard": 6,
+              "squee_upkeep_return": 6,
+              "topdeck_manipulation_activated": 10
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 32,
+          "lorehold_spell_cast": 24,
+          "lorehold_spell_rummage": 16,
+          "lorehold_upkeep_rummage": 2,
+          "miracle_cast": 9,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 4,
+          "squee_to_graveyard": 3,
+          "squee_upkeep_return": 4,
+          "topdeck_manipulation_activated": 7
         },
         "strong_seed_delta_pp": -55.56
       },

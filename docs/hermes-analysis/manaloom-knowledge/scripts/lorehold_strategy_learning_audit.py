@@ -60,6 +60,9 @@ DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
     REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
     REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+    REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+    REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+    REPORT_DIR / "lorehold_squee_refinement_package_gate_20260627_v2_seed20260625_hash0_isolated_timeout_galvanoth_cut_chimes.json",
 ]
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
@@ -138,6 +141,41 @@ CARD_ROLE_OVERRIDES = {
     "The Mind Stone": "ramp",
     "Thor, God of Thunder": "spell_damage_engine",
     "Tragic Arrogance": "board_wipe",
+}
+
+CARD_DECISION_OVERRIDES = {
+    "Approach of the Second Sun": (
+        "core_finisher",
+        "deterministic win line; benchmark other finishers against it rather than cutting blindly",
+    ),
+    "Bender's Waterskin": (
+        "flex_but_cut_risky",
+        "Galvanoth improved aggregate when cutting this slot but broke the seed-42 success case",
+    ),
+    "Galvanoth": (
+        "probation_external_candidate",
+        "not in champion; only Galvanoth/Bender was aggregate-positive and all checked alternate cuts failed seed 42",
+    ),
+    "Hexing Squelcher": (
+        "flex_cut_tested_negative",
+        "multiple packages tried this cut and lost aggregate or the known strong seed",
+    ),
+    "Squee, Goblin Nabob": (
+        "probation_engine",
+        "10-seed suite keeps Squee narrowly ahead and proves clean graveyard returns, but not a self-sufficient discard loop",
+    ),
+    "Storm Herd": (
+        "finisher_benchmark_lane",
+        "expensive token finisher; compare against alternate finishers as a package, not as generic filler",
+    ),
+    "Thor, God of Thunder": (
+        "modeled_not_deck_proven",
+        "local runtime rule and one natural 7-damage exposure exist, but 21-game synced gate showed +0.00 pp",
+    ),
+    "Victory Chimes": (
+        "flex_cut_tested_negative",
+        "Galvanoth over this generic colorless ramp slot lost aggregate and broke seed 42",
+    ),
 }
 
 
@@ -829,13 +867,20 @@ def render_markdown(report: dict[str, Any]) -> str:
                 )
             )
         lines.append("")
-        lines.append("Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-up Galvanoth/Hexing Squelcher swap is worse, so Galvanoth stays a probation hypothesis, not a deck insert. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
+        lines.append("Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
         lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")
     champion = report["deck_summaries"].get("6") or {}
     lines.append(f"- Quantity: `{champion.get('quantity_total')}` across `{champion.get('row_count')}` rows.")
     lines.append(f"- Primary role counts: `{json.dumps(champion.get('role_counts', {}), sort_keys=True)}`")
+    decision_manifest = report.get("card_decision_manifest") or {}
+    decision_summary = (decision_manifest.get("summary") or {}).get("decision_counts") or {}
+    lane_summary = (decision_manifest.get("summary") or {}).get("package_lane_counts") or {}
+    if decision_summary:
+        lines.append(f"- Slot decision counts: `{json.dumps(decision_summary, sort_keys=True)}`")
+    if lane_summary:
+        lines.append(f"- Package lane counts: `{json.dumps(lane_summary, sort_keys=True)}`")
     missing_cards = list(champion.get("missing_battle_rule_cards", []))
     materialized_cards = {
         row.get("materialized_squee", {}).get("card_name")
@@ -884,7 +929,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.append(
             f"- Effective unresolved local runtime/model rows after Thor audit: `{len(effective_missing_cards)}` cards: {', '.join(effective_missing_cards) or 'none'}."
         )
-    lines.append("- Full per-card role, tags, and rule keys are in the companion JSON under `deck_summaries.6.cards`.")
+    lines.append("- Full per-card role, tags, rule keys, package lane, and slot decision are in the companion JSON under `deck_summaries.6.cards` and `card_decision_manifest.cards`.")
     lines.append("")
     lines.append("## What Still Must Be Understood")
     lines.append("")
@@ -976,6 +1021,119 @@ def card_status(
     return "flex_or_contextual"
 
 
+def card_package_lane(card: dict[str, Any]) -> str:
+    role = effective_card_role(card)
+    tags = set(card.get("tags") or [])
+    cmc = float(card.get("cmc") or 0)
+    type_line = str(card.get("type_line") or "")
+    if card.get("card_name") == "Lorehold, the Historian":
+        return "commander_engine"
+    if role == "land":
+        return "mana_base"
+    if "topdeck_miracle_setup" in tags:
+        return "topdeck_miracle_setup"
+    if "hand_filter" in tags:
+        return "hand_filter"
+    if "graveyard_recursion" in tags:
+        return "graveyard_recursion"
+    if role in {"ramp", "mana_engine"} or "mana_engine" in tags:
+        return "early_mana"
+    if role in {"protection", "stax"} or "pressure_absorber" in tags:
+        return "pressure_absorber_or_protection"
+    if role in {"removal", "board_wipe"}:
+        return "interaction"
+    if role == "tutor":
+        return "selection"
+    if role == "wincon" or (("Instant" in type_line or "Sorcery" in type_line) and cmc >= 5):
+        return "finisher_or_big_spell"
+    if "instant_sorcery" in tags:
+        return "spell_density"
+    return "contextual"
+
+
+def card_decision(
+    card: dict[str, Any],
+    rule_audit: dict[str, Any] | None = None,
+    thor_audit: dict[str, Any] | None = None,
+) -> tuple[str, str]:
+    name = card.get("card_name") or ""
+    if name in CARD_DECISION_OVERRIDES:
+        return CARD_DECISION_OVERRIDES[name]
+    status = card_status(card, rule_audit, thor_audit)
+    role = effective_card_role(card)
+    lane = card_package_lane(card)
+    if status == "core_commander":
+        return ("locked_core", "commander defines the whole miracle/topdeck plan")
+    if status in {"missing_battle_rule_model", "unresolved_rule_or_aggregate_gap"}:
+        return ("unresolved_before_cut", "rule evidence is incomplete; do not use battle result as card judgment")
+    if status in {"local_runtime_rule_added_pending_sync", "materialization_gap_ready_rule"}:
+        return ("modeled_pending_durable_sync", "local evidence exists but durable source sync still matters before final promotion")
+    if role == "land":
+        return ("mana_base_core", "land slots are tuned as a package and should not be one-off cuts")
+    if lane in {"topdeck_miracle_setup", "hand_filter", "graveyard_recursion"}:
+        return ("core_engine_or_probation", "engine lane supports the current best shell; cut only with direct package evidence")
+    if role in {"removal", "board_wipe", "protection", "tutor"}:
+        return ("core_support", "support lane keeps Lorehold alive through setup and closing turns")
+    if role == "ramp":
+        return ("support_flex", "ramp slot can be challenged only by same-speed mana or stronger engine evidence")
+    if role == "wincon":
+        return ("finisher_benchmark_lane", "evaluate as a closing package, not as an isolated card cut")
+    if role in {"draw", "engine"}:
+        return ("engine_flex", "keep if it increases miracle/topdeck conversion in gates")
+    return ("manual_review", "role is contextual or weakly classified")
+
+
+def build_card_decision_manifest(
+    deck: dict[str, Any],
+    unresolved_rule_rows_audit: dict[str, Any],
+    thor_rule_runtime_audit: dict[str, Any],
+    squee_rule_materialization_audit: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    rule_audit_by_card = {
+        row.get("card"): row for row in (unresolved_rule_rows_audit or {}).get("rows", [])
+    }
+    materialized_cards = {
+        row.get("materialized_squee", {}).get("card_name")
+        for row in (squee_rule_materialization_audit or {}).get("rows", [])
+        if row.get("materialized_squee", {}).get("battle_rule_count")
+    }
+    materialized_cards.discard(None)
+    cards = []
+    decision_counts: Counter[str] = Counter()
+    lane_counts: Counter[str] = Counter()
+    for card in deck.get("cards") or []:
+        rule_audit = rule_audit_by_card.get(card.get("card_name"))
+        decision, decision_reason = card_decision(card, rule_audit, thor_rule_runtime_audit)
+        lane = card_package_lane(card)
+        status = card_status(card, rule_audit, thor_rule_runtime_audit)
+        if card.get("card_name") in materialized_cards and status == "unresolved_rule_or_aggregate_gap":
+            status = "materialized_rule_in_equal_gate_candidate"
+        decision_counts[decision] += 1
+        lane_counts[lane] += 1
+        cards.append(
+            {
+                "card_name": card.get("card_name"),
+                "quantity": card.get("quantity"),
+                "db_role": card.get("primary_role"),
+                "effective_role": effective_card_role(card),
+                "package_lane": lane,
+                "decision": decision,
+                "decision_reason": decision_reason,
+                "status": status,
+                "rule_materialized_in_equal_gate_candidate": card.get("card_name") in materialized_cards,
+                "battle_rule_count": len(card.get("battle_rule_keys") or []),
+                "tags": card.get("tags") or [],
+            }
+        )
+    return {
+        "summary": {
+            "decision_counts": dict(sorted(decision_counts.items())),
+            "package_lane_counts": dict(sorted(lane_counts.items())),
+        },
+        "cards": sorted(cards, key=lambda item: (item["decision"], item["package_lane"], item["card_name"] or "")),
+    }
+
+
 def render_card_roles_markdown(report: dict[str, Any]) -> str:
     deck = report["deck_summaries"].get("6") or {}
     cards = deck.get("cards") or []
@@ -983,6 +1141,12 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
         row.get("card"): row for row in (report.get("unresolved_rule_rows_audit") or {}).get("rows", [])
     }
     thor_audit = report.get("thor_rule_runtime_audit") or {}
+    materialized_cards = {
+        row.get("materialized_squee", {}).get("card_name")
+        for row in (report.get("squee_rule_materialization_audit") or {}).get("rows", [])
+        if row.get("materialized_squee", {}).get("battle_rule_count")
+    }
+    materialized_cards.discard(None)
     lines = [
         "# Lorehold Current Champion Card Roles - 2026-06-27",
         "",
@@ -991,8 +1155,8 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
         "- Comparison vs registered `deck_607`: champion has `Squee, Goblin Nabob`; registered 607 has `Insurrection`.",
         "- PostgreSQL writes: `false`",
         "",
-        "| Card | Qty | DB Role | Effective Role | Status | Battle Rule | Synergy Reason |",
-        "| --- | ---: | --- | --- | --- | --- | --- |",
+        "| Card | Qty | DB Role | Effective Role | Package Lane | Decision | Status | Battle Rule | Synergy Reason |",
+        "| --- | ---: | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for card in sorted(cards, key=lambda item: (item.get("primary_role") or "", item.get("card_name") or "")):
         keys = card.get("battle_rule_keys") or []
@@ -1000,6 +1164,8 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
         audit_decision = (rule_audit or {}).get("decision")
         if keys:
             rule_status = "ready"
+        elif card.get("card_name") in materialized_cards:
+            rule_status = "materialized_in_equal_gate_candidate"
         elif card.get("card_name") == thor_audit.get("card") and thor_audit.get("decision"):
             rule_status = "local_reviewed_rule_pending_sync"
         elif audit_decision == "deck_rule_materialization_gap":
@@ -1009,13 +1175,20 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
         else:
             rule_status = "missing_aggregate"
         reason = card_synergy_reason(card)
+        decision, decision_reason = card_decision(card, rule_audit, thor_audit)
+        status = card_status(card, rule_audit, thor_audit)
+        if card.get("card_name") in materialized_cards and status == "unresolved_rule_or_aggregate_gap":
+            status = "materialized_rule_in_equal_gate_candidate"
         lines.append(
-            "| {name} | {qty} | {db_role} | {effective_role} | {status} | {rule_status} | {reason} |".format(
+            "| {name} | {qty} | {db_role} | {effective_role} | {lane} | {decision}: {decision_reason} | {status} | {rule_status} | {reason} |".format(
                 name=card.get("card_name"),
                 qty=card.get("quantity"),
                 db_role=card.get("primary_role"),
                 effective_role=effective_card_role(card),
-                status=card_status(card, rule_audit, thor_audit),
+                lane=card_package_lane(card),
+                decision=decision,
+                decision_reason=decision_reason,
+                status=status,
                 rule_status=rule_status,
                 reason=reason,
             )
@@ -1027,6 +1200,8 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
     if missing:
         for card_name in missing:
             decision = (rule_audit_by_card.get(card_name) or {}).get("decision", "unclassified")
+            if card_name in materialized_cards:
+                decision = "materialized_rule_in_equal_gate_candidate"
             if card_name == thor_audit.get("card") and thor_audit.get("decision"):
                 decision = thor_audit.get("decision")
             lines.append(f"- {card_name}: `{decision}`")
@@ -1060,6 +1235,12 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     thor_rule_runtime_audit = read_json(args.thor_rule_runtime_audit)
     thor_rule_gate_audit = read_json(args.thor_rule_gate_audit)
     post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
+    card_decision_manifest = build_card_decision_manifest(
+        deck_summaries.get("6") or {},
+        unresolved_rule_rows_audit,
+        thor_rule_runtime_audit,
+        squee_rule_materialization_audit,
+    )
 
     open_questions = [
         "Use the per-game Squee diagnostic to decide whether the next improvement is topdeck consistency, explicit discard/rummage enablement, or a different closing package.",
@@ -1107,6 +1288,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "thor_rule_gate_audit": thor_rule_gate_audit,
         "general_synergy_confirm": general_confirm,
         "post_squee_package_gates": post_squee_package_gates,
+        "card_decision_manifest": card_decision_manifest,
         "open_questions": open_questions,
         "next_gates": next_gates,
     }
