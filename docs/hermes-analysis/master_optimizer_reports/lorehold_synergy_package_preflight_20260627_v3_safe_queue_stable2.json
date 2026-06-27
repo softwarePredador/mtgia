@@ -1,0 +1,244 @@
+{
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260627_v1.json",
+  "cut_safety_summary": {
+    "blocked_cut_count": 11,
+    "status_counts": {
+      "locked_do_not_cut": 9,
+      "risky_cut_only_same_lane": 2
+    },
+    "tested_cut_count": 11,
+    "untested_flex_pool_count": 6
+  },
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-27T19:37:12.373040+00:00",
+  "opponent_limit": 3,
+  "opponent_seed": 20260626,
+  "package_status_counts": {
+    "preflight_ready": 7
+  },
+  "packages": [
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Jeska's Will"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Birgi tests the same early-mana/spell-chain job without cutting the now-protected medallions, Bender's Waterskin, or Victory Chimes. Jeska's Will is the comparison slot because it is a powerful but one-shot mana burst rather than a repeatable cast-trigger engine.",
+      "package_key": "birgi_spellchain_cut_jeskas_will",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous exact package result",
+        "status": "clear"
+      },
+      "status": "preflight_ready"
+    },
+    {
+      "adds": [
+        "Seething Song"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Fellwar Stone"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Seething Song tests whether a ritual burst converts the current mana/spell bottleneck faster than a generic two-mana rock while preserving all cut-safety-protected ramp slots.",
+      "package_key": "seething_song_cut_fellwar_stone",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous exact package result",
+        "status": "clear"
+      },
+      "status": "preflight_ready"
+    },
+    {
+      "adds": [
+        "Storm-Kiln Artist"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Storm-Kiln Artist can turn every instant or sorcery into treasure. This tests a repeatable spell-mana engine over the most generic untested rock, without touching medallions, Bender's Waterskin, Victory Chimes, or the finisher package.",
+      "package_key": "storm_kiln_artist_cut_arcane_signet",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous exact package result",
+        "status": "clear"
+      },
+      "status": "preflight_ready"
+    },
+    {
+      "adds": [
+        "Runaway Steam-Kin"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Talisman of Conviction"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Runaway Steam-Kin is a low-curve red spell mana engine. It tests whether repeated red-spell turns create more conversion pressure than a generic two-mana Boros rock while preserving the protected three-mana ramp and medallion shell.",
+      "package_key": "runaway_steamkin_cut_talisman",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous exact package result",
+        "status": "clear"
+      },
+      "status": "preflight_ready"
+    },
+    {
+      "adds": [
+        "Boros Charm"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "family": "pressure_absorber",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Boros Charm previously failed when it cut protected Fated Clash. This retest keeps Fated Clash, Dawn's Truce, Hexing Squelcher, and the ramp shell intact, using another pressure/protection lane slot as the comparison instead. This is an explicit same-lane high-CMC spell benchmark, not a free cut of the miracle payoff package.",
+      "package_key": "boros_charm_pressure_cut_avatar_wrath",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous exact package result",
+        "status": "clear"
+      },
+      "status": "preflight_ready"
+    },
+    {
+      "adds": [
+        "Overmaster"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Tibalt's Trickery"
+      ],
+      "family": "spell_protection",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Overmaster protects a decisive instant or sorcery and replaces itself. This tests the spell-protection lane while keeping Hexing Squelcher and the known protection shell intact, comparing against a swingy protection/counter slot instead.",
+      "package_key": "overmaster_protect_draw_cut_tibalts_trickery",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous exact package result",
+        "status": "clear"
+      },
+      "status": "preflight_ready"
+    },
+    {
+      "adds": [
+        "Ghostly Prison"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "family": "pressure_absorber",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Ghostly Prison previously failed when it cut protected Hexing Squelcher. This retest keeps Hexing Squelcher and Fated Clash, then checks whether a static attack tax is better than a slower pressure cleanup spell against the combat-pressure deaths. This is an explicit pressure-lane benchmark, not a generic cut of the big-spell miracle plan.",
+      "package_key": "ghostly_prison_pressure_cut_promise",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous exact package result",
+        "status": "clear"
+      },
+      "status": "preflight_ready"
+    }
+  ],
+  "preflight_only": true,
+  "prior_package_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
+  ],
+  "prior_package_summary": {
+    "loaded_report_count": 2,
+    "missing_report_count": 0,
+    "package_key_count": 14
+  },
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}

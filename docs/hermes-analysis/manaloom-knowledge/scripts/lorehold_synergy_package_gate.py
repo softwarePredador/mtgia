@@ -76,6 +76,17 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
         "cuts": ["Bender's Waterskin"],
     },
+    "birgi_spellchain_cut_jeskas_will": {
+        "family": "spellchain_mana",
+        "hypothesis": (
+            "Birgi tests the same early-mana/spell-chain job without cutting the "
+            "now-protected medallions, Bender's Waterskin, or Victory Chimes. "
+            "Jeska's Will is the comparison slot because it is a powerful but "
+            "one-shot mana burst rather than a repeatable cast-trigger engine."
+        ),
+        "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+        "cuts": ["Jeska's Will"],
+    },
     "birgi_seething_chain_cut_medallions": {
         "family": "spellchain_mana",
         "hypothesis": (
@@ -87,6 +98,38 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         ),
         "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty", "Seething Song"],
         "cuts": ["Pearl Medallion", "Ruby Medallion"],
+    },
+    "seething_song_cut_fellwar_stone": {
+        "family": "spellchain_mana",
+        "hypothesis": (
+            "Seething Song tests whether a ritual burst converts the current "
+            "mana/spell bottleneck faster than a generic two-mana rock while "
+            "preserving all cut-safety-protected ramp slots."
+        ),
+        "adds": ["Seething Song"],
+        "cuts": ["Fellwar Stone"],
+    },
+    "storm_kiln_artist_cut_arcane_signet": {
+        "family": "spellchain_mana",
+        "hypothesis": (
+            "Storm-Kiln Artist can turn every instant or sorcery into treasure. "
+            "This tests a repeatable spell-mana engine over the most generic "
+            "untested rock, without touching medallions, Bender's Waterskin, "
+            "Victory Chimes, or the finisher package."
+        ),
+        "adds": ["Storm-Kiln Artist"],
+        "cuts": ["Arcane Signet"],
+    },
+    "runaway_steamkin_cut_talisman": {
+        "family": "spellchain_mana",
+        "hypothesis": (
+            "Runaway Steam-Kin is a low-curve red spell mana engine. It tests "
+            "whether repeated red-spell turns create more conversion pressure "
+            "than a generic two-mana Boros rock while preserving the protected "
+            "three-mana ramp and medallion shell."
+        ),
+        "adds": ["Runaway Steam-Kin"],
+        "cuts": ["Talisman of Conviction"],
     },
     "gamble_approach_access_cut_creative": {
         "family": "tutor_access",
@@ -235,6 +278,19 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "cuts": ["Fated Clash"],
         "allow_miracle_core_cuts": True,
     },
+    "boros_charm_pressure_cut_avatar_wrath": {
+        "family": "pressure_absorber",
+        "hypothesis": (
+            "Boros Charm previously failed when it cut protected Fated Clash. "
+            "This retest keeps Fated Clash, Dawn's Truce, Hexing Squelcher, and "
+            "the ramp shell intact, using another pressure/protection lane slot "
+            "as the comparison instead. This is an explicit same-lane high-CMC "
+            "spell benchmark, not a free cut of the miracle payoff package."
+        ),
+        "adds": ["Boros Charm"],
+        "cuts": ["Avatar's Wrath"],
+        "allow_miracle_core_cuts": True,
+    },
     "angel_grace_life_floor_cut_dawn": {
         "family": "life_floor_protection",
         "hypothesis": (
@@ -318,6 +374,31 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         ),
         "adds": ["Overmaster"],
         "cuts": ["Hexing Squelcher"],
+    },
+    "overmaster_protect_draw_cut_tibalts_trickery": {
+        "family": "spell_protection",
+        "hypothesis": (
+            "Overmaster protects a decisive instant or sorcery and replaces "
+            "itself. This tests the spell-protection lane while keeping Hexing "
+            "Squelcher and the known protection shell intact, comparing against "
+            "a swingy protection/counter slot instead."
+        ),
+        "adds": ["Overmaster"],
+        "cuts": ["Tibalt's Trickery"],
+    },
+    "ghostly_prison_pressure_cut_promise": {
+        "family": "pressure_absorber",
+        "hypothesis": (
+            "Ghostly Prison previously failed when it cut protected Hexing "
+            "Squelcher. This retest keeps Hexing Squelcher and Fated Clash, then "
+            "checks whether a static attack tax is better than a slower pressure "
+            "cleanup spell against the combat-pressure deaths. This is an "
+            "explicit pressure-lane benchmark, not a generic cut of the big-spell "
+            "miracle plan."
+        ),
+        "adds": ["Ghostly Prison"],
+        "cuts": ["Promise of Loyalty"],
+        "allow_miracle_core_cuts": True,
     },
     "boseiju_spell_protection_land": {
         "family": "spell_protection_land",
@@ -1070,7 +1151,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
         preflight = (result.get("cut_safety") or {}).get("status") or "not_checked"
         if result.get("prior_evidence", {}).get("status") not in {None, "clear", "not_checked"}:
             preflight = f"{preflight};{result['prior_evidence']['status']}"
-        if result.get("status") in {"skipped_cut_safety", "skipped_prior_evidence", "preflight_ready"}:
+        if result.get("status") in {
+            "skipped_cut_safety",
+            "skipped_prior_evidence",
+            "skipped_candidate_apply_error",
+            "preflight_ready",
+        }:
             lines.append(
                 "| {key} | {family} | {adds} | {cuts} | `{preflight}` | - | - | +0.00 | - | {status} |".format(
                     key=result["package_key"],
@@ -1237,15 +1323,38 @@ def main() -> int:
         out_dir = REPORT_DIR / f"{args.stem}_{stamp}_{package_key}"
         out_dir.mkdir(parents=True, exist_ok=True)
         candidate_db = out_dir / "knowledge_candidate.db"
-        shutil.copy2(source_db, candidate_db)
-        with connect(candidate_db) as conn:
-            candidate_meta = apply_package(
-                conn,
-                deck_id=6,
-                adds=list(definition["adds"]),
-                cuts=list(definition["cuts"]),
-                allow_miracle_core_cuts=bool(definition.get("allow_miracle_core_cuts")),
-            )
+        try:
+            shutil.copy2(source_db, candidate_db)
+            with connect(candidate_db) as conn:
+                candidate_meta = apply_package(
+                    conn,
+                    deck_id=6,
+                    adds=list(definition["adds"]),
+                    cuts=list(definition["cuts"]),
+                    allow_miracle_core_cuts=bool(definition.get("allow_miracle_core_cuts")),
+                )
+        except Exception as exc:
+            result = {
+                "package_key": package_key,
+                "family": definition.get("family") or "misc",
+                "hypothesis": definition["hypothesis"],
+                "adds": definition["adds"],
+                "cuts": definition["cuts"],
+                "status": "skipped_candidate_apply_error",
+                "cut_safety": package_cut_safety,
+                "prior_evidence": package_prior_evidence,
+                "candidate_db": str(candidate_db) if candidate_db.exists() else None,
+                "candidate_meta": {},
+                "gate_json": None,
+                "gate_markdown": None,
+                "gate_returncode": None,
+                "gate_stdout_tail": "",
+                "gate_stderr_tail": str(exc),
+                "gate_summary": {},
+            }
+            results.append(result)
+            print(json.dumps(result, ensure_ascii=False, indent=2), flush=True)
+            continue
 
         gate_stem = f"{args.stem}_{stamp}_{package_key}"
         completed = run_gate(

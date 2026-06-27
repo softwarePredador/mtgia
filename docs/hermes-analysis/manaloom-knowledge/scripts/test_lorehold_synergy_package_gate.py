@@ -128,6 +128,22 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             ["Pearl Medallion", "Ruby Medallion"],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["birgi_spellchain_cut_jeskas_will"]["cuts"],
+            ["Jeska's Will"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["seething_song_cut_fellwar_stone"]["adds"],
+            ["Seething Song"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["storm_kiln_artist_cut_arcane_signet"]["cuts"],
+            ["Arcane Signet"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["runaway_steamkin_cut_talisman"]["cuts"],
+            ["Talisman of Conviction"],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["gamble_approach_access_cut_creative"]["family"],
             "tutor_access",
         )
@@ -169,6 +185,70 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertTrue(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["allow_miracle_core_cuts"],
         )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["boros_charm_pressure_cut_avatar_wrath"]["cuts"],
+            ["Avatar's Wrath"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["boros_charm_pressure_cut_avatar_wrath"]["allow_miracle_core_cuts"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["overmaster_protect_draw_cut_tibalts_trickery"]["cuts"],
+            ["Tibalt's Trickery"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["ghostly_prison_pressure_cut_promise"]["cuts"],
+            ["Promise of Loyalty"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["ghostly_prison_pressure_cut_promise"]["allow_miracle_core_cuts"],
+        )
+
+    def test_new_cut_safety_aware_packages_do_not_touch_protected_slots(self):
+        protected_cut_safety = {
+            "enabled": True,
+            "cuts_by_name": {
+                name: {
+                    "card_name": name,
+                    "status": "locked_do_not_cut",
+                    "current_lane": "protected",
+                    "effective_role": "protected",
+                    "worst_strong_seed_delta_pp": -55.56,
+                    "best_delta_pp": -3.7,
+                    "reason": "known strong seed collapsed",
+                }
+                for name in [
+                    "Bender's Waterskin",
+                    "Dawn's Truce",
+                    "Fated Clash",
+                    "Hexing Squelcher",
+                    "Pearl Medallion",
+                    "Reliquary Tower",
+                    "Ruby Medallion",
+                    "Storm Herd",
+                    "Thor, God of Thunder",
+                    "Victory Chimes",
+                ]
+            },
+        }
+
+        new_package_keys = [
+            "birgi_spellchain_cut_jeskas_will",
+            "seething_song_cut_fellwar_stone",
+            "storm_kiln_artist_cut_arcane_signet",
+            "runaway_steamkin_cut_talisman",
+            "boros_charm_pressure_cut_avatar_wrath",
+            "overmaster_protect_draw_cut_tibalts_trickery",
+            "ghostly_prison_pressure_cut_promise",
+        ]
+
+        for package_key in new_package_keys:
+            with self.subTest(package_key=package_key):
+                classification = gate.classify_package_cut_safety(
+                    gate.PACKAGE_DEFINITIONS[package_key],
+                    protected_cut_safety,
+                )
+                self.assertEqual(classification["status"], "clear")
 
     def test_cut_safety_preflight_blocks_previous_failed_cut(self):
         cut_safety = {
@@ -278,6 +358,36 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
 
         self.assertIn("skipped_prior_evidence", markdown)
         self.assertIn("blocked_prior_reject", markdown)
+
+    def test_render_markdown_handles_apply_error_rows_without_gate(self):
+        markdown = gate.render_markdown(
+            {
+                "generated_at": "2026-06-27T00:00:00Z",
+                "source_db": "/tmp/source.db",
+                "games_per_opponent": 1,
+                "opponent_limit": 1,
+                "opponent_seed": 1,
+                "simulation_seed": 42,
+                "preflight_only": False,
+                "cut_safety_report": "/tmp/cut.json",
+                "prior_package_reports": ["/tmp/prior.json"],
+                "packages": [
+                    {
+                        "package_key": "bad_package",
+                        "family": "pressure_absorber",
+                        "hypothesis": "test",
+                        "adds": ["Boros Charm"],
+                        "cuts": ["Avatar's Wrath"],
+                        "status": "skipped_candidate_apply_error",
+                        "cut_safety": {"status": "clear"},
+                        "prior_evidence": {"status": "clear"},
+                        "candidate_meta": {},
+                    }
+                ],
+            }
+        )
+
+        self.assertIn("skipped_candidate_apply_error", markdown)
 
     def test_strategic_delta_includes_squee_metrics(self):
         payload = {
