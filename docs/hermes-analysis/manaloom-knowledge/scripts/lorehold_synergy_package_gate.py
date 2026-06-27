@@ -291,6 +291,72 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "cuts": ["Avatar's Wrath"],
         "allow_miracle_core_cuts": True,
     },
+    "perch_protection_cut_avatar_wrath": {
+        "family": "pressure_absorber",
+        "hypothesis": (
+            "Perch Protection is present in the two strongest non-607 variants "
+            "and has active local battle rules. It tests a same-lane protection "
+            "upgrade over Avatar's Wrath while preserving Dawn's Truce, Fated "
+            "Clash, Hexing Squelcher, High Noon, medallions, Storm Herd, and Thor."
+        ),
+        "adds": ["Perch Protection"],
+        "cuts": ["Avatar's Wrath"],
+        "allow_miracle_core_cuts": True,
+    },
+    "akromas_will_cut_avatar_wrath": {
+        "family": "pressure_absorber",
+        "hypothesis": (
+            "Akroma's Will is a 614 protection/finisher bridge with active local "
+            "battle rules. It challenges Avatar's Wrath without touching the "
+            "locked protection shell or the medallion/topdeck engine."
+        ),
+        "adds": ["Akroma's Will"],
+        "cuts": ["Avatar's Wrath"],
+        "allow_miracle_core_cuts": True,
+    },
+    "silence_cut_avatar_wrath": {
+        "family": "spell_protection",
+        "hypothesis": (
+            "Silence is shared by 614/615 and protects the decisive Lorehold or "
+            "Approach turn at one mana. This tests whether cheap proactive stack "
+            "protection beats a slower protection spell without cutting locked cards."
+        ),
+        "adds": ["Silence"],
+        "cuts": ["Avatar's Wrath"],
+        "allow_miracle_core_cuts": True,
+    },
+    "dragon_rage_channeler_cut_scarlet_witch": {
+        "family": "topdeck_filter",
+        "hypothesis": (
+            "Dragon's Rage Channeler is a low-cost 614 topdeck/filter engine with "
+            "active local battle rules. It targets seed 7's missing early engine "
+            "by challenging The Scarlet Witch, a materialization-sensitive slot."
+        ),
+        "adds": ["Dragon's Rage Channeler"],
+        "cuts": ["The Scarlet Witch"],
+        "allow_miracle_core_cuts": True,
+    },
+    "grand_abolisher_cut_mother_of_runes": {
+        "family": "spell_protection",
+        "hypothesis": (
+            "Grand Abolisher protects the whole decisive turn and appears in 615. "
+            "Mother of Runes is the same-creature-protection comparison slot, so "
+            "this is a risky same-lane test rather than a generic support cut."
+        ),
+        "adds": ["Grand Abolisher"],
+        "cuts": ["Mother of Runes"],
+    },
+    "reprieve_cut_avatar_wrath": {
+        "family": "spell_protection",
+        "hypothesis": (
+            "Reprieve is a 615 tempo/protection card with active local battle rules. "
+            "It can buy a turn and draw without cutting cards already locked by "
+            "the seed-42 protection pattern."
+        ),
+        "adds": ["Reprieve"],
+        "cuts": ["Avatar's Wrath"],
+        "allow_miracle_core_cuts": True,
+    },
     "angel_grace_life_floor_cut_dawn": {
         "family": "life_floor_protection",
         "hypothesis": (
