@@ -435,6 +435,16 @@ def build_review(
         )
 
     status_counts = Counter(row["decision"] for row in manual_reviews + contextual_reviews)
+    if status_counts.get("manual_tradeoff_not_blind_cut"):
+        safe_next_action = (
+            "Do not spend a gate on Squee cuts; test Austere over Emeria only as an explicit "
+            "wipe-over-rebuild tradeoff, not a blind same-lane replacement."
+        )
+    else:
+        safe_next_action = (
+            "No automatic gate is justified from this cut review; build a seed-safe tutor cut, "
+            "a non-Squee recursion package, or a lane-specific exposure model before battle."
+        )
     return {
         "generated_at": utc_now(),
         "strategy_audit": str(strategy_path),
@@ -449,10 +459,7 @@ def build_review(
             "contextual_lane_review_count": len(contextual_reviews),
             "decision_counts": dict(sorted(status_counts.items())),
             "automatic_gate_ready_count": 0,
-            "safe_next_action": (
-                "Do not spend a gate on Squee cuts; test Austere over Emeria only as an explicit "
-                "wipe-over-rebuild tradeoff, not a blind same-lane replacement."
-            ),
+            "safe_next_action": safe_next_action,
         },
         "manual_cut_reviews": manual_reviews,
         "contextual_lane_reviews": contextual_reviews,

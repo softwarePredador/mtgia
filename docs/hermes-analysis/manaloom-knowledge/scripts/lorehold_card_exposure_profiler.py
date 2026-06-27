@@ -87,8 +87,7 @@ def display_path(path: Path) -> str:
         return str(path)
 
 
-def values_for_target_matching(row: dict[str, Any]) -> list[object]:
-    values: list[object] = []
+def iter_target_matches(row: dict[str, Any], targets: dict[str, str]) -> Iterable[tuple[str, str]]:
     for key in (
         "card",
         "card_name",
@@ -99,23 +98,19 @@ def values_for_target_matching(row: dict[str, Any]) -> list[object]:
         "target",
         "object",
     ):
-        if row.get(key):
-            values.append(row[key])
-    metric_prefix, metric_card = split_metric_key(row.get("key"))
-    if metric_card:
-        values.append(metric_card)
-    if isinstance(row.get("discarded_cards"), list):
-        values.extend(row["discarded_cards"])
-    return values
-
-
-def match_targets(row: dict[str, Any], targets: dict[str, str]) -> list[str]:
-    matched: list[str] = []
-    for value in values_for_target_matching(row):
-        normalized = normalize_key(value)
+        if not row.get(key):
+            continue
+        normalized = normalize_key(row[key])
         if normalized in targets:
-            matched.append(targets[normalized])
-    return sorted(set(matched))
+            yield targets[normalized], key
+    metric_prefix, metric_card = split_metric_key(row.get("key"))
+    if metric_card and normalize_key(metric_card) in targets:
+        yield targets[normalize_key(metric_card)], "metric_card"
+    if isinstance(row.get("discarded_cards"), list):
+        for value in row["discarded_cards"]:
+            normalized = normalize_key(value)
+            if normalized in targets:
+                yield targets[normalized], "discarded_cards"
 
 
 def event_payload(row: dict[str, Any]) -> dict[str, Any]:
@@ -132,6 +127,7 @@ def evidence_record(
     path: str,
     row: dict[str, Any],
     target: str,
+    matched_field: str,
 ) -> dict[str, Any]:
     payload = event_payload(row)
     metric_type, metric_card = split_metric_key(payload.get("key"))
@@ -149,9 +145,18 @@ def evidence_record(
         "source": payload.get("source"),
         "reason": payload.get("reason"),
         "found": payload.get("found"),
+        "matched_field": matched_field,
         "path": path,
         "source_file": display_path(source_path),
-        "signature": event_signature(source_path, path, payload, target, event, metric_card),
+        "signature": event_signature(
+            source_path,
+            path,
+            payload,
+            target,
+            event,
+            metric_card,
+            matched_field,
+        ),
     }
 
 
@@ -162,6 +167,7 @@ def event_signature(
     target: str,
     event: str,
     metric_card: str,
+    matched_field: str,
 ) -> tuple[Any, ...]:
     game_context = ""
     for part in path.split("."):
@@ -179,6 +185,7 @@ def event_signature(
         payload.get("reason"),
         payload.get("source"),
         payload.get("key") or metric_card,
+        matched_field,
     )
 
 
@@ -192,8 +199,19 @@ def walk_json(
     if isinstance(obj, dict):
         payload = event_payload(obj)
         if obj.get("event") or obj.get("key"):
-            for target in match_targets(payload, targets):
-                yield evidence_record(source_path=source_path, path=path, row=obj, target=target)
+            seen_matches: set[tuple[str, str]] = set()
+            for target, matched_field in iter_target_matches(payload, targets):
+                match = (target, matched_field)
+                if match in seen_matches:
+                    continue
+                seen_matches.add(match)
+                yield evidence_record(
+                    source_path=source_path,
+                    path=path,
+                    row=obj,
+                    target=target,
+                    matched_field=matched_field,
+                )
         for key, value in obj.items():
             child_path = f"{path}.{key}" if path else str(key)
             yield from walk_json(value, source_path=source_path, path=child_path, targets=targets)
@@ -309,8 +327,17 @@ def summarize_card(card_name: str, records: list[dict[str, Any]], rule: dict[str
         if row["evidence_type"] == "summary_metric" and row.get("metric_key"):
             metric_counts[str(row["metric_key"])] += int(row.get("metric_count") or 0)
     effect_counts = Counter(str(row.get("effect")) for row in unique_records if row.get("effect"))
+    matched_field_counts = Counter(
+        str(row.get("matched_field")) for row in unique_records if row.get("matched_field")
+    )
     source_counts = Counter(str(row["source_file"]) for row in unique_records)
-    role_signals = infer_role_signals(event_counts, effect_counts, metric_counts, rule)
+    role_signals = infer_role_signals(
+        event_counts,
+        effect_counts,
+        metric_counts,
+        matched_field_counts,
+        rule,
+    )
     inferred_role, role_confidence = infer_role(
         card_name,
         role_signals,
@@ -334,6 +361,7 @@ def summarize_card(card_name: str, records: list[dict[str, Any]], rule: dict[str
                     "reason",
                     "source",
                     "found",
+                    "matched_field",
                     "source_file",
                     "path",
                 )
@@ -352,6 +380,7 @@ def summarize_card(card_name: str, records: list[dict[str, Any]], rule: dict[str
         "event_counts": dict(sorted(event_counts.items())),
         "metric_counts": dict(sorted(metric_counts.items())),
         "effect_counts": dict(sorted(effect_counts.items())),
+        "matched_field_counts": dict(sorted(matched_field_counts.items())),
         "source_file_count": len(source_counts),
         "source_files": [
             {"source_file": source, "unique_exposure_count": count}
@@ -370,6 +399,7 @@ def infer_role_signals(
     event_counts: Counter[str],
     effect_counts: Counter[str],
     metric_counts: Counter[str],
+    matched_field_counts: Counter[str],
     rule: dict[str, Any],
 ) -> list[str]:
     signals: set[str] = set()
@@ -378,13 +408,25 @@ def infer_role_signals(
     all_effects = set(effect_counts) | rule_effects
     if {"tokens_created", "token_maker"} & set(event_counts) or "token_maker" in all_effects:
         signals.add("board_development_tokens")
+    if all_effects & {"draw_cards", "draw_engine", "hand_filter", "exile_value"} or "wheel_resolved" in event_counts:
+        signals.add("draw_filter_value")
     if "protection_resolved" in event_counts or any("indestructible" in scope for scope in scopes):
         signals.add("protection_window")
     if "board_wipe_resolved" in event_counts or "board_wipe" in all_effects:
         signals.add("pressure_reset_board_wipe")
-    if "tutor_resolved" in event_counts or "tutor" in all_effects:
+    if any("tutor" in effect for effect in all_effects):
         signals.add("tutor_access")
-    if "graveyard_upkeep_return_self_to_hand" in all_effects or "trigger_resolved" in event_counts:
+    if "tutor_resolved" in event_counts and matched_field_counts.get("found"):
+        signals.add("tutor_target")
+    graveyard_effect = any(
+        "graveyard" in effect and ("return" in effect or "recursion" in effect)
+        for effect in all_effects
+    )
+    graveyard_scope = any(
+        "graveyard" in scope and ("return" in scope or "recursion" in scope)
+        for scope in scopes
+    )
+    if graveyard_effect or graveyard_scope:
         signals.add("graveyard_recursion")
     if "recursion" in all_effects:
         signals.add("spell_or_permanent_recursion")
@@ -419,6 +461,10 @@ def infer_role(
         return "recursion_candidate", "rule_ready_unexposed"
     if "tutor_access" in signal_set:
         return "tutor_access", "direct_event_or_rule" if direct_event_count else "rule_only"
+    if "draw_filter_value" in signal_set:
+        return "draw_filter_value", "direct_event_or_rule" if direct_event_count else "rule_only"
+    if "tutor_target" in signal_set:
+        return "tutor_target", "direct_event"
     if int(rule.get("active_rule_count") or 0) > 0:
         return "runtime_ready_unexposed", "rule_only"
     return "unproven_or_unmodeled", "missing_runtime_and_event_evidence"

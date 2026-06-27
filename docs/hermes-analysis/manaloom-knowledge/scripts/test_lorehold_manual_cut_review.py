@@ -230,3 +230,23 @@ def test_tutor_contextual_candidates_keep_prior_seed_regression_visible():
     assert len(contextual["Gamble"]["prior_evidence"]) == 2
     assert "Creative Technique" in contextual["Gamble"]["recommended_cut_search"]
     assert contextual["Enlightened Tutor"]["decision"] == "tutor_lane_probation_needs_seed_safe_cut"
+
+
+def test_manual_cut_review_safe_next_action_is_dynamic_after_tradeoff_removed():
+    model = cut_model()
+    model["pairing_hypotheses"] = [
+        row
+        for row in model["pairing_hypotheses"]
+        if row.get("candidate") != "Austere Command"
+    ]
+    with memory_db() as conn:
+        payload = review.build_review(
+            strategy_audit=strategy_audit(),
+            cut_model=model,
+            exposure_profile=exposure_profile(),
+            conn=conn,
+        )
+
+    safe_next_action = payload["summary"]["safe_next_action"]
+    assert "Austere" not in safe_next_action
+    assert "seed-safe tutor cut" in safe_next_action

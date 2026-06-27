@@ -176,3 +176,32 @@ def test_exposure_profiler_reads_jsonl_and_keeps_rule_only_candidates(tmp_path):
     assert by_card["Gamble"]["decision"]["status"] == "runtime_ready_cut_sensitive"
     assert by_card["Restoration Seminar"]["inferred_role"] == "unproven_or_unmodeled"
     assert by_card["Restoration Seminar"]["decision"]["status"] == "needs_non_squee_cut"
+
+
+def test_exposure_profiler_does_not_treat_tutor_found_target_as_tutor_source(tmp_path):
+    evidence = tmp_path / "tutor_target.jsonl"
+    evidence.write_text(
+        json.dumps(
+            {
+                "event": "tutor_resolved",
+                "card": "Gamble",
+                "found": "Wheel of Fortune",
+                "player": "Lorehold",
+                "turn": 5,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with memory_db() as conn:
+        payload = profiler.build_profile(
+            evidence_paths=[evidence],
+            card_names=["Wheel of Fortune"],
+            conn=conn,
+        )
+
+    wheel = payload["card_profiles"][0]
+    assert wheel["inferred_role"] == "tutor_target"
+    assert "tutor_access" not in wheel["role_signals"]
+    assert wheel["matched_field_counts"]["found"] == 1
