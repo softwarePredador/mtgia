@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T19:09:13Z`
+- Generated at: `2026-06-27T19:15:20Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -288,6 +288,26 @@ Read: Brainstone can improve weak seeds when it preserves the ramp shell, but th
 - Effective unresolved local runtime/model rows after Thor audit: `0` cards: none.
 - Full per-card role, tags, rule keys, package lane, and slot decision are in the companion JSON under `deck_summaries.6.cards` and `card_decision_manifest.cards`.
 
+## Cut Safety Manifest
+
+- Summary: `{"locked_do_not_cut": 9, "risky_cut_only_same_lane": 2}`; tested cuts `11`, blocked/protected cuts `11`, untested flex pool `6`.
+
+| Card | Status | Lane | Role | Worst Seed 42 pp | Best Delta pp | Worst Delta pp | Obs | Read |
+| --- | --- | --- | --- | ---: | ---: | ---: | ---: | --- |
+| Dawn's Truce | `locked_do_not_cut` | hand_filter | protection | -88.89 | -18.52 | -18.52 | 1 | one or more packages collapsed the known strong seed when cutting this slot |
+| Fated Clash | `locked_do_not_cut` | pressure_absorber_or_protection | removal | -88.89 | -88.89 | -88.89 | 1 | one or more packages collapsed the known strong seed when cutting this slot |
+| Hexing Squelcher | `locked_do_not_cut` | contextual | creature | -77.78 | +0.00 | -14.82 | 7 | one or more packages collapsed the known strong seed when cutting this slot |
+| Pearl Medallion | `locked_do_not_cut` | early_mana | ramp | -55.56 | +0.00 | +0.00 | 1 | one or more packages collapsed the known strong seed when cutting this slot |
+| Reliquary Tower | `locked_do_not_cut` | mana_base | land | -55.56 | -55.56 | -55.56 | 1 | one or more packages collapsed the known strong seed when cutting this slot |
+| Ruby Medallion | `locked_do_not_cut` | early_mana | ramp | -55.56 | +0.00 | +0.00 | 1 | one or more packages collapsed the known strong seed when cutting this slot |
+| Storm Herd | `locked_do_not_cut` | finisher_or_big_spell | wincon | -88.89 | -3.70 | -11.11 | 2 | one or more packages collapsed the known strong seed when cutting this slot |
+| Thor, God of Thunder | `locked_do_not_cut` | graveyard_recursion | spell_damage_engine | -55.56 | -44.45 | -55.56 | 3 | one or more packages collapsed the known strong seed when cutting this slot |
+| Victory Chimes | `locked_do_not_cut` | early_mana | ramp | -55.56 | -3.70 | -3.70 | 1 | one or more packages collapsed the known strong seed when cutting this slot |
+| Bender's Waterskin | `risky_cut_only_same_lane` | early_mana | ramp | -44.45 | +3.70 | -7.41 | 3 | aggregate upside exists, but it broke the known strong seed |
+| Creative Technique | `risky_cut_only_same_lane` | finisher_or_big_spell | big_spell_value | -44.45 | +3.70 | +3.70 | 1 | aggregate upside exists, but it broke the known strong seed |
+
+- Untested flex pool sample: `Arcane Signet`, `Boros Signet`, `Fellwar Stone`, `Jeska's Will`, `Sol Ring`, `Talisman of Conviction`.
+
 ## What Still Must Be Understood
 
 - Use the per-game Squee diagnostic to decide whether the next improvement is topdeck consistency, explicit discard/rummage enablement, or a different closing package.
@@ -308,6 +328,7 @@ Read: Brainstone can improve weak seeds when it preserves the ramp shell, but th
 - Galvanoth over Thor also failed seed-42 triage; Thor is not a clean cut for either the tutor-access lane or the topdeck/freecast lane from current evidence.
 - Boseiju, Who Shelters All over Reliquary Tower failed seed-42 triage; anti-counter land-slot protection does not address the observed life-zero combat-pressure losses by itself.
 - Boros Charm over Fated Clash failed seed-42 triage at 0-9; protect Fated Clash until a same-lane replacement proves it can preserve the strong seed.
+- The cut-safety manifest now blocks repeated cuts that already collapsed seed 42 and separates them from unresolved flex slots; use that manifest before generating another package.
 
 ## Next Gates
 
@@ -324,6 +345,7 @@ Read: Brainstone can improve weak seeds when it preserves the ramp shell, but th
 - Do not continue topdeck/freecast testing by cutting Thor unless a new hypothesis explains why the seed-42 collapse would not repeat.
 - Do not promote Boseiju over Reliquary Tower from the current land-slot gate; future spell-protection work should include pressure absorption or a conversion-speed gain, not only anti-counter text.
 - Do not cut Fated Clash for cheap pressure protection from the current evidence; if Boros Charm is retested, it needs a different cut with an explicit reason.
+- Before registering any new package, reject the candidate if every proposed cut is locked or protected by the cut-safety manifest and the package has no explicit same-lane proof rationale.
 - Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.
 - Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.
 - For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.

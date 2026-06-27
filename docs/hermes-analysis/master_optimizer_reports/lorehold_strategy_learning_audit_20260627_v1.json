@@ -1631,6 +1631,527 @@
     "shared_count": 93
   },
   "current_champion_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+  "cut_safety_manifest": {
+    "cuts": [
+      {
+        "best_delta_pp": -18.52,
+        "card_name": "Dawn's Truce",
+        "current_decision": "core_engine_or_probation",
+        "current_lane": "hand_filter",
+        "effective_role": "protection",
+        "observation_count": 1,
+        "observations": [
+          {
+            "adds": [
+              "Angel's Grace"
+            ],
+            "baseline": "8-19",
+            "candidate": "3-24",
+            "candidate_losses": 24,
+            "candidate_wins": 3,
+            "decision": "reject_or_rework",
+            "delta_pp": -18.52,
+            "family": "life_floor_protection",
+            "package_key": "angel_grace_life_floor_cut_dawn",
+            "strong_seed_delta_pp": -88.89
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": -18.52,
+        "worst_strong_seed_delta_pp": -88.89
+      },
+      {
+        "best_delta_pp": -88.89,
+        "card_name": "Fated Clash",
+        "current_decision": "core_support",
+        "current_lane": "pressure_absorber_or_protection",
+        "effective_role": "removal",
+        "observation_count": 1,
+        "observations": [
+          {
+            "adds": [
+              "Boros Charm"
+            ],
+            "baseline": "8-1",
+            "candidate": "0-9",
+            "candidate_losses": 9,
+            "candidate_wins": 0,
+            "decision": "reject_or_rework",
+            "delta_pp": -88.89,
+            "family": "pressure_absorber",
+            "package_key": "boros_charm_pressure_cut_fated",
+            "strong_seed_delta_pp": -88.89
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": -88.89,
+        "worst_strong_seed_delta_pp": -88.89
+      },
+      {
+        "best_delta_pp": 0.0,
+        "card_name": "Hexing Squelcher",
+        "current_decision": "flex_cut_tested_negative",
+        "current_lane": "contextual",
+        "effective_role": "creature",
+        "observation_count": 7,
+        "observations": [
+          {
+            "adds": [
+              "The One Ring"
+            ],
+            "baseline": "8-19",
+            "candidate": "4-23",
+            "candidate_losses": 23,
+            "candidate_wins": 4,
+            "decision": "reject_or_rework",
+            "delta_pp": -14.82,
+            "family": "draw_protection",
+            "package_key": "one_ring_protection_draw_cut_squelcher",
+            "strong_seed_delta_pp": -77.78
+          },
+          {
+            "adds": [
+              "Brainstone"
+            ],
+            "baseline": "8-19",
+            "candidate": "8-19",
+            "candidate_losses": 19,
+            "candidate_wins": 8,
+            "decision": "reject_or_rework",
+            "delta_pp": 0.0,
+            "family": "topdeck_setup",
+            "package_key": "brainstone_topdeck_miracle_cut_squelcher",
+            "strong_seed_delta_pp": -77.78
+          },
+          {
+            "adds": [
+              "Faithless Looting"
+            ],
+            "baseline": "8-19",
+            "candidate": "4-23",
+            "candidate_losses": 23,
+            "candidate_wins": 4,
+            "decision": "reject_or_rework",
+            "delta_pp": -14.82,
+            "family": "discard_rummage_recursion",
+            "package_key": "faithless_looting_squee_enabler",
+            "strong_seed_delta_pp": -66.67
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline": "8-19",
+            "candidate": "6-21",
+            "candidate_losses": 21,
+            "candidate_wins": 6,
+            "decision": "reject_or_rework",
+            "delta_pp": -7.41,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+            "strong_seed_delta_pp": -66.67
+          },
+          {
+            "adds": [
+              "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+            ],
+            "baseline": "8-19",
+            "candidate": "7-20",
+            "candidate_losses": 20,
+            "candidate_wins": 7,
+            "decision": "reject_or_rework",
+            "delta_pp": -3.7,
+            "family": "spellchain_mana",
+            "package_key": "birgi_spellchain_cut_squelcher",
+            "strong_seed_delta_pp": -55.56
+          },
+          {
+            "adds": [
+              "Ghostly Prison"
+            ],
+            "baseline": "8-19",
+            "candidate": "7-20",
+            "candidate_losses": 20,
+            "candidate_wins": 7,
+            "decision": "reject_or_rework",
+            "delta_pp": -3.7,
+            "family": "pressure_absorber",
+            "package_key": "ghostly_prison_pressure_cut_squelcher",
+            "strong_seed_delta_pp": -55.56
+          },
+          {
+            "adds": [
+              "Penance"
+            ],
+            "baseline": "8-19",
+            "candidate": "6-21",
+            "candidate_losses": 21,
+            "candidate_wins": 6,
+            "decision": "reject_or_rework",
+            "delta_pp": -7.41,
+            "family": "topdeck_protection",
+            "package_key": "penance_topdeck_protection_cut_squelcher",
+            "strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": -14.82,
+        "worst_strong_seed_delta_pp": -77.78
+      },
+      {
+        "best_delta_pp": 0.0,
+        "card_name": "Pearl Medallion",
+        "current_decision": "support_flex",
+        "current_lane": "early_mana",
+        "effective_role": "ramp",
+        "observation_count": 1,
+        "observations": [
+          {
+            "adds": [
+              "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+              "Seething Song"
+            ],
+            "baseline": "8-19",
+            "candidate": "8-19",
+            "candidate_losses": 19,
+            "candidate_wins": 8,
+            "decision": "reject_or_rework",
+            "delta_pp": 0.0,
+            "family": "spellchain_mana",
+            "package_key": "birgi_seething_chain_cut_medallions",
+            "strong_seed_delta_pp": -55.56
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": 0.0,
+        "worst_strong_seed_delta_pp": -55.56
+      },
+      {
+        "best_delta_pp": -55.56,
+        "card_name": "Reliquary Tower",
+        "current_decision": "mana_base_core",
+        "current_lane": "mana_base",
+        "effective_role": "land",
+        "observation_count": 1,
+        "observations": [
+          {
+            "adds": [
+              "Boseiju, Who Shelters All"
+            ],
+            "baseline": "8-1",
+            "candidate": "3-6",
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "decision": "reject_or_rework",
+            "delta_pp": -55.56,
+            "family": "spell_protection_land",
+            "package_key": "boseiju_spell_protection_land",
+            "strong_seed_delta_pp": -55.56
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": -55.56,
+        "worst_strong_seed_delta_pp": -55.56
+      },
+      {
+        "best_delta_pp": 0.0,
+        "card_name": "Ruby Medallion",
+        "current_decision": "support_flex",
+        "current_lane": "early_mana",
+        "effective_role": "ramp",
+        "observation_count": 1,
+        "observations": [
+          {
+            "adds": [
+              "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+              "Seething Song"
+            ],
+            "baseline": "8-19",
+            "candidate": "8-19",
+            "candidate_losses": 19,
+            "candidate_wins": 8,
+            "decision": "reject_or_rework",
+            "delta_pp": 0.0,
+            "family": "spellchain_mana",
+            "package_key": "birgi_seething_chain_cut_medallions",
+            "strong_seed_delta_pp": -55.56
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": 0.0,
+        "worst_strong_seed_delta_pp": -55.56
+      },
+      {
+        "best_delta_pp": -3.7,
+        "card_name": "Storm Herd",
+        "current_decision": "finisher_benchmark_lane",
+        "current_lane": "finisher_or_big_spell",
+        "effective_role": "wincon",
+        "observation_count": 2,
+        "observations": [
+          {
+            "adds": [
+              "Dance with Calamity"
+            ],
+            "baseline": "8-19",
+            "candidate": "7-20",
+            "candidate_losses": 20,
+            "candidate_wins": 7,
+            "decision": "reject_or_rework",
+            "delta_pp": -3.7,
+            "family": "payoff_challenge",
+            "package_key": "core_challenge_dance_over_storm",
+            "strong_seed_delta_pp": -88.89
+          },
+          {
+            "adds": [
+              "Aetherflux Reservoir"
+            ],
+            "baseline": "8-19",
+            "candidate": "5-22",
+            "candidate_losses": 22,
+            "candidate_wins": 5,
+            "decision": "reject_or_rework",
+            "delta_pp": -11.11,
+            "family": "payoff_challenge",
+            "package_key": "core_challenge_aetherflux_over_storm",
+            "strong_seed_delta_pp": -66.67
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": -11.11,
+        "worst_strong_seed_delta_pp": -88.89
+      },
+      {
+        "best_delta_pp": -44.45,
+        "card_name": "Thor, God of Thunder",
+        "current_decision": "modeled_not_deck_proven",
+        "current_lane": "graveyard_recursion",
+        "effective_role": "spell_damage_engine",
+        "observation_count": 3,
+        "observations": [
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline": "8-1",
+            "candidate": "3-6",
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "decision": "reject_or_rework",
+            "delta_pp": -55.56,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_thor",
+            "strong_seed_delta_pp": -55.56
+          },
+          {
+            "adds": [
+              "Gamble"
+            ],
+            "baseline": "8-1",
+            "candidate": "3-6",
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "decision": "reject_or_rework",
+            "delta_pp": -55.56,
+            "family": "tutor_access",
+            "package_key": "gamble_access_cut_thor",
+            "strong_seed_delta_pp": -55.56
+          },
+          {
+            "adds": [
+              "Enlightened Tutor"
+            ],
+            "baseline": "8-1",
+            "candidate": "4-5",
+            "candidate_losses": 5,
+            "candidate_wins": 4,
+            "decision": "reject_or_rework",
+            "delta_pp": -44.45,
+            "family": "tutor_access",
+            "package_key": "enlightened_engine_access_cut_thor",
+            "strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": -55.56,
+        "worst_strong_seed_delta_pp": -55.56
+      },
+      {
+        "best_delta_pp": -3.7,
+        "card_name": "Victory Chimes",
+        "current_decision": "flex_cut_tested_negative",
+        "current_lane": "early_mana",
+        "effective_role": "ramp",
+        "observation_count": 1,
+        "observations": [
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline": "8-19",
+            "candidate": "7-20",
+            "candidate_losses": 20,
+            "candidate_wins": 7,
+            "decision": "reject_or_rework",
+            "delta_pp": -3.7,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+            "strong_seed_delta_pp": -55.56
+          }
+        ],
+        "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+        "status": "locked_do_not_cut",
+        "worst_delta_pp": -3.7,
+        "worst_strong_seed_delta_pp": -55.56
+      },
+      {
+        "best_delta_pp": 3.7,
+        "card_name": "Bender's Waterskin",
+        "current_decision": "flex_but_cut_risky",
+        "current_lane": "early_mana",
+        "effective_role": "ramp",
+        "observation_count": 3,
+        "observations": [
+          {
+            "adds": [
+              "Primal Amulet // Primal Wellspring"
+            ],
+            "baseline": "8-19",
+            "candidate": "7-20",
+            "candidate_losses": 20,
+            "candidate_wins": 7,
+            "decision": "reject_or_rework",
+            "delta_pp": -3.7,
+            "family": "cost_reduce_copy",
+            "package_key": "primal_amulet_spell_engine",
+            "strong_seed_delta_pp": -44.45
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline": "8-19",
+            "candidate": "9-18",
+            "candidate_losses": 18,
+            "candidate_wins": 9,
+            "decision": "probation_deeper_gate_only",
+            "delta_pp": 3.7,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast",
+            "strong_seed_delta_pp": -44.45
+          },
+          {
+            "adds": [
+              "Brainstone"
+            ],
+            "baseline": "8-19",
+            "candidate": "6-21",
+            "candidate_losses": 21,
+            "candidate_wins": 6,
+            "decision": "reject_or_rework",
+            "delta_pp": -7.41,
+            "family": "topdeck_setup",
+            "package_key": "brainstone_topdeck_miracle",
+            "strong_seed_delta_pp": -33.33
+          }
+        ],
+        "reason": "aggregate upside exists, but it broke the known strong seed",
+        "status": "risky_cut_only_same_lane",
+        "worst_delta_pp": -7.41,
+        "worst_strong_seed_delta_pp": -44.45
+      },
+      {
+        "best_delta_pp": 3.7,
+        "card_name": "Creative Technique",
+        "current_decision": "manual_review",
+        "current_lane": "finisher_or_big_spell",
+        "effective_role": "big_spell_value",
+        "observation_count": 1,
+        "observations": [
+          {
+            "adds": [
+              "Gamble"
+            ],
+            "baseline": "8-19",
+            "candidate": "9-18",
+            "candidate_losses": 18,
+            "candidate_wins": 9,
+            "decision": "probation_deeper_gate_only",
+            "delta_pp": 3.7,
+            "family": "tutor_access",
+            "package_key": "gamble_approach_access_cut_creative",
+            "strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "aggregate upside exists, but it broke the known strong seed",
+        "status": "risky_cut_only_same_lane",
+        "worst_delta_pp": 3.7,
+        "worst_strong_seed_delta_pp": -44.45
+      }
+    ],
+    "summary": {
+      "blocked_cut_count": 11,
+      "status_counts": {
+        "locked_do_not_cut": 9,
+        "risky_cut_only_same_lane": 2
+      },
+      "tested_cut_count": 11,
+      "untested_flex_pool_count": 6
+    },
+    "untested_flex_pool": [
+      {
+        "card_name": "Arcane Signet",
+        "decision": "support_flex",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "status": "core_support"
+      },
+      {
+        "card_name": "Boros Signet",
+        "decision": "support_flex",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "status": "core_support"
+      },
+      {
+        "card_name": "Fellwar Stone",
+        "decision": "support_flex",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "status": "core_support"
+      },
+      {
+        "card_name": "Jeska's Will",
+        "decision": "support_flex",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "status": "core_support"
+      },
+      {
+        "card_name": "Sol Ring",
+        "decision": "support_flex",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "status": "core_support"
+      },
+      {
+        "card_name": "Talisman of Conviction",
+        "decision": "support_flex",
+        "effective_role": "ramp",
+        "package_lane": "early_mana",
+        "status": "core_support"
+      }
+    ]
+  },
   "deck_ids": [
     6,
     606,
@@ -19466,7 +19987,7 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T19:09:13Z",
+  "generated_at": "2026-06-27T19:15:20Z",
   "library_leng_telemetry_gates": {
     "paths": [
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
@@ -37435,6 +37956,7 @@
     "Do not continue topdeck/freecast testing by cutting Thor unless a new hypothesis explains why the seed-42 collapse would not repeat.",
     "Do not promote Boseiju over Reliquary Tower from the current land-slot gate; future spell-protection work should include pressure absorption or a conversion-speed gain, not only anti-counter text.",
     "Do not cut Fated Clash for cheap pressure protection from the current evidence; if Boros Charm is retested, it needs a different cut with an explicit reason.",
+    "Before registering any new package, reject the candidate if every proposed cut is locked or protected by the cut-safety manifest and the package has no explicit same-lane proof rationale.",
     "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
     "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
     "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap."
@@ -37457,7 +37979,8 @@
     "Gamble or Enlightened Tutor over Thor failed seed-42 triage; do not treat Thor as the obvious tutor-access cut just because Thor is not deck-proven yet.",
     "Galvanoth over Thor also failed seed-42 triage; Thor is not a clean cut for either the tutor-access lane or the topdeck/freecast lane from current evidence.",
     "Boseiju, Who Shelters All over Reliquary Tower failed seed-42 triage; anti-counter land-slot protection does not address the observed life-zero combat-pressure losses by itself.",
-    "Boros Charm over Fated Clash failed seed-42 triage at 0-9; protect Fated Clash until a same-lane replacement proves it can preserve the strong seed."
+    "Boros Charm over Fated Clash failed seed-42 triage at 0-9; protect Fated Clash until a same-lane replacement proves it can preserve the strong seed.",
+    "The cut-safety manifest now blocks repeated cuts that already collapsed seed 42 and separates them from unresolved flex slots; use that manifest before generating another package."
   ],
   "post_squee_package_gates": {
     "paths": [

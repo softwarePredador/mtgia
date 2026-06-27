@@ -180,6 +180,76 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
         self.assertEqual(row["strategic_delta"]["ritual_mana_added"], 9)
         self.assertEqual(row["strategic_delta"]["hand_to_topdeck_activation"], 3)
 
+    def test_cut_safety_manifest_blocks_collapsed_seed_and_flags_risky_cut(self):
+        manifest = audit.build_cut_safety_manifest(
+            {
+                "rows": [
+                    {
+                        "package_key": "boros_charm_pressure_cut_fated",
+                        "family": "pressure_absorption",
+                        "adds": ["Boros Charm"],
+                        "cuts": ["Fated Clash"],
+                        "baseline_wins": 8,
+                        "baseline_losses": 1,
+                        "candidate_wins": 0,
+                        "candidate_losses": 9,
+                        "delta_pp": -88.89,
+                        "strong_seed_delta_pp": -88.89,
+                        "decision": "reject_or_rework",
+                    },
+                    {
+                        "package_key": "primal_amulet_spell_engine",
+                        "family": "topdeck_freecast",
+                        "adds": ["Primal Amulet"],
+                        "cuts": ["Bender's Waterskin"],
+                        "baseline_wins": 8,
+                        "baseline_losses": 19,
+                        "candidate_wins": 9,
+                        "candidate_losses": 18,
+                        "delta_pp": 3.7,
+                        "strong_seed_delta_pp": -44.45,
+                        "decision": "probation_deeper_gate_only",
+                    },
+                ]
+            },
+            {
+                "cards": [
+                    {
+                        "card_name": "Fated Clash",
+                        "decision": "core_support",
+                        "package_lane": "interaction",
+                        "effective_role": "removal",
+                        "status": "ready",
+                    },
+                    {
+                        "card_name": "Bender's Waterskin",
+                        "decision": "engine_flex",
+                        "package_lane": "topdeck_setup",
+                        "effective_role": "topdeck_setup",
+                        "status": "ready",
+                    },
+                    {
+                        "card_name": "Manual Flex",
+                        "decision": "manual_review",
+                        "package_lane": "support",
+                        "effective_role": "support",
+                        "status": "ready",
+                    },
+                ]
+            },
+        )
+
+        by_name = {row["card_name"]: row for row in manifest["cuts"]}
+        self.assertEqual(by_name["Fated Clash"]["status"], "locked_do_not_cut")
+        self.assertEqual(by_name["Bender's Waterskin"]["status"], "risky_cut_only_same_lane")
+        self.assertEqual(manifest["summary"]["status_counts"]["locked_do_not_cut"], 1)
+        self.assertEqual(manifest["summary"]["status_counts"]["risky_cut_only_same_lane"], 1)
+        self.assertEqual(manifest["summary"]["blocked_cut_count"], 2)
+        self.assertEqual(
+            [row["card_name"] for row in manifest["untested_flex_pool"]],
+            ["Manual Flex"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

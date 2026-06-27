@@ -1315,6 +1315,44 @@ def render_markdown(report: dict[str, Any]) -> str:
         )
     lines.append("- Full per-card role, tags, rule keys, package lane, and slot decision are in the companion JSON under `deck_summaries.6.cards` and `card_decision_manifest.cards`.")
     lines.append("")
+    cut_safety = report.get("cut_safety_manifest") or {}
+    cut_summary = cut_safety.get("summary") or {}
+    cut_rows = cut_safety.get("cuts") or []
+    if cut_rows:
+        lines.append("## Cut Safety Manifest")
+        lines.append("")
+        lines.append(
+            "- Summary: "
+            f"`{json.dumps(cut_summary.get('status_counts', {}), sort_keys=True)}`; "
+            f"tested cuts `{cut_summary.get('tested_cut_count', 0)}`, "
+            f"blocked/protected cuts `{cut_summary.get('blocked_cut_count', 0)}`, "
+            f"untested flex pool `{cut_summary.get('untested_flex_pool_count', 0)}`."
+        )
+        lines.append("")
+        lines.append("| Card | Status | Lane | Role | Worst Seed 42 pp | Best Delta pp | Worst Delta pp | Obs | Read |")
+        lines.append("| --- | --- | --- | --- | ---: | ---: | ---: | ---: | --- |")
+        for row in cut_rows:
+            lines.append(
+                "| {card} | `{status}` | {lane} | {role} | {seed:+.2f} | {best:+.2f} | {worst:+.2f} | {obs} | {reason} |".format(
+                    card=row.get("card_name"),
+                    status=row.get("status"),
+                    lane=row.get("current_lane"),
+                    role=row.get("effective_role"),
+                    seed=float(row.get("worst_strong_seed_delta_pp") or 0),
+                    best=float(row.get("best_delta_pp") or 0),
+                    worst=float(row.get("worst_delta_pp") or 0),
+                    obs=row.get("observation_count"),
+                    reason=row.get("reason"),
+                )
+            )
+        lines.append("")
+        flex_pool = cut_safety.get("untested_flex_pool") or []
+        flex_names = ", ".join(f"`{row.get('card_name')}`" for row in flex_pool[:12])
+        lines.append(
+            f"- Untested flex pool sample: {flex_names or 'none'}"
+            + (f" plus `{len(flex_pool) - 12}` more." if len(flex_pool) > 12 else ".")
+        )
+        lines.append("")
     lines.append("## What Still Must Be Understood")
     lines.append("")
     for item in report["open_questions"]:
@@ -1520,6 +1558,103 @@ def build_card_decision_manifest(
     }
 
 
+def build_cut_safety_manifest(
+    post_squee_package_gates: dict[str, Any],
+    card_decision_manifest: dict[str, Any],
+) -> dict[str, Any]:
+    """Summarize which champion slots are unsafe cuts from battle evidence."""
+    card_lookup = {
+        row.get("card_name"): row
+        for row in (card_decision_manifest or {}).get("cards", [])
+        if row.get("card_name")
+    }
+    by_cut: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in (post_squee_package_gates or {}).get("rows", []):
+        for cut in row.get("cuts") or []:
+            by_cut[cut].append(
+                {
+                    "package_key": row.get("package_key"),
+                    "family": row.get("family"),
+                    "adds": row.get("adds") or [],
+                    "baseline": f"{row.get('baseline_wins')}-{row.get('baseline_losses')}",
+                    "candidate": f"{row.get('candidate_wins')}-{row.get('candidate_losses')}",
+                    "candidate_wins": int(row.get("candidate_wins") or 0),
+                    "candidate_losses": int(row.get("candidate_losses") or 0),
+                    "delta_pp": float(row.get("delta_pp") or 0.0),
+                    "strong_seed_delta_pp": float(row.get("strong_seed_delta_pp") or 0.0),
+                    "decision": row.get("decision"),
+                }
+            )
+
+    cut_rows: list[dict[str, Any]] = []
+    status_counts: Counter[str] = Counter()
+    for cut, observations in sorted(by_cut.items()):
+        card = card_lookup.get(cut) or {}
+        worst_strong = min(obs["strong_seed_delta_pp"] for obs in observations)
+        best_delta = max(obs["delta_pp"] for obs in observations)
+        worst_delta = min(obs["delta_pp"] for obs in observations)
+        collapsed_strong_seed = any(
+            obs["candidate_wins"] == 0 or obs["strong_seed_delta_pp"] <= -50.0
+            for obs in observations
+        )
+        broke_strong_seed = any(obs["strong_seed_delta_pp"] < 0 for obs in observations)
+        if collapsed_strong_seed:
+            status = "locked_do_not_cut"
+            reason = "one or more packages collapsed the known strong seed when cutting this slot"
+        elif broke_strong_seed and best_delta > 0:
+            status = "risky_cut_only_same_lane"
+            reason = "aggregate upside exists, but it broke the known strong seed"
+        elif broke_strong_seed or worst_delta < 0:
+            status = "protected_until_same_lane_win"
+            reason = "tested cuts failed or regressed; require a same-lane win before cutting again"
+        else:
+            status = "tested_no_blocker_yet"
+            reason = "tested without current blocker evidence, but still requires gate proof before promotion"
+        status_counts[status] += 1
+        cut_rows.append(
+            {
+                "card_name": cut,
+                "status": status,
+                "reason": reason,
+                "current_decision": card.get("decision", "not_in_current_champion"),
+                "current_lane": card.get("package_lane", "unknown"),
+                "effective_role": card.get("effective_role", "unknown"),
+                "worst_strong_seed_delta_pp": round(worst_strong, 2),
+                "best_delta_pp": round(best_delta, 2),
+                "worst_delta_pp": round(worst_delta, 2),
+                "observation_count": len(observations),
+                "observations": sorted(
+                    observations,
+                    key=lambda item: (item["strong_seed_delta_pp"], item["delta_pp"], item["package_key"] or ""),
+                ),
+            }
+        )
+
+    blocked = {row["card_name"] for row in cut_rows if row["status"] != "tested_no_blocker_yet"}
+    untested_flex_pool = [
+        {
+            "card_name": row.get("card_name"),
+            "decision": row.get("decision"),
+            "package_lane": row.get("package_lane"),
+            "effective_role": row.get("effective_role"),
+            "status": row.get("status"),
+        }
+        for row in (card_decision_manifest or {}).get("cards", [])
+        if row.get("card_name") not in blocked
+        and row.get("decision") in {"engine_flex", "manual_review", "support_flex"}
+    ]
+    return {
+        "summary": {
+            "status_counts": dict(sorted(status_counts.items())),
+            "tested_cut_count": len(cut_rows),
+            "blocked_cut_count": len(blocked),
+            "untested_flex_pool_count": len(untested_flex_pool),
+        },
+        "cuts": sorted(cut_rows, key=lambda item: (item["status"], item["card_name"])),
+        "untested_flex_pool": sorted(untested_flex_pool, key=lambda item: item["card_name"] or ""),
+    }
+
+
 def render_card_roles_markdown(report: dict[str, Any]) -> str:
     deck = report["deck_summaries"].get("6") or {}
     cards = deck.get("cards") or []
@@ -1629,6 +1764,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         thor_rule_runtime_audit,
         squee_rule_materialization_audit,
     )
+    cut_safety_manifest = build_cut_safety_manifest(
+        post_squee_package_gates,
+        card_decision_manifest,
+    )
 
     open_questions = [
         "Use the per-game Squee diagnostic to decide whether the next improvement is topdeck consistency, explicit discard/rummage enablement, or a different closing package.",
@@ -1649,6 +1788,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Galvanoth over Thor also failed seed-42 triage; Thor is not a clean cut for either the tutor-access lane or the topdeck/freecast lane from current evidence.",
         "Boseiju, Who Shelters All over Reliquary Tower failed seed-42 triage; anti-counter land-slot protection does not address the observed life-zero combat-pressure losses by itself.",
         "Boros Charm over Fated Clash failed seed-42 triage at 0-9; protect Fated Clash until a same-lane replacement proves it can preserve the strong seed.",
+        "The cut-safety manifest now blocks repeated cuts that already collapsed seed 42 and separates them from unresolved flex slots; use that manifest before generating another package.",
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
@@ -1664,6 +1804,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Do not continue topdeck/freecast testing by cutting Thor unless a new hypothesis explains why the seed-42 collapse would not repeat.",
         "Do not promote Boseiju over Reliquary Tower from the current land-slot gate; future spell-protection work should include pressure absorption or a conversion-speed gain, not only anti-counter text.",
         "Do not cut Fated Clash for cheap pressure protection from the current evidence; if Boros Charm is retested, it needs a different cut with an explicit reason.",
+        "Before registering any new package, reject the candidate if every proposed cut is locked or protected by the cut-safety manifest and the package has no explicit same-lane proof rationale.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
         "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.",
@@ -1698,6 +1839,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "loss_failure_classifier_path": str(args.loss_failure_classifier),
         "loss_failure_classifier": loss_failure_classifier,
         "card_decision_manifest": card_decision_manifest,
+        "cut_safety_manifest": cut_safety_manifest,
         "open_questions": open_questions,
         "next_gates": next_gates,
     }
