@@ -17,7 +17,7 @@ import random
 import signal
 import sqlite3
 import traceback
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
@@ -206,6 +206,8 @@ class GateTelemetry:
             "squee_upkeep_return": set(),
         }
         self.cards: Counter[str] = Counter()
+        self.event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
+        self.strategic_event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.squee_graveyard_entries_by_game: Counter[str] = Counter()
         self.squee_known_graveyard_balance_by_game: Counter[str] = Counter()
         self.squee_game_traces: dict[str, list[dict[str, Any]]] = {}
@@ -350,6 +352,8 @@ class GateTelemetry:
     def record(self, event: str, data: Mapping[str, Any]) -> None:
         self.event_sequence += 1
         self.events[event] += 1
+        self.event_counts_by_game[self.current_game][event] += 1
+        strategic_before = self.strategic_events.copy()
         player = str(data.get("player") or "")
         card = str(data.get("card") or "")
         squee_mentioned = "Squee, Goblin Nabob" in json.dumps(data, sort_keys=True, default=str)
@@ -438,12 +442,35 @@ class GateTelemetry:
                 balance_before=squee_balance_before,
                 balance_after=self.squee_known_graveyard_balance_by_game[self.current_game],
             )
+        for key, count in self.strategic_events.items():
+            delta = count - strategic_before.get(key, 0)
+            if delta:
+                self.strategic_event_counts_by_game[self.current_game][key] += delta
+
+    def game_summary(self, game_id: str) -> dict[str, Any]:
+        return {
+            "event_counts": dict(self.event_counts_by_game.get(game_id, {})),
+            "strategic_event_counts": dict(self.strategic_event_counts_by_game.get(game_id, {})),
+            "squee_known_graveyard_balance": int(self.squee_known_graveyard_balance_by_game.get(game_id, 0)),
+            "squee_trace_count": len(self.squee_game_traces.get(game_id, [])),
+            "squee_anomaly_count": sum(
+                1 for item in self.squee_anomalies if item.get("game_id") == game_id
+            ),
+        }
 
     def as_json(self, total_games: int) -> dict[str, Any]:
         games = max(1, total_games)
         return {
             "event_counts": dict(self.events),
             "strategic_event_counts": dict(self.strategic_events),
+            "event_counts_by_game": {
+                key: dict(value)
+                for key, value in sorted(self.event_counts_by_game.items())
+            },
+            "strategic_event_counts_by_game": {
+                key: dict(value)
+                for key, value in sorted(self.strategic_event_counts_by_game.items())
+            },
             "strategic_games": {
                 key: {
                     "games": len(value),
@@ -488,6 +515,7 @@ def run_deck_gate(
     win_turns: list[int] = []
     win_reasons: Counter[str] = Counter()
     opponent_rows: list[dict[str, Any]] = []
+    game_rows: list[dict[str, Any]] = []
     total_games = games_per_opponent * len(opponents)
     completed_games = 0
 
@@ -522,6 +550,7 @@ def run_deck_gate(
                     turns = int(battle.CURRENT_REPLAY_TURN or 0)
                     reason = f"game_timeout_{float(game_timeout_seconds):.1f}s"
                     telemetry.events["game_timeout"] += 1
+                    telemetry.event_counts_by_game[game_id]["game_timeout"] += 1
                 if result == "win":
                     wins += 1
                     profile_wins += 1
@@ -536,6 +565,19 @@ def run_deck_gate(
                     stalls += 1
                     profile_stalls += 1
                 completed_games += 1
+                game_rows.append(
+                    {
+                        "game_id": game_id,
+                        "game_index": game_index,
+                        "opponent": profile.get("name", "?"),
+                        "opponent_archetype": profile.get("archetype", "?"),
+                        "picked_opponents": [item.get("name", "?") for item in picked],
+                        "result": result,
+                        "turns": int(turns or 0),
+                        "reason": str(reason),
+                        **telemetry.game_summary(game_id),
+                    }
+                )
                 if progress_callback is not None:
                     progress_callback(
                         {
@@ -593,6 +635,7 @@ def run_deck_gate(
         "avg_win_turn": round(sum(win_turns) / len(win_turns), 2) if win_turns else 0,
         "win_reasons": dict(win_reasons),
         "opponents": opponent_rows,
+        "game_results": game_rows,
         "telemetry": telemetry.as_json(total_games),
     }
 

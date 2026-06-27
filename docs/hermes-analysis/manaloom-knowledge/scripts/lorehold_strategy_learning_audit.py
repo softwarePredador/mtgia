@@ -44,6 +44,7 @@ DEFAULT_SQUEE_GATES = [
 DEFAULT_GENERAL_SYNERGY_CONFIRM = (
     REPORT_DIR / "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
 )
+DEFAULT_SQUEE_SEED_DIAGNOSTIC = REPORT_DIR / "lorehold_squee_seed_diagnostic_20260627_v1.json"
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
 EXTERNAL_METHOD_SOURCES = [
@@ -403,6 +404,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append("- Zone-trace evidence proves `Squee` can be cast, move to graveyard, and return during games, not only in a unit test. Across the 10-seed suite it has `squee_to_graveyard=16`, `squee_upkeep_return=12`, `squee_return_after_known_graveyard_entry=12`, and `squee_return_without_known_graveyard_entry=0`.")
     lines.append("- Proven Squee routes in this suite are battlefield-to-graveyard through combat/wipes plus one opponent mill (`Brain Freeze`), but Squee does not appear in enough games to explain the whole deck result.")
     lines.append("- Important caveat: the trace gate still did not show `Squee` being discarded by Lorehold rummage or spell-rummage. Treat the discard-fuel loop as a hypothesis; the proven loop is graveyard recurrence after observed zone entries.")
+    lines.append("- The per-game seed diagnostic shows the real failure mode: Squee is not yet self-sufficient. Seed 42 wins when topdeck/miracle/spell volume is high; seeds 7 and 20260625 go `0W/9L` with no Squee graveyard/return events and very low topdeck/miracle conversion.")
     lines.append("- `Squee` still has an aggregate-loader gap: the verified runtime rule exists in `battle_card_rules`, but the candidate snapshot row keeps `deck_cards.battle_rules_json=[]` for that card.")
     lines.append("- The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.")
     lines.append("")
@@ -450,6 +452,27 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append("")
     lines.append("Interpretation: under fixed hash-seed, process-isolated, timeout-bounded conditions, the Squee candidate remains the best current candidate across the 10-seed suite, but only by a narrow margin. This is enough to keep studying the package, not enough to promote it as the final list. The trace evidence still proves every observed `squee_upkeep_return` occurred after an observed Squee graveyard entry, mostly battlefield-to-graveyard movement plus one mill event. It did not prove `lorehold_rummage_discards_squee` or `lorehold_spell_rummage_discards_squee`, so the exact discard-fuel loop remains a targeted next hypothesis rather than a closed fact.")
     lines.append("")
+    diagnostic = report.get("squee_seed_diagnostic") or {}
+    if diagnostic:
+        lines.append("## Squee Seed Diagnostic")
+        lines.append("")
+        lines.append(f"- Source: `{report.get('squee_seed_diagnostic_path')}`")
+        for finding in diagnostic.get("findings") or []:
+            lines.append(f"- {finding}")
+        lines.append("")
+        lines.append("| Seed | Result | Games | Avg Turns | Miracle | Topdeck | Spell Cast | Squee GY | Squee Return | Games With Topdeck | Games With Squee GY |")
+        lines.append("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
+        for gate in diagnostic.get("diagnostic_gates") or []:
+            for row in gate.get("candidate_by_result") or []:
+                ev = row.get("strategic_events") or {}
+                games_with = row.get("games_with") or {}
+                lines.append(
+                    f"| {gate.get('seed')} | {row.get('result')} | {row.get('games')} | {float(row.get('avg_turns') or 0):.2f} | "
+                    f"{ev.get('miracle_cast', 0)} | {ev.get('topdeck_manipulation_activated', 0)} | {ev.get('lorehold_spell_cast', 0)} | "
+                    f"{ev.get('squee_to_graveyard', 0)} | {ev.get('squee_upkeep_return', 0)} | "
+                    f"{games_with.get('topdeck_manipulation_activated', 0)} | {games_with.get('squee_to_graveyard', 0)} |"
+                )
+        lines.append("")
     lines.append("## Variant Learning")
     lines.append("")
     lines.append("| Rank | Deck | Score | Intent | Lands | Rule Ready | Main Risks |")
@@ -626,9 +649,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 
     squee_gates = aggregate_squee_gates(args.squee_gates)
     general_confirm = load_general_synergy_confirm(args.general_synergy_confirm)
+    squee_seed_diagnostic = read_json(args.squee_seed_diagnostic)
 
     open_questions = [
-        "Diagnose why the 10-seed suite compresses the Squee advantage to only +3 wins over `deck_607`; seed 7 and seed 20260625 are complete Squee failures.",
+        "Use the per-game Squee diagnostic to decide whether the next improvement is topdeck consistency, explicit discard/rummage enablement, or a different closing package.",
         "Treat Squee as a provisional micro-upgrade, not a promoted final deck slot, until a support package or alternative cut shows a larger reproducible edge.",
         "Make all decisive battle gates run with `PYTHONHASHSEED=0`, `--isolate-deck-process`, and per-game timeout; same simulation seed without fixed hash seed/process isolation is not enough for deck promotion.",
         "Review DB-role versus effective-role divergences surfaced by the card-role manifest, especially cards stored as `draw` or `unknown` while functioning as protection, removal, miracle engine, or board wipe.",
@@ -638,7 +662,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
-        "Build a Squee support/anti-failure diagnostic: compare seed 7 and seed 20260625 traces against seed 42 to learn why Squee sometimes never converts.",
+        "Build one topdeck consistency package against the 607+Squee champion, because seed 42 wins with topdeck=30/miracle=33 while the failure seeds are topdeck-poor.",
+        "Build one explicit Squee-enabler package with discard/rummage access, because the proven recurrence is real but the intended discard-fuel loop is still not observed.",
         "Build two narrow packages from 615: one Birgi/ritual package and one topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "If a candidate uses a rule missing from aggregated deck rows, run the battle-card-specific test plus one replay trace before trusting the battle result.",
@@ -657,6 +682,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "matrix_generated_at": matrix.get("generated_at"),
         "matrix_ranked": ranked,
         "squee_gates": squee_gates,
+        "squee_seed_diagnostic_path": str(args.squee_seed_diagnostic),
+        "squee_seed_diagnostic": squee_seed_diagnostic,
         "general_synergy_confirm": general_confirm,
         "open_questions": open_questions,
         "next_gates": next_gates,
@@ -668,6 +695,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     parser.add_argument("--squee-gate", dest="squee_gates", type=Path, action="append")
+    parser.add_argument("--squee-seed-diagnostic", type=Path, default=DEFAULT_SQUEE_SEED_DIAGNOSTIC)
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
     parser.add_argument("--deck-ids", default=",".join(str(value) for value in DEFAULT_DECK_IDS))
     parser.add_argument("--stem", default="lorehold_strategy_learning_audit_20260627_v1")

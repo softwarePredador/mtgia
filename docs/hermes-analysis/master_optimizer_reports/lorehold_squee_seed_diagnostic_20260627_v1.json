@@ -1,0 +1,1431 @@
+{
+  "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+  "diagnostic_gate_paths": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed42_20260627_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json"
+  ],
+  "diagnostic_gates": [
+    {
+      "candidate_by_result": [
+        {
+          "avg_turns": 6.0,
+          "games": 1,
+          "games_with": {
+            "lorehold_cost_paid": 1,
+            "lorehold_spell_cast": 1,
+            "lorehold_upkeep_rummage": 1,
+            "squee_to_graveyard": 1
+          },
+          "result": "loss",
+          "strategic_events": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 5,
+            "lorehold_upkeep_rummage": 5,
+            "squee_to_graveyard": 1
+          }
+        },
+        {
+          "avg_turns": 15.12,
+          "games": 8,
+          "games_with": {
+            "lorehold_cost_paid": 8,
+            "lorehold_spell_cast": 8,
+            "lorehold_spell_rummage": 4,
+            "lorehold_upkeep_rummage": 6,
+            "miracle_cast": 8,
+            "squee_return_after_known_graveyard_entry": 2,
+            "squee_to_graveyard": 3,
+            "squee_upkeep_return": 2,
+            "topdeck_manipulation_activated": 5
+          },
+          "result": "win",
+          "strategic_events": {
+            "lorehold_cost_paid": 141,
+            "lorehold_spell_cast": 113,
+            "lorehold_spell_rummage": 19,
+            "lorehold_upkeep_rummage": 36,
+            "miracle_cast": 33,
+            "squee_return_after_known_graveyard_entry": 5,
+            "squee_to_graveyard": 6,
+            "squee_upkeep_return": 5,
+            "topdeck_manipulation_activated": 30
+          }
+        }
+      ],
+      "candidate_game_lens": [
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "lorehold_spell_cast": 32,
+          "miracle_cast": 5,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "win",
+          "squee_to_graveyard": 1,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 9,
+          "turns": 17
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "lorehold_spell_cast": 19,
+          "miracle_cast": 7,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "win",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1,
+          "turns": 22
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "lorehold_spell_cast": 14,
+          "miracle_cast": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "win",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 8,
+          "turns": 20
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "lorehold_spell_cast": 9,
+          "miracle_cast": 3,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "win",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1,
+          "turns": 13
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "lorehold_spell_cast": 5,
+          "miracle_cast": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 1,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "lorehold_spell_cast": 6,
+          "miracle_cast": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "win",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 8
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "lorehold_spell_cast": 11,
+          "miracle_cast": 6,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "win",
+          "squee_to_graveyard": 3,
+          "squee_upkeep_return": 3,
+          "topdeck_manipulation_activated": 11,
+          "turns": 21
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "lorehold_spell_cast": 13,
+          "miracle_cast": 7,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "win",
+          "squee_to_graveyard": 2,
+          "squee_upkeep_return": 2,
+          "topdeck_manipulation_activated": 0,
+          "turns": 12
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "lorehold_spell_cast": 9,
+          "miracle_cast": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "win",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 8
+        }
+      ],
+      "deck_process_isolation": true,
+      "game_timeout_seconds": 20.0,
+      "python_hash_seed": "0",
+      "results": [
+        {
+          "avg_win_turn": 0.0,
+          "deck_key": "deck_6",
+          "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 89,
+            "lorehold_spell_cast": 66,
+            "lorehold_spell_rummage": 0,
+            "lorehold_upkeep_rummage": 15,
+            "miracle_cast": 9,
+            "squee_return_after_known_graveyard_entry": 0,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 0,
+            "squee_upkeep_return": 0,
+            "topdeck_manipulation_activated": 18
+          },
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        {
+          "avg_win_turn": 17.6,
+          "deck_key": "deck_607",
+          "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+          "games": 9,
+          "losses": 4,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 122,
+            "lorehold_spell_cast": 98,
+            "lorehold_spell_rummage": 4,
+            "lorehold_upkeep_rummage": 36,
+            "miracle_cast": 25,
+            "squee_return_after_known_graveyard_entry": 0,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 0,
+            "squee_upkeep_return": 0,
+            "topdeck_manipulation_activated": 9
+          },
+          "win_rate": 55.56,
+          "wins": 5
+        },
+        {
+          "avg_win_turn": 15.12,
+          "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+          "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+          "games": 9,
+          "losses": 1,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 148,
+            "lorehold_spell_cast": 118,
+            "lorehold_spell_rummage": 19,
+            "lorehold_upkeep_rummage": 41,
+            "miracle_cast": 33,
+            "squee_return_after_known_graveyard_entry": 5,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 7,
+            "squee_upkeep_return": 5,
+            "topdeck_manipulation_activated": 30
+          },
+          "win_rate": 88.89,
+          "wins": 8
+        }
+      ],
+      "seed": "42",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed42_20260627_v1.json",
+      "status": "ready"
+    },
+    {
+      "candidate_by_result": [
+        {
+          "avg_turns": 7.0,
+          "games": 9,
+          "games_with": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 9,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 8,
+            "miracle_cast": 2,
+            "topdeck_manipulation_activated": 1
+          },
+          "result": "loss",
+          "strategic_events": {
+            "lorehold_cost_paid": 64,
+            "lorehold_spell_cast": 48,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 38,
+            "miracle_cast": 4,
+            "topdeck_manipulation_activated": 3
+          }
+        }
+      ],
+      "candidate_game_lens": [
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "lorehold_spell_cast": 9,
+          "miracle_cast": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 10
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "lorehold_spell_cast": 4,
+          "miracle_cast": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "lorehold_spell_cast": 6,
+          "miracle_cast": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 7
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "lorehold_spell_cast": 6,
+          "miracle_cast": 3,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 3,
+          "turns": 7
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "lorehold_spell_cast": 8,
+          "miracle_cast": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 7
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "lorehold_spell_cast": 6,
+          "miracle_cast": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "lorehold_spell_cast": 3,
+          "miracle_cast": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 5
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "lorehold_spell_cast": 3,
+          "miracle_cast": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 8
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "lorehold_spell_cast": 3,
+          "miracle_cast": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 7
+        }
+      ],
+      "deck_process_isolation": true,
+      "game_timeout_seconds": 20.0,
+      "python_hash_seed": "0",
+      "results": [
+        {
+          "avg_win_turn": 17.0,
+          "deck_key": "deck_6",
+          "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+          "games": 9,
+          "losses": 6,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 100,
+            "lorehold_spell_cast": 79,
+            "lorehold_spell_rummage": 0,
+            "lorehold_upkeep_rummage": 4,
+            "miracle_cast": 10,
+            "squee_return_after_known_graveyard_entry": 0,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 0,
+            "squee_upkeep_return": 0,
+            "topdeck_manipulation_activated": 4
+          },
+          "win_rate": 33.33,
+          "wins": 3
+        },
+        {
+          "avg_win_turn": 14.75,
+          "deck_key": "deck_607",
+          "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+          "games": 9,
+          "losses": 5,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 97,
+            "lorehold_spell_cast": 84,
+            "lorehold_spell_rummage": 0,
+            "lorehold_upkeep_rummage": 46,
+            "miracle_cast": 25,
+            "squee_return_after_known_graveyard_entry": 0,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 0,
+            "squee_upkeep_return": 0,
+            "topdeck_manipulation_activated": 17
+          },
+          "win_rate": 44.44,
+          "wins": 4
+        },
+        {
+          "avg_win_turn": 0.0,
+          "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+          "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 64,
+            "lorehold_spell_cast": 48,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 38,
+            "miracle_cast": 4,
+            "squee_return_after_known_graveyard_entry": 0,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 0,
+            "squee_upkeep_return": 0,
+            "topdeck_manipulation_activated": 3
+          },
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      ],
+      "seed": "20260625",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json",
+      "status": "ready"
+    },
+    {
+      "candidate_by_result": [
+        {
+          "avg_turns": 6.33,
+          "games": 9,
+          "games_with": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 9,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 4,
+            "topdeck_manipulation_activated": 1
+          },
+          "result": "loss",
+          "strategic_events": {
+            "lorehold_cost_paid": 53,
+            "lorehold_spell_cast": 42,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 27,
+            "miracle_cast": 4,
+            "topdeck_manipulation_activated": 2
+          }
+        }
+      ],
+      "candidate_game_lens": [
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "lorehold_spell_cast": 3,
+          "miracle_cast": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "lorehold_spell_cast": 4,
+          "miracle_cast": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 2,
+          "turns": 7
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "lorehold_spell_cast": 5,
+          "miracle_cast": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "lorehold_spell_cast": 4,
+          "miracle_cast": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "lorehold_spell_cast": 7,
+          "miracle_cast": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 7
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "lorehold_spell_cast": 1,
+          "miracle_cast": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 5
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "lorehold_spell_cast": 6,
+          "miracle_cast": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 8
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "lorehold_spell_cast": 3,
+          "miracle_cast": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "lorehold_spell_cast": 9,
+          "miracle_cast": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "result": "loss",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        }
+      ],
+      "deck_process_isolation": true,
+      "game_timeout_seconds": 20.0,
+      "python_hash_seed": "0",
+      "results": [
+        {
+          "avg_win_turn": 17.5,
+          "deck_key": "deck_6",
+          "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+          "games": 9,
+          "losses": 7,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 95,
+            "lorehold_spell_cast": 80,
+            "lorehold_spell_rummage": 0,
+            "lorehold_upkeep_rummage": 10,
+            "miracle_cast": 9,
+            "squee_return_after_known_graveyard_entry": 0,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 0,
+            "squee_upkeep_return": 0,
+            "topdeck_manipulation_activated": 11
+          },
+          "win_rate": 22.22,
+          "wins": 2
+        },
+        {
+          "avg_win_turn": 9.0,
+          "deck_key": "deck_607",
+          "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+          "games": 9,
+          "losses": 8,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 83,
+            "lorehold_spell_cast": 65,
+            "lorehold_spell_rummage": 0,
+            "lorehold_upkeep_rummage": 36,
+            "miracle_cast": 12,
+            "squee_return_after_known_graveyard_entry": 0,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 0,
+            "squee_upkeep_return": 0,
+            "topdeck_manipulation_activated": 0
+          },
+          "win_rate": 11.11,
+          "wins": 1
+        },
+        {
+          "avg_win_turn": 0.0,
+          "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+          "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "strategic_events": {
+            "lorehold_cost_paid": 53,
+            "lorehold_spell_cast": 42,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 27,
+            "miracle_cast": 4,
+            "squee_return_after_known_graveyard_entry": 0,
+            "squee_return_without_known_graveyard_entry": 0,
+            "squee_to_graveyard": 0,
+            "squee_upkeep_return": 0,
+            "topdeck_manipulation_activated": 2
+          },
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      ],
+      "seed": "7",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
+      "status": "ready"
+    }
+  ],
+  "findings": [
+    "The 10-seed suite keeps Squee only narrowly ahead: 24W/66L vs deck_607 21W/69L. That is evidence to keep testing, not evidence to lock the final list.",
+    "Seed 42 is the success case: candidate 8W/1L with topdeck=30, miracle=33, squee_gy=7, squee_return=5.",
+    "Seeds 7 and 20260625 are the anti-cases: candidate 0W/9L and 0W/9L, with squee_gy=0/0 and squee_return=0/0.",
+    "The practical read is that Squee is not yet a self-sufficient plan. It helps when the topdeck/miracle/spell-volume engine is alive, but in failure seeds it does not appear or convert."
+  ],
+  "generated_at": "2026-06-27T15:47:22Z",
+  "next_tests": [
+    "Do not promote Squee as final on the current evidence; treat it as a provisional micro-upgrade.",
+    "Test one topdeck consistency package against 607+Squee, because the winning seed is topdeck/miracle rich and the failure seeds are not.",
+    "Test one explicit Squee-enabler package with discard/rummage access, because current traces prove graveyard recurrence but not the intended discard-fuel loop.",
+    "Keep per-game telemetry on all decisive gates so future swaps can be explained by actual game outcomes, not aggregate counters alone."
+  ],
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "suite_gates": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed13_20260627_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed21_20260627_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed42_20260627_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed123_20260627_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260624_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260626_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260627_v1.json"
+  ],
+  "suite_rows": [
+    {
+      "avg_win_turn": 17.5,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 7,
+      "seed": "7",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 95,
+        "lorehold_spell_cast": 80,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 10,
+        "miracle_cast": 9,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 11
+      },
+      "win_rate": 22.22,
+      "wins": 2
+    },
+    {
+      "avg_win_turn": 9.0,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 8,
+      "seed": "7",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 83,
+        "lorehold_spell_cast": 65,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 36,
+        "miracle_cast": 12,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 0
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 0.0,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 9,
+      "seed": "7",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 53,
+        "lorehold_spell_cast": 42,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 4,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 2
+      },
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    {
+      "avg_win_turn": 18.0,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 8,
+      "seed": "13",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed13_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 62,
+        "lorehold_spell_cast": 56,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 6,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 3
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 13.0,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 7,
+      "seed": "13",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed13_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 64,
+        "lorehold_spell_cast": 56,
+        "lorehold_spell_rummage": 3,
+        "lorehold_upkeep_rummage": 28,
+        "miracle_cast": 7,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 4
+      },
+      "win_rate": 22.22,
+      "wins": 2
+    },
+    {
+      "avg_win_turn": 16.0,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 8,
+      "seed": "13",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed13_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 76,
+        "lorehold_spell_cast": 65,
+        "lorehold_spell_rummage": 6,
+        "lorehold_upkeep_rummage": 21,
+        "miracle_cast": 9,
+        "squee_return_after_known_graveyard_entry": 2,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 3,
+        "squee_upkeep_return": 2,
+        "topdeck_manipulation_activated": 6
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 14.0,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 8,
+      "seed": "21",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed21_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 70,
+        "lorehold_spell_cast": 51,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 14,
+        "miracle_cast": 5,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 2
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 14.0,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 8,
+      "seed": "21",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed21_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 70,
+        "lorehold_spell_cast": 51,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 12,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 14
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 18.0,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 8,
+      "seed": "21",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed21_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 74,
+        "lorehold_spell_cast": 63,
+        "lorehold_spell_rummage": 6,
+        "lorehold_upkeep_rummage": 45,
+        "miracle_cast": 10,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 0
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 0.0,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 9,
+      "seed": "42",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed42_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 89,
+        "lorehold_spell_cast": 66,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 15,
+        "miracle_cast": 9,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 18
+      },
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    {
+      "avg_win_turn": 17.6,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 4,
+      "seed": "42",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed42_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 122,
+        "lorehold_spell_cast": 98,
+        "lorehold_spell_rummage": 4,
+        "lorehold_upkeep_rummage": 36,
+        "miracle_cast": 25,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 9
+      },
+      "win_rate": 55.56,
+      "wins": 5
+    },
+    {
+      "avg_win_turn": 15.12,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 1,
+      "seed": "42",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed42_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 148,
+        "lorehold_spell_cast": 118,
+        "lorehold_spell_rummage": 19,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 33,
+        "squee_return_after_known_graveyard_entry": 5,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "topdeck_manipulation_activated": 30
+      },
+      "win_rate": 88.89,
+      "wins": 8
+    },
+    {
+      "avg_win_turn": 15.0,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 8,
+      "seed": "99",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 90,
+        "lorehold_spell_cast": 72,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 19,
+        "miracle_cast": 13,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 14
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 0.0,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 9,
+      "seed": "99",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 74,
+        "lorehold_spell_cast": 57,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 11,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 8
+      },
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    {
+      "avg_win_turn": 14.5,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 7,
+      "seed": "99",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 103,
+        "lorehold_spell_cast": 84,
+        "lorehold_spell_rummage": 21,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 14,
+        "squee_return_after_known_graveyard_entry": 1,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "topdeck_manipulation_activated": 13
+      },
+      "win_rate": 22.22,
+      "wins": 2
+    },
+    {
+      "avg_win_turn": 17.8,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 4,
+      "seed": "123",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed123_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 124,
+        "lorehold_spell_cast": 99,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 14,
+        "miracle_cast": 17,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 20
+      },
+      "win_rate": 55.56,
+      "wins": 5
+    },
+    {
+      "avg_win_turn": 13.0,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 6,
+      "seed": "123",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed123_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 89,
+        "lorehold_spell_cast": 72,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 25,
+        "miracle_cast": 16,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 2
+      },
+      "win_rate": 33.33,
+      "wins": 3
+    },
+    {
+      "avg_win_turn": 14.4,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 4,
+      "seed": "123",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed123_20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 105,
+        "lorehold_spell_cast": 87,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 46,
+        "miracle_cast": 19,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 11
+      },
+      "win_rate": 55.56,
+      "wins": 5
+    },
+    {
+      "avg_win_turn": 12.0,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 8,
+      "seed": "20260624",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260624_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 79,
+        "lorehold_spell_cast": 71,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 21,
+        "miracle_cast": 10,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 5
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 13.5,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 7,
+      "seed": "20260624",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260624_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 81,
+        "lorehold_spell_cast": 64,
+        "lorehold_spell_rummage": 3,
+        "lorehold_upkeep_rummage": 36,
+        "miracle_cast": 15,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 13
+      },
+      "win_rate": 22.22,
+      "wins": 2
+    },
+    {
+      "avg_win_turn": 17.33,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 6,
+      "seed": "20260624",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260624_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 99,
+        "lorehold_spell_cast": 82,
+        "lorehold_spell_rummage": 16,
+        "lorehold_upkeep_rummage": 25,
+        "miracle_cast": 10,
+        "squee_return_after_known_graveyard_entry": 4,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 4,
+        "squee_upkeep_return": 4,
+        "topdeck_manipulation_activated": 11
+      },
+      "win_rate": 33.33,
+      "wins": 3
+    },
+    {
+      "avg_win_turn": 17.0,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 6,
+      "seed": "20260625",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 100,
+        "lorehold_spell_cast": 79,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 4,
+        "miracle_cast": 10,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 4
+      },
+      "win_rate": 33.33,
+      "wins": 3
+    },
+    {
+      "avg_win_turn": 14.75,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 5,
+      "seed": "20260625",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 97,
+        "lorehold_spell_cast": 84,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 46,
+        "miracle_cast": 25,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 17
+      },
+      "win_rate": 44.44,
+      "wins": 4
+    },
+    {
+      "avg_win_turn": 0.0,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 9,
+      "seed": "20260625",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 64,
+        "lorehold_spell_cast": 48,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 38,
+        "miracle_cast": 4,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 3
+      },
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    {
+      "avg_win_turn": 17.0,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 8,
+      "seed": "20260626",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260626_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 72,
+        "lorehold_spell_cast": 56,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 1,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 4
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 21.0,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 8,
+      "seed": "20260626",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260626_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 73,
+        "lorehold_spell_cast": 60,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 31,
+        "miracle_cast": 9,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 8
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 15.0,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 8,
+      "seed": "20260626",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260626_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 85,
+        "lorehold_spell_cast": 102,
+        "lorehold_spell_rummage": 6,
+        "lorehold_upkeep_rummage": 28,
+        "miracle_cast": 11,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 9
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 13.0,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "games": 9,
+      "losses": 8,
+      "seed": "20260627",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 73,
+        "lorehold_spell_cast": 60,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 6,
+        "miracle_cast": 9,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 7
+      },
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "avg_win_turn": 16.5,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "games": 9,
+      "losses": 7,
+      "seed": "20260627",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 106,
+        "lorehold_spell_cast": 87,
+        "lorehold_spell_rummage": 5,
+        "lorehold_upkeep_rummage": 29,
+        "miracle_cast": 13,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 6
+      },
+      "win_rate": 22.22,
+      "wins": 2
+    },
+    {
+      "avg_win_turn": 15.33,
+      "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "deck_name": "Lorehold 607 Squee isolated cached timeout candidate v3",
+      "games": 9,
+      "losses": 6,
+      "seed": "20260627",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260627_v1.json",
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 95,
+        "lorehold_spell_cast": 80,
+        "lorehold_spell_rummage": 15,
+        "lorehold_upkeep_rummage": 46,
+        "miracle_cast": 21,
+        "squee_return_after_known_graveyard_entry": 0,
+        "squee_return_without_known_graveyard_entry": 0,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "topdeck_manipulation_activated": 12
+      },
+      "win_rate": 33.33,
+      "wins": 3
+    }
+  ],
+  "suite_summary": {
+    "candidate_607_squee_hashseed0_isolated_cached_timeout_v3": {
+      "games": 90,
+      "losses": 66,
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 902,
+        "lorehold_spell_cast": 771,
+        "lorehold_spell_rummage": 93,
+        "lorehold_upkeep_rummage": 358,
+        "miracle_cast": 135,
+        "squee_return_after_known_graveyard_entry": 12,
+        "squee_to_graveyard": 16,
+        "squee_upkeep_return": 12,
+        "topdeck_manipulation_activated": 97
+      },
+      "win_rate": 26.67,
+      "wins": 24
+    },
+    "deck_6": {
+      "games": 90,
+      "losses": 74,
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 854,
+        "lorehold_spell_cast": 690,
+        "lorehold_upkeep_rummage": 110,
+        "miracle_cast": 89,
+        "topdeck_manipulation_activated": 88
+      },
+      "win_rate": 17.78,
+      "wins": 16
+    },
+    "deck_607": {
+      "games": 90,
+      "losses": 69,
+      "stalls": 0,
+      "strategic_events": {
+        "lorehold_cost_paid": 859,
+        "lorehold_spell_cast": 694,
+        "lorehold_spell_rummage": 17,
+        "lorehold_upkeep_rummage": 335,
+        "miracle_cast": 145,
+        "topdeck_manipulation_activated": 81
+      },
+      "win_rate": 23.33,
+      "wins": 21
+    }
+  }
+}

@@ -70,6 +70,15 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["strategic_event_counts"]["squee_upkeep_return"], 2)
         self.assertEqual(payload["strategic_event_counts"]["squee_return_after_known_graveyard_entry"], 1)
         self.assertEqual(payload["strategic_event_counts"]["squee_return_without_known_graveyard_entry"], 1)
+        self.assertEqual(payload["event_counts_by_game"]["game-1"]["miracle_cast"], 1)
+        self.assertEqual(payload["strategic_event_counts_by_game"]["game-1"]["squee_to_graveyard"], 3)
+        self.assertEqual(payload["strategic_event_counts_by_game"]["game-1"]["squee_upkeep_return"], 1)
+        self.assertEqual(
+            payload["strategic_event_counts_by_game"]["game-2"]["squee_return_without_known_graveyard_entry"],
+            1,
+        )
+        self.assertEqual(telemetry.game_summary("game-1")["strategic_event_counts"]["squee_to_graveyard"], 3)
+        self.assertEqual(telemetry.game_summary("game-2")["squee_anomaly_count"], 1)
         self.assertEqual(payload["strategic_games"]["miracle_cast"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["miracle_cast"]["rate"], 0.5)
         self.assertEqual(payload["strategic_games"]["squee_upkeep_return"]["games"], 2)
@@ -128,6 +137,9 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["strategic_event_counts"]["squee_to_graveyard"], 1)
         self.assertEqual(payload["strategic_event_counts"]["squee_upkeep_return"], 1)
         self.assertEqual(payload["strategic_event_counts"]["squee_return_after_known_graveyard_entry"], 1)
+        self.assertEqual(payload["strategic_event_counts_by_game"]["game-mill"]["squee_to_graveyard"], 1)
+        self.assertEqual(payload["strategic_event_counts_by_game"]["game-mill"]["squee_upkeep_return"], 1)
+        self.assertEqual(telemetry.game_summary("game-mill")["squee_trace_count"], 2)
         self.assertNotIn(
             "squee_return_without_known_graveyard_entry",
             payload["strategic_event_counts"],
