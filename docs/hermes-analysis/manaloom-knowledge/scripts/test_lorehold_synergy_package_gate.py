@@ -203,6 +203,29 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertTrue(
             gate.PACKAGE_DEFINITIONS["ghostly_prison_pressure_cut_promise"]["allow_miracle_core_cuts"],
         )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["guttersnipe_spell_payoff_cut_prismari"]["family"],
+            "spellcast_payoff",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["guttersnipe_spell_payoff_cut_prismari"]["adds"],
+            ["Guttersnipe"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["guttersnipe_spell_payoff_cut_prismari"]["cuts"],
+            ["Prismari Pianist"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["guttersnipe_spell_payoff_cut_prismari"]["allow_miracle_core_cuts"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["monastery_mentor_spell_tokens_cut_prismari"]["adds"],
+            ["Monastery Mentor"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["young_pyromancer_spell_tokens_cut_prismari"]["adds"],
+            ["Young Pyromancer"],
+        )
 
     def test_new_cut_safety_aware_packages_do_not_touch_protected_slots(self):
         protected_cut_safety = {

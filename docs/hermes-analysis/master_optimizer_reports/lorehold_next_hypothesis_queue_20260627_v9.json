@@ -1,0 +1,871 @@
+{
+  "generated_at": "2026-06-27T20:54:08Z",
+  "package_gate_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_silence_fixed.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_lapse_approach_gate_20260627_v1_fixed.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json"
+  ],
+  "promotion_contract": {
+    "hard_reject_if": [
+      "candidate cuts a locked/protected card without same-lane proof",
+      "candidate only adds generic ramp/value and lowers miracle/topdeck/spell volume",
+      "candidate wins weak seeds but collapses seed 42 in the first controlled gate",
+      "candidate depends on a card with unresolved battle runtime/model evidence"
+    ],
+    "must_target": [
+      "seed 7: missing early topdeck/Library/Squee engine",
+      "seed 20260625: engine appears but fails to convert Approach/topdeck loops into survival or a second win window",
+      "combat-pressure/life-zero losses without cutting the known protection shell"
+    ],
+    "promotion_bar": [
+      "tie or beat the Squee champion aggregate record across the same seed/opponent window",
+      "do not regress seed 42 unless a larger gate proves the strong-seed pattern moved elsewhere",
+      "do not promote from popularity or static structure without battle evidence",
+      "a negative smoke result remains no-promotion unless a specific failure classifier target explains why to override it"
+    ],
+    "required_telemetry": [
+      "miracle_cast and topdeck_manipulation_activated must not fall in the strong seed",
+      "discard_to_top_replacement should connect to survival, Approach recast, or a finisher window",
+      "spell_cast_mana_trigger or ritual_mana_added is useful only if win rate and seed-42 conversion survive",
+      "Squee value must be tied to observed graveyard entry route, not assumed discard synergy"
+    ]
+  },
+  "queue": [
+    {
+      "add_active_rule_counts": {
+        "Perch Protection": 1
+      },
+      "add_oracle_ready": {
+        "Perch Protection": true
+      },
+      "adds": [
+        "Perch Protection"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Avatar's Wrath": {
+          "decision": "core_support",
+          "effective_role": "protection",
+          "package_lane": "pressure_absorber_or_protection",
+          "status": "core_support"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "family": "pressure_absorber",
+      "hypothesis": "Perch Protection is present in the two strongest non-607 variants and has an active rule. It tests a same-lane protection upgrade over Avatar's Wrath while preserving Dawn's Truce, Fated Clash, Hexing Squelcher, High Noon, medallions, Storm Herd, and Thor.",
+      "lane": "protection_window",
+      "package_key": "perch_protection_cut_avatar_wrath",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Perch Protection": 1
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 2,
+        "candidate_wins": 1,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -66.67,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "combat-pressure losses should fall or loss turn should move later",
+        "miracle_cast and topdeck_manipulation_activated must not fall in seed 42",
+        "discard_to_top_replacement should convert into a survival or second-window line"
+      ],
+      "score": 31,
+      "source_decks": [
+        "deck_615",
+        "deck_614"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "seed_20260625_pressure_conversion",
+        "combat_pressure_life_zero"
+      ],
+      "variant_presence": 2
+    },
+    {
+      "add_active_rule_counts": {
+        "Akroma's Will": 2
+      },
+      "add_oracle_ready": {
+        "Akroma's Will": true
+      },
+      "adds": [
+        "Akroma's Will"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Avatar's Wrath": {
+          "decision": "core_support",
+          "effective_role": "protection",
+          "package_lane": "pressure_absorber_or_protection",
+          "status": "core_support"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "family": "pressure_absorber",
+      "hypothesis": "Akroma's Will is a 614 protection/finisher bridge with active rules. It challenges the same Avatar's Wrath slot without touching the locked protection shell.",
+      "lane": "protection_window",
+      "package_key": "akromas_will_cut_avatar_wrath",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Akroma's Will": 3
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 3,
+        "candidate_wins": 0,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -100.0,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "protection/combat-swing exposure must appear before life-zero losses",
+        "seed 42 cannot regress on miracle/topdeck conversion"
+      ],
+      "score": 23,
+      "source_decks": [
+        "deck_614"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "seed_20260625_pressure_conversion",
+        "finisher_window"
+      ],
+      "variant_presence": 1
+    },
+    {
+      "add_active_rule_counts": {
+        "Silence": 1
+      },
+      "add_oracle_ready": {
+        "Silence": true
+      },
+      "adds": [
+        "Silence"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Avatar's Wrath": {
+          "decision": "core_support",
+          "effective_role": "protection",
+          "package_lane": "pressure_absorber_or_protection",
+          "status": "core_support"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "family": "spell_protection",
+      "hypothesis": "Silence is shared by 614/615 and protects the decisive Lorehold or Approach turn at one mana. This tests whether cheap proactive stack protection beats a slower protection spell.",
+      "lane": "protection_window",
+      "package_key": "silence_cut_avatar_wrath",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Silence": 1
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 2,
+        "candidate_wins": 1,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -66.67,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_silence_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "candidate must show protected decisive spell turns or delayed losses",
+        "spell volume cannot fall in the strong seed"
+      ],
+      "score": 21,
+      "source_decks": [
+        "deck_615",
+        "deck_614"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "second_approach_window",
+        "decisive_spell_turn_protection"
+      ],
+      "variant_presence": 2
+    },
+    {
+      "add_active_rule_counts": {
+        "Dragon's Rage Channeler": 1
+      },
+      "add_oracle_ready": {
+        "Dragon's Rage Channeler": true
+      },
+      "adds": [
+        "Dragon's Rage Channeler"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "The Scarlet Witch": {
+          "decision": "modeled_pending_durable_sync",
+          "effective_role": "creature",
+          "package_lane": "early_mana",
+          "status": "materialization_gap_ready_rule"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "The Scarlet Witch"
+      ],
+      "family": "topdeck_filter",
+      "hypothesis": "Dragon's Rage Channeler is a low-cost 614 topdeck/filter engine with active rules. The Scarlet Witch is currently an unresolved/materialization-sensitive slot in the champion role audit, making this a possible early-engine test if the cut remains rule-safe.",
+      "lane": "topdeck_miracle_setup",
+      "package_key": "dragon_rage_channeler_cut_scarlet_witch",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Dragon's Rage Channeler": 2
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 3,
+        "candidate_wins": 0,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -100.0,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "seed 7 must improve topdeck_manipulation_activated or early spell volume",
+        "seed 42 miracle_cast cannot fall"
+      ],
+      "score": 16,
+      "source_decks": [
+        "deck_614"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "seed_7_missing_early_engine"
+      ],
+      "variant_presence": 1
+    },
+    {
+      "add_active_rule_counts": {
+        "Grand Abolisher": 1
+      },
+      "add_oracle_ready": {
+        "Grand Abolisher": true
+      },
+      "adds": [
+        "Grand Abolisher"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Mother of Runes": {
+          "decision": "core_support",
+          "effective_role": "protection",
+          "package_lane": "pressure_absorber_or_protection",
+          "status": "core_support"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Mother of Runes"
+      ],
+      "family": "spell_protection",
+      "hypothesis": "Grand Abolisher protects the whole decisive turn and appears in 615. Mother of Runes is a same-creature-protection comparison slot, but this cut is risky because Mother is part of the current early protection package.",
+      "lane": "protection_window",
+      "package_key": "grand_abolisher_cut_mother_of_runes",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Grand Abolisher": 1
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 3,
+        "candidate_wins": 0,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -100.0,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "commander/decisive turn survival must improve enough to justify losing Mother of Runes",
+        "seed 42 must not lose the early protection pattern"
+      ],
+      "score": 13,
+      "source_decks": [
+        "deck_615"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "decisive_spell_turn_protection"
+      ],
+      "variant_presence": 1
+    },
+    {
+      "add_active_rule_counts": {
+        "Reprieve": 1
+      },
+      "add_oracle_ready": {
+        "Reprieve": true
+      },
+      "adds": [
+        "Reprieve"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Avatar's Wrath": {
+          "decision": "core_support",
+          "effective_role": "protection",
+          "package_lane": "pressure_absorber_or_protection",
+          "status": "core_support"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "family": "spell_protection",
+      "hypothesis": "Reprieve is a 615 tempo/protection card with active rules. It can buy a turn and draw without cutting the locked cards that already hold seed 42 together.",
+      "lane": "protection_window",
+      "package_key": "reprieve_cut_avatar_wrath",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Reprieve": 2
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 3,
+        "candidate_wins": 0,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -100.0,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "loss turn should move later in pressure seeds",
+        "draw/protection value must not lower seed-42 miracle conversion"
+      ],
+      "score": 13,
+      "source_decks": [
+        "deck_615"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "tempo_survival",
+        "second_approach_window"
+      ],
+      "variant_presence": 1
+    },
+    {
+      "add_active_rule_counts": {
+        "Guttersnipe": 1
+      },
+      "add_oracle_ready": {
+        "Guttersnipe": true
+      },
+      "adds": [
+        "Guttersnipe"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Prismari Pianist": {
+          "decision": "finisher_benchmark_lane",
+          "effective_role": "wincon",
+          "package_lane": "finisher_or_big_spell",
+          "status": "core_or_flex_engine"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Prismari Pianist"
+      ],
+      "family": "spellcast_payoff",
+      "hypothesis": "Guttersnipe appears in local Lorehold variants 615/616 and is a direct instant/sorcery payoff. It attacks the observed failure where miracle/topdeck turns happen but do not turn into a win before combat pressure.",
+      "lane": "spell_chain_conversion",
+      "package_key": "guttersnipe_spell_payoff_cut_prismari",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Guttersnipe": 1
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 3,
+        "candidate_wins": 0,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -100.0,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "spell-cast damage payoff must appear in natural exposure",
+        "candidate cannot reduce seed-42 miracle_cast or lorehold_spell_cast enough to lose the known strong pattern"
+      ],
+      "score": 8,
+      "source_decks": [
+        "deck_615",
+        "deck_616",
+        "external_spellslinger_guides"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "topdeck_miracle_without_approach_under_pressure",
+        "spell_volume_payoff"
+      ],
+      "variant_presence": 1
+    },
+    {
+      "add_active_rule_counts": {
+        "Radiant Scrollwielder": 0
+      },
+      "add_oracle_ready": {
+        "Radiant Scrollwielder": true
+      },
+      "adds": [
+        "Radiant Scrollwielder"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "The Scarlet Witch": {
+          "decision": "modeled_pending_durable_sync",
+          "effective_role": "creature",
+          "package_lane": "early_mana",
+          "status": "materialization_gap_ready_rule"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "The Scarlet Witch"
+      ],
+      "family": "graveyard_recursion",
+      "hypothesis": "Radiant Scrollwielder is a 614 recursion/lifegain bridge, but it needs rule coverage before any battle result can be trusted.",
+      "lane": "graveyard_recursion",
+      "package_key": "radiant_scrollwielder_cut_scarlet_witch",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Radiant Scrollwielder": 3
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 2,
+        "candidate_wins": 1,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -66.67,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "graveyard spell reuse or lifegain must appear in natural exposure",
+        "no promotion if runtime/model evidence is missing"
+      ],
+      "score": 8,
+      "source_decks": [
+        "deck_614"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "spell_reuse",
+        "pressure_lifegain"
+      ],
+      "variant_presence": 1
+    },
+    {
+      "add_active_rule_counts": {
+        "Lapse of Certainty": 0
+      },
+      "add_oracle_ready": {
+        "Lapse of Certainty": true
+      },
+      "adds": [
+        "Lapse of Certainty"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Tibalt's Trickery": {
+          "decision": "core_support",
+          "effective_role": "protection",
+          "package_lane": "pressure_absorber_or_protection",
+          "status": "core_support"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Tibalt's Trickery"
+      ],
+      "family": "approach_topdeck_combo",
+      "hypothesis": "External Lorehold tech uses Lapse of Certainty to counter the first Approach of the Second Sun, putting it on top for the commander's first-draw miracle window. Tibalt's Trickery is the same counter/protection slot but has a random replacement drawback.",
+      "lane": "deterministic_finishers",
+      "package_key": "lapse_approach_topdeck_cut_tibalts_trickery",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Lapse of Certainty": 3
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 2,
+        "candidate_wins": 1,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -66.67,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_lapse_approach_gate_20260627_v1_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "own_approach_countered_to_top or countered_spell_moved_to_library_top must appear in exposure",
+        "second Approach conversion must improve without reducing seed-42 miracle/topdeck density"
+      ],
+      "score": 0,
+      "source_decks": [
+        "external_lorehold_deck_tech"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "second_approach_window",
+        "topdeck_miracle_setup"
+      ],
+      "variant_presence": 0
+    },
+    {
+      "add_active_rule_counts": {
+        "Monastery Mentor": 1
+      },
+      "add_oracle_ready": {
+        "Monastery Mentor": true
+      },
+      "adds": [
+        "Monastery Mentor"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Prismari Pianist": {
+          "decision": "finisher_benchmark_lane",
+          "effective_role": "wincon",
+          "package_lane": "finisher_or_big_spell",
+          "status": "core_or_flex_engine"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Prismari Pianist"
+      ],
+      "family": "spellcast_payoff",
+      "hypothesis": "Monastery Mentor appears in local Lorehold variant 616 and turns noncreature spell volume into board presence. This tests whether the deck needs a lower-curve board payoff rather than another expensive miracle payoff.",
+      "lane": "spell_chain_conversion",
+      "package_key": "monastery_mentor_spell_tokens_cut_prismari",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Monastery Mentor": 1
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 2,
+        "candidate_wins": 1,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -66.67,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "token creation must appear before combat-pressure losses",
+        "candidate must not collapse the seed-42 miracle/topdeck pattern"
+      ],
+      "score": 0,
+      "source_decks": [
+        "deck_616",
+        "external_spellslinger_guides"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "combat_pressure_life_zero",
+        "spell_volume_payoff"
+      ],
+      "variant_presence": 0
+    },
+    {
+      "add_active_rule_counts": {
+        "Young Pyromancer": 1
+      },
+      "add_oracle_ready": {
+        "Young Pyromancer": true
+      },
+      "adds": [
+        "Young Pyromancer"
+      ],
+      "blockers": [],
+      "cut_decisions": {
+        "Prismari Pianist": {
+          "decision": "finisher_benchmark_lane",
+          "effective_role": "wincon",
+          "package_lane": "finisher_or_big_spell",
+          "status": "core_or_flex_engine"
+        }
+      },
+      "cut_guardrails": {},
+      "cuts": [
+        "Prismari Pianist"
+      ],
+      "family": "spellcast_payoff",
+      "hypothesis": "Young Pyromancer appears in local Lorehold variant 616 and gives the lowest-curve token payoff for instant/sorcery turns. It targets early pressure without cutting lands, ramp, Storm Herd, Thor, or Hexing Squelcher.",
+      "lane": "spell_chain_conversion",
+      "package_key": "young_pyromancer_spell_tokens_cut_prismari",
+      "prior_gate": {
+        "added_rule_counts": {
+          "Young Pyromancer": 1
+        },
+        "baseline_losses": 0,
+        "baseline_wins": 3,
+        "candidate_losses": 2,
+        "candidate_wins": 1,
+        "decision": "tested_negative_do_not_promote",
+        "delta_pp": -66.67,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+        "status": "gated"
+      },
+      "required_telemetry": [
+        "early token creation must appear in weak seeds",
+        "candidate cannot trade away the current deterministic Approach/topdeck route"
+      ],
+      "score": 0,
+      "source_decks": [
+        "deck_616",
+        "external_spellslinger_guides"
+      ],
+      "status": "tested_negative_do_not_promote",
+      "targets": [
+        "combat_pressure_life_zero",
+        "early_spell_volume_payoff"
+      ],
+      "variant_presence": 0
+    }
+  ],
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_decks": {
+    "deck_614": {
+      "card_count": 91,
+      "missing_from_607": [
+        "Artist's Talent",
+        "Avatar's Wrath",
+        "Battlefield Forge",
+        "Boros Signet",
+        "Command Beacon",
+        "Dawn's Truce",
+        "Eiganjo, Seat of the Empire",
+        "Emeria's Call // Emeria, Shattered Skyclave",
+        "Everything Comes to Dust",
+        "Exotic Orchard",
+        "Farewell",
+        "Fellwar Stone",
+        "Furygale Flocking",
+        "Giver of Runes",
+        "Glittering Massif",
+        "High Noon",
+        "Hit the Mother Lode",
+        "Improvisation Capstone",
+        "Lightning Greaves",
+        "Mizzix's Mastery",
+        "Molecule Man",
+        "Path to Exile",
+        "Pinnacle Monk // Mystic Peak",
+        "Plaza of Heroes",
+        "Prismari Pianist",
+        "Promise of Loyalty",
+        "Radiant Summit",
+        "Redirect Lightning",
+        "Reforge the Soul",
+        "Reliquary Tower",
+        "Starfall Invocation",
+        "Stroke of Midnight",
+        "Surge to Victory",
+        "Swiftfoot Boots",
+        "Swords to Plowshares",
+        "Talisman of Conviction",
+        "Tempt with Bunnies",
+        "The Mind Stone",
+        "The Scarlet Witch",
+        "Thor, God of Thunder",
+        "Tibalt's Trickery",
+        "Tragic Arrogance",
+        "Turbulent Steppe",
+        "Unexpected Windfall",
+        "Victory Chimes",
+        "War Room",
+        "Winds of Abandon"
+      ],
+      "new_vs_607": [
+        "Aetherflux Reservoir",
+        "Akroma's Will",
+        "Ancient Den",
+        "Authority of the Consuls",
+        "Bolt Bend",
+        "Boros Charm",
+        "Brass's Bounty",
+        "Caldera Pyremaw",
+        "Cavern of Souls",
+        "Chrome Mox",
+        "Clifftop Retreat",
+        "Conduit Pylons",
+        "Currency Converter",
+        "Dance with Calamity",
+        "Deflecting Palm",
+        "Desperate Ritual",
+        "Dragon's Rage Channeler",
+        "Enlightened Tutor",
+        "Galvanoth",
+        "Gamble",
+        "Goldspan Dragon",
+        "Goliath Daydreamer",
+        "Great Furnace",
+        "Helm of Awakening",
+        "Heroes Remembered",
+        "Invincible Hymn",
+        "Invoke Calamity",
+        "Invoke Justice",
+        "Mana Geyser",
+        "Ol\u00f3rin's Searing Light",
+        "Penance",
+        "Perch Protection",
+        "Plateau",
+        "Pyretic Ritual",
+        "Radiant Scrollwielder",
+        "Reckless Handling",
+        "Seething Song",
+        "Silence",
+        "Soulfire Eruption",
+        "Storm-Kiln Artist",
+        "Treasonous Ogre",
+        "Trouble in Pairs",
+        "Ultima",
+        "Volcanic Vision"
+      ]
+    },
+    "deck_615": {
+      "card_count": 84,
+      "missing_from_607": [
+        "Artist's Talent",
+        "Avatar's Wrath",
+        "Battlefield Forge",
+        "Bender's Waterskin",
+        "Blasphemous Act",
+        "Bloodstained Mire",
+        "Boros Signet",
+        "Creative Technique",
+        "Dawn's Truce",
+        "Eiganjo, Seat of the Empire",
+        "Elegant Parlor",
+        "Emeria's Call // Emeria, Shattered Skyclave",
+        "Everything Comes to Dust",
+        "Exotic Orchard",
+        "Fated Clash",
+        "Fellwar Stone",
+        "Flawless Maneuver",
+        "Flooded Strand",
+        "Furygale Flocking",
+        "Generous Gift",
+        "Giver of Runes",
+        "Glittering Massif",
+        "High Noon",
+        "Hit the Mother Lode",
+        "Improvisation Capstone",
+        "Marsh Flats",
+        "Molecule Man",
+        "Mother of Runes",
+        "Path to Exile",
+        "Pearl Medallion",
+        "Pinnacle Monk // Mystic Peak",
+        "Plaza of Heroes",
+        "Prismari Pianist",
+        "Prismatic Vista",
+        "Promise of Loyalty",
+        "Redirect Lightning",
+        "Ruby Medallion",
+        "Scalding Tarn",
+        "Scroll Rack",
+        "Storm Herd",
+        "Stroke of Midnight",
+        "Sunbaked Canyon",
+        "Surge to Victory",
+        "Swiftfoot Boots",
+        "Talisman of Conviction",
+        "Tempt with Bunnies",
+        "The Mind Stone",
+        "The Scarlet Witch",
+        "Thor, God of Thunder",
+        "Tibalt's Trickery",
+        "Tragic Arrogance",
+        "Turbulent Steppe",
+        "Victory Chimes",
+        "War Room",
+        "Winds of Abandon",
+        "Windswept Heath",
+        "Wooded Foothills"
+      ],
+      "new_vs_607": [
+        "Apex of Power",
+        "Beacon of Immortality",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Boros Charm",
+        "Boseiju, Who Shelters All",
+        "Brass's Bounty",
+        "Cavern of Souls",
+        "Chaos Warp",
+        "Clifftop Retreat",
+        "Deflecting Palm",
+        "Double Vision",
+        "Enlightened Tutor",
+        "Erode",
+        "Faithless Looting",
+        "Flare of Duplication",
+        "Flashback",
+        "Galvanoth",
+        "Gamble",
+        "Goldspan Dragon",
+        "Goliath Daydreamer",
+        "Grand Abolisher",
+        "Guttersnipe",
+        "Heroes Remembered",
+        "Invoke Calamity",
+        "Lightning Bolt",
+        "Longshot, Rebel Bowman",
+        "Mana Vault",
+        "Mithril Coat",
+        "Myriad Landscape",
+        "Ol\u00f3rin's Searing Light",
+        "Perch Protection",
+        "Plateau",
+        "Primal Amulet // Primal Wellspring",
+        "Red Elemental Blast",
+        "Reiterate",
+        "Reprieve",
+        "Rite of the Dragoncaller",
+        "Seething Song",
+        "Silence",
+        "Single Combat",
+        "Sundown Pass",
+        "Taunt from the Rampart",
+        "The One Ring",
+        "Twinflame Tyrant",
+        "Underworld Breach",
+        "Vandalblast",
+        "Velomachus Lorehold"
+      ]
+    }
+  },
+  "strategy_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260627_v3.json",
+  "summary": {
+    "blocked_count": 0,
+    "gate_ready_count": 0,
+    "risky_same_lane_only_count": 0,
+    "status_counts": {
+      "tested_negative_do_not_promote": 11
+    },
+    "tested_negative_count": 11
+  }
+}

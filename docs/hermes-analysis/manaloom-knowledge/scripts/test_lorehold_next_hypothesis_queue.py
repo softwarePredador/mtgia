@@ -124,6 +124,9 @@ def test_gate_runner_contains_queue_ready_package_definitions():
         "grand_abolisher_cut_mother_of_runes",
         "reprieve_cut_avatar_wrath",
         "lapse_approach_topdeck_cut_tibalts_trickery",
+        "guttersnipe_spell_payoff_cut_prismari",
+        "monastery_mentor_spell_tokens_cut_prismari",
+        "young_pyromancer_spell_tokens_cut_prismari",
     ]:
         assert package_key in gate.PACKAGE_DEFINITIONS
         assert gate.PACKAGE_DEFINITIONS[package_key]["adds"]

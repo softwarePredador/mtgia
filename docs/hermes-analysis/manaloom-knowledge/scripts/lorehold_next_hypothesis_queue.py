@@ -34,6 +34,7 @@ DEFAULT_PACKAGE_GATE_REPORTS = [
     REPORT_DIR / "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
     REPORT_DIR / "lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json",
     REPORT_DIR / "lorehold_lapse_approach_gate_20260627_v1_fixed.json",
+    REPORT_DIR / "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
 ]
 
 
@@ -177,6 +178,60 @@ PACKAGE_IDEAS = [
         "required_telemetry": [
             "own_approach_countered_to_top or countered_spell_moved_to_library_top must appear in exposure",
             "second Approach conversion must improve without reducing seed-42 miracle/topdeck density",
+        ],
+    },
+    {
+        "package_key": "guttersnipe_spell_payoff_cut_prismari",
+        "source_decks": ["deck_615", "deck_616", "external_spellslinger_guides"],
+        "family": "spellcast_payoff",
+        "adds": ["Guttersnipe"],
+        "cuts": ["Prismari Pianist"],
+        "lane": "spell_chain_conversion",
+        "targets": ["topdeck_miracle_without_approach_under_pressure", "spell_volume_payoff"],
+        "hypothesis": (
+            "Guttersnipe appears in local Lorehold variants 615/616 and is a direct instant/sorcery "
+            "payoff. It attacks the observed failure where miracle/topdeck turns happen but do not "
+            "turn into a win before combat pressure."
+        ),
+        "required_telemetry": [
+            "spell-cast damage payoff must appear in natural exposure",
+            "candidate cannot reduce seed-42 miracle_cast or lorehold_spell_cast enough to lose the known strong pattern",
+        ],
+    },
+    {
+        "package_key": "monastery_mentor_spell_tokens_cut_prismari",
+        "source_decks": ["deck_616", "external_spellslinger_guides"],
+        "family": "spellcast_payoff",
+        "adds": ["Monastery Mentor"],
+        "cuts": ["Prismari Pianist"],
+        "lane": "spell_chain_conversion",
+        "targets": ["combat_pressure_life_zero", "spell_volume_payoff"],
+        "hypothesis": (
+            "Monastery Mentor appears in local Lorehold variant 616 and turns noncreature spell volume "
+            "into board presence. This tests whether the deck needs a lower-curve board payoff rather "
+            "than another expensive miracle payoff."
+        ),
+        "required_telemetry": [
+            "token creation must appear before combat-pressure losses",
+            "candidate must not collapse the seed-42 miracle/topdeck pattern",
+        ],
+    },
+    {
+        "package_key": "young_pyromancer_spell_tokens_cut_prismari",
+        "source_decks": ["deck_616", "external_spellslinger_guides"],
+        "family": "spellcast_payoff",
+        "adds": ["Young Pyromancer"],
+        "cuts": ["Prismari Pianist"],
+        "lane": "spell_chain_conversion",
+        "targets": ["combat_pressure_life_zero", "early_spell_volume_payoff"],
+        "hypothesis": (
+            "Young Pyromancer appears in local Lorehold variant 616 and gives the lowest-curve token "
+            "payoff for instant/sorcery turns. It targets early pressure without cutting lands, ramp, "
+            "Storm Herd, Thor, or Hexing Squelcher."
+        ),
+        "required_telemetry": [
+            "early token creation must appear in weak seeds",
+            "candidate cannot trade away the current deterministic Approach/topdeck route",
         ],
     },
 ]

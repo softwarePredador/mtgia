@@ -477,6 +477,43 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Lapse of Certainty"],
         "cuts": ["Tibalt's Trickery"],
     },
+    "guttersnipe_spell_payoff_cut_prismari": {
+        "family": "spellcast_payoff",
+        "hypothesis": (
+            "Guttersnipe is present in Lorehold variants 615/616 and gives direct "
+            "multiplayer damage on every instant or sorcery. This tests whether "
+            "a lower-curve spell payoff converts miracle/topdeck turns better "
+            "than Prismari Pianist without cutting the protected ramp, pressure, "
+            "or finisher shell."
+        ),
+        "adds": ["Guttersnipe"],
+        "cuts": ["Prismari Pianist"],
+        "allow_miracle_core_cuts": True,
+    },
+    "monastery_mentor_spell_tokens_cut_prismari": {
+        "family": "spellcast_payoff",
+        "hypothesis": (
+            "Monastery Mentor is present in Lorehold variant 616 and turns each "
+            "noncreature spell into a growing board. This checks whether a token "
+            "payoff survives combat pressure while converting Lorehold's miracle "
+            "spell volume better than Prismari Pianist."
+        ),
+        "adds": ["Monastery Mentor"],
+        "cuts": ["Prismari Pianist"],
+        "allow_miracle_core_cuts": True,
+    },
+    "young_pyromancer_spell_tokens_cut_prismari": {
+        "family": "spellcast_payoff",
+        "hypothesis": (
+            "Young Pyromancer is present in Lorehold variant 616 and creates board "
+            "presence from instant/sorcery casts at two mana. This tests the same "
+            "payoff lane at the lowest curve point while leaving the known topdeck "
+            "and protection shell untouched."
+        ),
+        "adds": ["Young Pyromancer"],
+        "cuts": ["Prismari Pianist"],
+        "allow_miracle_core_cuts": True,
+    },
     "ghostly_prison_pressure_cut_promise": {
         "family": "pressure_absorber",
         "hypothesis": (
