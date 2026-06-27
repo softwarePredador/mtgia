@@ -23,6 +23,7 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260627_v3.json"
 DEFAULT_CUT_MODEL = REPORT_DIR / "lorehold_variant_gap_miner_20260627_v2_cut_model.json"
+DEFAULT_EXPOSURE_PROFILE = REPORT_DIR / "lorehold_card_exposure_profile_20260627_v1.json"
 DEFAULT_DB = (
     REPORT_DIR
     / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
@@ -80,6 +81,12 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def read_optional_json(path: Path | None) -> dict[str, Any]:
+    if not path or not path.exists():
+        return {}
+    return read_json(path)
+
+
 def connect(path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
@@ -98,6 +105,14 @@ def cut_safety_lookup(strategy_audit: dict[str, Any]) -> dict[str, dict[str, Any
     return {
         normalize_key(row.get("card_name")): row
         for row in (strategy_audit.get("cut_safety_manifest") or {}).get("cuts") or []
+        if row.get("card_name")
+    }
+
+
+def exposure_lookup(exposure_profile: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        normalize_key(row.get("card_name")): row
+        for row in exposure_profile.get("card_profiles") or []
         if row.get("card_name")
     }
 
@@ -216,6 +231,7 @@ def classify_manual_pair(
     cut_rule: dict[str, Any],
     cut_decision: dict[str, Any],
     cut_safety: dict[str, Any],
+    cut_exposure: dict[str, Any] | None = None,
 ) -> tuple[str, str, list[str]]:
     cut_key = normalize_key(cut)
     reasons: list[str] = []
@@ -227,6 +243,22 @@ def classify_manual_pair(
         reasons.append("Variant recursion cards must prove a non-Squee cut or a multi-card recursion package.")
         return "do_not_cut_current_champion_engine", "blocked", reasons
     if cut_key == normalize_key("Emeria's Call // Emeria, Shattered Skyclave"):
+        exposure_decision = (cut_exposure or {}).get("decision") or {}
+        if (
+            (cut_exposure or {}).get("inferred_role") == "token_protection_rebuild"
+            and exposure_decision.get("status") == "not_safe_as_blind_cut"
+        ):
+            exposure_count = int((cut_exposure or {}).get("unique_exposure_count") or 0)
+            reasons.append(
+                f"Emeria has measured token/protection exposure in {exposure_count} deduplicated local events."
+            )
+            reasons.append(
+                "Austere Command is a board-wipe role, not a same-role replacement for rebuild/protection."
+            )
+            reasons.append(
+                "Gate only as an explicit wipe-over-rebuild tradeoff, not as an automatic cut."
+            )
+            return "manual_tradeoff_not_blind_cut", "manual_tradeoff_gate_only", reasons
         if cut_decision.get("status") == "materialization_gap_ready_rule":
             reasons.append("Emeria has a ready local rule but still needs durable role sync.")
         if not cut_decision.get("effective_role") or cut_decision.get("effective_role") == "unknown":
@@ -285,13 +317,16 @@ def build_review(
     *,
     strategy_audit: dict[str, Any],
     cut_model: dict[str, Any],
+    exposure_profile: dict[str, Any] | None = None,
     conn: sqlite3.Connection,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
     cut_model_path: Path = DEFAULT_CUT_MODEL,
     db_path: Path = DEFAULT_DB,
+    exposure_profile_path: Path | None = DEFAULT_EXPOSURE_PROFILE,
 ) -> dict[str, Any]:
     card_decisions = card_decision_lookup(strategy_audit)
     cut_safety = cut_safety_lookup(strategy_audit)
+    exposures = exposure_lookup(exposure_profile or {})
     manual_pairings = [
         row
         for row in cut_model.get("pairing_hypotheses") or []
@@ -330,6 +365,7 @@ def build_review(
             cut_rule=rule_summaries.get(cut_key, {}),
             cut_decision=card_decisions.get(cut_key, {}),
             cut_safety=cut_safety.get(cut_key, {}),
+            cut_exposure=exposures.get(cut_key, {}),
         )
         manual_reviews.append(
             {
@@ -352,6 +388,20 @@ def build_review(
                         "package_lane",
                         "status",
                         "rule_materialized_in_equal_gate_candidate",
+                    }
+                },
+                "cut_exposure": {
+                    key: value
+                    for key, value in (exposures.get(cut_key) or {}).items()
+                    if key
+                    in {
+                        "unique_exposure_count",
+                        "direct_event_count",
+                        "summary_metric_count",
+                        "role_signals",
+                        "inferred_role",
+                        "role_confidence",
+                        "decision",
                     }
                 },
                 "cut_deck_presence": deck_presence.get(cut_key, []),
@@ -389,6 +439,7 @@ def build_review(
         "generated_at": utc_now(),
         "strategy_audit": str(strategy_path),
         "cut_model": str(cut_model_path),
+        "exposure_profile": str(exposure_profile_path) if exposure_profile else "",
         "source_db": str(db_path),
         "postgres_writes": False,
         "source_db_mutated": False,
@@ -399,8 +450,8 @@ def build_review(
             "decision_counts": dict(sorted(status_counts.items())),
             "automatic_gate_ready_count": 0,
             "safe_next_action": (
-                "Do not spend a gate on Squee/Emeria cuts yet; find a non-engine cut or run a "
-                "targeted exposure gate that measures the unresolved role first."
+                "Do not spend a gate on Squee cuts; test Austere over Emeria only as an explicit "
+                "wipe-over-rebuild tradeoff, not a blind same-lane replacement."
             ),
         },
         "manual_cut_reviews": manual_reviews,
@@ -413,8 +464,8 @@ def build_review(
             },
             {
                 "priority": 2,
-                "action": "measure_emeria_role_before_austere_command_cut",
-                "reason": "Emeria has rule coverage but unknown strategic role; Austere Command cannot prove improvement if it deletes an unmeasured board/protection slot.",
+                "action": "gate_austere_over_emeria_only_as_tradeoff",
+                "reason": "Emeria now has measured token/protection exposure; Austere Command must prove board-reset value beats rebuild/protection loss.",
             },
             {
                 "priority": 3,
@@ -447,6 +498,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Generated at: `{payload['generated_at']}`",
         f"- Strategy audit: `{payload['strategy_audit']}`",
         f"- Cut model: `{payload['cut_model']}`",
+        f"- Exposure profile: `{payload['exposure_profile'] or 'none'}`",
         f"- Source DB: `{payload['source_db']}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
@@ -521,6 +573,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--strategy-audit", type=Path, default=DEFAULT_STRATEGY_AUDIT)
     parser.add_argument("--cut-model", type=Path, default=DEFAULT_CUT_MODEL)
+    parser.add_argument("--exposure-profile", type=Path, default=DEFAULT_EXPOSURE_PROFILE)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--stem", default="lorehold_manual_cut_review_20260627_v1")
     return parser.parse_args()
@@ -530,14 +583,17 @@ def main() -> int:
     args = parse_args()
     strategy_audit = read_json(args.strategy_audit)
     cut_model = read_json(args.cut_model)
+    exposure_profile = read_optional_json(args.exposure_profile)
     with connect(args.db) as conn:
         payload = build_review(
             strategy_audit=strategy_audit,
             cut_model=cut_model,
+            exposure_profile=exposure_profile,
             conn=conn,
             strategy_path=args.strategy_audit,
             cut_model_path=args.cut_model,
             db_path=args.db,
+            exposure_profile_path=args.exposure_profile,
         )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

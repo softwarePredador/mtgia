@@ -1,0 +1,1881 @@
+{
+  "card_profiles": [
+    {
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "decision": {
+        "next_action": "test_austere_only_as_explicit_wipe_over_rebuild_tradeoff",
+        "reason": "Emeria has direct token/protection exposure; cutting it deletes a measured rebuild/protection role.",
+        "status": "not_safe_as_blind_cut"
+      },
+      "direct_event_count": 181,
+      "effect_counts": {
+        "token_maker": 88
+      },
+      "event_counts": {
+        "protection_resolved": 88,
+        "tokens_created": 88,
+        "turn_end": 5
+      },
+      "inferred_role": "token_protection_rebuild",
+      "metric_counts": {
+        "discard_to_top:Emeria's Call // Emeria, Shattered Skyclave": 8,
+        "lorehold_rummage_to_top:Emeria's Call // Emeria, Shattered Skyclave": 8,
+        "miracle:Emeria's Call // Emeria, Shattered Skyclave": 19
+      },
+      "raw_record_count": 207,
+      "role_confidence": "direct_event_and_rule",
+      "role_signals": [
+        "board_development_tokens",
+        "discard_or_rummage_context",
+        "miracle_hit",
+        "protection_window"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1": 1
+        },
+        "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+        "effects": {
+          "token_maker": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "samples": [
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "packages[2].gate_summary.candidate.telemetry.squee_game_traces.synergy_reprieve_cut_avatar_wrath:Sisay, Weatherlight Captain #61 (real):0[8]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 8
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "packages[2].gate_summary.candidate.telemetry.squee_game_traces.synergy_reprieve_cut_avatar_wrath:Sisay, Weatherlight Captain #61 (real):0[9]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 8
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "packages[2].gate_summary.candidate.telemetry.squee_trace_samples[8]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 8
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "packages[2].gate_summary.candidate.telemetry.squee_trace_samples[9]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 8
+        },
+        {
+          "event": "turn_end",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Winota, Joiner of Forces #39 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 4
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Aang, at the Crossroads #106 (real):1[15]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 13
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Aang, at the Crossroads #106 (real):1[16]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 13
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Sisay, Weatherlight Captain #61 (real):0[22]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 8
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Sisay, Weatherlight Captain #61 (real):0[23]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 8
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Umbris, Fear Manifest #114 (real):1[50]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 13
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Umbris, Fear Manifest #114 (real):1[51]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 13
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Vivi Ornitier #99 (real):2[69]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 18
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Vivi Ornitier #99 (real):2[70]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 18
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0[4]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 10
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0[5]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 10
+        },
+        {
+          "event": "turn_end",
+          "evidence_type": "event",
+          "path": "results[0].telemetry.squee_game_traces.deck_6:Winota, Joiner of Forces #39 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 4
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Aang, at the Crossroads #106 (real):1[15]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 13
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Aang, at the Crossroads #106 (real):1[16]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 13
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Sisay, Weatherlight Captain #61 (real):0[22]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 8
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Sisay, Weatherlight Captain #61 (real):0[23]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 8
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Umbris, Fear Manifest #114 (real):1[50]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 13
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Umbris, Fear Manifest #114 (real):1[51]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 13
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Vivi Ornitier #99 (real):2[69]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 18
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Vivi Ornitier #99 (real):2[70]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 18
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0[4]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 10
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0[5]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 10
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Winota, Joiner of Forces #39 (real):0[38]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+          "turn": 13
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Winota, Joiner of Forces #39 (real):0[39]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+          "turn": 13
+        },
+        {
+          "event": "protection_resolved",
+          "evidence_type": "event",
+          "path": "results[0].telemetry.squee_game_traces.deck_6:Winota, Joiner of Forces #39 (real):0[38]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge_core_challenge_aetherflux_over_storm.json",
+          "turn": 13
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "path": "results[0].telemetry.squee_game_traces.deck_6:Winota, Joiner of Forces #39 (real):0[39]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge_core_challenge_aetherflux_over_storm.json",
+          "turn": 13
+        }
+      ],
+      "source_file_count": 76,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "unique_exposure_count": 11
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "unique_exposure_count": 11
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json",
+          "unique_exposure_count": 5
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+          "unique_exposure_count": 5
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land_partial.json",
+          "unique_exposure_count": 5
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1_brainstone_topdeck_miracle_cut_squelcher.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout_faithless_looting_squee_enabler.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout_galvanoth_topdeck_freecast.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2_storm_kiln_artist_cut_arcane_signet.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed42_v1_topfreecast_v1.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed42_v1_topfreecast_v1_primal_amulet_spell_engine.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge_core_challenge_aetherflux_over_storm.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge_core_challenge_dance_over_storm.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge_core_challenge_dance_over_storm.json",
+          "unique_exposure_count": 2
+        }
+      ],
+      "summary_metric_count": 12,
+      "unique_exposure_count": 193
+    },
+    {
+      "card_name": "Austere Command",
+      "decision": {
+        "next_action": "only_gate_against_emeria_if_targeting_more_board_reset_than_rebuild",
+        "reason": "Austere is a board-wipe role; it is not a same-role replacement for token/protection rebuild.",
+        "status": "candidate_role_known"
+      },
+      "direct_event_count": 2,
+      "effect_counts": {
+        "board_wipe": 1
+      },
+      "event_counts": {
+        "board_wipe_resolved": 1,
+        "spell_resolved": 1
+      },
+      "inferred_role": "board_wipe_pressure_reset",
+      "metric_counts": {},
+      "raw_record_count": 2,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "pressure_reset_board_wipe"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "austere_command_choose_two_destroy_modes_v1": 1
+        },
+        "card_name": "Austere Command",
+        "effects": {
+          "board_wipe": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "samples": [
+        {
+          "effect": "board_wipe",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:1",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_events_20260622_190701.jsonl",
+          "turn": 6
+        },
+        {
+          "event": "board_wipe_resolved",
+          "evidence_type": "event",
+          "path": "line:2",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_events_20260622_190701.jsonl",
+          "turn": 6
+        }
+      ],
+      "source_file_count": 1,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/austere_command_pg028_focused_events_20260622_190701.jsonl",
+          "unique_exposure_count": 2
+        }
+      ],
+      "summary_metric_count": 0,
+      "unique_exposure_count": 2
+    },
+    {
+      "card_name": "Squee, Goblin Nabob",
+      "decision": {
+        "next_action": "do_not_cut_for_volcanic_or_restoration_without_non_squee_package",
+        "reason": "Squee has direct graveyard-return exposure and active rule support.",
+        "status": "protect_current_engine"
+      },
+      "direct_event_count": 6476,
+      "effect_counts": {
+        "creature": 4511,
+        "graveyard_upkeep_return_self_to_hand": 617
+      },
+      "event_counts": {
+        "airbend_creature_cast_from_exile": 82,
+        "cast_announced": 1538,
+        "cast_illegal": 4,
+        "cost_paid": 1526,
+        "creature_cast": 1435,
+        "creature_to_battlefield": 4,
+        "miracle_cast": 4,
+        "permanent_moved_from_battlefield": 858,
+        "replacement_applied": 392,
+        "spell_cast": 4,
+        "spell_resolved": 4,
+        "trigger_resolved": 617,
+        "turn_end": 8
+      },
+      "inferred_role": "recursion_engine",
+      "metric_counts": {
+        "cost_paid:Squee, Goblin Nabob": 992,
+        "graveyard_return:Squee, Goblin Nabob": 269
+      },
+      "raw_record_count": 7342,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "discard_or_rummage_context",
+        "graveyard_recursion",
+        "paid_cast_exposure"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "graveyard_upkeep_return_self_to_hand_v1": 1
+        },
+        "card_name": "Squee, Goblin Nabob",
+        "effects": {
+          "creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "samples": [
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[0]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[4]",
+          "player": "Lorehold",
+          "reason": "fated_clash",
+          "source": "Fated Clash",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 16
+        },
+        {
+          "effect": "graveyard_upkeep_return_self_to_hand",
+          "event": "trigger_resolved",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[6]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 17
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[0]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[4]",
+          "player": "Lorehold",
+          "reason": "fated_clash",
+          "source": "Fated Clash",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 16
+        },
+        {
+          "effect": "graveyard_upkeep_return_self_to_hand",
+          "event": "trigger_resolved",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[6]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 17
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 12
+        }
+      ],
+      "source_file_count": 193,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+          "unique_exposure_count": 125
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+          "unique_exposure_count": 123
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "unique_exposure_count": 122
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "unique_exposure_count": 122
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848.json",
+          "unique_exposure_count": 102
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848_brass_bounty_cut_boros_signet.json",
+          "unique_exposure_count": 102
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2.json",
+          "unique_exposure_count": 91
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2_galvanoth_topdeck_freecast_cut_thor.json",
+          "unique_exposure_count": 91
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2_galvanoth_topdeck_freecast_cut_thor_partial.json",
+          "unique_exposure_count": 91
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json",
+          "unique_exposure_count": 90
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+          "unique_exposure_count": 90
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor_partial.json",
+          "unique_exposure_count": 90
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+          "unique_exposure_count": 87
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout_birgi_spellchain_cut_squelcher.json",
+          "unique_exposure_count": 87
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+          "unique_exposure_count": 86
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1_brainstone_topdeck_miracle_cut_squelcher.json",
+          "unique_exposure_count": 84
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+          "unique_exposure_count": 84
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes_galvanoth_topdeck_freecast_cut_chimes.json",
+          "unique_exposure_count": 84
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes_galvanoth_topdeck_freecast_cut_chimes_partial.json",
+          "unique_exposure_count": 84
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout_galvanoth_topdeck_freecast_cut_squelcher.json",
+          "unique_exposure_count": 83
+        }
+      ],
+      "summary_metric_count": 184,
+      "unique_exposure_count": 6660
+    },
+    {
+      "card_name": "Volcanic Vision",
+      "decision": {
+        "next_action": "find recursion cut that is not the protected Squee engine",
+        "reason": "Runtime-ready recursion candidate, but current safe-cut model points at Squee.",
+        "status": "needs_non_squee_cut"
+      },
+      "direct_event_count": 0,
+      "effect_counts": {},
+      "event_counts": {},
+      "inferred_role": "recursion_candidate",
+      "metric_counts": {
+        "miracle:Volcanic Vision": 2
+      },
+      "raw_record_count": 2,
+      "role_confidence": "summary_metric_and_rule",
+      "role_signals": [
+        "miracle_hit",
+        "spell_or_permanent_recursion"
+      ],
+      "rule_summary": {
+        "active_rule_count": 2,
+        "battle_model_scopes": {
+          "instant_sorcery_recursion_with_opponent_creature_damage_annotation_v1": 1
+        },
+        "card_name": "Volcanic Vision",
+        "effects": {
+          "recursion": 3
+        },
+        "execution_statuses": {
+          "auto": 2,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 2
+        },
+        "rule_count": 3
+      },
+      "samples": [
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "metric_count": 1,
+          "metric_key": "miracle:Volcanic Vision",
+          "path": "results[8].telemetry.top_cards[4]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "metric_count": 1,
+          "metric_key": "miracle:Volcanic Vision",
+          "path": "results[8].telemetry.top_cards[4]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json"
+        }
+      ],
+      "source_file_count": 2,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json",
+          "unique_exposure_count": 1
+        }
+      ],
+      "summary_metric_count": 2,
+      "unique_exposure_count": 2
+    },
+    {
+      "card_name": "Restoration Seminar",
+      "decision": {
+        "next_action": "find recursion cut that is not the protected Squee engine",
+        "reason": "Runtime-ready recursion candidate, but current safe-cut model points at Squee.",
+        "status": "needs_non_squee_cut"
+      },
+      "direct_event_count": 0,
+      "effect_counts": {},
+      "event_counts": {},
+      "inferred_role": "recursion_candidate",
+      "metric_counts": {
+        "cost_paid:Restoration Seminar": 2
+      },
+      "raw_record_count": 2,
+      "role_confidence": "summary_metric_and_rule",
+      "role_signals": [
+        "paid_cast_exposure",
+        "spell_or_permanent_recursion"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "nonland_permanent_graveyard_to_battlefield_paradigm_v1": 1
+        },
+        "card_name": "Restoration Seminar",
+        "effects": {
+          "recursion": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "samples": [
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Restoration Seminar",
+          "path": "results[6].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Restoration Seminar",
+          "path": "results[6].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json"
+        }
+      ],
+      "source_file_count": 2,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json",
+          "unique_exposure_count": 1
+        }
+      ],
+      "summary_metric_count": 2,
+      "unique_exposure_count": 2
+    },
+    {
+      "card_name": "Gamble",
+      "decision": {
+        "next_action": "retest only with seed-safe cut model",
+        "reason": "Tutor role is modelable; prior cut choices regressed the protected seed.",
+        "status": "runtime_ready_cut_sensitive"
+      },
+      "direct_event_count": 227,
+      "effect_counts": {
+        "tutor": 122
+      },
+      "event_counts": {
+        "cast_announced": 10,
+        "cost_paid": 8,
+        "miracle_cast": 7,
+        "priority_pass": 45,
+        "random_discard_after_tutor": 6,
+        "spell_cast": 45,
+        "spell_countered": 1,
+        "spell_resolved": 52,
+        "tutor_resolved": 53
+      },
+      "inferred_role": "tutor_access",
+      "metric_counts": {
+        "cost_paid:Gamble": 2
+      },
+      "raw_record_count": 228,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "paid_cast_exposure",
+        "tutor_access"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "any_card_to_hand_then_random_discard_v1": 1
+        },
+        "card_name": "Gamble",
+        "effects": {
+          "tutor": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "samples": [
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:4",
+          "player": "Active",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl",
+          "turn": 3
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Tutored Wincon",
+          "path": "line:5",
+          "player": "Active",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl",
+          "turn": 3
+        },
+        {
+          "event": "random_discard_after_tutor",
+          "evidence_type": "event",
+          "path": "line:6",
+          "player": "Active",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl",
+          "turn": 3
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:29",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_100.jsonl",
+          "turn": 2
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:30",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_100.jsonl",
+          "turn": 2
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Grand Abolisher",
+          "path": "line:31",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_100.jsonl",
+          "turn": 2
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:5",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1005.jsonl",
+          "turn": 1
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:6",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1005.jsonl",
+          "turn": 1
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Rise of the Eldrazi",
+          "path": "line:7",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1005.jsonl",
+          "turn": 1
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:21",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1006.jsonl",
+          "turn": 2
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:22",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1006.jsonl",
+          "turn": 2
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Rise of the Eldrazi",
+          "path": "line:23",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1006.jsonl",
+          "turn": 2
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:108",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1010.jsonl",
+          "turn": 6
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:109",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1010.jsonl",
+          "turn": 6
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Rise of the Eldrazi",
+          "path": "line:110",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1010.jsonl",
+          "turn": 6
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:213",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1013.jsonl",
+          "turn": 9
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:214",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1013.jsonl",
+          "turn": 9
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Smothering Tithe",
+          "path": "line:215",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1013.jsonl",
+          "turn": 9
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:36",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "turn": 3
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:37",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "turn": 3
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Storm Herd",
+          "path": "line:38",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "turn": 3
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:271",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1017.jsonl",
+          "turn": 13
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:272",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1017.jsonl",
+          "turn": 13
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "The One Ring",
+          "path": "line:273",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1017.jsonl",
+          "turn": 13
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:43",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1019.jsonl",
+          "turn": 3
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:47",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1019.jsonl",
+          "turn": 3
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Storm Herd",
+          "path": "line:48",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1019.jsonl",
+          "turn": 3
+        },
+        {
+          "effect": "tutor",
+          "event": "miracle_cast",
+          "evidence_type": "event",
+          "path": "line:178",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 7
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:179",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 7
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Rise of the Eldrazi",
+          "path": "line:180",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 7
+        }
+      ],
+      "source_file_count": 50,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_livecheck_v3_smoke/battle_forensic_seed_6262603.jsonl",
+          "unique_exposure_count": 18
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_canonical_replays_20260614_after_rule_fix/battle_forensic_seed_615.jsonl",
+          "unique_exposure_count": 14
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_201.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_table_intent_replay_20260620_162832.events.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_table_intent_replay_20260620_163438.events.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_table_intent_replay_20260620_163736.events.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_table_intent_replay_20260620_164334.events.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_seed63212004_replay_20260620_1556.events.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_battle_forensic_readonly_20260619_seeds42_44/battle_forensic_seed_44.jsonl",
+          "unique_exposure_count": 8
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_battle_forensic_readonly_20260619_seeds42_44/battle_forensic_seed_43.jsonl",
+          "unique_exposure_count": 7
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_canonical_replays_20260614_after_rule_fix/battle_forensic_seed_616.jsonl",
+          "unique_exposure_count": 7
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_978.jsonl",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_982.jsonl",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_997.jsonl",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_204.jsonl",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_livecheck_v3_smoke/battle_forensic_seed_6262602.jsonl",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg070_red_discard_runtime_focused_events_20260623_042617.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_100.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1005.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1006.jsonl",
+          "unique_exposure_count": 3
+        }
+      ],
+      "summary_metric_count": 1,
+      "unique_exposure_count": 228
+    },
+    {
+      "card_name": "Enlightened Tutor",
+      "decision": {
+        "next_action": "retest only with seed-safe cut model",
+        "reason": "Tutor role is modelable; prior cut choices regressed the protected seed.",
+        "status": "runtime_ready_cut_sensitive"
+      },
+      "direct_event_count": 194,
+      "effect_counts": {
+        "tutor": 117
+      },
+      "event_counts": {
+        "cast_announced": 6,
+        "cost_paid": 5,
+        "end_step_instant": 7,
+        "miracle_cast": 6,
+        "priority_pass": 24,
+        "spell_cast": 40,
+        "spell_resolved": 53,
+        "tutor_resolved": 53
+      },
+      "inferred_role": "tutor_access",
+      "metric_counts": {
+        "cost_paid:Enlightened Tutor": 18
+      },
+      "raw_record_count": 202,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "paid_cast_exposure",
+        "tutor_access"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_enchantment_tutor_to_library_top_v1": 1
+        },
+        "card_name": "Enlightened Tutor",
+        "effects": {
+          "tutor": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "samples": [
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:174",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1001.jsonl",
+          "turn": 8
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:175",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1001.jsonl",
+          "turn": 8
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Smothering Tithe",
+          "path": "line:176",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1001.jsonl",
+          "turn": 8
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:257",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1004.jsonl",
+          "turn": 13
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:259",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1004.jsonl",
+          "turn": 13
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Smothering Tithe",
+          "path": "line:260",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1004.jsonl",
+          "turn": 13
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:261",
+          "player": "Tivit, Seller of Secrets #100 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_101.jsonl",
+          "turn": 12
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:262",
+          "player": "Tivit, Seller of Secrets #100 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_101.jsonl",
+          "turn": 12
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Grafdigger's Cage",
+          "path": "line:263",
+          "player": "Tivit, Seller of Secrets #100 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_101.jsonl",
+          "turn": 12
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:178",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1012.jsonl",
+          "turn": 10
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:180",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1012.jsonl",
+          "turn": 10
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Rite of the Dragoncaller",
+          "path": "line:181",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1012.jsonl",
+          "turn": 10
+        },
+        {
+          "effect": "tutor",
+          "event": "miracle_cast",
+          "evidence_type": "event",
+          "path": "line:198",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "turn": 12
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:199",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "turn": 12
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Fiery Emancipation",
+          "path": "line:200",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "turn": 12
+        },
+        {
+          "effect": "tutor",
+          "event": "end_step_instant",
+          "evidence_type": "event",
+          "path": "line:351",
+          "player": "Winota, Joiner of Forces #73 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_102.jsonl",
+          "turn": 18
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:352",
+          "player": "Winota, Joiner of Forces #73 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_102.jsonl",
+          "turn": 18
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Mana Vault",
+          "path": "line:353",
+          "player": "Winota, Joiner of Forces #73 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_102.jsonl",
+          "turn": 18
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:77",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_102.jsonl",
+          "turn": 5
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:78",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_102.jsonl",
+          "turn": 5
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Sol Ring",
+          "path": "line:79",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_102.jsonl",
+          "turn": 5
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:14",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 1
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:15",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 1
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "The One Ring",
+          "path": "line:16",
+          "player": "Zirda, the Dawnwaker #69 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 1
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:308",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 13
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:309",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 13
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Smothering Tithe",
+          "path": "line:310",
+          "player": "Elsha of the Infinite #96 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "turn": 13
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "path": "line:26",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1022.jsonl",
+          "turn": 2
+        },
+        {
+          "effect": "tutor",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "path": "line:27",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1022.jsonl",
+          "turn": 2
+        },
+        {
+          "event": "tutor_resolved",
+          "evidence_type": "event",
+          "found": "Fiery Emancipation",
+          "path": "line:28",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1022.jsonl",
+          "turn": 2
+        }
+      ],
+      "source_file_count": 55,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_201.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_battle_forensic_readonly_20260619_seeds42_44/battle_forensic_seed_43.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_livecheck_v3_smoke/battle_forensic_seed_6262602.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_table_intent_replay_20260620_162832.events.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_table_intent_replay_20260620_163438.events.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_table_intent_replay_20260620_163736.events.jsonl",
+          "unique_exposure_count": 9
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_canonical_replays_20260614_after_rule_fix/battle_forensic_seed_616.jsonl",
+          "unique_exposure_count": 8
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_102.jsonl",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1020.jsonl",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_104.jsonl",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_988.jsonl",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1001.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1004.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_101.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1012.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1022.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1023.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1028.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_202.jsonl",
+          "unique_exposure_count": 3
+        }
+      ],
+      "summary_metric_count": 8,
+      "unique_exposure_count": 202
+    }
+  ],
+  "generated_at": "2026-06-27T23:25:51Z",
+  "package_implications": [
+    {
+      "decision": "manual_tradeoff_only",
+      "package": "austere_command_over_emeria",
+      "reason": "Emeria has measured token/protection exposure, so Austere must prove board-reset value beats rebuild/protection loss."
+    },
+    {
+      "decision": "blocked_until_non_squee_cut",
+      "package": "volcanic_or_restoration_over_squee",
+      "reason": "Squee has measured graveyard-return exposure and should remain protected."
+    },
+    {
+      "decision": "seed_safe_cut_required",
+      "package": "tutor_access",
+      "reason": "Tutor effects are modelable, but promotion depends on a cut model that preserves the known strong seed."
+    }
+  ],
+  "parse_errors": [],
+  "postgres_writes": false,
+  "scan_summary": {
+    "evidence_path_count": 623,
+    "json_files_scanned": 387,
+    "jsonl_files_scanned": 236,
+    "parse_error_count": 0,
+    "scanned_bytes": 63448634
+  },
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "target_cards": [
+    "Emeria's Call // Emeria, Shattered Skyclave",
+    "Austere Command",
+    "Squee, Goblin Nabob",
+    "Volcanic Vision",
+    "Restoration Seminar",
+    "Gamble",
+    "Enlightened Tutor"
+  ]
+}

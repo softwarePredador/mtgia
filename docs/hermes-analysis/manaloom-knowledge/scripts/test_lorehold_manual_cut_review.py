@@ -161,6 +161,26 @@ def cut_model():
     }
 
 
+def exposure_profile():
+    return {
+        "card_profiles": [
+            {
+                "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+                "unique_exposure_count": 193,
+                "direct_event_count": 181,
+                "summary_metric_count": 3,
+                "role_signals": ["board_development_tokens", "protection_window"],
+                "inferred_role": "token_protection_rebuild",
+                "role_confidence": "direct_event_and_rule",
+                "decision": {
+                    "status": "not_safe_as_blind_cut",
+                    "next_action": "test_austere_only_as_explicit_wipe_over_rebuild_tradeoff",
+                },
+            }
+        ]
+    }
+
+
 def test_manual_cut_review_blocks_squee_and_holds_emeria_for_role_review():
     with memory_db() as conn:
         payload = review.build_review(
@@ -178,6 +198,23 @@ def test_manual_cut_review_blocks_squee_and_holds_emeria_for_role_review():
         "decision"
     ] == "manual_review_role_gap_before_gate"
     assert payload["summary"]["automatic_gate_ready_count"] == 0
+
+
+def test_manual_cut_review_uses_exposure_profile_for_emeria_tradeoff():
+    with memory_db() as conn:
+        payload = review.build_review(
+            strategy_audit=strategy_audit(),
+            cut_model=cut_model(),
+            exposure_profile=exposure_profile(),
+            conn=conn,
+        )
+
+    manual = {(row["candidate"], row["cut"]): row for row in payload["manual_cut_reviews"]}
+    emeria = manual[("Austere Command", "Emeria's Call // Emeria, Shattered Skyclave")]
+    assert emeria["decision"] == "manual_tradeoff_not_blind_cut"
+    assert emeria["gate_action"] == "manual_tradeoff_gate_only"
+    assert emeria["cut_exposure"]["inferred_role"] == "token_protection_rebuild"
+    assert "193" in "; ".join(emeria["reasons"])
 
 
 def test_tutor_contextual_candidates_keep_prior_seed_regression_visible():
