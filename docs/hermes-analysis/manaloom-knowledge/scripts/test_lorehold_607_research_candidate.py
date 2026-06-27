@@ -37,7 +37,7 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
     def test_ghostly_prison_plan_is_stax_pressure_sidegrade(self):
         plan = research.RESEARCH_PLANS["ghostly_prison_v1"]
         self.assertEqual(plan["added"], [{"card_name": "Ghostly Prison", "source_deck_id": 613}])
-        self.assertEqual(plan["removed"], ["High Noon"])
+        self.assertEqual(plan["removed"], ["Promise of Loyalty"])
 
     def test_guttersnipe_plan_is_spell_payoff_sidegrade(self):
         plan = research.RESEARCH_PLANS["guttersnipe_v1"]

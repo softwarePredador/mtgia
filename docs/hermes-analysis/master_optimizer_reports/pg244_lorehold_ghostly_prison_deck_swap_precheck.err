@@ -1,0 +1,4 @@
+WARNING:  could not create relation-cache initialization file "global/pg_internal.init.23406": No space left on device
+DETAIL:  Continuing anyway, but there's something wrong.
+WARNING:  could not create relation-cache initialization file "base/16384/pg_internal.init.23406": No space left on device
+DETAIL:  Continuing anyway, but there's something wrong.

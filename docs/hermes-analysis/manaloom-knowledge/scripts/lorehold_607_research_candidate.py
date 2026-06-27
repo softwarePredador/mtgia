@@ -114,16 +114,16 @@ RESEARCH_PLANS = {
         "base_deck_id": 607,
         "candidate_deck_id": 6,
         "added": [{"card_name": "Ghostly Prison", "source_deck_id": 613}],
-        "removed": ["High Noon"],
+        "removed": ["Promise of Loyalty"],
         "intent": (
             "Test Ghostly Prison as a pressure-absorber stax sidegrade. This "
             "keeps Molecule Man, board wipes, miracle/topdeck setup, and protected "
-            "pressure pieces intact while replacing the closest nonprotected "
-            "enchantment tax slot."
+            "pressure pieces intact while replacing a slower pressure-cleanup "
+            "spell with a static combat tax."
         ),
         "external_signals": [
             "Local Lorehold variants 613 and 616 tag Ghostly Prison as protection/stax.",
-            "High Noon and Ghostly Prison are both low-cost enchantment stax pieces, but Ghostly Prison maps directly to combat pressure absorption.",
+            "Promise of Loyalty and Ghostly Prison both answer combat pressure, but Ghostly Prison starts earlier and repeatedly taxes attackers.",
             "The registry requires Ghostly Prison to be tested only as a pressure/stax replacement, not as a spell-density cut.",
         ],
     },
