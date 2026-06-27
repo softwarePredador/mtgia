@@ -582,6 +582,18 @@ def register_tests(battle, player):
             assert combat["attackers"] == 1
             assert declare_attackers["attack_restrictions"][0]["attack_tax_per_creature"] == 2
             assert declare_attackers["attack_restrictions"][0]["tax_paid"] == 2
+            assert declare_attackers["attack_restrictions"][0]["attack_restriction_sources"] == [
+                "Ghostly Prison"
+            ]
+            assert declare_attackers["attack_restrictions"][0]["attack_tax_sources"] == [
+                {
+                    "card": "Ghostly Prison",
+                    "attack_tax_per_creature": 2,
+                    "attack_tax_per_enchantment": 0,
+                    "enchantment_count": 0,
+                    "total_attack_tax_per_creature": 2,
+                }
+            ]
             assert attacker.available_mana() == 0
             assert sum(1 for card in attacker.battlefield if card.get("tapped")) == 1
             assert defender.life == 38
@@ -648,6 +660,26 @@ def register_tests(battle, player):
             assert combat["attackers"] == 2
             assert declare_attackers["attack_restrictions"][0]["attack_tax_per_creature"] == 5
             assert declare_attackers["attack_restrictions"][0]["tax_paid"] == 10
+            assert declare_attackers["attack_restrictions"][0]["attack_restriction_sources"] == [
+                "Sphere of Safety",
+                "Ghostly Prison",
+            ]
+            assert declare_attackers["attack_restrictions"][0]["attack_tax_sources"] == [
+                {
+                    "card": "Sphere of Safety",
+                    "attack_tax_per_creature": 0,
+                    "attack_tax_per_enchantment": 1,
+                    "enchantment_count": 3,
+                    "total_attack_tax_per_creature": 3,
+                },
+                {
+                    "card": "Ghostly Prison",
+                    "attack_tax_per_creature": 2,
+                    "attack_tax_per_enchantment": 0,
+                    "enchantment_count": 3,
+                    "total_attack_tax_per_creature": 2,
+                },
+            ]
             assert attacker.available_mana() == 0
             assert sum(1 for card in attacker.battlefield if card.get("tapped")) == 2
             assert defender.life == 36

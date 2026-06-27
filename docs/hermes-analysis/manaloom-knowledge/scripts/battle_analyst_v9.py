@@ -32185,8 +32185,9 @@ def defender_attack_filter_restrictions(defender):
     return max_power, sorted(required_keywords)
 
 
-def defender_attack_tax_per_creature(defender):
+def defender_attack_tax_details(defender):
     tax = 0
+    sources = []
     enchantment_count = sum(
         1
         for permanent in getattr(defender, "battlefield", []) or []
@@ -32198,14 +32199,38 @@ def defender_attack_tax_per_creature(defender):
             continue
         if permanent.get("effect") != "attack_tax":
             continue
+        contribution = 0
         try:
-            tax += max(0, int(permanent.get("attack_tax_per_creature", 0) or 0))
+            contribution += max(0, int(permanent.get("attack_tax_per_creature", 0) or 0))
         except (TypeError, ValueError):
             continue
         try:
-            tax += max(0, int(permanent.get("attack_tax_per_enchantment", 0) or 0)) * enchantment_count
+            contribution += (
+                max(0, int(permanent.get("attack_tax_per_enchantment", 0) or 0))
+                * enchantment_count
+            )
         except (TypeError, ValueError):
             continue
+        if contribution:
+            tax += contribution
+            sources.append(
+                {
+                    "card": permanent.get("name", "?"),
+                    "attack_tax_per_creature": int(
+                        permanent.get("attack_tax_per_creature", 0) or 0
+                    ),
+                    "attack_tax_per_enchantment": int(
+                        permanent.get("attack_tax_per_enchantment", 0) or 0
+                    ),
+                    "enchantment_count": enchantment_count,
+                    "total_attack_tax_per_creature": contribution,
+                }
+            )
+    return tax, sources
+
+
+def defender_attack_tax_per_creature(defender):
+    tax, _sources = defender_attack_tax_details(defender)
     return tax
 
 
@@ -32255,7 +32280,7 @@ def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
     if limit is not None:
         allowed_count = min(allowed_count, limit)
 
-    tax_per_creature = defender_attack_tax_per_creature(defender)
+    tax_per_creature, attack_tax_sources = defender_attack_tax_details(defender)
     tax_paid = 0
     if tax_per_creature > 0:
         affordable = int(attacker.available_mana() or 0) // tax_per_creature
@@ -32289,6 +32314,12 @@ def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
             "target": defender.name,
             "attack_limit": limit,
             "attack_tax_per_creature": tax_per_creature,
+            "attack_tax_sources": attack_tax_sources,
+            "attack_restriction_sources": [
+                source.get("card", "?")
+                for source in attack_tax_sources
+                if source.get("card")
+            ],
             "attack_max_power": max_power,
             "attack_requires_keywords": required_keywords,
             "tax_paid": tax_paid,

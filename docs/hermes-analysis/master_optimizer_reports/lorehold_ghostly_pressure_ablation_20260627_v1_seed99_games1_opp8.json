@@ -1,0 +1,415 @@
+{
+  "generated_at": "2026-06-27T22:22:20Z",
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v3_seed99_games3_opp8_20260627_221640_ghostly_prison_pressure_cut_promise/knowledge_candidate.db",
+  "games_per_opponent": 1,
+  "opponent_limit": 8,
+  "opponent_seed": 20260626,
+  "simulation_seed": 99,
+  "target_cards": [
+    "Crawlspace",
+    "Ghostly Prison",
+    "Magus of the Moat",
+    "Silent Arbiter",
+    "Sphere of Safety",
+    "Windborn Muse"
+  ],
+  "available_target_cards": [
+    "Ghostly Prison"
+  ],
+  "absent_target_cards": [
+    "Crawlspace",
+    "Magus of the Moat",
+    "Silent Arbiter",
+    "Sphere of Safety",
+    "Windborn Muse"
+  ],
+  "opponents": [
+    "Vivi Ornitier #99 (real)",
+    "Sisay, Weatherlight Captain #61 (real)",
+    "Winota, Joiner of Forces #39 (real)",
+    "Kenrith, the Returned King #113 (real)",
+    "Aang, at the Crossroads #106 (real)",
+    "Umbris, Fear Manifest #114 (real)",
+    "Rograkh, Son of Rohgahh #62 (real)",
+    "Tannuk, Memorial Ensign #40 (real)"
+  ],
+  "probability_baseline": [
+    {
+      "cards_seen": 7,
+      "one_specific_card_pct": 7.070707070707072,
+      "any_package_card_pct": 36.363254044301364
+    },
+    {
+      "cards_seen": 10,
+      "one_specific_card_pct": 10.1010101010101,
+      "any_package_card_pct": 48.13995396475396
+    },
+    {
+      "cards_seen": 12,
+      "one_specific_card_pct": 12.121212121212121,
+      "any_package_card_pct": 54.933672967839044
+    },
+    {
+      "cards_seen": 15,
+      "one_specific_card_pct": 15.151515151515149,
+      "any_package_card_pct": 63.72414715426225
+    },
+    {
+      "cards_seen": 20,
+      "one_specific_card_pct": 20.2020202020202,
+      "any_package_card_pct": 75.19362537732795
+    },
+    {
+      "cards_seen": 25,
+      "one_specific_card_pct": 25.25252525252525,
+      "any_package_card_pct": 83.46756365279587
+    }
+  ],
+  "scenarios": [
+    {
+      "label": "baseline_v7",
+      "games": 8,
+      "wins": 2,
+      "losses": 6,
+      "stalls": 0,
+      "win_rate": 25.0,
+      "avg_win_turn": 16.0,
+      "win_reasons": {
+        "elimination": 2
+      },
+      "opponents": [
+        {
+          "opponent": "Vivi Ornitier #99 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "wins": 1,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "avg_win_turn": 15.0,
+          "win_reasons": {
+            "elimination": 1
+          }
+        },
+        {
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Kenrith, the Returned King #113 (real)",
+          "wins": 1,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "avg_win_turn": 17.0,
+          "win_reasons": {
+            "elimination": 1
+          }
+        },
+        {
+          "opponent": "Aang, at the Crossroads #106 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Umbris, Fear Manifest #114 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Rograkh, Son of Rohgahh #62 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Tannuk, Memorial Ensign #40 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        }
+      ],
+      "telemetry": {
+        "games": 8,
+        "cards": {
+          "Crawlspace": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Ghostly Prison": {
+            "opening_seen_games": 2,
+            "drawn_games": 0,
+            "seen_games": 2,
+            "seen_rate": 0.25,
+            "draw_count": 0,
+            "cast_announced_games": 2,
+            "cost_paid_games": 2,
+            "cost_paid_count": 2,
+            "cast_rate_when_seen": 1.0
+          },
+          "Magus of the Moat": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Silent Arbiter": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Sphere of Safety": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Windborn Muse": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          }
+        },
+        "package_restrictions": {
+          "events": 2,
+          "attackers_before": 10,
+          "attackers_after": 5,
+          "attackers_restricted": 5,
+          "tax_paid": 10,
+          "source_event_counts": {
+            "Ghostly Prison": 2
+          }
+        }
+      }
+    },
+    {
+      "label": "without_ghostly_prison",
+      "games": 8,
+      "wins": 3,
+      "losses": 5,
+      "stalls": 0,
+      "win_rate": 37.5,
+      "avg_win_turn": 14.33,
+      "win_reasons": {
+        "elimination": 2,
+        "approach": 1
+      },
+      "opponents": [
+        {
+          "opponent": "Vivi Ornitier #99 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "wins": 1,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "avg_win_turn": 14.0,
+          "win_reasons": {
+            "elimination": 1
+          }
+        },
+        {
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Kenrith, the Returned King #113 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Aang, at the Crossroads #106 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Umbris, Fear Manifest #114 (real)",
+          "wins": 1,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "avg_win_turn": 17.0,
+          "win_reasons": {
+            "elimination": 1
+          }
+        },
+        {
+          "opponent": "Rograkh, Son of Rohgahh #62 (real)",
+          "wins": 0,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "avg_win_turn": 0,
+          "win_reasons": {}
+        },
+        {
+          "opponent": "Tannuk, Memorial Ensign #40 (real)",
+          "wins": 1,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "avg_win_turn": 12.0,
+          "win_reasons": {
+            "approach": 1
+          }
+        }
+      ],
+      "telemetry": {
+        "games": 8,
+        "cards": {
+          "Crawlspace": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Ghostly Prison": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Magus of the Moat": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Silent Arbiter": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Sphere of Safety": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          },
+          "Windborn Muse": {
+            "opening_seen_games": 0,
+            "drawn_games": 0,
+            "seen_games": 0,
+            "seen_rate": 0.0,
+            "draw_count": 0,
+            "cast_announced_games": 0,
+            "cost_paid_games": 0,
+            "cost_paid_count": 0,
+            "cast_rate_when_seen": 0.0
+          }
+        },
+        "package_restrictions": {
+          "events": 0,
+          "attackers_before": 0,
+          "attackers_after": 0,
+          "attackers_restricted": 0,
+          "tax_paid": 0,
+          "source_event_counts": {}
+        }
+      }
+    }
+  ],
+  "postgres_writes": false,
+  "source_db_mutated": false
+}
