@@ -95,6 +95,9 @@ DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
 DEFAULT_LOSS_FAILURE_CLASSIFIER = (
     REPORT_DIR / "lorehold_loss_failure_classifier_20260627_conversion_pressure_v8.json"
 )
+DEFAULT_SAFE_PACKAGE_GATES = [
+    REPORT_DIR / "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+]
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
 EXTERNAL_METHOD_SOURCES = [
@@ -576,6 +579,107 @@ def aggregate_post_squee_package_gates(paths: list[Path]) -> dict[str, Any]:
     return {"paths": [str(path) for path in paths], "rows": rows, "per_seed": per_seed}
 
 
+def safe_queue_decision(row: dict[str, Any]) -> str:
+    if row.get("status") != "gated":
+        return str(row.get("status") or "not_gated")
+    delta = float(row.get("delta_pp") or 0.0)
+    candidate_wins = int(row.get("candidate_wins") or 0)
+    baseline_wins = int(row.get("baseline_wins") or 0)
+    if delta >= 0 and candidate_wins >= baseline_wins:
+        return "promote_to_deeper_gate"
+    if delta > -50.0 and candidate_wins > 0:
+        return "watch_only_needs_stronger_justification"
+    return "smoke_negative_do_not_promote"
+
+
+def aggregate_safe_package_gates(paths: list[Path]) -> dict[str, Any]:
+    metrics = [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "spell_cast_mana_trigger",
+        "birgi_spell_cast_mana",
+        "ritual_mana_added",
+        "lorehold_spell_rummage",
+        "lorehold_upkeep_rummage",
+        "miracle_cast",
+        "tutor_resolved",
+        "random_discard_after_tutor",
+        "topdeck_manipulation_activated",
+        "discard_to_top_replacement",
+        "lorehold_rummage_discard_to_top",
+        "lorehold_spell_rummage_discard_to_top",
+        "hand_to_topdeck_activation",
+        "squee_to_graveyard",
+        "squee_upkeep_return",
+        "squee_return_after_known_graveyard_entry",
+    ]
+    rows: list[dict[str, Any]] = []
+    status_counts: Counter[str] = Counter()
+    decision_counts: Counter[str] = Counter()
+    for path in paths:
+        payload = read_json(path)
+        if not payload:
+            continue
+        for package in payload.get("packages") or []:
+            gate = package.get("gate_summary") or {}
+            baseline = gate.get("baseline") or {}
+            candidate = gate.get("candidate") or {}
+            baseline_events = (baseline.get("telemetry") or {}).get("strategic_event_counts") or {}
+            baseline_raw_events = (baseline.get("telemetry") or {}).get("event_counts") or {}
+            candidate_events = (candidate.get("telemetry") or {}).get("strategic_event_counts") or {}
+            candidate_raw_events = (candidate.get("telemetry") or {}).get("event_counts") or {}
+            row = {
+                "source": str(path),
+                "package_key": package.get("package_key"),
+                "family": package.get("family"),
+                "adds": package.get("adds") or [],
+                "cuts": package.get("cuts") or [],
+                "status": package.get("status"),
+                "cut_safety_status": (package.get("cut_safety") or {}).get("status"),
+                "prior_evidence_status": (package.get("prior_evidence") or {}).get("status"),
+                "added_rule_counts": (package.get("candidate_meta") or {}).get("added_rule_counts") or {},
+                "miracle_core_cuts": (package.get("candidate_meta") or {}).get("miracle_core_cuts") or [],
+                "baseline_wins": int(baseline.get("wins") or 0),
+                "baseline_losses": int(baseline.get("losses") or 0),
+                "baseline_stalls": int(baseline.get("stalls") or 0),
+                "baseline_win_rate": float(baseline.get("win_rate") or 0.0),
+                "candidate_wins": int(candidate.get("wins") or 0),
+                "candidate_losses": int(candidate.get("losses") or 0),
+                "candidate_stalls": int(candidate.get("stalls") or 0),
+                "candidate_win_rate": float(candidate.get("win_rate") or 0.0),
+                "delta_pp": float(gate.get("delta_pp") or 0.0),
+                "strategic_delta": {
+                    metric: int(candidate_events.get(metric) or candidate_raw_events.get(metric) or 0)
+                    - int(baseline_events.get(metric) or baseline_raw_events.get(metric) or 0)
+                    for metric in metrics
+                },
+            }
+            row["decision"] = safe_queue_decision(row)
+            rows.append(row)
+            status_counts[str(row["status"] or "unknown")] += 1
+            decision_counts[row["decision"]] += 1
+
+    rows.sort(key=lambda item: (-float(item.get("delta_pp") or 0.0), item.get("package_key") or ""))
+    best = rows[0] if rows else {}
+    return {
+        "paths": [str(path) for path in paths],
+        "summary": {
+            "package_count": len(rows),
+            "status_counts": dict(sorted(status_counts.items())),
+            "decision_counts": dict(sorted(decision_counts.items())),
+            "best_package_key": best.get("package_key"),
+            "best_delta_pp": best.get("delta_pp"),
+            "best_candidate_record": (
+                f"{best.get('candidate_wins', 0)}-{best.get('candidate_losses', 0)}-"
+                f"{best.get('candidate_stalls', 0)}"
+                if best
+                else None
+            ),
+        },
+        "rows": rows,
+    }
+
+
 def aggregate_library_leng_telemetry_gates(paths: list[Path]) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     aggregate = Counter()
@@ -741,6 +845,28 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"with win-rate delta `{float(interpretation.get('winrate_delta_pp') or 0):+.2f}` pp."
         )
     lines.append("- The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.")
+    safe_queue = report.get("safe_package_gates") or {}
+    safe_rows = safe_queue.get("rows") or []
+    if safe_rows:
+        safe_summary = safe_queue.get("summary") or {}
+        lines.append(
+            "- The cut-safety-aware safe queue v3 produced "
+            f"`{safe_summary.get('package_count', 0)}` executable packages that avoided the protected cuts, "
+            f"but the smoke gate still found no promotion. Best smoke result was "
+            f"`{safe_summary.get('best_package_key')}` at `{safe_summary.get('best_candidate_record')}` "
+            f"with delta `{float(safe_summary.get('best_delta_pp') or 0):+.2f}` pp."
+        )
+        overmaster_safe = next(
+            (row for row in safe_rows if row.get("package_key") == "overmaster_protect_draw_cut_tibalts_trickery"),
+            None,
+        )
+        if overmaster_safe:
+            lines.append(
+                "- `Overmaster` over `Tibalt's Trickery` is only a watch-list clue, not a deck change: "
+                f"candidate `{overmaster_safe['candidate_wins']}-{overmaster_safe['candidate_losses']}` vs "
+                f"baseline `{overmaster_safe['baseline_wins']}-{overmaster_safe['baseline_losses']}` "
+                f"(`{overmaster_safe['delta_pp']:+.2f}` pp), decision `{overmaster_safe['decision']}`."
+            )
     post_squee = report.get("post_squee_package_gates") or {}
     post_squee_rows = post_squee.get("rows") or []
     if post_squee_rows:
@@ -1253,6 +1379,48 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.append("")
         lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher, Victory Chimes, or Thor are worse on seed 42, so Galvanoth stays a probation hypothesis, not a deck insert. Primal Amulet over Bender's Waterskin repeats the same weak-seed improvement and strong-seed collapse pattern, so Bender is not a free cut. Gamble over Creative Technique shows that cheap universal access can help weak seeds, but the current result still breaks seed 42, so it is probation/rework rather than a deck change. The Thor-cut access retests were worse on seed 42, so Thor is not the clean cut for tutor access despite being modeled-not-deck-proven. Boseiju over Reliquary Tower preserves land count and spell-protection rules but still collapses seed 42, so land-slot anti-counter protection is not the current missing piece. Boros Charm over Fated Clash collapsed seed 42 completely, so Fated Clash is not a free slow-response cut even for a cheaper pressure card. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results alone. Birgi + Seething Song over both medallions improves the weak seeds while losing badly on seed 42, so medallions are part of the strong-seed conversion pattern and the ritual lane needs a different cut before any promotion. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
         lines.append("")
+    if safe_rows:
+        lines.append("## Cut-Safety-Aware Safe Queue V3")
+        lines.append("")
+        lines.append(
+            "This queue was generated after the cut-safety manifest blocked the earlier package list. "
+            "Every row below cleared cut-safety and prior-exact-package preflight, then ran as an isolated smoke gate against real opponents. "
+            "Because the baseline was 3-0 in this smoke, any negative result is treated as no-promotion evidence, not as permission to mutate the deck."
+        )
+        lines.append("")
+        lines.append("| Package | Adds | Cuts | Baseline | Candidate | Delta pp | Miracle | Topdeck | Spell | Mana Trigger | Birgi Mana | Ritual | Decision |")
+        lines.append("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+        for row in safe_rows:
+            delta = row.get("strategic_delta") or {}
+            lines.append(
+                "| `{package}` | {adds} | {cuts} | {base_w}-{base_l}-{base_s} | {cand_w}-{cand_l}-{cand_s} | {delta_pp:+.2f} | {miracle:+d} | {topdeck:+d} | {spell:+d} | {mana:+d} | {birgi_mana:+d} | {ritual:+d} | {decision} |".format(
+                    package=row.get("package_key"),
+                    adds=", ".join(row.get("adds") or []),
+                    cuts=", ".join(row.get("cuts") or []),
+                    base_w=row.get("baseline_wins", 0),
+                    base_l=row.get("baseline_losses", 0),
+                    base_s=row.get("baseline_stalls", 0),
+                    cand_w=row.get("candidate_wins", 0),
+                    cand_l=row.get("candidate_losses", 0),
+                    cand_s=row.get("candidate_stalls", 0),
+                    delta_pp=float(row.get("delta_pp") or 0.0),
+                    miracle=int(delta.get("miracle_cast") or 0),
+                    topdeck=int(delta.get("topdeck_manipulation_activated") or 0),
+                    spell=int(delta.get("lorehold_spell_cast") or 0),
+                    mana=int(delta.get("spell_cast_mana_trigger") or 0),
+                    birgi_mana=int(delta.get("birgi_spell_cast_mana") or 0),
+                    ritual=int(delta.get("ritual_mana_added") or 0),
+                    decision=row.get("decision"),
+                )
+            )
+        lines.append("")
+        lines.append(
+            "Read: this is the strongest current evidence against replacing generic ramp/support slots blindly. "
+            "Birgi, Seething Song, Storm-Kiln Artist, and Runaway Steam-Kin all reduced the miracle/topdeck conversion pattern in the smoke. "
+            "Boros Charm and Ghostly Prison still did not solve pressure when moved to safer non-protected cuts. "
+            "Overmaster is the only watch-list row because it retained two wins, but it still trailed the current shell and needs a different, explicit follow-up before any deeper gate."
+        )
+        lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")
     champion = report["deck_summaries"].get("6") or {}
@@ -1282,12 +1450,20 @@ def render_markdown(report: dict[str, Any]) -> str:
     if (report.get("thor_rule_runtime_audit") or {}).get("decision"):
         thor_local_runtime_cards.add((report.get("thor_rule_runtime_audit") or {}).get("card"))
     thor_local_runtime_cards.discard(None)
-    effective_missing_cards = [
+    missing_after_squee_materialization = [
         card
         for card in missing_cards
         if card not in materialized_cards
-        and card not in audit_materialization_cards
-        and card not in thor_local_runtime_cards
+    ]
+    missing_after_rule_materialization_audit = [
+        card
+        for card in missing_after_squee_materialization
+        if card not in audit_materialization_cards
+    ]
+    effective_missing_cards = [
+        card
+        for card in missing_after_rule_materialization_audit
+        if card not in thor_local_runtime_cards
     ]
     lines.append(
         f"- Missing aggregated battle-rule rows in the legacy champion DB: `{len(missing_cards)}` cards: {', '.join(missing_cards) or 'none'}."
@@ -1297,14 +1473,14 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"- Superseded by rule-materialization audit: `{', '.join(sorted(materialized_cards))}` now has materialized rule evidence in the equal-gate candidate."
         )
         lines.append(
-            f"- Effective unresolved rule rows after that audit: `{len(effective_missing_cards)}` cards: {', '.join(effective_missing_cards) or 'none'}."
+            f"- Effective unresolved rule rows after only that audit: `{len(missing_after_squee_materialization)}` cards: {', '.join(missing_after_squee_materialization) or 'none'}."
         )
     if audit_materialization_cards:
         lines.append(
             f"- Reclassified by remaining-row audit as deck materialization gaps: `{', '.join(sorted(audit_materialization_cards))}`."
         )
         lines.append(
-            f"- Effective unresolved rule/model rows after all current materialization evidence: `{len(effective_missing_cards)}` cards: {', '.join(effective_missing_cards) or 'none'}."
+            f"- Effective unresolved rule/model rows after deck materialization evidence: `{len(missing_after_rule_materialization_audit)}` cards: {', '.join(missing_after_rule_materialization_audit) or 'none'}."
         )
     if thor_local_runtime_cards:
         lines.append(
@@ -1756,6 +1932,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     thor_rule_runtime_audit = read_json(args.thor_rule_runtime_audit)
     thor_rule_gate_audit = read_json(args.thor_rule_gate_audit)
     post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
+    safe_package_gates = aggregate_safe_package_gates(args.safe_package_gate)
     library_leng_telemetry_gates = aggregate_library_leng_telemetry_gates(args.library_leng_telemetry_gate)
     loss_failure_classifier = read_json(args.loss_failure_classifier)
     card_decision_manifest = build_card_decision_manifest(
@@ -1789,6 +1966,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Boseiju, Who Shelters All over Reliquary Tower failed seed-42 triage; anti-counter land-slot protection does not address the observed life-zero combat-pressure losses by itself.",
         "Boros Charm over Fated Clash failed seed-42 triage at 0-9; protect Fated Clash until a same-lane replacement proves it can preserve the strong seed.",
         "The cut-safety manifest now blocks repeated cuts that already collapsed seed 42 and separates them from unresolved flex slots; use that manifest before generating another package.",
+        "The safe queue v3 proves that avoiding protected cuts is necessary but not sufficient: all seven cut-safe smoke packages were still worse than the baseline, so a future package needs a positive strategic reason plus a clean cut, not only cut-safety clearance.",
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
@@ -1805,6 +1983,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Do not promote Boseiju over Reliquary Tower from the current land-slot gate; future spell-protection work should include pressure absorption or a conversion-speed gain, not only anti-counter text.",
         "Do not cut Fated Clash for cheap pressure protection from the current evidence; if Boros Charm is retested, it needs a different cut with an explicit reason.",
         "Before registering any new package, reject the candidate if every proposed cut is locked or protected by the cut-safety manifest and the package has no explicit same-lane proof rationale.",
+        "Before deep-gating any future cut-safe package, require either a positive smoke result, a matchup-specific failure classifier target, or an explicit reason why a negative smoke should be overridden; the v3 safe queue produced no direct promotion.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
         "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.",
@@ -1835,6 +2014,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "thor_rule_gate_audit": thor_rule_gate_audit,
         "general_synergy_confirm": general_confirm,
         "post_squee_package_gates": post_squee_package_gates,
+        "safe_package_gates": safe_package_gates,
         "library_leng_telemetry_gates": library_leng_telemetry_gates,
         "loss_failure_classifier_path": str(args.loss_failure_classifier),
         "loss_failure_classifier": loss_failure_classifier,
@@ -1873,6 +2053,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
     parser.add_argument("--post-squee-package-gate", type=Path, action="append")
+    parser.add_argument("--safe-package-gate", type=Path, action="append")
     parser.add_argument("--library-leng-telemetry-gate", type=Path, action="append")
     parser.add_argument("--loss-failure-classifier", type=Path, default=DEFAULT_LOSS_FAILURE_CLASSIFIER)
     parser.add_argument("--deck-ids", default=",".join(str(value) for value in DEFAULT_DECK_IDS))
@@ -1887,6 +2068,8 @@ def main() -> int:
         args.squee_gates = DEFAULT_SQUEE_GATES
     if not args.post_squee_package_gate:
         args.post_squee_package_gate = DEFAULT_POST_SQUEE_PACKAGE_GATES
+    if not args.safe_package_gate:
+        args.safe_package_gate = DEFAULT_SAFE_PACKAGE_GATES
     if not args.library_leng_telemetry_gate:
         args.library_leng_telemetry_gate = DEFAULT_LIBRARY_LENG_TELEMETRY_GATES
 

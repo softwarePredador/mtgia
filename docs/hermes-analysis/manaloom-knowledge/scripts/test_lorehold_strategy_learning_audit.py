@@ -59,6 +59,98 @@ def package_payload(seed, package_key, baseline_wins, baseline_losses, candidate
     }
 
 
+def safe_queue_payload():
+    return {
+        "packages": [
+            {
+                "package_key": "overmaster_protect_draw_cut_tibalts_trickery",
+                "family": "spell_protection",
+                "adds": ["Overmaster"],
+                "cuts": ["Tibalt's Trickery"],
+                "status": "gated",
+                "cut_safety": {"status": "clear"},
+                "prior_evidence": {"status": "clear"},
+                "candidate_meta": {
+                    "added_rule_counts": {"Overmaster": 1},
+                    "miracle_core_cuts": [],
+                },
+                "gate_summary": {
+                    "baseline": {
+                        "wins": 3,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "telemetry": {
+                            "strategic_event_counts": {
+                                "lorehold_spell_cast": 51,
+                                "miracle_cast": 14,
+                            }
+                        },
+                    },
+                    "candidate": {
+                        "wins": 2,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 66.67,
+                        "telemetry": {
+                            "event_counts": {
+                                "ritual_mana_added": 3,
+                            },
+                            "strategic_event_counts": {
+                                "lorehold_spell_cast": 29,
+                                "miracle_cast": 7,
+                            }
+                        },
+                    },
+                    "delta_pp": -33.33,
+                },
+            },
+            {
+                "package_key": "birgi_spellchain_cut_jeskas_will",
+                "family": "spellchain_mana",
+                "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+                "cuts": ["Jeska's Will"],
+                "status": "gated",
+                "cut_safety": {"status": "clear"},
+                "prior_evidence": {"status": "clear"},
+                "candidate_meta": {
+                    "added_rule_counts": {"Birgi, God of Storytelling // Harnfel, Horn of Bounty": 1},
+                    "miracle_core_cuts": [],
+                },
+                "gate_summary": {
+                    "baseline": {
+                        "wins": 3,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "telemetry": {
+                            "strategic_event_counts": {
+                                "birgi_spell_cast_mana": 0,
+                                "lorehold_spell_cast": 51,
+                                "miracle_cast": 14,
+                            }
+                        },
+                    },
+                    "candidate": {
+                        "wins": 0,
+                        "losses": 3,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "telemetry": {
+                            "strategic_event_counts": {
+                                "birgi_spell_cast_mana": 1,
+                                "lorehold_spell_cast": 13,
+                                "miracle_cast": 1,
+                            }
+                        },
+                    },
+                    "delta_pp": -100.0,
+                },
+            },
+        ]
+    }
+
+
 class LoreholdStrategyLearningAuditTest(unittest.TestCase):
     def test_card_status_separates_materialization_gap_from_missing_model(self):
         card = {
@@ -248,6 +340,40 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
         self.assertEqual(
             [row["card_name"] for row in manifest["untested_flex_pool"]],
             ["Manual Flex"],
+        )
+
+    def test_safe_package_gate_classifies_negative_smoke_without_promotion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "safe_queue.json"
+            path.write_text(json.dumps(safe_queue_payload()), encoding="utf-8")
+
+            result = audit.aggregate_safe_package_gates([path])
+
+        self.assertEqual(result["summary"]["package_count"], 2)
+        self.assertEqual(
+            result["summary"]["decision_counts"]["watch_only_needs_stronger_justification"],
+            1,
+        )
+        self.assertEqual(
+            result["summary"]["decision_counts"]["smoke_negative_do_not_promote"],
+            1,
+        )
+        self.assertEqual(
+            result["summary"]["best_package_key"],
+            "overmaster_protect_draw_cut_tibalts_trickery",
+        )
+        by_key = {row["package_key"]: row for row in result["rows"]}
+        self.assertEqual(
+            by_key["overmaster_protect_draw_cut_tibalts_trickery"]["decision"],
+            "watch_only_needs_stronger_justification",
+        )
+        self.assertEqual(
+            by_key["birgi_spellchain_cut_jeskas_will"]["strategic_delta"]["birgi_spell_cast_mana"],
+            1,
+        )
+        self.assertEqual(
+            by_key["birgi_spellchain_cut_jeskas_will"]["strategic_delta"]["miracle_cast"],
+            -13,
         )
 
 
