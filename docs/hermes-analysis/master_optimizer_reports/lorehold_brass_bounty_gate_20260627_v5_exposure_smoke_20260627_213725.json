@@ -1,0 +1,2778 @@
+{
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260627_v3.json",
+  "cut_safety_summary": {
+    "blocked_cut_count": 11,
+    "status_counts": {
+      "locked_do_not_cut": 9,
+      "risky_cut_only_same_lane": 2
+    },
+    "tested_cut_count": 11,
+    "untested_flex_pool_count": 6
+  },
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-27T21:37:39.536467+00:00",
+  "opponent_limit": 8,
+  "opponent_seed": 20260626,
+  "package_status_counts": {
+    "gated": 1
+  },
+  "packages": [
+    {
+      "adds": [
+        "Brass's Bounty"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725_brass_bounty_cut_boros_signet/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Brass's Bounty": 2
+        },
+        "adds": [
+          "Brass's Bounty"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Boros Signet"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "reviewed_rule_upserts": {
+          "Brass's Bounty": 1
+        },
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Boros Signet"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725_brass_bounty_cut_boros_signet.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725_brass_bounty_cut_boros_signet.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 8 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=8\nrunning synergy_brass_bounty_cut_boros_signet games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725_brass_bounty_cut_boros_signet.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725_brass_bounty_cut_boros_signet.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 22.5,
+          "losses": 6,
+          "stalls": 0,
+          "telemetry": {
+            "card_event_counts": {
+              "board_wipe_resolved:Everything Comes to Dust": 4,
+              "board_wipe_resolved:Farewell": 1,
+              "board_wipe_resolved:Fated Clash": 1,
+              "board_wipe_resolved:Promise of Loyalty": 1,
+              "board_wipe_resolved:Starfall Invocation": 1,
+              "board_wipe_resolved:Tragic Arrogance": 2,
+              "cost_paid:Arcane Signet": 4,
+              "cost_paid:Artist's Talent": 1,
+              "cost_paid:Avatar's Wrath": 1,
+              "cost_paid:Bender's Waterskin": 2,
+              "cost_paid:Big Score": 1,
+              "cost_paid:Boros Signet": 3,
+              "cost_paid:Esper Sentinel": 1,
+              "cost_paid:Fated Clash": 1,
+              "cost_paid:Fellwar Stone": 1,
+              "cost_paid:Furygale Flocking": 1,
+              "cost_paid:Generous Gift": 2,
+              "cost_paid:Giver of Runes": 3,
+              "cost_paid:Hexing Squelcher": 4,
+              "cost_paid:High Noon": 2,
+              "cost_paid:Land Tax": 3,
+              "cost_paid:Library of Leng": 2,
+              "cost_paid:Lightning Greaves": 4,
+              "cost_paid:Lorehold, the Historian": 9,
+              "cost_paid:Mizzix's Mastery": 1,
+              "cost_paid:Monument to Endurance": 3,
+              "cost_paid:Mother of Runes": 3,
+              "cost_paid:Path to Exile": 5,
+              "cost_paid:Pearl Medallion": 2,
+              "cost_paid:Prismari Pianist": 1,
+              "cost_paid:Promise of Loyalty": 1,
+              "cost_paid:Reforge the Soul": 1,
+              "cost_paid:Ruby Medallion": 5,
+              "cost_paid:Scroll Rack": 2,
+              "cost_paid:Sensei's Divining Top": 4,
+              "cost_paid:Smothering Tithe": 2,
+              "cost_paid:Sol Ring": 2,
+              "cost_paid:Squee, Goblin Nabob": 1,
+              "cost_paid:Starfall Invocation": 1,
+              "cost_paid:Storm Herd": 1,
+              "cost_paid:Surge to Victory": 2,
+              "cost_paid:Swiftfoot Boots": 1,
+              "cost_paid:Swords to Plowshares": 1,
+              "cost_paid:Talisman of Conviction": 1,
+              "cost_paid:Tempt with Bunnies": 2,
+              "cost_paid:The Mind Stone": 2,
+              "cost_paid:The Scarlet Witch": 2,
+              "cost_paid:Unexpected Windfall": 2,
+              "cost_paid:Victory Chimes": 1,
+              "cost_paid:Winds of Abandon": 1,
+              "miracle_cast:Big Score": 1,
+              "miracle_cast:Creative Technique": 1,
+              "miracle_cast:Everything Comes to Dust": 2,
+              "miracle_cast:Farewell": 1,
+              "miracle_cast:Hit the Mother Lode": 1,
+              "miracle_cast:Improvisation Capstone": 1,
+              "miracle_cast:Jeska's Will": 1,
+              "miracle_cast:Mizzix's Mastery": 2,
+              "miracle_cast:Tragic Arrogance": 1,
+              "removal_resolved:Generous Gift": 2,
+              "removal_resolved:Path to Exile": 5,
+              "removal_resolved:Swords to Plowshares": 1,
+              "removal_resolved:Winds of Abandon": 1,
+              "spell_cast:Arcane Signet": 4,
+              "spell_cast:Artist's Talent": 1,
+              "spell_cast:Avatar's Wrath": 1,
+              "spell_cast:Bender's Waterskin": 2,
+              "spell_cast:Big Score": 1,
+              "spell_cast:Blasphemous Act": 1,
+              "spell_cast:Boros Signet": 3,
+              "spell_cast:Esper Sentinel": 1,
+              "spell_cast:Fated Clash": 1,
+              "spell_cast:Fellwar Stone": 1,
+              "spell_cast:Flawless Maneuver": 1,
+              "spell_cast:Furygale Flocking": 1,
+              "spell_cast:Generous Gift": 2,
+              "spell_cast:High Noon": 2,
+              "spell_cast:Land Tax": 3,
+              "spell_cast:Library of Leng": 2,
+              "spell_cast:Lightning Greaves": 4,
+              "spell_cast:Mizzix's Mastery": 1,
+              "spell_cast:Monument to Endurance": 3,
+              "spell_cast:Path to Exile": 5,
+              "spell_cast:Pearl Medallion": 2,
+              "spell_cast:Prismari Pianist": 1,
+              "spell_cast:Promise of Loyalty": 1,
+              "spell_cast:Reforge the Soul": 1,
+              "spell_cast:Ruby Medallion": 5,
+              "spell_cast:Scroll Rack": 2,
+              "spell_cast:Sensei's Divining Top": 4,
+              "spell_cast:Smothering Tithe": 2,
+              "spell_cast:Sol Ring": 2,
+              "spell_cast:Starfall Invocation": 1,
+              "spell_cast:Storm Herd": 1,
+              "spell_cast:Surge to Victory": 2,
+              "spell_cast:Swiftfoot Boots": 1,
+              "spell_cast:Swords to Plowshares": 1,
+              "spell_cast:Talisman of Conviction": 1,
+              "spell_cast:Tempt with Bunnies": 2,
+              "spell_cast:The Mind Stone": 2,
+              "spell_cast:The Scarlet Witch": 2,
+              "spell_cast:Tragic Arrogance": 1,
+              "spell_cast:Unexpected Windfall": 2,
+              "spell_cast:Victory Chimes": 1,
+              "spell_cast:Winds of Abandon": 1,
+              "spell_resolved:Artist's Talent": 1,
+              "spell_resolved:Avatar's Wrath": 1,
+              "spell_resolved:Bender's Waterskin": 1,
+              "spell_resolved:Big Score": 3,
+              "spell_resolved:Blasphemous Act": 2,
+              "spell_resolved:Creative Technique": 1,
+              "spell_resolved:Esper Sentinel": 1,
+              "spell_resolved:Everything Comes to Dust": 4,
+              "spell_resolved:Farewell": 1,
+              "spell_resolved:Fated Clash": 1,
+              "spell_resolved:Flawless Maneuver": 1,
+              "spell_resolved:Furygale Flocking": 1,
+              "spell_resolved:Generous Gift": 2,
+              "spell_resolved:High Noon": 2,
+              "spell_resolved:Hit the Mother Lode": 1,
+              "spell_resolved:Improvisation Capstone": 1,
+              "spell_resolved:Jeska's Will": 1,
+              "spell_resolved:Land Tax": 3,
+              "spell_resolved:Library of Leng": 2,
+              "spell_resolved:Lightning Greaves": 4,
+              "spell_resolved:Mizzix's Mastery": 3,
+              "spell_resolved:Monument to Endurance": 3,
+              "spell_resolved:Path to Exile": 5,
+              "spell_resolved:Pearl Medallion": 2,
+              "spell_resolved:Prismari Pianist": 1,
+              "spell_resolved:Promise of Loyalty": 1,
+              "spell_resolved:Reforge the Soul": 1,
+              "spell_resolved:Ruby Medallion": 5,
+              "spell_resolved:Scroll Rack": 2,
+              "spell_resolved:Sensei's Divining Top": 4,
+              "spell_resolved:Starfall Invocation": 1,
+              "spell_resolved:Storm Herd": 1,
+              "spell_resolved:Surge to Victory": 2,
+              "spell_resolved:Swiftfoot Boots": 1,
+              "spell_resolved:Swords to Plowshares": 1,
+              "spell_resolved:Tempt with Bunnies": 2,
+              "spell_resolved:The Scarlet Witch": 2,
+              "spell_resolved:Tragic Arrogance": 2,
+              "spell_resolved:Unexpected Windfall": 2,
+              "spell_resolved:Winds of Abandon": 1,
+              "topdeck_manipulation_activated:Scroll Rack": 3,
+              "topdeck_manipulation_activated:Sensei's Divining Top": 7,
+              "treasure_created:Big Score": 3,
+              "treasure_created:Unexpected Windfall": 2,
+              "trigger_resolved:Artist's Talent": 3,
+              "trigger_resolved:Esper Sentinel": 4,
+              "trigger_resolved:Smothering Tithe": 12,
+              "trigger_resolved:Surge to Victory": 2,
+              "trigger_resolved:The Mind Stone": 1
+            },
+            "card_event_counts_by_game": {
+              "deck_6:Aang, at the Crossroads #106 (real):0": {
+                "cost_paid:Big Score": 1,
+                "cost_paid:Boros Signet": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Mother of Runes": 1,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Big Score": 1,
+                "spell_cast:Boros Signet": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_resolved:Big Score": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Sensei's Divining Top": 1,
+                "treasure_created:Big Score": 1
+              },
+              "deck_6:Kenrith, the Returned King #113 (real):0": {
+                "board_wipe_resolved:Everything Comes to Dust": 2,
+                "board_wipe_resolved:Tragic Arrogance": 1,
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Furygale Flocking": 1,
+                "cost_paid:High Noon": 1,
+                "cost_paid:Land Tax": 1,
+                "cost_paid:Lightning Greaves": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "cost_paid:Sol Ring": 1,
+                "cost_paid:Squee, Goblin Nabob": 1,
+                "cost_paid:Storm Herd": 1,
+                "cost_paid:Talisman of Conviction": 1,
+                "cost_paid:Tempt with Bunnies": 1,
+                "cost_paid:The Mind Stone": 1,
+                "cost_paid:The Scarlet Witch": 1,
+                "cost_paid:Unexpected Windfall": 1,
+                "miracle_cast:Everything Comes to Dust": 1,
+                "miracle_cast:Mizzix's Mastery": 1,
+                "miracle_cast:Tragic Arrogance": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Furygale Flocking": 1,
+                "spell_cast:High Noon": 1,
+                "spell_cast:Land Tax": 1,
+                "spell_cast:Lightning Greaves": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_cast:Sol Ring": 1,
+                "spell_cast:Storm Herd": 1,
+                "spell_cast:Talisman of Conviction": 1,
+                "spell_cast:Tempt with Bunnies": 1,
+                "spell_cast:The Mind Stone": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_cast:Unexpected Windfall": 1,
+                "spell_resolved:Everything Comes to Dust": 2,
+                "spell_resolved:Furygale Flocking": 1,
+                "spell_resolved:High Noon": 1,
+                "spell_resolved:Land Tax": 1,
+                "spell_resolved:Lightning Greaves": 1,
+                "spell_resolved:Mizzix's Mastery": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Sensei's Divining Top": 1,
+                "spell_resolved:Storm Herd": 1,
+                "spell_resolved:Tempt with Bunnies": 1,
+                "spell_resolved:The Scarlet Witch": 1,
+                "spell_resolved:Tragic Arrogance": 1,
+                "spell_resolved:Unexpected Windfall": 1,
+                "treasure_created:Unexpected Windfall": 1,
+                "trigger_resolved:The Mind Stone": 1
+              },
+              "deck_6:Rograkh, Son of Rohgahh #62 (real):0": {
+                "cost_paid:Land Tax": 1,
+                "cost_paid:Lightning Greaves": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Monument to Endurance": 1,
+                "cost_paid:Mother of Runes": 1,
+                "cost_paid:Path to Exile": 1,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Land Tax": 1,
+                "spell_cast:Lightning Greaves": 1,
+                "spell_cast:Monument to Endurance": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_resolved:Land Tax": 1,
+                "spell_resolved:Lightning Greaves": 1,
+                "spell_resolved:Monument to Endurance": 1,
+                "spell_resolved:Path to Exile": 1
+              },
+              "deck_6:Sisay, Weatherlight Captain #61 (real):0": {
+                "board_wipe_resolved:Everything Comes to Dust": 1,
+                "cost_paid:Bender's Waterskin": 1,
+                "cost_paid:Boros Signet": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Lightning Greaves": 1,
+                "cost_paid:Lorehold, the Historian": 2,
+                "cost_paid:Monument to Endurance": 1,
+                "cost_paid:Smothering Tithe": 1,
+                "cost_paid:Surge to Victory": 1,
+                "cost_paid:Unexpected Windfall": 1,
+                "miracle_cast:Creative Technique": 1,
+                "miracle_cast:Mizzix's Mastery": 1,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Bender's Waterskin": 1,
+                "spell_cast:Blasphemous Act": 1,
+                "spell_cast:Boros Signet": 1,
+                "spell_cast:Flawless Maneuver": 1,
+                "spell_cast:Lightning Greaves": 1,
+                "spell_cast:Monument to Endurance": 1,
+                "spell_cast:Smothering Tithe": 1,
+                "spell_cast:Surge to Victory": 1,
+                "spell_cast:Unexpected Windfall": 1,
+                "spell_resolved:Bender's Waterskin": 1,
+                "spell_resolved:Big Score": 1,
+                "spell_resolved:Blasphemous Act": 1,
+                "spell_resolved:Creative Technique": 1,
+                "spell_resolved:Everything Comes to Dust": 1,
+                "spell_resolved:Flawless Maneuver": 1,
+                "spell_resolved:Lightning Greaves": 1,
+                "spell_resolved:Mizzix's Mastery": 1,
+                "spell_resolved:Monument to Endurance": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Surge to Victory": 1,
+                "spell_resolved:Unexpected Windfall": 1,
+                "treasure_created:Big Score": 1,
+                "treasure_created:Unexpected Windfall": 1,
+                "trigger_resolved:Smothering Tithe": 8,
+                "trigger_resolved:Surge to Victory": 1
+              },
+              "deck_6:Tannuk, Memorial Ensign #40 (real):0": {
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Artist's Talent": 1,
+                "cost_paid:Bender's Waterskin": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:High Noon": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Scroll Rack": 1,
+                "cost_paid:Swords to Plowshares": 1,
+                "cost_paid:Winds of Abandon": 1,
+                "removal_resolved:Generous Gift": 1,
+                "removal_resolved:Swords to Plowshares": 1,
+                "removal_resolved:Winds of Abandon": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Artist's Talent": 1,
+                "spell_cast:Bender's Waterskin": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:High Noon": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Scroll Rack": 1,
+                "spell_cast:Swords to Plowshares": 1,
+                "spell_cast:Winds of Abandon": 1,
+                "spell_resolved:Artist's Talent": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:High Noon": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Scroll Rack": 1,
+                "spell_resolved:Swords to Plowshares": 1,
+                "spell_resolved:Winds of Abandon": 1,
+                "trigger_resolved:Artist's Talent": 3
+              },
+              "deck_6:Umbris, Fear Manifest #114 (real):0": {
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:Pearl Medallion": 1,
+                "cost_paid:The Mind Stone": 1,
+                "spell_cast:Pearl Medallion": 1,
+                "spell_cast:The Mind Stone": 1,
+                "spell_resolved:Pearl Medallion": 1
+              },
+              "deck_6:Vivi Ornitier #99 (real):0": {
+                "board_wipe_resolved:Everything Comes to Dust": 1,
+                "board_wipe_resolved:Farewell": 1,
+                "board_wipe_resolved:Fated Clash": 1,
+                "board_wipe_resolved:Starfall Invocation": 1,
+                "board_wipe_resolved:Tragic Arrogance": 1,
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Avatar's Wrath": 1,
+                "cost_paid:Boros Signet": 1,
+                "cost_paid:Esper Sentinel": 1,
+                "cost_paid:Fated Clash": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Land Tax": 1,
+                "cost_paid:Library of Leng": 1,
+                "cost_paid:Lightning Greaves": 1,
+                "cost_paid:Lorehold, the Historian": 5,
+                "cost_paid:Mizzix's Mastery": 1,
+                "cost_paid:Monument to Endurance": 1,
+                "cost_paid:Mother of Runes": 1,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:Prismari Pianist": 1,
+                "cost_paid:Reforge the Soul": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Scroll Rack": 1,
+                "cost_paid:Sensei's Divining Top": 2,
+                "cost_paid:Smothering Tithe": 1,
+                "cost_paid:Sol Ring": 1,
+                "cost_paid:Starfall Invocation": 1,
+                "cost_paid:Surge to Victory": 1,
+                "cost_paid:Swiftfoot Boots": 1,
+                "cost_paid:Tempt with Bunnies": 1,
+                "cost_paid:The Scarlet Witch": 1,
+                "cost_paid:Victory Chimes": 1,
+                "miracle_cast:Big Score": 1,
+                "miracle_cast:Everything Comes to Dust": 1,
+                "miracle_cast:Farewell": 1,
+                "miracle_cast:Hit the Mother Lode": 1,
+                "miracle_cast:Improvisation Capstone": 1,
+                "miracle_cast:Jeska's Will": 1,
+                "removal_resolved:Generous Gift": 1,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Avatar's Wrath": 1,
+                "spell_cast:Boros Signet": 1,
+                "spell_cast:Esper Sentinel": 1,
+                "spell_cast:Fated Clash": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:Land Tax": 1,
+                "spell_cast:Library of Leng": 1,
+                "spell_cast:Lightning Greaves": 1,
+                "spell_cast:Mizzix's Mastery": 1,
+                "spell_cast:Monument to Endurance": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:Prismari Pianist": 1,
+                "spell_cast:Reforge the Soul": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Scroll Rack": 1,
+                "spell_cast:Sensei's Divining Top": 2,
+                "spell_cast:Smothering Tithe": 1,
+                "spell_cast:Sol Ring": 1,
+                "spell_cast:Starfall Invocation": 1,
+                "spell_cast:Surge to Victory": 1,
+                "spell_cast:Swiftfoot Boots": 1,
+                "spell_cast:Tempt with Bunnies": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_cast:Tragic Arrogance": 1,
+                "spell_cast:Victory Chimes": 1,
+                "spell_resolved:Avatar's Wrath": 1,
+                "spell_resolved:Big Score": 1,
+                "spell_resolved:Blasphemous Act": 1,
+                "spell_resolved:Esper Sentinel": 1,
+                "spell_resolved:Everything Comes to Dust": 1,
+                "spell_resolved:Farewell": 1,
+                "spell_resolved:Fated Clash": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Hit the Mother Lode": 1,
+                "spell_resolved:Improvisation Capstone": 1,
+                "spell_resolved:Jeska's Will": 1,
+                "spell_resolved:Land Tax": 1,
+                "spell_resolved:Library of Leng": 1,
+                "spell_resolved:Lightning Greaves": 1,
+                "spell_resolved:Mizzix's Mastery": 1,
+                "spell_resolved:Monument to Endurance": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Prismari Pianist": 1,
+                "spell_resolved:Reforge the Soul": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Scroll Rack": 1,
+                "spell_resolved:Sensei's Divining Top": 2,
+                "spell_resolved:Starfall Invocation": 1,
+                "spell_resolved:Surge to Victory": 1,
+                "spell_resolved:Swiftfoot Boots": 1,
+                "spell_resolved:Tempt with Bunnies": 1,
+                "spell_resolved:The Scarlet Witch": 1,
+                "spell_resolved:Tragic Arrogance": 1,
+                "topdeck_manipulation_activated:Scroll Rack": 3,
+                "topdeck_manipulation_activated:Sensei's Divining Top": 7,
+                "treasure_created:Big Score": 1,
+                "trigger_resolved:Esper Sentinel": 4,
+                "trigger_resolved:Smothering Tithe": 4,
+                "trigger_resolved:Surge to Victory": 1
+              },
+              "deck_6:Winota, Joiner of Forces #39 (real):0": {
+                "board_wipe_resolved:Promise of Loyalty": 1,
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Library of Leng": 1,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:Pearl Medallion": 1,
+                "cost_paid:Promise of Loyalty": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Library of Leng": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:Pearl Medallion": 1,
+                "spell_cast:Promise of Loyalty": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_resolved:Library of Leng": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Pearl Medallion": 1,
+                "spell_resolved:Promise of Loyalty": 1,
+                "spell_resolved:Ruby Medallion": 1
+              }
+            },
+            "card_strategy_counts": {
+              "cost_paid:Arcane Signet": 4,
+              "cost_paid:Artist's Talent": 1,
+              "cost_paid:Avatar's Wrath": 1,
+              "cost_paid:Bender's Waterskin": 2,
+              "cost_paid:Big Score": 1,
+              "cost_paid:Boros Signet": 3,
+              "cost_paid:Esper Sentinel": 1,
+              "cost_paid:Fated Clash": 1,
+              "cost_paid:Fellwar Stone": 1,
+              "cost_paid:Furygale Flocking": 1,
+              "cost_paid:Generous Gift": 2,
+              "cost_paid:Giver of Runes": 3,
+              "cost_paid:Hexing Squelcher": 4,
+              "cost_paid:High Noon": 2,
+              "cost_paid:Land Tax": 3,
+              "cost_paid:Library of Leng": 2,
+              "cost_paid:Lightning Greaves": 4,
+              "cost_paid:Lorehold, the Historian": 9,
+              "cost_paid:Mizzix's Mastery": 1,
+              "cost_paid:Monument to Endurance": 3,
+              "cost_paid:Mother of Runes": 3,
+              "cost_paid:Path to Exile": 5,
+              "cost_paid:Pearl Medallion": 2,
+              "cost_paid:Prismari Pianist": 1,
+              "cost_paid:Promise of Loyalty": 1,
+              "cost_paid:Reforge the Soul": 1,
+              "cost_paid:Ruby Medallion": 5,
+              "cost_paid:Scroll Rack": 2,
+              "cost_paid:Sensei's Divining Top": 4,
+              "cost_paid:Smothering Tithe": 2,
+              "cost_paid:Sol Ring": 2,
+              "cost_paid:Squee, Goblin Nabob": 1,
+              "cost_paid:Starfall Invocation": 1,
+              "cost_paid:Storm Herd": 1,
+              "cost_paid:Surge to Victory": 2,
+              "cost_paid:Swiftfoot Boots": 1,
+              "cost_paid:Swords to Plowshares": 1,
+              "cost_paid:Talisman of Conviction": 1,
+              "cost_paid:Tempt with Bunnies": 2,
+              "cost_paid:The Mind Stone": 2,
+              "cost_paid:The Scarlet Witch": 2,
+              "cost_paid:Unexpected Windfall": 2,
+              "cost_paid:Victory Chimes": 1,
+              "cost_paid:Winds of Abandon": 1,
+              "miracle:Big Score": 1,
+              "miracle:Creative Technique": 1,
+              "miracle:Everything Comes to Dust": 2,
+              "miracle:Farewell": 1,
+              "miracle:Hit the Mother Lode": 1,
+              "miracle:Improvisation Capstone": 1,
+              "miracle:Jeska's Will": 1,
+              "miracle:Mizzix's Mastery": 2,
+              "miracle:Tragic Arrogance": 1,
+              "topdeck:Scroll Rack": 3,
+              "topdeck:Sensei's Divining Top": 7
+            },
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 33,
+              "additional_cost_paid": 8,
+              "airbend_other_creatures_resolved": 1,
+              "attachment_sba": 2,
+              "board_wipe_resolved": 10,
+              "cast_announced": 289,
+              "cast_illegal": 1,
+              "combat": 142,
+              "combat_result": 152,
+              "combat_step": 838,
+              "commander_cast": 42,
+              "compensation_tokens_created": 2,
+              "composite_rule_component_resolved": 6,
+              "composite_rule_resolved": 3,
+              "cost_paid": 288,
+              "countered_spell_moved_to_graveyard": 3,
+              "creature_cast": 69,
+              "creature_to_battlefield": 2,
+              "damage_resolved": 3,
+              "damage_wipe_resolved": 2,
+              "demonstrate_resolved": 1,
+              "discard_modal_trigger_resolved": 2,
+              "draw_cards_resolved": 5,
+              "end_step_instant": 7,
+              "equipment_attached": 5,
+              "imprint_resolved": 2,
+              "jeskas_will_resolved": 1,
+              "land_played": 176,
+              "land_ramp_resolved": 3,
+              "land_tax_trigger_resolved": 4,
+              "land_tax_trigger_skipped": 23,
+              "lorehold_upkeep_rummage": 20,
+              "lorehold_upkeep_rummage_skipped": 21,
+              "mana_refreshed": 253,
+              "mill_resolved": 2,
+              "miracle_cast": 11,
+              "mizzix_mastery_copy_cast": 3,
+              "mizzix_mastery_resolved": 3,
+              "multi_defender_attack": 10,
+              "permanent_moved_from_battlefield": 89,
+              "player_eliminated": 12,
+              "priority_pass": 2522,
+              "protection_resolved": 2,
+              "recursion_resolved": 3,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 17,
+              "replacement_applied": 22,
+              "ritual_mana_added": 1,
+              "saga_chapter_progressed": 2,
+              "saga_chapter_resolved": 1,
+              "saga_sacrificed_by_sba": 1,
+              "self_exiled_on_resolution": 4,
+              "spell_cast": 182,
+              "spell_copied": 2,
+              "spell_copy_ceased_to_exist": 5,
+              "spell_countered": 3,
+              "spell_resolved": 145,
+              "surge_to_victory_resolved": 2,
+              "tokens_created": 2,
+              "top_nonland_free_cast": 2,
+              "top_nonland_free_cast_resolved": 3,
+              "topdeck_manipulation_activated": 10,
+              "treasure_created": 7,
+              "trigger_put_on_stack": 49,
+              "trigger_resolved": 56,
+              "turn_end": 240,
+              "turn_start": 253,
+              "tutor_life_loss_resolved": 1,
+              "tutor_resolved": 15,
+              "utility_artifact_activated": 1,
+              "utility_land_activated": 9,
+              "wheel_resolved": 1
+            },
+            "event_counts_by_game": {
+              "deck_6:Aang, at the Crossroads #106 (real):0": {
+                "additional_cost_paid": 2,
+                "cast_announced": 26,
+                "combat": 17,
+                "combat_result": 19,
+                "combat_step": 95,
+                "commander_cast": 2,
+                "cost_paid": 26,
+                "creature_cast": 10,
+                "damage_resolved": 1,
+                "draw_cards_resolved": 2,
+                "end_step_instant": 1,
+                "imprint_resolved": 1,
+                "land_played": 19,
+                "mana_refreshed": 26,
+                "multi_defender_attack": 2,
+                "permanent_moved_from_battlefield": 1,
+                "player_eliminated": 1,
+                "priority_pass": 248,
+                "removal_resolved": 1,
+                "spell_cast": 14,
+                "spell_resolved": 10,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 2,
+                "trigger_resolved": 2,
+                "turn_end": 25,
+                "turn_start": 26,
+                "tutor_resolved": 1
+              },
+              "deck_6:Kenrith, the Returned King #113 (real):0": {
+                "activated_ability_skipped": 16,
+                "additional_cost_paid": 2,
+                "board_wipe_resolved": 3,
+                "cast_announced": 32,
+                "combat": 15,
+                "combat_result": 17,
+                "combat_step": 91,
+                "commander_cast": 3,
+                "composite_rule_component_resolved": 2,
+                "composite_rule_resolved": 1,
+                "cost_paid": 32,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 1,
+                "equipment_attached": 1,
+                "imprint_resolved": 1,
+                "land_played": 23,
+                "land_ramp_resolved": 2,
+                "land_tax_trigger_resolved": 4,
+                "land_tax_trigger_skipped": 3,
+                "lorehold_upkeep_rummage": 6,
+                "mana_refreshed": 31,
+                "miracle_cast": 3,
+                "mizzix_mastery_copy_cast": 1,
+                "mizzix_mastery_resolved": 1,
+                "multi_defender_attack": 2,
+                "permanent_moved_from_battlefield": 31,
+                "player_eliminated": 3,
+                "priority_pass": 281,
+                "protection_resolved": 1,
+                "recursion_resolved": 1,
+                "replacement_applied": 1,
+                "self_exiled_on_resolution": 1,
+                "spell_cast": 28,
+                "spell_copy_ceased_to_exist": 1,
+                "spell_countered": 1,
+                "spell_resolved": 21,
+                "tokens_created": 2,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 1,
+                "trigger_resolved": 2,
+                "turn_end": 28,
+                "turn_start": 31,
+                "tutor_life_loss_resolved": 1,
+                "tutor_resolved": 4,
+                "utility_artifact_activated": 1,
+                "utility_land_activated": 7
+              },
+              "deck_6:Rograkh, Son of Rohgahh #62 (real):0": {
+                "activated_ability": 2,
+                "cast_announced": 23,
+                "combat": 17,
+                "combat_result": 17,
+                "combat_step": 97,
+                "commander_cast": 5,
+                "cost_paid": 23,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 3,
+                "creature_to_battlefield": 1,
+                "equipment_attached": 1,
+                "land_played": 23,
+                "land_tax_trigger_skipped": 1,
+                "lorehold_upkeep_rummage": 4,
+                "lorehold_upkeep_rummage_skipped": 4,
+                "mana_refreshed": 27,
+                "mill_resolved": 1,
+                "permanent_moved_from_battlefield": 2,
+                "player_eliminated": 1,
+                "priority_pass": 252,
+                "removal_resolved": 2,
+                "replacement_applied": 1,
+                "spell_cast": 15,
+                "spell_countered": 1,
+                "spell_resolved": 10,
+                "treasure_created": 1,
+                "turn_end": 26,
+                "turn_start": 27,
+                "tutor_resolved": 1
+              },
+              "deck_6:Sisay, Weatherlight Captain #61 (real):0": {
+                "activated_ability_skipped": 5,
+                "additional_cost_paid": 2,
+                "board_wipe_resolved": 1,
+                "cast_announced": 45,
+                "cast_illegal": 1,
+                "combat": 19,
+                "combat_result": 21,
+                "combat_step": 113,
+                "commander_cast": 9,
+                "cost_paid": 44,
+                "creature_cast": 15,
+                "damage_wipe_resolved": 1,
+                "demonstrate_resolved": 1,
+                "discard_modal_trigger_resolved": 2,
+                "draw_cards_resolved": 1,
+                "end_step_instant": 2,
+                "equipment_attached": 1,
+                "land_played": 24,
+                "lorehold_upkeep_rummage": 3,
+                "lorehold_upkeep_rummage_skipped": 6,
+                "mana_refreshed": 32,
+                "miracle_cast": 2,
+                "mizzix_mastery_copy_cast": 1,
+                "mizzix_mastery_resolved": 1,
+                "multi_defender_attack": 2,
+                "permanent_moved_from_battlefield": 6,
+                "player_eliminated": 1,
+                "priority_pass": 356,
+                "protection_resolved": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 3,
+                "replacement_applied": 6,
+                "self_exiled_on_resolution": 1,
+                "spell_cast": 23,
+                "spell_copied": 1,
+                "spell_copy_ceased_to_exist": 2,
+                "spell_resolved": 23,
+                "surge_to_victory_resolved": 1,
+                "top_nonland_free_cast": 2,
+                "top_nonland_free_cast_resolved": 3,
+                "treasure_created": 2,
+                "trigger_put_on_stack": 11,
+                "trigger_resolved": 12,
+                "turn_end": 31,
+                "turn_start": 32,
+                "tutor_resolved": 2
+              },
+              "deck_6:Tannuk, Memorial Ensign #40 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 4,
+                "cast_announced": 31,
+                "combat": 10,
+                "combat_result": 10,
+                "combat_step": 69,
+                "commander_cast": 4,
+                "compensation_tokens_created": 1,
+                "cost_paid": 31,
+                "creature_cast": 9,
+                "draw_cards_resolved": 1,
+                "land_played": 18,
+                "land_ramp_resolved": 1,
+                "mana_refreshed": 28,
+                "mill_resolved": 1,
+                "permanent_moved_from_battlefield": 1,
+                "player_eliminated": 1,
+                "priority_pass": 288,
+                "removal_resolved": 3,
+                "replacement_applied": 2,
+                "spell_cast": 18,
+                "spell_resolved": 14,
+                "trigger_put_on_stack": 3,
+                "trigger_resolved": 3,
+                "turn_end": 27,
+                "turn_start": 28,
+                "tutor_resolved": 4
+              },
+              "deck_6:Umbris, Fear Manifest #114 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 5,
+                "additional_cost_paid": 1,
+                "cast_announced": 27,
+                "combat": 10,
+                "combat_result": 10,
+                "combat_step": 62,
+                "commander_cast": 4,
+                "cost_paid": 27,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 7,
+                "damage_resolved": 2,
+                "end_step_instant": 1,
+                "land_played": 17,
+                "mana_refreshed": 22,
+                "permanent_moved_from_battlefield": 3,
+                "player_eliminated": 1,
+                "priority_pass": 204,
+                "recursion_resolved": 1,
+                "removal_resolved": 1,
+                "replacement_applied": 1,
+                "spell_cast": 16,
+                "spell_countered": 1,
+                "spell_resolved": 10,
+                "trigger_put_on_stack": 2,
+                "trigger_resolved": 2,
+                "turn_end": 21,
+                "turn_start": 22,
+                "tutor_resolved": 3
+              },
+              "deck_6:Vivi Ornitier #99 (real):0": {
+                "activated_ability_skipped": 3,
+                "additional_cost_paid": 1,
+                "airbend_other_creatures_resolved": 1,
+                "attachment_sba": 2,
+                "board_wipe_resolved": 5,
+                "cast_announced": 71,
+                "combat": 38,
+                "combat_result": 41,
+                "combat_step": 215,
+                "commander_cast": 11,
+                "compensation_tokens_created": 1,
+                "composite_rule_component_resolved": 4,
+                "composite_rule_resolved": 2,
+                "cost_paid": 71,
+                "creature_cast": 12,
+                "creature_to_battlefield": 1,
+                "damage_wipe_resolved": 1,
+                "draw_cards_resolved": 1,
+                "end_step_instant": 2,
+                "equipment_attached": 2,
+                "jeskas_will_resolved": 1,
+                "land_played": 32,
+                "land_tax_trigger_skipped": 19,
+                "lorehold_upkeep_rummage": 7,
+                "lorehold_upkeep_rummage_skipped": 11,
+                "mana_refreshed": 57,
+                "miracle_cast": 6,
+                "mizzix_mastery_copy_cast": 1,
+                "mizzix_mastery_resolved": 1,
+                "multi_defender_attack": 3,
+                "permanent_moved_from_battlefield": 36,
+                "player_eliminated": 3,
+                "priority_pass": 553,
+                "recursion_resolved": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 5,
+                "replacement_applied": 10,
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 1,
+                "saga_sacrificed_by_sba": 1,
+                "self_exiled_on_resolution": 2,
+                "spell_cast": 50,
+                "spell_copied": 1,
+                "spell_copy_ceased_to_exist": 2,
+                "spell_resolved": 44,
+                "surge_to_victory_resolved": 1,
+                "topdeck_manipulation_activated": 10,
+                "treasure_created": 2,
+                "trigger_put_on_stack": 14,
+                "trigger_resolved": 19,
+                "turn_end": 53,
+                "turn_start": 57,
+                "utility_land_activated": 2,
+                "wheel_resolved": 1
+              },
+              "deck_6:Winota, Joiner of Forces #39 (real):0": {
+                "board_wipe_resolved": 1,
+                "cast_announced": 34,
+                "combat": 16,
+                "combat_result": 17,
+                "combat_step": 96,
+                "commander_cast": 4,
+                "cost_paid": 34,
+                "creature_cast": 12,
+                "end_step_instant": 1,
+                "land_played": 20,
+                "mana_refreshed": 30,
+                "multi_defender_attack": 1,
+                "permanent_moved_from_battlefield": 9,
+                "player_eliminated": 1,
+                "priority_pass": 340,
+                "removal_resolved": 2,
+                "replacement_applied": 1,
+                "ritual_mana_added": 1,
+                "spell_cast": 18,
+                "spell_resolved": 13,
+                "trigger_put_on_stack": 16,
+                "trigger_resolved": 16,
+                "turn_end": 29,
+                "turn_start": 30
+              }
+            },
+            "squee_anomalies": [],
+            "squee_game_traces": {
+              "deck_6:Kenrith, the Returned King #113 (real):0": [
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 11
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3751,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "player": "Lorehold",
+                    "turn": 12
+                  },
+                  "event": "turn_start",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3752,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 12
+                  },
+                  "event": "cast_announced",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3755,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 12
+                  },
+                  "event": "cost_paid",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3756,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Squee, Goblin Nabob",
+                    "effect": "creature",
+                    "player": "Lorehold",
+                    "turn": 12
+                  },
+                  "event": "creature_cast",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3757,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Everything Comes to Dust",
+                    "destination": "exile",
+                    "player": "Lorehold",
+                    "turn": 13
+                  },
+                  "event": "board_wipe_resolved",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3777,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 13
+                  },
+                  "event": "combat_step",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3785,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 13
+                  },
+                  "event": "combat",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3787,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 13
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3794,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Spectator Seating",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 14
+                  },
+                  "event": "land_played",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3797,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 14
+                  },
+                  "event": "combat_step",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3802,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 14
+                  },
+                  "event": "combat",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3804,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 14
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3811,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "card": "Command Beacon",
+                    "effect": "land",
+                    "player": "Lorehold",
+                    "turn": 15
+                  },
+                  "event": "land_played",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3814,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 15
+                  },
+                  "event": "combat_step",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3822,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 15
+                  },
+                  "event": "combat",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3824,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 15
+                  },
+                  "event": "turn_end",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3833,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 16
+                  },
+                  "event": "combat_step",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3846,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                },
+                {
+                  "data": {
+                    "turn": 16
+                  },
+                  "event": "combat",
+                  "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3848,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                }
+              ]
+            },
+            "squee_known_graveyard_balance_by_game": {},
+            "squee_trace_samples": [
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 11
+                },
+                "event": "turn_end",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3751,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "player": "Lorehold",
+                  "turn": 12
+                },
+                "event": "turn_start",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3752,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 12
+                },
+                "event": "cast_announced",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3755,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 12
+                },
+                "event": "cost_paid",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3756,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Squee, Goblin Nabob",
+                  "effect": "creature",
+                  "player": "Lorehold",
+                  "turn": 12
+                },
+                "event": "creature_cast",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3757,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Everything Comes to Dust",
+                  "destination": "exile",
+                  "player": "Lorehold",
+                  "turn": 13
+                },
+                "event": "board_wipe_resolved",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3777,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 13
+                },
+                "event": "combat_step",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3785,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 13
+                },
+                "event": "combat",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3787,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 13
+                },
+                "event": "turn_end",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3794,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Spectator Seating",
+                  "effect": "land",
+                  "player": "Lorehold",
+                  "turn": 14
+                },
+                "event": "land_played",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3797,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 14
+                },
+                "event": "combat_step",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3802,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 14
+                },
+                "event": "combat",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3804,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 14
+                },
+                "event": "turn_end",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3811,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "card": "Command Beacon",
+                  "effect": "land",
+                  "player": "Lorehold",
+                  "turn": 15
+                },
+                "event": "land_played",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3814,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 15
+                },
+                "event": "combat_step",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3822,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 15
+                },
+                "event": "combat",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3824,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 15
+                },
+                "event": "turn_end",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3833,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 16
+                },
+                "event": "combat_step",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3846,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              },
+              {
+                "data": {
+                  "turn": 16
+                },
+                "event": "combat",
+                "game_id": "deck_6:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3848,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              }
+            ],
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 95,
+              "lorehold_spell_cast": 78,
+              "lorehold_spell_rummage": 3,
+              "lorehold_upkeep_rummage": 20,
+              "miracle_cast": 11,
+              "topdeck_manipulation_activated": 10
+            },
+            "strategic_event_counts_by_game": {
+              "deck_6:Aang, at the Crossroads #106 (real):0": {
+                "lorehold_cost_paid": 7,
+                "lorehold_spell_cast": 5
+              },
+              "deck_6:Kenrith, the Returned King #113 (real):0": {
+                "lorehold_cost_paid": 18,
+                "lorehold_spell_cast": 16,
+                "lorehold_upkeep_rummage": 6,
+                "miracle_cast": 3
+              },
+              "deck_6:Rograkh, Son of Rohgahh #62 (real):0": {
+                "lorehold_cost_paid": 6,
+                "lorehold_spell_cast": 4,
+                "lorehold_upkeep_rummage": 4
+              },
+              "deck_6:Sisay, Weatherlight Captain #61 (real):0": {
+                "lorehold_cost_paid": 10,
+                "lorehold_spell_cast": 9,
+                "lorehold_upkeep_rummage": 3,
+                "miracle_cast": 2
+              },
+              "deck_6:Tannuk, Memorial Ensign #40 (real):0": {
+                "lorehold_cost_paid": 9,
+                "lorehold_spell_cast": 9,
+                "lorehold_spell_rummage": 3
+              },
+              "deck_6:Umbris, Fear Manifest #114 (real):0": {
+                "lorehold_cost_paid": 3,
+                "lorehold_spell_cast": 2
+              },
+              "deck_6:Vivi Ornitier #99 (real):0": {
+                "lorehold_cost_paid": 34,
+                "lorehold_spell_cast": 27,
+                "lorehold_upkeep_rummage": 7,
+                "miracle_cast": 6,
+                "topdeck_manipulation_activated": 10
+              },
+              "deck_6:Winota, Joiner of Forces #39 (real):0": {
+                "lorehold_cost_paid": 8,
+                "lorehold_spell_cast": 6
+              }
+            },
+            "strategic_games": {
+              "birgi_spell_cast_mana": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "discard_to_top_replacement": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "hand_to_topdeck_activation": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_cost_paid": {
+                "games": 8,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_cast": {
+                "games": 8,
+                "rate": 1.0
+              },
+              "lorehold_spell_rummage": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "lorehold_spell_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_upkeep_rummage": {
+                "games": 4,
+                "rate": 0.5
+              },
+              "miracle_cast": {
+                "games": 3,
+                "rate": 0.375
+              },
+              "spell_cast_mana_trigger": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_after_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_without_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_to_graveyard": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_upkeep_return": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_cost_paid": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage_amount": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_spell_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.125
+              }
+            },
+            "top_cards": [
+              {
+                "count": 9,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 7,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 5,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 5,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Lightning Greaves"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Hexing Squelcher"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Sensei's Divining Top"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Giver of Runes"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Boros Signet"
+              }
+            ]
+          },
+          "win_rate": 25.0,
+          "wins": 2
+        },
+        "candidate": {
+          "avg_win_turn": 28.0,
+          "losses": 7,
+          "stalls": 0,
+          "telemetry": {
+            "card_event_counts": {
+              "board_wipe_resolved:Everything Comes to Dust": 1,
+              "board_wipe_resolved:Farewell": 1,
+              "board_wipe_resolved:Fated Clash": 1,
+              "board_wipe_resolved:Starfall Invocation": 1,
+              "board_wipe_resolved:Tragic Arrogance": 1,
+              "cost_paid:Arcane Signet": 2,
+              "cost_paid:Artist's Talent": 1,
+              "cost_paid:Avatar's Wrath": 1,
+              "cost_paid:Bender's Waterskin": 1,
+              "cost_paid:Esper Sentinel": 1,
+              "cost_paid:Fated Clash": 1,
+              "cost_paid:Fellwar Stone": 2,
+              "cost_paid:Generous Gift": 2,
+              "cost_paid:Giver of Runes": 3,
+              "cost_paid:Hexing Squelcher": 4,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Improvisation Capstone": 1,
+              "cost_paid:Jeska's Will": 1,
+              "cost_paid:Land Tax": 1,
+              "cost_paid:Library of Leng": 2,
+              "cost_paid:Lightning Greaves": 2,
+              "cost_paid:Lorehold, the Historian": 14,
+              "cost_paid:Mizzix's Mastery": 1,
+              "cost_paid:Monument to Endurance": 2,
+              "cost_paid:Mother of Runes": 2,
+              "cost_paid:Path to Exile": 2,
+              "cost_paid:Prismari Pianist": 2,
+              "cost_paid:Reforge the Soul": 1,
+              "cost_paid:Ruby Medallion": 2,
+              "cost_paid:Scroll Rack": 4,
+              "cost_paid:Sensei's Divining Top": 4,
+              "cost_paid:Smothering Tithe": 1,
+              "cost_paid:Sol Ring": 1,
+              "cost_paid:Starfall Invocation": 1,
+              "cost_paid:Stroke of Midnight": 2,
+              "cost_paid:Surge to Victory": 1,
+              "cost_paid:Swiftfoot Boots": 1,
+              "cost_paid:Talisman of Conviction": 1,
+              "cost_paid:Tempt with Bunnies": 3,
+              "cost_paid:The Scarlet Witch": 4,
+              "cost_paid:Victory Chimes": 3,
+              "miracle_cast:Big Score": 1,
+              "miracle_cast:Blasphemous Act": 1,
+              "miracle_cast:Brass's Bounty": 1,
+              "miracle_cast:Everything Comes to Dust": 1,
+              "miracle_cast:Farewell": 1,
+              "miracle_cast:Hit the Mother Lode": 1,
+              "miracle_cast:Improvisation Capstone": 1,
+              "miracle_cast:Jeska's Will": 1,
+              "miracle_cast:Mizzix's Mastery": 1,
+              "removal_resolved:Generous Gift": 2,
+              "removal_resolved:Path to Exile": 2,
+              "removal_resolved:Stroke of Midnight": 3,
+              "spell_cast:Arcane Signet": 2,
+              "spell_cast:Artist's Talent": 1,
+              "spell_cast:Avatar's Wrath": 1,
+              "spell_cast:Bender's Waterskin": 1,
+              "spell_cast:Dawn's Truce": 1,
+              "spell_cast:Esper Sentinel": 1,
+              "spell_cast:Fated Clash": 1,
+              "spell_cast:Fellwar Stone": 2,
+              "spell_cast:Flawless Maneuver": 2,
+              "spell_cast:Generous Gift": 2,
+              "spell_cast:High Noon": 1,
+              "spell_cast:Improvisation Capstone": 1,
+              "spell_cast:Jeska's Will": 1,
+              "spell_cast:Land Tax": 1,
+              "spell_cast:Library of Leng": 2,
+              "spell_cast:Lightning Greaves": 2,
+              "spell_cast:Mizzix's Mastery": 1,
+              "spell_cast:Monument to Endurance": 2,
+              "spell_cast:Path to Exile": 2,
+              "spell_cast:Prismari Pianist": 2,
+              "spell_cast:Redirect Lightning": 2,
+              "spell_cast:Reforge the Soul": 1,
+              "spell_cast:Ruby Medallion": 2,
+              "spell_cast:Scroll Rack": 4,
+              "spell_cast:Sensei's Divining Top": 4,
+              "spell_cast:Smothering Tithe": 1,
+              "spell_cast:Sol Ring": 1,
+              "spell_cast:Starfall Invocation": 1,
+              "spell_cast:Stroke of Midnight": 2,
+              "spell_cast:Surge to Victory": 1,
+              "spell_cast:Swiftfoot Boots": 1,
+              "spell_cast:Talisman of Conviction": 1,
+              "spell_cast:Teferi's Protection": 2,
+              "spell_cast:Tempt with Bunnies": 3,
+              "spell_cast:The Scarlet Witch": 4,
+              "spell_cast:Tragic Arrogance": 1,
+              "spell_cast:Victory Chimes": 3,
+              "spell_resolved:Artist's Talent": 1,
+              "spell_resolved:Avatar's Wrath": 1,
+              "spell_resolved:Big Score": 1,
+              "spell_resolved:Blasphemous Act": 2,
+              "spell_resolved:Brass's Bounty": 1,
+              "spell_resolved:Dawn's Truce": 1,
+              "spell_resolved:Esper Sentinel": 1,
+              "spell_resolved:Everything Comes to Dust": 1,
+              "spell_resolved:Farewell": 1,
+              "spell_resolved:Fated Clash": 1,
+              "spell_resolved:Flawless Maneuver": 2,
+              "spell_resolved:Generous Gift": 2,
+              "spell_resolved:High Noon": 1,
+              "spell_resolved:Hit the Mother Lode": 1,
+              "spell_resolved:Improvisation Capstone": 2,
+              "spell_resolved:Jeska's Will": 2,
+              "spell_resolved:Land Tax": 1,
+              "spell_resolved:Library of Leng": 2,
+              "spell_resolved:Lightning Greaves": 2,
+              "spell_resolved:Mizzix's Mastery": 1,
+              "spell_resolved:Monument to Endurance": 2,
+              "spell_resolved:Path to Exile": 2,
+              "spell_resolved:Prismari Pianist": 1,
+              "spell_resolved:Reforge the Soul": 1,
+              "spell_resolved:Ruby Medallion": 2,
+              "spell_resolved:Scroll Rack": 4,
+              "spell_resolved:Sensei's Divining Top": 4,
+              "spell_resolved:Starfall Invocation": 1,
+              "spell_resolved:Stroke of Midnight": 3,
+              "spell_resolved:Surge to Victory": 1,
+              "spell_resolved:Swiftfoot Boots": 1,
+              "spell_resolved:Teferi's Protection": 2,
+              "spell_resolved:Tempt with Bunnies": 3,
+              "spell_resolved:The Scarlet Witch": 4,
+              "spell_resolved:Tragic Arrogance": 1,
+              "topdeck_manipulation_activated:Scroll Rack": 4,
+              "topdeck_manipulation_activated:Sensei's Divining Top": 8,
+              "treasure_created:Big Score": 1,
+              "treasure_created:Brass's Bounty": 1,
+              "trigger_resolved:Artist's Talent": 3,
+              "trigger_resolved:Esper Sentinel": 4,
+              "trigger_resolved:Smothering Tithe": 4,
+              "trigger_resolved:Surge to Victory": 1
+            },
+            "card_event_counts_by_game": {
+              "synergy_brass_bounty_cut_boros_signet:Aang, at the Crossroads #106 (real):0": {
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Prismari Pianist": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Scroll Rack": 1,
+                "cost_paid:Tempt with Bunnies": 1,
+                "cost_paid:Victory Chimes": 1,
+                "spell_cast:Flawless Maneuver": 1,
+                "spell_cast:Prismari Pianist": 1,
+                "spell_cast:Redirect Lightning": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Scroll Rack": 1,
+                "spell_cast:Tempt with Bunnies": 1,
+                "spell_cast:Victory Chimes": 1,
+                "spell_resolved:Flawless Maneuver": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Scroll Rack": 1,
+                "spell_resolved:Tempt with Bunnies": 1,
+                "topdeck_manipulation_activated:Scroll Rack": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Kenrith, the Returned King #113 (real):0": {
+                "cost_paid:Artist's Talent": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Lorehold, the Historian": 2,
+                "cost_paid:Stroke of Midnight": 1,
+                "cost_paid:Talisman of Conviction": 1,
+                "removal_resolved:Generous Gift": 1,
+                "removal_resolved:Stroke of Midnight": 1,
+                "spell_cast:Artist's Talent": 1,
+                "spell_cast:Flawless Maneuver": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:Stroke of Midnight": 1,
+                "spell_cast:Talisman of Conviction": 1,
+                "spell_cast:Teferi's Protection": 1,
+                "spell_resolved:Artist's Talent": 1,
+                "spell_resolved:Flawless Maneuver": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Stroke of Midnight": 1,
+                "spell_resolved:Teferi's Protection": 1,
+                "trigger_resolved:Artist's Talent": 3
+              },
+              "synergy_brass_bounty_cut_boros_signet:Rograkh, Son of Rohgahh #62 (real):0": {
+                "cost_paid:Library of Leng": 1,
+                "cost_paid:Lorehold, the Historian": 2,
+                "cost_paid:Monument to Endurance": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "cost_paid:Tempt with Bunnies": 1,
+                "miracle_cast:Blasphemous Act": 1,
+                "miracle_cast:Mizzix's Mastery": 1,
+                "spell_cast:Library of Leng": 1,
+                "spell_cast:Monument to Endurance": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_cast:Tempt with Bunnies": 1,
+                "spell_resolved:Blasphemous Act": 1,
+                "spell_resolved:Library of Leng": 1,
+                "spell_resolved:Monument to Endurance": 1,
+                "spell_resolved:Sensei's Divining Top": 1,
+                "spell_resolved:Tempt with Bunnies": 1,
+                "topdeck_manipulation_activated:Sensei's Divining Top": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Sisay, Weatherlight Captain #61 (real):0": {
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Mother of Runes": 1,
+                "cost_paid:The Scarlet Witch": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Teferi's Protection": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_resolved:Teferi's Protection": 1,
+                "spell_resolved:The Scarlet Witch": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Tannuk, Memorial Ensign #40 (real):0": {
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Fellwar Stone": 1,
+                "cost_paid:Improvisation Capstone": 1,
+                "cost_paid:Lightning Greaves": 1,
+                "cost_paid:Lorehold, the Historian": 2,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:The Scarlet Witch": 1,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Dawn's Truce": 1,
+                "spell_cast:Fellwar Stone": 1,
+                "spell_cast:Improvisation Capstone": 1,
+                "spell_cast:Lightning Greaves": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_resolved:Dawn's Truce": 1,
+                "spell_resolved:Improvisation Capstone": 1,
+                "spell_resolved:Lightning Greaves": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:The Scarlet Witch": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Umbris, Fear Manifest #114 (real):0": {
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:High Noon": 1,
+                "cost_paid:Jeska's Will": 1,
+                "cost_paid:Lorehold, the Historian": 1,
+                "cost_paid:Scroll Rack": 1,
+                "cost_paid:Victory Chimes": 1,
+                "removal_resolved:Stroke of Midnight": 1,
+                "spell_cast:High Noon": 1,
+                "spell_cast:Jeska's Will": 1,
+                "spell_cast:Redirect Lightning": 1,
+                "spell_cast:Scroll Rack": 1,
+                "spell_cast:Victory Chimes": 1,
+                "spell_resolved:High Noon": 1,
+                "spell_resolved:Jeska's Will": 1,
+                "spell_resolved:Scroll Rack": 1,
+                "spell_resolved:Stroke of Midnight": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Vivi Ornitier #99 (real):0": {
+                "board_wipe_resolved:Everything Comes to Dust": 1,
+                "board_wipe_resolved:Farewell": 1,
+                "board_wipe_resolved:Fated Clash": 1,
+                "board_wipe_resolved:Starfall Invocation": 1,
+                "board_wipe_resolved:Tragic Arrogance": 1,
+                "cost_paid:Arcane Signet": 1,
+                "cost_paid:Avatar's Wrath": 1,
+                "cost_paid:Esper Sentinel": 1,
+                "cost_paid:Fated Clash": 1,
+                "cost_paid:Generous Gift": 1,
+                "cost_paid:Giver of Runes": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Land Tax": 1,
+                "cost_paid:Library of Leng": 1,
+                "cost_paid:Lightning Greaves": 1,
+                "cost_paid:Lorehold, the Historian": 5,
+                "cost_paid:Mizzix's Mastery": 1,
+                "cost_paid:Monument to Endurance": 1,
+                "cost_paid:Mother of Runes": 1,
+                "cost_paid:Path to Exile": 1,
+                "cost_paid:Prismari Pianist": 1,
+                "cost_paid:Reforge the Soul": 1,
+                "cost_paid:Ruby Medallion": 1,
+                "cost_paid:Scroll Rack": 1,
+                "cost_paid:Sensei's Divining Top": 2,
+                "cost_paid:Smothering Tithe": 1,
+                "cost_paid:Sol Ring": 1,
+                "cost_paid:Starfall Invocation": 1,
+                "cost_paid:Surge to Victory": 1,
+                "cost_paid:Swiftfoot Boots": 1,
+                "cost_paid:Tempt with Bunnies": 1,
+                "cost_paid:The Scarlet Witch": 1,
+                "cost_paid:Victory Chimes": 1,
+                "miracle_cast:Big Score": 1,
+                "miracle_cast:Brass's Bounty": 1,
+                "miracle_cast:Everything Comes to Dust": 1,
+                "miracle_cast:Farewell": 1,
+                "miracle_cast:Hit the Mother Lode": 1,
+                "miracle_cast:Improvisation Capstone": 1,
+                "miracle_cast:Jeska's Will": 1,
+                "removal_resolved:Generous Gift": 1,
+                "removal_resolved:Path to Exile": 1,
+                "spell_cast:Arcane Signet": 1,
+                "spell_cast:Avatar's Wrath": 1,
+                "spell_cast:Esper Sentinel": 1,
+                "spell_cast:Fated Clash": 1,
+                "spell_cast:Generous Gift": 1,
+                "spell_cast:Land Tax": 1,
+                "spell_cast:Library of Leng": 1,
+                "spell_cast:Lightning Greaves": 1,
+                "spell_cast:Mizzix's Mastery": 1,
+                "spell_cast:Monument to Endurance": 1,
+                "spell_cast:Path to Exile": 1,
+                "spell_cast:Prismari Pianist": 1,
+                "spell_cast:Reforge the Soul": 1,
+                "spell_cast:Ruby Medallion": 1,
+                "spell_cast:Scroll Rack": 1,
+                "spell_cast:Sensei's Divining Top": 2,
+                "spell_cast:Smothering Tithe": 1,
+                "spell_cast:Sol Ring": 1,
+                "spell_cast:Starfall Invocation": 1,
+                "spell_cast:Surge to Victory": 1,
+                "spell_cast:Swiftfoot Boots": 1,
+                "spell_cast:Tempt with Bunnies": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_cast:Tragic Arrogance": 1,
+                "spell_cast:Victory Chimes": 1,
+                "spell_resolved:Avatar's Wrath": 1,
+                "spell_resolved:Big Score": 1,
+                "spell_resolved:Blasphemous Act": 1,
+                "spell_resolved:Brass's Bounty": 1,
+                "spell_resolved:Esper Sentinel": 1,
+                "spell_resolved:Everything Comes to Dust": 1,
+                "spell_resolved:Farewell": 1,
+                "spell_resolved:Fated Clash": 1,
+                "spell_resolved:Generous Gift": 1,
+                "spell_resolved:Hit the Mother Lode": 1,
+                "spell_resolved:Improvisation Capstone": 1,
+                "spell_resolved:Jeska's Will": 1,
+                "spell_resolved:Land Tax": 1,
+                "spell_resolved:Library of Leng": 1,
+                "spell_resolved:Lightning Greaves": 1,
+                "spell_resolved:Mizzix's Mastery": 1,
+                "spell_resolved:Monument to Endurance": 1,
+                "spell_resolved:Path to Exile": 1,
+                "spell_resolved:Prismari Pianist": 1,
+                "spell_resolved:Reforge the Soul": 1,
+                "spell_resolved:Ruby Medallion": 1,
+                "spell_resolved:Scroll Rack": 1,
+                "spell_resolved:Sensei's Divining Top": 2,
+                "spell_resolved:Starfall Invocation": 1,
+                "spell_resolved:Surge to Victory": 1,
+                "spell_resolved:Swiftfoot Boots": 1,
+                "spell_resolved:Tempt with Bunnies": 1,
+                "spell_resolved:The Scarlet Witch": 1,
+                "spell_resolved:Tragic Arrogance": 1,
+                "topdeck_manipulation_activated:Scroll Rack": 3,
+                "topdeck_manipulation_activated:Sensei's Divining Top": 7,
+                "treasure_created:Big Score": 1,
+                "treasure_created:Brass's Bounty": 1,
+                "trigger_resolved:Esper Sentinel": 4,
+                "trigger_resolved:Smothering Tithe": 4,
+                "trigger_resolved:Surge to Victory": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0": {
+                "cost_paid:Bender's Waterskin": 1,
+                "cost_paid:Hexing Squelcher": 1,
+                "cost_paid:Scroll Rack": 1,
+                "cost_paid:Sensei's Divining Top": 1,
+                "cost_paid:Stroke of Midnight": 1,
+                "cost_paid:The Scarlet Witch": 1,
+                "removal_resolved:Stroke of Midnight": 1,
+                "spell_cast:Bender's Waterskin": 1,
+                "spell_cast:Scroll Rack": 1,
+                "spell_cast:Sensei's Divining Top": 1,
+                "spell_cast:Stroke of Midnight": 1,
+                "spell_cast:The Scarlet Witch": 1,
+                "spell_resolved:Scroll Rack": 1,
+                "spell_resolved:Sensei's Divining Top": 1,
+                "spell_resolved:Stroke of Midnight": 1,
+                "spell_resolved:The Scarlet Witch": 1
+              }
+            },
+            "card_strategy_counts": {
+              "cost_paid:Arcane Signet": 2,
+              "cost_paid:Artist's Talent": 1,
+              "cost_paid:Avatar's Wrath": 1,
+              "cost_paid:Bender's Waterskin": 1,
+              "cost_paid:Esper Sentinel": 1,
+              "cost_paid:Fated Clash": 1,
+              "cost_paid:Fellwar Stone": 2,
+              "cost_paid:Generous Gift": 2,
+              "cost_paid:Giver of Runes": 3,
+              "cost_paid:Hexing Squelcher": 4,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Improvisation Capstone": 1,
+              "cost_paid:Jeska's Will": 1,
+              "cost_paid:Land Tax": 1,
+              "cost_paid:Library of Leng": 2,
+              "cost_paid:Lightning Greaves": 2,
+              "cost_paid:Lorehold, the Historian": 14,
+              "cost_paid:Mizzix's Mastery": 1,
+              "cost_paid:Monument to Endurance": 2,
+              "cost_paid:Mother of Runes": 2,
+              "cost_paid:Path to Exile": 2,
+              "cost_paid:Prismari Pianist": 2,
+              "cost_paid:Reforge the Soul": 1,
+              "cost_paid:Ruby Medallion": 2,
+              "cost_paid:Scroll Rack": 4,
+              "cost_paid:Sensei's Divining Top": 4,
+              "cost_paid:Smothering Tithe": 1,
+              "cost_paid:Sol Ring": 1,
+              "cost_paid:Starfall Invocation": 1,
+              "cost_paid:Stroke of Midnight": 2,
+              "cost_paid:Surge to Victory": 1,
+              "cost_paid:Swiftfoot Boots": 1,
+              "cost_paid:Talisman of Conviction": 1,
+              "cost_paid:Tempt with Bunnies": 3,
+              "cost_paid:The Scarlet Witch": 4,
+              "cost_paid:Victory Chimes": 3,
+              "discard_to_top:Brass's Bounty": 5,
+              "lorehold_rummage_to_top:Brass's Bounty": 5,
+              "miracle:Big Score": 1,
+              "miracle:Blasphemous Act": 1,
+              "miracle:Brass's Bounty": 1,
+              "miracle:Everything Comes to Dust": 1,
+              "miracle:Farewell": 1,
+              "miracle:Hit the Mother Lode": 1,
+              "miracle:Improvisation Capstone": 1,
+              "miracle:Jeska's Will": 1,
+              "miracle:Mizzix's Mastery": 1,
+              "topdeck:Scroll Rack": 4,
+              "topdeck:Sensei's Divining Top": 8
+            },
+            "event_counts": {
+              "activated_ability": 8,
+              "activated_ability_skipped": 27,
+              "additional_cost_paid": 2,
+              "airbend_other_creatures_resolved": 1,
+              "attachment_sba": 2,
+              "board_wipe_resolved": 6,
+              "cast_announced": 280,
+              "chaos_warp_reveal_resolved": 1,
+              "combat": 142,
+              "combat_result": 155,
+              "combat_step": 825,
+              "commander_cast": 46,
+              "compensation_tokens_created": 5,
+              "composite_rule_component_resolved": 8,
+              "composite_rule_resolved": 4,
+              "cost_paid": 280,
+              "countered_spell_moved_to_graveyard": 3,
+              "creature_cast": 63,
+              "creature_to_battlefield": 8,
+              "damage_resolved": 2,
+              "damage_wipe_resolved": 2,
+              "draw_cards_resolved": 8,
+              "end_step_instant": 9,
+              "equipment_attached": 3,
+              "jeskas_will_resolved": 2,
+              "land_played": 172,
+              "land_ramp_resolved": 8,
+              "land_recursion_resolved": 1,
+              "land_tax_trigger_skipped": 19,
+              "lorehold_upkeep_rummage": 27,
+              "lorehold_upkeep_rummage_skipped": 21,
+              "mana_refreshed": 257,
+              "mill_resolved": 1,
+              "miracle_cast": 9,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 10,
+              "permanent_moved_from_battlefield": 77,
+              "phase_out_resolved": 2,
+              "player_eliminated": 10,
+              "priority_pass": 2517,
+              "protection_resolved": 5,
+              "random_discard_after_tutor": 1,
+              "recursion_resolved": 2,
+              "redirect_removal_resolved": 3,
+              "removal_resolved": 24,
+              "replacement_applied": 36,
+              "saga_chapter_progressed": 8,
+              "saga_chapter_resolved": 4,
+              "saga_sacrificed_by_sba": 4,
+              "self_exiled_on_resolution": 4,
+              "spell_cast": 181,
+              "spell_copied": 1,
+              "spell_copy_ceased_to_exist": 2,
+              "spell_countered": 3,
+              "spell_exiled_from_stack": 1,
+              "spell_resolved": 139,
+              "surge_to_victory_resolved": 1,
+              "topdeck_manipulation_activated": 12,
+              "treasure_created": 4,
+              "trigger_put_on_stack": 44,
+              "trigger_resolved": 49,
+              "turn_end": 243,
+              "turn_start": 257,
+              "tutor_life_loss_resolved": 2,
+              "tutor_resolved": 13,
+              "utility_land_activated": 10,
+              "wheel_resolved": 1
+            },
+            "event_counts_by_game": {
+              "synergy_brass_bounty_cut_boros_signet:Aang, at the Crossroads #106 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 10,
+                "additional_cost_paid": 1,
+                "cast_announced": 24,
+                "chaos_warp_reveal_resolved": 1,
+                "combat": 21,
+                "combat_result": 26,
+                "combat_step": 121,
+                "commander_cast": 4,
+                "composite_rule_component_resolved": 2,
+                "composite_rule_resolved": 1,
+                "cost_paid": 24,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 5,
+                "draw_cards_resolved": 1,
+                "land_played": 17,
+                "land_ramp_resolved": 2,
+                "lorehold_upkeep_rummage": 1,
+                "lorehold_upkeep_rummage_skipped": 2,
+                "mana_refreshed": 31,
+                "multi_defender_attack": 4,
+                "permanent_moved_from_battlefield": 1,
+                "player_eliminated": 1,
+                "priority_pass": 276,
+                "protection_resolved": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 2,
+                "replacement_applied": 1,
+                "spell_cast": 17,
+                "spell_countered": 1,
+                "spell_resolved": 9,
+                "topdeck_manipulation_activated": 1,
+                "turn_end": 30,
+                "turn_start": 31,
+                "tutor_resolved": 2,
+                "utility_land_activated": 2
+              },
+              "synergy_brass_bounty_cut_boros_signet:Kenrith, the Returned King #113 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 5,
+                "cast_announced": 36,
+                "combat": 13,
+                "combat_result": 13,
+                "combat_step": 74,
+                "commander_cast": 5,
+                "compensation_tokens_created": 2,
+                "cost_paid": 36,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 7,
+                "creature_to_battlefield": 2,
+                "draw_cards_resolved": 1,
+                "end_step_instant": 4,
+                "land_played": 21,
+                "land_ramp_resolved": 1,
+                "land_recursion_resolved": 1,
+                "lorehold_upkeep_rummage": 4,
+                "mana_refreshed": 26,
+                "permanent_moved_from_battlefield": 5,
+                "phase_out_resolved": 1,
+                "player_eliminated": 1,
+                "priority_pass": 324,
+                "protection_resolved": 1,
+                "removal_resolved": 3,
+                "replacement_applied": 6,
+                "self_exiled_on_resolution": 1,
+                "spell_cast": 26,
+                "spell_countered": 1,
+                "spell_resolved": 19,
+                "treasure_created": 1,
+                "trigger_put_on_stack": 21,
+                "trigger_resolved": 21,
+                "turn_end": 25,
+                "turn_start": 26,
+                "tutor_life_loss_resolved": 1,
+                "tutor_resolved": 3
+              },
+              "synergy_brass_bounty_cut_boros_signet:Rograkh, Son of Rohgahh #62 (real):0": {
+                "activated_ability": 3,
+                "activated_ability_skipped": 4,
+                "cast_announced": 30,
+                "combat": 14,
+                "combat_result": 14,
+                "combat_step": 85,
+                "commander_cast": 7,
+                "composite_rule_component_resolved": 2,
+                "composite_rule_resolved": 1,
+                "cost_paid": 30,
+                "creature_cast": 6,
+                "creature_to_battlefield": 2,
+                "damage_wipe_resolved": 1,
+                "draw_cards_resolved": 2,
+                "land_played": 21,
+                "lorehold_upkeep_rummage": 5,
+                "mana_refreshed": 28,
+                "mill_resolved": 1,
+                "miracle_cast": 2,
+                "permanent_moved_from_battlefield": 14,
+                "player_eliminated": 1,
+                "priority_pass": 272,
+                "random_discard_after_tutor": 1,
+                "removal_resolved": 2,
+                "replacement_applied": 5,
+                "spell_cast": 18,
+                "spell_exiled_from_stack": 1,
+                "spell_resolved": 14,
+                "topdeck_manipulation_activated": 1,
+                "turn_end": 27,
+                "turn_start": 28,
+                "tutor_resolved": 1,
+                "utility_land_activated": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Sisay, Weatherlight Captain #61 (real):0": {
+                "cast_announced": 29,
+                "combat": 19,
+                "combat_result": 19,
+                "combat_step": 102,
+                "commander_cast": 4,
+                "cost_paid": 29,
+                "creature_cast": 12,
+                "draw_cards_resolved": 1,
+                "land_played": 17,
+                "lorehold_upkeep_rummage": 1,
+                "mana_refreshed": 30,
+                "permanent_moved_from_battlefield": 5,
+                "phase_out_resolved": 1,
+                "player_eliminated": 1,
+                "priority_pass": 268,
+                "protection_resolved": 1,
+                "removal_resolved": 2,
+                "replacement_applied": 8,
+                "self_exiled_on_resolution": 1,
+                "spell_cast": 14,
+                "spell_resolved": 9,
+                "turn_end": 29,
+                "turn_start": 30
+              },
+              "synergy_brass_bounty_cut_boros_signet:Tannuk, Memorial Ensign #40 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 1,
+                "board_wipe_resolved": 1,
+                "cast_announced": 39,
+                "combat": 13,
+                "combat_result": 13,
+                "combat_step": 83,
+                "commander_cast": 7,
+                "cost_paid": 39,
+                "creature_cast": 7,
+                "creature_to_battlefield": 2,
+                "damage_resolved": 1,
+                "draw_cards_resolved": 2,
+                "end_step_instant": 1,
+                "equipment_attached": 1,
+                "land_played": 28,
+                "land_ramp_resolved": 2,
+                "lorehold_upkeep_rummage": 8,
+                "lorehold_upkeep_rummage_skipped": 6,
+                "mana_refreshed": 36,
+                "permanent_moved_from_battlefield": 6,
+                "player_eliminated": 1,
+                "priority_pass": 380,
+                "protection_resolved": 1,
+                "removal_resolved": 4,
+                "replacement_applied": 3,
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 1,
+                "saga_sacrificed_by_sba": 1,
+                "spell_cast": 26,
+                "spell_resolved": 20,
+                "trigger_put_on_stack": 10,
+                "trigger_resolved": 10,
+                "turn_end": 34,
+                "turn_start": 36,
+                "tutor_life_loss_resolved": 1,
+                "tutor_resolved": 4,
+                "utility_land_activated": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Umbris, Fear Manifest #114 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 3,
+                "cast_announced": 28,
+                "combat": 14,
+                "combat_result": 19,
+                "combat_step": 86,
+                "commander_cast": 4,
+                "compensation_tokens_created": 1,
+                "cost_paid": 28,
+                "countered_spell_moved_to_graveyard": 1,
+                "creature_cast": 7,
+                "creature_to_battlefield": 1,
+                "damage_resolved": 1,
+                "end_step_instant": 2,
+                "jeskas_will_resolved": 1,
+                "land_played": 18,
+                "land_ramp_resolved": 3,
+                "lorehold_upkeep_rummage": 1,
+                "lorehold_upkeep_rummage_skipped": 2,
+                "mana_refreshed": 26,
+                "multi_defender_attack": 3,
+                "permanent_moved_from_battlefield": 5,
+                "player_eliminated": 1,
+                "priority_pass": 224,
+                "protection_resolved": 1,
+                "recursion_resolved": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 3,
+                "replacement_applied": 2,
+                "saga_chapter_progressed": 4,
+                "saga_chapter_resolved": 2,
+                "saga_sacrificed_by_sba": 2,
+                "spell_cast": 18,
+                "spell_countered": 1,
+                "spell_resolved": 13,
+                "turn_end": 23,
+                "turn_start": 26,
+                "tutor_resolved": 2,
+                "utility_land_activated": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Vivi Ornitier #99 (real):0": {
+                "activated_ability_skipped": 3,
+                "additional_cost_paid": 1,
+                "airbend_other_creatures_resolved": 1,
+                "attachment_sba": 2,
+                "board_wipe_resolved": 5,
+                "cast_announced": 70,
+                "combat": 38,
+                "combat_result": 41,
+                "combat_step": 215,
+                "commander_cast": 11,
+                "compensation_tokens_created": 1,
+                "composite_rule_component_resolved": 4,
+                "composite_rule_resolved": 2,
+                "cost_paid": 70,
+                "creature_cast": 12,
+                "creature_to_battlefield": 1,
+                "damage_wipe_resolved": 1,
+                "draw_cards_resolved": 1,
+                "end_step_instant": 2,
+                "equipment_attached": 2,
+                "jeskas_will_resolved": 1,
+                "land_played": 32,
+                "land_tax_trigger_skipped": 19,
+                "lorehold_upkeep_rummage": 7,
+                "lorehold_upkeep_rummage_skipped": 11,
+                "mana_refreshed": 57,
+                "miracle_cast": 7,
+                "mizzix_mastery_copy_cast": 1,
+                "mizzix_mastery_resolved": 1,
+                "multi_defender_attack": 3,
+                "permanent_moved_from_battlefield": 36,
+                "player_eliminated": 3,
+                "priority_pass": 553,
+                "recursion_resolved": 1,
+                "redirect_removal_resolved": 1,
+                "removal_resolved": 5,
+                "replacement_applied": 10,
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 1,
+                "saga_sacrificed_by_sba": 1,
+                "self_exiled_on_resolution": 2,
+                "spell_cast": 49,
+                "spell_copied": 1,
+                "spell_copy_ceased_to_exist": 2,
+                "spell_resolved": 45,
+                "surge_to_victory_resolved": 1,
+                "topdeck_manipulation_activated": 10,
+                "treasure_created": 3,
+                "trigger_put_on_stack": 13,
+                "trigger_resolved": 18,
+                "turn_end": 53,
+                "turn_start": 57,
+                "utility_land_activated": 2,
+                "wheel_resolved": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0": {
+                "activated_ability": 1,
+                "activated_ability_skipped": 1,
+                "cast_announced": 24,
+                "combat": 10,
+                "combat_result": 10,
+                "combat_step": 59,
+                "commander_cast": 4,
+                "compensation_tokens_created": 1,
+                "cost_paid": 24,
+                "creature_cast": 7,
+                "land_played": 18,
+                "mana_refreshed": 23,
+                "permanent_moved_from_battlefield": 5,
+                "player_eliminated": 1,
+                "priority_pass": 220,
+                "removal_resolved": 3,
+                "replacement_applied": 1,
+                "spell_cast": 13,
+                "spell_resolved": 10,
+                "turn_end": 22,
+                "turn_start": 23,
+                "tutor_resolved": 1,
+                "utility_land_activated": 3
+              }
+            },
+            "squee_anomalies": [],
+            "squee_game_traces": {
+              "synergy_brass_bounty_cut_boros_signet:Kenrith, the Returned King #113 (real):0": [
+                {
+                  "data": {
+                    "discarded": 0,
+                    "discarded_cards": [],
+                    "player": "Lorehold",
+                    "turn": 7
+                  },
+                  "event": "turn_end",
+                  "game_id": "synergy_brass_bounty_cut_boros_signet:Kenrith, the Returned King #113 (real):0",
+                  "markers": [
+                    "mentions_squee"
+                  ],
+                  "seq": 3300,
+                  "squee_known_graveyard_balance_after": 0,
+                  "squee_known_graveyard_balance_before": 0
+                }
+              ]
+            },
+            "squee_known_graveyard_balance_by_game": {},
+            "squee_trace_samples": [
+              {
+                "data": {
+                  "discarded": 0,
+                  "discarded_cards": [],
+                  "player": "Lorehold",
+                  "turn": 7
+                },
+                "event": "turn_end",
+                "game_id": "synergy_brass_bounty_cut_boros_signet:Kenrith, the Returned King #113 (real):0",
+                "markers": [
+                  "mentions_squee"
+                ],
+                "seq": 3300,
+                "squee_known_graveyard_balance_after": 0,
+                "squee_known_graveyard_balance_before": 0
+              }
+            ],
+            "strategic_event_counts": {
+              "discard_to_top_replacement": 5,
+              "lorehold_cost_paid": 78,
+              "lorehold_rummage_discard_to_top": 5,
+              "lorehold_spell_cast": 63,
+              "lorehold_spell_rummage": 3,
+              "lorehold_upkeep_rummage": 27,
+              "miracle_cast": 9,
+              "topdeck_manipulation_activated": 12
+            },
+            "strategic_event_counts_by_game": {
+              "synergy_brass_bounty_cut_boros_signet:Aang, at the Crossroads #106 (real):0": {
+                "lorehold_cost_paid": 7,
+                "lorehold_spell_cast": 7,
+                "lorehold_upkeep_rummage": 1,
+                "topdeck_manipulation_activated": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Kenrith, the Returned King #113 (real):0": {
+                "lorehold_cost_paid": 7,
+                "lorehold_spell_cast": 6,
+                "lorehold_spell_rummage": 3,
+                "lorehold_upkeep_rummage": 4
+              },
+              "synergy_brass_bounty_cut_boros_signet:Rograkh, Son of Rohgahh #62 (real):0": {
+                "discard_to_top_replacement": 5,
+                "lorehold_cost_paid": 6,
+                "lorehold_rummage_discard_to_top": 5,
+                "lorehold_spell_cast": 4,
+                "lorehold_upkeep_rummage": 5,
+                "miracle_cast": 2,
+                "topdeck_manipulation_activated": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Sisay, Weatherlight Captain #61 (real):0": {
+                "lorehold_cost_paid": 5,
+                "lorehold_spell_cast": 3,
+                "lorehold_upkeep_rummage": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Tannuk, Memorial Ensign #40 (real):0": {
+                "lorehold_cost_paid": 8,
+                "lorehold_spell_cast": 7,
+                "lorehold_upkeep_rummage": 8
+              },
+              "synergy_brass_bounty_cut_boros_signet:Umbris, Fear Manifest #114 (real):0": {
+                "lorehold_cost_paid": 6,
+                "lorehold_spell_cast": 5,
+                "lorehold_upkeep_rummage": 1
+              },
+              "synergy_brass_bounty_cut_boros_signet:Vivi Ornitier #99 (real):0": {
+                "lorehold_cost_paid": 33,
+                "lorehold_spell_cast": 26,
+                "lorehold_upkeep_rummage": 7,
+                "miracle_cast": 7,
+                "topdeck_manipulation_activated": 10
+              },
+              "synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0": {
+                "lorehold_cost_paid": 6,
+                "lorehold_spell_cast": 5
+              }
+            },
+            "strategic_games": {
+              "birgi_spell_cast_mana": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "discard_to_top_replacement": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "hand_to_topdeck_activation": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_cost_paid": {
+                "games": 8,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discard_to_top": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "lorehold_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_cast": {
+                "games": 8,
+                "rate": 1.0
+              },
+              "lorehold_spell_rummage": {
+                "games": 1,
+                "rate": 0.125
+              },
+              "lorehold_spell_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_upkeep_rummage": {
+                "games": 7,
+                "rate": 0.875
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 0.25
+              },
+              "spell_cast_mana_trigger": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_after_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_without_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_to_graveyard": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_upkeep_return": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_cost_paid": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage_amount": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_spell_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 3,
+                "rate": 0.375
+              }
+            },
+            "top_cards": [
+              {
+                "count": 14,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 8,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 5,
+                "key": "lorehold_rummage_to_top:Brass's Bounty"
+              },
+              {
+                "count": 5,
+                "key": "discard_to_top:Brass's Bounty"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Hexing Squelcher"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:The Scarlet Witch"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Sensei's Divining Top"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Scroll Rack"
+              },
+              {
+                "count": 4,
+                "key": "topdeck:Scroll Rack"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Victory Chimes"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Giver of Runes"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Tempt with Bunnies"
+              }
+            ]
+          },
+          "win_rate": 12.5,
+          "wins": 1
+        },
+        "delta_pp": -12.5
+      },
+      "hypothesis": "Brass's Bounty is shared by six Lorehold variants and now has a reviewed runtime model that creates Treasure equal to lands controlled. This tests whether a late ritual/treasure burst is better than the least-blocked two-mana Boros rock without cutting Sol Ring, Bender's Waterskin, medallions, Victory Chimes, or the protection/finisher shell.",
+      "package_key": "brass_bounty_cut_boros_signet",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "prior package evidence disabled",
+        "status": "not_checked"
+      },
+      "status": "gated"
+    }
+  ],
+  "preflight_only": false,
+  "prior_package_reports": [],
+  "prior_package_summary": {
+    "loaded_report_count": 0,
+    "missing_report_count": 0,
+    "package_key_count": 0
+  },
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}

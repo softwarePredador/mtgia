@@ -36,6 +36,20 @@ DEFAULT_CANDIDATE_DB = (
     / "knowledge_candidate.db"
 )
 DEFAULT_DECK_IDS = (6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616)
+CARD_EXPOSURE_EVENTS = {
+    "activated_ability",
+    "board_wipe_resolved",
+    "cost_paid",
+    "draw_cards_resolved",
+    "miracle_cast",
+    "recursion_resolved",
+    "removal_resolved",
+    "spell_cast",
+    "spell_resolved",
+    "topdeck_manipulation_activated",
+    "treasure_created",
+    "trigger_resolved",
+}
 
 
 class GameTimeoutError(TimeoutError):
@@ -216,6 +230,8 @@ class GateTelemetry:
             "thor_noncreature_damage_amount": set(),
         }
         self.cards: Counter[str] = Counter()
+        self.card_event_counts: Counter[str] = Counter()
+        self.card_event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.strategic_event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.squee_graveyard_entries_by_game: Counter[str] = Counter()
@@ -378,6 +394,10 @@ class GateTelemetry:
         strategic_before = self.strategic_events.copy()
         player = str(data.get("player") or "")
         card = str(data.get("card") or "")
+        if player == "Lorehold" and card and event in CARD_EXPOSURE_EVENTS:
+            card_event_key = f"{event}:{card}"
+            self.card_event_counts[card_event_key] += 1
+            self.card_event_counts_by_game[self.current_game][card_event_key] += 1
         squee_mentioned = "Squee, Goblin Nabob" in json.dumps(data, sort_keys=True, default=str)
         squee_entry = self._squee_in_graveyard_payload(event, data)
         squee_return = (
@@ -523,6 +543,7 @@ class GateTelemetry:
         return {
             "event_counts": dict(self.event_counts_by_game.get(game_id, {})),
             "strategic_event_counts": dict(self.strategic_event_counts_by_game.get(game_id, {})),
+            "card_event_counts": dict(self.card_event_counts_by_game.get(game_id, {})),
             "squee_known_graveyard_balance": int(self.squee_known_graveyard_balance_by_game.get(game_id, 0)),
             "squee_trace_count": len(self.squee_game_traces.get(game_id, [])),
             "squee_anomaly_count": sum(
@@ -543,6 +564,11 @@ class GateTelemetry:
                 key: dict(value)
                 for key, value in sorted(self.strategic_event_counts_by_game.items())
             },
+            "card_event_counts": dict(sorted(self.card_event_counts.items())),
+            "card_event_counts_by_game": {
+                key: dict(value)
+                for key, value in sorted(self.card_event_counts_by_game.items())
+            },
             "strategic_games": {
                 key: {
                     "games": len(value),
@@ -554,6 +580,7 @@ class GateTelemetry:
                 {"key": key, "count": count}
                 for key, count in self.cards.most_common(12)
             ],
+            "card_strategy_counts": dict(sorted(self.cards.items())),
             "squee_trace_samples": list(self.squee_trace_samples),
             "squee_game_traces": {
                 key: value

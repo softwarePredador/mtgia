@@ -14,6 +14,7 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         telemetry.record("cost_paid", {"player": "Lorehold", "card": "Thor, God of Thunder"})
         telemetry.record("spell_cast", {"player": "Opponent", "card": "Counterspell"})
         telemetry.record("spell_cast", {"player": "Lorehold", "card": "Thor, God of Thunder"})
+        telemetry.record("treasure_created", {"player": "Lorehold", "card": "Brass's Bounty"})
         telemetry.record("topdeck_manipulation_activated", {"player": "Lorehold", "card": "Scroll Rack"})
         telemetry.record(
             "trigger_resolved",
@@ -111,6 +112,20 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["strategic_event_counts"]["squee_return_after_known_graveyard_entry"], 1)
         self.assertEqual(payload["strategic_event_counts"]["squee_return_without_known_graveyard_entry"], 1)
         self.assertEqual(payload["event_counts_by_game"]["game-1"]["miracle_cast"], 1)
+        self.assertEqual(payload["card_event_counts"]["cost_paid:Sol Ring"], 1)
+        self.assertEqual(payload["card_event_counts"]["spell_cast:Thor, God of Thunder"], 1)
+        self.assertEqual(payload["card_event_counts"]["treasure_created:Brass's Bounty"], 1)
+        self.assertEqual(payload["card_strategy_counts"]["topdeck:Scroll Rack"], 1)
+        self.assertEqual(payload["card_strategy_counts"]["discard_to_top:Storm Herd"], 1)
+        self.assertEqual(payload["card_strategy_counts"]["spell_rummage_to_top:Rise of the Eldrazi"], 1)
+        self.assertEqual(
+            payload["card_event_counts_by_game"]["game-1"]["treasure_created:Brass's Bounty"],
+            1,
+        )
+        self.assertEqual(
+            telemetry.game_summary("game-1")["card_event_counts"]["treasure_created:Brass's Bounty"],
+            1,
+        )
         self.assertEqual(payload["strategic_event_counts_by_game"]["game-1"]["squee_to_graveyard"], 3)
         self.assertEqual(payload["strategic_event_counts_by_game"]["game-1"]["squee_upkeep_return"], 1)
         self.assertEqual(
