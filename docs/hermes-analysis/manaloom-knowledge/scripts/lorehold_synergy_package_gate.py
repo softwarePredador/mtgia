@@ -32,6 +32,7 @@ DEFAULT_SOURCE_DB = (
     / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
     / "knowledge_candidate.db"
 )
+DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260627_v1.json"
 
 
 PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
@@ -444,6 +445,9 @@ MIRACLE_CORE_NAMES = {
     "Storm Herd",
     "The Scarlet Witch",
 }
+CUT_SAFETY_BLOCKED_STATUSES = {"locked_do_not_cut", "protected_until_same_lane_win"}
+CUT_SAFETY_RISKY_STATUSES = {"risky_cut_only_same_lane"}
+CUT_SAFETY_PROTECTED_STATUSES = CUT_SAFETY_BLOCKED_STATUSES | CUT_SAFETY_RISKY_STATUSES
 
 
 def utc_stamp() -> str:
@@ -474,6 +478,109 @@ def load_canonical_snapshot() -> dict[str, dict[str, Any]]:
 
 
 CANONICAL_RULES = load_canonical_snapshot()
+
+
+def load_cut_safety_manifest(path: Path | None) -> dict[str, Any]:
+    if path is None:
+        return {"enabled": False, "path": None, "summary": {}, "cuts_by_name": {}}
+    if not path.exists():
+        return {
+            "enabled": True,
+            "path": str(path),
+            "missing": True,
+            "summary": {},
+            "cuts_by_name": {},
+        }
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    manifest = payload.get("cut_safety_manifest") if isinstance(payload, dict) else None
+    if not isinstance(manifest, dict):
+        manifest = payload if isinstance(payload, dict) else {}
+    cuts_by_name = {
+        str(row.get("card_name")): row
+        for row in manifest.get("cuts", [])
+        if isinstance(row, dict) and row.get("card_name")
+    }
+    return {
+        "enabled": True,
+        "path": str(path),
+        "summary": manifest.get("summary") or {},
+        "cuts_by_name": cuts_by_name,
+    }
+
+
+def classify_package_cut_safety(
+    definition: dict[str, Any],
+    cut_safety: dict[str, Any],
+) -> dict[str, Any]:
+    if not cut_safety.get("enabled"):
+        return {"status": "not_checked", "reason": "cut-safety preflight disabled", "cuts": []}
+    if cut_safety.get("missing"):
+        return {
+            "status": "not_checked",
+            "reason": "cut-safety report missing",
+            "cuts": [],
+        }
+
+    cuts_by_name = cut_safety.get("cuts_by_name") or {}
+    cut_rows = [
+        cuts_by_name[cut]
+        for cut in definition.get("cuts", [])
+        if cut in cuts_by_name
+    ]
+    if not cut_rows:
+        return {
+            "status": "clear",
+            "reason": "no proposed cut has previous blocker evidence",
+            "cuts": [],
+        }
+
+    override_reason = str(definition.get("cut_safety_override_reason") or "").strip()
+    protected_rows = [
+        row
+        for row in cut_rows
+        if row.get("status") in CUT_SAFETY_PROTECTED_STATUSES
+    ]
+    blocked_rows = [
+        row
+        for row in cut_rows
+        if row.get("status") in CUT_SAFETY_BLOCKED_STATUSES
+    ]
+    risky_rows = [
+        row
+        for row in cut_rows
+        if row.get("status") in CUT_SAFETY_RISKY_STATUSES
+    ]
+    cut_summaries = [
+        {
+            "card_name": row.get("card_name"),
+            "status": row.get("status"),
+            "current_lane": row.get("current_lane"),
+            "effective_role": row.get("effective_role"),
+            "worst_strong_seed_delta_pp": row.get("worst_strong_seed_delta_pp"),
+            "best_delta_pp": row.get("best_delta_pp"),
+            "reason": row.get("reason"),
+        }
+        for row in protected_rows
+    ]
+
+    if protected_rows and not override_reason:
+        names = ", ".join(str(row.get("card_name")) for row in protected_rows)
+        return {
+            "status": "blocked_cut_safety",
+            "reason": f"proposed cuts already have blocker evidence: {names}",
+            "cuts": cut_summaries,
+        }
+    if blocked_rows and override_reason:
+        status = "override_locked_cut_safety"
+    elif risky_rows and override_reason:
+        status = "override_risky_cut_safety"
+    else:
+        status = "clear"
+    return {
+        "status": status,
+        "reason": override_reason or "cut-safety preflight passed",
+        "cuts": cut_summaries,
+    }
 
 
 def role_category_for_effect(effect_data: dict[str, Any]) -> str:
@@ -850,23 +957,37 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- opponent_limit: `{payload['opponent_limit']}`",
         f"- opponent_seed: `{payload['opponent_seed']}`",
         f"- simulation_seed: `{payload['simulation_seed']}`",
+        f"- cut_safety_report: `{payload.get('cut_safety_report') or '-'}`",
         "",
-        "| Package | Family | Adds | Cuts | Baseline | Candidate | Delta | Strategic Delta | Decision |",
-        "| --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
+        "| Package | Family | Adds | Cuts | Preflight | Baseline | Candidate | Delta | Strategic Delta | Decision |",
+        "| --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
     ]
     for result in payload["packages"]:
+        preflight = (result.get("cut_safety") or {}).get("status") or "not_checked"
+        if result.get("status") == "skipped_cut_safety":
+            lines.append(
+                "| {key} | {family} | {adds} | {cuts} | `{preflight}` | - | - | +0.00 | - | skipped_cut_safety |".format(
+                    key=result["package_key"],
+                    family=result.get("family") or "-",
+                    adds=", ".join(result["adds"]),
+                    cuts=", ".join(result["cuts"]),
+                    preflight=preflight,
+                )
+            )
+            continue
         gate = result.get("gate_summary") or {}
         baseline = gate.get("baseline") or {}
         candidate = gate.get("candidate") or {}
         delta = float(gate.get("delta_pp") or 0.0)
         decision = gate_decision(gate)
         lines.append(
-            "| {key} | {family} | {adds} | {cuts} | {bw}/{bl}/{bs} `{bwr:.2f}%` | "
+            "| {key} | {family} | {adds} | {cuts} | `{preflight}` | {bw}/{bl}/{bs} `{bwr:.2f}%` | "
             "{cw}/{cl}/{cs} `{cwr:.2f}%` | {delta:+.2f} | {strategic} | {decision} |".format(
                 key=result["package_key"],
                 family=result.get("family") or "-",
                 adds=", ".join(result["adds"]),
                 cuts=", ".join(result["cuts"]),
+                preflight=preflight,
                 bw=baseline.get("wins", 0),
                 bl=baseline.get("losses", 0),
                 bs=baseline.get("stalls", 0),
@@ -888,13 +1009,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 "",
                 f"- family: {result.get('family') or '-'}",
                 f"- hypothesis: {result['hypothesis']}",
+                f"- status: `{result.get('status') or 'gated'}`",
+                f"- cut_safety: `{json.dumps(result.get('cut_safety') or {}, sort_keys=True)}`",
                 f"- allow_miracle_core_cuts: `{result.get('candidate_meta', {}).get('allow_miracle_core_cuts')}`",
                 f"- miracle_core_cuts: `{', '.join(result.get('candidate_meta', {}).get('miracle_core_cuts') or []) or '-'}`",
                 f"- added_rule_counts: `{json.dumps(result.get('candidate_meta', {}).get('added_rule_counts') or {}, sort_keys=True)}`",
-                f"- candidate_db: `{result['candidate_db']}`",
+                f"- candidate_db: `{result.get('candidate_db') or '-'}`",
                 f"- gate_markdown: `{result.get('gate_markdown') or '-'}`",
                 f"- gate_json: `{result.get('gate_json') or '-'}`",
-                f"- gate_returncode: `{result['gate_returncode']}`",
+                f"- gate_returncode: `{result.get('gate_returncode')}`",
                 "",
             ]
         )
@@ -912,10 +1035,14 @@ def main() -> int:
     parser.add_argument("--game-timeout-seconds", type=float, default=90.0)
     parser.add_argument("--stem", default="lorehold_synergy_package_gate")
     parser.add_argument("--stamp", default=None)
+    parser.add_argument("--cut-safety-report", type=Path, default=DEFAULT_CUT_SAFETY_REPORT)
+    parser.add_argument("--no-cut-safety", action="store_true")
     args = parser.parse_args()
 
     source_db = args.source_db.resolve()
     stamp = args.stamp or utc_stamp()
+    cut_safety_report = None if args.no_cut_safety else args.cut_safety_report.resolve()
+    cut_safety = load_cut_safety_manifest(cut_safety_report)
     package_keys = [key.strip() for key in args.packages.split(",") if key.strip()]
     unknown = [key for key in package_keys if key not in PACKAGE_DEFINITIONS]
     if unknown:
@@ -924,6 +1051,28 @@ def main() -> int:
     results: list[dict[str, Any]] = []
     for package_key in package_keys:
         definition = PACKAGE_DEFINITIONS[package_key]
+        package_cut_safety = classify_package_cut_safety(definition, cut_safety)
+        if package_cut_safety["status"] == "blocked_cut_safety":
+            result = {
+                "package_key": package_key,
+                "family": definition.get("family") or "misc",
+                "hypothesis": definition["hypothesis"],
+                "adds": definition["adds"],
+                "cuts": definition["cuts"],
+                "status": "skipped_cut_safety",
+                "cut_safety": package_cut_safety,
+                "candidate_db": None,
+                "candidate_meta": {},
+                "gate_json": None,
+                "gate_markdown": None,
+                "gate_returncode": None,
+                "gate_stdout_tail": "",
+                "gate_stderr_tail": "",
+                "gate_summary": {},
+            }
+            results.append(result)
+            print(json.dumps(result, ensure_ascii=False, indent=2), flush=True)
+            continue
         out_dir = REPORT_DIR / f"{args.stem}_{stamp}_{package_key}"
         out_dir.mkdir(parents=True, exist_ok=True)
         candidate_db = out_dir / "knowledge_candidate.db"
@@ -963,6 +1112,8 @@ def main() -> int:
             "hypothesis": definition["hypothesis"],
             "adds": definition["adds"],
             "cuts": definition["cuts"],
+            "status": "gated",
+            "cut_safety": package_cut_safety,
             "candidate_db": str(candidate_db),
             "candidate_meta": candidate_meta,
             "gate_json": str(gate_json) if gate_json.exists() else None,
@@ -983,13 +1134,18 @@ def main() -> int:
         "opponent_limit": max(1, args.opponent_limit),
         "opponent_seed": args.opponent_seed,
         "simulation_seed": args.simulation_seed,
+        "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,
+        "cut_safety_summary": cut_safety.get("summary") or {},
         "packages": results,
     }
     report_json = REPORT_DIR / f"{args.stem}_{stamp}.json"
     report_md = REPORT_DIR / f"{args.stem}_{stamp}.md"
     report_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
     report_md.write_text(render_markdown(payload), encoding="utf-8")
-    print(json.dumps({"status": "ready", "json": str(report_json), "markdown": str(report_md)}, indent=2))
+    status = "ready"
+    if results and all(row.get("status") == "skipped_cut_safety" for row in results):
+        status = "cut_safety_blocked"
+    print(json.dumps({"status": status, "json": str(report_json), "markdown": str(report_md)}, indent=2))
     return 0
 
 

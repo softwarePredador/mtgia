@@ -170,6 +170,60 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["allow_miracle_core_cuts"],
         )
 
+    def test_cut_safety_preflight_blocks_previous_failed_cut(self):
+        cut_safety = {
+            "enabled": True,
+            "cuts_by_name": {
+                "Fated Clash": {
+                    "card_name": "Fated Clash",
+                    "status": "locked_do_not_cut",
+                    "current_lane": "pressure_absorber_or_protection",
+                    "effective_role": "removal",
+                    "worst_strong_seed_delta_pp": -88.89,
+                    "best_delta_pp": -88.89,
+                    "reason": "one or more packages collapsed the known strong seed",
+                }
+            },
+        }
+
+        classification = gate.classify_package_cut_safety(
+            gate.PACKAGE_DEFINITIONS["boros_charm_pressure_cut_fated"],
+            cut_safety,
+        )
+
+        self.assertEqual(classification["status"], "blocked_cut_safety")
+        self.assertIn("Fated Clash", classification["reason"])
+        self.assertEqual(classification["cuts"][0]["status"], "locked_do_not_cut")
+
+    def test_cut_safety_preflight_allows_explicit_risky_cut_override(self):
+        cut_safety = {
+            "enabled": True,
+            "cuts_by_name": {
+                "Bender's Waterskin": {
+                    "card_name": "Bender's Waterskin",
+                    "status": "risky_cut_only_same_lane",
+                    "current_lane": "early_mana",
+                    "effective_role": "ramp",
+                    "worst_strong_seed_delta_pp": -44.45,
+                    "best_delta_pp": 3.7,
+                    "reason": "aggregate upside exists, but it broke the known strong seed",
+                }
+            },
+        }
+        definition = {
+            "adds": ["Three-Mana Ramp Benchmark"],
+            "cuts": ["Bender's Waterskin"],
+            "cut_safety_override_reason": "same-lane early-mana benchmark preserves the protected ramp job",
+        }
+
+        classification = gate.classify_package_cut_safety(definition, cut_safety)
+
+        self.assertEqual(classification["status"], "override_risky_cut_safety")
+        self.assertEqual(
+            classification["reason"],
+            "same-lane early-mana benchmark preserves the protected ramp job",
+        )
+
     def test_strategic_delta_includes_squee_metrics(self):
         payload = {
             "baseline": {
