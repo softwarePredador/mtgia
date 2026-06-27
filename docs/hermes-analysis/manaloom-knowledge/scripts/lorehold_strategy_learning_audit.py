@@ -30,8 +30,15 @@ DEFAULT_DB = (
 )
 DEFAULT_MATRIX = REPORT_DIR / "lorehold_variant_strategy_matrix_20260626_v3.json"
 DEFAULT_SQUEE_GATES = [
+    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",
+    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed13_20260627_v1.json",
+    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed21_20260627_v1.json",
     REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed42_20260627_v1.json",
     REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json",
+    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed123_20260627_v1.json",
+    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260624_v1.json",
+    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260626_v1.json",
     REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260627_v1.json",
 ]
 DEFAULT_GENERAL_SYNERGY_CONFIRM = (
@@ -392,9 +399,9 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append(f"- Current evidence champion: `{report['current_champion_key']}`.")
     lines.append("- The strongest current direction is not a generic big-spell upgrade; it is improving the 607 shell by testing the expensive `Insurrection` slot against `Squee, Goblin Nabob` and then validating that result across seeds.")
     lines.append("- Decisive gate evidence now uses `PYTHONHASHSEED=0`, `deck_process_isolation=true`, per-game timeout, and the optimized battle-rule lookup cache; seed-42 baseline/candidate-only reproductions match the comparative gate exactly.")
-    lines.append("- The 3-seed suite keeps Squee ahead but shows high seed sensitivity: champion `13W/14L/0S` (`48.15%`) vs `deck_607` `7W/20L/0S` (`25.93%`) and source `deck_6` `2W/25L/0S` (`7.41%`).")
-    lines.append("- Zone-trace evidence proves `Squee` can be cast, move to graveyard, and return during games, not only in a unit test. Across the 3-seed suite it has `squee_to_graveyard=9`, `squee_upkeep_return=6`, `squee_return_after_known_graveyard_entry=6`, and `squee_return_without_known_graveyard_entry=0`.")
-    lines.append("- Proven Squee routes in this suite are battlefield-to-graveyard through combat/wipes plus one opponent mill (`Brain Freeze`).")
+    lines.append("- The 10-seed suite keeps Squee barely ahead but downgrades confidence: champion `24W/66L/0S` (`26.67%`) vs `deck_607` `21W/69L/0S` (`23.33%`) and source `deck_6` `16W/74L/0S` (`17.78%`).")
+    lines.append("- Zone-trace evidence proves `Squee` can be cast, move to graveyard, and return during games, not only in a unit test. Across the 10-seed suite it has `squee_to_graveyard=16`, `squee_upkeep_return=12`, `squee_return_after_known_graveyard_entry=12`, and `squee_return_without_known_graveyard_entry=0`.")
+    lines.append("- Proven Squee routes in this suite are battlefield-to-graveyard through combat/wipes plus one opponent mill (`Brain Freeze`), but Squee does not appear in enough games to explain the whole deck result.")
     lines.append("- Important caveat: the trace gate still did not show `Squee` being discarded by Lorehold rummage or spell-rummage. Treat the discard-fuel loop as a hypothesis; the proven loop is graveyard recurrence after observed zone entries.")
     lines.append("- `Squee` still has an aggregate-loader gap: the verified runtime rule exists in `battle_card_rules`, but the candidate snapshot row keeps `deck_cards.battle_rules_json=[]` for that card.")
     lines.append("- The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.")
@@ -441,7 +448,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"| `{key}` | {value['games']} | {value['wins']} | {value['losses']} | {value['stalls']} | {value['win_rate']:.2f}% | {ev.get('miracle_cast', 0)} | {ev.get('topdeck_manipulation_activated', 0)} | {ev.get('lorehold_spell_cast', 0)} | {ev.get('lorehold_cost_paid', 0)} | {ev.get('squee_to_graveyard', 0)} | {ev.get('squee_upkeep_return', 0)} | {ev.get('squee_return_after_known_graveyard_entry', 0)} | {ev.get('squee_return_without_known_graveyard_entry', 0)} | {ev.get('lorehold_upkeep_rummage', 0)} | {ev.get('lorehold_spell_rummage', 0)} | {ev.get('lorehold_rummage_discards_squee', 0)} |"
         )
     lines.append("")
-    lines.append("Interpretation: under fixed hash-seed, process-isolated, timeout-bounded conditions, the Squee candidate remains the best current candidate across the 3-seed suite, but the result is not final because seed 99 and seed 20260627 were much less favorable than seed 42. The trace evidence still proves every observed `squee_upkeep_return` occurred after an observed Squee graveyard entry, mostly battlefield-to-graveyard movement plus one mill event. It did not prove `lorehold_rummage_discards_squee` or `lorehold_spell_rummage_discards_squee`, so the exact discard-fuel loop remains a targeted next hypothesis rather than a closed fact.")
+    lines.append("Interpretation: under fixed hash-seed, process-isolated, timeout-bounded conditions, the Squee candidate remains the best current candidate across the 10-seed suite, but only by a narrow margin. This is enough to keep studying the package, not enough to promote it as the final list. The trace evidence still proves every observed `squee_upkeep_return` occurred after an observed Squee graveyard entry, mostly battlefield-to-graveyard movement plus one mill event. It did not prove `lorehold_rummage_discards_squee` or `lorehold_spell_rummage_discards_squee`, so the exact discard-fuel loop remains a targeted next hypothesis rather than a closed fact.")
     lines.append("")
     lines.append("## Variant Learning")
     lines.append("")
@@ -621,8 +628,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     general_confirm = load_general_synergy_confirm(args.general_synergy_confirm)
 
     open_questions = [
-        "Scale the trusted gate from the current 3-seed suite to a 5-seed or 10-seed process-isolated suite before promoting the deck as final.",
-        "Diagnose seed sensitivity: seed 42 strongly favors Squee, while seeds 99 and 20260627 show the candidate still leading but at a much lower win rate.",
+        "Diagnose why the 10-seed suite compresses the Squee advantage to only +3 wins over `deck_607`; seed 7 and seed 20260625 are complete Squee failures.",
+        "Treat Squee as a provisional micro-upgrade, not a promoted final deck slot, until a support package or alternative cut shows a larger reproducible edge.",
         "Make all decisive battle gates run with `PYTHONHASHSEED=0`, `--isolate-deck-process`, and per-game timeout; same simulation seed without fixed hash seed/process isolation is not enough for deck promotion.",
         "Review DB-role versus effective-role divergences surfaced by the card-role manifest, especially cards stored as `draw` or `unknown` while functioning as protection, removal, miracle engine, or board wipe.",
         "Separate finalizer slots from engine slots: Insurrection, Storm Herd, Approach, Rise of the Eldrazi, and Aetherflux Reservoir should be benchmarked as closing packages, not generic wincon labels.",
@@ -631,7 +638,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
-        "Run a 5-seed or 10-seed equal gate with `PYTHONHASHSEED=0`, process isolation, and timeout: trusted Squee champion vs `deck_607` vs the source deck 6, same real opponents.",
+        "Build a Squee support/anti-failure diagnostic: compare seed 7 and seed 20260625 traces against seed 42 to learn why Squee sometimes never converts.",
         "Build two narrow packages from 615: one Birgi/ritual package and one topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "If a candidate uses a rule missing from aggregated deck rows, run the battle-card-specific test plus one replay trace before trusting the battle result.",
