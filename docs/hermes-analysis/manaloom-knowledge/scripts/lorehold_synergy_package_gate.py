@@ -231,6 +231,17 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "cuts": ["Storm Herd"],
         "allow_miracle_core_cuts": True,
     },
+    "core_challenge_aetherflux_over_storm": {
+        "family": "payoff_challenge",
+        "hypothesis": (
+            "Aetherflux Reservoir may convert Lorehold's spell-chain turns into "
+            "a deterministic life-gain and 50-damage finish while preserving the "
+            "expensive instant/sorcery package outside the Storm Herd slot."
+        ),
+        "adds": ["Aetherflux Reservoir"],
+        "cuts": ["Storm Herd"],
+        "allow_miracle_core_cuts": True,
+    },
     "core_challenge_past_over_tragic": {
         "family": "payoff_challenge",
         "hypothesis": (

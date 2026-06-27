@@ -53,6 +53,13 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             gate.PACKAGE_DEFINITIONS["penance_topdeck_protection_cut_squelcher"]["family"],
             "topdeck_protection",
         )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
+            ["Storm Herd"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["allow_miracle_core_cuts"],
+        )
 
     def test_strategic_delta_includes_squee_metrics(self):
         payload = {

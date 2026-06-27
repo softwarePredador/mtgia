@@ -797,7 +797,7 @@
         "card_name": "Storm Herd",
         "db_role": "wincon",
         "decision": "finisher_benchmark_lane",
-        "decision_reason": "expensive token finisher; compare against alternate finishers as a package, not as generic filler",
+        "decision_reason": "expensive token finisher; current Storm Herd slot beat Dance with Calamity and Aetherflux Reservoir in aggregate finalizer gates",
         "effective_role": "wincon",
         "package_lane": "finisher_or_big_spell",
         "quantity": 1,
@@ -19446,7 +19446,7 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T17:21:02Z",
+  "generated_at": "2026-06-27T17:28:10Z",
   "matrix_generated_at": "2026-06-26T17:59:59.926705+00:00",
   "matrix_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json",
   "matrix_ranked": [
@@ -26206,7 +26206,7 @@
     "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
     "Build one topdeck consistency package against the 607+Squee champion, because seed 42 wins with topdeck=30/miracle=33 while the failure seeds are topdeck-poor.",
     "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
-    "Retest Galvanoth only as a probation topdeck-freecast hypothesis with a better cut than Bender's Waterskin, because the current gate is aggregate-positive but breaks seed 42.",
+    "Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.",
     "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
     "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
     "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
@@ -26218,7 +26218,7 @@
     "Make all decisive battle gates run with `PYTHONHASHSEED=0`, `--isolate-deck-process`, and per-game timeout; same simulation seed without fixed hash seed/process isolation is not enough for deck promotion.",
     "Review DB-role versus effective-role divergences surfaced by the card-role manifest, especially cards stored as `draw` or `unknown` while functioning as protection, removal, miracle engine, or board wipe.",
     "`Thor, God of Thunder` now has a local reviewed runtime rule and one natural synced-rule battle exposure for 7 damage, but the checked 21-game candidate sample had +0.00 pp win-rate delta; keep it as modeled-but-not-proven until a stratified or larger gate proves deck value.",
-    "Separate finalizer slots from engine slots: Insurrection, Storm Herd, Approach, Rise of the Eldrazi, and Aetherflux Reservoir should be benchmarked as closing packages, not generic wincon labels.",
+    "Separate finalizer slots from engine slots: Dance with Calamity and Aetherflux Reservoir have now failed the Storm Herd slot benchmark; remaining finalizer work should focus on other closing packages or different cuts, not repeating those two swaps.",
     "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
     "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family."
   ],
@@ -26232,7 +26232,10 @@
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json",
-      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed20260625_hash0_isolated_timeout_galvanoth_cut_chimes.json"
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed20260625_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json"
     ],
     "per_seed": [
       {
@@ -26885,6 +26888,192 @@
           "squee_upkeep_return": 6,
           "topdeck_manipulation_activated": 10
         }
+      },
+      {
+        "adds": [
+          "Dance with Calamity"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 9,
+        "candidate_wins": 0,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "delta_pp": -88.89,
+        "family": "payoff_challenge",
+        "package_key": "core_challenge_dance_over_storm",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -82,
+          "lorehold_spell_cast": -63,
+          "lorehold_spell_rummage": -14,
+          "lorehold_upkeep_rummage": 3,
+          "miracle_cast": -22,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -5,
+          "squee_to_graveyard": -7,
+          "squee_upkeep_return": -5,
+          "topdeck_manipulation_activated": -21
+        }
+      },
+      {
+        "adds": [
+          "Aetherflux Reservoir"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "delta_pp": -66.67,
+        "family": "payoff_challenge",
+        "package_key": "core_challenge_aetherflux_over_storm",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -53,
+          "lorehold_spell_cast": -40,
+          "lorehold_spell_rummage": -19,
+          "lorehold_upkeep_rummage": 2,
+          "miracle_cast": -22,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -3,
+          "squee_to_graveyard": -4,
+          "squee_upkeep_return": -3,
+          "topdeck_manipulation_activated": -20
+        }
+      },
+      {
+        "adds": [
+          "Dance with Calamity"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 6,
+        "candidate_wins": 3,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "delta_pp": 33.33,
+        "family": "payoff_challenge",
+        "package_key": "core_challenge_dance_over_storm",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 56,
+          "lorehold_spell_cast": 46,
+          "lorehold_spell_rummage": 5,
+          "lorehold_upkeep_rummage": 4,
+          "miracle_cast": 20,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 1,
+          "squee_to_graveyard": 2,
+          "squee_upkeep_return": 1,
+          "topdeck_manipulation_activated": 22
+        }
+      },
+      {
+        "adds": [
+          "Aetherflux Reservoir"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 8,
+        "candidate_wins": 1,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "delta_pp": 11.11,
+        "family": "payoff_challenge",
+        "package_key": "core_challenge_aetherflux_over_storm",
+        "seed": 7,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 20,
+          "lorehold_spell_cast": 20,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 10,
+          "miracle_cast": 8,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 3
+        }
+      },
+      {
+        "adds": [
+          "Dance with Calamity"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 5,
+        "candidate_wins": 4,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "delta_pp": 44.44,
+        "family": "payoff_challenge",
+        "package_key": "core_challenge_dance_over_storm",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 60,
+          "lorehold_spell_cast": 54,
+          "lorehold_spell_rummage": 0,
+          "lorehold_upkeep_rummage": -20,
+          "miracle_cast": 20,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 2,
+          "squee_to_graveyard": 2,
+          "squee_upkeep_return": 2,
+          "topdeck_manipulation_activated": 24
+        }
+      },
+      {
+        "adds": [
+          "Aetherflux Reservoir"
+        ],
+        "baseline_losses": 9,
+        "baseline_wins": 0,
+        "candidate_losses": 7,
+        "candidate_wins": 2,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "delta_pp": 22.22,
+        "family": "payoff_challenge",
+        "package_key": "core_challenge_aetherflux_over_storm",
+        "seed": 20260625,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 23,
+          "lorehold_spell_cast": 29,
+          "lorehold_spell_rummage": 5,
+          "lorehold_upkeep_rummage": 1,
+          "miracle_cast": 11,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": 0,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 3
+        }
       }
     ],
     "rows": [
@@ -27147,6 +27336,136 @@
           "topdeck_manipulation_activated": -14
         },
         "strong_seed_delta_pp": -55.56
+      },
+      {
+        "adds": [
+          "Dance with Calamity"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 20,
+        "candidate_win_rate": 25.93,
+        "candidate_wins": 7,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -3.7,
+        "family": "payoff_challenge",
+        "package_key": "core_challenge_dance_over_storm",
+        "seed_rows": [
+          {
+            "adds": [
+              "Dance with Calamity"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 9,
+            "candidate_wins": 0,
+            "cuts": [
+              "Storm Herd"
+            ],
+            "delta_pp": -88.89,
+            "family": "payoff_challenge",
+            "package_key": "core_challenge_dance_over_storm",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -82,
+              "lorehold_spell_cast": -63,
+              "lorehold_spell_rummage": -14,
+              "lorehold_upkeep_rummage": 3,
+              "miracle_cast": -22,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -5,
+              "squee_to_graveyard": -7,
+              "squee_upkeep_return": -5,
+              "topdeck_manipulation_activated": -21
+            }
+          },
+          {
+            "adds": [
+              "Dance with Calamity"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "cuts": [
+              "Storm Herd"
+            ],
+            "delta_pp": 33.33,
+            "family": "payoff_challenge",
+            "package_key": "core_challenge_dance_over_storm",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 56,
+              "lorehold_spell_cast": 46,
+              "lorehold_spell_rummage": 5,
+              "lorehold_upkeep_rummage": 4,
+              "miracle_cast": 20,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 1,
+              "squee_to_graveyard": 2,
+              "squee_upkeep_return": 1,
+              "topdeck_manipulation_activated": 22
+            }
+          },
+          {
+            "adds": [
+              "Dance with Calamity"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 5,
+            "candidate_wins": 4,
+            "cuts": [
+              "Storm Herd"
+            ],
+            "delta_pp": 44.44,
+            "family": "payoff_challenge",
+            "package_key": "core_challenge_dance_over_storm",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 60,
+              "lorehold_spell_cast": 54,
+              "lorehold_spell_rummage": 0,
+              "lorehold_upkeep_rummage": -20,
+              "miracle_cast": 20,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 2,
+              "squee_to_graveyard": 2,
+              "squee_upkeep_return": 2,
+              "topdeck_manipulation_activated": 24
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": 34,
+          "lorehold_spell_cast": 37,
+          "lorehold_spell_rummage": -9,
+          "lorehold_upkeep_rummage": -13,
+          "miracle_cast": 18,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -2,
+          "squee_to_graveyard": -3,
+          "squee_upkeep_return": -2,
+          "topdeck_manipulation_activated": 25
+        },
+        "strong_seed_delta_pp": -88.89
       },
       {
         "adds": [
@@ -27667,6 +27986,136 @@
           "topdeck_manipulation_activated": -1
         },
         "strong_seed_delta_pp": -44.45
+      },
+      {
+        "adds": [
+          "Aetherflux Reservoir"
+        ],
+        "baseline_games": 27,
+        "baseline_losses": 19,
+        "baseline_win_rate": 29.63,
+        "baseline_wins": 8,
+        "candidate_games": 27,
+        "candidate_losses": 22,
+        "candidate_win_rate": 18.52,
+        "candidate_wins": 5,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -11.11,
+        "family": "payoff_challenge",
+        "package_key": "core_challenge_aetherflux_over_storm",
+        "seed_rows": [
+          {
+            "adds": [
+              "Aetherflux Reservoir"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Storm Herd"
+            ],
+            "delta_pp": -66.67,
+            "family": "payoff_challenge",
+            "package_key": "core_challenge_aetherflux_over_storm",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -53,
+              "lorehold_spell_cast": -40,
+              "lorehold_spell_rummage": -19,
+              "lorehold_upkeep_rummage": 2,
+              "miracle_cast": -22,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -3,
+              "squee_to_graveyard": -4,
+              "squee_upkeep_return": -3,
+              "topdeck_manipulation_activated": -20
+            }
+          },
+          {
+            "adds": [
+              "Aetherflux Reservoir"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 8,
+            "candidate_wins": 1,
+            "cuts": [
+              "Storm Herd"
+            ],
+            "delta_pp": 11.11,
+            "family": "payoff_challenge",
+            "package_key": "core_challenge_aetherflux_over_storm",
+            "seed": 7,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 20,
+              "lorehold_spell_cast": 20,
+              "lorehold_spell_rummage": 2,
+              "lorehold_upkeep_rummage": 10,
+              "miracle_cast": 8,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 3
+            }
+          },
+          {
+            "adds": [
+              "Aetherflux Reservoir"
+            ],
+            "baseline_losses": 9,
+            "baseline_wins": 0,
+            "candidate_losses": 7,
+            "candidate_wins": 2,
+            "cuts": [
+              "Storm Herd"
+            ],
+            "delta_pp": 22.22,
+            "family": "payoff_challenge",
+            "package_key": "core_challenge_aetherflux_over_storm",
+            "seed": 20260625,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 23,
+              "lorehold_spell_cast": 29,
+              "lorehold_spell_rummage": 5,
+              "lorehold_upkeep_rummage": 1,
+              "miracle_cast": 11,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 3
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -10,
+          "lorehold_spell_cast": 9,
+          "lorehold_spell_rummage": -12,
+          "lorehold_upkeep_rummage": 13,
+          "miracle_cast": -3,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -3,
+          "squee_to_graveyard": -4,
+          "squee_upkeep_return": -3,
+          "topdeck_manipulation_activated": -14
+        },
+        "strong_seed_delta_pp": -66.67
       },
       {
         "adds": [
