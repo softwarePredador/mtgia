@@ -69,12 +69,18 @@ DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
     REPORT_DIR / "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json",
     REPORT_DIR / "lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1.json",
+    REPORT_DIR / "lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1.json",
+    REPORT_DIR / "lorehold_life_floor_conversion_gate_20260627_seed7_v1_life_floor_v1.json",
+    REPORT_DIR / "lorehold_life_floor_conversion_gate_20260627_seed20260625_v1_life_floor_v1.json",
 ]
 DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed42_squee_v1.json",
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed20260625_squee_v1.json",
 ]
+DEFAULT_LOSS_FAILURE_CLASSIFIER = (
+    REPORT_DIR / "lorehold_loss_failure_classifier_20260627_library_pressure_v1.json"
+)
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
 EXTERNAL_METHOD_SOURCES = [
@@ -645,6 +651,8 @@ def current_champion_key(squee_summary: dict[str, Any]) -> str:
 def render_markdown(report: dict[str, Any]) -> str:
     library_leng = report.get("library_leng_telemetry_gates") or {}
     library_leng_rows = library_leng.get("rows") or []
+    loss_classifier = report.get("loss_failure_classifier") or {}
+    loss_summary_rows = loss_classifier.get("summary_rows") or []
     lines: list[str] = []
     lines.append("# Lorehold Strategy Learning Audit - 2026-06-27")
     lines.append("")
@@ -751,6 +759,38 @@ def render_markdown(report: dict[str, Any]) -> str:
                 f"but broke seed 42 by `{brainstone['strong_seed_delta_pp']:+.2f}` pp; "
                 f"`Ghostly Prison` was `{ghostly['delta_pp']:+.2f}` pp and "
                 f"`The One Ring` was `{one_ring['delta_pp']:+.2f}` pp. None promotes from this evidence."
+            )
+        angel = next((row for row in post_squee_rows if row["package_key"] == "angel_grace_life_floor_cut_dawn"), None)
+        if angel:
+            lines.append(
+                "- Angel's Grace life-floor retest also rejects the intuitive cheap-protection swap: "
+                f"`{angel['candidate_wins']}-{angel['candidate_losses']}` vs "
+                f"`{angel['baseline_wins']}-{angel['baseline_losses']}` (`{angel['delta_pp']:+.2f}` pp) "
+                f"and seed 42 moved `{angel['strong_seed_delta_pp']:+.2f}` pp."
+            )
+    if loss_summary_rows:
+        baseline_7 = next(
+            (
+                row
+                for row in loss_summary_rows
+                if row.get("seed") == 7 and row.get("package_key") == "baseline_squee_champion"
+            ),
+            None,
+        )
+        baseline_20260625 = next(
+            (
+                row
+                for row in loss_summary_rows
+                if row.get("seed") == 20260625 and row.get("package_key") == "baseline_squee_champion"
+            ),
+            None,
+        )
+        if baseline_7 and baseline_20260625:
+            lines.append(
+                "- Loss classifier is now the driver for the next swap: baseline seed 7 losses are mostly "
+                f"`{json.dumps(baseline_7.get('primary_cause_counts', {}), sort_keys=True)}`, while seed 20260625 losses are "
+                f"`{json.dumps(baseline_20260625.get('primary_cause_counts', {}), sort_keys=True)}`. "
+                "Every classified baseline loss carries the combat-pressure death flag, so the next package must improve early survival without breaking the seed-42 engine pattern."
             )
     if library_leng_rows:
         seed42 = next((row for row in library_leng_rows if row.get("seed") == 42), None)
@@ -867,6 +907,43 @@ def render_markdown(report: dict[str, Any]) -> str:
             "Interpretation: Library of Leng is not a missing runtime feature anymore; it is a measurable engine. "
             "Seed 42 shows the intended conversion pattern, seed 7 lacks the engine almost entirely, and seed 20260625 proves that repeated Approach-to-top loops can still fail under fast life-total pressure. "
             "The next deck work should pair topdeck consistency with either faster protection/pressure absorption or a cleaner second-Approach/finisher conversion, rather than treating discard-to-top alone as the solution."
+        )
+        lines.append("")
+    if loss_summary_rows:
+        lines.append("## Loss Failure Classifier")
+        lines.append("")
+        lines.append(f"- Source: `{report.get('loss_failure_classifier_path')}`")
+        lines.append(
+            "- Read: this classifier uses per-game observed events over stale reason text; for example, an `approach_cast_tracked` event outranks a legacy `found=False` reason string."
+        )
+        lines.append("")
+        lines.append("| Seed | Package | Deck | Losses | Avg Loss Turn | Primary Causes | Pressure | Approach | Discard-Top | Topdeck | Miracle | Low Spell |")
+        lines.append("| ---: | --- | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |")
+        for row in loss_summary_rows:
+            flags = row.get("flag_counts") or {}
+            causes = ", ".join(
+                f"{key}={value}"
+                for key, value in sorted((row.get("primary_cause_counts") or {}).items())
+            )
+            lines.append(
+                "| {seed} | `{package}` | `{deck}` | {losses} | {avg:.2f} | {causes} | {pressure} | {approach} | {discard_top} | {topdeck} | {miracle} | {low_spell} |".format(
+                    seed=row.get("seed"),
+                    package=row.get("package_key"),
+                    deck=row.get("deck_key"),
+                    losses=row.get("losses"),
+                    avg=float(row.get("avg_loss_turn") or 0),
+                    causes=causes,
+                    pressure=flags.get("combat_pressure_death", 0),
+                    approach=flags.get("approach_seen", 0),
+                    discard_top=flags.get("discard_to_top_seen", 0),
+                    topdeck=flags.get("topdeck_seen", 0),
+                    miracle=flags.get("miracle_seen", 0),
+                    low_spell=flags.get("low_spell_volume", 0),
+                )
+            )
+        lines.append("")
+        lines.append(
+            "Interpretation: the problem is not a single missing prison/tax card. The failure mode alternates between no early engine, low early spell volume, and engine without Approach conversion, but all checked losses still die through combat-pressure/life-zero. `Angel's Grace` proves a one-mana life-floor can help the weak 20260625 seed, yet it destroys the seed-42 success pattern when it replaces Dawn's Truce; the next test needs to preserve the existing protection shell and change a less structurally important slot."
         )
         lines.append("")
     if materialization:
@@ -1047,7 +1124,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                 )
             )
         lines.append("")
-        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
+        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
         lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")
@@ -1418,6 +1495,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     thor_rule_gate_audit = read_json(args.thor_rule_gate_audit)
     post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
     library_leng_telemetry_gates = aggregate_library_leng_telemetry_gates(args.library_leng_telemetry_gate)
+    loss_failure_classifier = read_json(args.loss_failure_classifier)
     card_decision_manifest = build_card_decision_manifest(
         deck_summaries.get("6") or {},
         unresolved_rule_rows_audit,
@@ -1436,11 +1514,13 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.",
         "Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.",
         "The first Library/pressure retest rejected Brainstone, Ghostly Prison, and The One Ring over Hexing Squelcher; future tests need a new cut logic or a narrower per-game failure target.",
+        "Angel's Grace over Dawn's Truce confirms that one-mana life-floor protection can improve a weak seed but is not free; cutting the existing protection shell breaks seed 42 completely.",
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
-        "Run a per-game failure classifier for seeds 7 and 20260625: classify losses as missing Library/topdeck, topdeck without miracle conversion, second-Approach blocked, combat-pressure death, or mana bottleneck before choosing the next swap.",
+        "Build the next pressure/conversion package only after selecting a cut that preserves Dawn's Truce, Teferi's Protection, High Noon, Hexing Squelcher, Storm Herd, and the three-mana ramp shell unless a direct same-slot benchmark proves otherwise.",
         "Do not repeat Brainstone, Ghostly Prison, or The One Ring over Hexing Squelcher from the current evidence; only retest them if the failure classifier identifies a different cut or a narrower matchup-specific role.",
+        "Do not promote Angel's Grace over Dawn's Truce; any future Angel's Grace test must be a different cut and must preserve seed 42.",
         "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
         "Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.",
         "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
@@ -1475,6 +1555,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "general_synergy_confirm": general_confirm,
         "post_squee_package_gates": post_squee_package_gates,
         "library_leng_telemetry_gates": library_leng_telemetry_gates,
+        "loss_failure_classifier_path": str(args.loss_failure_classifier),
+        "loss_failure_classifier": loss_failure_classifier,
         "card_decision_manifest": card_decision_manifest,
         "open_questions": open_questions,
         "next_gates": next_gates,
@@ -1510,6 +1592,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
     parser.add_argument("--post-squee-package-gate", type=Path, action="append")
     parser.add_argument("--library-leng-telemetry-gate", type=Path, action="append")
+    parser.add_argument("--loss-failure-classifier", type=Path, default=DEFAULT_LOSS_FAILURE_CLASSIFIER)
     parser.add_argument("--deck-ids", default=",".join(str(value) for value in DEFAULT_DECK_IDS))
     parser.add_argument("--stem", default="lorehold_strategy_learning_audit_20260627_v1")
     return parser.parse_args()

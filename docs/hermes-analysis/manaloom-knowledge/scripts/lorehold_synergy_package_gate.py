@@ -152,6 +152,18 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Ghostly Prison"],
         "cuts": ["Hexing Squelcher"],
     },
+    "angel_grace_life_floor_cut_dawn": {
+        "family": "life_floor_protection",
+        "hypothesis": (
+            "The loss classifier shows early life-zero deaths even when the deck "
+            "sometimes finds topdeck or Approach setup. Angel's Grace is a one-mana "
+            "life-floor effect with executable runtime rules; this tests a same-lane "
+            "protection swap over Dawn's Truce without cutting ramp, High Noon, "
+            "Hexing Squelcher, or Storm Herd."
+        ),
+        "adds": ["Angel's Grace"],
+        "cuts": ["Dawn's Truce"],
+    },
     "primal_amulet_spell_engine": {
         "family": "cost_reduce_copy",
         "hypothesis": (

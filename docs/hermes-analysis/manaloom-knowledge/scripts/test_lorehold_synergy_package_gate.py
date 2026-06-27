@@ -66,6 +66,14 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "pressure_absorber",
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["angel_grace_life_floor_cut_dawn"]["cuts"],
+            ["Dawn's Truce"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["angel_grace_life_floor_cut_dawn"]["family"],
+            "life_floor_protection",
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )

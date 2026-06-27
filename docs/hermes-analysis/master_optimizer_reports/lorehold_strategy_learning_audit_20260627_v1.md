@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T17:56:05Z`
+- Generated at: `2026-06-27T18:10:29Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -31,6 +31,8 @@ Operationally, a better deck must increase at least one of these without breakin
 - Birgi is now instrumented and produced `+13` spell-cast mana triggers, but its aggregate result was `7-20` vs baseline `8-19` (`-3.70` pp); mana telemetry alone is not enough to promote it.
 - Penance is not a proven topdeck engine yet: observed `hand_to_topdeck_activation` delta was `+0` and the package lost `-7.41` pp aggregate.
 - Library/pressure conversion retest is now closed for the first pass: `Brainstone` over Hexing Squelcher finished `8-19` vs `8-19` (`+0.00` pp) but broke seed 42 by `-77.78` pp; `Ghostly Prison` was `-3.70` pp and `The One Ring` was `-14.82` pp. None promotes from this evidence.
+- Angel's Grace life-floor retest also rejects the intuitive cheap-protection swap: `3-24` vs `8-19` (`-18.52` pp) and seed 42 moved `-88.89` pp.
+- Loss classifier is now the driver for the next swap: baseline seed 7 losses are mostly `{"mana_spell_bottleneck_under_pressure": 3, "missing_engine_under_combat_pressure": 2, "topdeck_miracle_without_approach_under_pressure": 4}`, while seed 20260625 losses are `{"mana_spell_bottleneck_under_pressure": 4, "missing_engine_under_combat_pressure": 1, "second_approach_window_failed_under_pressure": 1, "topdeck_miracle_without_approach_under_pressure": 2, "topdeck_without_miracle_conversion_under_pressure": 1}`. Every classified baseline loss carries the combat-pressure death flag, so the next package must improve early survival without breaking the seed-42 engine pattern.
 - Library of Leng / discard-to-top telemetry is now visible in gates: seed 42 went `8-1` with `16` discard-to-top replacements, `30` topdeck activations, and `33` miracle casts.
 - Failure seeds split into two problems: seed 7 had `0` discard-to-top replacements, while seed 20260625 had `14` replacements but still went `0-9`; the issue is not only finding Library of Leng, but converting the topdecked card into survival or a second Approach window.
 
@@ -107,6 +109,31 @@ These gates rerun the Squee champion with the battle gate instrumented for disca
 Aggregate read: `8-19-0` over `27` games, with `30` discard-to-top replacements, `35` topdeck activations, and `41` miracle casts.
 Top discard-to-top signals: `discard_to_top:Deflecting Swat`=7, `lorehold_rummage_to_top:Approach of the Second Sun`=7, `discard_to_top:Approach of the Second Sun`=7, `lorehold_rummage_to_top:Deflecting Swat`=6, `lorehold_rummage_to_top:Dawn's Truce`=3, `discard_to_top:Dawn's Truce`=3.
 Interpretation: Library of Leng is not a missing runtime feature anymore; it is a measurable engine. Seed 42 shows the intended conversion pattern, seed 7 lacks the engine almost entirely, and seed 20260625 proves that repeated Approach-to-top loops can still fail under fast life-total pressure. The next deck work should pair topdeck consistency with either faster protection/pressure absorption or a cleaner second-Approach/finisher conversion, rather than treating discard-to-top alone as the solution.
+
+## Loss Failure Classifier
+
+- Source: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_loss_failure_classifier_20260627_library_pressure_v1.json`
+- Read: this classifier uses per-game observed events over stale reason text; for example, an `approach_cast_tracked` event outranks a legacy `found=False` reason string.
+
+| Seed | Package | Deck | Losses | Avg Loss Turn | Primary Causes | Pressure | Approach | Discard-Top | Topdeck | Miracle | Low Spell |
+| ---: | --- | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 7 | `angel_grace_life_floor_cut_dawn` | `synergy_angel_grace_life_floor_cut_dawn` | 9 | 7.33 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=5, topdeck_miracle_without_approach_under_pressure=2, topdeck_without_miracle_conversion_under_pressure=1 | 9 | 0 | 3 | 0 | 2 | 1 |
+| 7 | `baseline_squee_champion` | `deck_6` | 9 | 6.33 | mana_spell_bottleneck_under_pressure=3, missing_engine_under_combat_pressure=2, topdeck_miracle_without_approach_under_pressure=4 | 9 | 0 | 0 | 1 | 4 | 5 |
+| 7 | `brainstone_topdeck_miracle_cut_squelcher` | `synergy_brainstone_topdeck_miracle_cut_squelcher` | 7 | 6.86 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, topdeck_miracle_without_approach_under_pressure=2, topdeck_without_miracle_conversion_under_pressure=2 | 7 | 0 | 1 | 2 | 2 | 2 |
+| 7 | `ghostly_prison_pressure_cut_squelcher` | `synergy_ghostly_prison_pressure_cut_squelcher` | 7 | 7.57 | mana_spell_bottleneck_under_pressure=2, missing_engine_under_combat_pressure=1, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=3 | 7 | 1 | 0 | 1 | 4 | 3 |
+| 7 | `one_ring_protection_draw_cut_squelcher` | `synergy_one_ring_protection_draw_cut_squelcher` | 9 | 7.33 | mana_spell_bottleneck_under_pressure=2, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=4, topdeck_without_miracle_conversion_under_pressure=2 | 9 | 1 | 0 | 4 | 4 | 3 |
+| 42 | `angel_grace_life_floor_cut_dawn` | `synergy_angel_grace_life_floor_cut_dawn` | 9 | 7.44 | mana_spell_bottleneck_under_pressure=2, missing_engine_under_combat_pressure=1, second_approach_window_failed_under_pressure=2, topdeck_miracle_without_approach_under_pressure=3, topdeck_without_miracle_conversion_under_pressure=1 | 9 | 2 | 1 | 2 | 5 | 3 |
+| 42 | `baseline_squee_champion` | `deck_6` | 1 | 6.00 | missing_engine_under_combat_pressure=1 | 1 | 0 | 0 | 0 | 0 | 0 |
+| 42 | `brainstone_topdeck_miracle_cut_squelcher` | `synergy_brainstone_topdeck_miracle_cut_squelcher` | 8 | 7.88 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=1, topdeck_miracle_without_approach_under_pressure=4, topdeck_without_miracle_conversion_under_pressure=2 | 8 | 0 | 2 | 2 | 4 | 2 |
+| 42 | `ghostly_prison_pressure_cut_squelcher` | `synergy_ghostly_prison_pressure_cut_squelcher` | 6 | 6.83 | mana_spell_bottleneck_under_pressure=2, missing_engine_under_combat_pressure=3, topdeck_miracle_without_approach_under_pressure=1 | 6 | 0 | 0 | 0 | 1 | 3 |
+| 42 | `one_ring_protection_draw_cut_squelcher` | `synergy_one_ring_protection_draw_cut_squelcher` | 8 | 7.38 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=4 | 8 | 1 | 0 | 1 | 4 | 1 |
+| 20260625 | `angel_grace_life_floor_cut_dawn` | `synergy_angel_grace_life_floor_cut_dawn` | 6 | 7.00 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=2 | 6 | 1 | 0 | 1 | 3 | 2 |
+| 20260625 | `baseline_squee_champion` | `deck_6` | 9 | 7.00 | mana_spell_bottleneck_under_pressure=4, missing_engine_under_combat_pressure=1, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=2, topdeck_without_miracle_conversion_under_pressure=1 | 9 | 1 | 3 | 1 | 2 | 5 |
+| 20260625 | `brainstone_topdeck_miracle_cut_squelcher` | `synergy_brainstone_topdeck_miracle_cut_squelcher` | 4 | 7.25 | second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=3 | 4 | 1 | 2 | 1 | 3 | 1 |
+| 20260625 | `ghostly_prison_pressure_cut_squelcher` | `synergy_ghostly_prison_pressure_cut_squelcher` | 7 | 7.29 | mana_spell_bottleneck_under_pressure=4, missing_engine_under_combat_pressure=1, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=1 | 7 | 1 | 1 | 0 | 1 | 4 |
+| 20260625 | `one_ring_protection_draw_cut_squelcher` | `synergy_one_ring_protection_draw_cut_squelcher` | 6 | 7.67 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=2 | 6 | 1 | 0 | 2 | 3 | 1 |
+
+Interpretation: the problem is not a single missing prison/tax card. The failure mode alternates between no early engine, low early spell volume, and engine without Approach conversion, but all checked losses still die through combat-pressure/life-zero. `Angel's Grace` proves a one-mana life-floor can help the weak 20260625 seed, yet it destroys the seed-42 success pattern when it replaces Dawn's Truce; the next test needs to preserve the existing protection shell and change a less structurally important slot.
 
 ## Squee Rule Materialization Audit
 
@@ -212,8 +239,9 @@ These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=
 | `core_challenge_aetherflux_over_storm` | Aetherflux Reservoir | Storm Herd | 8-19 | 5-22 | -11.11 | -66.67 | -3 | -14 | +0 | +0 | +0 | +0 | +9 | +0 | +0 | -4 | -3 | reject_or_rework |
 | `faithless_looting_squee_enabler` | Faithless Looting | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -66.67 | +4 | +6 | +0 | +0 | +0 | +0 | +25 | +0 | +0 | -5 | -3 | reject_or_rework |
 | `one_ring_protection_draw_cut_squelcher` | The One Ring | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -77.78 | -9 | -17 | -30 | -27 | -3 | +0 | -7 | +0 | +0 | -3 | -2 | reject_or_rework |
+| `angel_grace_life_floor_cut_dawn` | Angel's Grace | Dawn's Truce | 8-19 | 3-24 | -18.52 | -88.89 | -7 | -8 | -8 | -10 | +2 | +0 | +1 | +0 | +0 | -1 | -1 | reject_or_rework |
 
-Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.
+Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.
 
 ## Current Champion Card-Role Coverage
 
@@ -242,12 +270,14 @@ Read: Brainstone can improve weak seeds when it preserves the ramp shell, but th
 - Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.
 - Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.
 - The first Library/pressure retest rejected Brainstone, Ghostly Prison, and The One Ring over Hexing Squelcher; future tests need a new cut logic or a narrower per-game failure target.
+- Angel's Grace over Dawn's Truce confirms that one-mana life-floor protection can improve a weak seed but is not free; cutting the existing protection shell breaks seed 42 completely.
 
 ## Next Gates
 
 - Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.
-- Run a per-game failure classifier for seeds 7 and 20260625: classify losses as missing Library/topdeck, topdeck without miracle conversion, second-Approach blocked, combat-pressure death, or mana bottleneck before choosing the next swap.
+- Build the next pressure/conversion package only after selecting a cut that preserves Dawn's Truce, Teferi's Protection, High Noon, Hexing Squelcher, Storm Herd, and the three-mana ramp shell unless a direct same-slot benchmark proves otherwise.
 - Do not repeat Brainstone, Ghostly Prison, or The One Ring over Hexing Squelcher from the current evidence; only retest them if the failure classifier identifies a different cut or a narrower matchup-specific role.
+- Do not promote Angel's Grace over Dawn's Truce; any future Angel's Grace test must be a different cut and must preserve seed 42.
 - Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.
 - Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.
 - Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.
