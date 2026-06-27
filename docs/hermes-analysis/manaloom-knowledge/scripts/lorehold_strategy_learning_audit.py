@@ -72,6 +72,9 @@ DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1.json",
     REPORT_DIR / "lorehold_life_floor_conversion_gate_20260627_seed7_v1_life_floor_v1.json",
     REPORT_DIR / "lorehold_life_floor_conversion_gate_20260627_seed20260625_v1_life_floor_v1.json",
+    REPORT_DIR / "lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1.json",
+    REPORT_DIR / "lorehold_spellchain_conversion_gate_20260627_seed7_v1_spellchain_v1.json",
+    REPORT_DIR / "lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1.json",
 ]
 DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
@@ -79,7 +82,7 @@ DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
     REPORT_DIR / "lorehold_library_leng_telemetry_gate_20260627_seed20260625_squee_v1.json",
 ]
 DEFAULT_LOSS_FAILURE_CLASSIFIER = (
-    REPORT_DIR / "lorehold_loss_failure_classifier_20260627_library_pressure_v1.json"
+    REPORT_DIR / "lorehold_loss_failure_classifier_20260627_conversion_pressure_v2.json"
 )
 DEFAULT_DECK_IDS = [6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]
 
@@ -88,6 +91,16 @@ EXTERNAL_METHOD_SOURCES = [
         "name": "EDHREC Lorehold commander page",
         "url": "https://edhrec.com/commanders/lorehold-the-historian",
         "use": "commander-specific package comparison lane",
+    },
+    {
+        "name": "EDHREC Lorehold cEDH average deck",
+        "url": "https://edhrec.com/average-decks/lorehold-the-historian/cedh",
+        "use": "external cross-check for ritual package, Birgi, Seething Song, and medallion retention",
+    },
+    {
+        "name": "Reddit EDHBrews Lorehold thread",
+        "url": "https://www.reddit.com/r/EDHBrews/comments/1s8q5nm/lorehold_the_historian/",
+        "use": "player-reported failure mode: fizzling, gas depletion, and difficulty finding a win condition",
     },
     {
         "name": "EDHREC spellslinger Commander guide",
@@ -457,6 +470,7 @@ def aggregate_post_squee_package_gates(paths: list[Path]) -> dict[str, Any]:
         "lorehold_spell_cast",
         "spell_cast_mana_trigger",
         "birgi_spell_cast_mana",
+        "ritual_mana_added",
         "lorehold_spell_rummage",
         "lorehold_upkeep_rummage",
         "miracle_cast",
@@ -480,7 +494,9 @@ def aggregate_post_squee_package_gates(paths: list[Path]) -> dict[str, Any]:
             baseline = gate.get("baseline") or {}
             candidate = gate.get("candidate") or {}
             baseline_events = (baseline.get("telemetry") or {}).get("strategic_event_counts") or {}
+            baseline_raw_events = (baseline.get("telemetry") or {}).get("event_counts") or {}
             candidate_events = (candidate.get("telemetry") or {}).get("strategic_event_counts") or {}
+            candidate_raw_events = (candidate.get("telemetry") or {}).get("event_counts") or {}
             seed_row = {
                 "source": str(path),
                 "seed": seed,
@@ -494,7 +510,8 @@ def aggregate_post_squee_package_gates(paths: list[Path]) -> dict[str, Any]:
                 "candidate_losses": int(candidate.get("losses") or 0),
                 "delta_pp": float(gate.get("delta_pp") or 0.0),
                 "strategic_delta": {
-                    metric: int(candidate_events.get(metric) or 0) - int(baseline_events.get(metric) or 0)
+                    metric: int(candidate_events.get(metric) or candidate_raw_events.get(metric) or 0)
+                    - int(baseline_events.get(metric) or baseline_raw_events.get(metric) or 0)
                     for metric in metrics
                 },
             }
@@ -716,7 +733,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     if post_squee_rows:
         best = post_squee_rows[0]
         lines.append(
-            "- Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, and Penance against the Squee champion. "
+            "- Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, Seething Song, and Penance against the Squee champion. "
             f"Best aggregate was `{best['package_key']}` at `{best['candidate_wins']}-{best['candidate_losses']}` "
             f"vs baseline `{best['baseline_wins']}-{best['baseline_losses']}` (`{best['delta_pp']:+.2f}` pp), "
             f"but seed 42 moved `{best['strong_seed_delta_pp']:+.2f}` pp, so it is not an automatic deck promotion."
@@ -733,6 +750,21 @@ def render_markdown(report: dict[str, Any]) -> str:
                 f"but its aggregate result was `{birgi['candidate_wins']}-{birgi['candidate_losses']}` "
                 f"vs baseline `{birgi['baseline_wins']}-{birgi['baseline_losses']}` (`{birgi['delta_pp']:+.2f}` pp); "
                 "mana telemetry alone is not enough to promote it."
+            )
+        birgi_ritual = next(
+            (row for row in post_squee_rows if row["package_key"] == "birgi_seething_chain_cut_medallions"),
+            None,
+        )
+        if birgi_ritual:
+            delta = birgi_ritual.get("strategic_delta") or {}
+            lines.append(
+                "- Birgi + Seething Song over Pearl/Ruby Medallion is a useful but rejected spell-chain clue: "
+                f"`{birgi_ritual['candidate_wins']}-{birgi_ritual['candidate_losses']}` vs "
+                f"`{birgi_ritual['baseline_wins']}-{birgi_ritual['baseline_losses']}` (`{birgi_ritual['delta_pp']:+.2f}` pp), "
+                f"seed 42 `{birgi_ritual['strong_seed_delta_pp']:+.2f}` pp, "
+                f"ritual delta `{int(delta.get('ritual_mana_added') or 0):+d}`, "
+                f"Birgi mana delta `{int(delta.get('birgi_spell_cast_mana') or 0):+d}`. "
+                "It helps weak seeds, but losing both medallions breaks the known strong conversion pattern."
             )
         if penance:
             delta = penance.get("strategic_delta") or {}
@@ -1094,12 +1126,12 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.append("")
         lines.append("These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=0`, process isolation, and per-game timeout. The promotion bar is stricter than a single positive seed: the package must improve aggregate results without breaking the known strong seed.")
         lines.append("")
-        lines.append("| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Discard-Top | Rummage-Top | Spell-Rummage-Top | Hand-Top | Spell | Mana | Birgi Mana | Squee GY | Squee Return | Decision |")
-        lines.append("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+        lines.append("| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Discard-Top | Rummage-Top | Spell-Rummage-Top | Hand-Top | Spell | Mana | Birgi Mana | Ritual | Squee GY | Squee Return | Decision |")
+        lines.append("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
         for row in post_squee_rows:
             delta = row.get("strategic_delta") or {}
             lines.append(
-                "| `{package}` | {adds} | {cuts} | {base_w}-{base_l} | {cand_w}-{cand_l} | {delta_pp:+.2f} | {strong:+.2f} | {miracle:+d} | {topdeck:+d} | {discard_top:+d} | {rummage_top:+d} | {spell_rummage_top:+d} | {hand_top:+d} | {spell:+d} | {mana:+d} | {birgi_mana:+d} | {squee_gy:+d} | {squee_return:+d} | {decision} |".format(
+                "| `{package}` | {adds} | {cuts} | {base_w}-{base_l} | {cand_w}-{cand_l} | {delta_pp:+.2f} | {strong:+.2f} | {miracle:+d} | {topdeck:+d} | {discard_top:+d} | {rummage_top:+d} | {spell_rummage_top:+d} | {hand_top:+d} | {spell:+d} | {mana:+d} | {birgi_mana:+d} | {ritual:+d} | {squee_gy:+d} | {squee_return:+d} | {decision} |".format(
                     package=row["package_key"],
                     adds=", ".join(row["adds"]),
                     cuts=", ".join(row["cuts"]),
@@ -1118,13 +1150,14 @@ def render_markdown(report: dict[str, Any]) -> str:
                     spell=int(delta.get("lorehold_spell_cast") or 0),
                     mana=int(delta.get("spell_cast_mana_trigger") or 0),
                     birgi_mana=int(delta.get("birgi_spell_cast_mana") or 0),
+                    ritual=int(delta.get("ritual_mana_added") or 0),
                     squee_gy=int(delta.get("squee_to_graveyard") or 0),
                     squee_return=int(delta.get("squee_upkeep_return") or 0),
                     decision=row["decision"],
                 )
             )
         lines.append("")
-        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
+        lines.append("Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results alone. Birgi + Seething Song over both medallions improves the weak seeds while losing badly on seed 42, so medallions are part of the strong-seed conversion pattern and the ritual lane needs a different cut before any promotion. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.")
         lines.append("")
     lines.append("## Current Champion Card-Role Coverage")
     lines.append("")
@@ -1515,6 +1548,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.",
         "The first Library/pressure retest rejected Brainstone, Ghostly Prison, and The One Ring over Hexing Squelcher; future tests need a new cut logic or a narrower per-game failure target.",
         "Angel's Grace over Dawn's Truce confirms that one-mana life-floor protection can improve a weak seed but is not free; cutting the existing protection shell breaks seed 42 completely.",
+        "Birgi + Seething Song over Pearl/Ruby Medallion confirms the ritual lane can help weak seeds, but cutting both medallions breaks seed 42; treat medallions as protected until a same-lane benchmark proves a safer cut.",
     ]
     next_gates = [
         "Keep the regression assertion that every `squee_upkeep_return` has an earlier same-game `squee_to_graveyard` or equivalent zone-entry event with source reason.",
@@ -1523,7 +1557,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Do not promote Angel's Grace over Dawn's Truce; any future Angel's Grace test must be a different cut and must preserve seed 42.",
         "Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.",
         "Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.",
-        "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
+        "Do not promote Birgi + Seething Song over Pearl/Ruby Medallion; any future ritual package must preserve at least one medallion or prove the medallion cut with a stronger seed-42 result.",
+        "Build the remaining revised topdeck-freecast package from 615 as a narrow one- or two-card test against the Squee champion.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
         "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.",

@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T18:10:29Z`
+- Generated at: `2026-06-27T18:25:23Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -27,8 +27,9 @@ Operationally, a better deck must increase at least one of these without breakin
 - Thor rule/runtime audit now closes the local model gap: `local_reviewed_runtime_rule_added_pending_durable_pg_sync`, temp materialized Thor rule count `1`. It still needs durable PostgreSQL/Hermes sync approval before promotion gates use it as source truth.
 - Thor synced-rule battle gate now has natural exposure evidence: `1` trigger for `7` damage across `21` candidate games, with win-rate delta `+0.00` pp.
 - The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.
-- Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, and Penance against the Squee champion. Best aggregate was `galvanoth_topdeck_freecast` at `9-18` vs baseline `8-19` (`+3.70` pp), but seed 42 moved `-44.45` pp, so it is not an automatic deck promotion.
+- Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, Seething Song, and Penance against the Squee champion. Best aggregate was `galvanoth_topdeck_freecast` at `9-18` vs baseline `8-19` (`+3.70` pp), but seed 42 moved `-44.45` pp, so it is not an automatic deck promotion.
 - Birgi is now instrumented and produced `+13` spell-cast mana triggers, but its aggregate result was `7-20` vs baseline `8-19` (`-3.70` pp); mana telemetry alone is not enough to promote it.
+- Birgi + Seething Song over Pearl/Ruby Medallion is a useful but rejected spell-chain clue: `8-19` vs `8-19` (`+0.00` pp), seed 42 `-55.56` pp, ritual delta `-2`, Birgi mana delta `+15`. It helps weak seeds, but losing both medallions breaks the known strong conversion pattern.
 - Penance is not a proven topdeck engine yet: observed `hand_to_topdeck_activation` delta was `+0` and the package lost `-7.41` pp aggregate.
 - Library/pressure conversion retest is now closed for the first pass: `Brainstone` over Hexing Squelcher finished `8-19` vs `8-19` (`+0.00` pp) but broke seed 42 by `-77.78` pp; `Ghostly Prison` was `-3.70` pp and `The One Ring` was `-14.82` pp. None promotes from this evidence.
 - Angel's Grace life-floor retest also rejects the intuitive cheap-protection swap: `3-24` vs `8-19` (`-18.52` pp) and seed 42 moved `-88.89` pp.
@@ -112,23 +113,26 @@ Interpretation: Library of Leng is not a missing runtime feature anymore; it is 
 
 ## Loss Failure Classifier
 
-- Source: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_loss_failure_classifier_20260627_library_pressure_v1.json`
+- Source: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_loss_failure_classifier_20260627_conversion_pressure_v2.json`
 - Read: this classifier uses per-game observed events over stale reason text; for example, an `approach_cast_tracked` event outranks a legacy `found=False` reason string.
 
 | Seed | Package | Deck | Losses | Avg Loss Turn | Primary Causes | Pressure | Approach | Discard-Top | Topdeck | Miracle | Low Spell |
 | ---: | --- | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 7 | `angel_grace_life_floor_cut_dawn` | `synergy_angel_grace_life_floor_cut_dawn` | 9 | 7.33 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=5, topdeck_miracle_without_approach_under_pressure=2, topdeck_without_miracle_conversion_under_pressure=1 | 9 | 0 | 3 | 0 | 2 | 1 |
 | 7 | `baseline_squee_champion` | `deck_6` | 9 | 6.33 | mana_spell_bottleneck_under_pressure=3, missing_engine_under_combat_pressure=2, topdeck_miracle_without_approach_under_pressure=4 | 9 | 0 | 0 | 1 | 4 | 5 |
+| 7 | `birgi_seething_chain_cut_medallions` | `synergy_birgi_seething_chain_cut_medallions` | 7 | 6.86 | mana_spell_bottleneck_under_pressure=3, missing_engine_under_combat_pressure=2, topdeck_miracle_without_approach_under_pressure=2 | 7 | 0 | 0 | 0 | 2 | 5 |
 | 7 | `brainstone_topdeck_miracle_cut_squelcher` | `synergy_brainstone_topdeck_miracle_cut_squelcher` | 7 | 6.86 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, topdeck_miracle_without_approach_under_pressure=2, topdeck_without_miracle_conversion_under_pressure=2 | 7 | 0 | 1 | 2 | 2 | 2 |
 | 7 | `ghostly_prison_pressure_cut_squelcher` | `synergy_ghostly_prison_pressure_cut_squelcher` | 7 | 7.57 | mana_spell_bottleneck_under_pressure=2, missing_engine_under_combat_pressure=1, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=3 | 7 | 1 | 0 | 1 | 4 | 3 |
 | 7 | `one_ring_protection_draw_cut_squelcher` | `synergy_one_ring_protection_draw_cut_squelcher` | 9 | 7.33 | mana_spell_bottleneck_under_pressure=2, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=4, topdeck_without_miracle_conversion_under_pressure=2 | 9 | 1 | 0 | 4 | 4 | 3 |
 | 42 | `angel_grace_life_floor_cut_dawn` | `synergy_angel_grace_life_floor_cut_dawn` | 9 | 7.44 | mana_spell_bottleneck_under_pressure=2, missing_engine_under_combat_pressure=1, second_approach_window_failed_under_pressure=2, topdeck_miracle_without_approach_under_pressure=3, topdeck_without_miracle_conversion_under_pressure=1 | 9 | 2 | 1 | 2 | 5 | 3 |
 | 42 | `baseline_squee_champion` | `deck_6` | 1 | 6.00 | missing_engine_under_combat_pressure=1 | 1 | 0 | 0 | 0 | 0 | 0 |
+| 42 | `birgi_seething_chain_cut_medallions` | `synergy_birgi_seething_chain_cut_medallions` | 6 | 7.50 | mana_spell_bottleneck_under_pressure=1, second_approach_window_failed_under_pressure=2, topdeck_miracle_without_approach_under_pressure=3 | 6 | 2 | 1 | 1 | 5 | 1 |
 | 42 | `brainstone_topdeck_miracle_cut_squelcher` | `synergy_brainstone_topdeck_miracle_cut_squelcher` | 8 | 7.88 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=1, topdeck_miracle_without_approach_under_pressure=4, topdeck_without_miracle_conversion_under_pressure=2 | 8 | 0 | 2 | 2 | 4 | 2 |
 | 42 | `ghostly_prison_pressure_cut_squelcher` | `synergy_ghostly_prison_pressure_cut_squelcher` | 6 | 6.83 | mana_spell_bottleneck_under_pressure=2, missing_engine_under_combat_pressure=3, topdeck_miracle_without_approach_under_pressure=1 | 6 | 0 | 0 | 0 | 1 | 3 |
 | 42 | `one_ring_protection_draw_cut_squelcher` | `synergy_one_ring_protection_draw_cut_squelcher` | 8 | 7.38 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=4 | 8 | 1 | 0 | 1 | 4 | 1 |
 | 20260625 | `angel_grace_life_floor_cut_dawn` | `synergy_angel_grace_life_floor_cut_dawn` | 6 | 7.00 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=2 | 6 | 1 | 0 | 1 | 3 | 2 |
 | 20260625 | `baseline_squee_champion` | `deck_6` | 9 | 7.00 | mana_spell_bottleneck_under_pressure=4, missing_engine_under_combat_pressure=1, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=2, topdeck_without_miracle_conversion_under_pressure=1 | 9 | 1 | 3 | 1 | 2 | 5 |
+| 20260625 | `birgi_seething_chain_cut_medallions` | `synergy_birgi_seething_chain_cut_medallions` | 6 | 7.33 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, topdeck_miracle_without_approach_under_pressure=2, topdeck_without_miracle_conversion_under_pressure=1 | 6 | 0 | 0 | 2 | 2 | 1 |
 | 20260625 | `brainstone_topdeck_miracle_cut_squelcher` | `synergy_brainstone_topdeck_miracle_cut_squelcher` | 4 | 7.25 | second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=3 | 4 | 1 | 2 | 1 | 3 | 1 |
 | 20260625 | `ghostly_prison_pressure_cut_squelcher` | `synergy_ghostly_prison_pressure_cut_squelcher` | 7 | 7.29 | mana_spell_bottleneck_under_pressure=4, missing_engine_under_combat_pressure=1, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=1 | 7 | 1 | 1 | 0 | 1 | 4 |
 | 20260625 | `one_ring_protection_draw_cut_squelcher` | `synergy_one_ring_protection_draw_cut_squelcher` | 6 | 7.67 | mana_spell_bottleneck_under_pressure=1, missing_engine_under_combat_pressure=2, second_approach_window_failed_under_pressure=1, topdeck_miracle_without_approach_under_pressure=2 | 6 | 1 | 0 | 2 | 3 | 1 |
@@ -225,23 +229,24 @@ Main read: 607 is the best structural shell because it is closest to the command
 
 These gates use the Squee champion as source deck id `6`, fixed `PYTHONHASHSEED=0`, process isolation, and per-game timeout. The promotion bar is stricter than a single positive seed: the package must improve aggregate results without breaking the known strong seed.
 
-| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Discard-Top | Rummage-Top | Spell-Rummage-Top | Hand-Top | Spell | Mana | Birgi Mana | Squee GY | Squee Return | Decision |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| `galvanoth_topdeck_freecast` | Galvanoth | Bender's Waterskin | 8-19 | 9-18 | +3.70 | -44.45 | +12 | +12 | +0 | +0 | +0 | +0 | +36 | +0 | +0 | +0 | -2 | probation_deeper_gate_only |
-| `brainstone_topdeck_miracle_cut_squelcher` | Brainstone | Hexing Squelcher | 8-19 | 8-19 | +0.00 | -77.78 | +7 | +4 | -1 | -4 | +3 | +0 | +24 | +0 | +0 | +8 | +3 | reject_or_rework |
-| `birgi_spellchain_cut_squelcher` | Birgi, God of Storytelling // Harnfel, Horn of Bounty | Hexing Squelcher | 8-19 | 7-20 | -3.70 | -55.56 | -13 | -14 | +0 | +0 | +0 | +0 | -22 | +13 | +13 | -1 | -1 | reject_or_rework |
-| `core_challenge_dance_over_storm` | Dance with Calamity | Storm Herd | 8-19 | 7-20 | -3.70 | -88.89 | +18 | +25 | +0 | +0 | +0 | +0 | +37 | +0 | +0 | -3 | -2 | reject_or_rework |
-| `galvanoth_topdeck_freecast_cut_chimes` | Galvanoth | Victory Chimes | 8-19 | 7-20 | -3.70 | -55.56 | +9 | +7 | +0 | +0 | +0 | +0 | +24 | +0 | +0 | +3 | +4 | reject_or_rework |
-| `ghostly_prison_pressure_cut_squelcher` | Ghostly Prison | Hexing Squelcher | 8-19 | 7-20 | -3.70 | -55.56 | +3 | -13 | -22 | -19 | -3 | +0 | +37 | +0 | +0 | -5 | -4 | reject_or_rework |
-| `brainstone_topdeck_miracle` | Brainstone | Bender's Waterskin | 8-19 | 6-21 | -7.41 | -33.33 | -6 | +2 | +0 | +0 | +0 | +0 | +43 | +0 | +0 | -5 | -2 | reject_or_rework |
-| `galvanoth_topdeck_freecast_cut_squelcher` | Galvanoth | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -66.67 | +5 | -3 | +0 | +0 | +0 | +0 | +28 | +0 | +0 | -4 | -4 | reject_or_rework |
-| `penance_topdeck_protection_cut_squelcher` | Penance | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -44.45 | +9 | -1 | +0 | +0 | +0 | +0 | +36 | +0 | +0 | -5 | -4 | reject_or_rework |
-| `core_challenge_aetherflux_over_storm` | Aetherflux Reservoir | Storm Herd | 8-19 | 5-22 | -11.11 | -66.67 | -3 | -14 | +0 | +0 | +0 | +0 | +9 | +0 | +0 | -4 | -3 | reject_or_rework |
-| `faithless_looting_squee_enabler` | Faithless Looting | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -66.67 | +4 | +6 | +0 | +0 | +0 | +0 | +25 | +0 | +0 | -5 | -3 | reject_or_rework |
-| `one_ring_protection_draw_cut_squelcher` | The One Ring | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -77.78 | -9 | -17 | -30 | -27 | -3 | +0 | -7 | +0 | +0 | -3 | -2 | reject_or_rework |
-| `angel_grace_life_floor_cut_dawn` | Angel's Grace | Dawn's Truce | 8-19 | 3-24 | -18.52 | -88.89 | -7 | -8 | -8 | -10 | +2 | +0 | +1 | +0 | +0 | -1 | -1 | reject_or_rework |
+| Package | Adds | Cuts | Aggregate Baseline | Aggregate Candidate | Delta pp | Seed 42 pp | Miracle | Topdeck | Discard-Top | Rummage-Top | Spell-Rummage-Top | Hand-Top | Spell | Mana | Birgi Mana | Ritual | Squee GY | Squee Return | Decision |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `galvanoth_topdeck_freecast` | Galvanoth | Bender's Waterskin | 8-19 | 9-18 | +3.70 | -44.45 | +12 | +12 | +0 | +0 | +0 | +0 | +36 | +0 | +0 | -6 | +0 | -2 | probation_deeper_gate_only |
+| `birgi_seething_chain_cut_medallions` | Birgi, God of Storytelling // Harnfel, Horn of Bounty, Seething Song | Pearl Medallion, Ruby Medallion | 8-19 | 8-19 | +0.00 | -55.56 | +1 | +12 | -12 | -13 | +1 | +0 | -2 | +15 | +15 | -2 | -3 | -3 | reject_or_rework |
+| `brainstone_topdeck_miracle_cut_squelcher` | Brainstone | Hexing Squelcher | 8-19 | 8-19 | +0.00 | -77.78 | +7 | +4 | -1 | -4 | +3 | +0 | +24 | +0 | +0 | -7 | +8 | +3 | reject_or_rework |
+| `birgi_spellchain_cut_squelcher` | Birgi, God of Storytelling // Harnfel, Horn of Bounty | Hexing Squelcher | 8-19 | 7-20 | -3.70 | -55.56 | -13 | -14 | +0 | +0 | +0 | +0 | -22 | +13 | +13 | -10 | -1 | -1 | reject_or_rework |
+| `core_challenge_dance_over_storm` | Dance with Calamity | Storm Herd | 8-19 | 7-20 | -3.70 | -88.89 | +18 | +25 | +0 | +0 | +0 | +0 | +37 | +0 | +0 | -3 | -3 | -2 | reject_or_rework |
+| `galvanoth_topdeck_freecast_cut_chimes` | Galvanoth | Victory Chimes | 8-19 | 7-20 | -3.70 | -55.56 | +9 | +7 | +0 | +0 | +0 | +0 | +24 | +0 | +0 | -9 | +3 | +4 | reject_or_rework |
+| `ghostly_prison_pressure_cut_squelcher` | Ghostly Prison | Hexing Squelcher | 8-19 | 7-20 | -3.70 | -55.56 | +3 | -13 | -22 | -19 | -3 | +0 | +37 | +0 | +0 | -2 | -5 | -4 | reject_or_rework |
+| `brainstone_topdeck_miracle` | Brainstone | Bender's Waterskin | 8-19 | 6-21 | -7.41 | -33.33 | -6 | +2 | +0 | +0 | +0 | +0 | +43 | +0 | +0 | -5 | -5 | -2 | reject_or_rework |
+| `galvanoth_topdeck_freecast_cut_squelcher` | Galvanoth | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -66.67 | +5 | -3 | +0 | +0 | +0 | +0 | +28 | +0 | +0 | -5 | -4 | -4 | reject_or_rework |
+| `penance_topdeck_protection_cut_squelcher` | Penance | Hexing Squelcher | 8-19 | 6-21 | -7.41 | -44.45 | +9 | -1 | +0 | +0 | +0 | +0 | +36 | +0 | +0 | -5 | -5 | -4 | reject_or_rework |
+| `core_challenge_aetherflux_over_storm` | Aetherflux Reservoir | Storm Herd | 8-19 | 5-22 | -11.11 | -66.67 | -3 | -14 | +0 | +0 | +0 | +0 | +9 | +0 | +0 | -3 | -4 | -3 | reject_or_rework |
+| `faithless_looting_squee_enabler` | Faithless Looting | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -66.67 | +4 | +6 | +0 | +0 | +0 | +0 | +25 | +0 | +0 | +0 | -5 | -3 | reject_or_rework |
+| `one_ring_protection_draw_cut_squelcher` | The One Ring | Hexing Squelcher | 8-19 | 4-23 | -14.82 | -77.78 | -9 | -17 | -30 | -27 | -3 | +0 | -7 | +0 | +0 | -2 | -3 | -2 | reject_or_rework |
+| `angel_grace_life_floor_cut_dawn` | Angel's Grace | Dawn's Truce | 8-19 | 3-24 | -18.52 | -88.89 | -7 | -8 | -8 | -10 | +2 | +0 | +1 | +0 | +0 | -8 | -1 | -1 | reject_or_rework |
 
-Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.
+Read: Brainstone can improve weak seeds when it preserves the ramp shell, but the Hexing Squelcher cut is only aggregate-neutral and collapses seed 42, so it is not a deck insert. Ghostly Prison was a coherent pressure hypothesis, but the retest avoiding the old High Noon cut still lost aggregate. The One Ring does not justify the slot here despite the Mind Stone interaction idea; it reduced the aggregate result and the Library discard-to-top metrics. Angel's Grace confirms that a one-mana life-floor can help seed 20260625, but replacing Dawn's Truce destroys seed 42 and loses aggregate, so this exact protection swap is rejected. Faithless Looting does not prove the intended Squee-discard loop here and loses badly overall. The original Galvanoth/Bender's Waterskin swap is the only positive aggregate signal, but it loses the strong seed 42; the follow-ups cutting Hexing Squelcher or Victory Chimes are both worse, so Galvanoth stays a probation hypothesis, not a deck insert. Dance with Calamity and Aetherflux Reservoir both improve some weak seeds over Storm Herd, but both lose aggregate and break seed 42, so Storm Herd remains protected for now. Birgi proves the new spell-cast mana telemetry can fire, but it does not improve results alone. Birgi + Seething Song over both medallions improves the weak seeds while losing badly on seed 42, so medallions are part of the strong-seed conversion pattern and the ritual lane needs a different cut before any promotion. Penance did not fire its hand-to-library activation in this gate, so it is not evidence for a working topdeck-protection engine yet.
 
 ## Current Champion Card-Role Coverage
 
@@ -271,6 +276,7 @@ Read: Brainstone can improve weak seeds when it preserves the ramp shell, but th
 - Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.
 - The first Library/pressure retest rejected Brainstone, Ghostly Prison, and The One Ring over Hexing Squelcher; future tests need a new cut logic or a narrower per-game failure target.
 - Angel's Grace over Dawn's Truce confirms that one-mana life-floor protection can improve a weak seed but is not free; cutting the existing protection shell breaks seed 42 completely.
+- Birgi + Seething Song over Pearl/Ruby Medallion confirms the ritual lane can help weak seeds, but cutting both medallions breaks seed 42; treat medallions as protected until a same-lane benchmark proves a safer cut.
 
 ## Next Gates
 
@@ -280,7 +286,8 @@ Read: Brainstone can improve weak seeds when it preserves the ramp shell, but th
 - Do not promote Angel's Grace over Dawn's Truce; any future Angel's Grace test must be a different cut and must preserve seed 42.
 - Do not promote Faithless Looting from the current package gate; it did not increase Squee graveyard/return enough and lost aggregate win rate.
 - Do not promote Galvanoth, Dance with Calamity, or Aetherflux Reservoir from current gates; each either loses aggregate or breaks the known strong seed 42.
-- Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.
+- Do not promote Birgi + Seething Song over Pearl/Ruby Medallion; any future ritual package must preserve at least one medallion or prove the medallion cut with a stronger seed-42 result.
+- Build the remaining revised topdeck-freecast package from 615 as a narrow one- or two-card test against the Squee champion.
 - Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.
 - Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.
 - For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.
@@ -288,6 +295,8 @@ Read: Brainstone can improve weak seeds when it preserves the ramp shell, but th
 ## External Method Sources
 
 - [EDHREC Lorehold commander page](https://edhrec.com/commanders/lorehold-the-historian): commander-specific package comparison lane.
+- [EDHREC Lorehold cEDH average deck](https://edhrec.com/average-decks/lorehold-the-historian/cedh): external cross-check for ritual package, Birgi, Seething Song, and medallion retention.
+- [Reddit EDHBrews Lorehold thread](https://www.reddit.com/r/EDHBrews/comments/1s8q5nm/lorehold_the_historian/): player-reported failure mode: fizzling, gas depletion, and difficulty finding a win condition.
 - [EDHREC spellslinger Commander guide](https://edhrec.com/guides/edhrec-guide-to-spellslinger-in-commander): spellslinger criteria: card flow, cheap interaction, protection, recursion, payoffs.
 - [EDHREC Commander deckbuilding guide](https://edhrec.com/articles/how-to-build-a-commander-deck): baseline structure guardrails for lands, ramp, draw, removal, and focused packages.
 - [Archidekt Lorehold corpus](https://archidekt.com/commanders/Lorehold%2C%20the%20Historian): user-built Lorehold shells and recurring package choices.

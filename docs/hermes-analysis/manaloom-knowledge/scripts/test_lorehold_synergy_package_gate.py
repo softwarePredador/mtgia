@@ -74,6 +74,18 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "life_floor_protection",
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["birgi_seething_chain_cut_medallions"]["family"],
+            "spellchain_mana",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["birgi_seething_chain_cut_medallions"]["adds"],
+            ["Birgi, God of Storytelling // Harnfel, Horn of Bounty", "Seething Song"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["birgi_seething_chain_cut_medallions"]["cuts"],
+            ["Pearl Medallion", "Ruby Medallion"],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )
@@ -85,6 +97,9 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         payload = {
             "baseline": {
                 "telemetry": {
+                    "event_counts": {
+                        "ritual_mana_added": 1,
+                    },
                     "strategic_event_counts": {
                         "topdeck_manipulation_activated": 2,
                         "hand_to_topdeck_activation": 1,
@@ -99,6 +114,9 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             },
             "candidate": {
                 "telemetry": {
+                    "event_counts": {
+                        "ritual_mana_added": 4,
+                    },
                     "strategic_event_counts": {
                         "topdeck_manipulation_activated": 5,
                         "hand_to_topdeck_activation": 4,
@@ -117,12 +135,14 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(delta["topdeck_manipulation_activated"], 3)
         self.assertEqual(delta["hand_to_topdeck_activation"], 3)
         self.assertEqual(delta["birgi_spell_cast_mana"], 2)
+        self.assertEqual(delta["ritual_mana_added"], 3)
         self.assertEqual(delta["discard_to_top_replacement"], 4)
         self.assertEqual(delta["lorehold_rummage_discard_to_top"], 3)
         self.assertEqual(delta["lorehold_spell_rummage_discard_to_top"], 3)
         self.assertEqual(delta["squee_to_graveyard"], 3)
         self.assertEqual(delta["squee_upkeep_return"], 3)
         self.assertIn("squee gy +3", gate.strategic_delta_text(payload))
+        self.assertIn("ritual +3", gate.strategic_delta_text(payload))
         self.assertIn("hand to top +3", gate.strategic_delta_text(payload))
         self.assertIn("discard-to-top +4", gate.strategic_delta_text(payload))
         self.assertIn("rummage-to-top +3", gate.strategic_delta_text(payload))

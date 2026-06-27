@@ -71,6 +71,18 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
         "cuts": ["Bender's Waterskin"],
     },
+    "birgi_seething_chain_cut_medallions": {
+        "family": "spellchain_mana",
+        "hypothesis": (
+            "The loss classifier shows mana/spell-volume failures under pressure. "
+            "This imports the narrow 615 ritual lane while preserving Dawn's Truce, "
+            "Teferi's Protection, High Noon, Hexing Squelcher, Storm Herd, and the "
+            "three-mana ramp shell; it tests whether cast-trigger mana plus a "
+            "one-shot ritual beats static red/white medallion discounts."
+        ),
+        "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty", "Seething Song"],
+        "cuts": ["Pearl Medallion", "Ruby Medallion"],
+    },
     "galvanoth_topdeck_freecast": {
         "family": "topdeck_freecast",
         "hypothesis": (
@@ -343,6 +355,7 @@ STRATEGIC_METRICS = (
     "lorehold_spell_cast",
     "spell_cast_mana_trigger",
     "birgi_spell_cast_mana",
+    "ritual_mana_added",
     "miracle_cast",
     "topdeck_manipulation_activated",
     "discard_to_top_replacement",
@@ -689,8 +702,12 @@ def summarize_gate(report: dict[str, Any], candidate_key: str) -> dict[str, Any]
 
 def strategic_counts(row: dict[str, Any]) -> dict[str, int]:
     telemetry = row.get("telemetry") or {}
-    counts = telemetry.get("strategic_event_counts") or {}
-    return {metric: int(counts.get(metric) or 0) for metric in STRATEGIC_METRICS}
+    strategic_counts = telemetry.get("strategic_event_counts") or {}
+    event_counts = telemetry.get("event_counts") or {}
+    return {
+        metric: int(strategic_counts.get(metric) or event_counts.get(metric) or 0)
+        for metric in STRATEGIC_METRICS
+    }
 
 
 def strategic_delta(gate: dict[str, Any]) -> dict[str, int]:
@@ -711,6 +728,7 @@ def strategic_delta_text(gate: dict[str, Any]) -> str:
         "lorehold_spell_cast": "spell",
         "spell_cast_mana_trigger": "spell mana",
         "birgi_spell_cast_mana": "birgi mana",
+        "ritual_mana_added": "ritual",
         "miracle_cast": "miracle",
         "topdeck_manipulation_activated": "topdeck",
         "discard_to_top_replacement": "discard-to-top",
