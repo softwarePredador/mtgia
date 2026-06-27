@@ -782,6 +782,297 @@ def current_champion_key(squee_summary: dict[str, Any]) -> str:
     return max(summary.items(), key=lambda item: (item[1].get("win_rate", 0), item[1].get("wins", 0)))[0]
 
 
+def gate_record(summary: dict[str, Any], key: str) -> dict[str, Any]:
+    value = summary.get(key) or {}
+    wins = int(value.get("wins") or 0)
+    losses = int(value.get("losses") or 0)
+    stalls = int(value.get("stalls") or 0)
+    games = int(value.get("games") or wins + losses + stalls)
+    return {
+        "deck_key": key,
+        "games": games,
+        "wins": wins,
+        "losses": losses,
+        "stalls": stalls,
+        "record": f"{wins}-{losses}-{stalls}",
+        "win_rate": float(value.get("win_rate") or (100.0 * wins / max(1, games))),
+        "strategic_events": value.get("strategic_events") or {},
+    }
+
+
+def find_seed_row(rows: list[dict[str, Any]], seed: object, deck_key: str | None = None) -> dict[str, Any]:
+    seed_text = str(seed)
+    for row in rows:
+        if str(row.get("seed")) != seed_text:
+            continue
+        if deck_key and row.get("deck_key") != deck_key:
+            continue
+        return row
+    return {}
+
+
+def summarize_package_results(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    decision_counts: Counter[str] = Counter()
+    family_counts: Counter[str] = Counter()
+    best_probation: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+    for row in rows:
+        decision = str(row.get("decision") or "unknown")
+        family = str(row.get("family") or "unknown")
+        decision_counts[decision] += 1
+        family_counts[family] += 1
+        compact = {
+            "package_key": row.get("package_key"),
+            "family": row.get("family"),
+            "adds": row.get("adds") or [],
+            "cuts": row.get("cuts") or [],
+            "delta_pp": float(row.get("delta_pp") or 0.0),
+            "strong_seed_delta_pp": float(row.get("strong_seed_delta_pp") or 0.0),
+            "decision": decision,
+        }
+        if decision != "reject_or_rework":
+            best_probation.append(compact)
+        else:
+            rejected.append(compact)
+    best_probation.sort(key=lambda item: (-item["delta_pp"], item["package_key"] or ""))
+    rejected.sort(key=lambda item: (item["delta_pp"], item["package_key"] or ""))
+    return {
+        "decision_counts": dict(sorted(decision_counts.items())),
+        "family_counts": dict(sorted(family_counts.items())),
+        "probation_or_watch": best_probation[:8],
+        "hard_reject_sample": rejected[:12],
+    }
+
+
+def build_strategy_dependency_map(
+    *,
+    squee_gates: dict[str, Any],
+    matrix_ranked: list[dict[str, Any]],
+    post_squee_package_gates: dict[str, Any],
+    safe_package_gates: dict[str, Any],
+    library_leng_telemetry_gates: dict[str, Any],
+    loss_failure_classifier: dict[str, Any],
+    cut_safety_manifest: dict[str, Any],
+) -> dict[str, Any]:
+    """Convert battle evidence into a reusable contract for the next hypothesis."""
+    squee_summary = squee_gates.get("summary") or {}
+    champion_key = current_champion_key(squee_gates)
+    champion_record = gate_record(squee_summary, champion_key)
+    deck_607_record = gate_record(squee_summary, "deck_607")
+    deck_6_record = gate_record(squee_summary, "deck_6")
+    squee_rows = squee_gates.get("rows") or []
+    seed42 = find_seed_row(squee_rows, 42, champion_key)
+    seed7 = find_seed_row(squee_rows, 7, champion_key)
+    seed20260625 = find_seed_row(squee_rows, 20260625, champion_key)
+    library_rows = library_leng_telemetry_gates.get("rows") or []
+    library_seed42 = find_seed_row(library_rows, 42)
+    library_seed7 = find_seed_row(library_rows, 7)
+    library_seed20260625 = find_seed_row(library_rows, 20260625)
+    loss_rows = loss_failure_classifier.get("summary_rows") or []
+    baseline_loss_rows = [
+        row
+        for row in loss_rows
+        if row.get("package_key") == "baseline_squee_champion"
+    ]
+    cut_rows = cut_safety_manifest.get("cuts") or []
+    locked_cuts = [
+        row for row in cut_rows
+        if row.get("status") in {"locked_do_not_cut", "protected_until_same_lane_win"}
+    ]
+    risky_cuts = [
+        row for row in cut_rows
+        if row.get("status") == "risky_cut_only_same_lane"
+    ]
+    post_rows = post_squee_package_gates.get("rows") or []
+    post_summary = summarize_package_results(post_rows)
+    safe_rows = safe_package_gates.get("rows") or []
+    safe_watch = [
+        {
+            "package_key": row.get("package_key"),
+            "family": row.get("family"),
+            "adds": row.get("adds") or [],
+            "cuts": row.get("cuts") or [],
+            "delta_pp": float(row.get("delta_pp") or 0.0),
+            "decision": row.get("decision"),
+        }
+        for row in safe_rows
+        if row.get("decision") == "watch_only_needs_stronger_justification"
+    ]
+    safe_rejected = [
+        {
+            "package_key": row.get("package_key"),
+            "family": row.get("family"),
+            "adds": row.get("adds") or [],
+            "cuts": row.get("cuts") or [],
+            "delta_pp": float(row.get("delta_pp") or 0.0),
+            "decision": row.get("decision"),
+        }
+        for row in safe_rows
+        if row.get("decision") == "smoke_negative_do_not_promote"
+    ]
+
+    variant_contract = []
+    for item in matrix_ranked:
+        key = item.get("deck_key")
+        if key == "deck_607":
+            action = "baseline_shell"
+            reason = "best structural match to commander intent and the current benchmark shell"
+        elif key in {"deck_615", "deck_614"}:
+            action = "extract_controlled_packages_only"
+            reason = "high structural rank but many slot changes; test one package at a time against 607+Squee"
+        elif int(item.get("land_count") or 0) < 33:
+            action = "do_not_import_full_list"
+            reason = "land count below current guardrail; use only isolated ideas if battle-ready"
+        else:
+            action = "secondary_reference_only"
+            reason = "less aligned than 607/615/614 or lower rule-readiness/role balance"
+        variant_contract.append(
+            {
+                "rank": item.get("rank"),
+                "deck_key": key,
+                "deck_name": item.get("deck_name"),
+                "land_count": item.get("land_count"),
+                "strategy_score": item.get("strategy_score"),
+                "commander_intent_score": item.get("commander_intent_score"),
+                "primary_risks": item.get("primary_risks") or [],
+                "action": action,
+                "reason": reason,
+            }
+        )
+
+    pillars = [
+        {
+            "pillar": "topdeck_miracle_setup",
+            "depends_on": ["Library of Leng", "Scroll Rack", "Sensei's Divining Top", "Molecule Man", "Bender's Waterskin"],
+            "current_evidence": (
+                f"seed42 library gate: discard_to_top={library_seed42.get('discard_to_top_replacement', 0)}, "
+                f"topdeck={library_seed42.get('topdeck_manipulation_activated', 0)}, "
+                f"miracle={library_seed42.get('miracle_cast', 0)}"
+            ),
+            "risk": "seed 7 shows the deck can miss the engine entirely",
+            "next_requirement": "improve early access or topdeck quality without reducing seed-42 miracle/topdeck counts",
+        },
+        {
+            "pillar": "spell_chain_conversion",
+            "depends_on": ["Ruby Medallion", "Pearl Medallion", "Jeska's Will", "Big Score", "Unexpected Windfall"],
+            "current_evidence": "Birgi and Seething Song produced mana telemetry, but medallion cuts broke seed 42",
+            "risk": "ritual mana that lowers miracle density or removes persistent reducers is not a win",
+            "next_requirement": "preserve at least one medallion or prove the cut in a same-lane seed-42 benchmark",
+        },
+        {
+            "pillar": "pressure_absorption",
+            "depends_on": ["Dawn's Truce", "Teferi's Protection", "High Noon", "Fated Clash", "Hexing Squelcher"],
+            "current_evidence": f"classified baseline losses: {len(baseline_loss_rows)} rows, all focused on combat-pressure/life-zero failure modes",
+            "risk": "cheap protection swaps can help weak seeds while destroying the known strong seed",
+            "next_requirement": "target survival/second-window conversion while preserving the existing protection shell",
+        },
+        {
+            "pillar": "deterministic_finishers",
+            "depends_on": ["Approach of the Second Sun", "Storm Herd", "Mizzix's Mastery", "Surge to Victory"],
+            "current_evidence": "Dance with Calamity and Aetherflux Reservoir lost the Storm Herd slot benchmark",
+            "risk": "replacing finishers with generic value lowers closing certainty",
+            "next_requirement": "benchmark finishers against Approach/Storm Herd lanes, not against unrelated support slots",
+        },
+        {
+            "pillar": "graveyard_recursion",
+            "depends_on": ["Squee, Goblin Nabob", "Pinnacle Monk // Mystic Peak", "Mizzix's Mastery"],
+            "current_evidence": (
+                f"Squee champion {champion_record['record']} vs deck_607 {deck_607_record['record']}; "
+                f"squee_return={champion_record['strategic_events'].get('squee_upkeep_return', 0)}"
+            ),
+            "risk": "Squee returns are proven after graveyard entry, but Lorehold discard-to-Squee is still not proven",
+            "next_requirement": "test recursion as a package only when the gate tracks actual discard/graveyard entry route",
+        },
+    ]
+
+    return {
+        "commander_plan": {
+            "intent": COMMANDER_INTENT,
+            "external_alignment": [
+                {
+                    "source": "EDHREC Lorehold miracle article",
+                    "supports": "first-draw miracle timing and opponent-upkeep rummage are the commander's core engine",
+                    "internal_decision": "matches the current topdeck/miracle pillar",
+                },
+                {
+                    "source": "Card Kingdom Lorehold synergy article",
+                    "supports": "Library of Leng plus Lorehold discard can put the discarded card on top for the draw",
+                    "internal_decision": "runtime telemetry confirms the engine exists, but survival/conversion still gates promotion",
+                },
+                {
+                    "source": "EDHREC cEDH average deck",
+                    "supports": "Birgi, Seething Song, Scroll Rack, Sensei's Divining Top, Ruby Medallion, and The One Ring are plausible external ideas",
+                    "internal_decision": "use as hypothesis source only; current battle gates rejected the tested cuts",
+                },
+            ],
+        },
+        "current_benchmark": {
+            "champion": champion_record,
+            "deck_607": deck_607_record,
+            "deck_6": deck_6_record,
+            "seed_42_champion": seed42,
+            "seed_7_champion": seed7,
+            "seed_20260625_champion": seed20260625,
+        },
+        "dependency_pillars": pillars,
+        "cut_guardrails": {
+            "locked_or_protected": [
+                {
+                    "card_name": row.get("card_name"),
+                    "status": row.get("status"),
+                    "lane": row.get("current_lane"),
+                    "worst_strong_seed_delta_pp": row.get("worst_strong_seed_delta_pp"),
+                    "reason": row.get("reason"),
+                }
+                for row in locked_cuts
+            ],
+            "risky_same_lane_only": [
+                {
+                    "card_name": row.get("card_name"),
+                    "status": row.get("status"),
+                    "lane": row.get("current_lane"),
+                    "best_delta_pp": row.get("best_delta_pp"),
+                    "worst_strong_seed_delta_pp": row.get("worst_strong_seed_delta_pp"),
+                    "reason": row.get("reason"),
+                }
+                for row in risky_cuts
+            ],
+            "untested_flex_pool": cut_safety_manifest.get("untested_flex_pool") or [],
+        },
+        "package_learning": {
+            "post_squee": post_summary,
+            "safe_queue_watch": safe_watch,
+            "safe_queue_rejected": safe_rejected,
+        },
+        "variant_import_contract": variant_contract[:12],
+        "next_hypothesis_contract": {
+            "promotion_bar": [
+                "tie or beat the Squee champion aggregate record across the same seed/opponent window",
+                "do not regress seed 42 unless a larger gate proves the strong-seed pattern moved elsewhere",
+                "do not promote from popularity or static structure without battle evidence",
+                "a negative smoke result remains no-promotion unless a specific failure classifier target explains why to override it",
+            ],
+            "must_target": [
+                "seed 7: missing early topdeck/Library/Squee engine",
+                "seed 20260625: engine appears but fails to convert Approach/topdeck loops into survival or a second win window",
+                "combat-pressure/life-zero losses without cutting the known protection shell",
+            ],
+            "required_telemetry": [
+                "miracle_cast and topdeck_manipulation_activated must not fall in the strong seed",
+                "discard_to_top_replacement should connect to survival, Approach recast, or a finisher window",
+                "spell_cast_mana_trigger or ritual_mana_added is useful only if win rate and seed-42 conversion survive",
+                "Squee value must be tied to observed graveyard entry route, not assumed discard synergy",
+            ],
+            "hard_reject_if": [
+                "candidate cuts a locked/protected card without same-lane proof",
+                "candidate only adds generic ramp/value and lowers miracle/topdeck/spell volume",
+                "candidate wins weak seeds but collapses seed 42 in the first controlled gate",
+                "candidate depends on a card with unresolved battle runtime/model evidence",
+            ],
+        },
+    }
+
+
 def render_markdown(report: dict[str, Any]) -> str:
     library_leng = report.get("library_leng_telemetry_gates") or {}
     library_leng_rows = library_leng.get("rows") or []
@@ -1529,6 +1820,99 @@ def render_markdown(report: dict[str, Any]) -> str:
             + (f" plus `{len(flex_pool) - 12}` more." if len(flex_pool) > 12 else ".")
         )
         lines.append("")
+    dependency_map = report.get("strategy_dependency_map") or {}
+    if dependency_map:
+        lines.append("## Strategy Dependency Map")
+        lines.append("")
+        benchmark = dependency_map.get("current_benchmark") or {}
+        champion_record = benchmark.get("champion") or {}
+        deck607_record = benchmark.get("deck_607") or {}
+        deck6_record = benchmark.get("deck_6") or {}
+        lines.append(
+            "- Current benchmark contract: "
+            f"`{champion_record.get('deck_key')}` `{champion_record.get('record')}` "
+            f"({float(champion_record.get('win_rate') or 0):.2f}%) vs "
+            f"`deck_607` `{deck607_record.get('record')}` "
+            f"({float(deck607_record.get('win_rate') or 0):.2f}%) and "
+            f"`deck_6` `{deck6_record.get('record')}` "
+            f"({float(deck6_record.get('win_rate') or 0):.2f}%)."
+        )
+        lines.append(
+            "- Read: a new idea must improve a named pillar and preserve the benchmark pattern. "
+            "A card being popular externally or cut-safe locally only creates a hypothesis."
+        )
+        lines.append("")
+        lines.append("| Pillar | Depends On | Current Evidence | Risk | Next Requirement |")
+        lines.append("| --- | --- | --- | --- | --- |")
+        for pillar in dependency_map.get("dependency_pillars") or []:
+            lines.append(
+                "| `{pillar}` | {depends} | {evidence} | {risk} | {requirement} |".format(
+                    pillar=pillar.get("pillar"),
+                    depends=", ".join(pillar.get("depends_on") or []),
+                    evidence=pillar.get("current_evidence"),
+                    risk=pillar.get("risk"),
+                    requirement=pillar.get("next_requirement"),
+                )
+            )
+        lines.append("")
+        guardrails = dependency_map.get("cut_guardrails") or {}
+        locked = guardrails.get("locked_or_protected") or []
+        risky = guardrails.get("risky_same_lane_only") or []
+        locked_names = ", ".join(f"`{row.get('card_name')}`" for row in locked[:14])
+        risky_names = ", ".join(f"`{row.get('card_name')}`" for row in risky[:14])
+        lines.append(
+            f"- Locked/protected cuts: {locked_names or 'none'}"
+            + (f" plus `{len(locked) - 14}` more." if len(locked) > 14 else ".")
+        )
+        lines.append(
+            f"- Risky same-lane-only cuts: {risky_names or 'none'}"
+            + (f" plus `{len(risky) - 14}` more." if len(risky) > 14 else ".")
+        )
+        package_learning = dependency_map.get("package_learning") or {}
+        post_summary = package_learning.get("post_squee") or {}
+        lines.append(
+            "- Package learning summary: "
+            f"post-Squee decisions `{json.dumps(post_summary.get('decision_counts', {}), sort_keys=True)}`, "
+            f"safe-queue watch `{len(package_learning.get('safe_queue_watch') or [])}`, "
+            f"safe-queue rejected `{len(package_learning.get('safe_queue_rejected') or [])}`."
+        )
+        probation = list(post_summary.get("probation_or_watch") or []) + list(package_learning.get("safe_queue_watch") or [])
+        if probation:
+            lines.append("")
+            lines.append("| Probation / Watch Item | Adds | Cuts | Delta pp | Seed 42 pp | Decision |")
+            lines.append("| --- | --- | --- | ---: | ---: | --- |")
+            for row in probation[:10]:
+                lines.append(
+                    "| `{package}` | {adds} | {cuts} | {delta:+.2f} | {seed:+.2f} | `{decision}` |".format(
+                        package=row.get("package_key"),
+                        adds=", ".join(row.get("adds") or []),
+                        cuts=", ".join(row.get("cuts") or []),
+                        delta=float(row.get("delta_pp") or 0.0),
+                        seed=float(row.get("strong_seed_delta_pp") or 0.0),
+                        decision=row.get("decision"),
+                    )
+                )
+        lines.append("")
+        lines.append("| Variant | Action | Reason |")
+        lines.append("| --- | --- | --- |")
+        for row in dependency_map.get("variant_import_contract") or []:
+            if row.get("deck_key") not in {"deck_607", "deck_615", "deck_614", "deck_612", "deck_616"}:
+                continue
+            lines.append(
+                f"| `{row.get('deck_key')}` {row.get('deck_name')} | `{row.get('action')}` | {row.get('reason')} |"
+            )
+        lines.append("")
+        contract = dependency_map.get("next_hypothesis_contract") or {}
+        lines.append("Next hypothesis contract:")
+        for item in contract.get("promotion_bar") or []:
+            lines.append(f"- Promotion bar: {item}")
+        for item in contract.get("must_target") or []:
+            lines.append(f"- Must target: {item}")
+        for item in contract.get("required_telemetry") or []:
+            lines.append(f"- Required telemetry: {item}")
+        for item in contract.get("hard_reject_if") or []:
+            lines.append(f"- Hard reject if: {item}")
+        lines.append("")
     lines.append("## What Still Must Be Understood")
     lines.append("")
     for item in report["open_questions"]:
@@ -1945,6 +2329,15 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         post_squee_package_gates,
         card_decision_manifest,
     )
+    strategy_dependency_map = build_strategy_dependency_map(
+        squee_gates=squee_gates,
+        matrix_ranked=ranked,
+        post_squee_package_gates=post_squee_package_gates,
+        safe_package_gates=safe_package_gates,
+        library_leng_telemetry_gates=library_leng_telemetry_gates,
+        loss_failure_classifier=loss_failure_classifier,
+        cut_safety_manifest=cut_safety_manifest,
+    )
 
     open_questions = [
         "Use the per-game Squee diagnostic to decide whether the next improvement is topdeck consistency, explicit discard/rummage enablement, or a different closing package.",
@@ -2020,6 +2413,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "loss_failure_classifier": loss_failure_classifier,
         "card_decision_manifest": card_decision_manifest,
         "cut_safety_manifest": cut_safety_manifest,
+        "strategy_dependency_map": strategy_dependency_map,
         "open_questions": open_questions,
         "next_gates": next_gates,
     }

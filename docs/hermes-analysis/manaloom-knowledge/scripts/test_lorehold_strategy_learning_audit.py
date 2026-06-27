@@ -376,6 +376,170 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
             -13,
         )
 
+    def test_strategy_dependency_map_turns_gates_into_next_hypothesis_contract(self):
+        result = audit.build_strategy_dependency_map(
+            squee_gates={
+                "summary": {
+                    "candidate_607_squee": {
+                        "games": 90,
+                        "wins": 24,
+                        "losses": 66,
+                        "stalls": 0,
+                        "win_rate": 26.67,
+                        "strategic_events": {"squee_upkeep_return": 12},
+                    },
+                    "deck_607": {
+                        "games": 90,
+                        "wins": 21,
+                        "losses": 69,
+                        "stalls": 0,
+                        "win_rate": 23.33,
+                    },
+                    "deck_6": {
+                        "games": 90,
+                        "wins": 16,
+                        "losses": 74,
+                        "stalls": 0,
+                        "win_rate": 17.78,
+                    },
+                },
+                "rows": [
+                    {
+                        "seed": 42,
+                        "deck_key": "candidate_607_squee",
+                        "wins": 8,
+                        "losses": 1,
+                        "strategic_events": {"miracle_cast": 33, "topdeck_manipulation_activated": 30},
+                    },
+                    {
+                        "seed": 7,
+                        "deck_key": "candidate_607_squee",
+                        "wins": 0,
+                        "losses": 9,
+                        "strategic_events": {"miracle_cast": 4, "topdeck_manipulation_activated": 2},
+                    },
+                ],
+            },
+            matrix_ranked=[
+                {"rank": 1, "deck_key": "deck_607", "deck_name": "607", "land_count": 34},
+                {"rank": 2, "deck_key": "deck_615", "deck_name": "615", "land_count": 34},
+                {"rank": 3, "deck_key": "deck_614", "deck_name": "614", "land_count": 33},
+                {"rank": 4, "deck_key": "deck_612", "deck_name": "612", "land_count": 27},
+            ],
+            post_squee_package_gates={
+                "rows": [
+                    {
+                        "package_key": "galvanoth_topdeck_freecast",
+                        "family": "topdeck_freecast",
+                        "adds": ["Galvanoth"],
+                        "cuts": ["Bender's Waterskin"],
+                        "delta_pp": 3.7,
+                        "strong_seed_delta_pp": -44.45,
+                        "decision": "probation_deeper_gate_only",
+                    },
+                    {
+                        "package_key": "birgi_spellchain_cut_squelcher",
+                        "family": "spellchain_mana",
+                        "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+                        "cuts": ["Hexing Squelcher"],
+                        "delta_pp": -3.7,
+                        "strong_seed_delta_pp": -55.56,
+                        "decision": "reject_or_rework",
+                    },
+                ]
+            },
+            safe_package_gates={
+                "rows": [
+                    {
+                        "package_key": "overmaster_protect_draw_cut_tibalts_trickery",
+                        "family": "spell_protection",
+                        "adds": ["Overmaster"],
+                        "cuts": ["Tibalt's Trickery"],
+                        "delta_pp": -33.33,
+                        "decision": "watch_only_needs_stronger_justification",
+                    },
+                    {
+                        "package_key": "seething_song_ritual_cut_victory_chimes",
+                        "family": "spellchain_mana",
+                        "adds": ["Seething Song"],
+                        "cuts": ["Victory Chimes"],
+                        "delta_pp": -100.0,
+                        "decision": "smoke_negative_do_not_promote",
+                    },
+                ]
+            },
+            library_leng_telemetry_gates={
+                "rows": [
+                    {
+                        "seed": 42,
+                        "discard_to_top_replacement": 30,
+                        "topdeck_manipulation_activated": 30,
+                        "miracle_cast": 33,
+                    },
+                    {
+                        "seed": 7,
+                        "discard_to_top_replacement": 0,
+                        "topdeck_manipulation_activated": 2,
+                        "miracle_cast": 4,
+                    },
+                ]
+            },
+            loss_failure_classifier={
+                "summary_rows": [
+                    {
+                        "package_key": "baseline_squee_champion",
+                        "seed": 7,
+                        "flag_counts": {"combat_pressure_death": 9},
+                    }
+                ]
+            },
+            cut_safety_manifest={
+                "cuts": [
+                    {
+                        "card_name": "Fated Clash",
+                        "status": "locked_do_not_cut",
+                        "current_lane": "interaction",
+                        "worst_strong_seed_delta_pp": -88.89,
+                        "reason": "collapsed strong seed",
+                    },
+                    {
+                        "card_name": "Bender's Waterskin",
+                        "status": "risky_cut_only_same_lane",
+                        "current_lane": "topdeck_miracle_setup",
+                        "best_delta_pp": 3.7,
+                        "worst_strong_seed_delta_pp": -44.45,
+                        "reason": "aggregate upside but strong seed risk",
+                    },
+                ],
+                "untested_flex_pool": [{"card_name": "Manual Flex"}],
+            },
+        )
+
+        self.assertEqual(result["current_benchmark"]["champion"]["deck_key"], "candidate_607_squee")
+        self.assertEqual(result["current_benchmark"]["champion"]["record"], "24-66-0")
+        locked_names = [row["card_name"] for row in result["cut_guardrails"]["locked_or_protected"]]
+        risky_names = [row["card_name"] for row in result["cut_guardrails"]["risky_same_lane_only"]]
+        self.assertEqual(locked_names, ["Fated Clash"])
+        self.assertEqual(risky_names, ["Bender's Waterskin"])
+        probation_keys = [
+            row["package_key"]
+            for row in result["package_learning"]["post_squee"]["probation_or_watch"]
+        ]
+        self.assertEqual(probation_keys, ["galvanoth_topdeck_freecast"])
+        self.assertEqual(
+            result["package_learning"]["safe_queue_watch"][0]["package_key"],
+            "overmaster_protect_draw_cut_tibalts_trickery",
+        )
+        actions = {row["deck_key"]: row["action"] for row in result["variant_import_contract"]}
+        self.assertEqual(actions["deck_607"], "baseline_shell")
+        self.assertEqual(actions["deck_615"], "extract_controlled_packages_only")
+        self.assertEqual(actions["deck_614"], "extract_controlled_packages_only")
+        self.assertEqual(actions["deck_612"], "do_not_import_full_list")
+        self.assertIn(
+            "candidate cuts a locked/protected card without same-lane proof",
+            result["next_hypothesis_contract"]["hard_reject_if"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
