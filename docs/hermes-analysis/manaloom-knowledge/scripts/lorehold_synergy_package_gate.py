@@ -20,7 +20,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import battle_rule_registry
 from master_optimizer_common import normalize_name
+from reviewed_battle_card_rules import DEFAULT_REVIEWED_RULES_PATH, load_reviewed_rule_rows
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -404,6 +406,17 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         ),
         "adds": ["Past in Flames"],
         "cuts": ["Bender's Waterskin"],
+    },
+    "radiant_scrollwielder_cut_scarlet_witch": {
+        "family": "graveyard_recursion",
+        "hypothesis": (
+            "Radiant Scrollwielder tests the 614 recursion/lifegain bridge: it "
+            "turns a used instant/sorcery into a same-turn recast while giving "
+            "all controlled instant/sorcery spells lifelink."
+        ),
+        "adds": ["Radiant Scrollwielder"],
+        "cuts": ["The Scarlet Witch"],
+        "allow_miracle_core_cuts": True,
     },
     "past_in_flames_cut_squelcher": {
         "family": "graveyard_recast",
@@ -920,6 +933,41 @@ def deck_cards(conn: sqlite3.Connection, deck_id: int) -> list[sqlite3.Row]:
     ).fetchall()
 
 
+def upsert_reviewed_rules_for_cards(
+    conn: sqlite3.Connection,
+    card_names: list[str],
+) -> dict[str, int]:
+    wanted = {normalize_name(name) for name in card_names}
+    if not wanted:
+        return {}
+    rows = [
+        row
+        for row in load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH)
+        if normalize_name(row["card_name"]) in wanted
+    ]
+    if not rows:
+        return {}
+    battle_rule_registry.ensure_battle_card_rules(conn)
+    counts: dict[str, int] = {}
+    for row in rows:
+        battle_rule_registry.upsert_battle_card_rule(
+            conn,
+            row["card_name"],
+            row["effect_json"],
+            source=row["source"],
+            confidence=row["confidence"],
+            review_status=row["review_status"],
+            execution_status=row.get("execution_status", "auto"),
+            deck_role_json=row.get("deck_role_json"),
+            notes=row.get("notes", ""),
+            oracle_hash=row.get("oracle_hash"),
+            logical_rule_key_value=row.get("logical_rule_key"),
+        )
+        counts[row["card_name"]] = counts.get(row["card_name"], 0) + 1
+    conn.commit()
+    return counts
+
+
 def is_miracle_core_cut(row: sqlite3.Row) -> bool:
     name = str(row["card_name"] or "")
     type_line = str(row["type_line"] or "")
@@ -977,6 +1025,7 @@ def apply_package(
             + ", ".join(miracle_core_cuts)
         )
 
+    reviewed_rule_upserts = upsert_reviewed_rules_for_cards(conn, adds)
     columns = [row[1] for row in conn.execute("PRAGMA table_info(deck_cards)") if row[1] != "id"]
     candidate_rows: list[dict[str, Any]] = []
     for row in rows:
@@ -1029,6 +1078,7 @@ def apply_package(
         "miracle_core_cuts": miracle_core_cuts,
         "row_count": len(candidate_rows),
         "total_cards": sum(int(row.get("quantity") or 1) for row in candidate_rows),
+        "reviewed_rule_upserts": reviewed_rule_upserts,
         "added_rule_counts": {
             name: len(active_rules_for_card(conn, name))
             for name in adds

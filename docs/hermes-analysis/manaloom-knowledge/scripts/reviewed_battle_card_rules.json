@@ -689,6 +689,32 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-20 against Scryfall API: draws four, then discards two unless an instant or sorcery is discarded. Runtime executes the draw baseline and carries the discard-condition metadata."
   },
+  "Radiant Scrollwielder": {
+    "effect_json": {
+      "cmc": 4.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 2,
+      "toughness": 4,
+      "instant_sorcery_spells_you_control_have_lifelink": true,
+      "trigger": "controller_upkeep",
+      "trigger_effect": "exile_random_instant_sorcery_from_graveyard_may_cast_this_turn",
+      "upkeep_exile_random_instant_sorcery_from_graveyard": true,
+      "upkeep_exiled_card_playable_until_eot": true,
+      "cast_exiled_card_exile_on_resolution": true,
+      "battle_model_scope": "radiant_scrollwielder_spell_lifelink_random_graveyard_recast_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature",
+      "subtype": "spell_lifelink_graveyard_recast"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-27 against local XMage source and XMage test: 2/4 creature; instants/sorceries you control have lifelink; beginning upkeep exiles a random instant/sorcery from your graveyard for casting this turn; if cast this way would go to graveyard, exile it instead. Runtime models spell-lifelink damage gain and exiled-card recast/exile replacement."
+  },
   "Rakdos, the Muscle": {
     "effect_json": {
       "cmc": 5.0,

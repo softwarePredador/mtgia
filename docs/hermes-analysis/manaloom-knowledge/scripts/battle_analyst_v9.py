@@ -2266,6 +2266,89 @@ def cast_airbend_card_from_exile(player, card, turn, phase):
     return True
 
 
+def cast_radiant_scrollwielder_card_from_exile(
+    player,
+    card,
+    opponents,
+    all_players,
+    turn,
+    phase,
+    stack,
+    rng,
+):
+    """Cast an instant/sorcery exiled by Radiant Scrollwielder until EOT."""
+    if not isinstance(card, dict) or card not in player.exile:
+        return False
+    if non_hand_cast_locked(player, turn=turn):
+        return False
+    try:
+        available_turn = int(card.get("_radiant_scrollwielder_cast_available_until_turn") or -1)
+    except (TypeError, ValueError):
+        available_turn = -1
+    if available_turn != int(turn):
+        return False
+    if not is_instant_or_sorcery_spell(card):
+        return False
+    if not is_instant(card) and not (is_sorcery(card) and phase in MAIN_PHASES):
+        return False
+
+    effect_data = get_card_effect(card)
+    effect_data, declared_targets = prepare_declared_removal_targets(
+        player,
+        opponents,
+        card,
+        effect_data,
+    )
+    if missing_required_declared_removal_target(effect_data, declared_targets):
+        return False
+    ctx = begin_cast_context(
+        player,
+        card,
+        phase,
+        effect_data=effect_data,
+        role="radiant_scrollwielder_recast",
+        targets=declared_targets,
+        source_zone="exile",
+    )
+    if not commit_cast_payment(ctx):
+        return False
+
+    player.exile.remove(card)
+    cast_copy = copy.deepcopy(card)
+    cast_copy["_exile_on_resolution"] = True
+    cast_copy["_exile_on_resolution_reason"] = (
+        card.get("_exile_on_resolution_reason") or "radiant_scrollwielder_replacement"
+    )
+    emit_replay_event(
+        "radiant_scrollwielder_exile_cast",
+        player=player.name,
+        card=card.get("name", "?"),
+        source=card.get("_radiant_scrollwielder_source"),
+        cast_available_until_turn=available_turn,
+        turn=turn,
+        phase=phase,
+        **ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    mark_cast_ledger_emitted(effect_data)
+    trigger_spell_cast_engines(
+        player, all_players, cast_copy, turn, phase, stack=stack, active_player=player
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        cast_copy,
+        turn,
+        phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
+    stack.push(cast_copy, player, effect_data)
+    return True
+
+
 def cast_flashback_spell_from_graveyard(player, card, opponents, all_players, turn, phase, stack, rng):
     """Cast an instant/sorcery from graveyard for flashback, exiling on resolution."""
     if not isinstance(card, dict) or card not in player.graveyard:
@@ -2466,6 +2549,20 @@ def create_map_token(player, name="Map Token"):
 
 
 def finish_countered_spell(player, card):
+    if isinstance(card, dict) and card.get("_exile_on_resolution"):
+        reason = card.get("_exile_on_resolution_reason") or "replacement_exile_countered"
+        move_to_exile(player, card, reason=reason, turn=CURRENT_REPLAY_TURN)
+        emit_replay_event(
+            "countered_spell_moved_to_exile",
+            player=getattr(player, "name", "?"),
+            card=card.get("name", "?"),
+            from_zone="stack",
+            to_zone="exile",
+            destination="exile",
+            replacement_reason=reason,
+            turn=CURRENT_REPLAY_TURN,
+        )
+        return
     graveyard_before = len(getattr(player, "graveyard", []) or [])
     exile_before = len(getattr(player, "exile", []) or [])
     result = _finish_countered_spell(player, card, move_to_exile_func=move_to_exile)
@@ -12402,6 +12499,70 @@ def process_graveyard_upkeep_self_return(player, turn):
             **replay_rule_fields(effect_data),
         )
     return returned
+
+
+def process_radiant_scrollwielder_upkeep_graveyard_recast(player, turn, rng):
+    """Exile a random instant/sorcery from graveyard for Radiant Scrollwielder."""
+    exiled_count = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+        if not effect_data.get("upkeep_exile_random_instant_sorcery_from_graveyard"):
+            continue
+        if permanent.get("radiant_scrollwielder_upkeep_last_turn") == turn:
+            continue
+        permanent["radiant_scrollwielder_upkeep_last_turn"] = turn
+        candidates = [
+            grave_card
+            for grave_card in list(getattr(player, "graveyard", []) or [])
+            if isinstance(grave_card, dict) and is_instant_or_sorcery_spell(grave_card)
+        ]
+        if not candidates:
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="beginning_of_your_upkeep",
+                effect="radiant_scrollwielder_graveyard_recast",
+                result="no_instant_or_sorcery_in_graveyard",
+                chosen=False,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+        selected_card = rng.choice(candidates)
+        if selected_card not in player.graveyard:
+            continue
+        player.graveyard.remove(selected_card)
+        selected_card["_radiant_scrollwielder_cast_available_until_turn"] = int(turn)
+        selected_card["_radiant_scrollwielder_source"] = permanent.get("name", "?")
+        selected_card["_radiant_scrollwielder_rule_key"] = effect_data.get("_rule_logical_key")
+        selected_card["_exile_on_resolution"] = True
+        selected_card["_exile_on_resolution_reason"] = "radiant_scrollwielder_replacement"
+        move_to_exile(
+            player,
+            selected_card,
+            reason="radiant_scrollwielder_upkeep",
+            turn=turn,
+        )
+        exiled_count += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="beginning_of_your_upkeep",
+            effect="radiant_scrollwielder_graveyard_recast",
+            result="exiled_random_card",
+            chosen=True,
+            exiled_card=selected_card.get("name", "?"),
+            exiled_type_line=selected_card.get("type_line", ""),
+            cast_available_until_turn=int(turn),
+            destination="exile",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+    return exiled_count
 
 
 def process_top_library_upkeep_free_cast(player, opponents, all_players, turn, rng, stack=None):
@@ -23984,6 +24145,27 @@ def process_end_step_token_sacrifices(player, turn):
     return sacrificed + exiled
 
 
+def spell_lifelink_sources(player, spell):
+    """Return permanents that give lifelink to this instant/sorcery spell."""
+    if not isinstance(spell, dict) or not is_instant_or_sorcery_spell(spell):
+        return []
+    sources = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+        if not effect_data.get("instant_sorcery_spells_you_control_have_lifelink"):
+            continue
+        sources.append(
+            {
+                "card": permanent.get("name", "?"),
+                "rule_key": effect_data.get("_rule_logical_key"),
+                "battle_model_scope": effect_data.get("battle_model_scope"),
+            }
+        )
+    return sources
+
+
 def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     raw_amount = effect_data.get("amount") or effect_data.get("damage") or 3
     if raw_amount == "x_available":
@@ -23998,13 +24180,16 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
         phase="resolution",
     )
     life_gain_requested = int(effect_data.get("gain_life") or effect_data.get("controller_gain_life") or 0)
+    lifelink_sources = spell_lifelink_sources(player, card)
 
-    def apply_controller_lifegain():
-        if life_gain_requested <= 0:
-            return 0, player.life, player.life
+    def apply_controller_lifegain(damage_dealt=0):
+        spell_lifelink_gain = max(0, int(damage_dealt or 0)) if lifelink_sources else 0
+        total_life_gain = life_gain_requested + spell_lifelink_gain
+        if total_life_gain <= 0:
+            return 0, player.life, player.life, spell_lifelink_gain
         controller_life_before = player.life
-        gain_life(player, life_gain_requested)
-        return player.life - controller_life_before, controller_life_before, player.life
+        gain_life(player, total_life_gain)
+        return player.life - controller_life_before, controller_life_before, player.life, spell_lifelink_gain
 
     for opp in opponents:
         targets = [
@@ -24034,7 +24219,9 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 reason="damage",
                 source=card,
             )
-            life_gained, controller_life_before, controller_life_after = apply_controller_lifegain()
+            life_gained, controller_life_before, controller_life_after, spell_lifelink_gain = (
+                apply_controller_lifegain(amount)
+            )
             emit_replay_event(
                 "damage_resolved",
                 player=player.name,
@@ -24045,17 +24232,18 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 result="creature_destroyed",
                 destination=destination,
                 life_gain_requested=life_gain_requested,
+                spell_lifelink_sources=lifelink_sources,
+                spell_lifelink_life_gained=spell_lifelink_gain,
                 life_gained=life_gained,
                 controller_life_before=controller_life_before,
                 controller_life_after=controller_life_after,
                 turn=turn,
                 **replay_rule_fields(effect_data),
             )
-            player.graveyard.append(card)
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
             return
     alive_opponents = [opp for opp in opponents if opp.is_alive()]
     if not direct_damage_targets_player(effect_data):
-        player.graveyard.append(card)
         emit_replay_event(
             "damage_resolved",
             player=player.name,
@@ -24065,12 +24253,16 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             turn=turn,
             **replay_rule_fields(effect_data),
         )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return
     if alive_opponents:
         target_player = min(alive_opponents, key=lambda opp: opp.life)
         life_before = target_player.life
         dealt = deal_damage(target_player, amount)
-        life_gained, controller_life_before, controller_life_after = apply_controller_lifegain()
+        actual_damage_dealt = amount if dealt else 0
+        life_gained, controller_life_before, controller_life_after, spell_lifelink_gain = (
+            apply_controller_lifegain(actual_damage_dealt)
+        )
         emit_replay_event(
             "damage_resolved",
             player=player.name,
@@ -24082,13 +24274,15 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             life_before=life_before,
             life_after=target_player.life,
             life_gain_requested=life_gain_requested,
+            spell_lifelink_sources=lifelink_sources,
+            spell_lifelink_life_gained=spell_lifelink_gain,
             life_gained=life_gained,
             controller_life_before=controller_life_before,
             controller_life_after=controller_life_after,
             turn=turn,
             **replay_rule_fields(effect_data),
         )
-    player.graveyard.append(card)
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
 
 
 def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
@@ -28122,6 +28316,23 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     return True
                 break
             if cast_airbend_card_from_exile(player, exiled_card, turn, phase):
+                if note_action():
+                    return True
+                break
+            if cast_radiant_scrollwielder_card_from_exile(
+                player,
+                exiled_card,
+                opponents,
+                all_players,
+                turn,
+                phase,
+                stack,
+                rng,
+            ):
+                while not stack.empty():
+                    priority_round(player, all_players, stack, turn, rng, phase=phase)
+                    if game_winner(all_players):
+                        return True
                 if note_action():
                     return True
                 break
@@ -33385,6 +33596,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.refresh_mana_sources(turn)
     process_upkeep_utility_lands(player, turn, all_players=all_players)
     process_graveyard_upkeep_self_return(player, turn)
+    process_radiant_scrollwielder_upkeep_graveyard_recast(player, turn, rng)
     process_rebound_upkeep(player, opponents, all_players, turn, rng, stack=stack)
     process_top_library_upkeep_free_cast(
         player,

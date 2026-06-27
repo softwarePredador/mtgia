@@ -32,6 +32,7 @@ DEFAULT_PACKAGE_GATE_REPORTS = [
     REPORT_DIR / "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
     REPORT_DIR / "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_silence_fixed.json",
     REPORT_DIR / "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+    REPORT_DIR / "lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json",
 ]
 
 
@@ -386,6 +387,12 @@ def build_queue(
         )
         prior_gate = prior_gate_results.get(idea["package_key"])
         status = apply_prior_gate_status(status, prior_gate)
+        visible_blockers = list(blockers)
+        if status in {
+            "tested_negative_do_not_promote",
+            "positive_gate_needs_deeper_validation",
+        }:
+            visible_blockers = []
         status_counts[status] += 1
         rows.append(
             {
@@ -393,7 +400,7 @@ def build_queue(
                 "status": status,
                 "score": score_package(idea, status, variant_presence),
                 "variant_presence": variant_presence,
-                "blockers": blockers,
+                "blockers": visible_blockers,
                 "prior_gate": prior_gate or {},
                 "add_oracle_ready": {card: oracle.get(card, False) for card in idea["adds"]},
                 "add_active_rule_counts": {card: int(rules.get(card) or 0) for card in idea["adds"]},

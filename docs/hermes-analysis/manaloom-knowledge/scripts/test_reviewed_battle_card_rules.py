@@ -268,6 +268,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Pirate's Pillage", by_name)
         self.assertIn("Prismatic Lens", by_name)
         self.assertIn("Practical Research", by_name)
+        self.assertIn("Radiant Scrollwielder", by_name)
         self.assertIn("Rampant Growth", by_name)
         self.assertIn("Rakdos, the Muscle", by_name)
         self.assertIn("Reanimate", by_name)
@@ -631,6 +632,19 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Practical Research"]["effect_json"]["effect"], "draw_cards")
         self.assertEqual(by_name["Practical Research"]["effect_json"]["count"], 4)
         self.assertEqual(by_name["Practical Research"]["effect_json"]["discard_count"], 2)
+        self.assertEqual(by_name["Radiant Scrollwielder"]["source"], "curated")
+        self.assertEqual(by_name["Radiant Scrollwielder"]["review_status"], "active")
+        self.assertEqual(by_name["Radiant Scrollwielder"]["execution_status"], "auto")
+        self.assertTrue(
+            by_name["Radiant Scrollwielder"]["effect_json"][
+                "instant_sorcery_spells_you_control_have_lifelink"
+            ]
+        )
+        self.assertTrue(
+            by_name["Radiant Scrollwielder"]["effect_json"][
+                "upkeep_exile_random_instant_sorcery_from_graveyard"
+            ]
+        )
         self.assertEqual(by_name["Rampant Growth"]["effect_json"]["effect"], "land_ramp")
         self.assertTrue(by_name["Rampant Growth"]["effect_json"]["basic_only"])
         self.assertTrue(by_name["Rampant Growth"]["effect_json"]["land_enters_tapped"])
