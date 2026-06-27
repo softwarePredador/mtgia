@@ -1,0 +1,789 @@
+{
+  "contextual_lane_reviews": [
+    {
+      "candidate": "Enlightened Tutor",
+      "candidate_deck_presence": [
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 31,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 54,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 74,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 83,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 608,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 611,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 612,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 613,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 614,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 615,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 619,
+          "functional_tag": null,
+          "functional_tags_json": "[]",
+          "quantity": 1,
+          "type_line": "Instant"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "deck_id": 621,
+          "functional_tag": null,
+          "functional_tags_json": "[]",
+          "quantity": 1,
+          "type_line": "Instant"
+        }
+      ],
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_enchantment_tutor_to_library_top_v1": 1
+        },
+        "card_name": "Enlightened Tutor",
+        "effects": {
+          "tutor": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2,
+        "sources": {
+          "curated": 1,
+          "generated": 1
+        }
+      },
+      "decision": "tutor_lane_probation_needs_seed_safe_cut",
+      "gate_action": "manual_review",
+      "lane": "contextual",
+      "prior_evidence": [
+        {
+          "adds": [
+            "Enlightened Tutor"
+          ],
+          "cuts": [
+            "Thor, God of Thunder"
+          ],
+          "decision": "reject_or_rework",
+          "delta_pp": -44.45,
+          "family": "tutor_access",
+          "package_key": "enlightened_engine_access_cut_thor",
+          "source_section": "hard_reject_sample",
+          "strong_seed_delta_pp": -44.45
+        }
+      ],
+      "reasons": [
+        "Prior evidence regressed the protected strong seed by -44.45 pp."
+      ],
+      "recommended_cut_search": "Search artifact/enchantment access cuts separately; do not use Thor as the tutor-access cut."
+    },
+    {
+      "candidate": "Gamble",
+      "candidate_deck_presence": [
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 58,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 74,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 83,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 105,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 609,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 612,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 613,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 614,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "deck_id": 615,
+          "functional_tag": "tutor",
+          "functional_tags_json": "[\"tutor\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        }
+      ],
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "any_card_to_hand_then_random_discard_v1": 1
+        },
+        "card_name": "Gamble",
+        "effects": {
+          "tutor": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2,
+        "sources": {
+          "curated": 1,
+          "generated": 1
+        }
+      },
+      "decision": "tutor_lane_probation_needs_seed_safe_cut",
+      "gate_action": "manual_review",
+      "lane": "contextual",
+      "prior_evidence": [
+        {
+          "adds": [
+            "Gamble"
+          ],
+          "cuts": [
+            "Creative Technique"
+          ],
+          "decision": "probation_deeper_gate_only",
+          "delta_pp": 3.7,
+          "family": "tutor_access",
+          "package_key": "gamble_approach_access_cut_creative",
+          "source_section": "probation_or_watch",
+          "strong_seed_delta_pp": -44.45
+        },
+        {
+          "adds": [
+            "Gamble"
+          ],
+          "cuts": [
+            "Thor, God of Thunder"
+          ],
+          "decision": "reject_or_rework",
+          "delta_pp": -55.56,
+          "family": "tutor_access",
+          "package_key": "gamble_access_cut_thor",
+          "source_section": "hard_reject_sample",
+          "strong_seed_delta_pp": -55.56
+        }
+      ],
+      "reasons": [
+        "Aggregate upside exists in at least one prior gate.",
+        "Prior evidence regressed the protected strong seed by -55.56 pp."
+      ],
+      "recommended_cut_search": "Keep Gamble on probation only if the cut does not touch Thor and does not repeat Creative Technique without a seed-42 protection explanation."
+    }
+  ],
+  "cut_model": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_gap_miner_20260627_v2_cut_model.json",
+  "external_research_sources": [
+    {
+      "finding": "Lorehold's core loop is first-draw miracle timing, opponent-upkeep rummage, topdeck manipulation, Library of Leng, and high-impact instant/sorcery hits.",
+      "title": "EDHREC - Miracles Every Turn With Lorehold, the Historian",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    },
+    {
+      "finding": "The deck needs a high instant/sorcery density so miracle draws do not become dead non-spell hits.",
+      "title": "EDHREC - Lorehold, the Historian: Boros Miracles on a Budget",
+      "url": "https://edhrec.com/articles/lorehold-the-historian-boros-miracles-on-a-budget"
+    },
+    {
+      "finding": "Community deck tech highlights Library of Leng and reanimation/discard routes as real Lorehold subpackages.",
+      "title": "Card Kingdom - 10 Crazy Synergy Cards for Lorehold, the Historian",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/"
+    },
+    {
+      "finding": "Community discussion reinforces discard, topdeck control, suspend/miracle, and reanimation as plausible lanes, but not as promotion evidence by itself.",
+      "title": "Reddit r/EDHBrews - Commander Deck Tech: Lorehold, the Historian",
+      "url": "https://www.reddit.com/r/EDHBrews/comments/1ssny05/commander_deck_tech_lorehold_the_historian/"
+    }
+  ],
+  "generated_at": "2026-06-27T23:18:03Z",
+  "manual_cut_reviews": [
+    {
+      "candidate": "Volcanic Vision",
+      "candidate_deck_presence": [
+        {
+          "card_name": "Volcanic Vision",
+          "cmc": 7.0,
+          "deck_id": 42,
+          "functional_tag": "removal",
+          "functional_tags_json": "[\"removal\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Volcanic Vision",
+          "cmc": 7.0,
+          "deck_id": 609,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Volcanic Vision",
+          "cmc": 7.0,
+          "deck_id": 611,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Volcanic Vision",
+          "cmc": 7.0,
+          "deck_id": 613,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Volcanic Vision",
+          "cmc": 7.0,
+          "deck_id": 614,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        }
+      ],
+      "candidate_rule": {
+        "active_rule_count": 2,
+        "battle_model_scopes": {
+          "instant_sorcery_recursion_with_opponent_creature_damage_annotation_v1": 1
+        },
+        "card_name": "Volcanic Vision",
+        "effects": {
+          "recursion": 3
+        },
+        "execution_statuses": {
+          "auto": 2,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 2
+        },
+        "rule_count": 3,
+        "sources": {
+          "curated": 1,
+          "generated": 2
+        }
+      },
+      "cut": "Squee, Goblin Nabob",
+      "cut_decision": {
+        "decision": "probation_engine",
+        "decision_reason": "10-seed suite keeps Squee narrowly ahead and proves clean graveyard returns, but not a self-sufficient discard loop",
+        "effective_role": "recursion_engine",
+        "package_lane": "graveyard_recursion",
+        "rule_materialized_in_equal_gate_candidate": true,
+        "status": "materialized_rule_in_equal_gate_candidate"
+      },
+      "cut_deck_presence": [
+        {
+          "card_name": "Squee, Goblin Nabob",
+          "cmc": 3.0,
+          "deck_id": 6,
+          "functional_tag": "wincon",
+          "functional_tags_json": "[\"wincon\"]",
+          "quantity": 1,
+          "type_line": "Legendary Creature \u2014 Goblin"
+        },
+        {
+          "card_name": "Squee, Goblin Nabob",
+          "cmc": 3.0,
+          "deck_id": 609,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Legendary Creature \u2014 Goblin"
+        },
+        {
+          "card_name": "Squee, Goblin Nabob",
+          "cmc": 3.0,
+          "deck_id": 610,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Legendary Creature \u2014 Goblin"
+        }
+      ],
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "graveyard_upkeep_return_self_to_hand_v1": 1
+        },
+        "card_name": "Squee, Goblin Nabob",
+        "effects": {
+          "creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1,
+        "sources": {
+          "curated": 1
+        }
+      },
+      "decision": "do_not_cut_current_champion_engine",
+      "gate_action": "blocked",
+      "lane": "graveyard_recursion",
+      "pairing_signature": "add:volcanic vision|cut:squee goblin nabob",
+      "reasons": [
+        "Squee is the current champion's probation recursion engine.",
+        "Squee's graveyard return is already materialized in the equal-gate candidate.",
+        "Variant recursion cards must prove a non-Squee cut or a multi-card recursion package."
+      ]
+    },
+    {
+      "candidate": "Restoration Seminar",
+      "candidate_deck_presence": [
+        {
+          "card_name": "Restoration Seminar",
+          "cmc": 0.0,
+          "deck_id": 606,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery \u2014 Lesson"
+        },
+        {
+          "card_name": "Restoration Seminar",
+          "cmc": 0.0,
+          "deck_id": 609,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery \u2014 Lesson"
+        },
+        {
+          "card_name": "Restoration Seminar",
+          "cmc": 0.0,
+          "deck_id": 610,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery \u2014 Lesson"
+        },
+        {
+          "card_name": "Restoration Seminar",
+          "cmc": 0.0,
+          "deck_id": 611,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery \u2014 Lesson"
+        },
+        {
+          "card_name": "Restoration Seminar",
+          "cmc": 0.0,
+          "deck_id": 612,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Sorcery \u2014 Lesson"
+        }
+      ],
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "nonland_permanent_graveyard_to_battlefield_paradigm_v1": 1
+        },
+        "card_name": "Restoration Seminar",
+        "effects": {
+          "recursion": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3,
+        "sources": {
+          "curated": 1,
+          "generated": 2
+        }
+      },
+      "cut": "Squee, Goblin Nabob",
+      "cut_decision": {
+        "decision": "probation_engine",
+        "decision_reason": "10-seed suite keeps Squee narrowly ahead and proves clean graveyard returns, but not a self-sufficient discard loop",
+        "effective_role": "recursion_engine",
+        "package_lane": "graveyard_recursion",
+        "rule_materialized_in_equal_gate_candidate": true,
+        "status": "materialized_rule_in_equal_gate_candidate"
+      },
+      "cut_deck_presence": [
+        {
+          "card_name": "Squee, Goblin Nabob",
+          "cmc": 3.0,
+          "deck_id": 6,
+          "functional_tag": "wincon",
+          "functional_tags_json": "[\"wincon\"]",
+          "quantity": 1,
+          "type_line": "Legendary Creature \u2014 Goblin"
+        },
+        {
+          "card_name": "Squee, Goblin Nabob",
+          "cmc": 3.0,
+          "deck_id": 609,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Legendary Creature \u2014 Goblin"
+        },
+        {
+          "card_name": "Squee, Goblin Nabob",
+          "cmc": 3.0,
+          "deck_id": 610,
+          "functional_tag": "engine",
+          "functional_tags_json": "[\"engine\"]",
+          "quantity": 1,
+          "type_line": "Legendary Creature \u2014 Goblin"
+        }
+      ],
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "graveyard_upkeep_return_self_to_hand_v1": 1
+        },
+        "card_name": "Squee, Goblin Nabob",
+        "effects": {
+          "creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1,
+        "sources": {
+          "curated": 1
+        }
+      },
+      "decision": "do_not_cut_current_champion_engine",
+      "gate_action": "blocked",
+      "lane": "graveyard_recursion",
+      "pairing_signature": "add:restoration seminar|cut:squee goblin nabob",
+      "reasons": [
+        "Squee is the current champion's probation recursion engine.",
+        "Squee's graveyard return is already materialized in the equal-gate candidate.",
+        "Variant recursion cards must prove a non-Squee cut or a multi-card recursion package."
+      ]
+    },
+    {
+      "candidate": "Austere Command",
+      "candidate_deck_presence": [
+        {
+          "card_name": "Austere Command",
+          "cmc": 6.0,
+          "deck_id": 606,
+          "functional_tag": "board_wipe",
+          "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Austere Command",
+          "cmc": 6.0,
+          "deck_id": 609,
+          "functional_tag": "board_wipe",
+          "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Austere Command",
+          "cmc": 6.0,
+          "deck_id": 610,
+          "functional_tag": "board_wipe",
+          "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Austere Command",
+          "cmc": 6.0,
+          "deck_id": 611,
+          "functional_tag": "board_wipe",
+          "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Austere Command",
+          "cmc": 6.0,
+          "deck_id": 612,
+          "functional_tag": "board_wipe",
+          "functional_tags_json": "[\"board_wipe\",\"wipe\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        }
+      ],
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "austere_command_choose_two_destroy_modes_v1": 1
+        },
+        "card_name": "Austere Command",
+        "effects": {
+          "board_wipe": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2,
+        "sources": {
+          "curated": 1,
+          "generated": 1
+        }
+      },
+      "cut": "Emeria's Call // Emeria, Shattered Skyclave",
+      "cut_decision": {
+        "decision": "modeled_pending_durable_sync",
+        "decision_reason": "local evidence exists but durable source sync still matters before final promotion",
+        "effective_role": "unknown",
+        "package_lane": "pressure_absorber_or_protection",
+        "rule_materialized_in_equal_gate_candidate": false,
+        "status": "materialization_gap_ready_rule"
+      },
+      "cut_deck_presence": [
+        {
+          "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+          "cmc": 7.0,
+          "deck_id": 6,
+          "functional_tag": "unknown",
+          "functional_tags_json": "[\"unknown\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+          "cmc": 7.0,
+          "deck_id": 607,
+          "functional_tag": "unknown",
+          "functional_tags_json": "[\"unknown\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+          "cmc": 7.0,
+          "deck_id": 609,
+          "functional_tag": "board_development",
+          "functional_tags_json": "[\"board_development\",\"token_maker\"]",
+          "quantity": 1,
+          "type_line": "Sorcery"
+        }
+      ],
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1": 1
+        },
+        "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+        "effects": {
+          "token_maker": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1,
+        "sources": {
+          "curated": 1
+        }
+      },
+      "decision": "manual_review_role_gap_before_gate",
+      "gate_action": "manual_review",
+      "lane": "pressure_absorber_or_protection",
+      "pairing_signature": "add:austere command|cut:emeria s call emeria shattered skyclave",
+      "reasons": [
+        "Emeria has a ready local rule but still needs durable role sync.",
+        "Emeria's strategic role is still unknown, so cutting it hides whether the deck needs board/protection density.",
+        "Austere-style board wipes can be tested only after Emeria exposure/role is measured or a safer cut is found."
+      ]
+    }
+  ],
+  "next_actions": [
+    {
+      "action": "preserve_squee_while_testing_recursion_variants",
+      "priority": 1,
+      "reason": "Squee is an observed champion/probation recursion engine; Volcanic Vision and Restoration Seminar need another cut or multi-card package."
+    },
+    {
+      "action": "measure_emeria_role_before_austere_command_cut",
+      "priority": 2,
+      "reason": "Emeria has rule coverage but unknown strategic role; Austere Command cannot prove improvement if it deletes an unmeasured board/protection slot."
+    },
+    {
+      "action": "rebuild_tutor_tests_around_seed_safe_cuts",
+      "priority": 3,
+      "reason": "Gamble and Enlightened Tutor are runtime-ready, but prior tests over Thor/Creative regressed the protected seed."
+    }
+  ],
+  "postgres_writes": false,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "strategy_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260627_v3.json",
+  "summary": {
+    "automatic_gate_ready_count": 0,
+    "contextual_lane_review_count": 2,
+    "decision_counts": {
+      "do_not_cut_current_champion_engine": 2,
+      "manual_review_role_gap_before_gate": 1,
+      "tutor_lane_probation_needs_seed_safe_cut": 2
+    },
+    "manual_cut_review_count": 3,
+    "safe_next_action": "Do not spend a gate on Squee/Emeria cuts yet; find a non-engine cut or run a targeted exposure gate that measures the unresolved role first."
+  }
+}
