@@ -59,6 +59,7 @@ def memory_db():
             (608, "Candidate Ramp", 1, "ramp", 7, "Sorcery", '["ramp"]', 0),
             (608, "Candidate Bad", 1, "draw", 3, "Sorcery", '["draw"]', 0),
             (608, "Candidate Partial", 1, "ramp", 7, "Sorcery", '["ramp"]', 0),
+            (608, "Candidate Protection", 1, "protection", 2, "Instant", '["protection"]', 0),
             (608, "Needs Rule", 1, "draw", 3, "Creature", '["draw"]', 0),
             (609, "Candidate Ramp", 1, "ramp", 7, "Sorcery", '["ramp"]', 0),
             (609, "Candidate Partial", 1, "ramp", 7, "Sorcery", '["ramp"]', 0),
@@ -100,6 +101,13 @@ def memory_db():
                         "treasure_count": 1,
                     }
                 ),
+            ),
+            (
+                "Candidate Protection",
+                "candidate protection",
+                "auto",
+                "verified",
+                json.dumps({"effect": "counter"}),
             ),
         ],
     )
@@ -196,7 +204,41 @@ def test_variant_gap_miner_blocks_review_only_and_marks_prior_negative(tmp_path)
     assert cuts["Prismari Pianist"]["status"] == "tested_negative_cut"
 
     assert payload["pairing_hypotheses"][0]["candidate"] == "Candidate Ramp"
+    assert payload["pairing_hypotheses"][0]["status"] == "gate_ready_safe_same_lane"
     assert payload["pairing_hypotheses"][0]["cut_options"][0]["card_name"] == "Safe Rock"
+    assert (
+        payload["pairing_hypotheses"][0]["cut_options"][0]["gate_readiness"]
+        == "safe_same_lane_flex"
+    )
+    pairings = {row["candidate"]: row for row in payload["pairing_hypotheses"]}
+    assert pairings["Candidate Protection"]["status"] == "blocked_no_safe_cut_in_lane"
+    assert pairings["Candidate Protection"]["cut_options"][0]["card_name"] == "Locked Core"
+    assert pairings["Candidate Protection"]["cut_options"][0]["gate_readiness"] == "blocked_cut_contract"
     assert "Candidate Partial" not in {
         row["candidate"] for row in payload["pairing_hypotheses"]
     }
+
+
+def test_variant_gap_miner_imports_negative_package_gate_history(tmp_path):
+    report_path = tmp_path / "package_gate.json"
+    report_path.write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "package_key": "negative_package",
+                        "status": "gated",
+                        "adds": ["Candidate Ramp"],
+                        "cuts": ["Safe Rock"],
+                        "gate_summary": {"delta_pp": -12.5},
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    history = miner.load_prior_gate_reports([report_path])
+
+    assert history["negative_adds"]["candidate ramp"][0]["package_key"] == "negative_package"
+    assert history["negative_cuts"]["safe rock"][0]["package_key"] == "negative_package"

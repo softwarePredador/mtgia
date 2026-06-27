@@ -384,6 +384,9 @@ def load_prior_gate_reports(paths: Iterable[Path]) -> dict[str, Any]:
 def default_prior_gate_report_paths() -> list[Path]:
     stems = [
         "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+        "lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+        "lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725.json",
+        "lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848.json",
         "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
         "lorehold_lapse_approach_gate_20260627_v1_fixed.json",
         "lorehold_next_hypothesis_queue_20260627_v9.json",
@@ -436,6 +439,27 @@ def cut_status(
     if card.get("is_commander"):
         return "blocked_commander"
     return "manual_review_needed"
+
+
+def pairing_signature(add_card: str, cut_card: str) -> str:
+    return f"add:{normalize_key(add_card)}|cut:{normalize_key(cut_card)}"
+
+
+def cut_gate_readiness(cut: dict[str, Any]) -> tuple[int, str, str]:
+    status = str(cut.get("status") or "")
+    if status == "untested_flex_candidate":
+        return 0, "safe_same_lane_flex", "cut is in the untested flex pool for this lane"
+    if status == "manual_review_needed":
+        return 1, "manual_cut_review_required", "cut needs role/runtime review before gate"
+    if status == "risky_same_lane_only":
+        return 2, "risky_cut_requires_override", "cut has prior strong-seed regression risk"
+    if status == "requires_same_lane_gate":
+        return 3, "protected_same_lane_benchmark_required", "cut is core/support and needs a stronger same-lane benchmark"
+    if status == "tested_negative_cut":
+        return 4, "blocked_prior_negative_cut", "cut already appeared in a negative gate"
+    if status.startswith("blocked"):
+        return 5, "blocked_cut_contract", "cut is blocked by core/lock contract"
+    return 6, "blocked_unknown_cut_model", "cut status is not eligible for automatic gate"
 
 
 def mine_variant_candidates(
@@ -572,8 +596,6 @@ def propose_pairings(
     cuts: list[dict[str, Any]],
     limit: int = 12,
 ) -> list[dict[str, Any]]:
-    eligible_cut_statuses = {"untested_flex_candidate", "risky_same_lane_only", "manual_review_needed"}
-    eligible_cuts = [row for row in cuts if row["status"] in eligible_cut_statuses]
     pairings: list[dict[str, Any]] = []
     for candidate in candidates:
         if candidate["status"] not in {
@@ -591,12 +613,13 @@ def propose_pairings(
                     "status": "needs_lane_model_before_gate",
                     "candidate_score": candidate["score"],
                     "cut_options": [],
+                    "recommended_action": "define contextual lane and candidate-specific cut model before gate",
                 }
             )
             continue
         same_lane = [
             cut
-            for cut in eligible_cuts
+            for cut in cuts
             if cut["lane"] == lane or lane in str(cut["lane"]) or str(cut["lane"]) in lane
         ]
         if not same_lane:
@@ -608,26 +631,52 @@ def propose_pairings(
                     "status": "needs_cut_model_before_gate",
                     "candidate_score": candidate["score"],
                     "cut_options": [],
+                    "recommended_action": "define a same-lane cut before battle gate",
                 }
             )
             continue
+        ranked_same_lane = sorted(
+            same_lane,
+            key=lambda cut: (
+                cut_gate_readiness(cut)[0],
+                int(cut.get("negative_cut_count") or 0),
+                str(cut.get("card_name") or ""),
+            ),
+        )
         cut_options = [
             {
                 "card_name": cut["card_name"],
                 "status": cut["status"],
                 "lane": cut["lane"],
                 "negative_cut_count": cut["negative_cut_count"],
+                "gate_readiness": cut_gate_readiness(cut)[1],
+                "readiness_reason": cut_gate_readiness(cut)[2],
+                "signature": pairing_signature(candidate["card_name"], cut["card_name"]),
             }
-            for cut in same_lane[:5]
+            for cut in ranked_same_lane[:5]
         ]
+        readinesses = {cut["gate_readiness"] for cut in cut_options}
+        if "safe_same_lane_flex" in readinesses:
+            status = "gate_ready_safe_same_lane"
+            recommended_action = "run a small equal gate before any promotion"
+        elif "manual_cut_review_required" in readinesses:
+            status = "manual_cut_review_required"
+            recommended_action = "review the cut role/runtime model before gate"
+        elif "risky_cut_requires_override" in readinesses:
+            status = "blocked_risky_cut_requires_override"
+            recommended_action = "do not gate without explicit override and strong-seed protection"
+        else:
+            status = "blocked_no_safe_cut_in_lane"
+            recommended_action = "find a safer same-lane cut or build a multi-card package"
         pairings.append(
             {
                 "candidate": candidate["card_name"],
                 "candidate_status": candidate["status"],
                 "lane": lane,
-                "status": "gate_candidate_requires_manual_review",
+                "status": status,
                 "candidate_score": candidate["score"],
                 "cut_options": cut_options,
+                "recommended_action": recommended_action,
             }
         )
     pairings.sort(key=lambda row: (-int(row["candidate_score"]), row["candidate"]))
@@ -666,6 +715,7 @@ def build_report(
     candidate_counts = Counter(row["status"] for row in candidates)
     cut_counts = Counter(row["status"] for row in cuts)
     pairings = propose_pairings(candidates, cuts)
+    pairing_counts = Counter(row["status"] for row in pairings)
     return {
         "generated_at": utc_now(),
         "source_db": str(DEFAULT_DB),
@@ -694,6 +744,12 @@ def build_report(
             ),
             "tested_negative_cut_count": cut_counts.get("tested_negative_cut", 0),
             "pairing_count": len(pairings),
+            "pairing_status_counts": dict(sorted(pairing_counts.items())),
+            "gate_ready_pairing_count": pairing_counts.get("gate_ready_safe_same_lane", 0),
+            "manual_review_pairing_count": pairing_counts.get("manual_cut_review_required", 0),
+            "blocked_pairing_count": sum(
+                count for status, count in pairing_counts.items() if status.startswith("blocked")
+            ),
         },
         "top_variant_candidates": candidates[:60],
         "cut_inventory": cuts,
@@ -770,14 +826,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append("- No automatic pairing is justified; choose a cut model before the next gate.")
     for row in payload["pairing_hypotheses"]:
         cuts = "; ".join(
-            f"{cut['card_name']} ({cut['status']}, {cut['lane']})"
+            f"{cut['card_name']} ({cut['gate_readiness']}, {cut['status']}, {cut['lane']})"
             for cut in row["cut_options"]
         ) or "none"
         lines.append(
-            "- `{candidate}` -> `{status}` in lane `{lane}`; cut options: {cuts}".format(
+            "- `{candidate}` -> `{status}` in lane `{lane}`; action: {action}; cut options: {cuts}".format(
                 candidate=row["candidate"],
                 status=row["status"],
                 lane=row["lane"],
+                action=row.get("recommended_action") or "review before gate",
                 cuts=cuts,
             )
         )
