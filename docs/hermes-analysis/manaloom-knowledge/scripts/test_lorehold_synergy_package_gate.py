@@ -101,6 +101,26 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             gate.PACKAGE_DEFINITIONS["gamble_approach_access_cut_creative"]["allow_miracle_core_cuts"],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["gamble_access_cut_thor"]["adds"],
+            ["Gamble"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["gamble_access_cut_thor"]["cuts"],
+            ["Thor, God of Thunder"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["enlightened_engine_access_cut_thor"]["family"],
+            "tutor_access",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["enlightened_engine_access_cut_thor"]["adds"],
+            ["Enlightened Tutor"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["enlightened_engine_access_cut_thor"]["cuts"],
+            ["Thor, God of Thunder"],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )

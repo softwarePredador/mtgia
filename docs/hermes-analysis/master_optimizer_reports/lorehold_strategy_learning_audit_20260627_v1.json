@@ -19466,7 +19466,7 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T18:41:56Z",
+  "generated_at": "2026-06-27T18:51:48Z",
   "library_leng_telemetry_gates": {
     "paths": [
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_leng_telemetry_gate_20260627_seed7_squee_v1.json",
@@ -19591,7 +19591,7 @@
       "Life-zero losses with combat/player-elimination events receive a combat-pressure flag.",
       "Low spell volume is only primary when no Library/topdeck/miracle engine appeared."
     ],
-    "generated_at": "2026-06-27T18:41:03Z",
+    "generated_at": "2026-06-27T18:51:04Z",
     "input_paths": [
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1_brainstone_topdeck_miracle_cut_squelcher.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1_ghostly_prison_pressure_cut_squelcher.json",
@@ -19613,6 +19613,8 @@
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed7_v1_topfreecast_v1_primal_amulet_spell_engine.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed20260625_v1_tutor_access_v1_gamble_approach_access_cut_creative.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v1_tutor_access_v1_gamble_approach_access_cut_creative.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2_enlightened_engine_access_cut_thor.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed7_v1_tutor_access_v1_gamble_approach_access_cut_creative.json"
     ],
     "loss_rows": [
@@ -23865,6 +23867,547 @@
         "turns": 6
       },
       {
+        "deck_key": "synergy_enlightened_engine_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_missing",
+          "low_spell_volume",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_enlightened_engine_access_cut_thor:Sisay, Weatherlight Captain #61 (real):0",
+        "game_index": 0,
+        "opponent": "Sisay, Weatherlight Captain #61 (real)",
+        "opponent_archetype": "control",
+        "package_key": "enlightened_engine_access_cut_thor",
+        "picked_opponents": [
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Vivi Ornitier #99 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "primary_cause": "mana_spell_bottleneck_under_pressure",
+        "primary_cause_label": "Low spell volume before combat-pressure death",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 13,
+          "combat_result": 14,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 1,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 1,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 0,
+          "low_spell_volume": true,
+          "miracle_cast": 0,
+          "multi_defender_attack": 1,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 7
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2_enlightened_engine_access_cut_thor.json",
+        "turns": 7
+      },
+      {
+        "deck_key": "synergy_enlightened_engine_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_seen",
+          "miracle_missing",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_enlightened_engine_access_cut_thor:Sisay, Weatherlight Captain #61 (real):2",
+        "game_index": 2,
+        "opponent": "Sisay, Weatherlight Captain #61 (real)",
+        "opponent_archetype": "control",
+        "package_key": "enlightened_engine_access_cut_thor",
+        "picked_opponents": [
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)",
+          "Vivi Ornitier #99 (real)"
+        ],
+        "primary_cause": "topdeck_without_miracle_conversion_under_pressure",
+        "primary_cause_label": "Discard/topdeck happened but no miracle conversion under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 14,
+          "combat_result": 14,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 9,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 6,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 2,
+          "low_spell_volume": false,
+          "miracle_cast": 0,
+          "multi_defender_attack": 0,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 2,
+          "turns": 7
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2_enlightened_engine_access_cut_thor.json",
+        "turns": 7
+      },
+      {
+        "deck_key": "synergy_enlightened_engine_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_seen",
+          "topdeck_missing",
+          "miracle_seen",
+          "low_spell_volume",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_enlightened_engine_access_cut_thor:Vivi Ornitier #99 (real):0",
+        "game_index": 0,
+        "opponent": "Vivi Ornitier #99 (real)",
+        "opponent_archetype": "combo",
+        "package_key": "enlightened_engine_access_cut_thor",
+        "picked_opponents": [
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "primary_cause": "topdeck_miracle_without_approach_under_pressure",
+        "primary_cause_label": "Topdeck/miracle happened but no Approach conversion under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 15,
+          "combat_result": 16,
+          "discard_to_top_replacement": 7,
+          "lorehold_cost_paid": 5,
+          "lorehold_rummage_discard_to_top": 7,
+          "lorehold_spell_cast": 3,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 7,
+          "low_spell_volume": true,
+          "miracle_cast": 1,
+          "multi_defender_attack": 1,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2_enlightened_engine_access_cut_thor.json",
+        "turns": 6
+      },
+      {
+        "deck_key": "synergy_enlightened_engine_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_missing",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_enlightened_engine_access_cut_thor:Winota, Joiner of Forces #39 (real):0",
+        "game_index": 0,
+        "opponent": "Winota, Joiner of Forces #39 (real)",
+        "opponent_archetype": "tribal",
+        "package_key": "enlightened_engine_access_cut_thor",
+        "picked_opponents": [
+          "Winota, Joiner of Forces #39 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Vivi Ornitier #99 (real)"
+        ],
+        "primary_cause": "missing_engine_under_combat_pressure",
+        "primary_cause_label": "No Library/topdeck/miracle engine before combat-pressure death",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 14,
+          "combat_result": 15,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 9,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 8,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 0,
+          "low_spell_volume": false,
+          "miracle_cast": 0,
+          "multi_defender_attack": 1,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 7
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2_enlightened_engine_access_cut_thor.json",
+        "turns": 7
+      },
+      {
+        "deck_key": "synergy_enlightened_engine_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_seen",
+          "miracle_missing",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_enlightened_engine_access_cut_thor:Winota, Joiner of Forces #39 (real):1",
+        "game_index": 1,
+        "opponent": "Winota, Joiner of Forces #39 (real)",
+        "opponent_archetype": "tribal",
+        "package_key": "enlightened_engine_access_cut_thor",
+        "picked_opponents": [
+          "Winota, Joiner of Forces #39 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Vivi Ornitier #99 (real)"
+        ],
+        "primary_cause": "topdeck_without_miracle_conversion_under_pressure",
+        "primary_cause_label": "Discard/topdeck happened but no miracle conversion under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 20,
+          "combat_result": 22,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 12,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 10,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 5,
+          "low_spell_volume": false,
+          "miracle_cast": 0,
+          "multi_defender_attack": 1,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1,
+          "turns": 11
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2_enlightened_engine_access_cut_thor.json",
+        "turns": 11
+      },
+      {
+        "deck_key": "synergy_gamble_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_seen"
+        ],
+        "game_id": "synergy_gamble_access_cut_thor:Sisay, Weatherlight Captain #61 (real):1",
+        "game_index": 1,
+        "opponent": "Sisay, Weatherlight Captain #61 (real)",
+        "opponent_archetype": "control",
+        "package_key": "gamble_access_cut_thor",
+        "picked_opponents": [
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Vivi Ornitier #99 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "primary_cause": "topdeck_miracle_without_approach_under_pressure",
+        "primary_cause_label": "Topdeck/miracle happened but no Approach conversion under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 16,
+          "combat_result": 17,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 12,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 7,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 3,
+          "low_spell_volume": false,
+          "miracle_cast": 2,
+          "multi_defender_attack": 1,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 3,
+          "squee_upkeep_return": 2,
+          "topdeck_manipulation_activated": 0,
+          "turns": 8
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+        "turns": 8
+      },
+      {
+        "deck_key": "synergy_gamble_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_missing",
+          "low_spell_volume",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_gamble_access_cut_thor:Sisay, Weatherlight Captain #61 (real):2",
+        "game_index": 2,
+        "opponent": "Sisay, Weatherlight Captain #61 (real)",
+        "opponent_archetype": "control",
+        "package_key": "gamble_access_cut_thor",
+        "picked_opponents": [
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Vivi Ornitier #99 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "primary_cause": "mana_spell_bottleneck_under_pressure",
+        "primary_cause_label": "Low spell volume before combat-pressure death",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 14,
+          "combat_result": 15,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 6,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 6,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 1,
+          "low_spell_volume": true,
+          "miracle_cast": 0,
+          "multi_defender_attack": 1,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+        "turns": 6
+      },
+      {
+        "deck_key": "synergy_gamble_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_seen",
+          "topdeck_missing",
+          "miracle_seen",
+          "low_spell_volume",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_gamble_access_cut_thor:Vivi Ornitier #99 (real):0",
+        "game_index": 0,
+        "opponent": "Vivi Ornitier #99 (real)",
+        "opponent_archetype": "combo",
+        "package_key": "gamble_access_cut_thor",
+        "picked_opponents": [
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "primary_cause": "topdeck_miracle_without_approach_under_pressure",
+        "primary_cause_label": "Topdeck/miracle happened but no Approach conversion under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 15,
+          "combat_result": 16,
+          "discard_to_top_replacement": 7,
+          "lorehold_cost_paid": 5,
+          "lorehold_rummage_discard_to_top": 7,
+          "lorehold_spell_cast": 3,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 7,
+          "low_spell_volume": true,
+          "miracle_cast": 1,
+          "multi_defender_attack": 1,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+        "turns": 6
+      },
+      {
+        "deck_key": "synergy_gamble_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_missing",
+          "miracle_missing",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_gamble_access_cut_thor:Winota, Joiner of Forces #39 (real):0",
+        "game_index": 0,
+        "opponent": "Winota, Joiner of Forces #39 (real)",
+        "opponent_archetype": "tribal",
+        "package_key": "gamble_access_cut_thor",
+        "picked_opponents": [
+          "Winota, Joiner of Forces #39 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Vivi Ornitier #99 (real)"
+        ],
+        "primary_cause": "missing_engine_under_combat_pressure",
+        "primary_cause_label": "No Library/topdeck/miracle engine before combat-pressure death",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 9,
+          "combat_result": 10,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 7,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 6,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 3,
+          "low_spell_volume": false,
+          "miracle_cast": 0,
+          "multi_defender_attack": 1,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 0,
+          "turns": 6
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+        "turns": 6
+      },
+      {
+        "deck_key": "synergy_gamble_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_seen",
+          "miracle_seen"
+        ],
+        "game_id": "synergy_gamble_access_cut_thor:Winota, Joiner of Forces #39 (real):1",
+        "game_index": 1,
+        "opponent": "Winota, Joiner of Forces #39 (real)",
+        "opponent_archetype": "tribal",
+        "package_key": "gamble_access_cut_thor",
+        "picked_opponents": [
+          "Winota, Joiner of Forces #39 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Vivi Ornitier #99 (real)"
+        ],
+        "primary_cause": "topdeck_miracle_without_approach_under_pressure",
+        "primary_cause_label": "Topdeck/miracle happened but no Approach conversion under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 25,
+          "combat_result": 25,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 14,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 12,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 5,
+          "low_spell_volume": false,
+          "miracle_cast": 3,
+          "multi_defender_attack": 0,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 1,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 4,
+          "turns": 11
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+        "turns": 11
+      },
+      {
+        "deck_key": "synergy_gamble_access_cut_thor",
+        "flags": [
+          "combat_pressure_death",
+          "discard_to_top_missing",
+          "topdeck_seen",
+          "miracle_missing",
+          "squee_loop_absent"
+        ],
+        "game_id": "synergy_gamble_access_cut_thor:Winota, Joiner of Forces #39 (real):2",
+        "game_index": 2,
+        "opponent": "Winota, Joiner of Forces #39 (real)",
+        "opponent_archetype": "tribal",
+        "package_key": "gamble_access_cut_thor",
+        "picked_opponents": [
+          "Winota, Joiner of Forces #39 (real)",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)"
+        ],
+        "primary_cause": "topdeck_without_miracle_conversion_under_pressure",
+        "primary_cause_label": "Discard/topdeck happened but no miracle conversion under pressure",
+        "reason": "life_zero|found=False|countered=0",
+        "seed": 42,
+        "signals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 11,
+          "combat_result": 11,
+          "discard_to_top_replacement": 0,
+          "lorehold_cost_paid": 7,
+          "lorehold_rummage_discard_to_top": 0,
+          "lorehold_spell_cast": 6,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 4,
+          "low_spell_volume": false,
+          "miracle_cast": 0,
+          "multi_defender_attack": 0,
+          "player_eliminated": 1,
+          "pressure_death": true,
+          "reason": "life_zero|found=False|countered=0",
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 1,
+          "turns": 7
+        },
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+        "turns": 7
+      },
+      {
         "deck_key": "synergy_gamble_approach_access_cut_creative",
         "flags": [
           "combat_pressure_death",
@@ -27616,11 +28159,11 @@
     ],
     "postgres_writes": false,
     "primary_cause_counts": {
-      "mana_spell_bottleneck_under_pressure": 39,
-      "missing_engine_under_combat_pressure": 35,
+      "mana_spell_bottleneck_under_pressure": 41,
+      "missing_engine_under_combat_pressure": 37,
       "second_approach_window_failed_under_pressure": 18,
-      "topdeck_miracle_without_approach_under_pressure": 59,
-      "topdeck_without_miracle_conversion_under_pressure": 11
+      "topdeck_miracle_without_approach_under_pressure": 63,
+      "topdeck_without_miracle_conversion_under_pressure": 14
     },
     "scope": "losses from Library/pressure, life-floor, spellchain, top-freecast, and tutor-access conversion detailed gates",
     "source_db_mutated": false,
@@ -28220,6 +28763,108 @@
           "squee_upkeep_return": 2,
           "topdeck_manipulation_activated": 3,
           "turns": 63
+        }
+      },
+      {
+        "avg_loss_turn": 7.6,
+        "deck_key": "synergy_enlightened_engine_access_cut_thor",
+        "flag_counts": {
+          "combat_pressure_death": 5,
+          "discard_to_top_missing": 4,
+          "discard_to_top_seen": 1,
+          "low_spell_volume": 2,
+          "miracle_missing": 4,
+          "miracle_seen": 1,
+          "squee_loop_absent": 5,
+          "topdeck_missing": 3,
+          "topdeck_seen": 2
+        },
+        "losses": 5,
+        "opponent_counts": {
+          "Sisay, Weatherlight Captain #61 (real)": 2,
+          "Vivi Ornitier #99 (real)": 1,
+          "Winota, Joiner of Forces #39 (real)": 2
+        },
+        "package_key": "enlightened_engine_access_cut_thor",
+        "primary_cause_counts": {
+          "mana_spell_bottleneck_under_pressure": 1,
+          "missing_engine_under_combat_pressure": 1,
+          "topdeck_miracle_without_approach_under_pressure": 1,
+          "topdeck_without_miracle_conversion_under_pressure": 2
+        },
+        "seed": 42,
+        "signal_totals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 76,
+          "combat_result": 81,
+          "discard_to_top_replacement": 7,
+          "lorehold_cost_paid": 36,
+          "lorehold_rummage_discard_to_top": 7,
+          "lorehold_spell_cast": 28,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 14,
+          "low_spell_volume": 2,
+          "miracle_cast": 1,
+          "multi_defender_attack": 4,
+          "player_eliminated": 5,
+          "pressure_death": 5,
+          "squee_to_graveyard": 0,
+          "squee_upkeep_return": 0,
+          "topdeck_manipulation_activated": 3,
+          "turns": 38
+        }
+      },
+      {
+        "avg_loss_turn": 7.33,
+        "deck_key": "synergy_gamble_access_cut_thor",
+        "flag_counts": {
+          "combat_pressure_death": 6,
+          "discard_to_top_missing": 5,
+          "discard_to_top_seen": 1,
+          "low_spell_volume": 2,
+          "miracle_missing": 3,
+          "miracle_seen": 3,
+          "squee_loop_absent": 4,
+          "topdeck_missing": 4,
+          "topdeck_seen": 2
+        },
+        "losses": 6,
+        "opponent_counts": {
+          "Sisay, Weatherlight Captain #61 (real)": 2,
+          "Vivi Ornitier #99 (real)": 1,
+          "Winota, Joiner of Forces #39 (real)": 3
+        },
+        "package_key": "gamble_access_cut_thor",
+        "primary_cause_counts": {
+          "mana_spell_bottleneck_under_pressure": 1,
+          "missing_engine_under_combat_pressure": 1,
+          "topdeck_miracle_without_approach_under_pressure": 3,
+          "topdeck_without_miracle_conversion_under_pressure": 1
+        },
+        "seed": 42,
+        "signal_totals": {
+          "approach_cast_tracked": 0,
+          "approach_first_resolution": 0,
+          "combat": 90,
+          "combat_result": 94,
+          "discard_to_top_replacement": 7,
+          "lorehold_cost_paid": 51,
+          "lorehold_rummage_discard_to_top": 7,
+          "lorehold_spell_cast": 40,
+          "lorehold_spell_rummage": 0,
+          "lorehold_spell_rummage_discard_to_top": 0,
+          "lorehold_upkeep_rummage": 23,
+          "low_spell_volume": 2,
+          "miracle_cast": 6,
+          "multi_defender_attack": 4,
+          "player_eliminated": 6,
+          "pressure_death": 6,
+          "squee_to_graveyard": 4,
+          "squee_upkeep_return": 2,
+          "topdeck_manipulation_activated": 5,
+          "turns": 44
         }
       },
       {
@@ -28828,9 +29473,9 @@
         }
       }
     ],
-    "total_loss_games": 162
+    "total_loss_games": 173
   },
-  "loss_failure_classifier_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_loss_failure_classifier_20260627_conversion_pressure_v4.json",
+  "loss_failure_classifier_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_loss_failure_classifier_20260627_conversion_pressure_v5.json",
   "matrix_generated_at": "2026-06-26T17:59:59.926705+00:00",
   "matrix_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json",
   "matrix_ranked": [
@@ -35596,6 +36241,7 @@
     "Do not promote Birgi + Seething Song over Pearl/Ruby Medallion; any future ritual package must preserve at least one medallion or prove the medallion cut with a stronger seed-42 result.",
     "Do not promote Primal Amulet over Bender's Waterskin; future topdeck/freecast work needs a different cut or a deeper Galvanoth-style exposure gate that preserves seed 42.",
     "Do not promote Gamble over Creative Technique from the current gate; if continuing tutor access, preserve seed 42 and test a different cut or a narrower access package rather than assuming the tutor lane is solved.",
+    "Do not continue tutor-access testing by cutting Thor unless a new hypothesis explains why the seed-42 collapse would not repeat.",
     "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
     "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
     "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap."
@@ -35614,7 +36260,8 @@
     "Angel's Grace over Dawn's Truce confirms that one-mana life-floor protection can improve a weak seed but is not free; cutting the existing protection shell breaks seed 42 completely.",
     "Birgi + Seething Song over Pearl/Ruby Medallion confirms the ritual lane can help weak seeds, but cutting both medallions breaks seed 42; treat medallions as protected until a same-lane benchmark proves a safer cut.",
     "Primal Amulet over Bender's Waterskin confirms the revised top-freecast/cost-reduction lane can help weak seeds, but the Bender cut still breaks seed 42; treat Bender as protected until a same-slot benchmark preserves the strong seed.",
-    "Gamble over Creative Technique is now a resolved probation clue: it improves aggregate and weak seeds but breaks seed 42, so the tutor lane needs a different cut or stronger exposure before promotion."
+    "Gamble over Creative Technique is now a resolved probation clue: it improves aggregate and weak seeds but breaks seed 42, so the tutor lane needs a different cut or stronger exposure before promotion.",
+    "Gamble or Enlightened Tutor over Thor failed seed-42 triage; do not treat Thor as the obvious tutor-access cut just because Thor is not deck-proven yet."
   ],
   "post_squee_package_gates": {
     "paths": [
@@ -35644,7 +36291,9 @@
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed20260625_v1_topfreecast_v1.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v1_tutor_access_v1.json",
       "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed7_v1_tutor_access_v1.json",
-      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed20260625_v1_tutor_access_v1.json"
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed20260625_v1_tutor_access_v1.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json"
     ],
     "per_seed": [
       {
@@ -37427,6 +38076,80 @@
           "squee_upkeep_return": 4,
           "topdeck_manipulation_activated": 17,
           "tutor_resolved": 2
+        }
+      },
+      {
+        "adds": [
+          "Enlightened Tutor"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 5,
+        "candidate_wins": 4,
+        "cuts": [
+          "Thor, God of Thunder"
+        ],
+        "delta_pp": -44.45,
+        "family": "tutor_access",
+        "package_key": "enlightened_engine_access_cut_thor",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": -9,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -55,
+          "lorehold_rummage_discard_to_top": -6,
+          "lorehold_spell_cast": -43,
+          "lorehold_spell_rummage": -19,
+          "lorehold_spell_rummage_discard_to_top": -3,
+          "lorehold_upkeep_rummage": -27,
+          "miracle_cast": -15,
+          "random_discard_after_tutor": 0,
+          "ritual_mana_added": -5,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -5,
+          "squee_to_graveyard": -7,
+          "squee_upkeep_return": -5,
+          "topdeck_manipulation_activated": -21,
+          "tutor_resolved": -3
+        }
+      },
+      {
+        "adds": [
+          "Gamble"
+        ],
+        "baseline_losses": 1,
+        "baseline_wins": 8,
+        "candidate_losses": 6,
+        "candidate_wins": 3,
+        "cuts": [
+          "Thor, God of Thunder"
+        ],
+        "delta_pp": -55.56,
+        "family": "tutor_access",
+        "package_key": "gamble_access_cut_thor",
+        "seed": 42,
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json",
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": -9,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -43,
+          "lorehold_rummage_discard_to_top": -6,
+          "lorehold_spell_cast": -34,
+          "lorehold_spell_rummage": -19,
+          "lorehold_spell_rummage_discard_to_top": -3,
+          "lorehold_upkeep_rummage": -15,
+          "miracle_cast": -16,
+          "random_discard_after_tutor": 3,
+          "ritual_mana_added": -3,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -1,
+          "squee_to_graveyard": -1,
+          "squee_upkeep_return": -1,
+          "topdeck_manipulation_activated": -21,
+          "tutor_resolved": -2
         }
       }
     ],
@@ -39902,6 +40625,166 @@
           "tutor_resolved": -1
         },
         "strong_seed_delta_pp": -88.89
+      },
+      {
+        "adds": [
+          "Enlightened Tutor"
+        ],
+        "baseline_games": 9,
+        "baseline_losses": 1,
+        "baseline_win_rate": 88.89,
+        "baseline_wins": 8,
+        "candidate_games": 9,
+        "candidate_losses": 5,
+        "candidate_win_rate": 44.44,
+        "candidate_wins": 4,
+        "cuts": [
+          "Thor, God of Thunder"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -44.45,
+        "family": "tutor_access",
+        "package_key": "enlightened_engine_access_cut_thor",
+        "seed_rows": [
+          {
+            "adds": [
+              "Enlightened Tutor"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 5,
+            "candidate_wins": 4,
+            "cuts": [
+              "Thor, God of Thunder"
+            ],
+            "delta_pp": -44.45,
+            "family": "tutor_access",
+            "package_key": "enlightened_engine_access_cut_thor",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "discard_to_top_replacement": -9,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -55,
+              "lorehold_rummage_discard_to_top": -6,
+              "lorehold_spell_cast": -43,
+              "lorehold_spell_rummage": -19,
+              "lorehold_spell_rummage_discard_to_top": -3,
+              "lorehold_upkeep_rummage": -27,
+              "miracle_cast": -15,
+              "random_discard_after_tutor": 0,
+              "ritual_mana_added": -5,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -5,
+              "squee_to_graveyard": -7,
+              "squee_upkeep_return": -5,
+              "topdeck_manipulation_activated": -21,
+              "tutor_resolved": -3
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": -9,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -55,
+          "lorehold_rummage_discard_to_top": -6,
+          "lorehold_spell_cast": -43,
+          "lorehold_spell_rummage": -19,
+          "lorehold_spell_rummage_discard_to_top": -3,
+          "lorehold_upkeep_rummage": -27,
+          "miracle_cast": -15,
+          "random_discard_after_tutor": 0,
+          "ritual_mana_added": -5,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -5,
+          "squee_to_graveyard": -7,
+          "squee_upkeep_return": -5,
+          "topdeck_manipulation_activated": -21,
+          "tutor_resolved": -3
+        },
+        "strong_seed_delta_pp": -44.45
+      },
+      {
+        "adds": [
+          "Gamble"
+        ],
+        "baseline_games": 9,
+        "baseline_losses": 1,
+        "baseline_win_rate": 88.89,
+        "baseline_wins": 8,
+        "candidate_games": 9,
+        "candidate_losses": 6,
+        "candidate_win_rate": 33.33,
+        "candidate_wins": 3,
+        "cuts": [
+          "Thor, God of Thunder"
+        ],
+        "decision": "reject_or_rework",
+        "delta_pp": -55.56,
+        "family": "tutor_access",
+        "package_key": "gamble_access_cut_thor",
+        "seed_rows": [
+          {
+            "adds": [
+              "Gamble"
+            ],
+            "baseline_losses": 1,
+            "baseline_wins": 8,
+            "candidate_losses": 6,
+            "candidate_wins": 3,
+            "cuts": [
+              "Thor, God of Thunder"
+            ],
+            "delta_pp": -55.56,
+            "family": "tutor_access",
+            "package_key": "gamble_access_cut_thor",
+            "seed": 42,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "discard_to_top_replacement": -9,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -43,
+              "lorehold_rummage_discard_to_top": -6,
+              "lorehold_spell_cast": -34,
+              "lorehold_spell_rummage": -19,
+              "lorehold_spell_rummage_discard_to_top": -3,
+              "lorehold_upkeep_rummage": -15,
+              "miracle_cast": -16,
+              "random_discard_after_tutor": 3,
+              "ritual_mana_added": -3,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -1,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": -1,
+              "topdeck_manipulation_activated": -21,
+              "tutor_resolved": -2
+            }
+          }
+        ],
+        "strategic_delta": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": -9,
+          "hand_to_topdeck_activation": 0,
+          "lorehold_cost_paid": -43,
+          "lorehold_rummage_discard_to_top": -6,
+          "lorehold_spell_cast": -34,
+          "lorehold_spell_rummage": -19,
+          "lorehold_spell_rummage_discard_to_top": -3,
+          "lorehold_upkeep_rummage": -15,
+          "miracle_cast": -16,
+          "random_discard_after_tutor": 3,
+          "ritual_mana_added": -3,
+          "spell_cast_mana_trigger": 0,
+          "squee_return_after_known_graveyard_entry": -1,
+          "squee_to_graveyard": -1,
+          "squee_upkeep_return": -1,
+          "topdeck_manipulation_activated": -21,
+          "tutor_resolved": -2
+        },
+        "strong_seed_delta_pp": -55.56
       }
     ]
   },

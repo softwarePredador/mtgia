@@ -96,6 +96,32 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "cuts": ["Creative Technique"],
         "allow_miracle_core_cuts": True,
     },
+    "gamble_access_cut_thor": {
+        "family": "tutor_access",
+        "hypothesis": (
+            "Gamble improved weak seeds when it cut Creative Technique but broke "
+            "seed 42. This retest keeps the modeled free-cast slot and instead "
+            "cuts Thor, whose local runtime rule has natural exposure but no deck "
+            "win-rate lift yet, while preserving Dawn's Truce, Teferi's Protection, "
+            "High Noon, Hexing Squelcher, Storm Herd, medallions, Bender's Waterskin, "
+            "and the three-mana ramp shell."
+        ),
+        "adds": ["Gamble"],
+        "cuts": ["Thor, God of Thunder"],
+        "allow_miracle_core_cuts": True,
+    },
+    "enlightened_engine_access_cut_thor": {
+        "family": "tutor_access",
+        "hypothesis": (
+            "Enlightened Tutor tests a lower-risk access line than Gamble: it cannot "
+            "find Approach, but it can put artifact/enchantment engines on top for "
+            "Lorehold and miracle setup without random discard. Thor is the cut for "
+            "the same modeled-not-proven reason as the Gamble retest."
+        ),
+        "adds": ["Enlightened Tutor"],
+        "cuts": ["Thor, God of Thunder"],
+        "allow_miracle_core_cuts": True,
+    },
     "galvanoth_topdeck_freecast": {
         "family": "topdeck_freecast",
         "hypothesis": (
