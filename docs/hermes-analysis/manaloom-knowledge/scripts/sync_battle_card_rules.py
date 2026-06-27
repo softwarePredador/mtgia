@@ -53,6 +53,7 @@ def load_battle_module(path: Path):
 
 
 battle = load_battle_module(BATTLE_PATH)
+DEFAULT_RUNTIME_WAIVERS = frozenset(getattr(battle, "MANUAL_RULE_RUNTIME_WAIVERS", set()))
 
 
 def parse_args() -> argparse.Namespace:
@@ -137,7 +138,12 @@ def build_rows(
     # After the 2026-06-16 canonicalization cleanup, active handwritten rules
     # should normally be empty. This loop remains only for explicit temporary
     # runtime waivers injected by tests or incident response.
-    for name in sorted(getattr(battle, "MANUAL_RULE_RUNTIME_WAIVERS", set())):
+    runtime_waivers = set(getattr(battle, "MANUAL_RULE_RUNTIME_WAIVERS", set()))
+    # Historical runtime waivers remain inspectable in battle_analyst_v9.py, but
+    # sync should only write waivers that were explicitly injected for this run.
+    if runtime_waivers == DEFAULT_RUNTIME_WAIVERS:
+        runtime_waivers = set()
+    for name in sorted(runtime_waivers):
         effect = dict(getattr(battle, "HANDCRAFTED_KNOWN_CARD_RULES", {}).get(name) or {})
         if not effect:
             continue

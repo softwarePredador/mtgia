@@ -51,6 +51,7 @@ DEFAULT_SQUEE_RULE_MATERIALIZATION_AUDIT = (
 DEFAULT_UNRESOLVED_RULE_ROWS_AUDIT = (
     REPORT_DIR / "lorehold_unresolved_rule_rows_audit_20260627_v1.json"
 )
+DEFAULT_THOR_RULE_RUNTIME_AUDIT = REPORT_DIR / "lorehold_thor_rule_runtime_audit_20260627_v1.json"
 DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
@@ -118,7 +119,7 @@ CARD_REASON_OVERRIDES = {
     "Starfall Invocation": "board wipe with gift/draw context; pressure control first",
     "Tempt with Bunnies": "token finisher and big-spell payoff",
     "The Mind Stone": "white Infinity Stone ramp/protection engine; not the classic Mind Stone draw rock",
-    "Thor, God of Thunder": "graveyard impulse-recast plus noncreature-spell damage payoff; rule modeling pending",
+    "Thor, God of Thunder": "noncreature-spell damage payoff now has local runtime; ETB temporary graveyard play remains annotation",
     "Tragic Arrogance": "selective board wipe; active rule exists and only needed deck-row materialization",
 }
 
@@ -537,6 +538,15 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"`{unresolved_summary.get('deck_rule_materialization_gap', 0)}` deck materialization gaps and "
             f"`{unresolved_summary.get('missing_battle_rule_model', 0)}` missing battle-rule/model gap."
         )
+    thor_audit = report.get("thor_rule_runtime_audit") or {}
+    if thor_audit.get("decision"):
+        verification = thor_audit.get("temp_sqlite_sync_verification") or {}
+        lines.append(
+            "- Thor rule/runtime audit now closes the local model gap: "
+            f"`{thor_audit.get('decision')}`, temp materialized Thor rule count "
+            f"`{verification.get('thor_deck_rule_count_after_temp_materialization', 0)}`. "
+            "It still needs durable PostgreSQL/Hermes sync approval before promotion gates use it as source truth."
+        )
     lines.append("- The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.")
     post_squee = report.get("post_squee_package_gates") or {}
     post_squee_rows = post_squee.get("rows") or []
@@ -685,6 +695,25 @@ def render_markdown(report: dict[str, Any]) -> str:
                 )
             )
         lines.append("")
+    if thor_audit:
+        verification = thor_audit.get("temp_sqlite_sync_verification") or {}
+        runtime = thor_audit.get("runtime_test_verification") or {}
+        reviewed_rule = thor_audit.get("reviewed_rule") or {}
+        lines.append("## Thor Rule Runtime Audit")
+        lines.append("")
+        lines.append(f"- Source: `{report.get('thor_rule_runtime_audit_path')}`")
+        lines.append(f"- Decision: `{thor_audit.get('decision')}`")
+        lines.append(f"- Runtime test: `{runtime.get('result')}`")
+        lines.append(
+            f"- Temp SQLite sync/materialization: Thor rule count `{verification.get('thor_sqlite_rule_count_after_temp_sync', 0)}`; "
+            f"deck materialized Thor rule count `{verification.get('thor_deck_rule_count_after_temp_materialization', 0)}`; "
+            f"rule key `{reviewed_rule.get('logical_rule_key')}`."
+        )
+        lines.append(
+            "- Executed branch: noncreature spell casts deal damage equal to the triggering spell mana value to any target. "
+            "ETB graveyard recast is recorded as annotation until a safe temporary-play executor is promoted."
+        )
+        lines.append("")
     lines.append("## Variant Learning")
     lines.append("")
     lines.append("| Rank | Deck | Score | Intent | Lands | Rule Ready | Main Risks |")
@@ -766,8 +795,16 @@ def render_markdown(report: dict[str, Any]) -> str:
         if row.get("decision") == "deck_rule_materialization_gap"
     }
     audit_materialization_cards.discard(None)
+    thor_local_runtime_cards = set()
+    if (report.get("thor_rule_runtime_audit") or {}).get("decision"):
+        thor_local_runtime_cards.add((report.get("thor_rule_runtime_audit") or {}).get("card"))
+    thor_local_runtime_cards.discard(None)
     effective_missing_cards = [
-        card for card in missing_cards if card not in materialized_cards and card not in audit_materialization_cards
+        card
+        for card in missing_cards
+        if card not in materialized_cards
+        and card not in audit_materialization_cards
+        and card not in thor_local_runtime_cards
     ]
     lines.append(
         f"- Missing aggregated battle-rule rows in the legacy champion DB: `{len(missing_cards)}` cards: {', '.join(missing_cards) or 'none'}."
@@ -785,6 +822,13 @@ def render_markdown(report: dict[str, Any]) -> str:
         )
         lines.append(
             f"- Effective unresolved rule/model rows after all current materialization evidence: `{len(effective_missing_cards)}` cards: {', '.join(effective_missing_cards) or 'none'}."
+        )
+    if thor_local_runtime_cards:
+        lines.append(
+            f"- Reclassified by Thor runtime audit as local reviewed rule added pending durable sync: `{', '.join(sorted(thor_local_runtime_cards))}`."
+        )
+        lines.append(
+            f"- Effective unresolved local runtime/model rows after Thor audit: `{len(effective_missing_cards)}` cards: {', '.join(effective_missing_cards) or 'none'}."
         )
     lines.append("- Full per-card role, tags, and rule keys are in the companion JSON under `deck_summaries.6.cards`.")
     lines.append("")
@@ -850,13 +894,19 @@ def card_synergy_reason(card: dict[str, Any]) -> str:
     return "manual review needed"
 
 
-def card_status(card: dict[str, Any], rule_audit: dict[str, Any] | None = None) -> str:
+def card_status(
+    card: dict[str, Any],
+    rule_audit: dict[str, Any] | None = None,
+    thor_audit: dict[str, Any] | None = None,
+) -> str:
     name = card.get("card_name") or ""
     role = effective_card_role(card)
     keys = card.get("battle_rule_keys") or []
     audit_decision = (rule_audit or {}).get("decision")
     if name == "Lorehold, the Historian":
         return "core_commander"
+    if name == (thor_audit or {}).get("card") and (thor_audit or {}).get("decision"):
+        return "local_runtime_rule_added_pending_sync"
     if not keys and audit_decision == "deck_rule_materialization_gap":
         return "materialization_gap_ready_rule"
     if not keys and audit_decision == "missing_battle_rule_model":
@@ -878,6 +928,7 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
     rule_audit_by_card = {
         row.get("card"): row for row in (report.get("unresolved_rule_rows_audit") or {}).get("rows", [])
     }
+    thor_audit = report.get("thor_rule_runtime_audit") or {}
     lines = [
         "# Lorehold Current Champion Card Roles - 2026-06-27",
         "",
@@ -895,6 +946,8 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
         audit_decision = (rule_audit or {}).get("decision")
         if keys:
             rule_status = "ready"
+        elif card.get("card_name") == thor_audit.get("card") and thor_audit.get("decision"):
+            rule_status = "local_reviewed_rule_pending_sync"
         elif audit_decision == "deck_rule_materialization_gap":
             rule_status = "source_rule_ready_needs_materialization"
         elif audit_decision == "missing_battle_rule_model":
@@ -908,7 +961,7 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
                 qty=card.get("quantity"),
                 db_role=card.get("primary_role"),
                 effective_role=effective_card_role(card),
-                status=card_status(card, rule_audit),
+                status=card_status(card, rule_audit, thor_audit),
                 rule_status=rule_status,
                 reason=reason,
             )
@@ -920,6 +973,8 @@ def render_card_roles_markdown(report: dict[str, Any]) -> str:
     if missing:
         for card_name in missing:
             decision = (rule_audit_by_card.get(card_name) or {}).get("decision", "unclassified")
+            if card_name == thor_audit.get("card") and thor_audit.get("decision"):
+                decision = thor_audit.get("decision")
             lines.append(f"- {card_name}: `{decision}`")
     else:
         lines.append("- none")
@@ -948,6 +1003,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     squee_seed_diagnostic = read_json(args.squee_seed_diagnostic)
     squee_rule_materialization_audit = read_json(args.squee_rule_materialization_audit)
     unresolved_rule_rows_audit = read_json(args.unresolved_rule_rows_audit)
+    thor_rule_runtime_audit = read_json(args.thor_rule_runtime_audit)
     post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
 
     open_questions = [
@@ -955,7 +1011,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Treat Squee as a provisional micro-upgrade, not a promoted final deck slot, until a support package or alternative cut shows a larger reproducible edge.",
         "Make all decisive battle gates run with `PYTHONHASHSEED=0`, `--isolate-deck-process`, and per-game timeout; same simulation seed without fixed hash seed/process isolation is not enough for deck promotion.",
         "Review DB-role versus effective-role divergences surfaced by the card-role manifest, especially cards stored as `draw` or `unknown` while functioning as protection, removal, miracle engine, or board wipe.",
-        "`Thor, God of Thunder` is the remaining real rule/model gap in the six-row unresolved audit; it needs ETB graveyard impulse-recast and noncreature-spell damage trigger modeling before strategic rejection or promotion.",
+        "`Thor, God of Thunder` now has a local reviewed runtime rule for the noncreature-spell damage trigger; the remaining caveat is durable PostgreSQL/Hermes sync and the ETB temporary-play branch before promotion gates treat it as fully modeled.",
         "Separate finalizer slots from engine slots: Insurrection, Storm Herd, Approach, Rise of the Eldrazi, and Aetherflux Reservoir should be benchmarked as closing packages, not generic wincon labels.",
         "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
         "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.",
@@ -967,7 +1023,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Retest Galvanoth only as a probation topdeck-freecast hypothesis with a better cut than Bender's Waterskin, because the current gate is aggregate-positive but breaks seed 42.",
         "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
-        "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active `battle_card_rules` row.",
+        "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
+        "Before evaluating Thor in a deck gate, run reviewed-rule sync into the gate SQLite or apply an approved PostgreSQL package so `battle_card_rules` contains `battle_rule_v1:280e17ec34ac105baeb6989491c6ff25`.",
     ]
 
     return {
@@ -989,6 +1046,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "squee_rule_materialization_audit": squee_rule_materialization_audit,
         "unresolved_rule_rows_audit_path": str(args.unresolved_rule_rows_audit),
         "unresolved_rule_rows_audit": unresolved_rule_rows_audit,
+        "thor_rule_runtime_audit_path": str(args.thor_rule_runtime_audit),
+        "thor_rule_runtime_audit": thor_rule_runtime_audit,
         "general_synergy_confirm": general_confirm,
         "post_squee_package_gates": post_squee_package_gates,
         "open_questions": open_questions,
@@ -1011,6 +1070,11 @@ def parse_args() -> argparse.Namespace:
         "--unresolved-rule-rows-audit",
         type=Path,
         default=DEFAULT_UNRESOLVED_RULE_ROWS_AUDIT,
+    )
+    parser.add_argument(
+        "--thor-rule-runtime-audit",
+        type=Path,
+        default=DEFAULT_THOR_RULE_RUNTIME_AUDIT,
     )
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
     parser.add_argument("--post-squee-package-gate", type=Path, action="append")

@@ -69,6 +69,14 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
             audit.card_status(card, {"decision": "missing_battle_rule_model"}),
             "missing_battle_rule_model",
         )
+        self.assertEqual(
+            audit.card_status(
+                {"card_name": "Thor, God of Thunder", "primary_role": "removal", "battle_rule_keys": []},
+                {"decision": "missing_battle_rule_model"},
+                {"card": "Thor, God of Thunder", "decision": "local_reviewed_runtime_rule_added_pending_durable_pg_sync"},
+            ),
+            "local_runtime_rule_added_pending_sync",
+        )
 
     def test_post_squee_gate_keeps_positive_aggregate_on_probation_when_seed_42_breaks(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -207,6 +207,8 @@ class GateTelemetry:
             "squee_return_after_known_graveyard_entry": set(),
             "squee_return_without_known_graveyard_entry": set(),
             "squee_upkeep_return": set(),
+            "thor_noncreature_damage": set(),
+            "thor_noncreature_damage_amount": set(),
         }
         self.cards: Counter[str] = Counter()
         self.event_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
@@ -420,6 +422,14 @@ class GateTelemetry:
                 self.strategic_events["lorehold_spell_rummage_discards_squee"] += 1
                 self.games_with["lorehold_spell_rummage_discards_squee"].add(self.current_game)
                 self.cards["spell_rummage_discard:Squee, Goblin Nabob"] += 1
+        elif event == "trigger_resolved" and player == "Lorehold" and card == "Thor, God of Thunder" and data.get("effect") == "damage_any_target":
+            amount = max(0, int(data.get("amount") or 0))
+            self.strategic_events["thor_noncreature_damage"] += 1
+            self.strategic_events["thor_noncreature_damage_amount"] += amount
+            self.games_with["thor_noncreature_damage"].add(self.current_game)
+            self.games_with["thor_noncreature_damage_amount"].add(self.current_game)
+            self.cards["thor_noncreature_damage:Thor, God of Thunder"] += 1
+            self.cards["thor_noncreature_damage_amount:Thor, God of Thunder"] += amount
         elif (
             event == "trigger_resolved"
             and player == "Lorehold"

@@ -17827,7 +17827,7 @@
       "package_key": "past_overmaster_spellchain"
     }
   ],
-  "generated_at": "2026-06-27T16:38:33Z",
+  "generated_at": "2026-06-27T16:52:39Z",
   "matrix_generated_at": "2026-06-26T17:59:59.926705+00:00",
   "matrix_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json",
   "matrix_ranked": [
@@ -24590,14 +24590,15 @@
     "Retest Galvanoth only as a probation topdeck-freecast hypothesis with a better cut than Bender's Waterskin, because the current gate is aggregate-positive but breaks seed 42.",
     "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
     "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
-    "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active `battle_card_rules` row."
+    "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
+    "Before evaluating Thor in a deck gate, run reviewed-rule sync into the gate SQLite or apply an approved PostgreSQL package so `battle_card_rules` contains `battle_rule_v1:280e17ec34ac105baeb6989491c6ff25`."
   ],
   "open_questions": [
     "Use the per-game Squee diagnostic to decide whether the next improvement is topdeck consistency, explicit discard/rummage enablement, or a different closing package.",
     "Treat Squee as a provisional micro-upgrade, not a promoted final deck slot, until a support package or alternative cut shows a larger reproducible edge.",
     "Make all decisive battle gates run with `PYTHONHASHSEED=0`, `--isolate-deck-process`, and per-game timeout; same simulation seed without fixed hash seed/process isolation is not enough for deck promotion.",
     "Review DB-role versus effective-role divergences surfaced by the card-role manifest, especially cards stored as `draw` or `unknown` while functioning as protection, removal, miracle engine, or board wipe.",
-    "`Thor, God of Thunder` is the remaining real rule/model gap in the six-row unresolved audit; it needs ETB graveyard impulse-recast and noncreature-spell damage trigger modeling before strategic rejection or promotion.",
+    "`Thor, God of Thunder` now has a local reviewed runtime rule for the noncreature-spell damage trigger; the remaining caveat is durable PostgreSQL/Hermes sync and the ETB temporary-play branch before promotion gates treat it as fully modeled.",
     "Separate finalizer slots from engine slots: Insurrection, Storm Herd, Approach, Rise of the Eldrazi, and Aetherflux Reservoir should be benchmarked as closing packages, not generic wincon labels.",
     "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
     "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family."
@@ -29867,6 +29868,53 @@
     }
   },
   "squee_seed_diagnostic_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_seed_diagnostic_20260627_v1.json",
+  "thor_rule_runtime_audit": {
+    "card": "Thor, God of Thunder",
+    "decision": "local_reviewed_runtime_rule_added_pending_durable_pg_sync",
+    "generated_at": "2026-06-27T16:47:33.728523+00:00",
+    "next_gate": "Run a Thor candidate battle gate only after the source SQLite used by the gate has synced reviewed rules or after PostgreSQL promotion is explicitly approved.",
+    "postgres_writes": false,
+    "reviewed_rule": {
+      "annotated_runtime_branch": "ETB own-graveyard Equipment/Instant/Sorcery temporary play access",
+      "battle_model_scope": "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1",
+      "execution_status": "auto",
+      "implemented_runtime_branch": "noncreature_spell_cast -> damage_any_target using trigger_spell_mana_value",
+      "logical_rule_key": "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
+      "oracle_hash": "0f2238f2ce8e4f2c0bbc2d5cea55f4d7",
+      "review_status": "active",
+      "source": "curated"
+    },
+    "runtime_files_changed": [
+      "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+      "docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.json",
+      "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py"
+    ],
+    "runtime_test_verification": {
+      "assertion": "Thor enters from reviewed rule, noncreature spell trigger deals damage equal to spell mana value, and creature spells do not add a second trigger.",
+      "command": "python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py -q",
+      "result": "30 passed"
+    },
+    "source_db": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+    "source_db_mutated": false,
+    "temp_sqlite_sync_verification": {
+      "canonical_snapshot_rows_exported_to_temp_file": 3258,
+      "curated_rows": 134,
+      "deck_materialized_card_count_after_temp_sync": 94,
+      "deck_materialized_row_count_after_temp_sync": 94,
+      "deleted_stale_reviewed_rows": 38,
+      "generated_rows": 0,
+      "input_rows": 134,
+      "inserted_or_updated": 134,
+      "manual_rows": 0,
+      "sync_returncode": 0,
+      "thor_deck_rule_count_after_temp_materialization": 1,
+      "thor_deck_rule_keys_after_temp_materialization": [
+        "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25"
+      ],
+      "thor_sqlite_rule_count_after_temp_sync": 1
+    }
+  },
+  "thor_rule_runtime_audit_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_thor_rule_runtime_audit_20260627_v1.json",
   "unresolved_rule_rows_audit": {
     "code_fix": "lorehold_optimizer_equal_gate.materialize_active_rules_for_deck fills battle_rules_json for all candidate deck rows from active battle_card_rules rows",
     "deck_id": 6,

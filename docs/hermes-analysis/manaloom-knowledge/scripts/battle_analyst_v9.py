@@ -25627,6 +25627,116 @@ def trigger_spell_cast_engines(
                 all_players=all_players,
             )
             continue
+        if permanent.get("trigger_effect") == "damage_any_target":
+            amount_source = str(permanent.get("trigger_damage_amount_source") or "")
+            if amount_source == "trigger_spell_mana_value":
+                amount = card_mana_value(spell)
+            else:
+                amount = int(permanent.get("trigger_damage") or permanent.get("damage") or 1)
+            amount = apply_controller_noncombat_damage_modifiers(
+                player,
+                amount,
+                permanent,
+                turn=turn,
+                phase=phase,
+            )
+            if amount <= 0:
+                continue
+
+            def resolve_spell_cast_damage_any_target_trigger(
+                permanent=permanent,
+                amount=amount,
+                trigger_kind=trigger_kind,
+            ):
+                alive_opponents = [opponent for opponent in opponents if opponent.is_alive()]
+                lethal_player = min(
+                    (opponent for opponent in alive_opponents if opponent.life <= amount),
+                    key=lambda opponent: (opponent.life, opponent.name),
+                    default=None,
+                )
+                killable_creatures = []
+                for opponent in alive_opponents:
+                    for creature in removal_target_candidates(
+                        opponent,
+                        {"effect": "remove_creature", "target": "creature"},
+                        controller=player,
+                        source=permanent,
+                    ):
+                        if creature.get("indestructible"):
+                            continue
+                        toughness = int(creature.get("toughness") or creature.get("power") or 2)
+                        if toughness <= amount:
+                            killable_creatures.append((target_priority(creature), opponent, creature))
+                target_player = None
+                target_creature = None
+                result = "no_legal_target_or_zero_damage"
+                life_before = None
+                life_after = None
+                destination = None
+                if lethal_player is not None:
+                    target_player = lethal_player
+                    life_before = target_player.life
+                    dealt = deal_damage(target_player, amount, source=permanent)
+                    life_after = target_player.life
+                    result = "player_damage" if dealt else "prevented"
+                elif killable_creatures:
+                    _priority, target_controller, target_creature = max(
+                        killable_creatures,
+                        key=lambda item: item[0],
+                    )
+                    process_taii_wakeen_noncombat_damage_to_creature(
+                        player,
+                        target_controller,
+                        permanent,
+                        target_creature,
+                        amount,
+                        turn=turn,
+                        phase=phase,
+                    )
+                    destination = move_creature_from_battlefield(
+                        target_controller,
+                        target_creature,
+                        reason="damage",
+                        source=permanent,
+                    )
+                    target_player = target_controller
+                    result = "creature_destroyed"
+                elif alive_opponents:
+                    target_player = min(alive_opponents, key=lambda opponent: (opponent.life, opponent.name))
+                    life_before = target_player.life
+                    dealt = deal_damage(target_player, amount, source=permanent)
+                    life_after = target_player.life
+                    result = "player_damage" if dealt else "prevented"
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    effect="damage_any_target",
+                    amount=amount,
+                    amount_source=amount_source or "static",
+                    target_player=target_player.name if target_player is not None else None,
+                    target=target_creature.get("name", "?") if target_creature is not None else None,
+                    result=result,
+                    destination=destination,
+                    life_before=life_before,
+                    life_after=life_after,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_spell_cast_damage_any_target_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         mana_amount = int(permanent.get("spell_cast_add_mana") or 0)
         if mana_amount <= 0:
             continue

@@ -87,7 +87,7 @@
 | Path to Exile | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
 | Stroke of Midnight | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
 | Swords to Plowshares | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
-| Thor, God of Thunder | 1 | removal | spell_damage_engine | missing_battle_rule_model | missing_battle_rule_model | graveyard impulse-recast plus noncreature-spell damage payoff; rule modeling pending |
+| Thor, God of Thunder | 1 | removal | spell_damage_engine | local_runtime_rule_added_pending_sync | local_reviewed_rule_pending_sync | noncreature-spell damage payoff now has local runtime; ETB temporary graveyard play remains annotation |
 | Winds of Abandon | 1 | removal | removal | core_support | ready | answers pressure so Lorehold reaches the miracle/combo window |
 | Land Tax | 1 | tutor | tutor | core_support | ready | finds setup, protection, or closing pieces |
 | Emeria's Call // Emeria, Shattered Skyclave | 1 | unknown | unknown | materialization_gap_ready_rule | source_rule_ready_needs_materialization | buys time or protects the decisive spell turn |
@@ -107,7 +107,7 @@
 - The Scarlet Witch: `deck_rule_materialization_gap`
 - Molecule Man: `deck_rule_materialization_gap`
 - The Mind Stone: `deck_rule_materialization_gap`
-- Thor, God of Thunder: `missing_battle_rule_model`
+- Thor, God of Thunder: `local_reviewed_runtime_rule_added_pending_durable_pg_sync`
 - Emeria's Call // Emeria, Shattered Skyclave: `deck_rule_materialization_gap`
 - Tragic Arrogance: `deck_rule_materialization_gap`
 - Squee, Goblin Nabob: `unclassified`

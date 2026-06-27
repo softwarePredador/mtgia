@@ -2590,6 +2590,37 @@
     "execution_status": "auto",
     "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: artifact grants no maximum hand size and taps for colorless mana. Runtime executes the colorless mana-rock baseline and records the hand-size static ability."
   },
+  "Thor, God of Thunder": {
+    "effect_json": {
+      "cmc": 5.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "power": 5,
+      "toughness": 5,
+      "flying": true,
+      "trigger": "noncreature_spell_cast",
+      "trigger_effect": "damage_any_target",
+      "trigger_damage_amount_source": "trigger_spell_mana_value",
+      "etb_exile_target_from_own_graveyard": true,
+      "etb_exile_target_types": ["Equipment", "Instant", "Sorcery"],
+      "etb_exiled_card_playable_until_next_turn": true,
+      "etb_graveyard_recast_annotation": true,
+      "battle_model_scope": "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "creature",
+      "subtype": "noncreature_spell_damage_recursion_payoff",
+      "strategy_role": "spell_damage_payoff_and_graveyard_recast"
+    },
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "active",
+    "execution_status": "auto",
+    "oracle_hash": "0f2238f2ce8e4f2c0bbc2d5cea55f4d7",
+    "logical_rule_key": "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
+    "notes": "Oracle-reviewed on 2026-06-27 against local PostgreSQL/Hermes cache: 5/5 flying creature; ETB exiles an Equipment, instant, or sorcery from your graveyard for play until next turn; noncreature spell casts deal damage equal to that spell's mana value to any target. Runtime executes the noncreature spell damage trigger and records the ETB graveyard recast branch as explicit annotation."
+  },
   "Tibalt's Trickery": {
     "effect_json": {
       "cmc": 2.0,

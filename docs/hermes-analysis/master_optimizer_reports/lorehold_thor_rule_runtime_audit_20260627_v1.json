@@ -1,0 +1,46 @@
+{
+  "card": "Thor, God of Thunder",
+  "decision": "local_reviewed_runtime_rule_added_pending_durable_pg_sync",
+  "generated_at": "2026-06-27T16:47:33.728523+00:00",
+  "next_gate": "Run a Thor candidate battle gate only after the source SQLite used by the gate has synced reviewed rules or after PostgreSQL promotion is explicitly approved.",
+  "postgres_writes": false,
+  "reviewed_rule": {
+    "annotated_runtime_branch": "ETB own-graveyard Equipment/Instant/Sorcery temporary play access",
+    "battle_model_scope": "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1",
+    "execution_status": "auto",
+    "implemented_runtime_branch": "noncreature_spell_cast -> damage_any_target using trigger_spell_mana_value",
+    "logical_rule_key": "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
+    "oracle_hash": "0f2238f2ce8e4f2c0bbc2d5cea55f4d7",
+    "review_status": "active",
+    "source": "curated"
+  },
+  "runtime_files_changed": [
+    "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.json",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py"
+  ],
+  "runtime_test_verification": {
+    "assertion": "Thor enters from reviewed rule, noncreature spell trigger deals damage equal to spell mana value, and creature spells do not add a second trigger.",
+    "command": "python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_reviewed_battle_card_rules.py -q",
+    "result": "30 passed"
+  },
+  "source_db": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "temp_sqlite_sync_verification": {
+    "canonical_snapshot_rows_exported_to_temp_file": 3258,
+    "curated_rows": 134,
+    "deck_materialized_card_count_after_temp_sync": 94,
+    "deck_materialized_row_count_after_temp_sync": 94,
+    "deleted_stale_reviewed_rows": 38,
+    "generated_rows": 0,
+    "input_rows": 134,
+    "inserted_or_updated": 134,
+    "manual_rows": 0,
+    "sync_returncode": 0,
+    "thor_deck_rule_count_after_temp_materialization": 1,
+    "thor_deck_rule_keys_after_temp_materialization": [
+      "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25"
+    ],
+    "thor_sqlite_rule_count_after_temp_sync": 1
+  }
+}

@@ -198,6 +198,21 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Molecule Man"]["effect_json"]["battle_model_scope"],
             "nonland_hand_miracle_zero_static_v1",
         )
+        self.assertEqual(by_name["Thor, God of Thunder"]["source"], "curated")
+        self.assertEqual(by_name["Thor, God of Thunder"]["review_status"], "active")
+        self.assertEqual(by_name["Thor, God of Thunder"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Thor, God of Thunder"]["logical_rule_key"],
+            "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
+        )
+        self.assertEqual(
+            by_name["Thor, God of Thunder"]["effect_json"]["battle_model_scope"],
+            "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1",
+        )
+        self.assertEqual(
+            by_name["Thor, God of Thunder"]["effect_json"]["trigger_effect"],
+            "damage_any_target",
+        )
         self.assertIn("Ashnod's Altar", by_name)
         self.assertIn("Akroma's Will", by_name)
         self.assertIn("Ancient Den", by_name)
@@ -1481,6 +1496,81 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             finally:
                 battle.DB = old_db
                 battle.battle_rule_registry._RULE_CACHE.clear()
+
+    def test_thor_noncreature_spell_trigger_deals_spell_mana_value_damage(self) -> None:
+        old_db = battle.DB
+        old_handler = battle.REPLAY_EVENT_HANDLER
+        events = []
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "rules.db"
+            self._seed_reviewed_rules_db(db_path)
+            try:
+                battle.DB = str(db_path)
+                battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                battle.battle_rule_registry._RULE_LIST_CACHE.clear()
+                player = battle.Player("Thor Player", None, [])
+                opponent = battle.Player("Opponent", None, [])
+                opponent.life = 4
+                thor = {
+                    "name": "Thor, God of Thunder",
+                    "type_line": "Legendary Creature — God Warrior Hero",
+                    "cmc": 5,
+                }
+                thor_effect = battle.get_card_effect(thor)
+                self.assertEqual(
+                    thor_effect["_rule_logical_key"],
+                    "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
+                )
+                battle.apply_effect_immediate(
+                    player,
+                    [opponent],
+                    thor,
+                    turn=3,
+                    rng=__import__("random").Random(17),
+                    effect_data_override=thor_effect,
+                )
+                self.assertTrue(
+                    any(
+                        card.get("name") == "Thor, God of Thunder"
+                        and card.get("trigger") == "noncreature_spell_cast"
+                        for card in player.battlefield
+                    )
+                )
+                battle.trigger_spell_cast_engines(
+                    player,
+                    [player, opponent],
+                    {"name": "Big Score", "type_line": "Instant", "cmc": 4},
+                    turn=3,
+                    phase="precombat_main",
+                    active_player=player,
+                )
+                battle.trigger_spell_cast_engines(
+                    player,
+                    [player, opponent],
+                    {"name": "Creature Followup", "type_line": "Creature", "cmc": 4},
+                    turn=3,
+                    phase="precombat_main",
+                    active_player=player,
+                )
+            finally:
+                battle.DB = old_db
+                battle.REPLAY_EVENT_HANDLER = old_handler
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                battle.battle_rule_registry._RULE_LIST_CACHE.clear()
+
+        thor_triggers = [
+            data
+            for event, data in events
+            if event == "trigger_resolved"
+            and data.get("card") == "Thor, God of Thunder"
+            and data.get("effect") == "damage_any_target"
+        ]
+        self.assertEqual(len(thor_triggers), 1)
+        self.assertEqual(thor_triggers[0]["amount"], 4)
+        self.assertEqual(thor_triggers[0]["target_player"], "Opponent")
+        self.assertEqual(thor_triggers[0]["result"], "player_damage")
+        self.assertEqual(opponent.life, 0)
 
     def test_decaying_time_loop_discards_own_hand_and_draws_same_count(self) -> None:
         old_db = battle.DB
