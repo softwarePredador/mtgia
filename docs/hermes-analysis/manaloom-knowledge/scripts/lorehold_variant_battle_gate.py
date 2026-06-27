@@ -207,6 +207,8 @@ class GateTelemetry:
             "squee_return_after_known_graveyard_entry": set(),
             "squee_return_without_known_graveyard_entry": set(),
             "squee_upkeep_return": set(),
+            "thor_cost_paid": set(),
+            "thor_spell_cast": set(),
             "thor_noncreature_damage": set(),
             "thor_noncreature_damage_amount": set(),
         }
@@ -386,9 +388,16 @@ class GateTelemetry:
             self.games_with["lorehold_cost_paid"].add(self.current_game)
             if card:
                 self.cards[f"cost_paid:{card}"] += 1
+            if card == "Thor, God of Thunder":
+                self.strategic_events["thor_cost_paid"] += 1
+                self.games_with["thor_cost_paid"].add(self.current_game)
         elif event == "spell_cast" and player == "Lorehold":
             self.strategic_events["lorehold_spell_cast"] += 1
             self.games_with["lorehold_spell_cast"].add(self.current_game)
+            if card == "Thor, God of Thunder":
+                self.strategic_events["thor_spell_cast"] += 1
+                self.games_with["thor_spell_cast"].add(self.current_game)
+                self.cards["spell_cast:Thor, God of Thunder"] += 1
         elif event == "trigger_resolved" and player == "Lorehold" and data.get("effect") == "add_mana":
             mana_added = max(1, int(data.get("mana_added") or 1))
             self.strategic_events["spell_cast_mana_trigger"] += mana_added

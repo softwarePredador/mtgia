@@ -52,6 +52,7 @@ DEFAULT_UNRESOLVED_RULE_ROWS_AUDIT = (
     REPORT_DIR / "lorehold_unresolved_rule_rows_audit_20260627_v1.json"
 )
 DEFAULT_THOR_RULE_RUNTIME_AUDIT = REPORT_DIR / "lorehold_thor_rule_runtime_audit_20260627_v1.json"
+DEFAULT_THOR_RULE_GATE_AUDIT = REPORT_DIR / "lorehold_thor_synced_rule_gate_audit_20260627_v1.json"
 DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
@@ -547,6 +548,16 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"`{verification.get('thor_deck_rule_count_after_temp_materialization', 0)}`. "
             "It still needs durable PostgreSQL/Hermes sync approval before promotion gates use it as source truth."
         )
+    thor_gate_audit = report.get("thor_rule_gate_audit") or {}
+    if thor_gate_audit.get("decision"):
+        interpretation = thor_gate_audit.get("interpretation") or {}
+        lines.append(
+            "- Thor synced-rule battle gate now has natural exposure evidence: "
+            f"`{interpretation.get('candidate_thor_damage_triggers', 0)}` trigger for "
+            f"`{interpretation.get('candidate_thor_damage_amount', 0)}` damage across "
+            f"`{interpretation.get('candidate_total_games', 0)}` candidate games, "
+            f"with win-rate delta `{float(interpretation.get('winrate_delta_pp') or 0):+.2f}` pp."
+        )
     lines.append("- The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.")
     post_squee = report.get("post_squee_package_gates") or {}
     post_squee_rows = post_squee.get("rows") or []
@@ -713,6 +724,49 @@ def render_markdown(report: dict[str, Any]) -> str:
             "- Executed branch: noncreature spell casts deal damage equal to the triggering spell mana value to any target. "
             "ETB graveyard recast is recorded as annotation until a safe temporary-play executor is promoted."
         )
+        lines.append("")
+    thor_gate_audit = report.get("thor_rule_gate_audit") or {}
+    if thor_gate_audit:
+        interpretation = thor_gate_audit.get("interpretation") or {}
+        lines.append("## Thor Synced Rule Battle Gate")
+        lines.append("")
+        lines.append(f"- Source: `{report.get('thor_rule_gate_audit_path')}`")
+        lines.append(f"- Decision: `{thor_gate_audit.get('decision')}`")
+        lines.append(
+            f"- Natural exposure: `{interpretation.get('candidate_thor_damage_exposure_games', 0)}`/"
+            f"`{interpretation.get('candidate_total_games', 0)}` candidate games; "
+            f"damage triggers `{interpretation.get('candidate_thor_damage_triggers', 0)}`; "
+            f"damage amount `{interpretation.get('candidate_thor_damage_amount', 0)}`; "
+            f"win-rate delta `{float(interpretation.get('winrate_delta_pp') or 0):+.2f}` pp."
+        )
+        lines.append("")
+        lines.append("| Deck | Games | W | L | S | WR | Thor Cost | Thor Cast | Thor Damage Triggers | Thor Damage | Miracle | Topdeck | Spell Cast |")
+        lines.append("| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
+        for key, value in sorted((thor_gate_audit.get("summary") or {}).items()):
+            events = value.get("strategic_events") or {}
+            lines.append(
+                f"| `{key}` | {value.get('games', 0)} | {value.get('wins', 0)} | {value.get('losses', 0)} | "
+                f"{value.get('stalls', 0)} | {float(value.get('win_rate') or 0):.2f}% | "
+                f"{events.get('thor_cost_paid', 0)} | {events.get('thor_spell_cast', 0)} | "
+                f"{events.get('thor_noncreature_damage', 0)} | {events.get('thor_noncreature_damage_amount', 0)} | "
+                f"{events.get('miracle_cast', 0)} | {events.get('topdeck_manipulation_activated', 0)} | "
+                f"{events.get('lorehold_spell_cast', 0)} |"
+            )
+        lines.append("")
+        exposure_rows = thor_gate_audit.get("per_game_exposure") or []
+        if exposure_rows:
+            lines.append("| Seed | Deck | Opponent | Result | Turns | Thor Cost | Thor Cast | Thor Damage | Damage Amount |")
+            lines.append("| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |")
+            for row in exposure_rows:
+                lines.append(
+                    f"| {row.get('seed')} | `{row.get('deck_key')}` | {row.get('opponent')} | {row.get('result')} | "
+                    f"{row.get('turns')} | {row.get('thor_cost_paid', 0)} | {row.get('thor_spell_cast', 0)} | "
+                    f"{row.get('thor_noncreature_damage', 0)} | {row.get('thor_noncreature_damage_amount', 0)} |"
+                )
+            lines.append("")
+        lines.append(str(interpretation.get("read") or "No interpretation available."))
+        lines.append("")
+        lines.append(str(interpretation.get("next_action") or "No next action available."))
         lines.append("")
     lines.append("## Variant Learning")
     lines.append("")
@@ -1004,6 +1058,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     squee_rule_materialization_audit = read_json(args.squee_rule_materialization_audit)
     unresolved_rule_rows_audit = read_json(args.unresolved_rule_rows_audit)
     thor_rule_runtime_audit = read_json(args.thor_rule_runtime_audit)
+    thor_rule_gate_audit = read_json(args.thor_rule_gate_audit)
     post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
 
     open_questions = [
@@ -1011,7 +1066,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Treat Squee as a provisional micro-upgrade, not a promoted final deck slot, until a support package or alternative cut shows a larger reproducible edge.",
         "Make all decisive battle gates run with `PYTHONHASHSEED=0`, `--isolate-deck-process`, and per-game timeout; same simulation seed without fixed hash seed/process isolation is not enough for deck promotion.",
         "Review DB-role versus effective-role divergences surfaced by the card-role manifest, especially cards stored as `draw` or `unknown` while functioning as protection, removal, miracle engine, or board wipe.",
-        "`Thor, God of Thunder` now has a local reviewed runtime rule for the noncreature-spell damage trigger; the remaining caveat is durable PostgreSQL/Hermes sync and the ETB temporary-play branch before promotion gates treat it as fully modeled.",
+        "`Thor, God of Thunder` now has a local reviewed runtime rule and one natural synced-rule battle exposure for 7 damage, but the checked 21-game candidate sample had +0.00 pp win-rate delta; keep it as modeled-but-not-proven until a stratified or larger gate proves deck value.",
         "Separate finalizer slots from engine slots: Insurrection, Storm Herd, Approach, Rise of the Eldrazi, and Aetherflux Reservoir should be benchmarked as closing packages, not generic wincon labels.",
         "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
         "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.",
@@ -1024,7 +1079,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.",
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
-        "Before evaluating Thor in a deck gate, run reviewed-rule sync into the gate SQLite or apply an approved PostgreSQL package so `battle_card_rules` contains `battle_rule_v1:280e17ec34ac105baeb6989491c6ff25`.",
+        "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.",
     ]
 
     return {
@@ -1048,6 +1103,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "unresolved_rule_rows_audit": unresolved_rule_rows_audit,
         "thor_rule_runtime_audit_path": str(args.thor_rule_runtime_audit),
         "thor_rule_runtime_audit": thor_rule_runtime_audit,
+        "thor_rule_gate_audit_path": str(args.thor_rule_gate_audit),
+        "thor_rule_gate_audit": thor_rule_gate_audit,
         "general_synergy_confirm": general_confirm,
         "post_squee_package_gates": post_squee_package_gates,
         "open_questions": open_questions,
@@ -1075,6 +1132,11 @@ def parse_args() -> argparse.Namespace:
         "--thor-rule-runtime-audit",
         type=Path,
         default=DEFAULT_THOR_RULE_RUNTIME_AUDIT,
+    )
+    parser.add_argument(
+        "--thor-rule-gate-audit",
+        type=Path,
+        default=DEFAULT_THOR_RULE_GATE_AUDIT,
     )
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
     parser.add_argument("--post-squee-package-gate", type=Path, action="append")

@@ -1,6 +1,6 @@
 # Lorehold Strategy Learning Audit - 2026-06-27
 
-- Generated at: `2026-06-27T16:52:39Z`
+- Generated at: `2026-06-27T17:09:17Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
 - Structural matrix: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v3.json`
 - PostgreSQL writes: `false`
@@ -25,6 +25,7 @@ Operationally, a better deck must increase at least one of these without breakin
 - Squee rule materialization is now fixed in the equal-gate loader evidence: Squee now materializes one verified/auto graveyard-recursion rule in the equal-gate candidate; across seeds 42, 7, and 20260625 candidate is 8/19 versus deck_607 10/17, so the fix improves rule evidence but does not prove a stronger deck by itself.
 - Remaining rule-row audit now separates aggregate sync gaps from real model gaps: `5` deck materialization gaps and `1` missing battle-rule/model gap.
 - Thor rule/runtime audit now closes the local model gap: `local_reviewed_runtime_rule_added_pending_durable_pg_sync`, temp materialized Thor rule count `1`. It still needs durable PostgreSQL/Hermes sync approval before promotion gates use it as source truth.
+- Thor synced-rule battle gate now has natural exposure evidence: `1` trigger for `7` damage across `21` candidate games, with win-rate delta `+0.00` pp.
 - The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.
 - Post-Squee package gates now cover Brainstone, Faithless Looting, Galvanoth, Birgi, and Penance against the Squee champion. Best aggregate was `galvanoth_topdeck_freecast` at `9-18` vs baseline `8-19` (`+3.70` pp), but seed 42 moved `-44.45` pp, so it is not an automatic deck promotion.
 - Birgi is now instrumented and produced `+13` spell-cast mana triggers, but its aggregate result was `7-20` vs baseline `8-19` (`-3.70` pp); mana telemetry alone is not enough to promote it.
@@ -127,6 +128,26 @@ Interpretation: under fixed hash-seed, process-isolated, timeout-bounded conditi
 - Temp SQLite sync/materialization: Thor rule count `1`; deck materialized Thor rule count `1`; rule key `battle_rule_v1:280e17ec34ac105baeb6989491c6ff25`.
 - Executed branch: noncreature spell casts deal damage equal to the triggering spell mana value to any target. ETB graveyard recast is recorded as annotation until a safe temporary-play executor is promoted.
 
+## Thor Synced Rule Battle Gate
+
+- Source: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_thor_synced_rule_gate_audit_20260627_v1.json`
+- Decision: `rule_sync_verified_battle_exposure_observed_no_winrate_delta`
+- Natural exposure: `1`/`21` candidate games; damage triggers `1`; damage amount `7`; win-rate delta `+0.00` pp.
+
+| Deck | Games | W | L | S | WR | Thor Cost | Thor Cast | Thor Damage Triggers | Thor Damage | Miracle | Topdeck | Spell Cast |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `deck_6` | 21 | 6 | 15 | 0 | 28.57% | 1 | 1 | 0 | 0 | 39 | 32 | 170 |
+| `deck_6_thor_synced` | 21 | 6 | 15 | 0 | 28.57% | 1 | 0 | 1 | 7 | 40 | 32 | 170 |
+
+| Seed | Deck | Opponent | Result | Turns | Thor Cost | Thor Cast | Thor Damage | Damage Amount |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 123 | `deck_6` | Vivi Ornitier #99 (real) | win | 10 | 1 | 1 | 0 | 0 |
+| 123 | `deck_6_thor_synced` | Vivi Ornitier #99 (real) | win | 10 | 1 | 0 | 1 | 7 |
+
+The synced Thor rule executed once in natural battle exposure and dealt 7 damage, but the 21-game candidate sample had the same 6-15 record as the baseline. This proves runtime behavior can matter, but not that Thor improves the deck at current sample size/exposure rate.
+
+Use a stratified Thor-exposure gate or larger sample before treating Thor as a keep/cut decision; ETB temporary graveyard play remains a separate runtime gap.
+
 ## Variant Learning
 
 | Rank | Deck | Score | Intent | Lands | Rule Ready | Main Risks |
@@ -190,7 +211,7 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - Treat Squee as a provisional micro-upgrade, not a promoted final deck slot, until a support package or alternative cut shows a larger reproducible edge.
 - Make all decisive battle gates run with `PYTHONHASHSEED=0`, `--isolate-deck-process`, and per-game timeout; same simulation seed without fixed hash seed/process isolation is not enough for deck promotion.
 - Review DB-role versus effective-role divergences surfaced by the card-role manifest, especially cards stored as `draw` or `unknown` while functioning as protection, removal, miracle engine, or board wipe.
-- `Thor, God of Thunder` now has a local reviewed runtime rule for the noncreature-spell damage trigger; the remaining caveat is durable PostgreSQL/Hermes sync and the ETB temporary-play branch before promotion gates treat it as fully modeled.
+- `Thor, God of Thunder` now has a local reviewed runtime rule and one natural synced-rule battle exposure for 7 damage, but the checked 21-game candidate sample had +0.00 pp win-rate delta; keep it as modeled-but-not-proven until a stratified or larger gate proves deck value.
 - Separate finalizer slots from engine slots: Insurrection, Storm Herd, Approach, Rise of the Eldrazi, and Aetherflux Reservoir should be benchmarked as closing packages, not generic wincon labels.
 - Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.
 - Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.
@@ -204,7 +225,7 @@ Read: Brainstone adds topdeck manipulation but does not convert wins. Faithless 
 - Build two narrow packages from 615: one Birgi/ritual package and one revised topdeck-freecast package, each with one or two cuts only, then gate them against the Squee champion.
 - Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.
 - Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.
-- Before evaluating Thor in a deck gate, run reviewed-rule sync into the gate SQLite or apply an approved PostgreSQL package so `battle_card_rules` contains `battle_rule_v1:280e17ec34ac105baeb6989491c6ff25`.
+- For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.
 
 ## External Method Sources
 
