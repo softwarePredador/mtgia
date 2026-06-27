@@ -216,6 +216,20 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Ghostly Prison"],
         "cuts": ["Hexing Squelcher"],
     },
+    "boros_charm_pressure_cut_fated": {
+        "family": "pressure_absorber",
+        "hypothesis": (
+            "Boros Charm appears across the stronger Lorehold variants as cheap "
+            "instant-speed protection/pressure absorption. This same-lane triage "
+            "tests whether lowering a five-mana pressure-response slot into a "
+            "two-mana modal protection spell improves the life-zero combat "
+            "failures without cutting ramp, topdeck engines, High Noon, Hexing "
+            "Squelcher, Storm Herd, or the protection shell."
+        ),
+        "adds": ["Boros Charm"],
+        "cuts": ["Fated Clash"],
+        "allow_miracle_core_cuts": True,
+    },
     "angel_grace_life_floor_cut_dawn": {
         "family": "life_floor_protection",
         "hypothesis": (

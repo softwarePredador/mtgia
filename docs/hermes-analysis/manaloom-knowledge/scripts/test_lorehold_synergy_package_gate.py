@@ -93,6 +93,21 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "pressure_absorber",
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["boros_charm_pressure_cut_fated"]["family"],
+            "pressure_absorber",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["boros_charm_pressure_cut_fated"]["adds"],
+            ["Boros Charm"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["boros_charm_pressure_cut_fated"]["cuts"],
+            ["Fated Clash"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["boros_charm_pressure_cut_fated"]["allow_miracle_core_cuts"],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["angel_grace_life_floor_cut_dawn"]["cuts"],
             ["Dawn's Truce"],
         )

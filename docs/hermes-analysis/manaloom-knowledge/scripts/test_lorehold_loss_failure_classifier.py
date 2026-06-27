@@ -123,10 +123,12 @@ class LoreholdLossFailureClassifierTest(unittest.TestCase):
             detailed_v1 = tmp_path / "lorehold_topfreecast_conversion_gate_20260627_seed42_v1_topfreecast_v1_galvanoth.json"
             detailed_v2 = tmp_path / "lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2_galvanoth.json"
             detailed_spell_land = tmp_path / "lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju.json"
+            detailed_pressure_v2 = tmp_path / "lorehold_pressure_conversion_gate_20260627_seed42_v2_pressure_v2_boros.json"
             summary_v2 = tmp_path / "lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2.json"
             detailed_v1.write_text("{}", encoding="utf-8")
             detailed_v2.write_text("{}", encoding="utf-8")
             detailed_spell_land.write_text("{}", encoding="utf-8")
+            detailed_pressure_v2.write_text("{}", encoding="utf-8")
             summary_v2.write_text("{}", encoding="utf-8")
 
             original = classifier.REPORT_DIR
@@ -139,6 +141,7 @@ class LoreholdLossFailureClassifierTest(unittest.TestCase):
         self.assertIn(detailed_v1, paths)
         self.assertIn(detailed_v2, paths)
         self.assertIn(detailed_spell_land, paths)
+        self.assertIn(detailed_pressure_v2, paths)
         self.assertNotIn(summary_v2, paths)
 
 
