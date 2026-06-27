@@ -45,6 +45,9 @@ DEFAULT_GENERAL_SYNERGY_CONFIRM = (
     REPORT_DIR / "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
 )
 DEFAULT_SQUEE_SEED_DIAGNOSTIC = REPORT_DIR / "lorehold_squee_seed_diagnostic_20260627_v1.json"
+DEFAULT_SQUEE_RULE_MATERIALIZATION_AUDIT = (
+    REPORT_DIR / "lorehold_squee_rule_materialization_audit_20260627_v1.json"
+)
 DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
@@ -517,7 +520,11 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append("- Proven Squee routes in this suite are battlefield-to-graveyard through combat/wipes plus one opponent mill (`Brain Freeze`), but Squee does not appear in enough games to explain the whole deck result.")
     lines.append("- Important caveat: the trace gate still did not show `Squee` being discarded by Lorehold rummage or spell-rummage. Treat the discard-fuel loop as a hypothesis; the proven loop is graveyard recurrence after observed zone entries.")
     lines.append("- The per-game seed diagnostic shows the real failure mode: Squee is not yet self-sufficient. Seed 42 wins when topdeck/miracle/spell volume is high; seeds 7 and 20260625 go `0W/9L` with no Squee graveyard/return events and very low topdeck/miracle conversion.")
-    lines.append("- `Squee` still has an aggregate-loader gap: the verified runtime rule exists in `battle_card_rules`, but the candidate snapshot row keeps `deck_cards.battle_rules_json=[]` for that card.")
+    materialization = report.get("squee_rule_materialization_audit") or {}
+    if materialization.get("finding"):
+        lines.append(f"- Squee rule materialization is now fixed in the equal-gate loader evidence: {materialization['finding']}")
+    else:
+        lines.append("- `Squee` still needs a rule-materialization check before trusting candidate snapshots that add it.")
     lines.append("- The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.")
     post_squee = report.get("post_squee_package_gates") or {}
     post_squee_rows = post_squee.get("rows") or []
@@ -614,6 +621,35 @@ def render_markdown(report: dict[str, Any]) -> str:
                     f"{games_with.get('topdeck_manipulation_activated', 0)} | {games_with.get('squee_to_graveyard', 0)} |"
                 )
         lines.append("")
+    if materialization:
+        lines.append("## Squee Rule Materialization Audit")
+        lines.append("")
+        lines.append(f"- Source: `{report.get('squee_rule_materialization_audit_path')}`")
+        lines.append(f"- Decision: `{materialization.get('decision')}`")
+        lines.append(f"- {materialization.get('finding')}")
+        lines.append("")
+        lines.append("| Seed | Deck | W | L | S | WR | Miracle | Topdeck | Squee GY | Squee Return | Rule Count | Rule Keys | Tags |")
+        lines.append("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |")
+        for row in materialization.get("rows") or []:
+            materialized = row.get("materialized_squee") or {}
+            lines.append(
+                "| {seed} | `{deck}` | {wins} | {losses} | {stalls} | {wr:.2f}% | {miracle} | {topdeck} | {squee_gy} | {squee_return} | {rule_count} | {rule_keys} | {tags} |".format(
+                    seed=row.get("seed"),
+                    deck=row.get("deck_key"),
+                    wins=row.get("wins"),
+                    losses=row.get("losses"),
+                    stalls=row.get("stalls"),
+                    wr=float(row.get("win_rate") or 0),
+                    miracle=row.get("miracle_cast"),
+                    topdeck=row.get("topdeck_manipulation_activated"),
+                    squee_gy=row.get("squee_to_graveyard"),
+                    squee_return=row.get("squee_upkeep_return"),
+                    rule_count=materialized.get("battle_rule_count") or 0,
+                    rule_keys=", ".join(materialized.get("battle_rule_keys") or []),
+                    tags=", ".join(materialized.get("functional_tags") or []),
+                )
+            )
+        lines.append("")
     lines.append("## Variant Learning")
     lines.append("")
     lines.append("| Rank | Deck | Score | Intent | Lands | Rule Ready | Main Risks |")
@@ -682,7 +718,24 @@ def render_markdown(report: dict[str, Any]) -> str:
     champion = report["deck_summaries"].get("6") or {}
     lines.append(f"- Quantity: `{champion.get('quantity_total')}` across `{champion.get('row_count')}` rows.")
     lines.append(f"- Primary role counts: `{json.dumps(champion.get('role_counts', {}), sort_keys=True)}`")
-    lines.append(f"- Missing aggregated battle-rule rows: `{len(champion.get('missing_battle_rule_cards', []))}` cards: {', '.join(champion.get('missing_battle_rule_cards', [])) or 'none'}.")
+    missing_cards = list(champion.get("missing_battle_rule_cards", []))
+    materialized_cards = {
+        row.get("materialized_squee", {}).get("card_name")
+        for row in materialization.get("rows", [])
+        if row.get("materialized_squee", {}).get("battle_rule_count")
+    }
+    materialized_cards.discard(None)
+    effective_missing_cards = [card for card in missing_cards if card not in materialized_cards]
+    lines.append(
+        f"- Missing aggregated battle-rule rows in the legacy champion DB: `{len(missing_cards)}` cards: {', '.join(missing_cards) or 'none'}."
+    )
+    if materialized_cards:
+        lines.append(
+            f"- Superseded by rule-materialization audit: `{', '.join(sorted(materialized_cards))}` now has materialized rule evidence in the equal-gate candidate."
+        )
+        lines.append(
+            f"- Effective unresolved rule rows after that audit: `{len(effective_missing_cards)}` cards: {', '.join(effective_missing_cards) or 'none'}."
+        )
     lines.append("- Full per-card role, tags, and rule keys are in the companion JSON under `deck_summaries.6.cards`.")
     lines.append("")
     lines.append("## What Still Must Be Understood")
@@ -825,6 +878,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     squee_gates = aggregate_squee_gates(args.squee_gates)
     general_confirm = load_general_synergy_confirm(args.general_synergy_confirm)
     squee_seed_diagnostic = read_json(args.squee_seed_diagnostic)
+    squee_rule_materialization_audit = read_json(args.squee_rule_materialization_audit)
     post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
 
     open_questions = [
@@ -861,6 +915,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "squee_gates": squee_gates,
         "squee_seed_diagnostic_path": str(args.squee_seed_diagnostic),
         "squee_seed_diagnostic": squee_seed_diagnostic,
+        "squee_rule_materialization_audit_path": str(args.squee_rule_materialization_audit),
+        "squee_rule_materialization_audit": squee_rule_materialization_audit,
         "general_synergy_confirm": general_confirm,
         "post_squee_package_gates": post_squee_package_gates,
         "open_questions": open_questions,
@@ -874,6 +930,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     parser.add_argument("--squee-gate", dest="squee_gates", type=Path, action="append")
     parser.add_argument("--squee-seed-diagnostic", type=Path, default=DEFAULT_SQUEE_SEED_DIAGNOSTIC)
+    parser.add_argument(
+        "--squee-rule-materialization-audit",
+        type=Path,
+        default=DEFAULT_SQUEE_RULE_MATERIALIZATION_AUDIT,
+    )
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
     parser.add_argument("--post-squee-package-gate", type=Path, action="append")
     parser.add_argument("--deck-ids", default=",".join(str(value) for value in DEFAULT_DECK_IDS))

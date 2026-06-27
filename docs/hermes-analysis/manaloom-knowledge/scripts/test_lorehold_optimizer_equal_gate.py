@@ -1,3 +1,4 @@
+import json
 import sqlite3
 import tempfile
 import unittest
@@ -46,6 +47,23 @@ class LoreholdOptimizerEqualGateTests(unittest.TestCase):
         )
         self.conn.execute(
             """
+            CREATE TABLE battle_card_rules (
+                normalized_name TEXT,
+                logical_rule_key TEXT,
+                card_name TEXT,
+                effect_json TEXT,
+                deck_role_json TEXT,
+                source TEXT,
+                confidence REAL,
+                review_status TEXT,
+                execution_status TEXT,
+                rule_version INTEGER,
+                oracle_hash TEXT
+            )
+            """
+        )
+        self.conn.execute(
+            """
             CREATE TABLE swap_benchmarks (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 deck_id INTEGER,
@@ -59,8 +77,40 @@ class LoreholdOptimizerEqualGateTests(unittest.TestCase):
         )
         self.conn.execute(
             """
+            CREATE TABLE slot_benchmarks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                deck_id INTEGER,
+                baseline_id INTEGER,
+                baseline_hash TEXT,
+                category TEXT,
+                card_added TEXT,
+                card_removed TEXT,
+                add_cmc REAL,
+                add_effect TEXT,
+                add_tag TEXT,
+                wr REAL,
+                phase TEXT
+            )
+            """
+        )
+        self.conn.execute(
+            """
             INSERT INTO card_oracle_cache (normalized_name, card_name, cmc, type_line, oracle_text)
             VALUES ('flashback', 'Flashback', 3, 'Sorcery', 'Draw two cards, then discard two cards.')
+            """
+        )
+        self.conn.execute(
+            """
+            INSERT INTO battle_card_rules (
+                normalized_name, logical_rule_key, card_name, effect_json,
+                deck_role_json, source, confidence, review_status,
+                execution_status, rule_version, oracle_hash
+            )
+            VALUES (
+                'flashback', 'rule:flashback', 'Flashback',
+                '{"effect":"loot"}', '{"category":"draw","effect":"loot"}',
+                'test', 0.9, 'verified', 'auto', 1, 'hash-1'
+            )
             """
         )
         self.conn.execute(
@@ -107,12 +157,18 @@ class LoreholdOptimizerEqualGateTests(unittest.TestCase):
 
         self.assertEqual(meta["total_cards"], 100)
         rows = self.conn.execute(
-            "SELECT card_name, quantity FROM deck_cards WHERE deck_id=6 ORDER BY card_name"
+            "SELECT card_name, quantity, functional_tag, functional_tags_json, battle_rules_json FROM deck_cards WHERE deck_id=6 ORDER BY card_name"
         ).fetchall()
         names = {row["card_name"] for row in rows}
         self.assertIn("Flashback", names)
         self.assertNotIn("Emeria's Call // Emeria, Shattered Skyclave", names)
         self.assertEqual(sum(int(row["quantity"] or 1) for row in rows), 100)
+        flashback = next(row for row in rows if row["card_name"] == "Flashback")
+        self.assertEqual(flashback["functional_tag"], "draw")
+        self.assertEqual(json.loads(flashback["functional_tags_json"]), ["draw", "engine"])
+        rules = json.loads(flashback["battle_rules_json"])
+        self.assertEqual(len(rules), 1)
+        self.assertEqual(rules[0]["logical_rule_key"], "rule:flashback")
 
     def test_load_swap_row_filters_by_deck_phase_and_card(self) -> None:
         row = gate.load_swap_row(
@@ -125,6 +181,53 @@ class LoreholdOptimizerEqualGateTests(unittest.TestCase):
 
         self.assertEqual(row["card_added"], "Flashback")
         self.assertEqual(row["card_removed"], "Emeria's Call // Emeria, Shattered Skyclave")
+
+    def test_load_swap_row_falls_back_to_slot_benchmark(self) -> None:
+        self.conn.execute("DELETE FROM swap_benchmarks")
+        self.conn.execute(
+            """
+            INSERT INTO slot_benchmarks (
+                deck_id, baseline_id, baseline_hash, category,
+                card_added, card_removed, add_cmc, add_effect, add_tag, wr, phase
+            )
+            VALUES (
+                607, 11, 'hash-1', 'wincon',
+                'Ashling, Flame Dancer', 'Storm Herd', 4, 'creature', 'wincon', 66.7, 'phase1'
+            )
+            """
+        )
+        self.conn.commit()
+
+        row = gate.load_swap_row(
+            self.conn,
+            deck_id=607,
+            baseline_id=11,
+            phase="phase1",
+            only_added="Ashling, Flame Dancer",
+        )
+
+        self.assertEqual(row["card_added"], "Ashling, Flame Dancer")
+        self.assertEqual(row["card_removed"], "Storm Herd")
+
+    def test_graveyard_return_rule_is_tagged_as_recursion_engine(self) -> None:
+        tags = gate.tags_from_rules(
+            "wincon",
+            [
+                {
+                    "effect_json": json.dumps(
+                        {
+                            "effect": "creature",
+                            "battle_model_scope": "graveyard_upkeep_return_self_to_hand_v1",
+                            "graveyard_upkeep_return_self_to_hand": True,
+                        }
+                    ),
+                    "deck_role_json": json.dumps({"category": "board_presence", "effect": "creature"}),
+                }
+            ],
+        )
+
+        self.assertEqual(tags[:2], ["graveyard_recursion", "engine"])
+        self.assertIn("wincon", tags)
 
 
 if __name__ == "__main__":

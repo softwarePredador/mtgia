@@ -51,9 +51,32 @@ def load_swap_row(
         """,
         params,
     ).fetchone()
+    if row is not None:
+        return row
+
+    row = conn.execute(
+        f"""
+        SELECT
+            id,
+            deck_id,
+            baseline_id,
+            baseline_hash,
+            card_added,
+            card_removed,
+            add_cmc,
+            add_effect,
+            add_tag,
+            phase
+        FROM slot_benchmarks
+        WHERE {' AND '.join(clauses)}
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        params,
+    ).fetchone()
     if row is None:
         raise RuntimeError(
-            f"no swap_benchmark row for deck_id={deck_id} phase={phase} only_added={only_added!r}"
+            f"no benchmark row for deck_id={deck_id} phase={phase} only_added={only_added!r}"
         )
     return row
 
@@ -63,6 +86,54 @@ def deck_rows(conn: sqlite3.Connection, deck_id: int) -> list[sqlite3.Row]:
         "SELECT * FROM deck_cards WHERE deck_id=? ORDER BY is_commander DESC, card_name",
         (deck_id,),
     ).fetchall()
+
+
+def active_rules_for_card(conn: sqlite3.Connection, card_name: str) -> list[dict[str, Any]]:
+    table = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='battle_card_rules'"
+    ).fetchone()
+    if not table:
+        return []
+    rows = conn.execute(
+        """
+        SELECT logical_rule_key, effect_json, deck_role_json, source,
+               confidence, review_status, execution_status, rule_version, oracle_hash
+        FROM battle_card_rules
+        WHERE normalized_name=?
+          AND review_status IN ('verified', 'active', 'needs_review')
+          AND execution_status != 'disabled'
+        ORDER BY logical_rule_key
+        """,
+        (normalize_name(card_name),),
+    ).fetchall()
+    return [dict(row) for row in rows]
+
+
+def tags_from_rules(base_tag: str | None, rules: list[dict[str, Any]]) -> list[str]:
+    tags: list[str] = []
+    for rule in rules:
+        try:
+            effect = json.loads(str(rule.get("effect_json") or "{}"))
+        except Exception:
+            effect = {}
+        scope = str(effect.get("battle_model_scope") or "")
+        if effect.get("graveyard_upkeep_return_self_to_hand") or (
+            "graveyard" in scope and "return" in scope
+        ):
+            for tag in ("graveyard_recursion", "engine"):
+                if tag not in tags:
+                    tags.append(tag)
+        try:
+            role = json.loads(str(rule.get("deck_role_json") or "{}"))
+        except Exception:
+            role = {}
+        category = str(role.get("category") or "").strip()
+        if category and category not in tags:
+            tags.append(category)
+    fallback = str(base_tag or "candidate").strip()
+    if fallback and fallback not in tags:
+        tags.append(fallback)
+    return tags or ["candidate"]
 
 
 def replace_candidate_deck(
@@ -90,6 +161,8 @@ def replace_candidate_deck(
     ).fetchone()
     if meta is None:
         raise RuntimeError(f"missing oracle cache for candidate card: {card_added}")
+    rules = active_rules_for_card(conn, card_added)
+    tags = tags_from_rules(add_tag, rules)
 
     candidate_rows: list[dict[str, Any]] = []
     for row in source_rows:
@@ -104,7 +177,7 @@ def replace_candidate_deck(
         "card_id": None,
         "card_name": card_added,
         "quantity": 1,
-        "functional_tag": add_tag or "candidate",
+        "functional_tag": tags[0],
         "tag_confidence": None,
         "is_commander": 0,
         "is_partner": 0,
@@ -113,11 +186,13 @@ def replace_candidate_deck(
         "oracle_text": meta["oracle_text"],
     }
     if "functional_tags_json" in columns:
-        added_row["functional_tags_json"] = json.dumps([add_tag or "candidate"], ensure_ascii=True)
+        added_row["functional_tags_json"] = json.dumps(tags, ensure_ascii=True)
     if "battle_rules_json" in columns:
-        added_row["battle_rules_json"] = "[]"
+        added_row["battle_rules_json"] = json.dumps(rules, ensure_ascii=True, sort_keys=True)
     if "semantic_tags_json" in columns:
         added_row["semantic_tags_json"] = "[]"
+    if "semantic_tags_v2_json" in columns:
+        added_row["semantic_tags_v2_json"] = "[]"
     candidate_rows.append({column: added_row.get(column) for column in columns})
 
     conn.execute("DELETE FROM deck_cards WHERE deck_id=?", (candidate_deck_id,))

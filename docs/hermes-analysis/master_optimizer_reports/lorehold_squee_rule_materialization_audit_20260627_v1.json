@@ -1,0 +1,183 @@
+{
+  "aggregate": {
+    "candidate_607_squee_goblin_nabob_equal_gate": {
+      "games": 27,
+      "lorehold_spell_rummage": 23,
+      "losses": 19,
+      "miracle_cast": 41,
+      "squee_to_graveyard": 7,
+      "squee_upkeep_return": 5,
+      "stalls": 0,
+      "topdeck_manipulation_activated": 35,
+      "win_rate": 29.63,
+      "wins": 8
+    },
+    "deck_607": {
+      "games": 27,
+      "lorehold_spell_rummage": 4,
+      "losses": 17,
+      "miracle_cast": 62,
+      "squee_to_graveyard": 0,
+      "squee_upkeep_return": 0,
+      "stalls": 0,
+      "topdeck_manipulation_activated": 26,
+      "win_rate": 37.04,
+      "wins": 10
+    }
+  },
+  "decision": "loader_gap_fixed_but_not_deck_promotion",
+  "finding": "Squee now materializes one verified/auto graveyard-recursion rule in the equal-gate candidate; across seeds 42, 7, and 20260625 candidate is 8/19 versus deck_607 10/17, so the fix improves rule evidence but does not prove a stronger deck by itself.",
+  "generated_at": "2026-06-27T16:25:45.205773+00:00",
+  "rows": [
+    {
+      "deck_key": "deck_607",
+      "lorehold_spell_rummage": 4,
+      "losses": 4,
+      "miracle_cast": 25,
+      "seed": 42,
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162318_squee_goblin_nabob.json",
+      "squee_to_graveyard": 0,
+      "squee_upkeep_return": 0,
+      "stalls": 0,
+      "topdeck_manipulation_activated": 9,
+      "win_rate": 55.56,
+      "wins": 5
+    },
+    {
+      "deck_key": "candidate_607_squee_goblin_nabob_equal_gate",
+      "lorehold_spell_rummage": 19,
+      "losses": 1,
+      "materialized_squee": {
+        "battle_rule_count": 1,
+        "battle_rule_keys": [
+          "battle_rule_v1:4565272d5decc69322e01a4f919df77e"
+        ],
+        "card_name": "Squee, Goblin Nabob",
+        "execution_statuses": [
+          "auto"
+        ],
+        "functional_tag": "graveyard_recursion",
+        "functional_tags": [
+          "graveyard_recursion",
+          "engine",
+          "board_presence",
+          "wincon"
+        ],
+        "review_statuses": [
+          "verified"
+        ]
+      },
+      "miracle_cast": 33,
+      "seed": 42,
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162318_squee_goblin_nabob.json",
+      "squee_to_graveyard": 7,
+      "squee_upkeep_return": 5,
+      "stalls": 0,
+      "topdeck_manipulation_activated": 30,
+      "win_rate": 88.89,
+      "wins": 8
+    },
+    {
+      "deck_key": "deck_607",
+      "lorehold_spell_rummage": 0,
+      "losses": 8,
+      "miracle_cast": 12,
+      "seed": 7,
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162333_squee_goblin_nabob.json",
+      "squee_to_graveyard": 0,
+      "squee_upkeep_return": 0,
+      "stalls": 0,
+      "topdeck_manipulation_activated": 0,
+      "win_rate": 11.11,
+      "wins": 1
+    },
+    {
+      "deck_key": "candidate_607_squee_goblin_nabob_equal_gate",
+      "lorehold_spell_rummage": 2,
+      "losses": 9,
+      "materialized_squee": {
+        "battle_rule_count": 1,
+        "battle_rule_keys": [
+          "battle_rule_v1:4565272d5decc69322e01a4f919df77e"
+        ],
+        "card_name": "Squee, Goblin Nabob",
+        "execution_statuses": [
+          "auto"
+        ],
+        "functional_tag": "graveyard_recursion",
+        "functional_tags": [
+          "graveyard_recursion",
+          "engine",
+          "board_presence",
+          "wincon"
+        ],
+        "review_statuses": [
+          "verified"
+        ]
+      },
+      "miracle_cast": 4,
+      "seed": 7,
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162333_squee_goblin_nabob.json",
+      "squee_to_graveyard": 0,
+      "squee_upkeep_return": 0,
+      "stalls": 0,
+      "topdeck_manipulation_activated": 2,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    {
+      "deck_key": "deck_607",
+      "lorehold_spell_rummage": 0,
+      "losses": 5,
+      "miracle_cast": 25,
+      "seed": 20260625,
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162346_squee_goblin_nabob.json",
+      "squee_to_graveyard": 0,
+      "squee_upkeep_return": 0,
+      "stalls": 0,
+      "topdeck_manipulation_activated": 17,
+      "win_rate": 44.44,
+      "wins": 4
+    },
+    {
+      "deck_key": "candidate_607_squee_goblin_nabob_equal_gate",
+      "lorehold_spell_rummage": 2,
+      "losses": 9,
+      "materialized_squee": {
+        "battle_rule_count": 1,
+        "battle_rule_keys": [
+          "battle_rule_v1:4565272d5decc69322e01a4f919df77e"
+        ],
+        "card_name": "Squee, Goblin Nabob",
+        "execution_statuses": [
+          "auto"
+        ],
+        "functional_tag": "graveyard_recursion",
+        "functional_tags": [
+          "graveyard_recursion",
+          "engine",
+          "board_presence",
+          "wincon"
+        ],
+        "review_statuses": [
+          "verified"
+        ]
+      },
+      "miracle_cast": 4,
+      "seed": 20260625,
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162346_squee_goblin_nabob.json",
+      "squee_to_graveyard": 0,
+      "squee_upkeep_return": 0,
+      "stalls": 0,
+      "topdeck_manipulation_activated": 3,
+      "win_rate": 0.0,
+      "wins": 0
+    }
+  ],
+  "scope": "Squee equal-gate candidate after loader materializes battle_rules_json from battle_card_rules",
+  "source_gate_jsons": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162318_squee_goblin_nabob.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162333_squee_goblin_nabob.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162346_squee_goblin_nabob.json"
+  ]
+}
