@@ -373,6 +373,8 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 "core_challenge_past_over_tragic": [
                     {
                         "package_key": "core_challenge_past_over_tragic",
+                        "adds": ["Past in Flames"],
+                        "cuts": ["Tragic Arrogance"],
                         "decision": "reject_or_rework",
                         "delta_pp": -50.0,
                         "source_report": "/tmp/prior.json",
@@ -389,6 +391,32 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
 
         self.assertEqual(classification["status"], "blocked_prior_reject")
         self.assertIn("reject_or_rework", classification["reason"])
+
+    def test_prior_evidence_does_not_block_same_key_with_different_signature(self):
+        prior_results = {
+            "enabled": True,
+            "by_package_key": {
+                "one_ring_burden_reset": [
+                    {
+                        "package_key": "one_ring_burden_reset",
+                        "adds": ["The One Ring"],
+                        "cuts": ["Artist's Talent"],
+                        "decision": "reject_or_rework",
+                        "delta_pp": -100.0,
+                        "source_report": "/tmp/prior.json",
+                    }
+                ]
+            },
+        }
+
+        classification = gate.classify_package_prior_evidence(
+            "one_ring_burden_reset",
+            gate.PACKAGE_DEFINITIONS["one_ring_burden_reset"],
+            prior_results,
+        )
+
+        self.assertEqual(classification["status"], "same_key_different_signature")
+        self.assertIn("different add/cut signature", classification["reason"])
 
     def test_render_markdown_handles_preflight_only_rows_without_gate(self):
         markdown = gate.render_markdown(

@@ -811,6 +811,11 @@ def classify_package_cut_safety(
 
 
 def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
+    def card_signature(cards: object) -> tuple[str, ...]:
+        if not isinstance(cards, list):
+            return ()
+        return tuple(sorted(normalize_name(str(card)) for card in cards if str(card).strip()))
+
     def compact_side(side: dict[str, Any]) -> dict[str, Any]:
         telemetry = side.get("telemetry") or {}
         return {
@@ -847,6 +852,8 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
                 "family": result.get("family"),
                 "adds": result.get("adds") or [],
                 "cuts": result.get("cuts") or [],
+                "adds_signature": card_signature(result.get("adds") or []),
+                "cuts_signature": card_signature(result.get("cuts") or []),
                 "decision": decision,
                 "delta_pp": gate.get("delta_pp"),
                 "baseline": compact_side(baseline),
@@ -879,10 +886,30 @@ def classify_package_prior_evidence(
         return {"status": "not_checked", "reason": "prior package evidence disabled", "matches": []}
     matches = (prior_results.get("by_package_key") or {}).get(package_key) or []
     if not matches:
-        return {"status": "clear", "reason": "no previous exact package result", "matches": []}
-    blocking = [
+        return {"status": "clear", "reason": "no previous package-key result", "matches": []}
+    target_adds = tuple(
+        sorted(normalize_name(str(card)) for card in definition.get("adds", []) if str(card).strip())
+    )
+    target_cuts = tuple(
+        sorted(normalize_name(str(card)) for card in definition.get("cuts", []) if str(card).strip())
+    )
+    exact_matches = [
         row
         for row in matches
+        if tuple(row.get("adds_signature") or sorted(normalize_name(str(card)) for card in row.get("adds", [])))
+        == target_adds
+        and tuple(row.get("cuts_signature") or sorted(normalize_name(str(card)) for card in row.get("cuts", [])))
+        == target_cuts
+    ]
+    if not exact_matches:
+        return {
+            "status": "same_key_different_signature",
+            "reason": "previous package-key result has different add/cut signature",
+            "matches": matches,
+        }
+    blocking = [
+        row
+        for row in exact_matches
         if row.get("decision") in PRIOR_PACKAGE_BLOCKED_DECISIONS
     ]
     override_reason = str(definition.get("prior_evidence_override_reason") or "").strip()
@@ -902,7 +929,7 @@ def classify_package_prior_evidence(
     return {
         "status": "seen_no_blocker",
         "reason": "previous exact package result was not a reject blocker",
-        "matches": matches,
+        "matches": exact_matches,
     }
 
 
