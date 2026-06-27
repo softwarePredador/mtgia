@@ -224,6 +224,61 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "same-lane early-mana benchmark preserves the protected ramp job",
         )
 
+    def test_prior_evidence_blocks_exact_rejected_package(self):
+        prior_results = {
+            "enabled": True,
+            "by_package_key": {
+                "core_challenge_past_over_tragic": [
+                    {
+                        "package_key": "core_challenge_past_over_tragic",
+                        "decision": "reject_or_rework",
+                        "delta_pp": -50.0,
+                        "source_report": "/tmp/prior.json",
+                    }
+                ]
+            },
+        }
+
+        classification = gate.classify_package_prior_evidence(
+            "core_challenge_past_over_tragic",
+            gate.PACKAGE_DEFINITIONS["core_challenge_past_over_tragic"],
+            prior_results,
+        )
+
+        self.assertEqual(classification["status"], "blocked_prior_reject")
+        self.assertIn("reject_or_rework", classification["reason"])
+
+    def test_render_markdown_handles_preflight_only_rows_without_gate(self):
+        markdown = gate.render_markdown(
+            {
+                "generated_at": "2026-06-27T00:00:00Z",
+                "source_db": "/tmp/source.db",
+                "games_per_opponent": 1,
+                "opponent_limit": 1,
+                "opponent_seed": 1,
+                "simulation_seed": 42,
+                "preflight_only": True,
+                "cut_safety_report": "/tmp/cut.json",
+                "prior_package_reports": ["/tmp/prior.json"],
+                "packages": [
+                    {
+                        "package_key": "core_challenge_past_over_tragic",
+                        "family": "payoff_challenge",
+                        "hypothesis": "test",
+                        "adds": ["Past in Flames"],
+                        "cuts": ["Tragic Arrogance"],
+                        "status": "skipped_prior_evidence",
+                        "cut_safety": {"status": "clear"},
+                        "prior_evidence": {"status": "blocked_prior_reject"},
+                        "candidate_meta": {},
+                    }
+                ],
+            }
+        )
+
+        self.assertIn("skipped_prior_evidence", markdown)
+        self.assertIn("blocked_prior_reject", markdown)
+
     def test_strategic_delta_includes_squee_metrics(self):
         payload = {
             "baseline": {
