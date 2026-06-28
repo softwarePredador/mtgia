@@ -4241,6 +4241,28 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
         }
     ),
+    "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence": handcrafted_runtime_rule(
+        {
+            "ability_kind": "state_triggered_static_replacement",
+            "cmc": 3.0,
+            "effect": "creature",
+            "mana_cost": "{2}{W}",
+            "colors": ["W"],
+            "type_line": "Legendary Creature - Fox Monk",
+            "power": 2,
+            "toughness": 2,
+            "subtypes": ["Fox", "Monk"],
+            "life_total_threshold": 30,
+            "flips_at_life_total_threshold": True,
+            "flipped_name": "Rune-Tail's Essence",
+            "flipped_type_line": "Legendary Enchantment",
+            "prevent_all_damage_to_controlled_creatures": True,
+            "prevent_damage_target_scope": "controlled_creatures",
+            "battle_model_scope": "life_30_flip_prevent_all_damage_to_controlled_creatures_v1",
+            "_rule_oracle_hash": "41538153d9a8b81b8233170efee5f9da",
+            "_rule_logical_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+        }
+    ),
     "Stuffy Doll": handcrafted_runtime_rule(
         {
             "ability_kind": "static_triggered_and_activated",
@@ -4663,6 +4685,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Boros Reckoner",
     "Repercussion",
     "Rem Karolus, Stalwart Slayer",
+    "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence",
     "Stuffy Doll",
     "Slickshot Show-Off",
     "Serra Ascendant",
@@ -4807,6 +4830,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed spell-damage prevention for self/controlled permanents and +1 spell damage to opponents/opponent permanents.",
         ["manaloom_log_learning_audit_20260628_v32_after_repercussion_runtime", "RemKarolusStalwartSlayer.java"],
         "2026-06-29T03:25:00Z",
+    ),
+    "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed life-30 flip into controlled-creature damage prevention enchantment.",
+        ["manaloom_log_learning_audit_20260628_v33_after_rem_karolus_runtime", "RuneTailKitsuneAscendant.java"],
+        "2026-06-29T03:45:00Z",
     ),
     "Stuffy Doll": manual_runtime_waiver_metadata(
         "Replace no_active runtime gap with XMage-backed chosen-player damage reflection, indestructible body, and tap self-damage ability.",
@@ -26104,6 +26132,42 @@ def life_total_threshold_static_is_active(permanent, controller):
     return _life_threshold_int(getattr(controller, "life", 0), default=0) >= threshold
 
 
+def apply_life_total_threshold_flip_state(
+    permanent,
+    controller,
+    active,
+    *,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    if not active or not permanent.get("flips_at_life_total_threshold"):
+        return False
+    if permanent.get("_life_total_threshold_flipped"):
+        return False
+    permanent["_life_total_threshold_flipped"] = True
+    permanent["flipped_to"] = permanent.get("flipped_name") or "flipped"
+    permanent["type_line"] = permanent.get("flipped_type_line") or permanent.get("type_line")
+    permanent["effect"] = "passive"
+    permanent["creature_type_suppressed"] = True
+    permanent["summoning_sick"] = False
+    if emit_event:
+        emit_replay_event(
+            "state_trigger_resolved",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            trigger="life_total_threshold",
+            threshold=_life_threshold_int(permanent.get("life_total_threshold"), default=0),
+            controller_life=getattr(controller, "life", None),
+            effect="flip_source",
+            transformed_to=permanent.get("flipped_to"),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+    return True
+
+
 def apply_life_total_threshold_source_static(
     permanent,
     controller,
@@ -26171,6 +26235,14 @@ def apply_life_total_threshold_source_static(
         permanent["_life_total_threshold_grants_applied"] = []
 
     permanent["_life_total_threshold_active"] = active
+    flipped_now = apply_life_total_threshold_flip_state(
+        permanent,
+        controller,
+        active,
+        turn=turn,
+        phase=phase,
+        emit_event=emit_event,
+    )
     after = {
         "power": permanent.get("power"),
         "toughness": permanent.get("toughness"),
@@ -26179,7 +26251,7 @@ def apply_life_total_threshold_source_static(
             for keyword in grants
         },
     }
-    if emit_event and (active != was_active or after != before):
+    if emit_event and (active != was_active or after != before or flipped_now):
         emit_replay_event(
             "static_life_total_threshold_state_changed",
             player=getattr(controller, "name", "?"),
@@ -26187,6 +26259,8 @@ def apply_life_total_threshold_source_static(
             threshold=_life_threshold_int(permanent.get("life_total_threshold"), default=0),
             controller_life=getattr(controller, "life", None),
             active=active,
+            flipped=bool(permanent.get("_life_total_threshold_flipped")),
+            flipped_to=permanent.get("flipped_to"),
             power_before=before["power"],
             power_after=after["power"],
             toughness_before=before["toughness"],
@@ -28819,6 +28893,9 @@ CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE = (
 REM_KAROLUS_SPELL_DAMAGE_REPLACEMENT_SCOPE = (
     "spell_damage_to_opponents_plus_one_prevent_own_nonself_v1"
 )
+RUNE_TAIL_CONTROLLED_CREATURE_DAMAGE_PREVENTION_SCOPE = (
+    "life_30_flip_prevent_all_damage_to_controlled_creatures_v1"
+)
 
 
 def damage_source_reference(source_card, controller):
@@ -28867,6 +28944,7 @@ def _static_damage_modifier_effects(controller, target_controller=None):
                     or effect_data.get("damage_bonus")
                     or effect_data.get("spell_damage_to_opponents_and_permanents_they_control_bonus")
                     or effect_data.get("prevent_spell_damage_to_you_and_permanents_you_control")
+                    or effect_data.get("prevent_all_damage_to_controlled_creatures")
                 ):
                     continue
                 scope = str(effect_data.get("battle_model_scope") or "")
@@ -28874,6 +28952,7 @@ def _static_damage_modifier_effects(controller, target_controller=None):
                     CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE,
                     CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE,
                     REM_KAROLUS_SPELL_DAMAGE_REPLACEMENT_SCOPE,
+                    RUNE_TAIL_CONTROLLED_CREATURE_DAMAGE_PREVENTION_SCOPE,
                 }:
                     continue
                 targets = effect_data.get("damage_modifier_targets") or []
@@ -28892,6 +28971,7 @@ def _static_damage_modifier_effects(controller, target_controller=None):
                         or 0
                     ),
                     bool(effect_data.get("prevent_spell_damage_to_you_and_permanents_you_control")),
+                    bool(effect_data.get("prevent_all_damage_to_controlled_creatures")),
                 )
                 if modifier_key in seen_modifier_keys:
                     continue
@@ -28958,6 +29038,18 @@ def _static_damage_modifier_applies(
             or effect_data.get("spell_damage_to_opponents_and_permanents_they_control_bonus")
         )
 
+    if scope == RUNE_TAIL_CONTROLLED_CREATURE_DAMAGE_PREVENTION_SCOPE:
+        if target_controller is not modifier_controller:
+            return False
+        if not isinstance(target, dict) or not is_battlefield_creature(target):
+            return False
+        if target is permanent:
+            return False
+        return bool(
+            effect_data.get("prevent_all_damage_to_controlled_creatures")
+            and permanent.get("_life_total_threshold_flipped")
+        )
+
     return False
 
 
@@ -29008,6 +29100,21 @@ def apply_static_damage_replacements(
                     "controller": getattr(modifier_controller, "name", None),
                     "scope": effect_data.get("battle_model_scope"),
                     "prevention": "spell_damage_to_self_or_controlled_permanent",
+                }
+            )
+            continue
+        if (
+            str(effect_data.get("battle_model_scope") or "")
+            == RUNE_TAIL_CONTROLLED_CREATURE_DAMAGE_PREVENTION_SCOPE
+            and effect_data.get("prevent_all_damage_to_controlled_creatures")
+        ):
+            modified_amount = 0
+            applied.append(
+                {
+                    "source": permanent.get("name", "?"),
+                    "controller": getattr(modifier_controller, "name", None),
+                    "scope": effect_data.get("battle_model_scope"),
+                    "prevention": "all_damage_to_controlled_creature",
                 }
             )
             continue
@@ -35128,7 +35235,8 @@ def apply_effect_immediate(
     elif effect == "land": pass
     elif effect == "creature":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
-        permanent["effect"] = "creature"
+        if not permanent.get("creature_type_suppressed"):
+            permanent["effect"] = "creature"
         player.battlefield.append(permanent)
         refresh_controlled_static_indestructible(
             player,
