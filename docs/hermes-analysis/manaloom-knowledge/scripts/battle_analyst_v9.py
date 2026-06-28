@@ -4108,6 +4108,29 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:776e69f786c18a8398012554b8e22907",
         }
     ),
+    "Wand of Vertebrae": handcrafted_runtime_rule(
+        {
+            "ability_kind": "activated",
+            "cmc": 1.0,
+            "effect": "passive",
+            "artifact": True,
+            "mana_cost": "{1}",
+            "activated_self_mill_count": 1,
+            "self_mill_activation_requires_tap": True,
+            "self_mill_min_library_after": 3,
+            "graveyard_shuffle_activation_cost_generic": 2,
+            "graveyard_shuffle_activation_requires_tap": True,
+            "graveyard_shuffle_exiles_self": True,
+            "graveyard_shuffle_target_count": 5,
+            "graveyard_shuffle_min_targets": 3,
+            "graveyard_shuffle_low_library_threshold": 8,
+            "graveyard_shuffle_target_controller": "self",
+            "graveyard_shuffle_destination": "library",
+            "battle_model_scope": "tap_self_mill_or_self_exile_graveyard_shuffle_artifact_v1",
+            "_rule_oracle_hash": "71de2615587654002b225714c5130a68",
+            "_rule_logical_key": "battle_rule_v1:ab583f78c19a22031bb99e0ac2d0d131",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4227,6 +4250,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Zirda, the Dawnwaker",
     "Wild Ricochet",
     "Whispersilk Cloak",
+    "Wand of Vertebrae",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4367,6 +4391,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace review_only indestructible metadata with XMage-backed Equipment shroud and can't-be-blocked attachment semantics.",
         ["manaloom_log_learning_audit_20260628_v17_after_wild_ricochet_runtime", "WhispersilkCloak.java"],
         "2026-06-28T23:05:00Z",
+    ),
+    "Wand of Vertebrae": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed tap self-mill and self-exile graveyard shuffle artifact semantics.",
+        ["manaloom_log_learning_audit_20260628_v18_after_whispersilk_cloak_runtime", "WandOfVertebrae.java"],
+        "2026-06-28T23:25:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -19602,6 +19631,284 @@ def cantrip_mana_filter_unlock_options(player, permanent, turn, *, phase="precom
     return options
 
 
+def graveyard_recycle_candidate_score(card, player, all_players, turn):
+    if not isinstance(card, dict):
+        return -1000
+    effect_data = get_card_effect(card)
+    effect = str(effect_data.get("effect") or "unknown")
+    name = card.get("name", "?")
+    score = threat_score(effect, name, player, all_players or [player], turn)
+    score += int(float(card.get("cmc") or card_mana_value(card) or 0))
+    if is_effective_land(card):
+        score -= 10
+    if effect == "unknown":
+        score -= 4
+    return score
+
+
+def graveyard_recycle_targets(player, permanent, all_players, turn):
+    target_count = max(1, int(permanent.get("graveyard_shuffle_target_count") or 5))
+    candidates = [
+        grave_card
+        for grave_card in list(getattr(player, "graveyard", []) or [])
+        if isinstance(grave_card, dict)
+    ]
+    candidates.sort(
+        key=lambda grave_card: (
+            -graveyard_recycle_candidate_score(grave_card, player, all_players, turn),
+            -int(float(grave_card.get("cmc") or card_mana_value(grave_card) or 0)),
+            grave_card.get("name", "?"),
+        )
+    )
+    return candidates[:target_count]
+
+
+def activate_graveyard_recycling_artifacts(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase,
+):
+    if phase not in {"precombat_main", "postcombat_main"}:
+        return 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not (
+            permanent.get("activated_self_mill_count")
+            or permanent.get("graveyard_shuffle_target_count")
+        ):
+            continue
+        if permanent.get("utility_artifact_used_this_turn"):
+            continue
+        if permanent.get("graveyard_shuffle_target_count"):
+            activation_cost = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(permanent.get("graveyard_shuffle_activation_cost_generic") or 0),
+            )
+            activation_cost_text = _activation_cost_text(activation_cost)
+            targets = graveyard_recycle_targets(player, permanent, all_players, turn)
+            min_targets = max(1, int(permanent.get("graveyard_shuffle_min_targets") or 1))
+            low_library_threshold = int(permanent.get("graveyard_shuffle_low_library_threshold") or 0)
+            low_library = low_library_threshold > 0 and len(player.library) <= low_library_threshold
+            if (
+                (phase == "postcombat_main" or low_library)
+                and targets
+                and (len(targets) >= min_targets or low_library)
+            ):
+                if permanent.get("graveyard_shuffle_activation_requires_tap", True) and permanent.get("tapped"):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "artifact_already_tapped_for_graveyard_shuffle",
+                        phase=phase,
+                    )
+                    continue
+                if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "failed_to_pay_graveyard_shuffle_activation_cost",
+                        phase=phase,
+                    )
+                    continue
+                if permanent.get("graveyard_shuffle_activation_requires_tap", True):
+                    permanent["tapped"] = True
+                permanent["utility_artifact_used_this_turn"] = True
+                library_before = len(player.library)
+                graveyard_before = len(player.graveyard)
+                moved = []
+                for moved_card in remove_cards_from_graveyard(
+                    player,
+                    targets,
+                    turn=turn,
+                    source_event="graveyard_shuffle_artifact",
+                ):
+                    player.library.append(moved_card)
+                    moved.append(moved_card)
+                player.shuffle(rng)
+                if permanent.get("graveyard_shuffle_exiles_self"):
+                    if permanent in player.battlefield:
+                        player.battlefield.remove(permanent)
+                    move_to_exile(
+                        player,
+                        permanent,
+                        reason="graveyard_shuffle_artifact_activation",
+                        turn=turn,
+                    )
+                emit_decision_trace(
+                    decision_type="utility_artifact_activation",
+                    player=player,
+                    turn=turn,
+                    phase=phase,
+                    available_options=[
+                        decision_card_option(
+                            target,
+                            get_card_effect(target),
+                            score=graveyard_recycle_candidate_score(target, player, all_players, turn),
+                            action="shuffle_graveyard_card_into_library",
+                        )
+                        for target in targets
+                    ],
+                    chosen_option=decision_card_option(
+                        permanent,
+                        action="self_exile_shuffle_graveyard_to_library",
+                        effect=permanent.get("effect", "passive"),
+                        score=18 + len(moved) * 3,
+                    ),
+                    score_components={
+                        "activation_cost_generic": activation_cost,
+                        "graveyard_cards_selected": len(moved),
+                        "library_before": library_before,
+                        "library_after": len(player.library),
+                        "graveyard_before": graveyard_before,
+                        "graveyard_after": len(player.graveyard),
+                    },
+                    rule_source="utility_artifact_activation_v1",
+                    rule_status=permanent.get("_rule_review_status", "active"),
+                    confidence="medium",
+                    expected_benefit_score=18 + len(moved) * 3,
+                    reason="recycle_best_graveyard_cards_before_source_loses_value",
+                    strategic_principle="convert expendable artifact into high-value library density and anti-decking buffer",
+                    heuristic_version=DECISION_STRATEGY_VERSION,
+                    resource_delta={
+                        "mana": -activation_cost,
+                        "graveyard": -len(moved),
+                        "library": len(moved),
+                        "artifacts": -1 if permanent.get("graveyard_shuffle_exiles_self") else 0,
+                    },
+                    risk_flags=["tap_artifact", "exile_artifact", "shuffle_graveyard_into_library"],
+                )
+                emit_replay_event(
+                    "utility_artifact_activated",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    activation_kind="self_exile_shuffle_graveyard_to_library",
+                    mana_paid=activation_cost,
+                    moved_cards=[
+                        moved_card.get("name", "?")
+                        for moved_card in moved
+                        if isinstance(moved_card, dict)
+                    ],
+                    moved_count=len(moved),
+                    library_before=library_before,
+                    library_after=len(player.library),
+                    graveyard_before=graveyard_before,
+                    graveyard_after=len(player.graveyard),
+                    exiled_self=bool(permanent.get("graveyard_shuffle_exiles_self")),
+                    phase=phase,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+                return 1
+
+        self_mill_count = int(permanent.get("activated_self_mill_count") or 0)
+        if phase != "precombat_main" or self_mill_count <= 0:
+            continue
+        if permanent.get("self_mill_activation_requires_tap", True) and permanent.get("tapped"):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "artifact_already_tapped_for_self_mill",
+                phase=phase,
+            )
+            continue
+        min_library_after = int(permanent.get("self_mill_min_library_after") or 0)
+        if len(player.library) <= min_library_after:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "library_too_low_for_self_mill",
+                phase=phase,
+                risk_flags=["decking_risk"],
+            )
+            continue
+        if permanent.get("self_mill_activation_requires_tap", True):
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        library_before = len(player.library)
+        graveyard_before = len(player.graveyard)
+        milled = []
+        for _ in range(min(self_mill_count, len(player.library))):
+            milled_card = player.library.pop(0)
+            player.graveyard.append(milled_card)
+            milled.append(milled_card)
+            resolve_land_cards_enter_graveyard_triggers(
+                player,
+                [milled_card],
+                turn=turn,
+                source_event="self_mill_artifact",
+            )
+        emit_decision_trace(
+            decision_type="utility_artifact_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    permanent,
+                    action="tap_self_mill",
+                    effect=permanent.get("effect", "passive"),
+                    score=14 + len(milled) * 2,
+                )
+            ],
+            chosen_option=decision_card_option(
+                permanent,
+                action="tap_self_mill",
+                effect=permanent.get("effect", "passive"),
+                score=14 + len(milled) * 2,
+            ),
+            score_components={
+                "milled_count": len(milled),
+                "library_before": library_before,
+                "library_after": len(player.library),
+                "graveyard_before": graveyard_before,
+                "graveyard_after": len(player.graveyard),
+            },
+            rule_source="utility_artifact_activation_v1",
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=14 + len(milled) * 2,
+            reason="build_graveyard_material_with_idle_artifact",
+            strategic_principle="use low-cost artifact tap ability to increase graveyard options without spending cards",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "library": -len(milled),
+                "graveyard": len(milled),
+            },
+            risk_flags=["tap_artifact", "self_mill"],
+        )
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="tap_self_mill",
+            milled=[
+                milled_card.get("name", "?")
+                for milled_card in milled
+                if isinstance(milled_card, dict)
+            ],
+            milled_count=len(milled),
+            library_before=library_before,
+            library_after=len(player.library),
+            graveyard_before=graveyard_before,
+            graveyard_after=len(player.graveyard),
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return 1
+    return 0
+
+
 def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, phase="postcombat_main"):
     if not player.is_alive():
         return 0
@@ -19620,6 +19927,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         normalize_card_name(permanent.get("name", "")): permanent
         for permanent in utility_artifacts
     }
+
+    if activate_graveyard_recycling_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
 
     tutor_to_hand_artifacts = [
         permanent
