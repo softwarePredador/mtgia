@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-06-28T00:00:00Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "purpose": "External package manifest for safe-cut follow-up gates without editing the static package registry for each hypothesis.",
+  "source_evidence": [
+    "lorehold_learning_evidence_ledger_20260628_v5.json",
+    "lorehold_all_package_preflight_20260628_v3_20260628_085000.json"
+  ],
+  "packages": [
+    {
+      "package_key": "gods_willing_commander_shield_cut_avatar_wrath",
+      "family": "targeted_commander_protection",
+      "hypothesis": "Gods Willing had a positive targeted-protection signal when measured over Promise of Loyalty, but Promise is registry-protected. This safe-cut follow-up preserves Promise and tests Gods Willing over Avatar's Wrath, a slower protection/pressure slot already used as the non-protected benchmark in other protection packages.",
+      "adds": [
+        "Gods Willing"
+      ],
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "allow_miracle_core_cuts": true
+    },
+    {
+      "package_key": "past_in_flames_recast_cut_big_score",
+      "family": "graveyard_recast",
+      "hypothesis": "Past in Flames had positive signal when tested over Bender's Waterskin, but Bender is protected by the current registry/cut-safety guard. This follow-up preserves the protected ramp shell and tests Past in Flames over Big Score, a one-shot discard/draw/Treasure card-flow slot in the same spell-velocity lane.",
+      "adds": [
+        "Past in Flames"
+      ],
+      "cuts": [
+        "Big Score"
+      ],
+      "allow_miracle_core_cuts": true
+    }
+  ]
+}

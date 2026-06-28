@@ -1,0 +1,126 @@
+{
+  "apply_only": false,
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+  "cut_safety_summary": {
+    "blocked_cut_count": 11,
+    "protected_registry_cut_count": 14,
+    "status_counts": {
+      "locked_do_not_cut": 9,
+      "risky_cut_only_same_lane": 2
+    },
+    "tested_cut_count": 11,
+    "untested_flex_pool_count": 6
+  },
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-28T07:39:09.541382+00:00",
+  "no_game_checkpoint": false,
+  "opponent_limit": 3,
+  "opponent_seed": 20260626,
+  "package_definition_files": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_dynamic_package_manifest_20260628_v1.json"
+  ],
+  "package_status_counts": {
+    "skipped_prior_evidence": 1
+  },
+  "packages": [
+    {
+      "adds": [
+        "Gods Willing"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "family": "targeted_commander_protection",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Gods Willing had a positive targeted-protection signal when measured over Promise of Loyalty, but Promise is registry-protected. This safe-cut follow-up preserves Promise and tests Gods Willing over Avatar's Wrath, a slower protection/pressure slot already used as the non-protected benchmark in other protection packages.",
+      "package_key": "gods_willing_commander_shield_cut_avatar_wrath",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Gods Willing"
+            ],
+            "adds_signature": [
+              "gods willing"
+            ],
+            "baseline": {},
+            "candidate": {},
+            "cuts": [
+              "Avatar's Wrath"
+            ],
+            "cuts_signature": [
+              "avatar's wrath"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": null,
+            "family": "registry_rejected",
+            "gate_json": null,
+            "gate_markdown": null,
+            "gate_returncode": null,
+            "package_key": "registry:leader_watchlist_probes:1:gods willing",
+            "registry_learning": "The champion shell strongly preferred Avatar's Wrath over the first protection watchlist package. None of those swaps preserved the pressure-defense profile.",
+            "registry_result": "Gods Willing 1W/2L/0S, WR 33.33%; Angel's Grace 1W/2L/0S, WR 33.33%; Sejiri Shelter 1W/2L/0S, WR 33.33%; Commander's Plate 1W/2L/0S, WR 33.33%; Clever Concealment 0W/3L/0S",
+            "registry_section": "leader_watchlist_probes",
+            "registry_status": "rejected_probe_batch",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json",
+            "strategic_delta": {}
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "status": "skipped_prior_evidence"
+    }
+  ],
+  "preflight_only": true,
+  "prior_package_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json"
+  ],
+  "prior_package_summary": {
+    "loaded_report_count": 15,
+    "missing_report_count": 0,
+    "package_key_count": 68,
+    "registry_prior_result_count": 37,
+    "signature_count": 66
+  },
+  "protected_cut_registry": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json",
+  "protected_cut_registry_summary": {
+    "protected_registry_cut_count": 14
+  },
+  "registry_prior_summary": {
+    "registry_prior_result_count": 37
+  },
+  "runtime_package_proposal_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v5_topdeck_damage_proposals.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/xmage_hidden_retreat_runtime_scope_20260628_v3_proposals.json"
+  ],
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}

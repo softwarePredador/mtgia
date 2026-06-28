@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import signal
 import shutil
 import sqlite3
@@ -37,6 +38,7 @@ DEFAULT_SOURCE_DB = (
     / "knowledge_candidate.db"
 )
 DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
+DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 DEFAULT_RUNTIME_PACKAGE_PROPOSALS = (
     REPORT_DIR / "lorehold_runtime_gap_family_queue_20260628_v5_topdeck_damage_proposals.json"
 )
@@ -59,6 +61,11 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
     REPORT_DIR / "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
     REPORT_DIR / "lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+    REPORT_DIR / "lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+    REPORT_DIR / "lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+    REPORT_DIR / "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+    REPORT_DIR / "lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+    REPORT_DIR / "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
 )
 
 
@@ -141,6 +148,18 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
             "Victory Chimes, or the finisher package."
         ),
         "adds": ["Storm-Kiln Artist"],
+        "cuts": ["Arcane Signet"],
+    },
+    "mana_vault_fast_mana_cut_arcane_signet": {
+        "family": "fast_mana",
+        "hypothesis": (
+            "Mana Vault is legal, battle-ready fast mana and appears in multiple "
+            "Lorehold variants. This tests whether one-mana colorless burst "
+            "accelerates commander and expensive spell windows more than Arcane "
+            "Signet's colored fixing, without cutting protected medallions, "
+            "Bender's Waterskin, Victory Chimes, or Jeska's Will."
+        ),
+        "adds": ["Mana Vault"],
         "cuts": ["Arcane Signet"],
     },
     "brass_bounty_cut_boros_signet": {
@@ -906,10 +925,77 @@ MIRACLE_CORE_NAMES = {
     "Storm Herd",
     "The Scarlet Witch",
 }
-CUT_SAFETY_BLOCKED_STATUSES = {"locked_do_not_cut", "protected_until_same_lane_win"}
+CUT_SAFETY_BLOCKED_STATUSES = {
+    "locked_do_not_cut",
+    "protected_until_same_lane_win",
+    "protected_until_same_function_replacement_wins",
+}
 CUT_SAFETY_RISKY_STATUSES = {"risky_cut_only_same_lane"}
 CUT_SAFETY_PROTECTED_STATUSES = CUT_SAFETY_BLOCKED_STATUSES | CUT_SAFETY_RISKY_STATUSES
 PRIOR_PACKAGE_BLOCKED_DECISIONS = {"reject_or_rework", "invalid_or_incomplete"}
+
+
+def card_signature(cards: object) -> tuple[str, ...]:
+    if not isinstance(cards, list):
+        return ()
+    return tuple(sorted(normalize_name(str(card)) for card in cards if str(card).strip()))
+
+
+def package_signature_key(adds: object, cuts: object) -> str:
+    return json.dumps(
+        {"adds": card_signature(adds), "cuts": card_signature(cuts)},
+        sort_keys=True,
+    )
+
+
+def load_package_definition_file(path: Path) -> dict[str, dict[str, Any]]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    raw_packages = payload.get("packages") if isinstance(payload, dict) else None
+    if not isinstance(raw_packages, list):
+        raise ValueError(f"{path} must contain a packages list")
+    definitions: dict[str, dict[str, Any]] = {}
+    for index, row in enumerate(raw_packages):
+        if not isinstance(row, dict):
+            raise ValueError(f"{path} package #{index + 1} must be an object")
+        package_key = str(row.get("package_key") or "").strip()
+        if not package_key:
+            raise ValueError(f"{path} package #{index + 1} is missing package_key")
+        adds = row.get("adds")
+        cuts = row.get("cuts")
+        hypothesis = str(row.get("hypothesis") or "").strip()
+        if not isinstance(adds, list) or not all(str(card).strip() for card in adds):
+            raise ValueError(f"{path} package {package_key} must contain non-empty adds")
+        if not isinstance(cuts, list) or not all(str(card).strip() for card in cuts):
+            raise ValueError(f"{path} package {package_key} must contain non-empty cuts")
+        if not hypothesis:
+            raise ValueError(f"{path} package {package_key} is missing hypothesis")
+        definitions[package_key] = {
+            "family": row.get("family") or "external_manifest",
+            "hypothesis": hypothesis,
+            "adds": [str(card) for card in adds],
+            "cuts": [str(card) for card in cuts],
+        }
+        for optional_key in (
+            "allow_miracle_core_cuts",
+            "cut_safety_override_reason",
+            "registry_protected_cut_override_reason",
+        ):
+            if optional_key in row:
+                definitions[package_key][optional_key] = row[optional_key]
+    return definitions
+
+
+def merge_package_definitions(package_files: list[Path]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    definitions = dict(PACKAGE_DEFINITIONS)
+    loaded_paths: list[str] = []
+    for path in package_files:
+        loaded = load_package_definition_file(path)
+        collisions = sorted(set(definitions) & set(loaded))
+        if collisions:
+            raise ValueError(f"{path} redefines existing package(s): {', '.join(collisions)}")
+        definitions.update(loaded)
+        loaded_paths.append(str(path))
+    return definitions, loaded_paths
 
 
 def utc_stamp() -> str:
@@ -970,6 +1056,73 @@ def load_cut_safety_manifest(path: Path | None) -> dict[str, Any]:
     }
 
 
+def load_registry_cut_guard(path: Path | None) -> dict[str, Any]:
+    if path is None:
+        return {"enabled": False, "path": None, "protected_names": []}
+    if not path.exists():
+        return {
+            "enabled": True,
+            "path": str(path),
+            "missing": True,
+            "protected_names": [],
+        }
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    protected_names = [
+        str(name)
+        for name in payload.get("protected_cards_until_same_function_replacement_wins", [])
+        if str(name).strip()
+    ]
+    return {
+        "enabled": True,
+        "path": str(path),
+        "protected_names": protected_names,
+        "summary": {
+            "protected_registry_cut_count": len(protected_names),
+        },
+    }
+
+
+def merge_registry_cut_guard(
+    cut_safety: dict[str, Any],
+    registry_guard: dict[str, Any],
+) -> dict[str, Any]:
+    if not cut_safety.get("enabled") or not registry_guard.get("enabled"):
+        return cut_safety
+    if registry_guard.get("missing"):
+        merged = dict(cut_safety)
+        summary = dict(merged.get("summary") or {})
+        summary["registry_guard_missing"] = True
+        merged["summary"] = summary
+        return merged
+
+    merged = dict(cut_safety)
+    cuts_by_name = dict(merged.get("cuts_by_name") or {})
+    for card_name in registry_guard.get("protected_names") or []:
+        cuts_by_name[card_name] = {
+            **cuts_by_name.get(card_name, {}),
+            "card_name": card_name,
+            "status": "protected_until_same_function_replacement_wins",
+            "current_decision": "registry_protected",
+            "current_lane": cuts_by_name.get(card_name, {}).get("current_lane") or "registry_protected",
+            "effective_role": cuts_by_name.get(card_name, {}).get("effective_role"),
+            "reason": (
+                "registry protects this card until a same-function replacement "
+                "wins a current-leader gate"
+            ),
+        }
+    summary = dict(merged.get("summary") or {})
+    summary.update(registry_guard.get("summary") or {})
+    merged["summary"] = summary
+    merged["registry_guard"] = {
+        "enabled": True,
+        "path": registry_guard.get("path"),
+        "missing": bool(registry_guard.get("missing")),
+        "protected_names": list(registry_guard.get("protected_names") or []),
+    }
+    merged["cuts_by_name"] = cuts_by_name
+    return merged
+
+
 def classify_package_cut_safety(
     definition: dict[str, Any],
     cut_safety: dict[str, Any],
@@ -1007,6 +1160,11 @@ def classify_package_cut_safety(
         for row in cut_rows
         if row.get("status") in CUT_SAFETY_BLOCKED_STATUSES
     ]
+    registry_blocked_rows = [
+        row
+        for row in blocked_rows
+        if row.get("status") == "protected_until_same_function_replacement_wins"
+    ]
     risky_rows = [
         row
         for row in cut_rows
@@ -1025,6 +1183,16 @@ def classify_package_cut_safety(
         for row in protected_rows
     ]
 
+    registry_override_reason = str(
+        definition.get("registry_protected_cut_override_reason") or ""
+    ).strip()
+    if registry_blocked_rows and not registry_override_reason:
+        names = ", ".join(str(row.get("card_name")) for row in registry_blocked_rows)
+        return {
+            "status": "blocked_cut_safety",
+            "reason": f"proposed cuts are registry-protected: {names}",
+            "cuts": cut_summaries,
+        }
     if protected_rows and not override_reason:
         names = ", ".join(str(row.get("card_name")) for row in protected_rows)
         return {
@@ -1036,21 +1204,18 @@ def classify_package_cut_safety(
         status = "override_locked_cut_safety"
     elif risky_rows and override_reason:
         status = "override_risky_cut_safety"
+    elif registry_blocked_rows and registry_override_reason:
+        status = "override_registry_cut_safety"
     else:
         status = "clear"
     return {
         "status": status,
-        "reason": override_reason or "cut-safety preflight passed",
+        "reason": registry_override_reason or override_reason or "cut-safety preflight passed",
         "cuts": cut_summaries,
     }
 
 
 def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
-    def card_signature(cards: object) -> tuple[str, ...]:
-        if not isinstance(cards, list):
-            return ()
-        return tuple(sorted(normalize_name(str(card)) for card in cards if str(card).strip()))
-
     def compact_side(side: dict[str, Any]) -> dict[str, Any]:
         telemetry = side.get("telemetry") or {}
         return {
@@ -1063,6 +1228,7 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
         }
 
     by_package_key: dict[str, list[dict[str, Any]]] = {}
+    by_signature: dict[str, list[dict[str, Any]]] = {}
     loaded_paths: list[str] = []
     missing_paths: list[str] = []
     for path in paths:
@@ -1104,17 +1270,129 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
                 "gate_returncode": result.get("gate_returncode"),
             }
             by_package_key.setdefault(str(result.get("package_key")), []).append(package_result)
+            by_signature.setdefault(
+                package_signature_key(package_result["adds"], package_result["cuts"]),
+                [],
+            ).append(package_result)
     return {
         "enabled": bool(paths),
         "loaded_paths": loaded_paths,
         "missing_paths": missing_paths,
         "by_package_key": by_package_key,
+        "by_signature": by_signature,
         "summary": {
             "loaded_report_count": len(loaded_paths),
             "missing_report_count": len(missing_paths),
             "package_key_count": len(by_package_key),
+            "signature_count": len(by_signature),
         },
     }
+
+
+def parse_registry_swap_scope(scope: str) -> tuple[list[str], list[str]]:
+    if ";" not in scope:
+        return [], []
+    add_part, cut_part = scope.split(";", 1)
+    adds = [
+        match.group(1).strip().strip(".,")
+        for match in re.finditer(r"\+\s*(.*?)(?=\s*(?:/|,)\s*\+|;|$)", add_part)
+        if match.group(1).strip().strip(".,")
+    ]
+    cuts = [
+        match.group(1).strip().strip(".,")
+        for match in re.finditer(r"-\s*(.*?)(?=\s*(?:/|,)\s*-|;|$)", cut_part)
+        if match.group(1).strip().strip(".,")
+    ]
+    return adds, cuts
+
+
+def load_registry_prior_results(path: Path | None) -> dict[str, Any]:
+    if path is None:
+        return {"enabled": False, "loaded_paths": [], "missing_paths": [], "results": []}
+    if not path.exists():
+        return {
+            "enabled": True,
+            "loaded_paths": [],
+            "missing_paths": [str(path)],
+            "results": [],
+        }
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    results: list[dict[str, Any]] = []
+    for section in ("tested", "leader_follow_up_probes", "leader_watchlist_probes"):
+        for index, row in enumerate(payload.get(section) or []):
+            status = str(row.get("status") or "")
+            if not status.startswith("rejected"):
+                continue
+            adds, cuts = parse_registry_swap_scope(str(row.get("swap_or_scope") or ""))
+            if not adds or not cuts:
+                continue
+            for add in adds:
+                package_result = {
+                    "package_key": f"registry:{section}:{index}:{normalize_name(add)}",
+                    "source_report": str(path),
+                    "family": "registry_rejected",
+                    "adds": [add],
+                    "cuts": cuts,
+                    "adds_signature": card_signature([add]),
+                    "cuts_signature": card_signature(cuts),
+                    "decision": "reject_or_rework",
+                    "delta_pp": None,
+                    "baseline": {},
+                    "candidate": {},
+                    "strategic_delta": {},
+                    "gate_json": None,
+                    "gate_markdown": None,
+                    "gate_returncode": None,
+                    "registry_section": section,
+                    "registry_status": status,
+                    "registry_result": row.get("result"),
+                    "registry_learning": row.get("learning"),
+                }
+                results.append(package_result)
+    return {
+        "enabled": True,
+        "loaded_paths": [str(path)],
+        "missing_paths": [],
+        "results": results,
+        "summary": {
+            "registry_prior_result_count": len(results),
+        },
+    }
+
+
+def merge_registry_prior_results(
+    prior_results: dict[str, Any],
+    registry_results: dict[str, Any],
+) -> dict[str, Any]:
+    if not registry_results.get("enabled"):
+        return prior_results
+    merged = dict(prior_results)
+    by_package_key = {
+        key: list(value)
+        for key, value in (merged.get("by_package_key") or {}).items()
+    }
+    by_signature = {
+        key: list(value)
+        for key, value in (merged.get("by_signature") or {}).items()
+    }
+    for row in registry_results.get("results") or []:
+        by_package_key.setdefault(str(row.get("package_key")), []).append(row)
+        by_signature.setdefault(package_signature_key(row.get("adds"), row.get("cuts")), []).append(row)
+    summary = dict(merged.get("summary") or {})
+    summary.update(registry_results.get("summary") or {})
+    summary["package_key_count"] = len(by_package_key)
+    summary["signature_count"] = len(by_signature)
+    merged["by_package_key"] = by_package_key
+    merged["by_signature"] = by_signature
+    merged["summary"] = summary
+    merged["loaded_paths"] = list(merged.get("loaded_paths") or []) + list(
+        registry_results.get("loaded_paths") or []
+    )
+    merged["missing_paths"] = list(merged.get("missing_paths") or []) + list(
+        registry_results.get("missing_paths") or []
+    )
+    return merged
 
 
 def classify_package_prior_evidence(
@@ -1124,16 +1402,25 @@ def classify_package_prior_evidence(
 ) -> dict[str, Any]:
     if not prior_results.get("enabled"):
         return {"status": "not_checked", "reason": "prior package evidence disabled", "matches": []}
-    matches = (prior_results.get("by_package_key") or {}).get(package_key) or []
-    if not matches:
-        return {"status": "clear", "reason": "no previous package-key result", "matches": []}
     target_adds = tuple(
         sorted(normalize_name(str(card)) for card in definition.get("adds", []) if str(card).strip())
     )
     target_cuts = tuple(
         sorted(normalize_name(str(card)) for card in definition.get("cuts", []) if str(card).strip())
     )
-    exact_matches = [
+    matches = (prior_results.get("by_package_key") or {}).get(package_key) or []
+    signature_matches = (prior_results.get("by_signature") or {}).get(
+        package_signature_key(definition.get("adds") or [], definition.get("cuts") or []),
+        [],
+    )
+    if not matches and not signature_matches:
+        return {
+            "status": "clear",
+            "reason": "no previous package-key or add/cut signature result",
+            "matches": [],
+        }
+
+    exact_key_matches = [
         row
         for row in matches
         if tuple(row.get("adds_signature") or sorted(normalize_name(str(card)) for card in row.get("adds", [])))
@@ -1141,6 +1428,19 @@ def classify_package_prior_evidence(
         and tuple(row.get("cuts_signature") or sorted(normalize_name(str(card)) for card in row.get("cuts", [])))
         == target_cuts
     ]
+    exact_matches: list[dict[str, Any]] = []
+    seen = set()
+    for row in exact_key_matches + list(signature_matches):
+        marker = (
+            row.get("source_report"),
+            row.get("package_key"),
+            tuple(row.get("adds_signature") or ()),
+            tuple(row.get("cuts_signature") or ()),
+        )
+        if marker in seen:
+            continue
+        seen.add(marker)
+        exact_matches.append(row)
     if not exact_matches:
         return {
             "status": "same_key_different_signature",
@@ -1775,7 +2075,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- apply_only: `{payload.get('apply_only')}`",
         f"- no_game_checkpoint: `{payload.get('no_game_checkpoint')}`",
         f"- runtime_package_proposal_reports: `{', '.join(payload.get('runtime_package_proposal_reports') or []) or '-'}`",
+        f"- package_definition_files: `{', '.join(payload.get('package_definition_files') or []) or '-'}`",
         f"- cut_safety_report: `{payload.get('cut_safety_report') or '-'}`",
+        f"- protected_cut_registry: `{payload.get('protected_cut_registry') or '-'}`",
         f"- prior_package_reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         f"- package_status_counts: `{json.dumps(payload.get('package_status_counts') or {}, sort_keys=True)}`",
         "",
@@ -1867,7 +2169,18 @@ def main() -> int:
     parser.add_argument("--gate-timeout-seconds", type=float, default=0.0)
     parser.add_argument("--stem", default="lorehold_synergy_package_gate")
     parser.add_argument("--stamp", default=None)
+    parser.add_argument(
+        "--package-file",
+        type=Path,
+        action="append",
+        default=[],
+        help=(
+            "External JSON package manifest with a packages list. "
+            "Each row needs package_key, hypothesis, adds, and cuts."
+        ),
+    )
     parser.add_argument("--cut-safety-report", type=Path, default=DEFAULT_CUT_SAFETY_REPORT)
+    parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     parser.add_argument("--no-cut-safety", action="store_true")
     parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--apply-only", action="store_true")
@@ -1887,8 +2200,13 @@ def main() -> int:
 
     source_db = args.source_db.resolve()
     stamp = args.stamp or utc_stamp()
+    package_files = [path.resolve() for path in args.package_file]
+    package_definitions, loaded_package_files = merge_package_definitions(package_files)
     cut_safety_report = None if args.no_cut_safety else args.cut_safety_report.resolve()
     cut_safety = load_cut_safety_manifest(cut_safety_report)
+    registry_path = None if args.no_cut_safety else args.registry.resolve()
+    registry_guard = load_registry_cut_guard(registry_path)
+    cut_safety = merge_registry_cut_guard(cut_safety, registry_guard)
     prior_package_reports = [] if args.ignore_prior_results else [
         path.resolve() for path in (args.prior_package_report or list(DEFAULT_PRIOR_PACKAGE_REPORTS))
     ]
@@ -1901,14 +2219,16 @@ def main() -> int:
         )
     ]
     prior_results = load_prior_package_results(prior_package_reports)
+    registry_prior_results = load_registry_prior_results(registry_path)
+    prior_results = merge_registry_prior_results(prior_results, registry_prior_results)
     package_keys = [key.strip() for key in args.packages.split(",") if key.strip()]
-    unknown = [key for key in package_keys if key not in PACKAGE_DEFINITIONS]
+    unknown = [key for key in package_keys if key not in package_definitions]
     if unknown:
         raise SystemExit(f"unknown package(s): {', '.join(unknown)}")
 
     results: list[dict[str, Any]] = []
     for package_key in package_keys:
-        definition = PACKAGE_DEFINITIONS[package_key]
+        definition = package_definitions[package_key]
         package_cut_safety = classify_package_cut_safety(definition, cut_safety)
         package_prior_evidence = classify_package_prior_evidence(package_key, definition, prior_results)
         if package_cut_safety["status"] == "blocked_cut_safety":
@@ -2098,7 +2418,11 @@ def main() -> int:
         "apply_only": bool(args.apply_only),
         "no_game_checkpoint": bool(args.no_game_checkpoint),
         "runtime_package_proposal_reports": [str(path) for path in runtime_package_proposal_reports],
+        "package_definition_files": loaded_package_files,
         "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,
+        "protected_cut_registry": str(registry_path) if registry_path else None,
+        "protected_cut_registry_summary": registry_guard.get("summary") or {},
+        "registry_prior_summary": registry_prior_results.get("summary") or {},
         "cut_safety_summary": cut_safety.get("summary") or {},
         "prior_package_reports": [str(path) for path in prior_package_reports],
         "prior_package_summary": prior_results.get("summary") or {},

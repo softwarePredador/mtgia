@@ -558,6 +558,40 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "same-lane early-mana benchmark preserves the protected ramp job",
         )
 
+    def test_registry_protected_cut_blocks_even_without_cut_safety_row(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            registry = Path(tmp) / "registry.json"
+            registry.write_text(
+                json.dumps(
+                    {
+                        "protected_cards_until_same_function_replacement_wins": [
+                            "Promise of Loyalty",
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            cut_safety = gate.merge_registry_cut_guard(
+                {"enabled": True, "path": "/tmp/cut.json", "summary": {}, "cuts_by_name": {}},
+                gate.load_registry_cut_guard(registry),
+            )
+            classification = gate.classify_package_cut_safety(
+                {
+                    "adds": ["Penance"],
+                    "cuts": ["Promise of Loyalty"],
+                    "cut_safety_override_reason": "generic override is not enough",
+                },
+                cut_safety,
+            )
+
+        self.assertEqual(classification["status"], "blocked_cut_safety")
+        self.assertIn("registry-protected", classification["reason"])
+        self.assertEqual(
+            classification["cuts"][0]["status"],
+            "protected_until_same_function_replacement_wins",
+        )
+
     def test_prior_evidence_blocks_exact_rejected_package(self):
         prior_results = {
             "enabled": True,
@@ -610,6 +644,140 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(classification["status"], "same_key_different_signature")
         self.assertIn("different add/cut signature", classification["reason"])
 
+    def test_prior_evidence_blocks_rejected_add_cut_signature_under_different_key(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            prior = Path(tmp) / "prior.json"
+            prior.write_text(
+                json.dumps(
+                    {
+                        "packages": [
+                            {
+                                "package_key": "old_mana_vault_probe",
+                                "adds": ["Mana Vault"],
+                                "cuts": ["Arcane Signet"],
+                                "decision": "reject_or_rework",
+                                "gate_summary": {"delta_pp": -66.67},
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            prior_results = gate.load_prior_package_results([prior])
+            classification = gate.classify_package_prior_evidence(
+                "mana_vault_fast_mana_cut_arcane_signet",
+                gate.PACKAGE_DEFINITIONS["mana_vault_fast_mana_cut_arcane_signet"],
+                prior_results,
+            )
+
+        self.assertEqual(classification["status"], "blocked_prior_reject")
+        self.assertEqual(classification["matches"][0]["package_key"], "old_mana_vault_probe")
+
+    def test_external_package_definition_file_loads_new_package(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            package_file = Path(tmp) / "packages.json"
+            package_file.write_text(
+                json.dumps(
+                    {
+                        "packages": [
+                            {
+                                "package_key": "gods_willing_commander_shield_cut_avatar_wrath",
+                                "family": "targeted_commander_protection",
+                                "hypothesis": "Test cheap commander protection over a slower protected-slot benchmark.",
+                                "adds": ["Gods Willing"],
+                                "cuts": ["Avatar's Wrath"],
+                                "allow_miracle_core_cuts": True,
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            definitions, loaded = gate.merge_package_definitions([package_file])
+
+        definition = definitions["gods_willing_commander_shield_cut_avatar_wrath"]
+        self.assertEqual(loaded, [str(package_file)])
+        self.assertEqual(definition["adds"], ["Gods Willing"])
+        self.assertEqual(definition["cuts"], ["Avatar's Wrath"])
+        self.assertTrue(definition["allow_miracle_core_cuts"])
+
+    def test_external_package_definition_file_rejects_static_key_collision(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            package_file = Path(tmp) / "packages.json"
+            package_file.write_text(
+                json.dumps(
+                    {
+                        "packages": [
+                            {
+                                "package_key": "reprieve_cut_avatar_wrath",
+                                "hypothesis": "Collision should fail.",
+                                "adds": ["Gods Willing"],
+                                "cuts": ["Avatar's Wrath"],
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaises(ValueError):
+                gate.merge_package_definitions([package_file])
+
+    def test_parse_registry_swap_scope_preserves_mdfc_slashes(self):
+        adds, cuts = gate.parse_registry_swap_scope(
+            "+Birgi, God of Storytelling // Harnfel, Horn of Bounty / +Seething Song; "
+            "-Pinnacle Monk // Mystic Peak / -Arcane Signet"
+        )
+
+        self.assertEqual(
+            adds,
+            [
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "Seething Song",
+            ],
+        )
+        self.assertEqual(cuts, ["Pinnacle Monk // Mystic Peak", "Arcane Signet"])
+
+    def test_registry_prior_reject_blocks_same_add_cut_signature(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            registry = Path(tmp) / "registry.json"
+            registry.write_text(
+                json.dumps(
+                    {
+                        "leader_follow_up_probes": [
+                            {
+                                "swap_or_scope": "+Reprieve; -Avatar's Wrath",
+                                "status": "rejected_current_leader_gate",
+                                "result": "candidate lost prior gate",
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            prior_results = gate.merge_registry_prior_results(
+                {
+                    "enabled": True,
+                    "loaded_paths": [],
+                    "missing_paths": [],
+                    "by_package_key": {},
+                    "by_signature": {},
+                    "summary": {},
+                },
+                gate.load_registry_prior_results(registry),
+            )
+            classification = gate.classify_package_prior_evidence(
+                "reprieve_cut_avatar_wrath",
+                {"adds": ["Reprieve"], "cuts": ["Avatar's Wrath"]},
+                prior_results,
+            )
+
+        self.assertEqual(classification["status"], "blocked_prior_reject")
+        self.assertEqual(classification["matches"][0]["family"], "registry_rejected")
+
     def test_default_prior_reports_include_rejected_benchmark_gates(self):
         default_names = {path.name for path in gate.DEFAULT_PRIOR_PACKAGE_REPORTS}
 
@@ -639,6 +807,26 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         )
         self.assertIn(
             "lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
             default_names,
         )
 
