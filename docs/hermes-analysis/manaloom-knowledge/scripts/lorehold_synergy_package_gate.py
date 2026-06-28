@@ -2510,6 +2510,63 @@ def exposure_summary_text(exposure: dict[str, Any]) -> str:
     return f"{status}: " + ", ".join(parts)
 
 
+LOW_EXPOSURE_STATUSES = {
+    "candidate_added_card_low_access",
+    "candidate_added_card_low_exposure",
+    "candidate_added_cards_accessed_not_used",
+    "candidate_added_cards_near_access_low_use",
+}
+
+
+def exposure_requires_inconclusive(exposure: dict[str, Any] | None) -> bool:
+    if not exposure:
+        return False
+    if bool(exposure.get("low_candidate_added_card_use")):
+        return True
+    status = str(exposure.get("status") or "")
+    if status in LOW_EXPOSURE_STATUSES:
+        return True
+    candidate_added = exposure.get("candidate_added_cards") or {}
+    if "all_cards_used" in candidate_added:
+        return not bool(candidate_added.get("all_cards_used"))
+    return False
+
+
+def exposure_inconclusive_decision(
+    exposure: dict[str, Any] | None,
+    forced_access_mode: str = "none",
+) -> str | None:
+    if not exposure_requires_inconclusive(exposure):
+        return None
+    if forced_access_mode and forced_access_mode != "none":
+        return "forced_access_inconclusive_low_exposure"
+    return "inconclusive_low_exposure"
+
+
+def telemetry_present(side: dict[str, Any]) -> bool:
+    return isinstance(side.get("telemetry"), Mapping)
+
+
+def result_exposure_summary(result: dict[str, Any]) -> dict[str, Any]:
+    exposure = result.get("exposure_summary") or {}
+    if exposure:
+        return exposure
+    gate = result.get("gate_summary") or {}
+    baseline = gate.get("baseline") or {}
+    candidate = gate.get("candidate") or {}
+    if not (
+        isinstance(baseline, dict)
+        and isinstance(candidate, dict)
+        and (telemetry_present(baseline) or telemetry_present(candidate))
+    ):
+        return {}
+    adds = list(result.get("adds") or [])
+    cuts = list(result.get("cuts") or [])
+    if not adds:
+        return {}
+    return package_exposure_summary(gate, adds=adds, cuts=cuts)
+
+
 def gate_decision(
     gate: dict[str, Any],
     exposure: dict[str, Any] | None = None,
@@ -2519,10 +2576,9 @@ def gate_decision(
     candidate = gate.get("candidate") or {}
     if not baseline or not candidate:
         return "invalid_or_incomplete"
-    if exposure and exposure.get("low_candidate_added_card_use"):
-        if forced_access_mode and forced_access_mode != "none":
-            return "forced_access_inconclusive_low_exposure"
-        return "inconclusive_low_exposure"
+    exposure_decision = exposure_inconclusive_decision(exposure, forced_access_mode)
+    if exposure_decision:
+        return exposure_decision
 
     baseline_wins = int(baseline.get("wins") or 0)
     baseline_losses = int(baseline.get("losses") or 0)
@@ -2554,16 +2610,23 @@ def gate_decision(
 
 
 def package_result_decision(result: dict[str, Any], payload: dict[str, Any] | None = None) -> str:
+    forced_access_mode = str(
+        result.get("forced_access_mode")
+        or (payload or {}).get("forced_access_mode")
+        or "none"
+    )
+    exposure_decision = exposure_inconclusive_decision(
+        result_exposure_summary(result),
+        forced_access_mode,
+    )
+    if exposure_decision:
+        return exposure_decision
     if result.get("decision"):
         return str(result["decision"])
     return gate_decision(
         result.get("gate_summary") or {},
-        result.get("exposure_summary") or {},
-        forced_access_mode=str(
-            result.get("forced_access_mode")
-            or (payload or {}).get("forced_access_mode")
-            or "none"
-        ),
+        result_exposure_summary(result),
+        forced_access_mode=forced_access_mode,
     )
 
 

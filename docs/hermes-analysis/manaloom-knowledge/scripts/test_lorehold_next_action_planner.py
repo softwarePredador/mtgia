@@ -1,6 +1,11 @@
 import lorehold_next_action_planner as planner
 
 
+def test_defaults_use_current_cut_models():
+    assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260628_v2_current_miner.json"
+    assert planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0].name == "lorehold_hand_filter_cut_model_20260628_v4_current_miner.json"
+
+
 def miner_report():
     return {
         "summary": {
@@ -917,6 +922,19 @@ def test_next_action_planner_downgrades_low_exposure_rejects_to_inconclusive():
     )
     guardrails = {row["guardrail_key"]: row for row in payload["guardrails"]}
     assert "inconclusive_low_exposure_is_not_card_proof" in guardrails
+
+
+def test_next_action_planner_infers_low_exposure_from_status_without_boolean():
+    result = {
+        "package_key": "silence_cut_avatar_wrath",
+        "decision": "reject_or_rework",
+        "exposure_summary": {
+            "status": "candidate_added_cards_accessed_not_used",
+            "candidate_added_cards": {"all_cards_used": False},
+        },
+    }
+
+    assert planner.infer_package_decision(result) == "inconclusive_low_exposure"
 
 
 def test_next_action_planner_keeps_diagnostic_low_exposure_below_strategy_actions():

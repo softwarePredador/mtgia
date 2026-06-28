@@ -1226,6 +1226,65 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
 
         self.assertEqual(counts, {"inconclusive_low_exposure": 1})
 
+    def test_package_result_decision_overrides_raw_decision_when_exposure_is_low(self):
+        package = {
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "decision": "reject_or_rework",
+            "gate_summary": {
+                "baseline": {"wins": 3, "losses": 0, "win_rate": 100.0},
+                "candidate": {"wins": 0, "losses": 3, "win_rate": 0.0},
+                "delta_pp": -100.0,
+            },
+            "exposure_summary": {
+                "low_candidate_added_card_use": True,
+                "status": "candidate_added_card_low_access",
+            },
+        }
+
+        self.assertEqual(gate.package_result_decision(package), "inconclusive_low_exposure")
+
+    def test_package_result_decision_treats_accessed_not_used_status_as_inconclusive(self):
+        package = {
+            "package_key": "silence_cut_avatar_wrath",
+            "decision": "promote_to_deeper_gate",
+            "gate_summary": {
+                "baseline": {"wins": 0, "losses": 3, "win_rate": 0.0},
+                "candidate": {"wins": 3, "losses": 0, "win_rate": 100.0},
+                "delta_pp": 100.0,
+            },
+            "exposure_summary": {
+                "status": "candidate_added_cards_accessed_not_used",
+                "candidate_added_cards": {"all_cards_used": False},
+            },
+        }
+
+        self.assertEqual(gate.package_result_decision(package), "inconclusive_low_exposure")
+
+    def test_package_result_decision_computes_missing_exposure_from_gate_telemetry(self):
+        package = {
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "decision": "promote_to_deeper_gate",
+            "adds": ["Mana Vault"],
+            "cuts": ["Arcane Signet"],
+            "gate_summary": {
+                "baseline": {
+                    "wins": 0,
+                    "losses": 3,
+                    "win_rate": 0.0,
+                    "telemetry": {"card_event_counts": {"spell_cast:Arcane Signet": 1}},
+                },
+                "candidate": {
+                    "wins": 3,
+                    "losses": 0,
+                    "win_rate": 100.0,
+                    "telemetry": {"card_event_counts": {}},
+                },
+                "delta_pp": 100.0,
+            },
+        }
+
+        self.assertEqual(gate.package_result_decision(package), "inconclusive_low_exposure")
+
     def test_gate_decision_marks_forced_access_positive_as_confirmation_signal(self):
         gate_summary = {
             "baseline": {"wins": 0, "losses": 3, "win_rate": 0.0, "telemetry": {}},

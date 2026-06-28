@@ -41,9 +41,9 @@ DEFAULT_HYPOTHESIS_QUEUE = (
 DEFAULT_TRACE_AUDIT = (
     REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
 )
-DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260627_v1.json"]
+DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260628_v2_current_miner.json"]
 DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
-    REPORT_DIR / "lorehold_hand_filter_cut_model_20260627_v3_big_score_rejected.json"
+    REPORT_DIR / "lorehold_hand_filter_cut_model_20260628_v4_current_miner.json"
 ]
 DEFAULT_RECURSION_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json"
@@ -76,6 +76,12 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
 INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "inconclusive_low_exposure",
     "forced_access_inconclusive_low_exposure",
+}
+LOW_EXPOSURE_STATUSES = {
+    "candidate_added_card_low_access",
+    "candidate_added_card_low_exposure",
+    "candidate_added_cards_accessed_not_used",
+    "candidate_added_cards_near_access_low_use",
 }
 
 
@@ -226,24 +232,47 @@ def summarize_cut_options(pairings: list[dict[str, Any]], limit: int = 5) -> lis
     return cards
 
 
+def exposure_requires_inconclusive(exposure: dict[str, Any]) -> bool:
+    if not exposure:
+        return False
+    if bool(exposure.get("low_candidate_added_card_use")):
+        return True
+    status = str(exposure.get("status") or "")
+    if status in LOW_EXPOSURE_STATUSES:
+        return True
+    candidate_added = exposure.get("candidate_added_cards") or {}
+    if "all_cards_used" in candidate_added:
+        return not bool(candidate_added.get("all_cards_used"))
+    return False
+
+
+def low_exposure_decision(
+    exposure: dict[str, Any],
+    forced_access_mode: str = "none",
+) -> str | None:
+    if not exposure_requires_inconclusive(exposure):
+        return None
+    if forced_access_mode and forced_access_mode != "none":
+        return "forced_access_inconclusive_low_exposure"
+    return "inconclusive_low_exposure"
+
+
 def infer_package_decision(result: dict[str, Any]) -> str:
     exposure = result.get("exposure_summary") or {}
-    low_candidate_use = bool(exposure.get("low_candidate_added_card_use"))
     forced_access_mode = str(result.get("forced_access_mode") or "none")
+    exposure_decision = low_exposure_decision(exposure, forced_access_mode)
     if result.get("decision"):
         decision = str(result["decision"])
         if decision in INCONCLUSIVE_EXPOSURE_DECISIONS:
             return decision
-        if low_candidate_use:
-            if forced_access_mode and forced_access_mode != "none":
-                return "forced_access_inconclusive_low_exposure"
-            return "inconclusive_low_exposure"
+        if exposure_decision:
+            return exposure_decision
         return "reject_or_rework" if decision.startswith("reject") else decision
     aggregate = result.get("aggregate") or {}
     aggregate_decision = str(aggregate.get("decision") or "")
     if aggregate_decision:
-        if low_candidate_use:
-            return "inconclusive_low_exposure"
+        if exposure_decision:
+            return exposure_decision
         return "reject_or_rework" if aggregate_decision.startswith("reject") else aggregate_decision
     gate = result.get("gate_summary") or {}
     baseline = gate.get("baseline") or {}
@@ -252,8 +281,8 @@ def infer_package_decision(result: dict[str, Any]) -> str:
     candidate_wins = int(candidate.get("wins") or 0)
     delta = float(gate.get("delta_pp") or 0.0)
     if delta < 0 or candidate_wins < baseline_wins:
-        if low_candidate_use:
-            return "inconclusive_low_exposure"
+        if exposure_decision:
+            return exposure_decision
         return "reject_or_rework"
     if delta > 0 or candidate_wins > baseline_wins:
         return "promote_to_deeper_gate"
