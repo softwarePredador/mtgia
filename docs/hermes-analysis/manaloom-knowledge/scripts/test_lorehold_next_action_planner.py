@@ -345,6 +345,51 @@ def prior_brass_seed_matrix_report():
     )
 
 
+def prior_profiled_family_seed_matrix_report():
+    def package(key, add, cut):
+        return {
+            "package_key": key,
+            "adds": [add],
+            "cuts": [cut],
+            "aggregate": {
+                "decision": "reject_regresses_strong_seed",
+                "delta_pp_total": -22.22,
+                "baseline_record": "4-5",
+                "candidate_record": "2-7",
+                "strong_seed_regressions": [42],
+            },
+        }
+
+    return (
+        planner.REPORT_DIR
+        / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+        {
+            "packages": [
+                package(
+                    "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
+                    "Seething Song",
+                    "Bender's Waterskin",
+                ),
+                package(
+                    "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+                    "Mana Vault",
+                    "Bender's Waterskin",
+                ),
+                package(
+                    "invoke_calamity_same_lane_benchmark_cut_creative_technique",
+                    "Invoke Calamity",
+                    "Creative Technique",
+                ),
+                package(
+                    "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
+                    "Velomachus Lorehold",
+                    "Creative Technique",
+                ),
+            ]
+        },
+    )
+
+
 def hand_filter_cut_model_report():
     return (
         planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0],
@@ -654,6 +699,28 @@ def test_next_action_planner_imports_seed_matrix_aggregate_rejections():
     assert guardrails["prior_package_reports_have_rejections"]["rejected_package_keys"] == [
         "brass_bounty_cut_boros_signet"
     ]
+
+
+def test_next_action_planner_imports_profiled_family_seed_matrix_rejections():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        prior_package_reports=[prior_profiled_family_seed_matrix_report()],
+    )
+
+    assert payload["summary"]["prior_rejected_package_count"] == 4
+    assert payload["summary"]["prior_rejected_package_keys"] == [
+        "invoke_calamity_same_lane_benchmark_cut_creative_technique",
+        "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+        "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
+        "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
+    ]
+    guardrails = {row["guardrail_key"]: row for row in payload["guardrails"]}
+    assert guardrails["prior_package_reports_have_rejections"]["rejected_package_count"] == 4
+    assert guardrails["prior_package_reports_have_rejections"]["rejected_package_keys"][0] == (
+        "invoke_calamity_same_lane_benchmark_cut_creative_technique"
+    )
 
 
 def test_next_action_planner_prioritizes_focus_access_trace_review():

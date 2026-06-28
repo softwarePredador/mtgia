@@ -59,6 +59,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_brass_bounty_recurring_seed_window_20260628_v1_run.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
 ]
 
 
