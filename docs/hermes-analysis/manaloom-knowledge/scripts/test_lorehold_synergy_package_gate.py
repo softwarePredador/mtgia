@@ -3,15 +3,19 @@ import json
 import sqlite3
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import lorehold_synergy_package_gate as gate
 
 
 class LoreholdSynergyPackageGateTest(unittest.TestCase):
     def test_run_gate_uses_decisive_reproducibility_flags(self):
-        with patch("lorehold_synergy_package_gate.subprocess.run") as run:
-            run.return_value.returncode = 0
+        with patch("lorehold_synergy_package_gate.subprocess.Popen") as popen:
+            process = MagicMock()
+            process.pid = 123
+            process.returncode = 0
+            process.communicate.return_value = ("", "")
+            popen.return_value = process
             gate.run_gate(
                 source_db=Path("/tmp/source.db"),
                 candidate_db=Path("/tmp/candidate.db"),
@@ -24,7 +28,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 stem="test_stem",
             )
 
-        args, kwargs = run.call_args
+        args, kwargs = popen.call_args
         cmd = args[0]
         self.assertIn("--isolate-deck-process", cmd)
         self.assertNotIn("--no-game-checkpoint", cmd)
@@ -32,8 +36,12 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(kwargs["cwd"], str(gate.SCRIPT_DIR))
 
     def test_run_gate_can_disable_checkpoint_explicitly_for_smoke_runs(self):
-        with patch("lorehold_synergy_package_gate.subprocess.run") as run:
-            run.return_value.returncode = 0
+        with patch("lorehold_synergy_package_gate.subprocess.Popen") as popen:
+            process = MagicMock()
+            process.pid = 123
+            process.returncode = 0
+            process.communicate.return_value = ("", "")
+            popen.return_value = process
             gate.run_gate(
                 source_db=Path("/tmp/source.db"),
                 candidate_db=Path("/tmp/candidate.db"),
@@ -47,7 +55,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 no_game_checkpoint=True,
             )
 
-        cmd = run.call_args.args[0]
+        cmd = popen.call_args.args[0]
         self.assertIn("--no-game-checkpoint", cmd)
 
     def test_runtime_rule_priority_prefers_land_scaled_treasure_model(self):

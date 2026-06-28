@@ -1508,9 +1508,9 @@ def run_gate(
     opponent_seed: int,
     simulation_seed: int,
     game_timeout_seconds: float,
-    deck_process_timeout_seconds: float,
-    gate_timeout_seconds: float,
-    stem: str,
+    deck_process_timeout_seconds: float = 0.0,
+    gate_timeout_seconds: float = 0.0,
+    stem: str = "lorehold_synergy_package_gate",
     no_game_checkpoint: bool = False,
 ) -> subprocess.CompletedProcess[str]:
     cmd = [
