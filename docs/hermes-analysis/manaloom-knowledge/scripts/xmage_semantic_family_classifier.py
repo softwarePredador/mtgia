@@ -805,6 +805,24 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("play_from_top_condition") == "opponent_controls_more_lands"
         )
 
+    if (
+        effect == "damage_modifier"
+        and scope == "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
+    ):
+        targets = effect_json.get("damage_modifier_targets") or []
+        return (
+            types == {"CREATURE"}
+            and "TwinflameTyrantEffect" in effect_classes
+            and "SimpleStaticAbility" in ability_classes
+            and int(effect_json.get("damage_multiplier") or 0) == 2
+            and effect_json.get("damage_modifier_applies_to") == "sources_you_control"
+            and effect_json.get("damage_modifier_duration") == "while_on_battlefield"
+            and set(targets) == {"opponents", "opponent_permanents"}
+            and bool(effect_json.get("flying"))
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 5
+        )
+
     if effect == "creature" and scope == "rishkar_counter_mana_creature_waiver_v1":
         return (
             types == {"CREATURE"}

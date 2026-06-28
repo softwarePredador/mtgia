@@ -3410,6 +3410,13 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "battle_model_scope": (
                                     "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
                                 ),
+                                "damage_modifier_applies_to": "sources_you_control",
+                                "damage_modifier_duration": "while_on_battlefield",
+                                "damage_modifier_targets": ["opponents", "opponent_permanents"],
+                                "damage_multiplier": 2,
+                                "flying": True,
+                                "power": 3,
+                                "toughness": 5,
                             },
                         },
                     },
@@ -3426,7 +3433,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_card["Twinflame Tyrant"]["family_id"], "static_damage_modifier")
         self.assertEqual(
             by_card["Twinflame Tyrant"]["promotion_lane"],
-            "runtime_family_implementation_required",
+            "batch_metadata_candidate_requires_pg_precheck",
         )
 
     def test_classifier_marks_lightning_helix_exact_scope_as_batch_safe(self) -> None:

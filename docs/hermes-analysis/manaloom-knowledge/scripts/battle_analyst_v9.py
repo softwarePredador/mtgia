@@ -21810,8 +21810,26 @@ def process_controlled_creature_enters_triggers(
         def resolve_creature_enters_damage_trigger(permanent=permanent, amount=amount):
             damaged = []
             for opponent in opponents or []:
-                if getattr(opponent, "is_alive", lambda: True)() and deal_damage(opponent, amount):
-                    damaged.append({"player": opponent.name, "life_after": opponent.life})
+                if not getattr(opponent, "is_alive", lambda: True)():
+                    continue
+                damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+                    player,
+                    opponent,
+                    permanent,
+                    amount,
+                    turn=turn,
+                    phase="trigger_resolution",
+                    damage_event_type="player",
+                )
+                if dealt:
+                    damaged.append(
+                        {
+                            "player": opponent.name,
+                            "amount": target_amount,
+                            "dealt": damage_dealt,
+                            "life_after": opponent.life,
+                        }
+                    )
             emit_replay_event(
                 "trigger_resolved",
                 player=player.name,
@@ -22363,8 +22381,26 @@ def trigger_landfall(
             amount = int(permanent.get("landfall_damage_each_opponent") or 1)
             damaged = []
             for opponent in trigger_opponents:
-                if opponent.is_alive() and deal_damage(opponent, amount):
-                    damaged.append({"player": opponent.name, "life_after": opponent.life})
+                if not opponent.is_alive():
+                    continue
+                damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+                    player,
+                    opponent,
+                    permanent,
+                    amount,
+                    turn=turn,
+                    phase="trigger_resolution",
+                    damage_event_type="player",
+                )
+                if dealt:
+                    damaged.append(
+                        {
+                            "player": opponent.name,
+                            "amount": target_amount,
+                            "dealt": damage_dealt,
+                            "life_after": opponent.life,
+                        }
+                    )
             drew = False
             if permanent.get("landfall_second_draw") and count == 2:
                 player.draw(1, random.Random(turn + count))
@@ -24424,24 +24460,45 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
         return player.life - controller_life_before, controller_life_before, player.life, spell_lifelink_gain
 
     for opp in opponents:
-        targets = [
-            target
-            for target in removal_target_candidates(
+        target_options = []
+        for target in removal_target_candidates(
+            opp,
+            effect_data,
+            controller=player,
+            source=card,
+        ):
+            target_amount = apply_static_damage_replacements(
+                player,
                 opp,
-                effect_data,
-                controller=player,
-                source=card,
+                target,
+                card,
+                amount,
+                damage_event_type="permanent",
+                turn=turn,
+                phase="resolution",
+                emit=False,
             )
-            if int(target.get("toughness") or target.get("power") or 2) <= amount
-        ]
-        if targets:
-            target = choose_best_creature_target(targets)
+            if int(target.get("toughness") or target.get("power") or 2) <= target_amount:
+                target_options.append((target, target_amount))
+        if target_options:
+            target = choose_best_creature_target([item[0] for item in target_options])
+            target_amount = next(item[1] for item in target_options if item[0] is target)
+            target_amount = apply_static_damage_replacements(
+                player,
+                opp,
+                target,
+                card,
+                amount,
+                damage_event_type="permanent",
+                turn=turn,
+                phase="resolution",
+            )
             process_taii_wakeen_noncombat_damage_to_creature(
                 player,
                 opp,
                 card,
                 target,
-                amount,
+                target_amount,
                 turn=turn,
                 phase="resolution",
             )
@@ -24452,13 +24509,14 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 source=card,
             )
             life_gained, controller_life_before, controller_life_after, spell_lifelink_gain = (
-                apply_controller_lifegain(amount)
+                apply_controller_lifegain(target_amount)
             )
             emit_replay_event(
                 "damage_resolved",
                 player=player.name,
                 card=card.get("name", "?"),
-                amount=amount,
+                amount=target_amount,
+                original_amount=amount,
                 target_player=opp.name,
                 target=target.get("name", "?"),
                 result="creature_destroyed",
@@ -24490,8 +24548,15 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
     if alive_opponents:
         target_player = min(alive_opponents, key=lambda opp: opp.life)
         life_before = target_player.life
-        dealt = deal_damage(target_player, amount)
-        actual_damage_dealt = amount if dealt else 0
+        actual_damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+            player,
+            target_player,
+            card,
+            amount,
+            turn=turn,
+            phase="resolution",
+            damage_event_type="player",
+        )
         life_gained, controller_life_before, controller_life_after, spell_lifelink_gain = (
             apply_controller_lifegain(actual_damage_dealt)
         )
@@ -24499,7 +24564,8 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             "damage_resolved",
             player=player.name,
             card=card.get("name", "?"),
-            amount=amount,
+            amount=target_amount,
+            original_amount=amount,
             target_player=target_player.name,
             result="player_damage" if dealt else "prevented",
             cause="direct_damage",
@@ -24531,13 +24597,23 @@ def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
         if not opponent.is_alive():
             continue
         life_before = opponent.life
-        dealt = deal_damage(opponent, amount, source=card)
+        damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+            player,
+            opponent,
+            card,
+            amount,
+            turn=turn,
+            phase="resolution",
+            damage_event_type="player",
+        )
         damaged.append(
             {
                 "player": opponent.name,
                 "life_before": life_before,
                 "life_after": opponent.life,
-                "dealt": amount if dealt else 0,
+                "amount": target_amount,
+                "original_amount": amount,
+                "dealt": damage_dealt,
                 "result": "player_damage" if dealt else "prevented",
             }
         )
@@ -24545,7 +24621,8 @@ def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
         "damage_each_opponent_resolved",
         player=player.name,
         card=card.get("name", "?"),
-        amount=amount,
+        amount=max([entry["amount"] for entry in damaged] or [amount]),
+        original_amount=amount,
         damaged_opponents=[entry["player"] for entry in damaged],
         damage_results=damaged,
         turn=turn,
@@ -24572,6 +24649,142 @@ def damage_amount_from_x_context(effect_data, default=0):
         return int(default or 0)
 
 
+CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE = (
+    "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
+)
+
+
+def damage_source_reference(source_card, controller):
+    source = dict(source_card) if isinstance(source_card, dict) else {"name": str(source_card or "damage_source")}
+    if controller is not None:
+        source.setdefault("controller", getattr(controller, "name", None))
+        source.setdefault("owner", getattr(controller, "name", None))
+    return source
+
+
+def _static_damage_modifier_effects(controller):
+    effects = []
+    for permanent in getattr(controller, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        candidates = [permanent]
+        try:
+            resolved = get_card_effect(permanent)
+        except Exception:
+            resolved = {}
+        if isinstance(resolved, dict) and resolved is not permanent:
+            candidates.append({**permanent, **resolved})
+        for effect_data in candidates:
+            if effect_data.get("effect") != "damage_modifier":
+                continue
+            if (
+                str(effect_data.get("battle_model_scope") or "")
+                != CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE
+            ):
+                continue
+            if effect_data.get("damage_modifier_applies_to") not in (None, "sources_you_control"):
+                continue
+            targets = effect_data.get("damage_modifier_targets") or []
+            if isinstance(targets, str):
+                targets = read_json_list(targets) or [targets]
+            if targets and not {"opponents", "opponent_permanents"}.issubset(set(targets)):
+                continue
+            effects.append((permanent, effect_data))
+    return effects
+
+
+def _source_controlled_by(source_card, controller):
+    if controller is None:
+        return False
+    controller_name = getattr(controller, "name", None)
+    if not isinstance(source_card, dict):
+        return True
+    source_controller = source_card.get("controller") or source_card.get("owner")
+    return source_controller in (None, "", controller_name)
+
+
+def apply_static_damage_replacements(
+    controller,
+    target_controller,
+    target,
+    source_card,
+    amount,
+    *,
+    damage_event_type,
+    turn=None,
+    phase=None,
+    emit=True,
+):
+    try:
+        modified_amount = max(0, int(amount or 0))
+    except Exception:
+        modified_amount = 0
+    if modified_amount <= 0 or controller is None or target_controller is None:
+        return modified_amount
+    if target_controller is controller:
+        return modified_amount
+    if not _source_controlled_by(source_card, controller):
+        return modified_amount
+
+    original_amount = modified_amount
+    applied = []
+    for permanent, effect_data in _static_damage_modifier_effects(controller):
+        multiplier = int(effect_data.get("damage_multiplier") or 2)
+        if multiplier <= 1:
+            continue
+        modified_amount *= multiplier
+        applied.append(
+            {
+                "source": permanent.get("name", "?"),
+                "scope": effect_data.get("battle_model_scope"),
+                "multiplier": multiplier,
+            }
+        )
+    if applied and emit:
+        emit_replay_event(
+            "static_damage_replacement_applied",
+            player=getattr(controller, "name", None),
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else source_card,
+            target_controller=getattr(target_controller, "name", None),
+            target=target.get("name", "?") if isinstance(target, dict) else getattr(target, "name", target),
+            damage_event_type=damage_event_type,
+            original_amount=original_amount,
+            final_amount=modified_amount,
+            modifiers=applied,
+            turn=turn,
+            phase=phase,
+        )
+    return modified_amount
+
+
+def deal_damage_to_player_with_static_replacements(
+    controller,
+    target_player,
+    source_card,
+    amount,
+    *,
+    turn=None,
+    phase=None,
+    damage_event_type="player",
+):
+    final_amount = apply_static_damage_replacements(
+        controller,
+        target_player,
+        target_player,
+        source_card,
+        amount,
+        damage_event_type=damage_event_type,
+        turn=turn,
+        phase=phase,
+    )
+    dealt = deal_damage(
+        target_player,
+        final_amount,
+        source=damage_source_reference(source_card, controller),
+    )
+    return (final_amount if dealt else 0), final_amount, dealt
+
+
 def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, effect_data, turn):
     amount = damage_amount_from_x_context(
         effect_data,
@@ -24593,13 +24806,23 @@ def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, e
         if not opponent.is_alive():
             continue
         life_before = opponent.life
-        dealt = deal_damage(opponent, amount, source=card)
+        damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+            player,
+            opponent,
+            card,
+            amount,
+            turn=turn,
+            phase="resolution",
+            damage_event_type="player",
+        )
         damaged.append(
             {
                 "player": opponent.name,
                 "life_before": life_before,
                 "life_after": opponent.life,
-                "dealt": amount if dealt else 0,
+                "amount": target_amount,
+                "original_amount": amount,
+                "dealt": damage_dealt,
                 "result": "player_damage" if dealt else "prevented",
             }
         )
@@ -24610,13 +24833,24 @@ def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, e
             if permanent.get("indestructible"):
                 protected.append({"controller": opponent.name, "name": permanent.get("name", "?")})
                 continue
+            permanent_amount = apply_static_damage_replacements(
+                player,
+                opponent,
+                permanent,
+                card,
+                amount,
+                damage_event_type="permanent",
+                turn=turn,
+                phase="resolution",
+            )
             toughness = _damage_sweep_creature_toughness(permanent)
-            if toughness > amount:
+            if toughness > permanent_amount:
                 survived_damage.append(
                     {
                         "controller": opponent.name,
                         "name": permanent.get("name", "?"),
                         "toughness": toughness,
+                        "damage_amount": permanent_amount,
                     }
                 )
                 continue
@@ -24625,7 +24859,7 @@ def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, e
                 opponent,
                 card,
                 permanent,
-                amount,
+                permanent_amount,
                 turn=turn,
                 phase="resolution",
             )
@@ -24640,6 +24874,7 @@ def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, e
                     "controller": opponent.name,
                     "name": permanent.get("name", "?"),
                     "toughness": toughness,
+                    "damage_amount": permanent_amount,
                     "destination": destination,
                 }
             )
@@ -24648,7 +24883,8 @@ def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, e
         "damage_each_opponent_and_opponent_creatures_resolved",
         player=player.name,
         card=card.get("name", "?"),
-        amount=amount,
+        amount=max([entry["amount"] for entry in damaged] or [amount]),
+        original_amount=amount,
         x_value=amount,
         damaged_opponents=[entry["player"] for entry in damaged],
         damage_results=damaged,
@@ -24806,13 +25042,24 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                         }
                     )
                     continue
+                permanent_amount = apply_static_damage_replacements(
+                    player,
+                    participant,
+                    permanent,
+                    card,
+                    amount,
+                    damage_event_type="permanent",
+                    turn=turn,
+                    phase="resolution",
+                )
                 toughness = _damage_sweep_creature_toughness(permanent)
-                if toughness > amount:
+                if toughness > permanent_amount:
                     survived_damage.append(
                         {
                             "controller": participant.name,
                             "name": permanent.get("name", "?"),
                             "toughness": toughness,
+                            "damage_amount": permanent_amount,
                         }
                     )
                     continue
@@ -24821,7 +25068,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                     participant,
                     card,
                     permanent,
-                    amount,
+                    permanent_amount,
                     turn=turn,
                     phase="resolution",
                 )
@@ -24837,6 +25084,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                         "name": permanent.get("name", "?"),
                         "permanent_type": "creature",
                         "toughness": toughness,
+                        "damage_amount": permanent_amount,
                         "destination": destination,
                     }
                 )
@@ -24854,7 +25102,17 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
             ):
                 planeswalkers_seen += 1
                 loyalty_before = int(permanent.get("loyalty", 0) or 0)
-                if not damage_to_planeswalker(card, permanent, amount):
+                permanent_amount = apply_static_damage_replacements(
+                    player,
+                    participant,
+                    permanent,
+                    card,
+                    amount,
+                    damage_event_type="permanent",
+                    turn=turn,
+                    phase="resolution",
+                )
+                if not damage_to_planeswalker(card, permanent, permanent_amount):
                     continue
                 loyalty_after = int(permanent.get("loyalty", 0) or 0)
                 if loyalty_after > 0:
@@ -24863,6 +25121,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                             "controller": participant.name,
                             "name": permanent.get("name", "?"),
                             "loyalty_after": loyalty_after,
+                            "damage_amount": permanent_amount,
                         }
                     )
                     continue
@@ -24879,6 +25138,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                         "permanent_type": "planeswalker",
                         "loyalty_before": loyalty_before,
                         "loyalty_after": loyalty_after,
+                        "damage_amount": permanent_amount,
                         "destination": "graveyard",
                     }
                 )
@@ -25678,7 +25938,15 @@ def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn
         key=lambda opponent: _player_and_creatures_damage_target_score(opponent, amount),
     )
     life_before = target.life
-    dealt = deal_damage(target, amount)
+    damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+        player,
+        target,
+        card,
+        amount,
+        turn=turn,
+        phase="resolution",
+        damage_event_type="player",
+    )
     destroyed = []
     protected = []
     creatures_seen = 0
@@ -25689,14 +25957,24 @@ def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn
         if permanent.get("indestructible"):
             protected.append(permanent.get("name", "?"))
             continue
-        if _damage_sweep_creature_toughness(permanent) > amount:
+        permanent_amount = apply_static_damage_replacements(
+            player,
+            target,
+            permanent,
+            card,
+            amount,
+            damage_event_type="permanent",
+            turn=turn,
+            phase="resolution",
+        )
+        if _damage_sweep_creature_toughness(permanent) > permanent_amount:
             continue
         process_taii_wakeen_noncombat_damage_to_creature(
             player,
             target,
             card,
             permanent,
-            amount,
+            permanent_amount,
             turn=turn,
             phase="resolution",
         )
@@ -25718,7 +25996,8 @@ def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn
         player=player.name,
         card=card.get("name", "?"),
         effect=effect_data.get("effect", "damage_player_and_creatures"),
-        amount=amount,
+        amount=target_amount,
+        original_amount=amount,
         target_player=target.name,
         result="player_and_creatures_damage" if dealt else "creature_damage_only_or_prevented",
         cause="target_player_and_controller_creatures",
@@ -26027,8 +26306,24 @@ def trigger_spell_cast_engines(
                 for opponent in all_players:
                     if opponent == player or not opponent.is_alive():
                         continue
-                    if deal_damage(opponent, amount):
-                        damaged.append({"player": opponent.name, "life_after": opponent.life})
+                    damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+                        player,
+                        opponent,
+                        permanent,
+                        amount,
+                        turn=turn,
+                        phase=phase,
+                        damage_event_type="player",
+                    )
+                    if dealt:
+                        damaged.append(
+                            {
+                                "player": opponent.name,
+                                "amount": target_amount,
+                                "dealt": damage_dealt,
+                                "life_after": opponent.life,
+                            }
+                        )
                 emit_replay_event(
                     "trigger_resolved",
                     player=player.name,
@@ -26075,9 +26370,30 @@ def trigger_spell_cast_engines(
                 trigger_kind=trigger_kind,
             ):
                 alive_opponents = [opponent for opponent in opponents if opponent.is_alive()]
+                lethal_player_options = [
+                    (
+                        opponent,
+                        apply_static_damage_replacements(
+                            player,
+                            opponent,
+                            opponent,
+                            permanent,
+                            amount,
+                            damage_event_type="player",
+                            turn=turn,
+                            phase=phase,
+                            emit=False,
+                        ),
+                    )
+                    for opponent in alive_opponents
+                ]
                 lethal_player = min(
-                    (opponent for opponent in alive_opponents if opponent.life <= amount),
-                    key=lambda opponent: (opponent.life, opponent.name),
+                    (
+                        (opponent, target_amount)
+                        for opponent, target_amount in lethal_player_options
+                        if opponent.life <= target_amount
+                    ),
+                    key=lambda item: (item[0].life, item[0].name),
                     default=None,
                 )
                 killable_creatures = []
@@ -26090,9 +26406,22 @@ def trigger_spell_cast_engines(
                     ):
                         if creature.get("indestructible"):
                             continue
+                        target_amount = apply_static_damage_replacements(
+                            player,
+                            opponent,
+                            creature,
+                            permanent,
+                            amount,
+                            damage_event_type="permanent",
+                            turn=turn,
+                            phase=phase,
+                            emit=False,
+                        )
                         toughness = int(creature.get("toughness") or creature.get("power") or 2)
-                        if toughness <= amount:
-                            killable_creatures.append((target_priority(creature), opponent, creature))
+                        if toughness <= target_amount:
+                            killable_creatures.append(
+                                (target_priority(creature), opponent, creature, target_amount)
+                            )
                 target_player = None
                 target_creature = None
                 result = "no_legal_target_or_zero_damage"
@@ -26100,15 +26429,34 @@ def trigger_spell_cast_engines(
                 life_after = None
                 destination = None
                 if lethal_player is not None:
-                    target_player = lethal_player
+                    target_player, _lethal_amount = lethal_player
                     life_before = target_player.life
-                    dealt = deal_damage(target_player, amount, source=permanent)
+                    damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+                        player,
+                        target_player,
+                        permanent,
+                        amount,
+                        turn=turn,
+                        phase=phase,
+                        damage_event_type="player",
+                    )
+                    amount = target_amount
                     life_after = target_player.life
                     result = "player_damage" if dealt else "prevented"
                 elif killable_creatures:
-                    _priority, target_controller, target_creature = max(
+                    _priority, target_controller, target_creature, _target_amount = max(
                         killable_creatures,
                         key=lambda item: item[0],
+                    )
+                    amount = apply_static_damage_replacements(
+                        player,
+                        target_controller,
+                        target_creature,
+                        permanent,
+                        amount,
+                        damage_event_type="permanent",
+                        turn=turn,
+                        phase=phase,
                     )
                     process_taii_wakeen_noncombat_damage_to_creature(
                         player,
@@ -26130,7 +26478,16 @@ def trigger_spell_cast_engines(
                 elif alive_opponents:
                     target_player = min(alive_opponents, key=lambda opponent: (opponent.life, opponent.name))
                     life_before = target_player.life
-                    dealt = deal_damage(target_player, amount, source=permanent)
+                    damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+                        player,
+                        target_player,
+                        permanent,
+                        amount,
+                        turn=turn,
+                        phase=phase,
+                        damage_event_type="player",
+                    )
+                    amount = target_amount
                     life_after = target_player.life
                     result = "player_damage" if dealt else "prevented"
                 emit_replay_event(
@@ -26611,7 +26968,19 @@ def trigger_spell_cast_engines(
                 ]
                 target = max(alive_opponents, key=lambda opponent: opponent.life) if alive_opponents else None
                 target_life_before = target.life if target is not None else None
-                dealt = deal_damage(target, amount) if target is not None and amount > 0 else False
+                damage_dealt, target_amount, dealt = (
+                    deal_damage_to_player_with_static_replacements(
+                        player,
+                        target,
+                        permanent,
+                        amount,
+                        turn=turn,
+                        phase=phase,
+                        damage_event_type="player",
+                    )
+                    if target is not None and amount > 0
+                    else (0, amount, False)
+                )
                 emit_replay_event(
                     "trigger_resolved",
                     player=player.name,
@@ -26622,7 +26991,8 @@ def trigger_spell_cast_engines(
                     counters_added=counter_count,
                     source_power_before=source_power_before,
                     source_power_after=source_power_after,
-                    amount=amount,
+                    amount=target_amount,
+                    original_amount=amount,
                     target_player=target.name if target is not None else None,
                     target_life_before=target_life_before,
                     target_life_after=target.life if target is not None else None,
@@ -26650,8 +27020,24 @@ def trigger_spell_cast_engines(
             for opponent in all_players:
                 if opponent == player or not opponent.is_alive():
                     continue
-                if deal_damage(opponent, amount):
-                    damaged.append({"player": opponent.name, "life_after": opponent.life})
+                damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+                    player,
+                    opponent,
+                    permanent,
+                    amount,
+                    turn=turn,
+                    phase=phase,
+                    damage_event_type="player",
+                )
+                if dealt:
+                    damaged.append(
+                        {
+                            "player": opponent.name,
+                            "amount": target_amount,
+                            "dealt": damage_dealt,
+                            "life_after": opponent.life,
+                        }
+                    )
             emit_replay_event(
                 "trigger_resolved",
                 player=player.name,
@@ -33020,9 +33406,19 @@ def projected_player_combat_damage_details(attacker, target, attackers, block_as
                 for blocker in declared_blockers
             )
             projected_damage = max(0, power - lethal_blocker_damage)
-        details["player_damage"] += projected_damage
         source_entry = None
         if projected_damage > 0:
+            projected_damage = apply_static_damage_replacements(
+                attacker,
+                target,
+                target,
+                attacking_creature,
+                projected_damage,
+                damage_event_type="player",
+                phase="combat_projection",
+                emit=False,
+            )
+            details["player_damage"] += projected_damage
             source_entry = {
                 "source": attacking_creature,
                 "source_name": attacking_creature.get("name", "?"),
@@ -33400,7 +33796,15 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
         damage = combat_stat(creature, "power", 2) if damage is None else damage
         damage_source = dict(creature)
         damage_source.setdefault("controller", attacker.name)
-        damage_dealt = deal_damage(target, damage, source=damage_source)
+        damage_dealt, final_damage, dealt = deal_damage_to_player_with_static_replacements(
+            attacker,
+            target,
+            damage_source,
+            damage,
+            turn=turn,
+            phase="combat_damage",
+            damage_event_type="player",
+        )
         if damage_dealt:
             record_table_hostility(
                 target,
@@ -33411,11 +33815,11 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
             )
             attacker.threat_level += max(1, damage_dealt // 2)
         if damage_dealt and creature.get("lifelink"):
-            gain_life(attacker, damage)
+            gain_life(attacker, final_damage)
         if damage_dealt and creature.get("is_commander") and creature.get("owner") == attacker.name:
             source_key = commander_damage_key(target.name, creature, attacker.name)
-            attacker.commander_damage_by_source[source_key] += damage
-            attacker.commander_damage[target.name] += damage
+            attacker.commander_damage_by_source[source_key] += final_damage
+            attacker.commander_damage[target.name] += final_damage
         if damage_dealt:
             process_surge_to_victory_combat_damage_triggers(
                 attacker,
@@ -33437,10 +33841,20 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
             return creature.get("first_strike") or creature.get("double_strike")
         return not creature.get("first_strike") or creature.get("double_strike")
 
-    def mark_damage(source, damaged, amount):
+    def mark_damage(source, damaged, amount, *, source_controller=None, damaged_controller=None):
         if amount <= 0:
             return
-        marked_damage[id(damaged)] += amount
+        final_amount = apply_static_damage_replacements(
+            source_controller,
+            damaged_controller,
+            damaged,
+            source,
+            amount,
+            damage_event_type="permanent",
+            turn=turn,
+            phase="combat_damage",
+        )
+        marked_damage[id(damaged)] += final_amount
         if source.get("deathtouch"):
             deathtouch_damage.add(id(damaged))
 
@@ -33489,7 +33903,13 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                             marked_damage,
                         )
                         assigned_damage = min(remaining, lethal_needed)
-                        mark_damage(attacking_creature, blocker, assigned_damage)
+                        mark_damage(
+                            attacking_creature,
+                            blocker,
+                            assigned_damage,
+                            source_controller=attacker,
+                            damaged_controller=target,
+                        )
                         remaining -= assigned_damage
                     if attacking_creature.get("trample") and remaining > 0:
                         if deal_player_damage(attacking_creature, remaining):
@@ -33501,6 +33921,8 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                         blocker,
                         attacking_creature,
                         combat_stat(blocker, "power", 2),
+                        source_controller=target,
+                        damaged_controller=attacker,
                     )
 
         if damaging_creatures_to_player:
