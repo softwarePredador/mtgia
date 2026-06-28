@@ -29,12 +29,19 @@ DEFAULT_DB = (
 )
 DEFAULT_STRATEGY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_SEED_MATRIX = REPORT_DIR / "lorehold_seed_matrix_all_20260628_v1_run.json"
+DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_CANDIDATES = [
     "Brainstone",
     "Penance",
     "Enlightened Tutor",
     "Gamble",
     "Hidden Retreat",
+]
+ACCESS_TARGETS = [
+    "Squee, Goblin Nabob",
+    "Sensei's Divining Top",
+    "Scroll Rack",
+    "Library of Leng",
 ]
 DEFAULT_VARIANT_DECK_IDS = tuple(range(607, 617))
 ACTIVE_EXECUTION_STATUSES = {"auto", "active"}
@@ -159,6 +166,29 @@ def candidate_lane(card_name: str) -> str:
         "Gamble": "access_tutor",
     }
     return lanes.get(card_name, "access")
+
+
+def candidate_access_targets(card_name: str) -> list[str]:
+    targets = {
+        "Brainstone": ["Sensei's Divining Top", "Scroll Rack", "Library of Leng"],
+        "Penance": ["Sensei's Divining Top", "Scroll Rack", "Library of Leng"],
+        "Hidden Retreat": ["Sensei's Divining Top", "Scroll Rack", "Library of Leng"],
+        "Enlightened Tutor": ["Sensei's Divining Top", "Scroll Rack", "Library of Leng"],
+        "Gamble": list(ACCESS_TARGETS),
+    }
+    return targets.get(card_name, [])
+
+
+def squee_probe_summary(squee_probe_report: dict[str, Any] | None) -> dict[str, Any]:
+    summary = (squee_probe_report or {}).get("summary") or {}
+    return {
+        "status": summary.get("status", ""),
+        "next_action": summary.get("next_action", ""),
+        "modeled_when_accessed": bool(summary.get("modeled_when_accessed")),
+        "weak_focus_missing_squee_access_seeds": summary.get("weak_focus_missing_squee_access_seeds") or [],
+        "weak_material_missing_squee_seeds": summary.get("weak_material_missing_squee_seeds") or [],
+        "seed42_anchor_record": summary.get("seed42_anchor_record") or {},
+    }
 
 
 def compatible_cut_lanes(candidate: str) -> set[str]:
@@ -475,12 +505,14 @@ def build_model(
     conn: sqlite3.Connection,
     strategy_report: dict[str, Any],
     seed_matrix_report: dict[str, Any],
+    squee_probe_report: dict[str, Any] | None = None,
     candidates: list[str] = DEFAULT_CANDIDATES,
     deck_id: int = 6,
     variant_deck_ids: Iterable[int] = DEFAULT_VARIANT_DECK_IDS,
     db_path: Path = DEFAULT_DB,
     strategy_path: Path = DEFAULT_STRATEGY_REPORT,
     seed_matrix_path: Path = DEFAULT_SEED_MATRIX,
+    squee_probe_path: Path = DEFAULT_SQUEE_PROBE,
 ) -> dict[str, Any]:
     deck_cards = load_deck_cards(conn, deck_id)
     deck_cards_by_name = {normalize_key(row["card_name"]): row for row in deck_cards}
@@ -489,6 +521,7 @@ def build_model(
     usage = variant_usage(conn, all_names, variant_deck_ids)
     cut_safety = load_cut_safety(strategy_report)
     seed_matrix = load_seed_matrix(seed_matrix_report)
+    squee_summary = squee_probe_summary(squee_probe_report)
 
     pair_rows: list[dict[str, Any]] = []
     for candidate in candidates:
@@ -517,6 +550,12 @@ def build_model(
                 "status": status,
                 "score": score,
                 "lane": candidate_lane(candidate),
+                "access_targets": candidate_access_targets(candidate),
+                "target_failure_modes": [
+                    "seed7_missing_engine_access",
+                    "seed20260625_conversion_under_pressure",
+                    "squee_graveyard_entry_route",
+                ],
                 "blockers": blockers,
                 "rule_summary": rules.get(key) or {},
                 "variant_usage": usage.get(key) or {},
@@ -531,6 +570,7 @@ def build_model(
         "source_db": str(db_path),
         "strategy_report": str(strategy_path),
         "seed_matrix_report": str(seed_matrix_path),
+        "squee_probe_report": str(squee_probe_path) if squee_probe_report else "",
         "deck_id": deck_id,
         "variant_deck_ids": list(variant_deck_ids),
         "postgres_writes": False,
@@ -542,10 +582,26 @@ def build_model(
             "preflight_access_candidate_ready_count": len(preflight_rows),
             "manual_review_count": len(manual_rows),
             "status_counts": dict(sorted(status_counts.items())),
+            "access_density_status": (
+                "squee_route_modeled_access_density_needed"
+                if squee_summary.get("status") == "squee_route_modeled_but_access_gap_remains"
+                else "squee_access_context_unresolved"
+            ),
+            "squee_probe_status": squee_summary.get("status", ""),
+            "weak_access_seeds": squee_summary.get("weak_material_missing_squee_seeds") or [],
+            "target_access_cards": list(ACCESS_TARGETS),
             "recommended_next_action": (
                 f"gate_{preflight_rows[0]['candidate']}_over_{preflight_rows[0]['cut']}"
                 if preflight_rows
-                else "no_access_swap_ready; upgrade_hidden_retreat_runtime_or_build_new_cut_not_in_reject_set"
+                else "no_access_swap_ready; build_new_seed_safe_cut_or_upgrade_hidden_retreat_runtime"
+            ),
+        },
+        "access_density_context": {
+            "target_access_cards": list(ACCESS_TARGETS),
+            "squee_probe": squee_summary,
+            "package_constraint": (
+                "Any access package must improve reach to Squee/Top/Rack/Library while preserving "
+                "seed-42 Squee, miracle, and topdeck telemetry."
             ),
         },
         "candidates": candidate_rows,
@@ -578,6 +634,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- source_db: `{payload['source_db']}`",
         f"- strategy_report: `{payload['strategy_report']}`",
         f"- seed_matrix_report: `{payload['seed_matrix_report']}`",
+        f"- squee_probe_report: `{payload.get('squee_probe_report') or '-'}`",
         "- postgres_writes: `false`",
         "- source_db_mutated: `false`",
         "",
@@ -588,22 +645,26 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- preflight_access_candidate_ready_count: `{payload['summary']['preflight_access_candidate_ready_count']}`",
         f"- manual_review_count: `{payload['summary']['manual_review_count']}`",
         f"- status_counts: `{json.dumps(payload['summary']['status_counts'], sort_keys=True)}`",
+        f"- access_density_status: `{payload['summary']['access_density_status']}`",
+        f"- squee_probe_status: `{payload['summary'].get('squee_probe_status') or '-'}`",
+        f"- target_access_cards: `{', '.join(payload['summary']['target_access_cards'])}`",
         f"- recommended_next_action: `{payload['summary']['recommended_next_action']}`",
         "",
         "## Access Candidates",
         "",
-        "| Candidate | Status | Lane | Score | Variant Decks | Active Rules | Blockers |",
-        "| --- | --- | --- | ---: | --- | ---: | --- |",
+        "| Candidate | Status | Lane | Score | Access Targets | Variant Decks | Active Rules | Blockers |",
+        "| --- | --- | --- | ---: | --- | --- | ---: | --- |",
     ]
     for row in payload["candidates"]:
         usage = row.get("variant_usage") or {}
         rules = row.get("rule_summary") or {}
         lines.append(
-            "| {card} | `{status}` | `{lane}` | {score} | {decks} | {rules} | {blockers} |".format(
+            "| {card} | `{status}` | `{lane}` | {score} | {targets} | {decks} | {rules} | {blockers} |".format(
                 card=row["card_name"],
                 status=row["status"],
                 lane=row["lane"],
                 score=row["score"],
+                targets=", ".join(row.get("access_targets") or []) or "-",
                 decks=",".join(str(deck) for deck in usage.get("deck_ids") or []) or "-",
                 rules=int(rules.get("active_rule_count") or 0),
                 blockers="; ".join(row.get("blockers") or []) or "none",
@@ -666,9 +727,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--strategy-report", type=Path, default=DEFAULT_STRATEGY_REPORT)
     parser.add_argument("--seed-matrix-report", type=Path, default=DEFAULT_SEED_MATRIX)
+    parser.add_argument("--squee-probe", type=Path, default=DEFAULT_SQUEE_PROBE)
     parser.add_argument("--candidate", action="append")
     parser.add_argument("--deck-id", type=int, default=6)
-    parser.add_argument("--stem", default="lorehold_access_cut_model_20260628_v1")
+    parser.add_argument("--stem", default="lorehold_access_cut_model_20260628_v2")
     return parser.parse_args()
 
 
@@ -679,11 +741,13 @@ def main() -> int:
             conn=conn,
             strategy_report=read_json(args.strategy_report),
             seed_matrix_report=read_json(args.seed_matrix_report),
+            squee_probe_report=read_json(args.squee_probe) if args.squee_probe.exists() else None,
             candidates=args.candidate or DEFAULT_CANDIDATES,
             deck_id=args.deck_id,
             db_path=args.db,
             strategy_path=args.strategy_report,
             seed_matrix_path=args.seed_matrix_report,
+            squee_probe_path=args.squee_probe,
         )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

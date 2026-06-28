@@ -29,6 +29,7 @@ DEFAULT_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_202606
 DEFAULT_MINER_REPORT = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260628_v1.md"
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
+DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260628_v2.json"
 
 PROTECTED_CARDS = {
     "Urza's Saga",
@@ -410,22 +411,38 @@ def squee_route_modeled(squee_probe: dict[str, Any] | None) -> bool:
 def squee_work_item(
     *,
     squee_probe: dict[str, Any] | None,
+    access_model: dict[str, Any] | None,
     modes: dict[str, dict[str, Any]],
     squee_probe_path: Path | None = None,
+    access_model_path: Path | None = None,
 ) -> dict[str, Any]:
     mode = modes.get("squee_graveyard_entry_route") or {}
     if squee_route_modeled(squee_probe):
         summary = (squee_probe or {}).get("summary") or {}
+        access_summary = (access_model or {}).get("summary") or {}
         weak_seeds = summary.get("weak_material_missing_squee_seeds") or []
+        if access_summary:
+            reason = (
+                "Squee discard/return is modeled when accessed; access model found "
+                f"{int(access_summary.get('preflight_access_candidate_ready_count') or 0)} "
+                "preflight-ready access swaps and requires a new seed-safe cut or runtime upgrade."
+            )
+        else:
+            reason = (
+                "Squee discard/return is modeled when accessed; the remaining blocker is access "
+                f"or conversion in weak seeds: {', '.join(weak_seeds) or '-'}."
+            )
         return {
             "work_key": "squee_access_density_model",
             "failure_mode": "squee_graveyard_entry_route",
-            "reason": (
-                "Squee discard/return is modeled when accessed; the remaining blocker is access "
-                f"or conversion in weak seeds: {', '.join(weak_seeds) or '-'}."
-            ),
+            "reason": reason,
             "target_seeds": weak_seeds or mode.get("target_seeds", []),
             "evidence_report": str(squee_probe_path or ""),
+            "access_model_report": str(access_model_path or "") if access_summary else "",
+            "access_model_status": access_summary.get("access_density_status", ""),
+            "preflight_access_candidate_ready_count": int(
+                access_summary.get("preflight_access_candidate_ready_count") or 0
+            ),
             "status": summary.get("status"),
         }
     return {
@@ -442,7 +459,9 @@ def instrumentation_route(
     planner_payload: dict[str, Any],
     trace_audit: dict[str, Any],
     squee_probe: dict[str, Any] | None = None,
+    access_model: dict[str, Any] | None = None,
     squee_probe_path: Path | None = None,
+    access_model_path: Path | None = None,
 ) -> dict[str, Any]:
     gate_ready = [row for row in package_candidates if row["status"] == "gate_ready_focus_access_package"]
     if gate_ready:
@@ -459,8 +478,10 @@ def instrumentation_route(
         "required_work": [
             squee_work_item(
                 squee_probe=squee_probe,
+                access_model=access_model,
                 modes=modes,
                 squee_probe_path=squee_probe_path,
+                access_model_path=access_model_path,
             ),
             {
                 "work_key": "contextual_tutor_cut_model",
@@ -492,11 +513,13 @@ def build_report(
     trace_audit: dict[str, Any],
     miner_report: dict[str, Any],
     squee_probe: dict[str, Any] | None = None,
+    access_model: dict[str, Any] | None = None,
     planner_path: Path = DEFAULT_PLANNER,
     trace_path: Path = DEFAULT_TRACE_AUDIT,
     miner_path: Path = DEFAULT_MINER_REPORT,
     design_path: Path = DEFAULT_DESIGN_REPORT,
     squee_probe_path: Path = DEFAULT_SQUEE_PROBE,
+    access_model_path: Path = DEFAULT_ACCESS_MODEL,
 ) -> dict[str, Any]:
     modes = focus_failure_modes(trace_audit)
     package_candidates = evaluate_pairings(
@@ -515,6 +538,7 @@ def build_report(
         "miner_report": str(miner_path),
         "design_contract": str(design_path),
         "squee_probe": str(squee_probe_path) if squee_probe else "",
+        "access_model": str(access_model_path) if access_model else "",
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -528,6 +552,9 @@ def build_report(
             ),
             "seed_42_anchor_available": seed_42_anchor_available(trace_audit),
             "squee_probe_status": ((squee_probe or {}).get("summary") or {}).get("status", ""),
+            "access_model_status": ((access_model or {}).get("summary") or {}).get(
+                "access_density_status", ""
+            ),
             "recommended_next_action": (
                 "run_package_preflight_then_seed42_anchor_gate"
                 if gate_ready
@@ -552,7 +579,9 @@ def build_report(
             planner_payload=planner_payload,
             trace_audit=trace_audit,
             squee_probe=squee_probe,
+            access_model=access_model,
             squee_probe_path=squee_probe_path,
+            access_model_path=access_model_path,
         ),
     }
 
@@ -568,6 +597,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Miner report: `{payload['miner_report']}`",
         f"- Design contract: `{payload['design_contract']}`",
         f"- Squee probe: `{payload['squee_probe'] or '-'}`",
+        f"- Access model: `{payload['access_model'] or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -579,6 +609,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Package statuses: `{json.dumps(summary['package_status_counts'], sort_keys=True)}`",
         f"- Seed-42 anchor available: `{str(summary['seed_42_anchor_available']).lower()}`",
         f"- Squee probe status: `{summary.get('squee_probe_status') or '-'}`",
+        f"- Access model status: `{summary.get('access_model_status') or '-'}`",
         "",
         "## Gate-Ready Packages",
         "",
@@ -640,7 +671,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--design-report", type=Path, default=DEFAULT_DESIGN_REPORT)
     parser.add_argument("--squee-probe", type=Path, default=DEFAULT_SQUEE_PROBE)
-    parser.add_argument("--stem", default="lorehold_focus_access_package_generator_20260628_v2")
+    parser.add_argument("--access-model", type=Path, default=DEFAULT_ACCESS_MODEL)
+    parser.add_argument("--stem", default="lorehold_focus_access_package_generator_20260628_v3")
     return parser.parse_args()
 
 
@@ -651,11 +683,13 @@ def main() -> int:
         trace_audit=read_json(args.trace_audit),
         miner_report=read_json(args.miner_report),
         squee_probe=read_json(args.squee_probe) if args.squee_probe.exists() else None,
+        access_model=read_json(args.access_model) if args.access_model.exists() else None,
         planner_path=args.planner,
         trace_path=args.trace_audit,
         miner_path=args.miner_report,
         design_path=args.design_report,
         squee_probe_path=args.squee_probe,
+        access_model_path=args.access_model,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

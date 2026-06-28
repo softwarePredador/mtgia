@@ -179,10 +179,18 @@ def test_completed_squee_probe_routes_to_access_density_model():
         trace_audit=trace_audit(),
         miner_report=miner_with_pairing(pairing),
         squee_probe=squee_probe,
+        access_model={
+            "summary": {
+                "access_density_status": "squee_route_modeled_access_density_needed",
+                "preflight_access_candidate_ready_count": 0,
+            }
+        },
     )
 
     required = report["instrumentation_route"]["required_work"]
     assert required[0]["work_key"] == "squee_access_density_model"
     assert required[0]["target_seeds"] == ["7", "20260625"]
     assert report["summary"]["squee_probe_status"] == "squee_route_modeled_but_access_gap_remains"
+    assert report["summary"]["access_model_status"] == "squee_route_modeled_access_density_needed"
+    assert required[0]["preflight_access_candidate_ready_count"] == 0
     assert "squee_graveyard_entry_probe" not in {row["work_key"] for row in required}

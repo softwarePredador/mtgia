@@ -132,6 +132,18 @@ def seed_matrix_report():
     }
 
 
+def squee_probe_report():
+    return {
+        "summary": {
+            "status": "squee_route_modeled_but_access_gap_remains",
+            "next_action": "target_access_density_not_squee_sequencing",
+            "modeled_when_accessed": True,
+            "weak_material_missing_squee_seeds": ["7", "20260625"],
+            "seed42_anchor_record": {"wins": 3, "losses": 0, "stalls": 0},
+        }
+    }
+
+
 def test_hidden_retreat_is_blocked_until_runtime_is_executable():
     with memory_db() as conn:
         payload = model.build_model(
@@ -187,3 +199,22 @@ def test_access_model_can_surface_same_lane_preflight_candidate():
     assert ready[("Brainstone", "Low Exposure Topdeck Flex")]["status"] == (
         "preflight_access_candidate_ready"
     )
+
+
+def test_access_model_records_squee_access_density_context():
+    with memory_db() as conn:
+        payload = model.build_model(
+            conn=conn,
+            strategy_report=strategy_report(),
+            seed_matrix_report=seed_matrix_report(),
+            squee_probe_report=squee_probe_report(),
+            candidates=["Enlightened Tutor", "Gamble"],
+        )
+
+    assert payload["summary"]["access_density_status"] == "squee_route_modeled_access_density_needed"
+    assert payload["summary"]["squee_probe_status"] == "squee_route_modeled_but_access_gap_remains"
+    assert payload["summary"]["weak_access_seeds"] == ["7", "20260625"]
+    assert "Squee, Goblin Nabob" in payload["summary"]["target_access_cards"]
+    by_card = {row["card_name"]: row for row in payload["candidates"]}
+    assert "Squee, Goblin Nabob" not in by_card["Enlightened Tutor"]["access_targets"]
+    assert "Squee, Goblin Nabob" in by_card["Gamble"]["access_targets"]
