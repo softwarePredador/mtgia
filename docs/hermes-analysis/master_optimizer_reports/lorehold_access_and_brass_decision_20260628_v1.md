@@ -5,6 +5,17 @@
 - seed_matrix_basis: `docs/hermes-analysis/master_optimizer_reports/lorehold_seed_matrix_all_20260628_v1_run.md`
 - postgres_writes: `false`
 - source_db_mutated: `false`
+- superseded_by: `docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_recurring_seed_window_decision_20260628_v1.md`
+
+## Supersession Note
+
+The `Brass's Bounty` recommendation below is superseded by the later recurring
+seed window gate. The later gate tested seeds `63261404` through `63261419` and
+rejected `Brass's Bounty` over `Boros Signet`: baseline `14-34`, candidate
+`12-36`, `-4.17pp`, decision `reject_regresses_strong_seed`.
+
+Keep this file as the evidence chain for why the larger gate was run, not as a
+current deck-promotion recommendation.
 
 ## Access/Topdeck Decision
 
