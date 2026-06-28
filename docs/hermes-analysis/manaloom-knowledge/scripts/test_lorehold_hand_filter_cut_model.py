@@ -4,6 +4,10 @@ import sqlite3
 import lorehold_hand_filter_cut_model as model
 
 
+def test_default_miner_uses_current_runtime_queue():
+    assert model.DEFAULT_MINER_REPORT.name == "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
+
+
 def memory_db():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row

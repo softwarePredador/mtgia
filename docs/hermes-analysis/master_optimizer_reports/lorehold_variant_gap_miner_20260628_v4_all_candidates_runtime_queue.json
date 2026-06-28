@@ -6487,66 +6487,6 @@
       "variant_total_quantity": 3
     },
     {
-      "active_rule_count": 0,
-      "battle_model_scopes": [],
-      "card_name": "Twinflame Tyrant",
-      "cmc": 5.0,
-      "disabled_rule_count": 0,
-      "effects": [
-        "finisher"
-      ],
-      "functional_tags": {
-        "wincon": 6
-      },
-      "lane": "finisher_or_big_spell",
-      "negative_add_count": 0,
-      "negative_add_packages": [],
-      "review_only_rule_count": 2,
-      "reviewed_rule_override_count": 0,
-      "rule_count": 2,
-      "rule_quality_flags": [],
-      "score": 10,
-      "status": "blocked_runtime_rule_gap",
-      "type_line": "Creature \u2014 Dragon",
-      "variant_deck_count": 3,
-      "variant_decks": [
-        608,
-        611,
-        615
-      ],
-      "variant_total_quantity": 3
-    },
-    {
-      "active_rule_count": 0,
-      "battle_model_scopes": [],
-      "card_name": "Verge Rangers",
-      "cmc": 3.0,
-      "disabled_rule_count": 0,
-      "effects": [
-        "topdeck_manipulation"
-      ],
-      "functional_tags": {
-        "draw": 6
-      },
-      "lane": "hand_filter",
-      "negative_add_count": 0,
-      "negative_add_packages": [],
-      "review_only_rule_count": 2,
-      "reviewed_rule_override_count": 0,
-      "rule_count": 2,
-      "rule_quality_flags": [],
-      "score": 10,
-      "status": "blocked_runtime_rule_gap",
-      "type_line": "Creature \u2014 Human Scout Ranger",
-      "variant_deck_count": 3,
-      "variant_decks": [
-        609,
-        611,
-        613
-      ],
-      "variant_total_quantity": 3
-    },
-    {
       "active_rule_count": 1,
       "battle_model_scopes": [
         "noncreature_spell_cast_create_1_1_white_monk_prowess_v1"
@@ -6612,6 +6552,70 @@
         614
       ],
       "variant_total_quantity": 1
+    },
+    {
+      "active_rule_count": 0,
+      "battle_model_scopes": [],
+      "card_name": "Twinflame Tyrant",
+      "cmc": 5.0,
+      "disabled_rule_count": 0,
+      "effects": [
+        "finisher"
+      ],
+      "functional_tags": {
+        "wincon": 6
+      },
+      "lane": "finisher_or_big_spell",
+      "negative_add_count": 1,
+      "negative_add_packages": [
+        "pg245_twinflame_damage_payoff_cut_thor"
+      ],
+      "review_only_rule_count": 2,
+      "reviewed_rule_override_count": 0,
+      "rule_count": 2,
+      "rule_quality_flags": [],
+      "score": 0,
+      "status": "blocked_runtime_rule_gap",
+      "type_line": "Creature \u2014 Dragon",
+      "variant_deck_count": 3,
+      "variant_decks": [
+        608,
+        611,
+        615
+      ],
+      "variant_total_quantity": 3
+    },
+    {
+      "active_rule_count": 0,
+      "battle_model_scopes": [],
+      "card_name": "Verge Rangers",
+      "cmc": 3.0,
+      "disabled_rule_count": 0,
+      "effects": [
+        "topdeck_manipulation"
+      ],
+      "functional_tags": {
+        "draw": 6
+      },
+      "lane": "hand_filter",
+      "negative_add_count": 1,
+      "negative_add_packages": [
+        "pg245_verge_rangers_topdeck_land_cut_waterskin"
+      ],
+      "review_only_rule_count": 2,
+      "reviewed_rule_override_count": 0,
+      "rule_count": 2,
+      "rule_quality_flags": [],
+      "score": 0,
+      "status": "blocked_runtime_rule_gap",
+      "type_line": "Creature \u2014 Human Scout Ranger",
+      "variant_deck_count": 3,
+      "variant_decks": [
+        609,
+        611,
+        613
+      ],
+      "variant_total_quantity": 3
     },
     {
       "active_rule_count": 0,
@@ -8656,8 +8660,10 @@
       "decision_status": "local_runtime_rule_added_pending_sync",
       "effective_role": "spell_damage_engine",
       "lane": "graveyard_recursion",
-      "negative_cut_count": 0,
-      "negative_cut_packages": [],
+      "negative_cut_count": 1,
+      "negative_cut_packages": [
+        "pg245_twinflame_damage_payoff_cut_thor"
+      ],
       "quantity": 1,
       "status": "blocked_locked_cut",
       "worst_delta_pp": -55.56,
@@ -9294,20 +9300,6 @@
       "worst_strong_seed_delta_pp": null
     },
     {
-      "card_name": "Bender's Waterskin",
-      "cut_safety_status": "risky_cut_only_same_lane",
-      "decision": "flex_but_cut_risky",
-      "decision_status": "core_support",
-      "effective_role": "ramp",
-      "lane": "early_mana",
-      "negative_cut_count": 0,
-      "negative_cut_packages": [],
-      "quantity": 1,
-      "status": "risky_same_lane_only",
-      "worst_delta_pp": -7.41,
-      "worst_strong_seed_delta_pp": -44.45
-    },
-    {
       "card_name": "Creative Technique",
       "cut_safety_status": "risky_cut_only_same_lane",
       "decision": "manual_review",
@@ -9336,6 +9328,22 @@
       "status": "tested_negative_cut",
       "worst_delta_pp": null,
       "worst_strong_seed_delta_pp": null
+    },
+    {
+      "card_name": "Bender's Waterskin",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "decision": "flex_but_cut_risky",
+      "decision_status": "core_support",
+      "effective_role": "ramp",
+      "lane": "early_mana",
+      "negative_cut_count": 1,
+      "negative_cut_packages": [
+        "pg245_verge_rangers_topdeck_land_cut_waterskin"
+      ],
+      "quantity": 1,
+      "status": "tested_negative_cut",
+      "worst_delta_pp": -7.41,
+      "worst_strong_seed_delta_pp": -44.45
     },
     {
       "card_name": "Boros Signet",
@@ -9598,7 +9606,7 @@
       "total_cards": 100
     }
   },
-  "generated_at": "2026-06-28T01:17:32Z",
+  "generated_at": "2026-06-28T09:43:54Z",
   "method_notes": [
     "SQLite/Hermes was read as an audit cache only; no PostgreSQL write was performed.",
     "Battle rules were aggregated by card name before deck comparison to avoid multi-rule fanout.",
@@ -9771,7 +9779,7 @@
       ],
       "delta_pp": -66.67,
       "package_key": "perch_protection_cut_avatar_wrath",
-      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260627_v9.json",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
       "status": "tested_negative_do_not_promote"
     },
     {
@@ -9783,7 +9791,7 @@
       ],
       "delta_pp": -100.0,
       "package_key": "akromas_will_cut_avatar_wrath",
-      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260627_v9.json",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
       "status": "tested_negative_do_not_promote"
     },
     {
@@ -9795,7 +9803,7 @@
       ],
       "delta_pp": -66.67,
       "package_key": "silence_cut_avatar_wrath",
-      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260627_v9.json",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
       "status": "tested_negative_do_not_promote"
     },
     {
@@ -9807,7 +9815,7 @@
       ],
       "delta_pp": -100.0,
       "package_key": "dragon_rage_channeler_cut_scarlet_witch",
-      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260627_v9.json",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
       "status": "tested_negative_do_not_promote"
     },
     {
@@ -9819,7 +9827,7 @@
       ],
       "delta_pp": -100.0,
       "package_key": "grand_abolisher_cut_mother_of_runes",
-      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260627_v9.json",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
       "status": "tested_negative_do_not_promote"
     },
     {
@@ -9831,7 +9839,19 @@
       ],
       "delta_pp": -100.0,
       "package_key": "reprieve_cut_avatar_wrath",
-      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260627_v9.json",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
+      "status": "tested_negative_do_not_promote"
+    },
+    {
+      "adds": [
+        "Verge Rangers"
+      ],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "delta_pp": -100.0,
+      "package_key": "pg245_verge_rangers_topdeck_land_cut_waterskin",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
       "status": "tested_negative_do_not_promote"
     },
     {
@@ -9843,7 +9863,19 @@
       ],
       "delta_pp": -66.67,
       "package_key": "radiant_scrollwielder_cut_scarlet_witch",
-      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260627_v9.json",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
+      "status": "tested_negative_do_not_promote"
+    },
+    {
+      "adds": [
+        "Twinflame Tyrant"
+      ],
+      "cuts": [
+        "Thor, God of Thunder"
+      ],
+      "delta_pp": -33.34,
+      "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
       "status": "tested_negative_do_not_promote"
     }
   ],
@@ -10425,10 +10457,10 @@
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_austere_emeria_tradeoff_gate_20260627_v1_20260627_232955.json",
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json",
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_lapse_approach_gate_20260627_v1_fixed.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260627_v9.json"
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
   ],
   "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
-  "strategy_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260627_v3.json",
+  "strategy_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
   "summary": {
     "blocked_pairing_count": 8,
     "blocked_runtime_rule_gap_count": 61,
@@ -10443,8 +10475,8 @@
       "blocked_locked_cut": 9,
       "manual_review_needed": 4,
       "requires_same_lane_gate": 38,
-      "risky_same_lane_only": 2,
-      "tested_negative_cut": 12,
+      "risky_same_lane_only": 1,
+      "tested_negative_cut": 13,
       "untested_flex_candidate": 1
     },
     "gate_ready_pairing_count": 0,
@@ -10457,7 +10489,7 @@
     },
     "runtime_ready_unexplored_count": 192,
     "tested_negative_add_count": 17,
-    "tested_negative_cut_count": 12,
+    "tested_negative_cut_count": 13,
     "variant_only_card_count": 270
   },
   "top_variant_candidates": [

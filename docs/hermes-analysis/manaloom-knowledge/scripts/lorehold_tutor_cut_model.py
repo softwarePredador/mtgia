@@ -28,9 +28,9 @@ DEFAULT_DB = (
     / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
     / "knowledge_candidate.db"
 )
-DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260627_v3.json"
+DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_MINER_REPORT = (
-    REPORT_DIR / "lorehold_variant_gap_miner_20260627_v3_post_austere_tradeoff.json"
+    REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_EXPOSURE_PROFILES = [
     REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json",
@@ -449,7 +449,7 @@ def build_model(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Tutor Cut Model - 2026-06-27",
+        "# Lorehold Tutor Cut Model - 2026-06-28",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Source DB: `{payload['source_db']}`",
@@ -541,7 +541,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--candidate", action="append")
     parser.add_argument("--deck-id", type=int, default=6)
-    parser.add_argument("--stem", default="lorehold_tutor_cut_model_20260627_v1")
+    parser.add_argument("--stem", default="lorehold_tutor_cut_model_20260628_v2_current_miner")
     return parser.parse_args()
 
 

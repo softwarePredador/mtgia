@@ -28,7 +28,7 @@ DEFAULT_DB = (
     / "knowledge_candidate.db"
 )
 DEFAULT_MINER_REPORT = (
-    REPORT_DIR / "lorehold_variant_gap_miner_20260627_v3_post_austere_tradeoff.json"
+    REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_EXPOSURE_PROFILES = [
     REPORT_DIR / "lorehold_hand_filter_cut_candidate_exposure_profile_20260627_v1.json",
@@ -357,7 +357,7 @@ def build_model(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Hand Filter Cut Model - 2026-06-27",
+        "# Lorehold Hand Filter Cut Model - 2026-06-28",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Source DB: `{payload['source_db']}`",
@@ -438,7 +438,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
-    parser.add_argument("--stem", default="lorehold_hand_filter_cut_model_20260627_v1")
+    parser.add_argument("--stem", default="lorehold_hand_filter_cut_model_20260628_v4_current_miner")
     return parser.parse_args()
 
 

@@ -1,6 +1,10 @@
 import lorehold_runtime_gap_family_queue as queue
 
 
+def test_default_miner_report_uses_current_runtime_queue() -> None:
+    assert queue.DEFAULT_MINER_REPORT.name == "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
+
+
 def miner_report() -> dict:
     return {
         "base_deck_id": 6,

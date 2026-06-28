@@ -1,8 +1,8 @@
 # Lorehold Variant Gap Miner - 2026-06-27
 
-- Generated at: `2026-06-28T01:17:32Z`
+- Generated at: `2026-06-28T09:43:54Z`
 - Source DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db`
-- Strategy audit: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260627_v3.json`
+- Strategy audit: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json`
 - Base deck: `6`
 - Variant decks: `608, 609, 610, 611, 612, 613, 614, 615, 616`
 - PostgreSQL writes: `false`
@@ -12,11 +12,11 @@
 
 - variant_only_card_count: `270`
 - candidate_status_counts: `{'blocked_runtime_rule_gap': 61, 'high_frequency_runtime_ready_unexplored': 20, 'runtime_ready_unexplored': 172, 'tested_negative_add_requires_new_cut': 17}`
-- cut_status_counts: `{'blocked_core_cut': 28, 'blocked_locked_cut': 9, 'manual_review_needed': 4, 'requires_same_lane_gate': 38, 'risky_same_lane_only': 2, 'tested_negative_cut': 12, 'untested_flex_candidate': 1}`
+- cut_status_counts: `{'blocked_core_cut': 28, 'blocked_locked_cut': 9, 'manual_review_needed': 4, 'requires_same_lane_gate': 38, 'risky_same_lane_only': 1, 'tested_negative_cut': 13, 'untested_flex_candidate': 1}`
 - runtime_ready_unexplored_count: `192`
 - blocked_runtime_rule_gap_count: `61`
 - tested_negative_add_count: `17`
-- tested_negative_cut_count: `12`
+- tested_negative_cut_count: `13`
 - pairing_count: `12`
 - pairing_status_counts: `{'blocked_no_safe_cut_in_lane': 8, 'manual_cut_review_required': 2, 'needs_lane_model_before_gate': 2}`
 - gate_ready_pairing_count: `0`
@@ -63,8 +63,8 @@
 | Rank | Card | Score | Decks | Lane | Review-only Rules | Disabled Rules |
 | ---: | --- | ---: | --- | --- | ---: | ---: |
 | 1 | `Goliath Daydreamer` | 10 | 613, 614, 615 | `contextual` | 1 | 0 |
-| 2 | `Twinflame Tyrant` | 10 | 608, 611, 615 | `finisher_or_big_spell` | 2 | 0 |
-| 3 | `Verge Rangers` | 10 | 609, 611, 613 | `hand_filter` | 2 | 0 |
+| 2 | `Twinflame Tyrant` | 0 | 608, 611, 615 | `finisher_or_big_spell` | 2 | 0 |
+| 3 | `Verge Rangers` | 0 | 609, 611, 613 | `hand_filter` | 2 | 0 |
 | 4 | `Ancient Copper Dragon` | 0 | 608, 616 | `early_mana` | 2 | 0 |
 | 5 | `Beacon of Immortality` | 0 | 610, 615 | `finisher_or_big_spell` | 2 | 0 |
 | 6 | `Boros Reckoner` | 0 | 612, 616 | `contextual` | 0 | 0 |
@@ -112,13 +112,13 @@
 | `Ruby Medallion` | `blocked_locked_cut` | `early_mana` | 0 | none |
 | `Victory Chimes` | `blocked_locked_cut` | `early_mana` | 0 | none |
 | `Storm Herd` | `blocked_locked_cut` | `finisher_or_big_spell` | 0 | none |
-| `Thor, God of Thunder` | `blocked_locked_cut` | `graveyard_recursion` | 0 | none |
+| `Thor, God of Thunder` | `blocked_locked_cut` | `graveyard_recursion` | 1 | pg245_twinflame_damage_payoff_cut_thor |
 | `Dawn's Truce` | `blocked_locked_cut` | `hand_filter` | 0 | none |
 | `Reliquary Tower` | `blocked_locked_cut` | `mana_base` | 0 | none |
 | `Fated Clash` | `blocked_locked_cut` | `pressure_absorber_or_protection` | 0 | none |
-| `Bender's Waterskin` | `risky_same_lane_only` | `early_mana` | 0 | none |
 | `Creative Technique` | `risky_same_lane_only` | `finisher_or_big_spell` | 0 | none |
 | `Arcane Signet` | `tested_negative_cut` | `early_mana` | 1 | storm_kiln_artist_cut_arcane_signet |
+| `Bender's Waterskin` | `tested_negative_cut` | `early_mana` | 1 | pg245_verge_rangers_topdeck_land_cut_waterskin |
 | `Boros Signet` | `tested_negative_cut` | `early_mana` | 1 | brass_bounty_cut_boros_signet |
 | `Fellwar Stone` | `tested_negative_cut` | `early_mana` | 1 | seething_song_cut_fellwar_stone |
 | `Jeska's Will` | `tested_negative_cut` | `early_mana` | 1 | birgi_spellchain_cut_jeskas_will |

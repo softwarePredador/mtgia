@@ -4,6 +4,11 @@ import sqlite3
 import lorehold_variant_gap_miner as miner
 
 
+def test_defaults_use_current_strategy_and_hypothesis_queue():
+    assert miner.DEFAULT_STRATEGY_AUDIT.name == "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
+    assert miner.DEFAULT_QUEUE_REPORT.name == "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
+
+
 def memory_db():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row

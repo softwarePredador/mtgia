@@ -33,8 +33,8 @@ DEFAULT_DB = Path(
         / "knowledge_candidate.db",
     )
 )
-DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260627_v3.json"
-DEFAULT_QUEUE_REPORT = REPORT_DIR / "lorehold_next_hypothesis_queue_20260627_v9.json"
+DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
+DEFAULT_QUEUE_REPORT = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
 DEFAULT_BASE_DECK_ID = 6
 DEFAULT_VARIANT_DECK_IDS = tuple(range(608, 617))
 ACTIVE_EXECUTION_STATUSES = {"active", "verified", "auto", "reviewed"}
@@ -390,7 +390,7 @@ def default_prior_gate_report_paths() -> list[Path]:
         "lorehold_austere_emeria_tradeoff_gate_20260627_v1_20260627_232955.json",
         "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
         "lorehold_lapse_approach_gate_20260627_v1_fixed.json",
-        "lorehold_next_hypothesis_queue_20260627_v9.json",
+        "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
     ]
     return [REPORT_DIR / stem for stem in stems]
 
@@ -877,7 +877,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prior-gate-report", type=Path, action="append")
     parser.add_argument("--base-deck-id", type=int, default=DEFAULT_BASE_DECK_ID)
     parser.add_argument("--variant-deck-ids", default=None)
-    parser.add_argument("--stem", default="lorehold_variant_gap_miner_20260627_v1")
+    parser.add_argument("--stem", default="lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue")
     return parser.parse_args()
 
 
