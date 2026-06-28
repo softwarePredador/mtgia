@@ -1,0 +1,1326 @@
+{
+  "apply_only": false,
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+  "cut_safety_summary": {
+    "blocked_cut_count": 11,
+    "status_counts": {
+      "locked_do_not_cut": 9,
+      "risky_cut_only_same_lane": 2
+    },
+    "tested_cut_count": 11,
+    "untested_flex_pool_count": 6
+  },
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-28T07:19:40.578109+00:00",
+  "no_game_checkpoint": false,
+  "opponent_limit": 3,
+  "opponent_seed": 20260626,
+  "package_status_counts": {
+    "skipped_cut_safety": 17,
+    "skipped_prior_evidence": 2
+  },
+  "packages": [
+    {
+      "adds": [
+        "Brainstone"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Hexing Squelcher",
+            "current_lane": "contextual",
+            "effective_role": "creature",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -77.78
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Hexing Squelcher",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "topdeck_setup",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Brainstone failed when it cut Bender's Waterskin; this variant preserves ramp and tests whether a cheap one-shot topdeck engine can help seed 7 find the Library/topdeck conversion line.",
+      "package_key": "brainstone_topdeck_miracle_cut_squelcher",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Dance with Calamity"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": -3.7,
+            "card_name": "Storm Herd",
+            "current_lane": "finisher_or_big_spell",
+            "effective_role": "wincon",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -88.89
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Storm Herd",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Storm Herd"
+      ],
+      "family": "payoff_challenge",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Dance with Calamity is an expensive sorcery payoff that may produce more immediate wins than Storm Herd when miracle makes it cheap.",
+      "package_key": "core_challenge_dance_over_storm",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Dance with Calamity"
+            ],
+            "adds_signature": [
+              "dance with calamity"
+            ],
+            "baseline": {
+              "avg_win_turn": 11.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 28,
+                "lorehold_spell_cast": 22,
+                "miracle_cast": 5,
+                "topdeck_manipulation_activated": 3
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 14.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 26,
+                "lorehold_spell_cast": 24,
+                "miracle_cast": 7,
+                "topdeck_manipulation_activated": 2
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "cuts": [
+              "Storm Herd"
+            ],
+            "cuts_signature": [
+              "storm herd"
+            ],
+            "decision": "tie_promote_to_deeper_gate",
+            "delta_pp": 0.0,
+            "family": "payoff_challenge",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm.md",
+            "gate_returncode": 0,
+            "package_key": "core_challenge_dance_over_storm",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -2,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": 2,
+              "lorehold_spell_rummage": 0,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": 2,
+              "random_discard_after_tutor": 1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -1,
+              "tutor_resolved": 1
+            }
+          }
+        ],
+        "reason": "previous exact package result was not a reject blocker",
+        "status": "seen_no_blocker"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Galvanoth"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Bender's Waterskin",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "reason": "aggregate upside exists, but it broke the known strong seed",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Bender's Waterskin",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "topdeck_freecast",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Galvanoth turns topdeck setup into free upkeep casts for the same expensive instant/sorcery package Lorehold wants to miracle.",
+      "package_key": "galvanoth_topdeck_freecast",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "adds_signature": [
+              "galvanoth"
+            ],
+            "baseline": {
+              "avg_win_turn": 11.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 28,
+                "lorehold_spell_cast": 22,
+                "miracle_cast": 5,
+                "topdeck_manipulation_activated": 3
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 17.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 32,
+                "lorehold_spell_cast": 23,
+                "miracle_cast": 2
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "cuts_signature": [
+              "bender's waterskin"
+            ],
+            "decision": "tie_watch_strategy_regression",
+            "delta_pp": 0.0,
+            "family": "topdeck_freecast",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_galvanoth_topdeck_freecast.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_galvanoth_topdeck_freecast.md",
+            "gate_returncode": 0,
+            "package_key": "galvanoth_topdeck_freecast",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": 4,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": 1,
+              "lorehold_spell_rummage": 0,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -3,
+              "random_discard_after_tutor": 1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -3,
+              "tutor_resolved": 2
+            }
+          }
+        ],
+        "reason": "previous exact package result was not a reject blocker",
+        "status": "seen_no_blocker"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Angel's Grace"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": -18.52,
+            "card_name": "Dawn's Truce",
+            "current_lane": "hand_filter",
+            "effective_role": "protection",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -88.89
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Dawn's Truce",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Dawn's Truce"
+      ],
+      "family": "life_floor_protection",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "The loss classifier shows early life-zero deaths even when the deck sometimes finds topdeck or Approach setup. Angel's Grace is a one-mana life-floor effect with executable runtime rules; this tests a same-lane protection swap over Dawn's Truce without cutting ramp, High Noon, Hexing Squelcher, or Storm Herd.",
+      "package_key": "angel_grace_life_floor_cut_dawn",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Seething Song"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Pearl Medallion",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -55.56
+          },
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Ruby Medallion",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -55.56
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Pearl Medallion, Ruby Medallion",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Pearl Medallion",
+        "Ruby Medallion"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "The loss classifier shows mana/spell-volume failures under pressure. This imports the narrow 615 ritual lane while preserving Dawn's Truce, Teferi's Protection, High Noon, Hexing Squelcher, Storm Herd, and the three-mana ramp shell; it tests whether cast-trigger mana plus a one-shot ritual beats static red/white medallion discounts.",
+      "package_key": "birgi_seething_chain_cut_medallions",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Galvanoth"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": -3.7,
+            "card_name": "Victory Chimes",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -55.56
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Victory Chimes",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Victory Chimes"
+      ],
+      "family": "topdeck_freecast",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Galvanoth was the only aggregate-positive topdeck package, but the Bender's Waterskin cut broke the seed-42 success case and the Hexing Squelcher cut was worse. This retest preserves both colored ramp and anti-counter pressure, cutting the more generic colorless three-mana ramp slot instead.",
+      "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Gamble"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Creative Technique",
+            "current_lane": "finisher_or_big_spell",
+            "effective_role": "big_spell_value",
+            "reason": "aggregate upside exists, but it broke the known strong seed",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Creative Technique",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Creative Technique"
+      ],
+      "family": "tutor_access",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "The loss classifier shows topdeck/miracle turns failing to find or recast Approach before combat pressure. Gamble tests a cheap universal tutor over a five-mana demonstrate/free-cast slot while preserving the existing protection, ramp, medallion, Bender's Waterskin, Hexing Squelcher, and Storm Herd shell.",
+      "package_key": "gamble_approach_access_cut_creative",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Gods Willing"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "family": "targeted_commander_protection",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "After the runtime learned targeted protection responses, Gods Willing tests the cheapest 616 commander shield against the seed-7 failure mode where Lorehold died to targeted removal with one mana available. Promise of Loyalty is the pressure-lane comparison slot: it is a five-mana sorcery cleanup spell already challenged by the Ghostly Prison pressure test, while this keeps Mother/Giver, Dawn's Truce, High Noon, topdeck engines, ramp, and the expensive win package intact.",
+      "package_key": "gods_willing_commander_shield_cut_promise",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Gods Willing"
+            ],
+            "adds_signature": [
+              "gods willing"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 2,
+                "lorehold_cost_paid": 62,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 2,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 2,
+                "squee_to_graveyard": 3,
+                "squee_upkeep_return": 2,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 14.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 28,
+                "lorehold_spell_cast": 21,
+                "lorehold_upkeep_rummage": 7,
+                "miracle_cast": 4
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Promise of Loyalty"
+            ],
+            "cuts_signature": [
+              "promise of loyalty"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "family": "targeted_commander_protection",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2_gods_willing_commander_shield_cut_promise.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2_gods_willing_commander_shield_cut_promise.md",
+            "gate_returncode": 0,
+            "package_key": "gods_willing_commander_shield_cut_promise",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -34,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -32,
+              "lorehold_spell_rummage": -16,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -9,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -2,
+              "squee_to_graveyard": -3,
+              "squee_upkeep_return": -2,
+              "topdeck_manipulation_activated": -12,
+              "tutor_resolved": -4
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "status": "skipped_prior_evidence"
+    },
+    {
+      "adds": [
+        "The One Ring"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Hexing Squelcher",
+            "current_lane": "contextual",
+            "effective_role": "creature",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -77.78
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Hexing Squelcher",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "draw_protection",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "The One Ring may buy the exact turn seed 20260625 lacks while adding repeatable draw. This preserves the three-mana ramp shell and cuts the narrower anti-counter creature instead.",
+      "package_key": "one_ring_protection_draw_cut_squelcher",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Hexing Squelcher",
+            "current_lane": "contextual",
+            "effective_role": "creature",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -77.78
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Hexing Squelcher",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Birgi adds red mana on every spell cast, which should help Lorehold chain miracle spells without cutting the expensive spell package.",
+      "package_key": "birgi_spellchain_cut_squelcher",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+            ],
+            "adds_signature": [
+              "birgi, god of storytelling // harnfel, horn of bounty"
+            ],
+            "baseline": {
+              "avg_win_turn": 11.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 28,
+                "lorehold_spell_cast": 22,
+                "miracle_cast": 5,
+                "topdeck_manipulation_activated": 3
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 15.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 24,
+                "lorehold_spell_cast": 22,
+                "miracle_cast": 5
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "cuts": [
+              "Hexing Squelcher"
+            ],
+            "cuts_signature": [
+              "hexing squelcher"
+            ],
+            "decision": "tie_promote_to_deeper_gate",
+            "delta_pp": 0.0,
+            "family": "spellchain_mana",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher.md",
+            "gate_returncode": 0,
+            "package_key": "birgi_spellchain_cut_squelcher",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -4,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": 0,
+              "lorehold_spell_rummage": 0,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": 0,
+              "random_discard_after_tutor": 1,
+              "ritual_mana_added": 2,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -3,
+              "tutor_resolved": 2
+            }
+          }
+        ],
+        "reason": "previous exact package result was not a reject blocker",
+        "status": "seen_no_blocker"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Aetherflux Reservoir"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": -3.7,
+            "card_name": "Storm Herd",
+            "current_lane": "finisher_or_big_spell",
+            "effective_role": "wincon",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -88.89
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Storm Herd",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Storm Herd"
+      ],
+      "family": "payoff_challenge",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Aetherflux Reservoir may convert Lorehold's spell-chain turns into a deterministic life-gain and 50-damage finish while preserving the expensive instant/sorcery package outside the Storm Herd slot.",
+      "package_key": "core_challenge_aetherflux_over_storm",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Galvanoth"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Hexing Squelcher",
+            "current_lane": "contextual",
+            "effective_role": "creature",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -77.78
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Hexing Squelcher",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "topdeck_freecast",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Galvanoth was aggregate-positive but failed the seed-42 success case when it cut Bender's Waterskin. This retest preserves the ramp shell and cuts the narrower anti-counter creature instead.",
+      "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Ghostly Prison"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Hexing Squelcher",
+            "current_lane": "contextual",
+            "effective_role": "creature",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -77.78
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Hexing Squelcher",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "pressure_absorber",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Ghostly Prison directly attacks the seed-20260625 failure mode: the deck can put Approach on top but dies to combat pressure before conversion. This retest avoids the prior bad High Noon cut.",
+      "package_key": "ghostly_prison_pressure_cut_squelcher",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Penance"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Hexing Squelcher",
+            "current_lane": "contextual",
+            "effective_role": "creature",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -77.78
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Hexing Squelcher",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "topdeck_protection",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Penance gives an executable hand-to-library topdeck line plus combat damage prevention. It tests topdeck consistency without relying on land-only placeholder rules such as The Biblioplex or Mirrorpool.",
+      "package_key": "penance_topdeck_protection_cut_squelcher",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Primal Amulet // Primal Wellspring"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Bender's Waterskin",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "reason": "aggregate upside exists, but it broke the known strong seed",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Bender's Waterskin",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "cost_reduce_copy",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Primal Amulet reduces instant/sorcery costs and can transform into a spell-copying mana land, matching the deck's expensive spell plan.",
+      "package_key": "primal_amulet_spell_engine",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Primal Amulet // Primal Wellspring"
+            ],
+            "adds_signature": [
+              "primal amulet // primal wellspring"
+            ],
+            "baseline": {
+              "avg_win_turn": 11.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 28,
+                "lorehold_spell_cast": 22,
+                "miracle_cast": 5,
+                "topdeck_manipulation_activated": 3
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 10.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 12,
+                "lorehold_spell_cast": 11,
+                "miracle_cast": 2
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "cuts_signature": [
+              "bender's waterskin"
+            ],
+            "decision": "tie_watch_strategy_regression",
+            "delta_pp": 0.0,
+            "family": "cost_reduce_copy",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine.md",
+            "gate_returncode": 0,
+            "package_key": "primal_amulet_spell_engine",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -16,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -11,
+              "lorehold_spell_rummage": 0,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -3,
+              "random_discard_after_tutor": 0,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -3,
+              "tutor_resolved": 1
+            }
+          }
+        ],
+        "reason": "previous exact package result was not a reject blocker",
+        "status": "seen_no_blocker"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Brainstone"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Bender's Waterskin",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "reason": "aggregate upside exists, but it broke the known strong seed",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Bender's Waterskin",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "topdeck_setup",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Brainstone is another cheap topdeck manipulation artifact that can turn the first draw into a planned miracle window.",
+      "package_key": "brainstone_topdeck_miracle",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Brainstone"
+            ],
+            "adds_signature": [
+              "brainstone"
+            ],
+            "baseline": {
+              "avg_win_turn": 11.0,
+              "losses": 1,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 28,
+                "lorehold_spell_cast": 22,
+                "miracle_cast": 5,
+                "topdeck_manipulation_activated": 3
+              },
+              "win_rate": 50.0,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 15,
+                "lorehold_spell_cast": 11
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "cuts_signature": [
+              "bender's waterskin"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -50.0,
+            "family": "topdeck_setup",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_brainstone_topdeck_miracle.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_brainstone_topdeck_miracle.md",
+            "gate_returncode": 0,
+            "package_key": "brainstone_topdeck_miracle",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -13,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -11,
+              "lorehold_spell_rummage": 0,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -5,
+              "random_discard_after_tutor": 0,
+              "ritual_mana_added": 3,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -3,
+              "tutor_resolved": 2
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Faithless Looting"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 0.0,
+            "card_name": "Hexing Squelcher",
+            "current_lane": "contextual",
+            "effective_role": "creature",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -77.78
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Hexing Squelcher",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "discard_rummage_recursion",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Faithless Looting gives the Squee shell a cheap, executable discard outlet plus card flow, testing whether the proven Squee return loop needs more ways to put Squee into the graveyard before Lorehold's topdeck/miracle engine can convert.",
+      "package_key": "faithless_looting_squee_enabler",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "skipped_cut_safety"
+    },
+    {
+      "adds": [
+        "Brass's Bounty"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Boros Signet"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Brass's Bounty is shared by six Lorehold variants and now has a reviewed runtime model that creates Treasure equal to lands controlled. This tests whether a late ritual/treasure burst is better than the least-blocked two-mana Boros rock without cutting Sol Ring, Bender's Waterskin, medallions, Victory Chimes, or the protection/finisher shell.",
+      "package_key": "brass_bounty_cut_boros_signet",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Brass's Bounty"
+            ],
+            "adds_signature": [
+              "brass's bounty"
+            ],
+            "baseline": {
+              "avg_win_turn": null,
+              "losses": null,
+              "stalls": null,
+              "strategic_event_counts": {},
+              "win_rate": null,
+              "wins": null
+            },
+            "candidate": {
+              "avg_win_turn": null,
+              "losses": null,
+              "stalls": null,
+              "strategic_event_counts": {},
+              "win_rate": null,
+              "wins": null
+            },
+            "cuts": [
+              "Boros Signet"
+            ],
+            "cuts_signature": [
+              "boros signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -2.22,
+            "family": "spellchain_mana",
+            "gate_json": null,
+            "gate_markdown": null,
+            "gate_returncode": null,
+            "package_key": "brass_bounty_cut_boros_signet",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+            "strategic_delta": {}
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "status": "skipped_prior_evidence"
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Bender's Waterskin",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "reason": "aggregate upside exists, but it broke the known strong seed",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "proposed cuts already have blocker evidence: Bender's Waterskin",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "graveyard_recast",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "Past in Flames turns the graveyard of used instant/sorcery cards into a second spell chain without removing a miracle payoff.",
+      "package_key": "past_in_flames_recast",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Past in Flames"
+            ],
+            "adds_signature": [
+              "past in flames"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 51,
+                "miracle_cast": 14,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 17.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 49,
+                "lorehold_spell_cast": 42,
+                "miracle_cast": 6,
+                "topdeck_manipulation_activated": 11
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Bender's Waterskin"
+            ],
+            "cuts_signature": [
+              "bender's waterskin"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "family": "graveyard_recast",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331_past_in_flames_recast.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331_past_in_flames_recast.md",
+            "gate_returncode": 0,
+            "package_key": "past_in_flames_recast",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -12,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -9,
+              "lorehold_spell_rummage": 0,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -8,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": 0,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -1,
+              "tutor_resolved": -4
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "status": "skipped_cut_safety"
+    }
+  ],
+  "preflight_only": true,
+  "prior_package_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json"
+  ],
+  "prior_package_summary": {
+    "loaded_report_count": 11,
+    "missing_report_count": 0,
+    "package_key_count": 25
+  },
+  "runtime_package_proposal_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v5_topdeck_damage_proposals.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/xmage_hidden_retreat_runtime_scope_20260628_v3_proposals.json"
+  ],
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}

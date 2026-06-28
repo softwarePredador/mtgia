@@ -56,6 +56,9 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
     REPORT_DIR / "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+    REPORT_DIR / "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+    REPORT_DIR / "lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
 )
 
 
@@ -1075,7 +1078,12 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
             if not isinstance(result, dict) or not result.get("package_key"):
                 continue
             gate = result.get("gate_summary") or {}
-            decision = str(result.get("decision") or gate_decision(gate))
+            aggregate = result.get("aggregate") or {}
+            decision = str(
+                result.get("decision")
+                or aggregate.get("decision")
+                or gate_decision(gate)
+            )
             baseline = gate.get("baseline") or {}
             candidate = gate.get("candidate") or {}
             package_result = {
@@ -1087,7 +1095,7 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
                 "adds_signature": card_signature(result.get("adds") or []),
                 "cuts_signature": card_signature(result.get("cuts") or []),
                 "decision": decision,
-                "delta_pp": gate.get("delta_pp"),
+                "delta_pp": gate.get("delta_pp", aggregate.get("delta_pp_total")),
                 "baseline": compact_side(baseline),
                 "candidate": compact_side(candidate),
                 "strategic_delta": strategic_delta(gate) if gate else {},

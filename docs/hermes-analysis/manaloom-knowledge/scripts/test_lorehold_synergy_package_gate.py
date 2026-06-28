@@ -629,6 +629,52 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
             default_names,
         )
+        self.assertIn(
+            "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+            default_names,
+        )
+
+    def test_prior_evidence_blocks_aggregate_matrix_reject(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            prior = Path(tmp) / "matrix.json"
+            prior.write_text(
+                json.dumps(
+                    {
+                        "packages": [
+                            {
+                                "package_key": "brass_bounty_cut_boros_signet",
+                                "family": "spellchain_mana",
+                                "adds": ["Brass's Bounty"],
+                                "cuts": ["Boros Signet"],
+                                "aggregate": {
+                                    "decision": "reject_or_rework",
+                                    "delta_pp_total": -2.22,
+                                },
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            prior_results = gate.load_prior_package_results([prior])
+            classification = gate.classify_package_prior_evidence(
+                "brass_bounty_cut_boros_signet",
+                gate.PACKAGE_DEFINITIONS["brass_bounty_cut_boros_signet"],
+                prior_results,
+            )
+
+        self.assertEqual(classification["status"], "blocked_prior_reject")
+        self.assertIn("reject_or_rework", classification["reason"])
+        self.assertEqual(classification["matches"][0]["delta_pp"], -2.22)
 
     def test_render_markdown_handles_preflight_only_rows_without_gate(self):
         markdown = gate.render_markdown(
