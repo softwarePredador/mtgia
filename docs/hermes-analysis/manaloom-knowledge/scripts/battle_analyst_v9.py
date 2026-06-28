@@ -554,6 +554,12 @@ def change_life(player, delta):
     changed = _change_life(player, delta, emit_replay_event=emit_replay_event)
     if changed and life_before is not None:
         _record_life_lost_this_turn(player, life_before)
+        refresh_life_total_threshold_statics_for_player(
+            player,
+            turn=CURRENT_REPLAY_TURN,
+            phase="life_change",
+            emit_events=True,
+        )
     return changed
 
 
@@ -562,11 +568,25 @@ def deal_damage(player, amount, source=None):
     dealt = _deal_damage(player, amount, emit_replay_event=emit_replay_event, source=source)
     if dealt and life_before is not None:
         _record_life_lost_this_turn(player, life_before)
+        refresh_life_total_threshold_statics_for_player(
+            player,
+            turn=CURRENT_REPLAY_TURN,
+            phase="damage",
+            emit_events=True,
+        )
     return dealt
 
 
 def gain_life(player, amount, cap=40):
-    return _gain_life(player, amount, cap=cap, emit_replay_event=emit_replay_event)
+    gained = _gain_life(player, amount, cap=cap, emit_replay_event=emit_replay_event)
+    if gained:
+        refresh_life_total_threshold_statics_for_player(
+            player,
+            turn=CURRENT_REPLAY_TURN,
+            phase="gain_life",
+            emit_events=True,
+        )
+    return gained
 
 
 def clear_turn_scoped_permanent_flags(all_players):
@@ -4139,6 +4159,29 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:9fd2ff72170533330fc8ba9165bd99b4",
         }
     ),
+    "Serra Ascendant": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 1.0,
+            "effect": "creature",
+            "mana_cost": "{W}",
+            "colors": ["W"],
+            "type_line": "Creature - Human Monk",
+            "power": 1,
+            "toughness": 1,
+            "base_power": 1,
+            "base_toughness": 1,
+            "subtypes": ["Human", "Monk"],
+            "lifelink": True,
+            "life_total_threshold": 30,
+            "life_total_threshold_power_bonus": 5,
+            "life_total_threshold_toughness_bonus": 5,
+            "life_total_threshold_grants": ["flying"],
+            "battle_model_scope": "controller_life_total_30_plus_self_plus_5_5_flying_static_v1",
+            "_rule_oracle_hash": "a08a773363e4484f37512d57594b56eb",
+            "_rule_logical_key": "battle_rule_v1:c3124030acfa1668606aca59dbbb7e2e",
+        }
+    ),
     "The Walls of Ba Sing Se": handcrafted_runtime_rule(
         {
             "ability_kind": "static",
@@ -4429,6 +4472,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Boros Reckoner",
     "Stuffy Doll",
     "Slickshot Show-Off",
+    "Serra Ascendant",
     "The Walls of Ba Sing Se",
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
@@ -4567,6 +4611,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed flying, haste, noncreature-spell self pump, and plot metadata.",
         ["manaloom_log_learning_audit_20260628_v22_after_stuffy_doll_runtime", "SlickshotShowOff.java"],
         "2026-06-29T00:40:00Z",
+    ),
+    "Serra Ascendant": manual_runtime_waiver_metadata(
+        "Replace review_only runtime gap with XMage-backed lifelink body and controller-life-threshold +5/+5 flying static.",
+        ["manaloom_log_learning_audit_20260628_v24_after_walls_runtime", "SerraAscendant.java"],
+        "2026-06-29T01:20:00Z",
     ),
     "The Walls of Ba Sing Se": manual_runtime_waiver_metadata(
         "Replace review_only runtime gap with XMage-backed defender body and other-controlled-permanents indestructible static.",
@@ -6633,7 +6682,7 @@ class Player:
             if any(amount > 0 for amount in colors.values())
         }
         if life_payment:
-            self.life -= life_payment
+            change_life(self, -life_payment)
         return True
 
     def spend_card_mana(self, card, additional_generic=0):
@@ -25674,6 +25723,144 @@ def refresh_all_controlled_static_indestructible(
     return refreshed
 
 
+def _life_threshold_int(value, default=0):
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return default
+
+
+def life_total_threshold_static_is_active(permanent, controller):
+    threshold = _life_threshold_int(permanent.get("life_total_threshold"), default=0)
+    if threshold <= 0 or controller is None:
+        return False
+    return _life_threshold_int(getattr(controller, "life", 0), default=0) >= threshold
+
+
+def apply_life_total_threshold_source_static(
+    permanent,
+    controller,
+    *,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    if not isinstance(permanent, dict) or not permanent.get("life_total_threshold"):
+        return False
+    if not is_battlefield_creature(permanent):
+        return False
+    if "life_total_threshold_base_power" not in permanent:
+        permanent["life_total_threshold_base_power"] = _life_threshold_int(
+            permanent.get("base_power", permanent.get("power")),
+            default=1,
+        )
+    if "life_total_threshold_base_toughness" not in permanent:
+        permanent["life_total_threshold_base_toughness"] = _life_threshold_int(
+            permanent.get("base_toughness", permanent.get("toughness")),
+            default=permanent["life_total_threshold_base_power"],
+        )
+
+    base_power = permanent["life_total_threshold_base_power"]
+    base_toughness = permanent["life_total_threshold_base_toughness"]
+    power_bonus = _life_threshold_int(permanent.get("life_total_threshold_power_bonus"), default=0)
+    toughness_bonus = _life_threshold_int(permanent.get("life_total_threshold_toughness_bonus"), default=0)
+    grants = [
+        str(keyword).strip()
+        for keyword in permanent.get("life_total_threshold_grants", []) or []
+        if str(keyword).strip()
+    ]
+    active = life_total_threshold_static_is_active(permanent, controller)
+    was_active = bool(permanent.get("_life_total_threshold_active"))
+    before = {
+        "power": permanent.get("power"),
+        "toughness": permanent.get("toughness"),
+        "grants": {
+            keyword: bool(permanent.get(keyword))
+            for keyword in grants
+        },
+    }
+
+    if active:
+        permanent["power"] = base_power + power_bonus
+        permanent["toughness"] = base_toughness + toughness_bonus
+        original_keywords = permanent.setdefault("_life_total_threshold_original_keywords", {})
+        applied = []
+        for keyword in grants:
+            original_keywords.setdefault(keyword, bool(permanent.get(keyword)))
+            permanent[keyword] = True
+            applied.append(keyword)
+        permanent["_life_total_threshold_grants_applied"] = applied
+        if "haste" in applied:
+            permanent["summoning_sick"] = False
+    else:
+        permanent["power"] = base_power
+        permanent["toughness"] = base_toughness
+        original_keywords = permanent.get("_life_total_threshold_original_keywords", {})
+        for keyword in permanent.get("_life_total_threshold_grants_applied", []) or grants:
+            if original_keywords.get(keyword):
+                permanent[keyword] = True
+            else:
+                permanent[keyword] = False
+        permanent["_life_total_threshold_grants_applied"] = []
+
+    permanent["_life_total_threshold_active"] = active
+    after = {
+        "power": permanent.get("power"),
+        "toughness": permanent.get("toughness"),
+        "grants": {
+            keyword: bool(permanent.get(keyword))
+            for keyword in grants
+        },
+    }
+    if emit_event and (active != was_active or after != before):
+        emit_replay_event(
+            "static_life_total_threshold_state_changed",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            threshold=_life_threshold_int(permanent.get("life_total_threshold"), default=0),
+            controller_life=getattr(controller, "life", None),
+            active=active,
+            power_before=before["power"],
+            power_after=after["power"],
+            toughness_before=before["toughness"],
+            toughness_after=after["toughness"],
+            grants=grants,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+    return active
+
+
+def refresh_life_total_threshold_statics_for_player(
+    player,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    refreshed = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict) or not permanent.get("life_total_threshold"):
+            continue
+        active = apply_life_total_threshold_source_static(
+            permanent,
+            player,
+            turn=turn,
+            phase=phase,
+            emit_event=emit_events,
+        )
+        refreshed.append(
+            {
+                "card": permanent.get("name", "?"),
+                "active": active,
+                "power": permanent.get("power"),
+                "toughness": permanent.get("toughness"),
+            }
+        )
+    return refreshed
+
+
 def prepare_entering_permanent(permanent, controller=None, all_players=None, turn=None):
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
@@ -25720,6 +25907,13 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
             )
         except (TypeError, ValueError):
             permanent["toughness"] = permanent["power"] or 1
+        apply_life_total_threshold_source_static(
+            permanent,
+            controller,
+            turn=turn,
+            phase="enter_battlefield",
+            emit_event=True,
+        )
     elif enters_tapped:
         permanent["tapped"] = True
     return permanent
@@ -26316,7 +26510,7 @@ def activate_land_tutor_creatures(player, turn, opponents=None):
                 )
                 continue
             if life_cost > 0:
-                player.life -= life_cost
+                change_life(player, -life_cost)
             if permanent.get("activation_requires_tap"):
                 permanent["tapped"] = True
             if permanent in player.battlefield:
@@ -38741,7 +38935,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             if burden_counters > 0:
                 life_before = player.life
                 if not player.life_cant_change:
-                    player.life -= burden_counters
+                    change_life(player, -burden_counters)
                 emit_replay_event(
                     "one_ring_burden_life_loss",
                     player=player.name,
