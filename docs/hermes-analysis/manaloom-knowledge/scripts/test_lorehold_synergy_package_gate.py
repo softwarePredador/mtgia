@@ -996,6 +996,111 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertIn("rummage-to-top +3", gate.strategic_delta_text(payload))
         self.assertIn("spell-rummage-to-top +3", gate.strategic_delta_text(payload))
 
+    def test_package_exposure_summary_marks_added_card_used(self):
+        payload = {
+            "baseline": {
+                "games": 3,
+                "telemetry": {
+                    "card_event_counts": {
+                        "spell_cast:Arcane Signet": 2,
+                        "cost_paid:Arcane Signet": 2,
+                    },
+                },
+            },
+            "candidate": {
+                "games": 3,
+                "telemetry": {
+                    "card_event_counts": {
+                        "spell_cast:Mana Vault": 2,
+                        "cost_paid:Mana Vault": 2,
+                    },
+                    "card_strategy_counts": {
+                        "cost_paid:Mana Vault": 2,
+                    },
+                },
+            },
+        }
+
+        exposure = gate.package_exposure_summary(
+            payload,
+            adds=["Mana Vault"],
+            cuts=["Arcane Signet"],
+        )
+
+        self.assertEqual(exposure["status"], "candidate_added_cards_used")
+        self.assertFalse(exposure["low_candidate_added_card_use"])
+        self.assertEqual(
+            exposure["candidate_added_cards"]["cards"][0]["recorded_use_count"],
+            4,
+        )
+        self.assertEqual(
+            exposure["baseline_cut_cards"]["cards"][0]["recorded_use_count"],
+            4,
+        )
+
+    def test_gate_decision_is_inconclusive_when_added_card_never_used(self):
+        gate_summary = {
+            "baseline": {"wins": 0, "losses": 3, "win_rate": 0.0, "telemetry": {}},
+            "candidate": {"wins": 3, "losses": 0, "win_rate": 100.0, "telemetry": {}},
+            "delta_pp": 100.0,
+        }
+        exposure = gate.package_exposure_summary(
+            gate_summary,
+            adds=["Mana Vault"],
+            cuts=["Arcane Signet"],
+        )
+
+        self.assertEqual(gate.gate_decision(gate_summary, exposure), "inconclusive_low_exposure")
+
+    def test_prior_evidence_reject_is_downgraded_when_exposure_shows_no_use(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            prior = Path(tmp) / "prior.json"
+            prior.write_text(
+                json.dumps(
+                    {
+                        "packages": [
+                            {
+                                "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+                                "adds": ["Mana Vault"],
+                                "cuts": ["Arcane Signet"],
+                                "decision": "reject_or_rework",
+                                "gate_summary": {
+                                    "baseline": {"wins": 3, "losses": 0, "win_rate": 100.0},
+                                    "candidate": {"wins": 0, "losses": 3, "win_rate": 0.0},
+                                    "delta_pp": -100.0,
+                                },
+                                "exposure_summary": {
+                                    "low_candidate_added_card_use": True,
+                                    "status": "candidate_added_card_low_exposure",
+                                    "candidate_added_cards": {
+                                        "cards": [
+                                            {
+                                                "card_name": "Mana Vault",
+                                                "recorded_use_count": 0,
+                                            }
+                                        ]
+                                    },
+                                },
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            prior_results = gate.load_prior_package_results([prior])
+            classification = gate.classify_package_prior_evidence(
+                "mana_vault_fast_mana_cut_arcane_signet",
+                gate.PACKAGE_DEFINITIONS["mana_vault_fast_mana_cut_arcane_signet"],
+                prior_results,
+            )
+
+        self.assertEqual(classification["status"], "seen_no_blocker")
+        self.assertEqual(
+            classification["matches"][0]["decision"],
+            "inconclusive_low_exposure",
+        )
+
     def test_runtime_package_rules_deprecate_review_only_shadows(self):
         with tempfile.TemporaryDirectory() as tmp:
             proposals = Path(tmp) / "proposals.json"

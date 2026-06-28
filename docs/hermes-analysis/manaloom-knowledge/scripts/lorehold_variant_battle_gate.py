@@ -44,6 +44,7 @@ CARD_EXPOSURE_EVENTS = {
     "board_wipe_resolved",
     "cost_paid",
     "draw_cards_resolved",
+    "land_played",
     "miracle_cast",
     "recursion_resolved",
     "removal_resolved",
@@ -52,8 +53,10 @@ CARD_EXPOSURE_EVENTS = {
     "topdeck_manipulation_activated",
     "treasure_created",
     "trigger_resolved",
+    "utility_artifact_activated",
+    "utility_land_activated",
 }
-FOCUS_TRACE_CARDS = {
+BASE_FOCUS_TRACE_CARDS = {
     "Urza's Saga",
     "Library of Leng",
     "Sensei's Divining Top",
@@ -79,6 +82,20 @@ FOCUS_TRACE_EVENTS = {
     "trigger_skipped",
     "utility_artifact_activated",
 }
+
+
+def focus_trace_cards() -> set[str]:
+    cards = set(BASE_FOCUS_TRACE_CARDS)
+    raw = os.environ.get("MANALOOM_FOCUS_ACCESS_CARDS", "")
+    if not raw:
+        return cards
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        parsed = [part.strip() for part in raw.split("|") if part.strip()]
+    if isinstance(parsed, list):
+        cards.update(str(item).strip() for item in parsed if str(item).strip())
+    return cards
 
 
 class GameTimeoutError(TimeoutError):
@@ -474,18 +491,19 @@ class GateTelemetry:
         self.squee_trace_samples.append(trace)
 
     def _focus_card_matches(self, event: str, data: Mapping[str, Any]) -> list[str]:
+        focus_cards = focus_trace_cards()
         if event == "focus_card_access_snapshot":
             zones = data.get("focus_card_zones") or {}
             if isinstance(zones, Mapping):
                 return sorted(
                     card
-                    for card in FOCUS_TRACE_CARDS
+                    for card in focus_cards
                     if card in zones and (zones.get(card) or {}).get("zone") != "absent"
                 )
         raw = json.dumps(data, sort_keys=True, default=str)
         matches = {
             card
-            for card in FOCUS_TRACE_CARDS
+            for card in focus_cards
             if card in raw or data.get("card") == card
         }
         if event == "lorehold_upkeep_rummage" and data.get("player") == "Lorehold":

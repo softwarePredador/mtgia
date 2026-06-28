@@ -1246,11 +1246,30 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
                 continue
             gate = result.get("gate_summary") or {}
             aggregate = result.get("aggregate") or {}
-            decision = str(
-                result.get("decision")
-                or aggregate.get("decision")
-                or gate_decision(gate)
-            )
+            exposure = result.get("exposure_summary") or {}
+            if not exposure and result.get("gate_json"):
+                detailed_gate_path = Path(str(result.get("gate_json")))
+                if detailed_gate_path.exists():
+                    try:
+                        detailed_gate = summarize_gate(
+                            load_gate_result(detailed_gate_path),
+                            f"synergy_{result.get('package_key')}",
+                        )
+                        exposure = package_exposure_summary(
+                            detailed_gate,
+                            adds=list(result.get("adds") or []),
+                            cuts=list(result.get("cuts") or []),
+                        )
+                        if not gate:
+                            gate = detailed_gate
+                    except Exception:
+                        exposure = {}
+            raw_decision = str(result.get("decision") or aggregate.get("decision") or "")
+            exposure_decision = gate_decision(gate, exposure)
+            if exposure.get("low_candidate_added_card_use"):
+                decision = exposure_decision
+            else:
+                decision = raw_decision or exposure_decision
             baseline = gate.get("baseline") or {}
             candidate = gate.get("candidate") or {}
             package_result = {
@@ -1266,6 +1285,7 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
                 "baseline": compact_side(baseline),
                 "candidate": compact_side(candidate),
                 "strategic_delta": strategic_delta(gate) if gate else {},
+                "exposure_summary": exposure,
                 "gate_json": result.get("gate_json"),
                 "gate_markdown": result.get("gate_markdown"),
                 "gate_returncode": result.get("gate_returncode"),
@@ -1853,6 +1873,7 @@ def run_gate(
     source_db: Path,
     candidate_db: Path,
     package_key: str,
+    focus_cards: list[str] | None = None,
     games: int,
     opponent_limit: int,
     opponent_seed: int,
@@ -1898,6 +1919,11 @@ def run_gate(
         cmd.append("--no-game-checkpoint")
     env = dict(os.environ)
     env["PYTHONHASHSEED"] = "0"
+    if focus_cards:
+        env["MANALOOM_FOCUS_ACCESS_CARDS"] = json.dumps(
+            sorted({str(card).strip() for card in focus_cards if str(card).strip()}),
+            ensure_ascii=False,
+        )
     timeout = float(gate_timeout_seconds or 0.0)
     if timeout <= 0:
         total_games = max(1, games) * max(1, opponent_limit)
@@ -1952,6 +1978,11 @@ def compact_gate_telemetry(telemetry: dict[str, Any]) -> dict[str, Any]:
         "strategic_event_counts": telemetry.get("strategic_event_counts") or {},
         "strategic_games": telemetry.get("strategic_games") or {},
         "event_counts": telemetry.get("event_counts") or {},
+        "card_event_counts": telemetry.get("card_event_counts") or {},
+        "card_strategy_counts": telemetry.get("card_strategy_counts") or {},
+        "focus_card_trace_card_counts_by_game": (
+            telemetry.get("focus_card_trace_card_counts_by_game") or {}
+        ),
         "top_cards": telemetry.get("top_cards") or [],
         "lorehold_attack_restrictions": telemetry.get("lorehold_attack_restrictions") or {},
         "lorehold_attack_restriction_source_events": (
@@ -2035,11 +2066,119 @@ def strategic_delta_text(gate: dict[str, Any]) -> str:
     return ", ".join(f"{labels[key]} {value:+d}" for key, value in delta.items())
 
 
-def gate_decision(gate: dict[str, Any]) -> str:
+def card_event_breakdown(telemetry: dict[str, Any], card_name: str) -> dict[str, int]:
+    breakdown: dict[str, int] = {}
+    counts = telemetry.get("card_event_counts") or {}
+    if isinstance(counts, dict):
+        for key, value in counts.items():
+            prefix, separator, name = str(key).partition(":")
+            if not separator or name != card_name:
+                continue
+            breakdown[prefix] = breakdown.get(prefix, 0) + int(value or 0)
+    if breakdown:
+        return dict(sorted(breakdown.items()))
+    counts = telemetry.get("card_strategy_counts") or {}
+    if isinstance(counts, dict):
+        for key, value in counts.items():
+            prefix, separator, name = str(key).partition(":")
+            if not separator or name != card_name:
+                continue
+            breakdown[prefix] = breakdown.get(prefix, 0) + int(value or 0)
+    return dict(sorted(breakdown.items()))
+
+
+def focus_location_trace_count(telemetry: dict[str, Any], card_name: str) -> tuple[int, int]:
+    by_game = telemetry.get("focus_card_trace_card_counts_by_game") or {}
+    if not isinstance(by_game, dict):
+        return 0, 0
+    total = 0
+    games = 0
+    for counts in by_game.values():
+        if not isinstance(counts, dict):
+            continue
+        count = int(counts.get(card_name) or 0)
+        total += count
+        if count > 0:
+            games += 1
+    return total, games
+
+
+def side_card_exposure(row: dict[str, Any], cards: list[str]) -> dict[str, Any]:
+    telemetry = row.get("telemetry") or {}
+    summaries: list[dict[str, Any]] = []
+    for card_name in cards:
+        event_breakdown = card_event_breakdown(telemetry, card_name)
+        recorded_use_count = sum(event_breakdown.values())
+        location_trace_count, location_trace_games = focus_location_trace_count(telemetry, card_name)
+        summaries.append(
+            {
+                "card_name": card_name,
+                "recorded_use_count": recorded_use_count,
+                "event_breakdown": event_breakdown,
+                "location_trace_count": location_trace_count,
+                "location_trace_games": location_trace_games,
+                "status": "used" if recorded_use_count > 0 else "no_recorded_use",
+            }
+        )
+    return {
+        "cards": summaries,
+        "card_count": len(cards),
+        "cards_with_recorded_use": sum(
+            1 for item in summaries if int(item.get("recorded_use_count") or 0) > 0
+        ),
+        "total_recorded_use_count": sum(
+            int(item.get("recorded_use_count") or 0) for item in summaries
+        ),
+        "all_cards_used": all(
+            int(item.get("recorded_use_count") or 0) > 0 for item in summaries
+        )
+        if summaries
+        else True,
+    }
+
+
+def package_exposure_summary(
+    gate: dict[str, Any],
+    *,
+    adds: list[str],
+    cuts: list[str],
+) -> dict[str, Any]:
+    candidate = gate.get("candidate") or {}
+    baseline = gate.get("baseline") or {}
+    candidate_added = side_card_exposure(candidate, adds)
+    baseline_cut = side_card_exposure(baseline, cuts)
+    return {
+        "candidate_added_cards": candidate_added,
+        "baseline_cut_cards": baseline_cut,
+        "low_candidate_added_card_use": not bool(candidate_added.get("all_cards_used", True)),
+        "status": (
+            "candidate_added_cards_used"
+            if candidate_added.get("all_cards_used", True)
+            else "candidate_added_card_low_exposure"
+        ),
+    }
+
+
+def exposure_summary_text(exposure: dict[str, Any]) -> str:
+    candidate = exposure.get("candidate_added_cards") or {}
+    cards = candidate.get("cards") or []
+    if not cards:
+        return "-"
+    parts = [
+        f"{item.get('card_name')} use={int(item.get('recorded_use_count') or 0)}"
+        for item in cards
+    ]
+    status = exposure.get("status") or "unknown"
+    return f"{status}: " + ", ".join(parts)
+
+
+def gate_decision(gate: dict[str, Any], exposure: dict[str, Any] | None = None) -> str:
     baseline = gate.get("baseline") or {}
     candidate = gate.get("candidate") or {}
     if not baseline or not candidate:
         return "invalid_or_incomplete"
+    if exposure and exposure.get("low_candidate_added_card_use"):
+        return "inconclusive_low_exposure"
 
     baseline_wins = int(baseline.get("wins") or 0)
     baseline_losses = int(baseline.get("losses") or 0)
@@ -2082,8 +2221,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- prior_package_reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         f"- package_status_counts: `{json.dumps(payload.get('package_status_counts') or {}, sort_keys=True)}`",
         "",
-        "| Package | Family | Adds | Cuts | Preflight | Baseline | Candidate | Delta | Strategic Delta | Decision |",
-        "| --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
+        "| Package | Family | Adds | Cuts | Preflight | Baseline | Candidate | Delta | Strategic Delta | Exposure | Decision |",
+        "| --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- |",
     ]
     for result in payload["packages"]:
         preflight = (result.get("cut_safety") or {}).get("status") or "not_checked"
@@ -2097,7 +2236,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "apply_ready",
         }:
             lines.append(
-                "| {key} | {family} | {adds} | {cuts} | `{preflight}` | - | - | +0.00 | - | {status} |".format(
+                "| {key} | {family} | {adds} | {cuts} | `{preflight}` | - | - | +0.00 | - | - | {status} |".format(
                     key=result["package_key"],
                     family=result.get("family") or "-",
                     adds=", ".join(result["adds"]),
@@ -2111,10 +2250,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         baseline = gate.get("baseline") or {}
         candidate = gate.get("candidate") or {}
         delta = float(gate.get("delta_pp") or 0.0)
-        decision = gate_decision(gate)
+        exposure = result.get("exposure_summary") or {}
+        decision = gate_decision(gate, exposure)
         lines.append(
             "| {key} | {family} | {adds} | {cuts} | `{preflight}` | {bw}/{bl}/{bs} `{bwr:.2f}%` | "
-            "{cw}/{cl}/{cs} `{cwr:.2f}%` | {delta:+.2f} | {strategic} | {decision} |".format(
+            "{cw}/{cl}/{cs} `{cwr:.2f}%` | {delta:+.2f} | {strategic} | {exposure} | {decision} |".format(
                 key=result["package_key"],
                 family=result.get("family") or "-",
                 adds=", ".join(result["adds"]),
@@ -2130,6 +2270,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 cwr=float(candidate.get("win_rate") or 0.0),
                 delta=delta,
                 strategic=strategic_delta_text(gate),
+                exposure=exposure_summary_text(exposure),
                 decision=decision,
             )
         )
@@ -2147,6 +2288,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- allow_miracle_core_cuts: `{result.get('candidate_meta', {}).get('allow_miracle_core_cuts')}`",
                 f"- miracle_core_cuts: `{', '.join(result.get('candidate_meta', {}).get('miracle_core_cuts') or []) or '-'}`",
                 f"- added_rule_counts: `{json.dumps(result.get('candidate_meta', {}).get('added_rule_counts') or {}, sort_keys=True)}`",
+                f"- exposure_summary: `{json.dumps(result.get('exposure_summary') or {}, sort_keys=True)}`",
                 f"- candidate_db: `{result.get('candidate_db') or '-'}`",
                 f"- gate_markdown: `{result.get('gate_markdown') or '-'}`",
                 f"- gate_json: `{result.get('gate_json') or '-'}`",
@@ -2363,6 +2505,7 @@ def main() -> int:
             source_db=source_db,
             candidate_db=candidate_db,
             package_key=package_key,
+            focus_cards=list(definition["adds"]) + list(definition["cuts"]),
             games=max(1, args.games),
             opponent_limit=max(1, args.opponent_limit),
             opponent_seed=args.opponent_seed,
@@ -2381,6 +2524,15 @@ def main() -> int:
                 load_gate_result(gate_json),
                 f"synergy_{package_key}",
             )
+        exposure_summary = (
+            package_exposure_summary(
+                gate_summary,
+                adds=list(definition["adds"]),
+                cuts=list(definition["cuts"]),
+            )
+            if gate_summary
+            else {}
+        )
         result = {
             "package_key": package_key,
             "family": definition.get("family") or "misc",
@@ -2398,6 +2550,7 @@ def main() -> int:
             "gate_stdout_tail": completed.stdout[-2000:],
             "gate_stderr_tail": completed.stderr[-2000:],
             "gate_summary": gate_summary,
+            "exposure_summary": exposure_summary,
         }
         results.append(result)
         print(json.dumps(result, ensure_ascii=False, indent=2), flush=True)

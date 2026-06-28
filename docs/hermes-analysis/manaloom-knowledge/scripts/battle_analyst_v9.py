@@ -6395,7 +6395,7 @@ def _opening_hand_summary(hand):
     ]
 
 
-FOCUS_ACCESS_CARD_NAMES = (
+BASE_FOCUS_ACCESS_CARD_NAMES = (
     "Urza's Saga",
     "Library of Leng",
     "Sensei's Divining Top",
@@ -6407,6 +6407,22 @@ FOCUS_ACCESS_CARD_NAMES = (
 )
 
 
+def focus_access_card_names():
+    names = list(BASE_FOCUS_ACCESS_CARD_NAMES)
+    raw = os.environ.get("MANALOOM_FOCUS_ACCESS_CARDS", "")
+    if raw:
+        try:
+            parsed = json.loads(raw)
+        except json.JSONDecodeError:
+            parsed = [part.strip() for part in raw.split("|") if part.strip()]
+        if isinstance(parsed, list):
+            for item in parsed:
+                name = str(item).strip()
+                if name and name not in names:
+                    names.append(name)
+    return tuple(names)
+
+
 def _zone_card_name(card):
     if isinstance(card, dict):
         return str(card.get("name") or card.get("card_name") or "?")
@@ -6414,7 +6430,7 @@ def _zone_card_name(card):
 
 
 def _focus_zone_names(cards):
-    focus = set(FOCUS_ACCESS_CARD_NAMES)
+    focus = set(focus_access_card_names())
     return [
         _zone_card_name(card)
         for card in cards or []
@@ -6424,10 +6440,11 @@ def _focus_zone_names(cards):
 
 def focus_card_zone_snapshot(player):
     """Trace-only location summary for Lorehold engine cards."""
-    focus = set(FOCUS_ACCESS_CARD_NAMES)
+    focus_names = focus_access_card_names()
+    focus = set(focus_names)
     zones = {
         card_name: {"zone": "absent"}
-        for card_name in FOCUS_ACCESS_CARD_NAMES
+        for card_name in focus_names
     }
     zone_sources = (
         ("hand", getattr(player, "hand", []) or []),
