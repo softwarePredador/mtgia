@@ -4139,6 +4139,27 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:9fd2ff72170533330fc8ba9165bd99b4",
         }
     ),
+    "The Walls of Ba Sing Se": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 8.0,
+            "effect": "creature",
+            "artifact": True,
+            "legendary": True,
+            "mana_cost": "{8}",
+            "type_line": "Legendary Artifact Creature - Wall",
+            "power": 0,
+            "toughness": 30,
+            "subtypes": ["Wall"],
+            "defender": True,
+            "other_permanents_you_control_have_indestructible": True,
+            "static_grants": ["indestructible"],
+            "static_grant_scope": "other_permanents_you_control",
+            "battle_model_scope": "other_permanents_you_control_have_indestructible_static_v1",
+            "_rule_oracle_hash": "3eda937f066b2e5ab8fff222caecafab",
+            "_rule_logical_key": "battle_rule_v1:1e5bcf3b45fcae347879976d74d2ef84",
+        }
+    ),
     "Ancient Copper Dragon": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4408,6 +4429,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Boros Reckoner",
     "Stuffy Doll",
     "Slickshot Show-Off",
+    "The Walls of Ba Sing Se",
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
     "Wild Ricochet",
@@ -4545,6 +4567,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed flying, haste, noncreature-spell self pump, and plot metadata.",
         ["manaloom_log_learning_audit_20260628_v22_after_stuffy_doll_runtime", "SlickshotShowOff.java"],
         "2026-06-29T00:40:00Z",
+    ),
+    "The Walls of Ba Sing Se": manual_runtime_waiver_metadata(
+        "Replace review_only runtime gap with XMage-backed defender body and other-controlled-permanents indestructible static.",
+        ["manaloom_log_learning_audit_20260628_v23_after_slickshot_showoff_runtime", "TheWallsOfBaSingSe.java"],
+        "2026-06-29T01:00:00Z",
     ),
     "Ancient Copper Dragon": manual_runtime_waiver_metadata(
         "Replace passive review_only evidence with XMage-backed combat-damage d20 Treasure trigger semantics.",
@@ -8431,6 +8458,17 @@ def move_removed_permanent_to_destination(
             all_players=all_players,
         )
     else:
+        if isinstance(target, dict) and target.get("indestructible"):
+            emit_replay_event(
+                "removal_prevented_by_indestructible",
+                player=getattr(target_controller, "name", "?"),
+                card=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+                target=target.get("name", "?"),
+                destination=destination,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            return "none"
         move_permanent_from_battlefield(
             target_controller,
             target,
@@ -12364,6 +12402,12 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
     )
     if "sacrifice" in str(reason or "").lower():
         owner.record_permanent_sacrificed(creature, CURRENT_REPLAY_TURN)
+    refresh_controlled_static_indestructible(
+        owner,
+        turn=CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
     return destination
 
 
@@ -12406,6 +12450,12 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
             turn=CURRENT_REPLAY_TURN,
             source_event=str(reason or "battlefield_to_graveyard"),
         )
+    refresh_controlled_static_indestructible(
+        owner,
+        turn=CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
     return destination
 
 
@@ -12525,10 +12575,21 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
     target_type = str(effect_data.get("target") or "").lower()
     if not target_type:
         target_type = "creature" if effect == "remove_creature" else "nonland_permanent"
+    refresh_controlled_static_indestructible(
+        player,
+        phase="target_selection",
+    )
+    destroy_to_graveyard = removal_destination(effect_data) == "graveyard"
 
     candidates = []
     for card in player.battlefield:
         if not isinstance(card, dict):
+            continue
+        if (
+            destroy_to_graveyard
+            and card.get("indestructible")
+            and not effect_data.get("uses_stat_modifier_removal")
+        ):
             continue
         if not is_legal_target(
             source or effect_data,
@@ -25495,6 +25556,124 @@ def apply_as_enters_choose_player_static(
     return permanent["chosen_player_name"]
 
 
+def controlled_static_indestructible_sources(controller):
+    sources = []
+    for source in getattr(controller, "battlefield", []) or []:
+        if not isinstance(source, dict):
+            continue
+        if source.get("other_permanents_you_control_have_indestructible"):
+            sources.append(source)
+    return sources
+
+
+def apply_controlled_static_indestructible_to_permanent(
+    permanent,
+    controller,
+    *,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    if not isinstance(permanent, dict) or controller is None:
+        return False
+    source = next(
+        (
+            candidate
+            for candidate in controlled_static_indestructible_sources(controller)
+            if candidate is not permanent
+        ),
+        None,
+    )
+    had_static = bool(permanent.get("static_indestructible_source"))
+    if source is None:
+        if had_static:
+            original = bool(permanent.pop("static_indestructible_original", False))
+            permanent["indestructible"] = original
+            source_name = permanent.pop("static_indestructible_source", None)
+            permanent.pop("static_indestructible_rule_key", None)
+            if emit_event:
+                emit_replay_event(
+                    "static_indestructible_removed",
+                    player=getattr(controller, "name", "?"),
+                    card=permanent.get("name", "?"),
+                    source_card=source_name,
+                    indestructible=bool(permanent.get("indestructible")),
+                    turn=turn,
+                    phase=phase,
+                )
+        return False
+
+    if "static_indestructible_original" not in permanent:
+        permanent["static_indestructible_original"] = bool(permanent.get("indestructible"))
+    permanent["indestructible"] = True
+    permanent["static_indestructible_source"] = source.get("name", "?")
+    permanent["static_indestructible_rule_key"] = source.get("_rule_logical_key")
+    if emit_event and not had_static:
+        emit_replay_event(
+            "static_indestructible_applied",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            source_card=source.get("name", "?"),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(source),
+        )
+    return True
+
+
+def refresh_controlled_static_indestructible(
+    controller,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    refreshed = []
+    for permanent in list(getattr(controller, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        active = apply_controlled_static_indestructible_to_permanent(
+            permanent,
+            controller,
+            turn=turn,
+            phase=phase,
+            emit_event=emit_events,
+        )
+        if active or permanent.get("static_indestructible_source"):
+            refreshed.append(
+                {
+                    "card": permanent.get("name", "?"),
+                    "indestructible": bool(permanent.get("indestructible")),
+                    "source": permanent.get("static_indestructible_source"),
+                }
+            )
+    return refreshed
+
+
+def refresh_all_controlled_static_indestructible(
+    participants,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    refreshed = []
+    seen = set()
+    for participant in participants or []:
+        if participant is None or id(participant) in seen:
+            continue
+        seen.add(id(participant))
+        refreshed.extend(
+            refresh_controlled_static_indestructible(
+                participant,
+                turn=turn,
+                phase=phase,
+                emit_events=emit_events,
+            )
+        )
+    return refreshed
+
+
 def prepare_entering_permanent(permanent, controller=None, all_players=None, turn=None):
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
@@ -25515,6 +25694,13 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         controller,
         all_players,
         turn=turn,
+    )
+    apply_controlled_static_indestructible_to_permanent(
+        permanent,
+        controller,
+        turn=turn,
+        phase="enter_battlefield",
+        emit_event=True,
     )
     if is_battlefield_creature(permanent):
         permanent["haste"] = has_haste(permanent)
@@ -28353,6 +28539,12 @@ def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, e
 
 
 def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
+    refresh_all_controlled_static_indestructible(
+        [player, *list(opponents)],
+        turn=turn,
+        phase="damage_wipe_treasure",
+        emit_events=True,
+    )
     amount = int(effect_data.get("damage") or effect_data.get("average_damage") or 6)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
@@ -28467,6 +28659,12 @@ def damage_wipe_amount(player, card, effect_data):
 
 
 def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spell=True):
+    refresh_all_controlled_static_indestructible(
+        [player, *list(opponents)],
+        turn=turn,
+        phase="damage_wipe",
+        emit_events=True,
+    )
     amount = damage_wipe_amount(player, card, effect_data)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
@@ -33617,6 +33815,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 c_copy["summoning_sick"] = not c_copy["haste"]
                 c_copy["tapped"] = False
                 player.battlefield.append(c_copy)
+                refresh_controlled_static_indestructible(
+                    player,
+                    turn=turn,
+                    phase=phase,
+                    emit_events=True,
+                )
                 emit_replay_event(
                     "creature_cast",
                     player=player.name,
@@ -34230,6 +34434,12 @@ def apply_effect_immediate(
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "creature"
         player.battlefield.append(permanent)
+        refresh_controlled_static_indestructible(
+            player,
+            turn=turn,
+            phase=phase or "resolution",
+            emit_events=True,
+        )
         resolve_generic_permanent_etb(
             player,
             opponents,
@@ -35020,6 +35230,12 @@ def apply_effect_immediate(
         if effect_data.get("modal_destroy_modes") or effect_data.get("destroy_modes"):
             resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
             return
+        refresh_all_controlled_static_indestructible(
+            [player, *list(opponents)],
+            turn=turn,
+            phase="board_wipe",
+            emit_events=True,
+        )
         destroy_card_types = list(effect_data.get("destroy_card_types") or ["creature"])
         context = board_wipe_decision_context(player, opponents)
         destroyed = 0
