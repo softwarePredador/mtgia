@@ -1,0 +1,82 @@
+{
+  "generated_at": "2026-06-28T10:35:25Z",
+  "mutations_performed": [],
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "status": "read_only_operational_queue_executed_no_deck_swap_ready",
+  "source_operational_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260628_v5_operational_queue.json",
+  "executed_items": [
+    {
+      "rank": 1,
+      "work_key": "runtime_rule_gap_batch",
+      "report": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v7_operational_queue.json",
+      "status": "blocked_by_pg_or_mapper_followup",
+      "summary": {
+        "blocked_runtime_rule_gap_count": 61,
+        "family_count": 5,
+        "ready_for_structured_pull_count": 9,
+        "batch_metadata_candidate_requires_pg_precheck": 2,
+        "split_family_scope_review_required": 7,
+        "mapper_metadata_or_test_scenario_required": 52
+      },
+      "next_blocker": "PG245 Twinflame Tyrant / Verge Rangers precheck cannot run while PostgreSQL target has no response; remaining runtime cards require split-scope or manual mapper/test-scenario work."
+    },
+    {
+      "rank": 2,
+      "work_key": "hand_filter_non_core_cut_search",
+      "report": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260628_v5_operational_queue.json",
+      "status": "no_preflight_benchmark_ready",
+      "summary": {
+        "candidate_count": 5,
+        "evaluated_pair_count": 25,
+        "preflight_benchmark_ready_count": 0,
+        "prior_rejected_pair_count": 2,
+        "prior_rejected_cut_counts": {
+          "big score": 2
+        }
+      },
+      "next_blocker": "Big Score already failed exact hand-filter gates; Esper Sentinel, Monument to Endurance, Rise of the Eldrazi, and other cuts remain core/high-exposure."
+    },
+    {
+      "rank": 3,
+      "work_key": "contextual_tutor_cut_model",
+      "report": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260628_v3_operational_queue.json",
+      "status": "no_direct_tutor_swap_ready",
+      "summary": {
+        "candidate_count": 2,
+        "evaluated_pair_count": 188,
+        "direct_gate_ready_count": 0,
+        "protected_benchmark_required": 72,
+        "blocked": 102
+      },
+      "next_blocker": "The only high-scoring tutor cuts are protected engine cards such as Land Tax, Library of Leng, Scroll Rack, and Sensei's Divining Top; Thor and Creative Technique tutor cuts have prior strong-seed regressions."
+    },
+    {
+      "rank": 4,
+      "work_key": "squee_access_density_model",
+      "report": "docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260628_v4_operational_queue.json",
+      "status": "no_preflight_access_candidate_ready",
+      "summary": {
+        "candidate_count": 5,
+        "evaluated_pair_count": 470,
+        "preflight_access_candidate_ready_count": 0,
+        "manual_review_count": 45,
+        "hidden_retreat_package_status": "prepared_read_only_pending_apply_approval",
+        "hidden_retreat_runtime_model_status": "runtime_proposal_overlay_active"
+      },
+      "next_blocker": "Squee route is modeled only when accessed; Hidden Retreat remains a read-only overlay until approved PG apply/sync, and all current access cuts are cross-lane, protected, or prior-blocked."
+    }
+  ],
+  "postgres_probe": {
+    "report": "docs/hermes-analysis/master_optimizer_reports/pg245_lorehold_topdeck_damage_runtime_20260628_precheck_probe_20260628_103331.json",
+    "status": "postgres_unreachable_pg_isready_no_response",
+    "target": "143.198.230.247:5433/halder"
+  },
+  "recommended_next_actions": [
+    "Do not create a blind Lorehold deck swap from the current queue.",
+    "When PostgreSQL responds, rerun PG245 precheck for Twinflame Tyrant / Verge Rangers and only then consider apply/postcheck/sync.",
+    "Separately prepare PG244 Hidden Retreat precheck/apply/sync if the access-density path is chosen.",
+    "If PostgreSQL remains unavailable, implement one split-scope runtime family or a manual mapper/test scenario from the 61-card runtime gap queue before generating new deck packages.",
+    "A new candidate deck change requires a new non-core cut source; current hand-filter, tutor, and Squee/access cut models do not expose one."
+  ]
+}
