@@ -4182,6 +4182,27 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:c3124030acfa1668606aca59dbbb7e2e",
         }
     ),
+    "Sawhorn Nemesis": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static_replacement",
+            "cmc": 4.0,
+            "effect": "creature",
+            "mana_cost": "{3}{R}",
+            "colors": ["R"],
+            "type_line": "Creature - Dinosaur",
+            "power": 2,
+            "toughness": 4,
+            "subtypes": ["Dinosaur"],
+            "as_enters_choose_player": True,
+            "damage_modifier_applies_to": "chosen_player_or_permanents_they_control",
+            "damage_modifier_targets": ["chosen_player", "chosen_player_permanents"],
+            "damage_modifier_duration": "while_on_battlefield",
+            "damage_multiplier": 2,
+            "battle_model_scope": "chosen_player_or_permanents_they_control_damage_doubled_v1",
+            "_rule_oracle_hash": "93e3f5684069bf77d7219e17f3e04a6c",
+            "_rule_logical_key": "battle_rule_v1:93e3f5684069bf77d7219e17f3e04a6c:sawhorn_nemesis_runtime_v1",
+        }
+    ),
     "The Walls of Ba Sing Se": handcrafted_runtime_rule(
         {
             "ability_kind": "static",
@@ -4473,6 +4494,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Stuffy Doll",
     "Slickshot Show-Off",
     "Serra Ascendant",
+    "Sawhorn Nemesis",
     "The Walls of Ba Sing Se",
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
@@ -4616,6 +4638,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace review_only runtime gap with XMage-backed lifelink body and controller-life-threshold +5/+5 flying static.",
         ["manaloom_log_learning_audit_20260628_v24_after_walls_runtime", "SerraAscendant.java"],
         "2026-06-29T01:20:00Z",
+    ),
+    "Sawhorn Nemesis": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed chosen-player damage-doubling replacement for that player and permanents they control.",
+        ["manaloom_log_learning_audit_20260628_v25_after_serra_ascendant_runtime", "SawhornNemesis.java"],
+        "2026-06-29T01:40:00Z",
     ),
     "The Walls of Ba Sing Se": manual_runtime_waiver_metadata(
         "Replace review_only runtime gap with XMage-backed defender body and other-controlled-permanents indestructible static.",
@@ -28446,6 +28473,9 @@ def damage_amount_from_x_context(effect_data, default=0):
 CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE = (
     "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
 )
+CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE = (
+    "chosen_player_or_permanents_they_control_damage_doubled_v1"
+)
 
 
 def damage_source_reference(source_card, controller):
@@ -28456,45 +28486,62 @@ def damage_source_reference(source_card, controller):
     return source
 
 
-def _static_damage_modifier_effects(controller):
+def _static_damage_modifier_participants(controller, target_controller=None):
+    participants = []
+    seen = set()
+
+    def add(participant):
+        if participant is None or id(participant) in seen:
+            return
+        seen.add(id(participant))
+        participants.append(participant)
+
+    add(controller)
+    add(target_controller)
+    for participant in list(participants):
+        for opponent in getattr(participant, "_current_opponents", []) or []:
+            add(opponent)
+    return participants
+
+
+def _static_damage_modifier_effects(controller, target_controller=None):
     effects = []
     seen_modifier_keys = set()
-    for permanent in getattr(controller, "battlefield", []) or []:
-        if not isinstance(permanent, dict):
-            continue
-        candidates = [permanent]
-        try:
-            resolved = get_card_effect(permanent)
-        except Exception:
-            resolved = {}
-        if isinstance(resolved, dict) and resolved is not permanent:
-            candidates.append({**permanent, **resolved})
-        for effect_data in candidates:
-            if effect_data.get("effect") != "damage_modifier":
+    for modifier_controller in _static_damage_modifier_participants(controller, target_controller):
+        for permanent in getattr(modifier_controller, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
                 continue
-            if (
-                str(effect_data.get("battle_model_scope") or "")
-                != CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE
-            ):
-                continue
-            if effect_data.get("damage_modifier_applies_to") not in (None, "sources_you_control"):
-                continue
-            targets = effect_data.get("damage_modifier_targets") or []
-            if isinstance(targets, str):
-                targets = read_json_list(targets) or [targets]
-            if targets and not {"opponents", "opponent_permanents"}.issubset(set(targets)):
-                continue
-            modifier_key = (
-                permanent.get("name") or effect_data.get("name") or id(permanent),
-                effect_data.get("battle_model_scope"),
-                effect_data.get("damage_modifier_applies_to") or "sources_you_control",
-                tuple(sorted(str(target) for target in targets)),
-                int(effect_data.get("damage_multiplier") or 2),
-            )
-            if modifier_key in seen_modifier_keys:
-                continue
-            seen_modifier_keys.add(modifier_key)
-            effects.append((permanent, effect_data))
+            candidates = [permanent]
+            try:
+                resolved = get_card_effect(permanent)
+            except Exception:
+                resolved = {}
+            if isinstance(resolved, dict) and resolved is not permanent:
+                candidates.append({**permanent, **resolved})
+            for effect_data in candidates:
+                if not effect_data.get("damage_multiplier"):
+                    continue
+                scope = str(effect_data.get("battle_model_scope") or "")
+                if scope not in {
+                    CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE,
+                    CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE,
+                }:
+                    continue
+                targets = effect_data.get("damage_modifier_targets") or []
+                if isinstance(targets, str):
+                    targets = read_json_list(targets) or [targets]
+                modifier_key = (
+                    getattr(modifier_controller, "name", None),
+                    permanent.get("name") or effect_data.get("name") or id(permanent),
+                    scope,
+                    effect_data.get("damage_modifier_applies_to"),
+                    tuple(sorted(str(target) for target in targets)),
+                    int(effect_data.get("damage_multiplier") or 2),
+                )
+                if modifier_key in seen_modifier_keys:
+                    continue
+                seen_modifier_keys.add(modifier_key)
+                effects.append((modifier_controller, permanent, effect_data))
     return effects
 
 
@@ -28506,6 +28553,35 @@ def _source_controlled_by(source_card, controller):
         return True
     source_controller = source_card.get("controller") or source_card.get("owner")
     return source_controller in (None, "", controller_name)
+
+
+def _static_damage_modifier_applies(
+    modifier_controller,
+    permanent,
+    effect_data,
+    target_controller,
+    source_card,
+):
+    scope = str(effect_data.get("battle_model_scope") or "")
+    if scope == CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE:
+        if target_controller is modifier_controller:
+            return False
+        if not _source_controlled_by(source_card, modifier_controller):
+            return False
+        if effect_data.get("damage_modifier_applies_to") not in (None, "sources_you_control"):
+            return False
+        targets = effect_data.get("damage_modifier_targets") or []
+        if isinstance(targets, str):
+            targets = read_json_list(targets) or [targets]
+        return not targets or {"opponents", "opponent_permanents"}.issubset(set(targets))
+
+    if scope == CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE:
+        chosen_player = permanent.get("chosen_player_name") or effect_data.get("chosen_player_name")
+        if not chosen_player:
+            return False
+        return getattr(target_controller, "name", None) == chosen_player
+
+    return False
 
 
 def apply_static_damage_replacements(
@@ -28526,14 +28602,21 @@ def apply_static_damage_replacements(
         modified_amount = 0
     if modified_amount <= 0 or controller is None or target_controller is None:
         return modified_amount
-    if target_controller is controller:
-        return modified_amount
-    if not _source_controlled_by(source_card, controller):
-        return modified_amount
 
     original_amount = modified_amount
     applied = []
-    for permanent, effect_data in _static_damage_modifier_effects(controller):
+    for modifier_controller, permanent, effect_data in _static_damage_modifier_effects(
+        controller,
+        target_controller,
+    ):
+        if not _static_damage_modifier_applies(
+            modifier_controller,
+            permanent,
+            effect_data,
+            target_controller,
+            source_card,
+        ):
+            continue
         multiplier = int(effect_data.get("damage_multiplier") or 2)
         if multiplier <= 1:
             continue
@@ -28541,6 +28624,7 @@ def apply_static_damage_replacements(
         applied.append(
             {
                 "source": permanent.get("name", "?"),
+                "controller": getattr(modifier_controller, "name", None),
                 "scope": effect_data.get("battle_model_scope"),
                 "multiplier": multiplier,
             }
