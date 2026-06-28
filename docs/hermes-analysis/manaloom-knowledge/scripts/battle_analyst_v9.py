@@ -4263,6 +4263,30 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
         }
     ),
+    "Unstable Glyphbridge // Sandswirl Wanderglyph": handcrafted_runtime_rule(
+        {
+            "ability_kind": "etb_selective_creature_wipe_and_transform_metadata",
+            "cmc": 5.0,
+            "effect": "glyphbridge_selective_creature_wipe",
+            "mana_cost": "{3}{W}{W}",
+            "colors": ["W"],
+            "type_line": "Artifact",
+            "etb_if_cast": True,
+            "choose_one_small_creature_each_player_power_max": 2,
+            "destroy_all_other_creatures": True,
+            "craft_with_artifact": "{3}{W}{W}",
+            "back_face_name": "Sandswirl Wanderglyph",
+            "back_face_type_line": "Artifact Creature - Golem",
+            "back_face_power": 5,
+            "back_face_toughness": 3,
+            "back_face_flying": True,
+            "back_face_opponent_spell_cast_attack_lock_metadata": True,
+            "back_face_attacked_you_spell_lock_metadata": True,
+            "battle_model_scope": "etb_choose_small_creature_each_player_destroy_rest_craft_metadata_v1",
+            "_rule_oracle_hash": "e56f55f81b1f72be8c4e3752f1916898",
+            "_rule_logical_key": "battle_rule_v1:f4168e92445f0a9b9b2de0ef32f4b78d",
+        }
+    ),
     "Stuffy Doll": handcrafted_runtime_rule(
         {
             "ability_kind": "static_triggered_and_activated",
@@ -4686,6 +4710,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Repercussion",
     "Rem Karolus, Stalwart Slayer",
     "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence",
+    "Unstable Glyphbridge // Sandswirl Wanderglyph",
     "Stuffy Doll",
     "Slickshot Show-Off",
     "Serra Ascendant",
@@ -4835,6 +4860,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed life-30 flip into controlled-creature damage prevention enchantment.",
         ["manaloom_log_learning_audit_20260628_v33_after_rem_karolus_runtime", "RuneTailKitsuneAscendant.java"],
         "2026-06-29T03:45:00Z",
+    ),
+    "Unstable Glyphbridge // Sandswirl Wanderglyph": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed cast-ETB selective creature wipe plus craft/back-face restriction metadata.",
+        ["manaloom_log_learning_audit_20260628_v34_after_rune_tail_runtime", "UnstableGlyphbridge.java"],
+        "2026-06-29T04:05:00Z",
     ),
     "Stuffy Doll": manual_runtime_waiver_metadata(
         "Replace no_active runtime gap with XMage-backed chosen-player damage reflection, indestructible body, and tap self-damage ability.",
@@ -15865,6 +15895,138 @@ def resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
         **fields,
     )
     finish_resolved_spell(player, card, turn=turn)
+
+
+def _glyphbridge_keep_choice(creatures, max_power):
+    eligible = [
+        creature
+        for creature in creatures
+        if card_power_value(creature, default=1) <= max_power
+    ]
+    if not eligible:
+        return None
+    return max(
+        eligible,
+        key=lambda creature: (
+            card_toughness_value(creature, default=1),
+            card_power_value(creature, default=1),
+            card_mana_value(creature),
+            str(creature.get("name") or ""),
+        ),
+    )
+
+
+def resolve_glyphbridge_selective_creature_wipe(player, opponents, card, effect_data, turn):
+    participants = [player, *list(opponents or [])]
+    max_power = int(effect_data.get("choose_one_small_creature_each_player_power_max") or 2)
+    permanent = prepare_entering_permanent(
+        enrich_card({**card, **effect_data}),
+        controller=player,
+        all_players=participants,
+        turn=turn,
+    )
+    permanent["effect"] = "passive"
+    permanent["type_line"] = effect_data.get("type_line") or permanent.get("type_line") or "Artifact"
+    player.battlefield.append(permanent)
+    refresh_all_controlled_static_indestructible(
+        participants,
+        turn=turn,
+        phase="glyphbridge_selective_creature_wipe",
+        emit_events=True,
+    )
+
+    chosen_by_controller = {}
+    chosen_records = []
+    destroyed_records = []
+    protected_records = []
+    own_creatures_destroyed = 0
+    opponent_creatures_destroyed = 0
+    live_opponent_creatures_destroyed = 0
+    creatures_seen = 0
+
+    for participant in participants:
+        creatures = [
+            creature
+            for creature in list(getattr(participant, "battlefield", []) or [])
+            if is_battlefield_creature(creature)
+        ]
+        creatures_seen += len(creatures)
+        chosen = _glyphbridge_keep_choice(creatures, max_power)
+        if chosen is not None:
+            chosen_by_controller[participant] = id(chosen)
+            chosen_records.append(
+                {
+                    "controller": participant.name,
+                    "name": chosen.get("name", "?"),
+                    "power": card_power_value(chosen, default=1),
+                    "toughness": card_toughness_value(chosen, default=1),
+                }
+            )
+
+    for participant in participants:
+        is_self = participant is player
+        is_live_opponent = (not is_self) and participant.is_alive()
+        keep_id = chosen_by_controller.get(participant)
+        for creature in list(getattr(participant, "battlefield", []) or []):
+            if not is_battlefield_creature(creature):
+                continue
+            if id(creature) == keep_id:
+                continue
+            if isinstance(creature, dict) and creature.get("indestructible"):
+                protected_records.append(
+                    {
+                        "controller": participant.name,
+                        "name": creature.get("name", "?"),
+                        "reason": "indestructible",
+                    }
+                )
+                continue
+            destination = move_creature_from_battlefield(
+                participant,
+                creature,
+                reason="glyphbridge_selective_creature_wipe",
+                source=card,
+                all_players=participants,
+            )
+            destroyed_records.append(
+                {
+                    "controller": participant.name,
+                    "name": creature.get("name", "?"),
+                    "destination": destination,
+                    "power": card_power_value(creature, default=1),
+                    "toughness": card_toughness_value(creature, default=1),
+                }
+            )
+            if is_self:
+                own_creatures_destroyed += 1
+            else:
+                opponent_creatures_destroyed += 1
+                if is_live_opponent:
+                    live_opponent_creatures_destroyed += 1
+
+    fields = replay_rule_fields(effect_data)
+    emit_replay_event(
+        "glyphbridge_selective_creature_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        permanent=permanent.get("name", card.get("name", "?")),
+        max_chosen_power=max_power,
+        creatures_seen=creatures_seen,
+        chosen_count=len(chosen_records),
+        chosen_cards=chosen_records,
+        destroyed=len(destroyed_records),
+        destroyed_cards=destroyed_records[:20],
+        protected=len(protected_records),
+        protected_cards=protected_records[:20],
+        own_creatures_destroyed=own_creatures_destroyed,
+        opponent_creatures_destroyed=opponent_creatures_destroyed,
+        live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
+        craft_with_artifact=effect_data.get("craft_with_artifact"),
+        back_face_name=effect_data.get("back_face_name"),
+        turn=turn,
+        **fields,
+    )
+    return permanent
 
 
 def _permanent_type_line(permanent):
@@ -36018,6 +36180,8 @@ def apply_effect_immediate(
         resolve_everything_comes_to_dust(player, opponents, card, effect_data, turn)
     elif effect == "fated_clash_protect_then_destroy":
         resolve_fated_clash(player, opponents, card, effect_data, turn)
+    elif effect == "glyphbridge_selective_creature_wipe":
+        resolve_glyphbridge_selective_creature_wipe(player, opponents, card, effect_data, turn)
     elif effect == "damage_wipe_treasure":
         apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng)
     elif effect == "equipment_haste_shroud":
