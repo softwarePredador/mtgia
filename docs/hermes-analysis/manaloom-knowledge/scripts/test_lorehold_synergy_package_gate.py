@@ -1052,6 +1052,115 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
 
         self.assertEqual(gate.gate_decision(gate_summary, exposure), "inconclusive_low_exposure")
 
+    def test_side_card_exposure_distinguishes_library_only_low_access(self):
+        row = {
+            "telemetry": {
+                "focus_card_game_traces": {
+                    "game-1": [
+                        {
+                            "event": "focus_card_access_snapshot",
+                            "data": {
+                                "focus_card_zones": {
+                                    "Wheel of Fortune": {
+                                        "zone": "library",
+                                        "library_position": 68,
+                                        "library_top_7": False,
+                                    }
+                                }
+                            },
+                        }
+                    ],
+                    "game-2": [
+                        {
+                            "event": "focus_card_access_snapshot",
+                            "data": {
+                                "focus_card_zones": {
+                                    "Wheel of Fortune": {
+                                        "zone": "library",
+                                        "library_position": 41,
+                                        "library_top_7": False,
+                                    }
+                                }
+                            },
+                        }
+                    ],
+                }
+            }
+        }
+
+        exposure = gate.side_card_exposure(row, ["Wheel of Fortune"])
+        card = exposure["cards"][0]
+
+        self.assertEqual(card["status"], "library_only_not_used")
+        self.assertEqual(card["access_profile"]["library_only_games"], 2)
+        self.assertEqual(card["access_profile"]["accessed_games"], 0)
+        self.assertFalse(exposure["all_cards_accessed"])
+
+    def test_side_card_exposure_flags_accessed_but_not_used(self):
+        row = {
+            "telemetry": {
+                "focus_card_game_traces": {
+                    "game-1": [
+                        {
+                            "event": "focus_card_access_snapshot",
+                            "data": {
+                                "phase": "opening_keep",
+                                "focus_card_zones": {
+                                    "Silence": {
+                                        "zone": "hand",
+                                    }
+                                },
+                                "hand_focus": ["Silence"],
+                            },
+                        }
+                    ]
+                }
+            }
+        }
+
+        exposure = gate.side_card_exposure(row, ["Silence"])
+        package = gate.package_exposure_summary(
+            {"candidate": row, "baseline": {"telemetry": {}}},
+            adds=["Silence"],
+            cuts=["Avatar's Wrath"],
+        )
+
+        self.assertEqual(exposure["cards"][0]["status"], "accessed_not_used")
+        self.assertEqual(exposure["cards"][0]["access_profile"]["accessed_games"], 1)
+        self.assertTrue(exposure["all_cards_accessed"])
+        self.assertEqual(package["status"], "candidate_added_cards_accessed_not_used")
+        self.assertEqual(package["next_step"], "inspect_play_heuristic_or_runtime_for_accessed_card")
+
+    def test_compact_gate_telemetry_preserves_access_summary_without_full_traces(self):
+        telemetry = {
+            "focus_card_game_traces": {
+                "game-1": [
+                    {
+                        "event": "focus_card_access_snapshot",
+                        "data": {
+                            "focus_card_zones": {
+                                "Valakut Awakening // Valakut Stoneforge": {
+                                    "zone": "library",
+                                    "library_position": 5,
+                                    "library_top_7": True,
+                                }
+                            }
+                        },
+                    }
+                ]
+            }
+        }
+
+        compact = gate.compact_gate_telemetry(telemetry)
+        profile = gate.focus_card_access_profile(
+            compact,
+            "Valakut Awakening // Valakut Stoneforge",
+        )
+
+        self.assertNotIn("focus_card_game_traces", compact)
+        self.assertEqual(profile["near_access_games"], 1)
+        self.assertEqual(profile["dominant_zone"], "library")
+
     def test_prior_evidence_reject_is_downgraded_when_exposure_shows_no_use(self):
         with tempfile.TemporaryDirectory() as tmp:
             prior = Path(tmp) / "prior.json"

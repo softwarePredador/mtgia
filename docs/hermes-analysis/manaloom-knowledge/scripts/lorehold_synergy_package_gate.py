@@ -18,7 +18,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -1983,6 +1983,7 @@ def compact_gate_telemetry(telemetry: dict[str, Any]) -> dict[str, Any]:
         "focus_card_trace_card_counts_by_game": (
             telemetry.get("focus_card_trace_card_counts_by_game") or {}
         ),
+        "focus_card_access_summary": compact_focus_card_access_summary(telemetry),
         "top_cards": telemetry.get("top_cards") or [],
         "lorehold_attack_restrictions": telemetry.get("lorehold_attack_restrictions") or {},
         "lorehold_attack_restriction_source_events": (
@@ -2103,13 +2104,180 @@ def focus_location_trace_count(telemetry: dict[str, Any], card_name: str) -> tup
     return total, games
 
 
+ACCESS_ZONES = {"hand", "battlefield", "graveyard", "exile", "stack"}
+
+
+def card_names_from_snapshots(value: Any) -> set[str]:
+    names: set[str] = set()
+    if not isinstance(value, list):
+        return names
+    for item in value:
+        if isinstance(item, Mapping):
+            name = str(item.get("name") or "").strip()
+        else:
+            name = str(item or "").strip()
+        if name:
+            names.add(name)
+    return names
+
+
+def focus_card_access_profile(telemetry: dict[str, Any], card_name: str) -> dict[str, Any]:
+    """Summarize whether a focused card was actually accessible, not merely present."""
+
+    compact_summary = telemetry.get("focus_card_access_summary") or {}
+    if isinstance(compact_summary, dict) and isinstance(compact_summary.get(card_name), dict):
+        return dict(compact_summary[card_name])
+
+    traces_by_game = telemetry.get("focus_card_game_traces") or {}
+    trace_count, trace_games = focus_location_trace_count(telemetry, card_name)
+    profile: dict[str, Any] = {
+        "trace_count": trace_count,
+        "trace_games": trace_games,
+        "zone_counts": {},
+        "accessed_trace_count": 0,
+        "accessed_games": 0,
+        "near_access_trace_count": 0,
+        "near_access_games": 0,
+        "drawn_trace_count": 0,
+        "drawn_games": 0,
+        "opening_hand_trace_count": 0,
+        "opening_hand_games": 0,
+        "library_only_games": 0,
+        "dominant_zone": None,
+    }
+    if not isinstance(traces_by_game, dict):
+        return profile
+
+    zone_counts: dict[str, int] = {}
+    accessed_games: set[str] = set()
+    near_access_games: set[str] = set()
+    drawn_games: set[str] = set()
+    opening_games: set[str] = set()
+    library_only_games: set[str] = set()
+    observed_games: set[str] = set()
+    detailed_trace_count = 0
+
+    for raw_game_id, traces in traces_by_game.items():
+        game_id = str(raw_game_id)
+        if not isinstance(traces, list):
+            continue
+        game_observed = False
+        game_accessed = False
+        game_near = False
+        game_library_only = False
+        for trace in traces:
+            if not isinstance(trace, Mapping):
+                continue
+            data = trace.get("data") or {}
+            if not isinstance(data, Mapping):
+                continue
+            zones = data.get("focus_card_zones") or {}
+            zone_info = zones.get(card_name) if isinstance(zones, Mapping) else None
+            zone = ""
+            if isinstance(zone_info, Mapping):
+                zone = str(zone_info.get("zone") or "").strip()
+            if not zone:
+                continue
+            detailed_trace_count += 1
+            zone_counts[zone] = zone_counts.get(zone, 0) + 1
+            if zone != "absent":
+                game_observed = True
+            if zone == "library":
+                game_library_only = True
+            drawn_names = (
+                card_names_from_snapshots(data.get("drawn_for_turn"))
+                | card_names_from_snapshots(data.get("drawn"))
+                | card_names_from_snapshots(data.get("first_draw"))
+            )
+            if card_name in drawn_names:
+                profile["drawn_trace_count"] = int(profile["drawn_trace_count"]) + 1
+                drawn_games.add(game_id)
+                game_accessed = True
+            if card_name in set(data.get("hand_focus") or []):
+                game_accessed = True
+            if zone in ACCESS_ZONES:
+                profile["accessed_trace_count"] = int(profile["accessed_trace_count"]) + 1
+                game_accessed = True
+            if (
+                isinstance(zone_info, Mapping)
+                and bool(zone_info.get("library_top_7"))
+            ) or card_name in set(data.get("library_top_focus") or []):
+                profile["near_access_trace_count"] = int(profile["near_access_trace_count"]) + 1
+                game_near = True
+            if data.get("phase") == "opening_keep" and zone == "hand":
+                profile["opening_hand_trace_count"] = int(profile["opening_hand_trace_count"]) + 1
+                opening_games.add(game_id)
+                game_accessed = True
+        if game_observed:
+            observed_games.add(game_id)
+        if game_accessed:
+            accessed_games.add(game_id)
+        elif game_near:
+            near_access_games.add(game_id)
+        elif game_library_only:
+            library_only_games.add(game_id)
+
+    if detailed_trace_count:
+        profile["trace_count"] = detailed_trace_count
+        profile["trace_games"] = len(observed_games)
+    profile["zone_counts"] = dict(sorted(zone_counts.items()))
+    profile["accessed_games"] = len(accessed_games)
+    profile["near_access_games"] = len(near_access_games)
+    profile["drawn_games"] = len(drawn_games)
+    profile["opening_hand_games"] = len(opening_games)
+    profile["library_only_games"] = len(library_only_games)
+    if zone_counts:
+        profile["dominant_zone"] = max(zone_counts.items(), key=lambda item: item[1])[0]
+    return profile
+
+
+def compact_focus_card_access_summary(telemetry: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    traces_by_game = telemetry.get("focus_card_game_traces") or {}
+    if not isinstance(traces_by_game, dict):
+        return {}
+    card_names: set[str] = set()
+    for traces in traces_by_game.values():
+        if not isinstance(traces, list):
+            continue
+        for trace in traces:
+            if not isinstance(trace, Mapping):
+                continue
+            data = trace.get("data") or {}
+            if not isinstance(data, Mapping):
+                continue
+            zones = data.get("focus_card_zones") or {}
+            if isinstance(zones, Mapping):
+                card_names.update(str(name) for name in zones.keys())
+    return {
+        card_name: focus_card_access_profile(telemetry, card_name)
+        for card_name in sorted(card_names)
+    }
+
+
+def access_status(recorded_use_count: int, profile: dict[str, Any]) -> str:
+    if recorded_use_count > 0:
+        return "used"
+    if int(profile.get("accessed_games") or 0) > 0:
+        return "accessed_not_used"
+    if int(profile.get("near_access_games") or 0) > 0:
+        return "near_access_not_used"
+    if int(profile.get("library_only_games") or 0) > 0:
+        return "library_only_not_used"
+    if int(profile.get("trace_games") or 0) > 0:
+        return "observed_not_used"
+    return "not_observed"
+
+
 def side_card_exposure(row: dict[str, Any], cards: list[str]) -> dict[str, Any]:
     telemetry = row.get("telemetry") or {}
     summaries: list[dict[str, Any]] = []
     for card_name in cards:
         event_breakdown = card_event_breakdown(telemetry, card_name)
         recorded_use_count = sum(event_breakdown.values())
-        location_trace_count, location_trace_games = focus_location_trace_count(telemetry, card_name)
+        access_profile = focus_card_access_profile(telemetry, card_name)
+        location_trace_count = int(access_profile.get("trace_count") or 0)
+        location_trace_games = int(access_profile.get("trace_games") or 0)
+        status = access_status(recorded_use_count, access_profile)
         summaries.append(
             {
                 "card_name": card_name,
@@ -2117,15 +2285,31 @@ def side_card_exposure(row: dict[str, Any], cards: list[str]) -> dict[str, Any]:
                 "event_breakdown": event_breakdown,
                 "location_trace_count": location_trace_count,
                 "location_trace_games": location_trace_games,
-                "status": "used" if recorded_use_count > 0 else "no_recorded_use",
+                "access_profile": access_profile,
+                "status": status,
             }
         )
+    cards_with_access = sum(
+        1
+        for item in summaries
+        if int(item.get("recorded_use_count") or 0) > 0
+        or int((item.get("access_profile") or {}).get("accessed_games") or 0) > 0
+    )
+    cards_with_near_access = sum(
+        1
+        for item in summaries
+        if int(item.get("recorded_use_count") or 0) > 0
+        or int((item.get("access_profile") or {}).get("accessed_games") or 0) > 0
+        or int((item.get("access_profile") or {}).get("near_access_games") or 0) > 0
+    )
     return {
         "cards": summaries,
         "card_count": len(cards),
         "cards_with_recorded_use": sum(
             1 for item in summaries if int(item.get("recorded_use_count") or 0) > 0
         ),
+        "cards_with_access": cards_with_access,
+        "cards_with_near_access": cards_with_near_access,
         "total_recorded_use_count": sum(
             int(item.get("recorded_use_count") or 0) for item in summaries
         ),
@@ -2134,7 +2318,29 @@ def side_card_exposure(row: dict[str, Any], cards: list[str]) -> dict[str, Any]:
         )
         if summaries
         else True,
+        "all_cards_accessed": cards_with_access == len(summaries) if summaries else True,
+        "all_cards_near_access": cards_with_near_access == len(summaries) if summaries else True,
     }
+
+
+def package_exposure_status(candidate_added: dict[str, Any]) -> str:
+    if candidate_added.get("all_cards_used", True):
+        return "candidate_added_cards_used"
+    if candidate_added.get("all_cards_accessed", False):
+        return "candidate_added_cards_accessed_not_used"
+    if candidate_added.get("all_cards_near_access", False):
+        return "candidate_added_cards_near_access_low_use"
+    return "candidate_added_card_low_access"
+
+
+def package_exposure_next_step(candidate_added: dict[str, Any]) -> str:
+    if candidate_added.get("all_cards_used", True):
+        return "evaluate_winrate_and_strategy_delta"
+    if candidate_added.get("all_cards_accessed", False):
+        return "inspect_play_heuristic_or_runtime_for_accessed_card"
+    if candidate_added.get("all_cards_near_access", False):
+        return "rerun_targeted_access_or_draw_window"
+    return "increase_sample_or_run_forced_access_gate"
 
 
 def package_exposure_summary(
@@ -2151,11 +2357,9 @@ def package_exposure_summary(
         "candidate_added_cards": candidate_added,
         "baseline_cut_cards": baseline_cut,
         "low_candidate_added_card_use": not bool(candidate_added.get("all_cards_used", True)),
-        "status": (
-            "candidate_added_cards_used"
-            if candidate_added.get("all_cards_used", True)
-            else "candidate_added_card_low_exposure"
-        ),
+        "low_candidate_added_card_access": not bool(candidate_added.get("all_cards_accessed", True)),
+        "status": package_exposure_status(candidate_added),
+        "next_step": package_exposure_next_step(candidate_added),
     }
 
 
@@ -2164,10 +2368,17 @@ def exposure_summary_text(exposure: dict[str, Any]) -> str:
     cards = candidate.get("cards") or []
     if not cards:
         return "-"
-    parts = [
-        f"{item.get('card_name')} use={int(item.get('recorded_use_count') or 0)}"
-        for item in cards
-    ]
+    parts = []
+    for item in cards:
+        profile = item.get("access_profile") or {}
+        parts.append(
+            (
+                f"{item.get('card_name')} use={int(item.get('recorded_use_count') or 0)}"
+                f" access_games={int(profile.get('accessed_games') or 0)}"
+                f" near_games={int(profile.get('near_access_games') or 0)}"
+                f" dominant_zone={profile.get('dominant_zone') or '-'}"
+            )
+        )
     status = exposure.get("status") or "unknown"
     return f"{status}: " + ", ".join(parts)
 
