@@ -432,6 +432,48 @@ def prior_strategy_audit_report():
     )
 
 
+def prior_low_exposure_report(*, with_strategy_scope=False):
+    return (
+        planner.REPORT_DIR / "low_exposure_package_report.json",
+        {
+            "cut_safety_report": "/tmp/cut.json" if with_strategy_scope else None,
+            "prior_package_reports": ["/tmp/prior.json"] if with_strategy_scope else [],
+            "packages": [
+                {
+                    "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+                    "adds": ["Mana Vault"],
+                    "cuts": ["Arcane Signet"],
+                    "decision": "reject_or_rework",
+                    "gate_summary": {
+                        "baseline": {"wins": 1, "losses": 0, "win_rate": 100.0},
+                        "candidate": {"wins": 1, "losses": 0, "win_rate": 100.0},
+                        "delta_pp": 0.0,
+                    },
+                    "exposure_summary": {
+                        "low_candidate_added_card_use": True,
+                        "status": "candidate_added_card_low_access",
+                        "next_step": "increase_sample_or_run_forced_access_gate",
+                        "candidate_added_cards": {
+                            "cards": [
+                                {
+                                    "card_name": "Mana Vault",
+                                    "status": "library_only_not_used",
+                                    "recorded_use_count": 0,
+                                    "access_profile": {
+                                        "accessed_games": 0,
+                                        "near_access_games": 0,
+                                        "library_only_games": 1,
+                                    },
+                                }
+                            ]
+                        },
+                    },
+                }
+            ],
+        },
+    )
+
+
 def hand_filter_cut_model_report():
     return (
         planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0],
@@ -794,6 +836,12 @@ def test_next_action_planner_default_prior_reports_include_strategy_audit():
     assert planner.DEFAULT_STRATEGY_AUDIT in planner.DEFAULT_PRIOR_PACKAGE_REPORTS
 
 
+def test_next_action_planner_defaults_include_exposure_contract_report():
+    default_names = {path.name for path in planner.DEFAULT_PRIOR_PACKAGE_REPORTS}
+
+    assert "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json" in default_names
+
+
 def test_next_action_planner_default_prior_reports_include_profiled_history():
     expected = {
         "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
@@ -804,6 +852,50 @@ def test_next_action_planner_default_prior_reports_include_profiled_history():
     }
     default_names = {path.name for path in planner.DEFAULT_PRIOR_PACKAGE_REPORTS}
     assert expected.issubset(default_names)
+
+
+def test_next_action_planner_downgrades_low_exposure_rejects_to_inconclusive():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        prior_package_reports=[prior_low_exposure_report(with_strategy_scope=True)],
+    )
+
+    assert payload["summary"]["prior_rejected_package_count"] == 0
+    assert payload["summary"]["prior_inconclusive_low_exposure_count"] == 1
+    assert payload["summary"]["prior_inconclusive_low_exposure_keys"] == [
+        "mana_vault_fast_mana_cut_arcane_signet"
+    ]
+    assert payload["summary"]["recommended_next_action"] == (
+        "resolve_inconclusive_package_exposures"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "resolve_strategy_gate_low_exposure_before_next_swap"
+    assert action["strategy_gate_inconclusive_count"] == 1
+    assert action["packages"][0]["candidate_added_card_statuses"][0]["status"] == (
+        "library_only_not_used"
+    )
+    guardrails = {row["guardrail_key"]: row for row in payload["guardrails"]}
+    assert "inconclusive_low_exposure_is_not_card_proof" in guardrails
+
+
+def test_next_action_planner_keeps_diagnostic_low_exposure_below_strategy_actions():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review_with_profiled_cut_evidence(),
+        exposure_profiles=[exposure_profile()],
+        prior_package_reports=[prior_low_exposure_report(with_strategy_scope=False)],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "build_same_lane_benchmarks_from_profiled_cut_slots"
+    )
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    action = actions["resolve_inconclusive_package_exposures"]
+    assert action["priority"] == 6
+    assert action["status"] == "diagnostic_low_exposure_recorded_no_strategy_block"
+    assert action["diagnostic_or_contract_inconclusive_count"] == 1
 
 
 def test_next_action_planner_prioritizes_focus_access_trace_review():
