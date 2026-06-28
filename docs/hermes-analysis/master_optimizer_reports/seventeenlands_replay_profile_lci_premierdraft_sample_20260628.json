@@ -1,0 +1,1747 @@
+{
+  "arena_id_annotation_source": {
+    "cache_path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_arena_id_cache_20260628.json",
+    "lookups_attempted": 8,
+    "resolver": "Scryfall /cards/arena/{arena_id} via curl"
+  },
+  "arena_id_annotations": {
+    "1": {
+      "arena_id": "1",
+      "reason": "likely_hidden_or_unknown_marker",
+      "resolved": false,
+      "skipped": true
+    },
+    "116886": {
+      "arena_id": "116886",
+      "resolved": false,
+      "skipped": true
+    },
+    "1268": {
+      "arena_id": "1268",
+      "resolved": false,
+      "skipped": true
+    },
+    "169531": {
+      "arena_id": "169531",
+      "resolved": false,
+      "skipped": true
+    },
+    "2": {
+      "arena_id": "2",
+      "reason": "likely_hidden_or_unknown_marker",
+      "resolved": false,
+      "skipped": true
+    },
+    "304": {
+      "arena_id": "304",
+      "reason": "likely_hidden_or_unknown_marker",
+      "resolved": false,
+      "skipped": true
+    },
+    "87011": {
+      "arena_id": "87011",
+      "name": "Plains",
+      "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+      "resolved": true,
+      "scryfall_id": "486fbcf9-3a04-47f6-8927-886c2a454499"
+    },
+    "87133": {
+      "arena_id": "87133",
+      "resolved": false,
+      "skipped": true
+    },
+    "87134": {
+      "arena_id": "87134",
+      "resolved": false,
+      "skipped": true
+    },
+    "87149": {
+      "arena_id": "87149",
+      "name": "Ironpaw Aspirant",
+      "oracle_id": "fab5f694-4a9c-4e72-b164-f236e8212ff7",
+      "resolved": true,
+      "scryfall_id": "f70689a0-ac69-4052-84fc-9055e9e1c54b"
+    },
+    "87155": {
+      "arena_id": "87155",
+      "name": "Miner's Guidewing",
+      "oracle_id": "eb161d0b-e534-463c-b1d1-7210bfba5d28",
+      "resolved": true,
+      "scryfall_id": "9048cd9d-df3f-4705-a5f4-e5b09760c631"
+    },
+    "87160": {
+      "arena_id": "87160",
+      "name": "Oltec Cloud Guard",
+      "oracle_id": "922a8e27-a367-40c6-84df-86ed32f71c7c",
+      "resolved": true,
+      "scryfall_id": "02d68a38-2e0b-401b-b67d-a55e2af5b18d"
+    },
+    "87186": {
+      "arena_id": "87186",
+      "resolved": false,
+      "skipped": true
+    },
+    "87199": {
+      "arena_id": "87199",
+      "resolved": false,
+      "skipped": true
+    },
+    "87207": {
+      "arena_id": "87207",
+      "name": "Oaken Siren",
+      "oracle_id": "a06a35a9-a23e-4a0a-90bc-84e7a52d2cef",
+      "resolved": true,
+      "scryfall_id": "d7731ef5-da74-4436-8ee7-01c065cbefae"
+    },
+    "87214": {
+      "arena_id": "87214",
+      "resolved": false,
+      "skipped": true
+    },
+    "87217": {
+      "arena_id": "87217",
+      "resolved": false,
+      "skipped": true
+    },
+    "87220": {
+      "arena_id": "87220",
+      "name": "Spyglass Siren",
+      "oracle_id": "4ec9d9eb-14e2-47ea-88a2-d2394e363784",
+      "resolved": true,
+      "scryfall_id": "41e54343-95e5-4dc4-9f18-e4a415fe5e0a"
+    },
+    "87227": {
+      "arena_id": "87227",
+      "name": "Waterwind Scout",
+      "oracle_id": "db65f874-6bf3-4fdb-a977-10b01b7ee2e9",
+      "resolved": true,
+      "scryfall_id": "8a7738fb-0a1b-4010-b8c0-e1129739c765"
+    },
+    "87228": {
+      "arena_id": "87228",
+      "resolved": false,
+      "skipped": true
+    },
+    "87244": {
+      "arena_id": "87244",
+      "resolved": false,
+      "skipped": true
+    },
+    "87264": {
+      "arena_id": "87264",
+      "resolved": false,
+      "skipped": true
+    },
+    "87287": {
+      "arena_id": "87287",
+      "resolved": false,
+      "skipped": true
+    },
+    "87302": {
+      "arena_id": "87302",
+      "name": "Goblin Tomb Raider",
+      "oracle_id": "37ce95bb-8ff5-47b9-85e4-21be7a794940",
+      "resolved": true,
+      "scryfall_id": "018160fe-f602-43f5-8495-241a08eaa69c"
+    },
+    "87313": {
+      "arena_id": "87313",
+      "name": "Plundering Pirate",
+      "oracle_id": "3ab13412-1eaf-40c0-905d-8a3ca0c51be5",
+      "resolved": true,
+      "scryfall_id": "5bb2552f-8370-4931-83e1-93706d51413a"
+    },
+    "87319": {
+      "arena_id": "87319",
+      "resolved": false,
+      "skipped": true
+    },
+    "87326": {
+      "arena_id": "87326",
+      "resolved": false,
+      "skipped": true
+    },
+    "87386": {
+      "arena_id": "87386",
+      "resolved": false,
+      "skipped": true
+    },
+    "87423": {
+      "arena_id": "87423",
+      "resolved": false,
+      "skipped": true
+    },
+    "87454": {
+      "arena_id": "87454",
+      "resolved": false,
+      "skipped": true
+    },
+    "87457": {
+      "arena_id": "87457",
+      "resolved": false,
+      "skipped": true
+    },
+    "87460": {
+      "arena_id": "87460",
+      "resolved": false,
+      "skipped": true
+    },
+    "87473": {
+      "arena_id": "87473",
+      "resolved": false,
+      "skipped": true
+    },
+    "87483": {
+      "arena_id": "87483",
+      "error": "curl: (56) The requested URL returned error: 404",
+      "resolved": false
+    },
+    "87578": {
+      "arena_id": "87578",
+      "name": "Plains",
+      "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+      "resolved": true,
+      "scryfall_id": "5bb495cc-9908-455e-bec9-3993d595f4f9"
+    },
+    "87579": {
+      "arena_id": "87579",
+      "name": "Island",
+      "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+      "resolved": true,
+      "scryfall_id": "bbeca27a-6c5b-40b9-83a4-a3a2096ff6f8"
+    },
+    "87580": {
+      "arena_id": "87580",
+      "name": "Island",
+      "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+      "resolved": true,
+      "scryfall_id": "671516eb-b088-4a15-aec9-1781ca016e11"
+    },
+    "87582": {
+      "arena_id": "87582",
+      "name": "Swamp",
+      "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+      "resolved": true,
+      "scryfall_id": "d86cd8fb-4ba7-4311-b0f3-b06fa112eda5"
+    },
+    "87584": {
+      "arena_id": "87584",
+      "name": "Mountain",
+      "oracle_id": "a3fb7228-e76b-4e96-a40e-20b5fed75685",
+      "resolved": true,
+      "scryfall_id": "adf13285-d127-4534-9f49-aa86914da175"
+    },
+    "87586": {
+      "arena_id": "87586",
+      "name": "Forest",
+      "oracle_id": "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+      "resolved": true,
+      "scryfall_id": "07264de1-4322-4adb-8f08-c0aa236747c7"
+    }
+  },
+  "arena_id_notes": [
+    "Small numeric IDs can be hidden/unknown Arena-side markers in replay_data, not Scryfall-resolvable cards.",
+    "EOT *_in_play columns are treated as battlefield card ID lists, not scalar counts."
+  ],
+  "generated_at": "2026-06-28T17:41:31+00:00",
+  "header": {
+    "base_column_count": 629,
+    "field_count": 2579,
+    "max_turn_column": 30,
+    "turn_column_count": 1950,
+    "turn_columns_per_turn": {
+      "1": 65,
+      "10": 65,
+      "11": 65,
+      "12": 65,
+      "13": 65,
+      "14": 65,
+      "15": 65,
+      "16": 65,
+      "17": 65,
+      "18": 65,
+      "19": 65,
+      "2": 65,
+      "20": 65,
+      "21": 65,
+      "22": 65,
+      "23": 65,
+      "24": 65,
+      "25": 65,
+      "26": 65,
+      "27": 65,
+      "28": 65,
+      "29": 65,
+      "3": 65,
+      "30": 65,
+      "4": 65,
+      "5": 65,
+      "6": 65,
+      "7": 65,
+      "8": 65,
+      "9": 65
+    },
+    "turn_side_counts": {
+      "oppo": 990,
+      "user": 960
+    },
+    "turn_suffix_count": 33,
+    "turn_suffixes": [
+      "cards_discarded",
+      "cards_drawn",
+      "cards_drawn_or_tutored",
+      "cards_tutored",
+      "creatures_attacked",
+      "creatures_blocked",
+      "creatures_blocking",
+      "creatures_cast",
+      "creatures_unblocked",
+      "eot_oppo_cards_in_hand",
+      "eot_oppo_creatures_in_play",
+      "eot_oppo_lands_in_play",
+      "eot_oppo_life",
+      "eot_oppo_non_creatures_in_play",
+      "eot_user_cards_in_hand",
+      "eot_user_creatures_in_play",
+      "eot_user_lands_in_play",
+      "eot_user_life",
+      "eot_user_non_creatures_in_play",
+      "lands_played",
+      "non_creatures_cast",
+      "oppo_abilities",
+      "oppo_combat_damage_taken",
+      "oppo_creatures_killed_combat",
+      "oppo_creatures_killed_non_combat",
+      "oppo_instants_sorceries_cast",
+      "oppo_mana_spent",
+      "user_abilities",
+      "user_combat_damage_taken",
+      "user_creatures_killed_combat",
+      "user_creatures_killed_non_combat",
+      "user_instants_sorceries_cast",
+      "user_mana_spent"
+    ]
+  },
+  "next_integration_steps": [
+    "Persist this profile as an artifact, not a database write.",
+    "Use the normalized event schema as an adapter target for ManaLoom battle replay comparators.",
+    "Add per-card observation gates to deckbuilder experiments so substitutions are scored only when drawn/cast/used.",
+    "Use Scryfall arena_id resolution only as a cache-backed annotation layer."
+  ],
+  "not_recommended_use": [
+    "Do not promote card battle rules directly from replay_data.",
+    "Do not treat PremierDraft behavior as Commander/Lorehold strategy proof.",
+    "Do not infer exact stack, target selection, replacement effects, or hidden choices from these columns alone."
+  ],
+  "postgres_writes": false,
+  "recommended_use": [
+    "Calibrate battle/deckbuilder tempo priors: land drops, mana spend, cast timing, combat pressure.",
+    "Compare ManaLoom simulated games against real MTGA limited cadence before tuning heuristics.",
+    "Build exposure-aware tests that require a card/action to be observed before judging a candidate swap.",
+    "Map arena_id to card names only as reference metadata; keep reviewed rules in PostgreSQL/Hermes flows."
+  ],
+  "rows_sampled": 200,
+  "sample_game_identity": {
+    "draft_id": "976d867638234d0087008f387809c325",
+    "draft_time": "2023-11-09 22:57:41",
+    "event_type": "PremierDraft",
+    "expansion": "LCI",
+    "game_number": "1",
+    "game_time": "2023-11-09 23:43:35",
+    "main_colors": "RG",
+    "match_number": "1",
+    "num_mulligans": "0",
+    "num_turns": "13",
+    "on_play": "False",
+    "opp_colors": "WR",
+    "opp_num_mulligans": "0",
+    "opp_rank": "None",
+    "rank": "bronze",
+    "splash_colors": "WU",
+    "won": "False"
+  },
+  "sample_game_normalized_events": [
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "draw_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_1_cards_drawn",
+      "turn": 1
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87585",
+      "event_type": "play_land",
+      "owner_side": "user",
+      "raw_column": "user_turn_1_lands_played",
+      "turn": 1
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_1_eot_oppo_cards_in_hand",
+      "turn": 1,
+      "value": 5.0
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87585",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_1_eot_user_lands_in_play",
+      "turn": 1
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_1_eot_oppo_lands_in_play",
+      "turn": 1
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87155",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_1_eot_oppo_creatures_in_play",
+      "turn": 1
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "user",
+      "raw_column": "user_turn_1_eot_user_life",
+      "turn": 1,
+      "value": 20.0
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_1_eot_oppo_life",
+      "turn": 1,
+      "value": 20.0
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87578",
+      "event_type": "play_land",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_1_lands_played",
+      "turn": 1
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87155",
+      "event_type": "cast_creature",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_1_creatures_cast",
+      "turn": 1
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "mana_spent",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_1_oppo_mana_spent",
+      "turn": 1,
+      "value": 1.0
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_1_eot_oppo_cards_in_hand",
+      "turn": 1,
+      "value": 5.0
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_1_eot_oppo_lands_in_play",
+      "turn": 1
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87155",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_1_eot_oppo_creatures_in_play",
+      "turn": 1
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_1_eot_user_life",
+      "turn": 1,
+      "value": 20.0
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_1_eot_oppo_life",
+      "turn": 1,
+      "value": 20.0
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87366",
+      "event_type": "draw_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_2_cards_drawn",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "play_land",
+      "owner_side": "user",
+      "raw_column": "user_turn_2_lands_played",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87366",
+      "event_type": "cast_creature",
+      "owner_side": "user",
+      "raw_column": "user_turn_2_creatures_cast",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "event_type": "mana_spent",
+      "owner_side": "user",
+      "raw_column": "user_turn_2_user_mana_spent",
+      "turn": 2,
+      "value": 2.0
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_2_eot_oppo_cards_in_hand",
+      "turn": 2,
+      "value": 4.0
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_2_eot_user_lands_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87585",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_2_eot_user_lands_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87584",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_2_eot_oppo_lands_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_2_eot_oppo_lands_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87366",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_2_eot_user_creatures_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87134",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_2_eot_oppo_creatures_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87155",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_2_eot_oppo_creatures_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "user",
+      "raw_column": "user_turn_2_eot_user_life",
+      "turn": 2,
+      "value": 19.0
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_2_eot_oppo_life",
+      "turn": 2,
+      "value": 20.0
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "1",
+      "event_type": "draw_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_cards_drawn",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87584",
+      "event_type": "play_land",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_lands_played",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87134",
+      "event_type": "cast_creature",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_creatures_cast",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87155",
+      "event_type": "attack",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_creatures_attacked",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87155",
+      "event_type": "unblocked_attacker",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_creatures_unblocked",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "combat_damage",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_2_user_combat_damage_taken",
+      "turn": 2,
+      "value": 1.0
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "mana_spent",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_oppo_mana_spent",
+      "turn": 2,
+      "value": 2.0
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_eot_oppo_cards_in_hand",
+      "turn": 2,
+      "value": 4.0
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87585",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_2_eot_user_lands_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87584",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_eot_oppo_lands_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_eot_oppo_lands_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87134",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_eot_oppo_creatures_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87155",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_eot_oppo_creatures_in_play",
+      "turn": 2
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_2_eot_user_life",
+      "turn": 2,
+      "value": 19.0
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_2_eot_oppo_life",
+      "turn": 2,
+      "value": 20.0
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "draw_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_cards_drawn",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "play_land",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_lands_played",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87301",
+      "event_type": "cast_creature",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_creatures_cast",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87374",
+      "event_type": "cast_creature",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_creatures_cast",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "169621",
+      "event_type": "activate_ability",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_user_abilities",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "event_type": "mana_spent",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_user_mana_spent",
+      "turn": 3,
+      "value": 4.0
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_cards_in_hand",
+      "turn": 3,
+      "value": 3.0
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_eot_user_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_eot_user_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87585",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_eot_user_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87584",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87374",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_eot_user_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87301",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_eot_user_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87366",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_eot_user_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87134",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87155",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87483",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87483",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87175",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_non_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87300",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_non_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "user",
+      "raw_column": "user_turn_3_eot_user_life",
+      "turn": 3,
+      "value": 15.0
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_3_eot_oppo_life",
+      "turn": 3,
+      "value": 20.0
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "1",
+      "event_type": "draw_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_cards_drawn",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87578",
+      "event_type": "play_land",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_lands_played",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87300",
+      "event_type": "cast_noncreature",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_non_creatures_cast",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87175",
+      "event_type": "cast_noncreature",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_non_creatures_cast",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "169620",
+      "event_type": "activate_ability",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_oppo_abilities",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "169437",
+      "event_type": "activate_ability",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_oppo_abilities",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "147847",
+      "event_type": "activate_ability",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_oppo_abilities",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87155",
+      "event_type": "attack",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_creatures_attacked",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87134",
+      "event_type": "attack",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_creatures_attacked",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87155",
+      "event_type": "unblocked_attacker",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_creatures_unblocked",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87134",
+      "event_type": "unblocked_attacker",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_creatures_unblocked",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "combat_damage",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_3_user_combat_damage_taken",
+      "turn": 3,
+      "value": 4.0
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "mana_spent",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_oppo_mana_spent",
+      "turn": 3,
+      "value": 3.0
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_cards_in_hand",
+      "turn": 3,
+      "value": 3.0
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87460",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_3_eot_user_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87585",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_3_eot_user_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87584",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_lands_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87366",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_3_eot_user_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87134",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87155",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87483",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87483",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87175",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_non_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "87300",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_non_creatures_in_play",
+      "turn": 3
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "user",
+      "raw_column": "oppo_turn_3_eot_user_life",
+      "turn": 3,
+      "value": 15.0
+    },
+    {
+      "active_side": "oppo",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_3_eot_oppo_life",
+      "turn": 3,
+      "value": 20.0
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87279",
+      "event_type": "draw_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_cards_drawn",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "play_land",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_lands_played",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87375",
+      "event_type": "cast_creature",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_creatures_cast",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "event_type": "mana_spent",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_user_mana_spent",
+      "turn": 4,
+      "value": 3.0
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_cards_in_hand",
+      "turn": 4,
+      "value": 2.0
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_eot_user_lands_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_eot_user_lands_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87460",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_eot_user_lands_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87585",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_eot_user_lands_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_lands_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_lands_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87584",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_lands_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87578",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_lands_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87375",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_eot_user_creatures_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87366",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_eot_user_creatures_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87155",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_creatures_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87483",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_creatures_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87321",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_non_creatures_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87175",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_non_creatures_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "arena_id": "87300",
+      "event_type": "end_turn_battlefield_card",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_non_creatures_in_play",
+      "turn": 4
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "user",
+      "raw_column": "user_turn_4_eot_user_life",
+      "turn": 4,
+      "value": 13.0
+    },
+    {
+      "active_side": "user",
+      "event_type": "end_turn_state",
+      "owner_side": "oppo",
+      "raw_column": "user_turn_4_eot_oppo_life",
+      "turn": 4,
+      "value": 20.0
+    },
+    {
+      "active_side": "oppo",
+      "arena_id": "1",
+      "event_type": "draw_card",
+      "owner_side": "oppo",
+      "raw_column": "oppo_turn_4_cards_drawn",
+      "turn": 4
+    }
+  ],
+  "sample_summary": {
+    "main_colors_top": {
+      "BG": 8,
+      "BR": 9,
+      "RG": 12,
+      "UB": 19,
+      "UG": 13,
+      "UR": 39,
+      "WB": 14,
+      "WG": 8,
+      "WR": 38,
+      "WU": 40
+    },
+    "nonempty_suffix_counts_top": {
+      "cards_drawn": 3369,
+      "cards_drawn_or_tutored": 1679,
+      "creatures_attacked": 1655,
+      "creatures_blocked": 533,
+      "creatures_blocking": 533,
+      "creatures_cast": 1972,
+      "creatures_unblocked": 1406,
+      "eot_oppo_cards_in_hand": 3680,
+      "eot_oppo_creatures_in_play": 2794,
+      "eot_oppo_lands_in_play": 3469,
+      "eot_oppo_life": 3680,
+      "eot_oppo_non_creatures_in_play": 1906,
+      "eot_user_cards_in_hand": 582,
+      "eot_user_creatures_in_play": 2895,
+      "eot_user_lands_in_play": 3471,
+      "eot_user_life": 3680,
+      "eot_user_non_creatures_in_play": 2073,
+      "lands_played": 2590,
+      "non_creatures_cast": 786,
+      "oppo_abilities": 1145,
+      "oppo_combat_damage_taken": 838,
+      "oppo_creatures_killed_combat": 381,
+      "oppo_instants_sorceries_cast": 271,
+      "oppo_mana_spent": 1592,
+      "user_abilities": 1229,
+      "user_combat_damage_taken": 662,
+      "user_creatures_killed_combat": 362,
+      "user_creatures_killed_non_combat": 168,
+      "user_instants_sorceries_cast": 222,
+      "user_mana_spent": 1625
+    },
+    "num_turns_distribution_top": {
+      "10": 26,
+      "11": 23,
+      "12": 13,
+      "13": 7,
+      "14": 5,
+      "15": 2,
+      "16": 2,
+      "19": 1,
+      "24": 1,
+      "4": 1,
+      "5": 9,
+      "6": 17,
+      "7": 33,
+      "8": 26,
+      "9": 33
+    },
+    "opponent_colors_top": {
+      "B": 6,
+      "BG": 6,
+      "BR": 11,
+      "RG": 24,
+      "UB": 14,
+      "UG": 11,
+      "UR": 12,
+      "WB": 17,
+      "WG": 16,
+      "WR": 32,
+      "WRG": 8,
+      "WU": 12
+    },
+    "outcomes": {
+      "False": 82,
+      "True": 118
+    },
+    "top_arena_ids": {
+      "1": 2888,
+      "116886": 140,
+      "1268": 145,
+      "169531": 124,
+      "2": 381,
+      "304": 151,
+      "87011": 280,
+      "87133": 152,
+      "87134": 166,
+      "87149": 283,
+      "87155": 656,
+      "87160": 307,
+      "87186": 187,
+      "87199": 142,
+      "87207": 380,
+      "87214": 269,
+      "87217": 135,
+      "87220": 351,
+      "87227": 325,
+      "87228": 262,
+      "87244": 176,
+      "87264": 137,
+      "87287": 146,
+      "87302": 363,
+      "87313": 303,
+      "87319": 130,
+      "87326": 182,
+      "87386": 150,
+      "87423": 133,
+      "87454": 161,
+      "87457": 157,
+      "87460": 179,
+      "87473": 183,
+      "87483": 401,
+      "87578": 522,
+      "87579": 490,
+      "87580": 468,
+      "87582": 288,
+      "87584": 618,
+      "87586": 425
+    },
+    "top_card_like_arena_ids": {
+      "116886": 140,
+      "1268": 145,
+      "1319": 118,
+      "169432": 88,
+      "169531": 124,
+      "84596": 92,
+      "87011": 280,
+      "87017": 101,
+      "87133": 152,
+      "87134": 166,
+      "87142": 94,
+      "87146": 116,
+      "87149": 283,
+      "87150": 84,
+      "87155": 656,
+      "87160": 307,
+      "87163": 74,
+      "87166": 107,
+      "87167": 79,
+      "87175": 109,
+      "87179": 111,
+      "87186": 187,
+      "87197": 96,
+      "87199": 142,
+      "87207": 380,
+      "87214": 269,
+      "87217": 135,
+      "87220": 351,
+      "87221": 121,
+      "87227": 325,
+      "87228": 262,
+      "87239": 100,
+      "87241": 93,
+      "87244": 176,
+      "87246": 88,
+      "87248": 78,
+      "87264": 137,
+      "87279": 107,
+      "87281": 87,
+      "87285": 90,
+      "87287": 146,
+      "87302": 363,
+      "87303": 94,
+      "87306": 73,
+      "87313": 303,
+      "87319": 130,
+      "87321": 97,
+      "87326": 182,
+      "87328": 112,
+      "87329": 97,
+      "87332": 76,
+      "87365": 102,
+      "87366": 118,
+      "87368": 80,
+      "87375": 72,
+      "87386": 150,
+      "87390": 84,
+      "87409": 79,
+      "87412": 98,
+      "87423": 133,
+      "87439": 101,
+      "87454": 161,
+      "87455": 101,
+      "87457": 157,
+      "87460": 179,
+      "87473": 183,
+      "87474": 84,
+      "87480": 96,
+      "87483": 401,
+      "87578": 522,
+      "87579": 490,
+      "87580": 468,
+      "87582": 288,
+      "87584": 618,
+      "87585": 88,
+      "87586": 425
+    },
+    "turn_behavior_metrics": {
+      "1": {
+        "active_mana_spent_avg_positive": 1.0,
+        "active_mana_spent_positive_observations": 132,
+        "creature_cast_entries": 100,
+        "land_play_entries": 400,
+        "noncreature_cast_entries": 32,
+        "spell_action_entries": 132,
+        "total_combat_damage": 0.0
+      },
+      "10": {
+        "active_mana_spent_avg_positive": 5.219,
+        "active_mana_spent_positive_observations": 128,
+        "creature_cast_entries": 80,
+        "land_play_entries": 68,
+        "noncreature_cast_entries": 67,
+        "spell_action_entries": 147,
+        "total_combat_damage": 383.0
+      },
+      "11": {
+        "active_mana_spent_avg_positive": 5.027,
+        "active_mana_spent_positive_observations": 75,
+        "creature_cast_entries": 47,
+        "land_play_entries": 34,
+        "noncreature_cast_entries": 42,
+        "spell_action_entries": 89,
+        "total_combat_damage": 225.0
+      },
+      "12": {
+        "active_mana_spent_avg_positive": 4.644,
+        "active_mana_spent_positive_observations": 45,
+        "creature_cast_entries": 31,
+        "land_play_entries": 14,
+        "noncreature_cast_entries": 17,
+        "spell_action_entries": 48,
+        "total_combat_damage": 197.0
+      },
+      "13": {
+        "active_mana_spent_avg_positive": 4.92,
+        "active_mana_spent_positive_observations": 25,
+        "creature_cast_entries": 15,
+        "land_play_entries": 14,
+        "noncreature_cast_entries": 16,
+        "spell_action_entries": 31,
+        "total_combat_damage": 74.0
+      },
+      "14": {
+        "active_mana_spent_avg_positive": 3.625,
+        "active_mana_spent_positive_observations": 16,
+        "creature_cast_entries": 9,
+        "land_play_entries": 8,
+        "noncreature_cast_entries": 6,
+        "spell_action_entries": 15,
+        "total_combat_damage": 38.0
+      },
+      "15": {
+        "active_mana_spent_avg_positive": 6.333,
+        "active_mana_spent_positive_observations": 9,
+        "creature_cast_entries": 10,
+        "land_play_entries": 6,
+        "noncreature_cast_entries": 5,
+        "spell_action_entries": 15,
+        "total_combat_damage": 17.0
+      },
+      "16": {
+        "active_mana_spent_avg_positive": 6.75,
+        "active_mana_spent_positive_observations": 4,
+        "creature_cast_entries": 3,
+        "land_play_entries": 4,
+        "noncreature_cast_entries": 2,
+        "spell_action_entries": 5,
+        "total_combat_damage": 6.0
+      },
+      "17": {
+        "active_mana_spent_avg_positive": 6.833,
+        "active_mana_spent_positive_observations": 6,
+        "creature_cast_entries": 4,
+        "land_play_entries": 0,
+        "noncreature_cast_entries": 4,
+        "spell_action_entries": 8,
+        "total_combat_damage": 8.0
+      },
+      "18": {
+        "active_mana_spent_avg_positive": 5.2,
+        "active_mana_spent_positive_observations": 5,
+        "creature_cast_entries": 2,
+        "land_play_entries": 3,
+        "noncreature_cast_entries": 3,
+        "spell_action_entries": 5,
+        "total_combat_damage": 10.0
+      },
+      "19": {
+        "active_mana_spent_avg_positive": 6.0,
+        "active_mana_spent_positive_observations": 3,
+        "creature_cast_entries": 2,
+        "land_play_entries": 1,
+        "noncreature_cast_entries": 0,
+        "spell_action_entries": 2,
+        "total_combat_damage": 5.0
+      },
+      "2": {
+        "active_mana_spent_avg_positive": 1.901,
+        "active_mana_spent_positive_observations": 324,
+        "creature_cast_entries": 246,
+        "land_play_entries": 400,
+        "noncreature_cast_entries": 81,
+        "spell_action_entries": 327,
+        "total_combat_damage": 97.0
+      },
+      "20": {
+        "active_mana_spent_avg_positive": 3.5,
+        "active_mana_spent_positive_observations": 2,
+        "creature_cast_entries": 1,
+        "land_play_entries": 1,
+        "noncreature_cast_entries": 0,
+        "spell_action_entries": 1,
+        "total_combat_damage": 0.0
+      },
+      "21": {
+        "active_mana_spent_avg_positive": 4.0,
+        "active_mana_spent_positive_observations": 1,
+        "creature_cast_entries": 0,
+        "land_play_entries": 1,
+        "noncreature_cast_entries": 0,
+        "spell_action_entries": 0,
+        "total_combat_damage": 0.0
+      },
+      "22": {
+        "active_mana_spent_avg_positive": 9.0,
+        "active_mana_spent_positive_observations": 1,
+        "creature_cast_entries": 0,
+        "land_play_entries": 1,
+        "noncreature_cast_entries": 1,
+        "spell_action_entries": 1,
+        "total_combat_damage": 0.0
+      },
+      "23": {
+        "active_mana_spent_avg_positive": 4.0,
+        "active_mana_spent_positive_observations": 1,
+        "creature_cast_entries": 1,
+        "land_play_entries": 1,
+        "noncreature_cast_entries": 1,
+        "spell_action_entries": 2,
+        "total_combat_damage": 6.0
+      },
+      "24": {
+        "active_mana_spent_avg_positive": null,
+        "active_mana_spent_positive_observations": 0,
+        "creature_cast_entries": 0,
+        "land_play_entries": 0,
+        "noncreature_cast_entries": 0,
+        "spell_action_entries": 0,
+        "total_combat_damage": 0.0
+      },
+      "3": {
+        "active_mana_spent_avg_positive": 2.765,
+        "active_mana_spent_positive_observations": 353,
+        "creature_cast_entries": 260,
+        "land_play_entries": 386,
+        "noncreature_cast_entries": 125,
+        "spell_action_entries": 385,
+        "total_combat_damage": 371.0
+      },
+      "4": {
+        "active_mana_spent_avg_positive": 3.489,
+        "active_mana_spent_positive_observations": 370,
+        "creature_cast_entries": 326,
+        "land_play_entries": 346,
+        "noncreature_cast_entries": 141,
+        "spell_action_entries": 467,
+        "total_combat_damage": 603.0
+      },
+      "5": {
+        "active_mana_spent_avg_positive": 3.975,
+        "active_mana_spent_positive_observations": 365,
+        "creature_cast_entries": 279,
+        "land_play_entries": 282,
+        "noncreature_cast_entries": 223,
+        "spell_action_entries": 502,
+        "total_combat_damage": 760.0
+      },
+      "6": {
+        "active_mana_spent_avg_positive": 4.355,
+        "active_mana_spent_positive_observations": 338,
+        "creature_cast_entries": 263,
+        "land_play_entries": 222,
+        "noncreature_cast_entries": 202,
+        "spell_action_entries": 465,
+        "total_combat_damage": 794.0
+      },
+      "7": {
+        "active_mana_spent_avg_positive": 4.571,
+        "active_mana_spent_positive_observations": 294,
+        "creature_cast_entries": 218,
+        "land_play_entries": 181,
+        "noncreature_cast_entries": 165,
+        "spell_action_entries": 383,
+        "total_combat_damage": 710.0
+      },
+      "8": {
+        "active_mana_spent_avg_positive": 5.091,
+        "active_mana_spent_positive_observations": 230,
+        "creature_cast_entries": 169,
+        "land_play_entries": 129,
+        "noncreature_cast_entries": 118,
+        "spell_action_entries": 287,
+        "total_combat_damage": 507.0
+      },
+      "9": {
+        "active_mana_spent_avg_positive": 4.966,
+        "active_mana_spent_positive_observations": 178,
+        "creature_cast_entries": 130,
+        "land_play_entries": 91,
+        "noncreature_cast_entries": 113,
+        "spell_action_entries": 243,
+        "total_combat_damage": 492.0
+      }
+    }
+  },
+  "source": "https://17lands-public.s3.amazonaws.com/analysis_data/replay_data/replay_data_public.LCI.PremierDraft.csv.gz",
+  "source_db_mutated": false,
+  "source_label": "17Lands LCI PremierDraft replay_data"
+}

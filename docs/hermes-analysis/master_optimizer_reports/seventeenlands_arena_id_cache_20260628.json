@@ -1,0 +1,112 @@
+{
+  "87011": {
+    "arena_id": "87011",
+    "name": "Plains",
+    "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+    "resolved": true,
+    "scryfall_id": "486fbcf9-3a04-47f6-8927-886c2a454499"
+  },
+  "87149": {
+    "arena_id": "87149",
+    "name": "Ironpaw Aspirant",
+    "oracle_id": "fab5f694-4a9c-4e72-b164-f236e8212ff7",
+    "resolved": true,
+    "scryfall_id": "f70689a0-ac69-4052-84fc-9055e9e1c54b"
+  },
+  "87155": {
+    "arena_id": "87155",
+    "name": "Miner's Guidewing",
+    "oracle_id": "eb161d0b-e534-463c-b1d1-7210bfba5d28",
+    "resolved": true,
+    "scryfall_id": "9048cd9d-df3f-4705-a5f4-e5b09760c631"
+  },
+  "87160": {
+    "arena_id": "87160",
+    "name": "Oltec Cloud Guard",
+    "oracle_id": "922a8e27-a367-40c6-84df-86ed32f71c7c",
+    "resolved": true,
+    "scryfall_id": "02d68a38-2e0b-401b-b67d-a55e2af5b18d"
+  },
+  "87207": {
+    "arena_id": "87207",
+    "name": "Oaken Siren",
+    "oracle_id": "a06a35a9-a23e-4a0a-90bc-84e7a52d2cef",
+    "resolved": true,
+    "scryfall_id": "d7731ef5-da74-4436-8ee7-01c065cbefae"
+  },
+  "87220": {
+    "arena_id": "87220",
+    "name": "Spyglass Siren",
+    "oracle_id": "4ec9d9eb-14e2-47ea-88a2-d2394e363784",
+    "resolved": true,
+    "scryfall_id": "41e54343-95e5-4dc4-9f18-e4a415fe5e0a"
+  },
+  "87227": {
+    "arena_id": "87227",
+    "name": "Waterwind Scout",
+    "oracle_id": "db65f874-6bf3-4fdb-a977-10b01b7ee2e9",
+    "resolved": true,
+    "scryfall_id": "8a7738fb-0a1b-4010-b8c0-e1129739c765"
+  },
+  "87302": {
+    "arena_id": "87302",
+    "name": "Goblin Tomb Raider",
+    "oracle_id": "37ce95bb-8ff5-47b9-85e4-21be7a794940",
+    "resolved": true,
+    "scryfall_id": "018160fe-f602-43f5-8495-241a08eaa69c"
+  },
+  "87313": {
+    "arena_id": "87313",
+    "name": "Plundering Pirate",
+    "oracle_id": "3ab13412-1eaf-40c0-905d-8a3ca0c51be5",
+    "resolved": true,
+    "scryfall_id": "5bb2552f-8370-4931-83e1-93706d51413a"
+  },
+  "87483": {
+    "arena_id": "87483",
+    "error": "curl: (56) The requested URL returned error: 404",
+    "resolved": false
+  },
+  "87578": {
+    "arena_id": "87578",
+    "name": "Plains",
+    "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+    "resolved": true,
+    "scryfall_id": "5bb495cc-9908-455e-bec9-3993d595f4f9"
+  },
+  "87579": {
+    "arena_id": "87579",
+    "name": "Island",
+    "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+    "resolved": true,
+    "scryfall_id": "bbeca27a-6c5b-40b9-83a4-a3a2096ff6f8"
+  },
+  "87580": {
+    "arena_id": "87580",
+    "name": "Island",
+    "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+    "resolved": true,
+    "scryfall_id": "671516eb-b088-4a15-aec9-1781ca016e11"
+  },
+  "87582": {
+    "arena_id": "87582",
+    "name": "Swamp",
+    "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+    "resolved": true,
+    "scryfall_id": "d86cd8fb-4ba7-4311-b0f3-b06fa112eda5"
+  },
+  "87584": {
+    "arena_id": "87584",
+    "name": "Mountain",
+    "oracle_id": "a3fb7228-e76b-4e96-a40e-20b5fed75685",
+    "resolved": true,
+    "scryfall_id": "adf13285-d127-4534-9f49-aa86914da175"
+  },
+  "87586": {
+    "arena_id": "87586",
+    "name": "Forest",
+    "oracle_id": "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+    "resolved": true,
+    "scryfall_id": "07264de1-4322-4adb-8f08-c0aa236747c7"
+  }
+}
