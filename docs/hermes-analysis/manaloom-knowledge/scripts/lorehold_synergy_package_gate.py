@@ -2101,17 +2101,38 @@ def load_gate_result(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def compact_game_results(game_results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    compacted: list[dict[str, Any]] = []
+    for row in game_results:
+        if not isinstance(row, dict):
+            continue
+        compacted.append(
+            {
+                "game_id": row.get("game_id"),
+                "game_index": row.get("game_index"),
+                "opponent": row.get("opponent"),
+                "opponent_archetype": row.get("opponent_archetype"),
+                "result": row.get("result"),
+                "turns": row.get("turns"),
+                "reason": row.get("reason"),
+            }
+        )
+    return compacted
+
+
 def compact_gate_telemetry(telemetry: dict[str, Any]) -> dict[str, Any]:
     return {
         "strategic_event_counts": telemetry.get("strategic_event_counts") or {},
         "strategic_games": telemetry.get("strategic_games") or {},
         "event_counts": telemetry.get("event_counts") or {},
         "card_event_counts": telemetry.get("card_event_counts") or {},
+        "card_event_counts_by_game": telemetry.get("card_event_counts_by_game") or {},
         "card_strategy_counts": telemetry.get("card_strategy_counts") or {},
         "focus_card_trace_card_counts_by_game": (
             telemetry.get("focus_card_trace_card_counts_by_game") or {}
         ),
         "focus_card_access_summary": compact_focus_card_access_summary(telemetry),
+        "focus_card_access_by_game": compact_focus_card_access_by_game(telemetry),
         "top_cards": telemetry.get("top_cards") or [],
         "lorehold_attack_restrictions": telemetry.get("lorehold_attack_restrictions") or {},
         "lorehold_attack_restriction_source_events": (
@@ -2130,6 +2151,7 @@ def compact_gate_row(row: dict[str, Any]) -> dict[str, Any]:
         "stalls": row.get("stalls"),
         "win_rate": row.get("win_rate"),
         "avg_win_turn": row.get("avg_win_turn"),
+        "game_results": compact_game_results(row.get("game_results") or []),
         "telemetry": compact_gate_telemetry(row.get("telemetry") or {}),
     }
 
@@ -2196,24 +2218,135 @@ def strategic_delta_text(gate: dict[str, Any]) -> str:
 
 
 def card_event_breakdown(telemetry: dict[str, Any], card_name: str) -> dict[str, int]:
-    breakdown: dict[str, int] = {}
-    counts = telemetry.get("card_event_counts") or {}
-    if isinstance(counts, dict):
-        for key, value in counts.items():
-            prefix, separator, name = str(key).partition(":")
-            if not separator or name != card_name:
-                continue
-            breakdown[prefix] = breakdown.get(prefix, 0) + int(value or 0)
-    if breakdown:
+    def breakdown_from_counts(counts: Any) -> dict[str, int]:
+        breakdown: dict[str, int] = {}
+        if isinstance(counts, dict):
+            for key, value in counts.items():
+                prefix, separator, name = str(key).partition(":")
+                if not separator or name != card_name:
+                    continue
+                breakdown[prefix] = breakdown.get(prefix, 0) + int(value or 0)
         return dict(sorted(breakdown.items()))
-    counts = telemetry.get("card_strategy_counts") or {}
-    if isinstance(counts, dict):
+
+    breakdown = breakdown_from_counts(telemetry.get("card_event_counts") or {})
+    if breakdown:
+        return breakdown
+    return breakdown_from_counts(telemetry.get("card_strategy_counts") or {})
+
+
+def card_event_breakdown_by_game(telemetry: dict[str, Any], card_name: str) -> dict[str, dict[str, int]]:
+    by_game = telemetry.get("card_event_counts_by_game") or {}
+    if not isinstance(by_game, dict):
+        return {}
+    result: dict[str, dict[str, int]] = {}
+    for raw_game_id, counts in by_game.items():
+        breakdown: dict[str, int] = {}
+        if not isinstance(counts, dict):
+            continue
         for key, value in counts.items():
             prefix, separator, name = str(key).partition(":")
             if not separator or name != card_name:
                 continue
             breakdown[prefix] = breakdown.get(prefix, 0) + int(value or 0)
-    return dict(sorted(breakdown.items()))
+        if breakdown:
+            result[str(raw_game_id)] = dict(sorted(breakdown.items()))
+    return result
+
+
+def result_record(game_results: list[dict[str, Any]]) -> dict[str, Any]:
+    wins = losses = stalls = 0
+    for row in game_results:
+        result = str(row.get("result") or "")
+        if result == "win":
+            wins += 1
+        elif result == "loss":
+            losses += 1
+        else:
+            stalls += 1
+    games = wins + losses + stalls
+    return {
+        "games": games,
+        "wins": wins,
+        "losses": losses,
+        "stalls": stalls,
+        "win_rate": round(wins / max(1, games) * 100, 2) if games else 0.0,
+    }
+
+
+def card_exposure_outcome_summary(row: dict[str, Any], card_name: str) -> dict[str, Any]:
+    telemetry = row.get("telemetry") or {}
+    game_results = [
+        game
+        for game in row.get("game_results") or []
+        if isinstance(game, dict) and game.get("game_id")
+    ]
+    use_by_game = card_event_breakdown_by_game(telemetry, card_name)
+    access_by_game = focus_card_access_game_profiles(telemetry, card_name)
+    annotated_games: list[dict[str, Any]] = []
+    for game in game_results:
+        game_id = str(game.get("game_id") or "")
+        event_breakdown = use_by_game.get(game_id) or {}
+        recorded_use_count = sum(int(value or 0) for value in event_breakdown.values())
+        access_profile = access_by_game.get(game_id) or {}
+        if recorded_use_count > 0:
+            exposure_status = "used"
+        elif bool(access_profile.get("accessed")):
+            exposure_status = "accessed_not_used"
+        elif bool(access_profile.get("near_access")):
+            exposure_status = "near_access_not_used"
+        elif bool(access_profile.get("library_only")):
+            exposure_status = "library_only_not_used"
+        elif access_profile:
+            exposure_status = "observed_not_used"
+        else:
+            exposure_status = "not_observed"
+        annotated_games.append(
+            {
+                "game_id": game_id,
+                "opponent": game.get("opponent"),
+                "result": game.get("result"),
+                "turns": game.get("turns"),
+                "recorded_use_count": recorded_use_count,
+                "event_breakdown": event_breakdown,
+                "access_status": exposure_status,
+                "accessed": recorded_use_count > 0 or bool(access_profile.get("accessed")),
+                "near_access": bool(access_profile.get("near_access")),
+                "dominant_zone": access_profile.get("dominant_zone"),
+            }
+        )
+
+    used_games = [game for game in annotated_games if game["access_status"] == "used"]
+    accessed_or_used_games = [
+        game for game in annotated_games if game["access_status"] in {"used", "accessed_not_used"}
+    ]
+    near_or_better_games = [
+        game
+        for game in annotated_games
+        if game["access_status"] in {"used", "accessed_not_used", "near_access_not_used"}
+    ]
+    status_counts: dict[str, int] = {}
+    for game in annotated_games:
+        status = str(game.get("access_status") or "not_observed")
+        status_counts[status] = status_counts.get(status, 0) + 1
+    return {
+        "card_name": card_name,
+        "all_games": result_record(annotated_games),
+        "used_games": result_record(used_games),
+        "accessed_or_used_games": result_record(accessed_or_used_games),
+        "near_access_or_better_games": result_record(near_or_better_games),
+        "status_counts": dict(sorted(status_counts.items())),
+        "sample_quality": (
+            "card_used_sample"
+            if used_games
+            else "card_accessed_not_used_sample"
+            if accessed_or_used_games
+            else "card_near_access_only_sample"
+            if near_or_better_games
+            else "no_card_exposure_sample"
+        ),
+        "games": annotated_games[:20],
+        "games_truncated": len(annotated_games) > 20,
+    }
 
 
 def focus_location_trace_count(telemetry: dict[str, Any], card_name: str) -> tuple[int, int]:
@@ -2359,7 +2492,93 @@ def focus_card_access_profile(telemetry: dict[str, Any], card_name: str) -> dict
     return profile
 
 
+def focus_card_access_game_profiles(telemetry: dict[str, Any], card_name: str) -> dict[str, dict[str, Any]]:
+    compact_by_game = telemetry.get("focus_card_access_by_game") or {}
+    if isinstance(compact_by_game, dict) and isinstance(compact_by_game.get(card_name), dict):
+        return {
+            str(game_id): dict(profile)
+            for game_id, profile in compact_by_game[card_name].items()
+            if isinstance(profile, Mapping)
+        }
+
+    traces_by_game = telemetry.get("focus_card_game_traces") or {}
+    if not isinstance(traces_by_game, dict):
+        return {}
+
+    profiles: dict[str, dict[str, Any]] = {}
+    for raw_game_id, traces in traces_by_game.items():
+        game_id = str(raw_game_id)
+        if not isinstance(traces, list):
+            continue
+        profile: dict[str, Any] = {
+            "trace_count": 0,
+            "zone_counts": {},
+            "accessed": False,
+            "near_access": False,
+            "drawn": False,
+            "opening_hand": False,
+            "library_only": False,
+            "dominant_zone": None,
+        }
+        zone_counts: dict[str, int] = {}
+        observed = False
+        saw_library = False
+        for trace in traces:
+            if not isinstance(trace, Mapping):
+                continue
+            data = trace.get("data") or {}
+            if not isinstance(data, Mapping):
+                continue
+            zones = data.get("focus_card_zones") or {}
+            zone_info = zones.get(card_name) if isinstance(zones, Mapping) else None
+            zone = ""
+            if isinstance(zone_info, Mapping):
+                zone = str(zone_info.get("zone") or "").strip()
+            if not zone:
+                continue
+            profile["trace_count"] = int(profile["trace_count"]) + 1
+            zone_counts[zone] = zone_counts.get(zone, 0) + 1
+            if zone != "absent":
+                observed = True
+            if zone == "library":
+                saw_library = True
+            drawn_names = (
+                card_names_from_snapshots(data.get("drawn_for_turn"))
+                | card_names_from_snapshots(data.get("drawn"))
+                | card_names_from_snapshots(data.get("first_draw"))
+            )
+            if card_name in drawn_names:
+                profile["drawn"] = True
+                profile["accessed"] = True
+            if card_name in set(data.get("hand_focus") or []):
+                profile["accessed"] = True
+            if zone in ACCESS_ZONES:
+                profile["accessed"] = True
+            if (
+                isinstance(zone_info, Mapping)
+                and bool(zone_info.get("library_top_7"))
+            ) or card_name in set(data.get("library_top_focus") or []):
+                profile["near_access"] = True
+            if data.get("phase") == "opening_keep" and zone == "hand":
+                profile["opening_hand"] = True
+                profile["accessed"] = True
+
+        if not observed and not int(profile["trace_count"]):
+            continue
+        profile["zone_counts"] = dict(sorted(zone_counts.items()))
+        if zone_counts:
+            profile["dominant_zone"] = max(zone_counts.items(), key=lambda item: item[1])[0]
+        profile["library_only"] = bool(
+            saw_library and not profile["accessed"] and not profile["near_access"]
+        )
+        profiles[game_id] = profile
+    return profiles
+
+
 def compact_focus_card_access_summary(telemetry: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    existing = telemetry.get("focus_card_access_summary") or {}
+    if isinstance(existing, dict) and existing:
+        return existing
     traces_by_game = telemetry.get("focus_card_game_traces") or {}
     if not isinstance(traces_by_game, dict):
         return {}
@@ -2378,6 +2597,32 @@ def compact_focus_card_access_summary(telemetry: dict[str, Any]) -> dict[str, di
                 card_names.update(str(name) for name in zones.keys())
     return {
         card_name: focus_card_access_profile(telemetry, card_name)
+        for card_name in sorted(card_names)
+    }
+
+
+def compact_focus_card_access_by_game(telemetry: dict[str, Any]) -> dict[str, dict[str, dict[str, Any]]]:
+    existing = telemetry.get("focus_card_access_by_game") or {}
+    if isinstance(existing, dict) and existing:
+        return existing
+    traces_by_game = telemetry.get("focus_card_game_traces") or {}
+    if not isinstance(traces_by_game, dict):
+        return {}
+    card_names: set[str] = set()
+    for traces in traces_by_game.values():
+        if not isinstance(traces, list):
+            continue
+        for trace in traces:
+            if not isinstance(trace, Mapping):
+                continue
+            data = trace.get("data") or {}
+            if not isinstance(data, Mapping):
+                continue
+            zones = data.get("focus_card_zones") or {}
+            if isinstance(zones, Mapping):
+                card_names.update(str(name) for name in zones.keys())
+    return {
+        card_name: focus_card_access_game_profiles(telemetry, card_name)
         for card_name in sorted(card_names)
     }
 
@@ -2414,6 +2659,7 @@ def side_card_exposure(row: dict[str, Any], cards: list[str]) -> dict[str, Any]:
                 "location_trace_count": location_trace_count,
                 "location_trace_games": location_trace_games,
                 "access_profile": access_profile,
+                "outcome_summary": card_exposure_outcome_summary(row, card_name),
                 "status": status,
             }
         )
@@ -2499,12 +2745,17 @@ def exposure_summary_text(exposure: dict[str, Any]) -> str:
     parts = []
     for item in cards:
         profile = item.get("access_profile") or {}
+        outcome = item.get("outcome_summary") or {}
+        used_games = outcome.get("used_games") or {}
         parts.append(
             (
                 f"{item.get('card_name')} use={int(item.get('recorded_use_count') or 0)}"
                 f" access_games={int(profile.get('accessed_games') or 0)}"
                 f" near_games={int(profile.get('near_access_games') or 0)}"
                 f" dominant_zone={profile.get('dominant_zone') or '-'}"
+                f" used_record={int(used_games.get('wins') or 0)}W/"
+                f"{int(used_games.get('losses') or 0)}L/"
+                f"{int(used_games.get('stalls') or 0)}S"
             )
         )
     status = exposure.get("status") or "unknown"

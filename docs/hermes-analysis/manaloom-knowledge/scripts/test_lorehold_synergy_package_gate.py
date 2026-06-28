@@ -1197,6 +1197,59 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             4,
         )
 
+    def test_card_exposure_outcome_counts_only_games_where_card_was_used(self):
+        payload = {
+            "baseline": {
+                "games": 3,
+                "wins": 1,
+                "losses": 2,
+                "game_results": [
+                    {"game_id": "baseline:a:0", "result": "win", "opponent": "a"},
+                    {"game_id": "baseline:b:0", "result": "loss", "opponent": "b"},
+                    {"game_id": "baseline:c:0", "result": "loss", "opponent": "c"},
+                ],
+                "telemetry": {
+                    "card_event_counts": {"spell_cast:Arcane Signet": 1},
+                    "card_event_counts_by_game": {
+                        "baseline:a:0": {"spell_cast:Arcane Signet": 1},
+                    },
+                },
+            },
+            "candidate": {
+                "games": 3,
+                "wins": 2,
+                "losses": 1,
+                "game_results": [
+                    {"game_id": "candidate:a:0", "result": "win", "opponent": "a"},
+                    {"game_id": "candidate:b:0", "result": "win", "opponent": "b"},
+                    {"game_id": "candidate:c:0", "result": "loss", "opponent": "c"},
+                ],
+                "telemetry": {
+                    "card_event_counts": {"spell_cast:Mana Vault": 1},
+                    "card_event_counts_by_game": {
+                        "candidate:c:0": {"spell_cast:Mana Vault": 1},
+                    },
+                },
+            },
+        }
+
+        exposure = gate.package_exposure_summary(
+            payload,
+            adds=["Mana Vault"],
+            cuts=["Arcane Signet"],
+        )
+
+        outcome = exposure["candidate_added_cards"]["cards"][0]["outcome_summary"]
+        self.assertEqual(outcome["all_games"]["wins"], 2)
+        self.assertEqual(outcome["all_games"]["losses"], 1)
+        self.assertEqual(outcome["used_games"]["games"], 1)
+        self.assertEqual(outcome["used_games"]["wins"], 0)
+        self.assertEqual(outcome["used_games"]["losses"], 1)
+        self.assertEqual(outcome["status_counts"]["used"], 1)
+        self.assertEqual(outcome["status_counts"]["not_observed"], 2)
+        self.assertEqual(outcome["sample_quality"], "card_used_sample")
+        self.assertIn("used_record=0W/1L/0S", gate.exposure_summary_text(exposure))
+
     def test_gate_decision_is_inconclusive_when_added_card_never_used(self):
         gate_summary = {
             "baseline": {"wins": 0, "losses": 3, "win_rate": 0.0, "telemetry": {}},
@@ -1418,6 +1471,55 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertTrue(exposure["all_cards_accessed"])
         self.assertEqual(package["status"], "candidate_added_cards_accessed_not_used")
         self.assertEqual(package["next_step"], "inspect_play_heuristic_or_runtime_for_accessed_card")
+
+    def test_card_exposure_outcome_separates_accessed_not_used_from_used_record(self):
+        row = {
+            "game_results": [
+                {"game_id": "game-1", "result": "win", "opponent": "a"},
+            ],
+            "telemetry": {
+                "focus_card_game_traces": {
+                    "game-1": [
+                        {
+                            "event": "focus_card_access_snapshot",
+                            "data": {
+                                "phase": "opening_keep",
+                                "focus_card_zones": {
+                                    "Silence": {
+                                        "zone": "hand",
+                                    }
+                                },
+                                "hand_focus": ["Silence"],
+                            },
+                        }
+                    ]
+                }
+            },
+        }
+
+        package = gate.package_exposure_summary(
+            {"candidate": row, "baseline": {"telemetry": {}}},
+            adds=["Silence"],
+            cuts=["Avatar's Wrath"],
+        )
+
+        outcome = package["candidate_added_cards"]["cards"][0]["outcome_summary"]
+        self.assertEqual(outcome["used_games"]["games"], 0)
+        self.assertEqual(outcome["accessed_or_used_games"]["games"], 1)
+        self.assertEqual(outcome["accessed_or_used_games"]["wins"], 1)
+        self.assertEqual(outcome["status_counts"]["accessed_not_used"], 1)
+        self.assertEqual(outcome["sample_quality"], "card_accessed_not_used_sample")
+        self.assertEqual(
+            gate.gate_decision(
+                {
+                    "baseline": {"wins": 0, "losses": 1, "win_rate": 0.0},
+                    "candidate": {"wins": 1, "losses": 0, "win_rate": 100.0},
+                    "delta_pp": 100.0,
+                },
+                package,
+            ),
+            "inconclusive_low_exposure",
+        )
 
     def test_compact_gate_telemetry_preserves_access_summary_without_full_traces(self):
         telemetry = {
