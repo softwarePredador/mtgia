@@ -1,0 +1,1147 @@
+{
+  "action_queue": [
+    {
+      "category": "runtime_rule_gap",
+      "count": 43,
+      "examples": [
+        {
+          "detail": "coherence audit has critical=0, high=379",
+          "evidence": {
+            "deck_id": null,
+            "finding_counts": {
+              "generic_effect_without_model_scope": 79,
+              "missing_oracle_text": 1,
+              "no_active_battle_rule": 172,
+              "no_trusted_executable_rule": 98,
+              "review_only_or_needs_review_rule": 229,
+              "trusted_rule_without_oracle_hash": 127
+            },
+            "severity_counts": {
+              "high": 379,
+              "medium": 54,
+              "pass": 601
+            }
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pgc023_finale_post_20260628_152000.json"
+        },
+        {
+          "detail": "coherence audit has critical=0, high=379",
+          "evidence": {
+            "deck_id": null,
+            "finding_counts": {
+              "generic_effect_without_model_scope": 79,
+              "missing_oracle_text": 1,
+              "no_active_battle_rule": 172,
+              "no_trusted_executable_rule": 98,
+              "review_only_or_needs_review_rule": 229,
+              "trusted_rule_without_oracle_hash": 127
+            },
+            "severity_counts": {
+              "high": 379,
+              "medium": 54,
+              "pass": 601
+            }
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pgc023_finale_post_20260628_151100.json"
+        },
+        {
+          "detail": "coherence audit has critical=0, high=380",
+          "evidence": {
+            "deck_id": null,
+            "finding_counts": {
+              "generic_effect_without_model_scope": 80,
+              "missing_oracle_text": 1,
+              "no_active_battle_rule": 172,
+              "no_trusted_executable_rule": 98,
+              "review_only_or_needs_review_rule": 230,
+              "trusted_rule_without_oracle_hash": 128
+            },
+            "severity_counts": {
+              "high": 380,
+              "medium": 54,
+              "pass": 600
+            }
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pgc023_current_20260628_145800.json"
+        },
+        {
+          "detail": "coherence audit has critical=0, high=380",
+          "evidence": {
+            "deck_id": null,
+            "finding_counts": {
+              "generic_effect_without_model_scope": 80,
+              "missing_oracle_text": 1,
+              "no_active_battle_rule": 172,
+              "no_trusted_executable_rule": 98,
+              "review_only_or_needs_review_rule": 230,
+              "trusted_rule_without_oracle_hash": 128
+            },
+            "severity_counts": {
+              "high": 380,
+              "medium": 54,
+              "pass": 600
+            }
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pgc019_eternal_witness_post_20260628_184100.json"
+        },
+        {
+          "detail": "coherence audit has critical=0, high=381",
+          "evidence": {
+            "deck_id": null,
+            "finding_counts": {
+              "generic_effect_without_model_scope": 80,
+              "missing_oracle_text": 1,
+              "no_active_battle_rule": 172,
+              "no_trusted_executable_rule": 98,
+              "review_only_or_needs_review_rule": 231,
+              "trusted_rule_without_oracle_hash": 129
+            },
+            "severity_counts": {
+              "high": 381,
+              "medium": 54,
+              "pass": 599
+            }
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_pgc019_start_20260628_183100.json"
+        }
+      ],
+      "issue_type": "coherence_critical_high_findings",
+      "next_action": "prioritize_cards_with_no_active_or_no_trusted_rules_in_current_deck_scope",
+      "severity": "critical"
+    },
+    {
+      "category": "postgres_sync_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "report status is postgres_unreachable_pg_isready_no_response",
+          "evidence": {
+            "status": "postgres_unreachable_pg_isready_no_response"
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/pg245_lorehold_topdeck_damage_runtime_20260628_precheck_probe_20260628_103331.json"
+        }
+      ],
+      "issue_type": "top_level_status",
+      "next_action": "resolve_pg_connectivity_or_apply_state_before_claiming_sync",
+      "severity": "critical"
+    },
+    {
+      "category": "blocked_workflow",
+      "count": 68,
+      "examples": [
+        {
+          "detail": "text log contains blocked",
+          "evidence": {
+            "snippets": [
+              "- status: `needs_more_evidence`",
+              "| `candidate_607_birgi_v1` | P1 | `executed_inconclusive_candidate_unobserved` | `birgi_v1` | matching executable research plan found |",
+              "- battle_prior_status: `inconclusive_candidate_unobserved`"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_execute_20260628.md"
+        },
+        {
+          "detail": "text log contains blocked",
+          "evidence": {
+            "snippets": [
+              "- Status: `inconclusive_candidate_unobserved`"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_execute_20260628_birgi_v1_gate_17lands_prior.md"
+        },
+        {
+          "detail": "text log contains blocked",
+          "evidence": {
+            "snippets": [
+              "- Prior inconclusive low-exposure packages loaded: `17`",
+              "- Prior inconclusive low-exposure package keys: `akromas_will_cut_avatar_wrath, austere_command_wipe_over_emeria_tradeoff, boros_charm_pressure_cut_avatar_wrath, enlightened_access_benchmark_cut_land_tax, gamble_access_benchmark_cut_land_tax, grand_abolisher_cut_mother_of_runes, hidden_retreat_stack",
+              "| 6 | `resolve_inconclusive_package_exposures` | `diagnostic_low_exposure_recorded_no_strategy_block` | `battle_gate_evidence_quality` | Akroma's Will, Austere Command, Boros Charm, Enlightened Tutor, Gamble, Grand Abolisher, Hidden Retreat, Perch Protection, Plateau, Seething Song, Silence, Storm-K"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260628_actionability_v1.md"
+        },
+        {
+          "detail": "text log contains blocked",
+          "evidence": {
+            "snippets": [
+              "- Blocked runtime cards: `61`"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v17_boros_runtime.md"
+        },
+        {
+          "detail": "text log contains blocked",
+          "evidence": {
+            "snippets": [
+              "- decision_counts: `{\"candidate_used_without_cut_comparator\": 4, \"card_outcome_rejects_current_pair\": 4, \"forced_access_card_outcome_no_lift_reject_or_rework\": 1, \"inconclusive_no_candidate_used_sample\": 8, \"insufficient_card_outcome_used_sample\": 7, \"missing_per_card_outcome_data\": 44}`",
+              "- rollup_status_counts: `{\"forced_access_no_lift_reject_or_rework\": 1, \"inconclusive_low_candidate_use\": 8, \"insufficient_card_outcome_sample\": 5, \"missing_per_card_data\": 41, \"natural_reject_current_pair\": 2, \"used_without_cut_comparator\": 4}`",
+              "| `austere_command_wipe_over_emeria_tradeoff` | `Austere Command` | `Emeria's Call // Emeria, Shattered Skyclave` | `inconclusive_low_candidate_use` | 1 | 1 | 0 | - | -66.67 to -66.67 | `rerun_larger_or_forced_access_then_natural_confirmation` |"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.md"
+        }
+      ],
+      "issue_type": "text_blocked",
+      "next_action": "inspect_text_log_and_convert_recurring_pattern_to_structured_gate_field",
+      "severity": "high"
+    },
+    {
+      "category": "runtime_rule_gap",
+      "count": 2,
+      "examples": [
+        {
+          "detail": "synergy_ghostly_prison_pressure_cut_promise has 1 Squee graveyard anomalies",
+          "evidence": {
+            "deck_key": "synergy_ghostly_prison_pressure_cut_promise",
+            "sample": [
+              {
+                "event": "trigger_resolved",
+                "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                "kind": "squee_return_without_known_graveyard_entry",
+                "recent_trace": [
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 10
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9915,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 11
+                    },
+                    "event": "turn_start",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9924,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 11
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9925,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 11
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9927,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 11
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9935,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 11
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9939,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 11
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9949,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "discarded": 0,
+                      "discarded_cards": [],
+                      "player": "Lorehold",
+                      "turn": 11
+                    },
+                    "event": "turn_end",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9950,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 12
+                    },
+                    "event": "turn_start",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9951,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 12
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9952,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 12
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9954,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 12
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Umbris, Fear Manifest #114 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 9965,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  }
+                ],
+                "seq": 10060,
+                "turn": 12
+              }
+            ]
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_winota_gate_20260628_v1_20260628_073000_ghostly_prison_pressure_cut_promise.json"
+        },
+        {
+          "detail": "synergy_ghostly_prison_pressure_cut_promise has 1 Squee graveyard anomalies",
+          "evidence": {
+            "deck_key": "synergy_ghostly_prison_pressure_cut_promise",
+            "sample": [
+              {
+                "event": "trigger_resolved",
+                "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                "kind": "squee_return_without_known_graveyard_entry",
+                "recent_trace": [
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 6
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4250,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 6
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4256,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "discarded": 0,
+                      "discarded_cards": [],
+                      "player": "Lorehold",
+                      "turn": 6
+                    },
+                    "event": "turn_end",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4257,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "discard_destination": "graveyard",
+                      "discarded": "Squee, Goblin Nabob",
+                      "player": "Lorehold",
+                      "reason": "discard_squee_for_upkeep_recursion",
+                      "turn": 6
+                    },
+                    "event": "lorehold_upkeep_rummage",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "graveyard_entry"
+                    ],
+                    "seq": 4260,
+                    "squee_known_graveyard_balance_after": 1,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 7
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4353,
+                    "squee_known_graveyard_balance_after": 1,
+                    "squee_known_graveyard_balance_before": 1
+                  },
+                  {
+                    "data": {
+                      "card": "Squee, Goblin Nabob",
+                      "destination": "hand",
+                      "effect": "graveyard_upkeep_return_self_to_hand",
+                      "player": "Lorehold",
+                      "trigger": "beginning_of_your_upkeep",
+                      "turn": 7
+                    },
+                    "event": "trigger_resolved",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "upkeep_return"
+                    ],
+                    "seq": 4355,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 1
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 7
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4356,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 7
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4364,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "card": "Reforge the Soul",
+                      "player": "Lorehold",
+                      "turn": 7
+                    },
+                    "event": "wheel_resolved",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4376,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 7
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4390,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 7
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4454,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  },
+                  {
+                    "data": {
+                      "player": "Lorehold",
+                      "turn": 8
+                    },
+                    "event": "focus_card_access_snapshot",
+                    "game_id": "synergy_ghostly_prison_pressure_cut_promise:Kinnan, Bonder Prodigy #84 (real):0",
+                    "markers": [
+                      "mentions_squee"
+                    ],
+                    "seq": 4514,
+                    "squee_known_graveyard_balance_after": 0,
+                    "squee_known_graveyard_balance_before": 0
+                  }
+                ],
+                "seq": 4517,
+                "turn": 8
+              }
+            ]
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_champion_gate_20260628_v1_20260628_072510_ghostly_prison_pressure_cut_promise.json"
+        }
+      ],
+      "issue_type": "squee_graveyard_anomaly",
+      "next_action": "fix_squee_zone_accounting_before_using_recursion_results",
+      "severity": "high"
+    },
+    {
+      "category": "battle_runtime_quality",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "text log contains timeout",
+          "evidence": {
+            "snippets": [
+              "| galvanoth_topdeck_freecast | `conflicting_signal_needs_champion_gate` | +44.44 | +11.11 | `lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json` |",
+              "| galvanoth_topdeck_freecast_cut_chimes | `conflicting_signal_needs_champion_gate` | +33.33 | +11.11 | `lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json` |",
+              "| birgi_spellchain_cut_squelcher | `conflicting_signal_needs_champion_gate` | +22.22 | +22.22 | `lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json` |"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_learning_evidence_ledger_20260628_v1.md"
+        }
+      ],
+      "issue_type": "text_timeout",
+      "next_action": "inspect_text_log_and_convert_recurring_pattern_to_structured_gate_field",
+      "severity": "high"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "candidate card was not observed: Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "evidence": {
+            "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "evidence_level": "library_only",
+            "trace_count": 45
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_execute_20260628_birgi_v1_gate_17lands_prior.json"
+        }
+      ],
+      "issue_type": "candidate_unobserved",
+      "next_action": "do_not_score_swap_until_forced_or_natural_access_sample_exists",
+      "severity": "high"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "candidate card was not observed: Mana Vault",
+          "evidence": {
+            "card": "Mana Vault",
+            "evidence_level": null,
+            "trace_count": null
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_battle_prior_compare_deck607_replay_20260628.json"
+        }
+      ],
+      "issue_type": "candidate_unobserved",
+      "next_action": "do_not_score_swap_until_forced_or_natural_access_sample_exists",
+      "severity": "high"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "report status is needs_more_evidence",
+          "evidence": {
+            "status": "needs_more_evidence"
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_execute_20260628.json"
+        }
+      ],
+      "issue_type": "top_level_status",
+      "next_action": "rerun_with_candidate_observation_or_min_used_sample",
+      "severity": "high"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "report status is inconclusive_candidate_unobserved",
+          "evidence": {
+            "status": "inconclusive_candidate_unobserved"
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_execute_20260628_birgi_v1_gate_17lands_prior.json"
+        }
+      ],
+      "issue_type": "top_level_status",
+      "next_action": "rerun_with_candidate_observation_or_min_used_sample",
+      "severity": "high"
+    },
+    {
+      "category": "xmage_mapping_gap",
+      "count": 22,
+      "examples": [
+        {
+          "detail": "XMage pipeline still has 53 manual or blocked rows",
+          "evidence": {
+            "manual_or_blocked_count": 53
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v18_boros_pg_candidate.json"
+        },
+        {
+          "detail": "XMage pipeline still has 53 manual or blocked rows",
+          "evidence": {
+            "manual_or_blocked_count": 53
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v17_boros_runtime_families.json"
+        },
+        {
+          "detail": "XMage pipeline still has 106 manual or blocked rows",
+          "evidence": {
+            "manual_or_blocked_count": 106
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v17_boros_runtime.json"
+        },
+        {
+          "detail": "XMage pipeline still has 54 manual or blocked rows",
+          "evidence": {
+            "manual_or_blocked_count": 54
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v16_balefire_pg_candidate.json"
+        },
+        {
+          "detail": "XMage pipeline still has 54 manual or blocked rows",
+          "evidence": {
+            "manual_or_blocked_count": 54
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v15_balefire_runtime_families.json"
+        }
+      ],
+      "issue_type": "manual_or_blocked_rules",
+      "next_action": "group_manual_rows_by_effect_family_and_create_mapper_or_runtime_family_test",
+      "severity": "medium"
+    },
+    {
+      "category": "runtime_or_test_failure",
+      "count": 6,
+      "examples": [
+        {
+          "detail": "text log contains warning",
+          "evidence": {
+            "snippets": [
+              "- status: `warning`"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_forced_opening_20260628.md"
+        },
+        {
+          "detail": "text log contains warning",
+          "evidence": {
+            "snippets": [
+              "documentation-only mismatch."
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/pgc006_formidable_speaker_annotation_only_executor_guard_package.md"
+        },
+        {
+          "detail": "text log contains warning",
+          "evidence": {
+            "snippets": [
+              "- Status counts: `{\"blocked\": 102, \"blocked_ramp_floor_mismatch\": 8, \"manual_role_review_required\": 6, \"protected_benchmark_required\": 72}`"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260628_v3_operational_queue.md"
+        },
+        {
+          "detail": "text log contains warning",
+          "evidence": {
+            "snippets": [
+              "- Status counts: `{\"blocked\": 102, \"blocked_ramp_floor_mismatch\": 8, \"manual_role_review_required\": 6, \"protected_benchmark_required\": 72}`"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260628_v2_current_miner.md"
+        },
+        {
+          "detail": "text log contains warning",
+          "evidence": {
+            "snippets": [
+              "| Enlightened Tutor | Bender's Waterskin | `blocked` | 82 | unsupported_cut_role:unmeasured, candidate_role_mismatch:unknown |",
+              "| Goblin Engineer | Bender's Waterskin | `blocked` | 77 | unsupported_cut_role:unmeasured, candidate_role_mismatch:unknown |",
+              "| Mana Vault | Bender's Waterskin | `blocked` | 77 | unsupported_cut_role:unmeasured, candidate_role_mismatch:unknown |"
+            ],
+            "test_names": []
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260628_v1.md"
+        }
+      ],
+      "issue_type": "text_warning",
+      "next_action": "inspect_text_log_and_convert_recurring_pattern_to_structured_gate_field",
+      "severity": "medium"
+    },
+    {
+      "category": "battle_rhythm_gap",
+      "count": 3,
+      "examples": [
+        {
+          "detail": "battle prior emitted 4 rhythm flags",
+          "evidence": {
+            "sample_flags": [
+              {
+                "metric": "spell_action_entries",
+                "observed_per_player_slot": 39.5,
+                "prior_per_player_slot": 8.9,
+                "ratio": 4.4382,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "creature_cast_entries",
+                "observed_per_player_slot": 2.5,
+                "prior_per_player_slot": 5.49,
+                "ratio": 0.4554,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "noncreature_cast_entries",
+                "observed_per_player_slot": 37.0,
+                "prior_per_player_slot": 3.41,
+                "ratio": 10.8504,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "total_combat_damage",
+                "observed_per_player_slot": 0.0,
+                "prior_per_player_slot": 13.2575,
+                "ratio": 0.0,
+                "scope": "whole_game"
+              }
+            ]
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_forced_opening_20260628_birgi_v1_gate_17lands_prior.json"
+        },
+        {
+          "detail": "battle prior emitted 4 rhythm flags",
+          "evidence": {
+            "sample_flags": [
+              {
+                "metric": "spell_action_entries",
+                "observed_per_player_slot": 37.5,
+                "prior_per_player_slot": 8.9,
+                "ratio": 4.2135,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "creature_cast_entries",
+                "observed_per_player_slot": 1.0,
+                "prior_per_player_slot": 5.49,
+                "ratio": 0.1821,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "noncreature_cast_entries",
+                "observed_per_player_slot": 36.5,
+                "prior_per_player_slot": 3.41,
+                "ratio": 10.7038,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "total_combat_damage",
+                "observed_per_player_slot": 0.0,
+                "prior_per_player_slot": 13.2575,
+                "ratio": 0.0,
+                "scope": "whole_game"
+              }
+            ]
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_execute_20260628_birgi_v1_gate_17lands_prior.json"
+        },
+        {
+          "detail": "battle prior emitted 22 rhythm flags",
+          "evidence": {
+            "sample_flags": [
+              {
+                "metric": "spell_action_entries",
+                "observed_per_player_slot": 1.5,
+                "prior_per_player_slot": 0.33,
+                "ratio": 4.5455,
+                "turn": 1
+              },
+              {
+                "metric": "creature_cast_entries",
+                "observed_per_player_slot": 0.0,
+                "prior_per_player_slot": 0.25,
+                "ratio": 0.0,
+                "turn": 1
+              },
+              {
+                "metric": "noncreature_cast_entries",
+                "observed_per_player_slot": 1.5,
+                "prior_per_player_slot": 0.08,
+                "ratio": 18.75,
+                "turn": 1
+              },
+              {
+                "metric": "spell_action_entries",
+                "observed_per_player_slot": 3.0,
+                "prior_per_player_slot": 0.8175,
+                "ratio": 3.6697,
+                "turn": 2
+              },
+              {
+                "metric": "noncreature_cast_entries",
+                "observed_per_player_slot": 2.5,
+                "prior_per_player_slot": 0.2025,
+                "ratio": 12.3457,
+                "turn": 2
+              }
+            ]
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_battle_prior_compare_deck607_replay_20260628.json"
+        }
+      ],
+      "issue_type": "prior_rhythm_flags",
+      "next_action": "calibrate_or_quarantine_gate_metrics_before_treating_winrate_as_strategy_signal",
+      "severity": "medium"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 2,
+      "examples": [
+        {
+          "detail": "focus card traced but not accessed: The Mind Stone",
+          "evidence": {
+            "card": "The Mind Stone",
+            "deck_key": "deck_6",
+            "library_only_games": 3,
+            "trace_count": 136
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410_birgi_spellchain_cut_jeskas_will.json"
+        },
+        {
+          "detail": "focus card traced but not accessed: The Mind Stone",
+          "evidence": {
+            "card": "The Mind Stone",
+            "deck_key": "synergy_birgi_spellchain_cut_jeskas_will",
+            "library_only_games": 3,
+            "trace_count": 110
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410_birgi_spellchain_cut_jeskas_will.json"
+        }
+      ],
+      "issue_type": "focus_card_library_only",
+      "next_action": "rerun_targeted_gate_with_forced_focus_access_or_larger_sample",
+      "severity": "medium"
+    },
+    {
+      "category": "battle_rhythm_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "report status is warning",
+          "evidence": {
+            "status": "warning"
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_forced_opening_20260628.json"
+        }
+      ],
+      "issue_type": "top_level_status",
+      "next_action": "inspect_rhythm_flags_before_using_gate_for_deckbuilder",
+      "severity": "medium"
+    },
+    {
+      "category": "battle_rhythm_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "report status is battle_prior_warning",
+          "evidence": {
+            "status": "battle_prior_warning"
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_17lands_prior_birgi_forced_opening_20260628_birgi_v1_gate_17lands_prior.json"
+        }
+      ],
+      "issue_type": "top_level_status",
+      "next_action": "inspect_rhythm_flags_before_using_gate_for_deckbuilder",
+      "severity": "medium"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "focus card traced but not accessed: Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "evidence": {
+            "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "deck_key": "deck_6",
+            "library_only_games": 0,
+            "trace_count": 136
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410_birgi_spellchain_cut_jeskas_will.json"
+        }
+      ],
+      "issue_type": "focus_card_library_only",
+      "next_action": "rerun_targeted_gate_with_forced_focus_access_or_larger_sample",
+      "severity": "medium"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "focus card traced but not accessed: Library of Leng",
+          "evidence": {
+            "card": "Library of Leng",
+            "deck_key": "deck_6",
+            "library_only_games": 3,
+            "trace_count": 136
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410_birgi_spellchain_cut_jeskas_will.json"
+        }
+      ],
+      "issue_type": "focus_card_library_only",
+      "next_action": "rerun_targeted_gate_with_forced_focus_access_or_larger_sample",
+      "severity": "medium"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "focus card traced but not accessed: Jeska's Will",
+          "evidence": {
+            "card": "Jeska's Will",
+            "deck_key": "synergy_birgi_spellchain_cut_jeskas_will",
+            "library_only_games": 0,
+            "trace_count": 110
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410_birgi_spellchain_cut_jeskas_will.json"
+        }
+      ],
+      "issue_type": "focus_card_library_only",
+      "next_action": "rerun_targeted_gate_with_forced_focus_access_or_larger_sample",
+      "severity": "medium"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "focus card traced but not accessed: Squee, Goblin Nabob",
+          "evidence": {
+            "card": "Squee, Goblin Nabob",
+            "deck_key": "synergy_birgi_spellchain_cut_jeskas_will",
+            "library_only_games": 3,
+            "trace_count": 110
+          },
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410_birgi_spellchain_cut_jeskas_will.json"
+        }
+      ],
+      "issue_type": "focus_card_library_only",
+      "next_action": "rerun_targeted_gate_with_forced_focus_access_or_larger_sample",
+      "severity": "medium"
+    }
+  ],
+  "category_counts": {
+    "battle_rhythm_gap": 5,
+    "battle_runtime_quality": 1,
+    "blocked_workflow": 68,
+    "evidence_gap": 10,
+    "postgres_sync_gap": 1,
+    "runtime_or_test_failure": 6,
+    "runtime_rule_gap": 45,
+    "xmage_mapping_gap": 22
+  },
+  "files_scanned": 900,
+  "generated_at": "2026-06-28T18:16:00Z",
+  "include_patterns": [
+    "lorehold",
+    "deck607",
+    "seventeenlands",
+    "xmage",
+    "pgc",
+    "battle"
+  ],
+  "issue_count": 158,
+  "parse_warnings": {},
+  "postgres_writes": false,
+  "reports_dir": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports",
+  "severity_counts": {
+    "critical": 2,
+    "high": 117,
+    "medium": 39
+  },
+  "source_db_mutated": false,
+  "status_counts": {
+    "active_learning_registry": 1,
+    "battle_prior_warning": 1,
+    "generated_isolated_candidate": 2,
+    "inconclusive_candidate_unobserved": 1,
+    "needs_more_evidence": 1,
+    "pass": 26,
+    "postgres_unreachable_pg_isready_no_response": 1,
+    "read_only_operational_queue_executed_no_deck_swap_ready": 1,
+    "ready": 69,
+    "ready_for_manual_review": 5,
+    "runtime_executor_implemented_metadata_pending_pg_or_mapper": 1,
+    "squee_rebaseline_demoted": 1,
+    "warning": 1
+  },
+  "suffix_counts": {
+    ".json": 389,
+    ".jsonl": 11,
+    ".md": 320,
+    ".out": 176,
+    ".txt": 4
+  },
+  "superseded_issue_count": 2,
+  "superseded_issue_samples": [
+    {
+      "category": "runtime_or_test_failure",
+      "detail": "text log contains runtime_traceback",
+      "evidence": {
+        "snippets": [
+          "Traceback (most recent call last):"
+        ],
+        "test_names": [
+          "test_pgc010_kinnan_adds_one_mana_to_nonland_sources_only_with_annotation_boundary"
+        ]
+      },
+      "issue_type": "text_runtime_traceback",
+      "next_action": "inspect_text_log_and_convert_recurring_pattern_to_structured_gate_field",
+      "severity": "critical",
+      "source_file": "pgc010_kinnan_registered_runtime_test_20260628_135800.out",
+      "source_mtime": 1782655120.010792,
+      "source_path": "docs/hermes-analysis/master_optimizer_reports/pgc010_kinnan_registered_runtime_test_20260628_135800.out",
+      "superseded_by": [
+        {
+          "source_mtime": 1782670549.5472758,
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/pgc023_finale_battle_analyst_v10_3_suite_20260628_152200.out",
+          "test_name": "test_pgc010_kinnan_adds_one_mana_to_nonland_sources_only_with_annotation_boundary"
+        }
+      ]
+    },
+    {
+      "category": "runtime_or_test_failure",
+      "detail": "text log contains test_failure",
+      "evidence": {
+        "snippets": [
+          "AssertionError"
+        ],
+        "test_names": [
+          "test_pgc010_kinnan_adds_one_mana_to_nonland_sources_only_with_annotation_boundary"
+        ]
+      },
+      "issue_type": "text_test_failure",
+      "next_action": "inspect_text_log_and_convert_recurring_pattern_to_structured_gate_field",
+      "severity": "critical",
+      "source_file": "pgc010_kinnan_registered_runtime_test_20260628_135800.out",
+      "source_mtime": 1782655120.010792,
+      "source_path": "docs/hermes-analysis/master_optimizer_reports/pgc010_kinnan_registered_runtime_test_20260628_135800.out",
+      "superseded_by": [
+        {
+          "source_mtime": 1782670549.5472758,
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/pgc023_finale_battle_analyst_v10_3_suite_20260628_152200.out",
+          "test_name": "test_pgc010_kinnan_adds_one_mana_to_nonland_sources_only_with_annotation_boundary"
+        }
+      ]
+    }
+  ]
+}
