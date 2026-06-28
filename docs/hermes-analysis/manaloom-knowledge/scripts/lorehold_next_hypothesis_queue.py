@@ -21,7 +21,7 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260627_v3.json"
+DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_DB = (
     REPORT_DIR
     / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
@@ -35,6 +35,8 @@ DEFAULT_PACKAGE_GATE_REPORTS = [
     REPORT_DIR / "lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json",
     REPORT_DIR / "lorehold_lapse_approach_gate_20260627_v1_fixed.json",
     REPORT_DIR / "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+    REPORT_DIR / "lorehold_pg245_runtime_smoke_gate_20260628_pg245_smoke_v1.json",
+    REPORT_DIR / "lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
 ]
 
 
@@ -234,6 +236,40 @@ PACKAGE_IDEAS = [
             "candidate cannot trade away the current deterministic Approach/topdeck route",
         ],
     },
+    {
+        "package_key": "pg245_verge_rangers_topdeck_land_cut_waterskin",
+        "source_decks": ["runtime_package_pg245"],
+        "family": "topdeck_play",
+        "adds": ["Verge Rangers"],
+        "cuts": ["Bender's Waterskin"],
+        "lane": "topdeck_miracle_setup",
+        "targets": ["seed_7_missing_early_engine", "land_drop_velocity"],
+        "hypothesis": (
+            "PG245 makes Verge Rangers executable through isolated runtime package materialization. "
+            "It tests whether top-library land play is worth the risky Bender's Waterskin ramp slot."
+        ),
+        "required_telemetry": [
+            "played_from_top_library land events must appear in natural exposure",
+            "seed-42 miracle/topdeck conversion cannot collapse after losing Bender's Waterskin",
+        ],
+    },
+    {
+        "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+        "source_decks": ["runtime_package_pg245"],
+        "family": "static_damage_modifier",
+        "adds": ["Twinflame Tyrant"],
+        "cuts": ["Thor, God of Thunder"],
+        "lane": "spell_chain_conversion",
+        "targets": ["spell_damage_conversion", "combat_damage_conversion"],
+        "hypothesis": (
+            "PG245 makes Twinflame Tyrant executable through isolated runtime package materialization. "
+            "It tests whether a static damage doubler can replace Thor's same-mana damage payoff slot."
+        ),
+        "required_telemetry": [
+            "static_damage_replacement_applied must appear in natural exposure or the slot is only theoretical",
+            "candidate must beat the current Thor shell across the same real-opponent gate, not only a smoke run",
+        ],
+    },
 ]
 
 
@@ -284,6 +320,28 @@ def cut_guardrail_lookup(report: dict[str, Any]) -> dict[str, dict[str, Any]]:
         for row in guardrails.get(section) or []:
             if row.get("card_name"):
                 out[row["card_name"]] = {**row, "guardrail_section": section}
+    return out
+
+
+def runtime_package_ready_lookup(report: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    readiness = report.get("runtime_package_readiness") or {}
+    for row in readiness.get("cards") or []:
+        card_name = row.get("card_name")
+        if not card_name:
+            continue
+        if str(row.get("readiness") or "").startswith("runtime_ready"):
+            out[str(card_name)] = {
+                key: row.get(key)
+                for key in (
+                    "readiness",
+                    "family_id",
+                    "effect",
+                    "battle_model_scope",
+                    "logical_rule_key",
+                    "oracle_hash",
+                )
+            }
     return out
 
 
@@ -342,6 +400,7 @@ def package_status(
     report: dict[str, Any],
     oracle: dict[str, bool],
     rules: dict[str, int],
+    runtime_package_ready: dict[str, dict[str, Any]],
     cut_guardrails: dict[str, dict[str, Any]],
     card_decisions: dict[str, dict[str, Any]],
 ) -> tuple[str, list[str]]:
@@ -349,7 +408,7 @@ def package_status(
     for card in idea["adds"]:
         if not oracle.get(card):
             reasons.append(f"missing_oracle:{card}")
-        if int(rules.get(card) or 0) <= 0:
+        if int(rules.get(card) or 0) <= 0 and card not in runtime_package_ready:
             reasons.append(f"missing_active_rule:{card}")
     for cut in idea["cuts"]:
         guardrail = cut_guardrails.get(cut)
@@ -440,6 +499,7 @@ def build_queue(
     deck_sets = {key: deck_card_names(report, key) for key in ("deck_607", "deck_615", "deck_614")}
     cut_guardrails = cut_guardrail_lookup(report)
     card_decisions = card_decision_lookup(report)
+    runtime_package_ready = runtime_package_ready_lookup(report)
     prior_gate_results = load_prior_gate_results(prior_gate_reports or [])
     all_adds = sorted({card for idea in PACKAGE_IDEAS for card in idea["adds"]})
     oracle = oracle_presence(conn, all_adds)
@@ -456,6 +516,7 @@ def build_queue(
             report=report,
             oracle=oracle,
             rules=rules,
+            runtime_package_ready=runtime_package_ready,
             cut_guardrails=cut_guardrails,
             card_decisions=card_decisions,
         )
@@ -478,6 +539,11 @@ def build_queue(
                 "prior_gate": prior_gate or {},
                 "add_oracle_ready": {card: oracle.get(card, False) for card in idea["adds"]},
                 "add_active_rule_counts": {card: int(rules.get(card) or 0) for card in idea["adds"]},
+                "runtime_package_readiness": {
+                    card: runtime_package_ready.get(card)
+                    for card in idea["adds"]
+                    if card in runtime_package_ready
+                },
                 "cut_guardrails": {
                     cut: cut_guardrails.get(cut)
                     for cut in idea["cuts"]
@@ -525,7 +591,7 @@ def build_queue(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Next Hypothesis Queue - 2026-06-27",
+        "# Lorehold Next Hypothesis Queue - 2026-06-28",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Strategy audit: `{payload['strategy_audit']}`",

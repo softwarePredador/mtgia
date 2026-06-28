@@ -19,6 +19,8 @@ def memory_db():
         "Perch Protection",
         "Avatar's Wrath",
         "The Scarlet Witch",
+        "Twinflame Tyrant",
+        "Verge Rangers",
     ]:
         conn.execute(
             "INSERT INTO card_oracle_cache (name, normalized_name) VALUES (?, ?)",
@@ -127,10 +129,40 @@ def test_gate_runner_contains_queue_ready_package_definitions():
         "guttersnipe_spell_payoff_cut_prismari",
         "monastery_mentor_spell_tokens_cut_prismari",
         "young_pyromancer_spell_tokens_cut_prismari",
+        "pg245_verge_rangers_topdeck_land_cut_waterskin",
+        "pg245_twinflame_damage_payoff_cut_thor",
     ]:
         assert package_key in gate.PACKAGE_DEFINITIONS
         assert gate.PACKAGE_DEFINITIONS[package_key]["adds"]
         assert gate.PACKAGE_DEFINITIONS[package_key]["cuts"]
+
+
+def test_runtime_package_readiness_unblocks_missing_active_rule():
+    payload = report_payload()
+    payload["runtime_package_readiness"] = {
+        "cards": [
+            {
+                "card_name": "Verge Rangers",
+                "readiness": "runtime_ready_pg_precheck_blocked",
+                "family_id": "topdeck_play",
+                "effect": {"kind": "topdeck_play"},
+                "battle_model_scope": "runtime_package_materialized_candidate_only",
+                "logical_rule_key": "topdeck_play:verge_rangers",
+                "oracle_hash": "sha256:verge",
+            }
+        ]
+    }
+
+    with memory_db() as conn:
+        result = queue.build_queue(payload, conn, [])
+
+    by_key = {row["package_key"]: row for row in result["queue"]}
+    package = by_key["pg245_verge_rangers_topdeck_land_cut_waterskin"]
+    assert package["status"] == "gate_ready"
+    assert "missing_active_rule:Verge Rangers" not in package["blockers"]
+    assert package["runtime_package_readiness"]["Verge Rangers"]["readiness"] == (
+        "runtime_ready_pg_precheck_blocked"
+    )
 
 
 def test_prior_negative_gate_demotes_package_from_ready_queue(tmp_path):
