@@ -1123,6 +1123,39 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "forced_access_signal_requires_natural_confirmation",
         )
 
+    def test_forced_access_signal_adds_natural_confirmation_queue_item(self):
+        payload = {
+            "games_per_opponent": 1,
+            "opponent_limit": 3,
+            "opponent_seed": 20260626,
+            "simulation_seed": 42,
+            "forced_access_mode": "opening_hand",
+            "packages": [
+                {
+                    "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+                    "family": "fast_mana",
+                    "adds": ["Mana Vault"],
+                    "cuts": ["Arcane Signet"],
+                    "forced_access_mode": "opening_hand",
+                    "gate_summary": {
+                        "baseline": {"wins": 0, "losses": 3},
+                        "candidate": {"wins": 1, "losses": 2},
+                        "delta_pp": 33.33,
+                    },
+                    "exposure_summary": {"low_candidate_added_card_use": False},
+                }
+            ],
+        }
+
+        queue = gate.forced_access_confirmation_queue(payload)
+
+        self.assertEqual(len(queue), 1)
+        self.assertEqual(
+            queue[0]["decision"],
+            "forced_access_signal_requires_natural_confirmation",
+        )
+        self.assertIn("--forced-access-mode none", queue[0]["suggested_command"])
+
     def test_side_card_exposure_distinguishes_library_only_low_access(self):
         row = {
             "telemetry": {

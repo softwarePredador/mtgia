@@ -2444,6 +2444,59 @@ def gate_decision(
     return "reject_or_rework"
 
 
+def package_result_decision(result: dict[str, Any], payload: dict[str, Any] | None = None) -> str:
+    if result.get("decision"):
+        return str(result["decision"])
+    return gate_decision(
+        result.get("gate_summary") or {},
+        result.get("exposure_summary") or {},
+        forced_access_mode=str(
+            result.get("forced_access_mode")
+            or (payload or {}).get("forced_access_mode")
+            or "none"
+        ),
+    )
+
+
+def forced_access_confirmation_queue(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    queue: list[dict[str, Any]] = []
+    for result in payload.get("packages") or []:
+        decision = package_result_decision(result, payload)
+        if decision not in {
+            "forced_access_signal_requires_natural_confirmation",
+            "forced_access_tie_requires_natural_confirmation",
+        }:
+            continue
+        package_key = str(result.get("package_key") or "")
+        if not package_key:
+            continue
+        suggested_command = (
+            "python3 docs/hermes-analysis/manaloom-knowledge/scripts/"
+            f"lorehold_synergy_package_gate.py --packages {package_key} "
+            f"--games {max(1, int(payload.get('games_per_opponent') or 1))} "
+            f"--opponent-limit {max(1, int(payload.get('opponent_limit') or 1))} "
+            f"--opponent-seed {int(payload.get('opponent_seed') or 20260626)} "
+            f"--simulation-seed {int(payload.get('simulation_seed') or 42)} "
+            "--forced-access-mode none"
+        )
+        queue.append(
+            {
+                "package_key": package_key,
+                "family": result.get("family") or "misc",
+                "adds": list(result.get("adds") or []),
+                "cuts": list(result.get("cuts") or []),
+                "forced_access_mode": result.get("forced_access_mode")
+                or payload.get("forced_access_mode")
+                or "none",
+                "decision": decision,
+                "natural_confirmation_status": "required",
+                "next_step": "run_natural_gate_without_forced_access_before_promoting",
+                "suggested_command": suggested_command,
+            }
+        )
+    return queue
+
+
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
         "# Lorehold Synergy Package Gate",
@@ -2496,11 +2549,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         candidate = gate.get("candidate") or {}
         delta = float(gate.get("delta_pp") or 0.0)
         exposure = result.get("exposure_summary") or {}
-        decision = gate_decision(
-            gate,
-            exposure,
-            forced_access_mode=str(result.get("forced_access_mode") or payload.get("forced_access_mode") or "none"),
-        )
+        decision = package_result_decision(result, payload)
         lines.append(
             "| {key} | {family} | {adds} | {cuts} | `{preflight}` | {bw}/{bl}/{bs} `{bwr:.2f}%` | "
             "{cw}/{cl}/{cs} `{cwr:.2f}%` | {delta:+.2f} | {strategic} | {exposure} | {decision} |".format(
@@ -2523,6 +2572,31 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 decision=decision,
             )
         )
+    confirmation_queue = payload.get("forced_access_confirmation_queue") or []
+    if confirmation_queue:
+        lines.extend(
+            [
+                "",
+                "## Forced Access Confirmation Queue",
+                "",
+                "| Package | Adds | Cuts | Forced Mode | Decision | Next Step |",
+                "| --- | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for row in confirmation_queue:
+            lines.append(
+                "| {package} | {adds} | {cuts} | `{mode}` | `{decision}` | `{next_step}` |".format(
+                    package=row.get("package_key"),
+                    adds=", ".join(row.get("adds") or []),
+                    cuts=", ".join(row.get("cuts") or []),
+                    mode=row.get("forced_access_mode") or "none",
+                    decision=row.get("decision"),
+                    next_step=row.get("next_step"),
+                )
+            )
+        lines.extend(["", "### Suggested Commands", ""])
+        for row in confirmation_queue:
+            lines.append(f"- `{row.get('suggested_command')}`")
     lines.extend(["", "## Package Notes", ""])
     for result in payload["packages"]:
         lines.extend(
@@ -2851,6 +2925,7 @@ def main() -> int:
         "package_status_counts": dict(sorted(status_counts.items())),
         "packages": results,
     }
+    payload["forced_access_confirmation_queue"] = forced_access_confirmation_queue(payload)
     report_json = REPORT_DIR / f"{args.stem}_{stamp}.json"
     report_md = REPORT_DIR / f"{args.stem}_{stamp}.md"
     report_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
