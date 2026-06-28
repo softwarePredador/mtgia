@@ -1,0 +1,237 @@
+{
+  "decision": {
+    "do_not_create_squee_sequencing_swap": true,
+    "do_not_cut_squee_for_current_recursion_candidates": true,
+    "keep_squee_runtime_model": true,
+    "next_package_constraint": "Any next package must increase access/conversion while preserving seed-42 Squee/miracle/topdeck telemetry."
+  },
+  "generated_at": "2026-06-28T06:31:23Z",
+  "postgres_writes": false,
+  "runtime_gate_rows": {
+    "20260625": {
+      "deck_key": "deck_6",
+      "deck_process_isolation": false,
+      "events": {
+        "discard_to_top_replacement": 8,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 14,
+        "miracle_cast": 2
+      },
+      "game_timeout_seconds": 20.0,
+      "games_per_opponent": 1,
+      "opponent_seed": 20260626,
+      "python_hash_seed": "0",
+      "record": {
+        "losses": 2,
+        "stalls": 0,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "seed": "20260625",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_squee_rummage_gate_20260628_seed20260625_v1.json",
+      "squee_discard_count": 0,
+      "squee_material_event_count": 0,
+      "status": "ready"
+    },
+    "42": {
+      "deck_key": "deck_6",
+      "deck_process_isolation": false,
+      "events": {
+        "lorehold_spell_rummage": 16,
+        "lorehold_spell_rummage_discards_squee": 2,
+        "lorehold_upkeep_rummage": 8,
+        "miracle_cast": 13,
+        "squee_return_after_known_graveyard_entry": 2,
+        "squee_to_graveyard": 3,
+        "squee_upkeep_return": 2,
+        "topdeck_manipulation_activated": 12
+      },
+      "game_timeout_seconds": 20.0,
+      "games_per_opponent": 1,
+      "opponent_seed": 20260626,
+      "python_hash_seed": "0",
+      "record": {
+        "losses": 0,
+        "stalls": 0,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "seed": "42",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_squee_rummage_gate_20260628_seed42_v1.json",
+      "squee_discard_count": 2,
+      "squee_material_event_count": 9,
+      "status": "ready"
+    },
+    "7": {
+      "deck_key": "deck_6",
+      "deck_process_isolation": false,
+      "events": {
+        "lorehold_rummage_discards_squee": 1,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 1,
+        "squee_return_after_known_graveyard_entry": 2,
+        "squee_to_graveyard": 2,
+        "squee_upkeep_return": 2,
+        "topdeck_manipulation_activated": 2
+      },
+      "game_timeout_seconds": 20.0,
+      "games_per_opponent": 1,
+      "opponent_seed": 20260626,
+      "python_hash_seed": "0",
+      "record": {
+        "losses": 3,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "7",
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_squee_rummage_gate_20260628_seed7_v1.json",
+      "squee_discard_count": 1,
+      "squee_material_event_count": 7,
+      "status": "ready"
+    }
+  },
+  "runtime_gates": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_squee_rummage_gate_20260628_seed7_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_squee_rummage_gate_20260628_seed20260625_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_squee_rummage_gate_20260628_seed42_v1.json"
+  ],
+  "source_db_mutated": false,
+  "summary": {
+    "modeled_when_accessed": true,
+    "next_action": "target_access_density_not_squee_sequencing",
+    "runtime_gate_count": 3,
+    "runtime_squee_event_totals": {
+      "lorehold_rummage_discards_squee": 1,
+      "lorehold_spell_rummage_discards_squee": 2,
+      "squee_return_after_known_graveyard_entry": 4,
+      "squee_to_graveyard": 5,
+      "squee_upkeep_return": 4
+    },
+    "seed42_anchor_record": {
+      "losses": 0,
+      "stalls": 0,
+      "win_rate": 100.0,
+      "wins": 3
+    },
+    "status": "squee_route_modeled_but_access_gap_remains",
+    "trace_seed_count": 3,
+    "weak_focus_missing_squee_access_seeds": [
+      "7",
+      "20260625"
+    ],
+    "weak_material_missing_squee_seeds": [
+      "7",
+      "20260625"
+    ],
+    "weak_runtime_nonwinning_seeds": [
+      "7",
+      "20260625"
+    ]
+  },
+  "trace_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json",
+  "trace_seed_rows": {
+    "20260625": {
+      "events": {
+        "lorehold_upkeep_rummage": 38,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 3
+      },
+      "record": {
+        "losses": 0,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "20260625",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_diag_seed20260625_candidate_only_20260628_v1.json",
+      "squee_focus": {
+        "early_zones": {
+          "library": 144
+        },
+        "evidence_level": "focus_access_trace_available",
+        "first_hand_or_battlefield": null,
+        "min_library_position": 9,
+        "opening_zones": {
+          "library": 9
+        },
+        "squee_trace_matches": {}
+      },
+      "squee_material_event_count": 0,
+      "squee_reached_hand_or_battlefield": false,
+      "trace_data_level": "per_game_event_counts"
+    },
+    "42": {
+      "events": {
+        "lorehold_upkeep_rummage": 39,
+        "miracle_cast": 32,
+        "topdeck_manipulation_activated": 30
+      },
+      "record": {
+        "losses": 0,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "42",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_diag_seed42_candidate_only_20260628_v1.json",
+      "squee_focus": {
+        "early_zones": {
+          "hand": 13,
+          "library": 131
+        },
+        "evidence_level": "focus_access_trace_available",
+        "first_hand_or_battlefield": {
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "phase": "after_draw_step",
+          "turn": 1,
+          "zone": "hand"
+        },
+        "min_library_position": 1,
+        "opening_zones": {
+          "library": 9
+        },
+        "squee_trace_matches": {
+          "cast_announced": 5,
+          "cost_paid": 5,
+          "creature_cast": 5,
+          "permanent_moved_from_battlefield": 3,
+          "trigger_resolved": 3
+        }
+      },
+      "squee_material_event_count": 0,
+      "squee_reached_hand_or_battlefield": true,
+      "trace_data_level": "per_game_event_counts"
+    },
+    "7": {
+      "events": {
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 2
+      },
+      "record": {
+        "losses": 0,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "7",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_diag_seed7_candidate_only_20260628_v1.json",
+      "squee_focus": {
+        "early_zones": {
+          "library": 144
+        },
+        "evidence_level": "focus_access_trace_available",
+        "first_hand_or_battlefield": null,
+        "min_library_position": 4,
+        "opening_zones": {
+          "library": 9
+        },
+        "squee_trace_matches": {}
+      },
+      "squee_material_event_count": 0,
+      "squee_reached_hand_or_battlefield": false,
+      "trace_data_level": "per_game_event_counts"
+    }
+  }
+}
