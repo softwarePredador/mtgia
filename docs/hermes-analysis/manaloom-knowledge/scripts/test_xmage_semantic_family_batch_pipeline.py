@@ -2156,6 +2156,63 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(proposal["oracle_hash"], "localhash123")
         self.assertTrue(proposal["safe_for_batch_pg_package"])
 
+    def test_goliath_daydreamer_scope_is_batch_safe_after_runtime_test_support(self) -> None:
+        report = generator.build_generator_report(
+            batch_audit={
+                "cards": [
+                    {
+                        "card_name": "Goliath Daydreamer",
+                        "normalized_name": "goliath daydreamer",
+                        "severity": "high",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "oracle_hash": "715d2c178b304a7c5e6beed655883851",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "GoliathDaydreamer",
+                            "path": "/xmage/GoliathDaydreamer.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "GoliathDaydreamerCastEffect",
+                                "GoliathDaydreamerExileEffect",
+                                "OneShotEffect",
+                            ],
+                            "ability_classes": [
+                                "AttacksTriggeredAbility",
+                                "SpellCastControllerTriggeredAbility",
+                            ],
+                            "counter_types": ["DREAM"],
+                            "primary_effect": {
+                                "ability_kind": "triggered",
+                                "attack_free_cast_counter_type": "dream",
+                                "attack_may_cast_owned_exiled_card_with_counter_without_paying_mana": True,
+                                "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+                                "effect": "free_cast",
+                                "exiled_counter_type": "dream",
+                                "power": 4,
+                                "spell_cast_from_hand_card_types": ["instant", "sorcery"],
+                                "spell_cast_from_hand_exile_instead_of_graveyard": True,
+                                "toughness": 4,
+                                "trigger": "instant_sorcery_cast_from_hand_and_attack",
+                            },
+                        },
+                    }
+                ]
+            },
+            external_harvest=None,
+        )
+
+        proposal = report["proposals"][0]
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["review_status"], "verified")
+        self.assertEqual(proposal["execution_status"], "auto")
+        self.assertEqual(proposal["source"], "curated")
+        self.assertEqual(proposal["deck_role_json"]["category"], "combo_value")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "free_cast")
+
     def test_classifier_marks_supported_modal_mana_rock_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

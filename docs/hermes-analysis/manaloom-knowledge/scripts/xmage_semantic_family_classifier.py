@@ -3257,6 +3257,29 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("exiles_self"))
         )
 
+    if (
+        effect == "free_cast"
+        and scope == "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and {
+                "GoliathDaydreamerCastEffect",
+                "GoliathDaydreamerExileEffect",
+                "OneShotEffect",
+            }.issubset(effect_classes)
+            and {
+                "AttacksTriggeredAbility",
+                "SpellCastControllerTriggeredAbility",
+            }.issubset(ability_classes)
+            and effect_json.get("trigger") == "instant_sorcery_cast_from_hand_and_attack"
+            and effect_json.get("spell_cast_from_hand_card_types") == ["instant", "sorcery"]
+            and bool(effect_json.get("spell_cast_from_hand_exile_instead_of_graveyard"))
+            and effect_json.get("exiled_counter_type") == "dream"
+            and bool(effect_json.get("attack_may_cast_owned_exiled_card_with_counter_without_paying_mana"))
+            and effect_json.get("attack_free_cast_counter_type") == "dream"
+        )
+
     if effect == "direct_damage" and scope == "damage_any_target_and_gain_life_v1":
         return (
             types.issubset({"INSTANT", "SORCERY"})
