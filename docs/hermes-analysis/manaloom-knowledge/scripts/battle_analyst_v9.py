@@ -19328,6 +19328,14 @@ def is_squee_graveyard_recursion_card(card):
     )
 
 
+def should_hold_squee_for_lorehold_recursion(player, card, phase=None):
+    if not is_squee_graveyard_recursion_card(card):
+        return False
+    if phase not in {None, "precombat_main", "postcombat_main"}:
+        return False
+    return player_has_lorehold_miracle_engine(player)
+
+
 def activate_lorehold_topdeck_artifacts(
     player,
     turn,
@@ -29006,6 +29014,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 get_card_effect(candidate),
                 phase,
             )
+            and not should_hold_squee_for_lorehold_recursion(player, candidate, phase)
             for candidate in player.hand
         )
         if not has_free_castable:
@@ -29044,6 +29053,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 if str(candidate_effect.get("effect") or "").lower() in COUNTERLIKE_EFFECTS.union({"unknown", "ramp_ritual"}):
                     continue
                 if not can_cast_in_phase(candidate, candidate_effect, phase):
+                    continue
+                if should_hold_squee_for_lorehold_recursion(player, candidate, phase):
                     continue
                 candidates.append((candidate, 0, candidate_effect.get("effect") or "spell"))
             return candidates
@@ -29106,6 +29117,8 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             if should_hold_for_response_window(player, candidate, candidate_effect, phase):
                 continue
             if should_reserve_survival_response_mana(player, candidate, candidate_effect, phase):
+                continue
+            if should_hold_squee_for_lorehold_recursion(player, candidate, phase):
                 continue
             if effect_name not in HIGH_IMPACT_PAYOFF_EFFECTS:
                 continue
@@ -29846,6 +29859,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             get_card_effect(c),
             phase,
         )
+        and not should_hold_squee_for_lorehold_recursion(player, c, phase)
         and spell_has_required_library_target(player, get_card_effect(c))
     ]
     # v8: Miracle check for Lorehold
