@@ -1,0 +1,550 @@
+{
+  "apply_only": false,
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+  "cut_safety_summary": {
+    "blocked_cut_count": 11,
+    "status_counts": {
+      "locked_do_not_cut": 9,
+      "risky_cut_only_same_lane": 2
+    },
+    "tested_cut_count": 11,
+    "untested_flex_pool_count": 6
+  },
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-28T05:02:15.407936+00:00",
+  "no_game_checkpoint": false,
+  "opponent_limit": 3,
+  "opponent_seed": 20260626,
+  "package_status_counts": {
+    "gated": 1
+  },
+  "packages": [
+    {
+      "adds": [
+        "Penance"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_access_package_gate_20260628_seed20260625_penance_runtime_v1_penance_runtime_topdeck_cut_promise/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Penance": 1
+        },
+        "adds": [
+          "Penance"
+        ],
+        "allow_miracle_core_cuts": true,
+        "cuts": [
+          "Promise of Loyalty"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [
+          "Promise of Loyalty"
+        ],
+        "reviewed_rule_upserts": {},
+        "row_count": 94,
+        "runtime_package_rule_upserts": {},
+        "total_cards": 100
+      },
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "family": "topdeck_protection",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_access_package_gate_20260628_seed20260625_penance_runtime_v1_penance_runtime_topdeck_cut_promise.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_access_package_gate_20260628_seed20260625_penance_runtime_v1_penance_runtime_topdeck_cut_promise.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 3 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=3\nrunning synergy_penance_runtime_topdeck_cut_promise games=1 opponents=3\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_access_package_gate_20260628_seed20260625_penance_runtime_v1_penance_runtime_topdeck_cut_promise.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_access_package_gate_20260628_seed20260625_penance_runtime_v1_penance_runtime_topdeck_cut_promise.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 9.0,
+          "error": null,
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "status": "pass",
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 8,
+              "additional_cost_paid": 3,
+              "approach_cast_tracked": 4,
+              "approach_first_resolution": 2,
+              "attachment_sba": 1,
+              "board_wipe_resolved": 2,
+              "cast_announced": 124,
+              "combat": 48,
+              "combat_result": 52,
+              "combat_step": 292,
+              "commander_cast": 17,
+              "cost_paid": 124,
+              "countered_spell_moved_to_graveyard": 5,
+              "creature_cast": 23,
+              "discard_modal_trigger_resolved": 2,
+              "draw_cards_resolved": 3,
+              "end_step_instant": 1,
+              "equipment_unattached": 1,
+              "etb_recursion_resolved": 1,
+              "focus_card_access_snapshot": 137,
+              "game_won": 1,
+              "jeskas_will_resolved": 2,
+              "land_played": 61,
+              "land_ramp_resolved": 3,
+              "lorehold_upkeep_rummage": 14,
+              "lorehold_upkeep_rummage_skipped": 11,
+              "mana_refreshed": 102,
+              "miracle_cast": 2,
+              "multi_defender_attack": 4,
+              "permanent_moved_from_battlefield": 20,
+              "phase_out_resolved": 1,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 2,
+              "priority_pass": 1188,
+              "protection_from_everything_granted": 2,
+              "random_discard_after_tutor": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 13,
+              "replacement_applied": 19,
+              "ritual_mana_added": 1,
+              "self_exiled_on_resolution": 1,
+              "spell_cast": 87,
+              "spell_countered": 5,
+              "spell_resolved": 60,
+              "trigger_put_on_stack": 53,
+              "trigger_resolved": 55,
+              "trigger_skipped": 1,
+              "turn_end": 99,
+              "turn_start": 102,
+              "tutor_life_loss_resolved": 1,
+              "tutor_resolved": 9,
+              "utility_artifact_activated": 1,
+              "utility_land_activated": 7
+            },
+            "lorehold_attack_restriction_source_events": {
+              "unattributed": 9
+            },
+            "lorehold_attack_restrictions": {
+              "attackers_after": 20,
+              "attackers_before": 29,
+              "attackers_restricted": 9,
+              "events": 9,
+              "tax_paid": 0
+            },
+            "strategic_event_counts": {
+              "discard_to_top_replacement": 8,
+              "lorehold_cost_paid": 33,
+              "lorehold_rummage_discard_to_top": 8,
+              "lorehold_spell_cast": 27,
+              "lorehold_spell_rummage": 2,
+              "lorehold_upkeep_rummage": 14,
+              "miracle_cast": 2
+            },
+            "strategic_games": {
+              "birgi_spell_cast_mana": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "discard_to_top_replacement": {
+                "games": 1,
+                "rate": 0.3333
+              },
+              "hand_to_topdeck_activation": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_cost_paid": {
+                "games": 3,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discard_to_top": {
+                "games": 1,
+                "rate": 0.3333
+              },
+              "lorehold_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_cast": {
+                "games": 3,
+                "rate": 1.0
+              },
+              "lorehold_spell_rummage": {
+                "games": 1,
+                "rate": 0.3333
+              },
+              "lorehold_spell_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_upkeep_rummage": {
+                "games": 3,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 1,
+                "rate": 0.3333
+              },
+              "spell_cast_mana_trigger": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_after_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_without_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_to_graveyard": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_upkeep_return": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_cost_paid": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage_amount": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_spell_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 7,
+                "key": "lorehold_rummage_to_top:Approach of the Second Sun"
+              },
+              {
+                "count": 7,
+                "key": "discard_to_top:Approach of the Second Sun"
+              },
+              {
+                "count": 6,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Approach of the Second Sun"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Jeska's Will"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Library of Leng"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Fellwar Stone"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Pearl Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Promise of Loyalty"
+              },
+              {
+                "count": 1,
+                "key": "lorehold_rummage_to_top:Tragic Arrogance"
+              },
+              {
+                "count": 1,
+                "key": "discard_to_top:Tragic Arrogance"
+              }
+            ]
+          },
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 22.0,
+          "error": null,
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "status": "pass",
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 15,
+              "additional_cost_paid": 4,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 1,
+              "board_wipe_resolved": 2,
+              "cast_announced": 85,
+              "combat": 40,
+              "combat_result": 43,
+              "combat_step": 238,
+              "commander_cast": 10,
+              "compensation_tokens_created": 2,
+              "cost_paid": 85,
+              "countered_spell_moved_to_graveyard": 4,
+              "creature_cast": 11,
+              "discard_modal_trigger_resolved": 1,
+              "draw_cards_resolved": 2,
+              "equipment_unattached": 1,
+              "etb_recursion_resolved": 1,
+              "etb_removal_resolved": 1,
+              "extra_turn_scheduled": 1,
+              "extra_turn_taken": 1,
+              "focus_card_access_snapshot": 171,
+              "game_lost": 1,
+              "land_played": 61,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 13,
+              "lorehold_upkeep_rummage_skipped": 2,
+              "mana_refreshed": 84,
+              "mill_resolved": 2,
+              "miracle_cast": 3,
+              "multi_defender_attack": 3,
+              "permanent_moved_from_battlefield": 22,
+              "player_eliminated": 5,
+              "priority_pass": 811,
+              "protection_from_everything_granted": 1,
+              "random_discard_after_tutor": 1,
+              "removal_resolved": 8,
+              "replacement_applied": 2,
+              "saga_chapter_progressed": 1,
+              "self_exiled_on_resolution": 1,
+              "spell_cast": 64,
+              "spell_countered": 4,
+              "spell_resolved": 39,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 2,
+              "treasure_created": 2,
+              "trigger_put_on_stack": 19,
+              "trigger_resolved": 21,
+              "turn_end": 80,
+              "turn_start": 84,
+              "tutor_resolved": 5,
+              "utility_artifact_activated": 1,
+              "utility_land_activated": 1
+            },
+            "lorehold_attack_restriction_source_events": {},
+            "lorehold_attack_restrictions": {},
+            "strategic_event_counts": {
+              "graveyard_upkeep_return_self_to_hand": 2,
+              "lorehold_cost_paid": 31,
+              "lorehold_rummage_discards_squee": 2,
+              "lorehold_spell_cast": 25,
+              "lorehold_upkeep_rummage": 13,
+              "miracle_cast": 3,
+              "squee_return_after_known_graveyard_entry": 2,
+              "squee_to_graveyard": 4,
+              "squee_upkeep_return": 2,
+              "thor_cost_paid": 1,
+              "thor_spell_cast": 1,
+              "topdeck_manipulation_activated": 2
+            },
+            "strategic_games": {
+              "birgi_spell_cast_mana": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "discard_to_top_replacement": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "graveyard_upkeep_return_self_to_hand": {
+                "games": 2,
+                "rate": 0.6667
+              },
+              "hand_to_topdeck_activation": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_cost_paid": {
+                "games": 3,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_rummage_discards_squee": {
+                "games": 1,
+                "rate": 0.3333
+              },
+              "lorehold_spell_cast": {
+                "games": 3,
+                "rate": 1.0
+              },
+              "lorehold_spell_rummage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_upkeep_rummage": {
+                "games": 2,
+                "rate": 0.6667
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 0.6667
+              },
+              "spell_cast_mana_trigger": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_after_known_graveyard_entry": {
+                "games": 2,
+                "rate": 0.6667
+              },
+              "squee_return_without_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_to_graveyard": {
+                "games": 2,
+                "rate": 0.6667
+              },
+              "squee_upkeep_return": {
+                "games": 2,
+                "rate": 0.6667
+              },
+              "thor_cost_paid": {
+                "games": 1,
+                "rate": 0.3333
+              },
+              "thor_noncreature_damage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage_amount": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_spell_cast": {
+                "games": 1,
+                "rate": 0.3333
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.3333
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:The Mind Stone"
+              },
+              {
+                "count": 2,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "rummage_discard:Squee, Goblin Nabob"
+              },
+              {
+                "count": 2,
+                "key": "squee_to_graveyard:lorehold_upkeep_rummage"
+              },
+              {
+                "count": 2,
+                "key": "graveyard_return:Squee, Goblin Nabob"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Generous Gift"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Victory Chimes"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sensei's Divining Top"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Scroll Rack"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Smothering Tithe"
+              }
+            ]
+          },
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Penance is retested after the battle runtime learned to use hand-to-library activations proactively as Lorehold miracle setup, not only as a lethal-combat damage shield. This avoids the locked Hexing Squelcher cut and measures whether the new sequencing can replace one five-mana wipe/political spell without reducing the known topdeck engine.",
+      "package_key": "penance_runtime_topdeck_cut_promise",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "gated"
+    }
+  ],
+  "preflight_only": false,
+  "prior_package_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json"
+  ],
+  "prior_package_summary": {
+    "loaded_report_count": 8,
+    "missing_report_count": 0,
+    "package_key_count": 21
+  },
+  "simulation_seed": 20260625,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}

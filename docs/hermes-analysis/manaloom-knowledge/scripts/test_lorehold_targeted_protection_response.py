@@ -45,6 +45,114 @@ def resolve_targeted_removal_after_response(active, players, stack):
     battle.priority_round(active, players, stack, turn=4, rng=random.Random(2), phase="precombat_main")
 
 
+def penance_permanent():
+    return {
+        "name": "Penance",
+        "cmc": 3,
+        "type_line": "Enchantment",
+        "effect": "damage_prevention_shield",
+        "activation_cost": "put_card_from_hand_on_top_of_library",
+        "activation_cost_generic": 0,
+        "activation_requires_put_card_from_hand_on_top_library": True,
+        "activated_prevent_next_damage_from_chosen_source": True,
+        "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_next_damage_from_chosen_black_or_red_source_to_you_v1",
+        "rule_source": "test",
+        "review_status": "verified",
+    }
+
+
+def test_lorehold_uses_penance_as_proactive_miracle_topdeck_setup():
+    commander = lorehold_commander()
+    lorehold = player("Lorehold", commander=commander, is_human=True)
+    opponent = player("Opponent")
+    penance = penance_permanent()
+    storm_herd = {
+        "name": "Storm Herd",
+        "cmc": 10,
+        "type_line": "Sorcery",
+    }
+    plains = {
+        "name": "Plains",
+        "cmc": 0,
+        "type_line": "Basic Land — Plains",
+    }
+    lorehold.battlefield = [commander, penance]
+    lorehold.hand = [storm_herd]
+    lorehold.library = [plains]
+
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        activated = battle.activate_lorehold_topdeck_artifacts(
+            lorehold,
+            turn=5,
+            rng=random.Random(4),
+            phase="opponent_upkeep",
+            all_players=[opponent, lorehold],
+            stack=battle.Stack(),
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert activated == 1
+    assert storm_herd not in lorehold.hand
+    assert lorehold.library[0] is storm_herd
+    assert penance["utility_artifact_used_this_turn"] is True
+    assert any(
+        event == "hand_to_topdeck_activation"
+        and data.get("card") == "Penance"
+        and data.get("hand_to_top") == "Storm Herd"
+        for event, data in events
+    )
+    assert any(
+        event == "topdeck_manipulation_activated"
+        and data.get("card") == "Penance"
+        and data.get("activation_kind") == "hand_to_top_for_lorehold_miracle_setup"
+        for event, data in events
+    )
+
+
+def test_lorehold_does_not_use_penance_when_top_card_is_already_better():
+    commander = lorehold_commander()
+    lorehold = player("Lorehold", commander=commander, is_human=True)
+    opponent = player("Opponent")
+    penance = penance_permanent()
+    storm_herd = {
+        "name": "Storm Herd",
+        "cmc": 10,
+        "type_line": "Sorcery",
+    }
+    approach = {
+        "name": "Approach of the Second Sun",
+        "cmc": 7,
+        "type_line": "Sorcery",
+    }
+    lorehold.battlefield = [commander, penance]
+    lorehold.hand = [storm_herd]
+    lorehold.library = [approach]
+
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        activated = battle.activate_lorehold_topdeck_artifacts(
+            lorehold,
+            turn=5,
+            rng=random.Random(5),
+            phase="opponent_upkeep",
+            all_players=[opponent, lorehold],
+            stack=battle.Stack(),
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert activated == 0
+    assert storm_herd in lorehold.hand
+    assert lorehold.library[0] is approach
+    assert not any(event == "hand_to_topdeck_activation" for event, _ in events)
+
+
 def test_lorehold_uses_gods_willing_response_for_targeted_commander_removal():
     commander = lorehold_commander()
     lorehold = player("Lorehold", commander=commander, is_human=True)

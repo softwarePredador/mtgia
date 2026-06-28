@@ -19340,6 +19340,174 @@ def activate_lorehold_topdeck_artifacts(
     if not player.is_alive() or not player_has_lorehold_miracle_engine(player):
         return 0
 
+    hand_to_top_permanents = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("activation_requires_put_card_from_hand_on_top_library")
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase in {"upkeep", "opponent_upkeep"} and hand_to_top_permanents:
+        for permanent in hand_to_top_permanents:
+            activation_cost_generic = int(permanent.get("activation_cost_generic") or 0)
+            activation_colors = list(permanent.get("activation_cost_colors") or [])
+            activation_cost_text = ""
+            if activation_cost_generic > 0:
+                activation_cost_text += "{%d}" % activation_cost_generic
+            activation_cost_text += "".join("{%s}" % color for color in activation_colors)
+            if not activation_cost_text:
+                activation_cost_text = "{0}"
+            if not player.can_pay(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_hand_to_top_activation",
+                    phase=phase,
+                )
+                continue
+
+            hand_candidates = [
+                card
+                for card in player.hand
+                if isinstance(card, dict) and miracle_card_scope_allows(player, card)
+            ]
+            if not hand_candidates:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_hand_spell_worth_setting_as_first_draw",
+                    phase=phase,
+                )
+                continue
+
+            top_before = player.library[0] if player.library else None
+            top_before_score = lorehold_draw_priority(top_before, player) if top_before else -999
+            scored_hand = sorted(
+                (
+                    {
+                        "card": card,
+                        "score": lorehold_draw_priority(card, player),
+                    }
+                    for card in hand_candidates
+                ),
+                key=lambda item: (
+                    -item["score"],
+                    -int(_opening_hand_card_cmc(item["card"]) or 0),
+                    item["card"].get("name", "?"),
+                ),
+            )
+            chosen_hand = scored_hand[0]
+            if (
+                chosen_hand["score"] < 130
+                or chosen_hand["score"] <= top_before_score
+            ):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "top_library_card_already_good_enough_for_first_draw",
+                    phase=phase,
+                )
+                continue
+            if not player.spend_mana(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_hand_to_top_activation_cost",
+                    phase=phase,
+                )
+                continue
+
+            player.hand.remove(chosen_hand["card"])
+            player.library.insert(0, chosen_hand["card"])
+            permanent["utility_artifact_used_this_turn"] = True
+            if permanent.get("activation_requires_tap"):
+                permanent["tapped"] = True
+
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        item["card"],
+                        score=item["score"],
+                        action="set_hand_spell_as_next_draw",
+                        effect="hand_to_topdeck_activation",
+                    )
+                    for item in scored_hand
+                ],
+                chosen_option=decision_card_option(
+                    chosen_hand["card"],
+                    score=chosen_hand["score"],
+                    action="activate_hand_to_topdeck_setup",
+                    effect="hand_to_topdeck_activation",
+                ),
+                rejected_options=[
+                    decision_card_option(
+                        item["card"],
+                        score=item["score"],
+                        action="leave_in_hand",
+                        effect="hand_to_topdeck_activation",
+                    )
+                    for item in scored_hand[1:]
+                ],
+                score_components={
+                    "activation_cost": activation_cost_text,
+                    "top_before": top_before.get("name", "?") if top_before else None,
+                    "top_before_score": top_before_score,
+                    "top_after": chosen_hand["card"].get("name", "?"),
+                    "hand_to_top": chosen_hand["card"].get("name", "?"),
+                },
+                rule_source=permanent.get("_rule_source", permanent.get("rule_source", "lorehold_hand_to_topdeck_setup_v1")),
+                rule_status=permanent.get("_rule_review_status", permanent.get("review_status", "active")),
+                confidence="medium",
+                expected_benefit_score=chosen_hand["score"],
+                actual_outcome="hand_spell_moved_to_top_for_next_draw",
+                reason="convert_high_priority_hand_spell_into_next_first_draw",
+                strategic_principle="use hand-to-top library abilities as Lorehold miracle setup when they improve the next first draw",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "mana": -activation_cost_generic,
+                    "top_before": top_before.get("name", "?") if top_before else None,
+                    "top_after": chosen_hand["card"].get("name", "?"),
+                    "hand_to_top": chosen_hand["card"].get("name", "?"),
+                },
+                risk_flags=["delayed_first_draw_setup", "hand_card_moved_to_library"],
+                rejected_reason="lower_first_draw_priority_than_selected_hand_spell",
+            )
+            event_fields = replay_rule_fields(permanent)
+            emit_replay_event(
+                "hand_to_topdeck_activation",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="put_card_from_hand_on_top_for_lorehold_miracle_setup",
+                top_before=top_before.get("name", "?") if top_before else None,
+                top_after=chosen_hand["card"].get("name", "?"),
+                hand_to_top=chosen_hand["card"].get("name", "?"),
+                activation_cost=activation_cost_text,
+                phase=phase,
+                turn=turn,
+                **event_fields,
+            )
+            emit_replay_event(
+                "topdeck_manipulation_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="hand_to_top_for_lorehold_miracle_setup",
+                top_before=top_before.get("name", "?") if top_before else None,
+                top_after=chosen_hand["card"].get("name", "?"),
+                hand_to_top=chosen_hand["card"].get("name", "?"),
+                phase=phase,
+                turn=turn,
+                **event_fields,
+            )
+            return 1
+
     exchange_artifacts = [
         permanent
         for permanent in player.battlefield

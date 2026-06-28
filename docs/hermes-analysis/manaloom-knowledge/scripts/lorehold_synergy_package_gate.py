@@ -324,6 +324,20 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Penance"],
         "cuts": ["Hexing Squelcher"],
     },
+    "penance_runtime_topdeck_cut_promise": {
+        "family": "topdeck_protection",
+        "hypothesis": (
+            "Penance is retested after the battle runtime learned to use "
+            "hand-to-library activations proactively as Lorehold miracle setup, "
+            "not only as a lethal-combat damage shield. This avoids the locked "
+            "Hexing Squelcher cut and measures whether the new sequencing can "
+            "replace one five-mana wipe/political spell without reducing the "
+            "known topdeck engine."
+        ),
+        "adds": ["Penance"],
+        "cuts": ["Promise of Loyalty"],
+        "allow_miracle_core_cuts": True,
+    },
     "ghostly_prison_pressure_cut_squelcher": {
         "family": "pressure_absorber",
         "hypothesis": (
