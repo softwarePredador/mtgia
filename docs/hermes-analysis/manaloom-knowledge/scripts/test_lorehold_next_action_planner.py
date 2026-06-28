@@ -390,6 +390,48 @@ def prior_profiled_family_seed_matrix_report():
     )
 
 
+def prior_strategy_audit_report():
+    return (
+        planner.DEFAULT_STRATEGY_AUDIT,
+        {
+            "cut_safety_manifest": {
+                "cuts": [
+                    {
+                        "card_name": "Hexing Squelcher",
+                        "observations": [
+                            {
+                                "package_key": "faithless_looting_squee_enabler",
+                                "family": "discard_rummage_recursion",
+                                "adds": ["Faithless Looting"],
+                                "baseline": "8-19",
+                                "candidate": "4-23",
+                                "decision": "reject_or_rework",
+                                "delta_pp": -14.82,
+                            }
+                        ],
+                    }
+                ]
+            },
+            "post_squee_package_gates": {
+                "rows": [
+                    {
+                        "package_key": "brainstone_topdeck_miracle_cut_squelcher",
+                        "family": "topdeck_setup",
+                        "adds": ["Brainstone"],
+                        "cuts": ["Hexing Squelcher"],
+                        "baseline_wins": 8,
+                        "baseline_losses": 19,
+                        "candidate_wins": 8,
+                        "candidate_losses": 19,
+                        "decision": "reject_or_rework",
+                        "delta_pp": 0.0,
+                    }
+                ]
+            },
+        },
+    )
+
+
 def hand_filter_cut_model_report():
     return (
         planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0],
@@ -721,6 +763,35 @@ def test_next_action_planner_imports_profiled_family_seed_matrix_rejections():
     assert guardrails["prior_package_reports_have_rejections"]["rejected_package_keys"][0] == (
         "invoke_calamity_same_lane_benchmark_cut_creative_technique"
     )
+
+
+def test_next_action_planner_imports_strategy_audit_rejections():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        prior_package_reports=[prior_strategy_audit_report()],
+    )
+
+    assert payload["summary"]["prior_rejected_package_count"] == 2
+    assert payload["summary"]["prior_rejected_package_keys"] == [
+        "brainstone_topdeck_miracle_cut_squelcher",
+        "faithless_looting_squee_enabler",
+    ]
+    prior = planner.rejected_package_evidence([prior_strategy_audit_report()])
+    assert prior["faithless_looting_squee_enabler"]["cuts"] == ["Hexing Squelcher"]
+    assert prior["faithless_looting_squee_enabler"]["source_section"] == (
+        "cut_safety_manifest"
+    )
+    assert prior["faithless_looting_squee_enabler"]["baseline"]["wins"] == 8
+    assert prior["brainstone_topdeck_miracle_cut_squelcher"]["source_section"] == (
+        "post_squee_package_gates"
+    )
+    assert prior["brainstone_topdeck_miracle_cut_squelcher"]["candidate"]["losses"] == 19
+
+
+def test_next_action_planner_default_prior_reports_include_strategy_audit():
+    assert planner.DEFAULT_STRATEGY_AUDIT in planner.DEFAULT_PRIOR_PACKAGE_REPORTS
 
 
 def test_next_action_planner_prioritizes_focus_access_trace_review():
