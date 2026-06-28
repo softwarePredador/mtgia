@@ -4440,6 +4440,39 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:1e5bcf3b45fcae347879976d74d2ef84",
         }
     ),
+    "Toralf, God of Fury // Toralf's Hammer": handcrafted_runtime_rule(
+        {
+            "ability_kind": "modal_dfc_triggered_static_and_equipment_metadata",
+            "cmc": 4.0,
+            "effect": "creature",
+            "mana_cost": "{2}{R}{R}",
+            "colors": ["R"],
+            "type_line": "Legendary Creature - God",
+            "legendary": True,
+            "power": 5,
+            "toughness": 4,
+            "subtypes": ["God"],
+            "trample": True,
+            "trigger": "opponent_permanent_excess_noncombat_damage",
+            "trigger_effect": "damage_any_target",
+            "damage_amount_source": "excess_noncombat_damage",
+            "excess_noncombat_damage_to_opponent_permanent_reflect_any_target": True,
+            "target": "any_target_other_than_damaged_permanent",
+            "target_constraints": {"scope": "any_target", "exclude_damaged_permanent": True},
+            "back_face_name": "Toralf's Hammer",
+            "back_face_type_line": "Legendary Artifact - Equipment",
+            "back_face_mana_cost": "{1}{R}",
+            "equip_cost": "{1}{R}",
+            "equipped_legendary_creature_power_bonus": 3,
+            "equipped_creature_gains_unattach_damage_any_target": True,
+            "hammer_activation_cost": "{1}{R}, tap, unattach",
+            "hammer_activation_damage": 3,
+            "hammer_activation_returns_to_owner_hand": True,
+            "battle_model_scope": "opponent_creature_excess_noncombat_damage_reflect_any_target_equipment_metadata_v1",
+            "_rule_oracle_hash": "900c199972617df82c6ddf796e2cf04f",
+            "_rule_logical_key": "battle_rule_v1:733e913423b3c4471520195c8a814097",
+        }
+    ),
     "Ancient Copper Dragon": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4718,6 +4751,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Screaming Nemesis",
     "Single Combat",
     "The Walls of Ba Sing Se",
+    "Toralf, God of Fury // Toralf's Hammer",
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
     "Wild Ricochet",
@@ -4900,6 +4934,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace review_only runtime gap with XMage-backed defender body and other-controlled-permanents indestructible static.",
         ["manaloom_log_learning_audit_20260628_v23_after_slickshot_showoff_runtime", "TheWallsOfBaSingSe.java"],
         "2026-06-29T01:00:00Z",
+    ),
+    "Toralf, God of Fury // Toralf's Hammer": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed excess noncombat damage trigger plus Hammer back-face equipment metadata.",
+        ["manaloom_log_learning_audit_20260628_v35_after_unstable_glyphbridge_runtime", "ToralfGodOfFury.java"],
+        "2026-06-29T04:30:00Z",
     ),
     "Ancient Copper Dragon": manual_runtime_waiver_metadata(
         "Replace passive review_only evidence with XMage-backed combat-damage d20 Treasure trigger semantics.",
@@ -25378,6 +25417,7 @@ def resolve_damage_any_target(
     *,
     turn=None,
     phase=None,
+    exclude_permanent=None,
 ):
     alive_opponents = [opponent for opponent in (opponents or []) if opponent.is_alive()]
     result = {
@@ -25420,6 +25460,7 @@ def resolve_damage_any_target(
     )
 
     killable_creatures = []
+    excluded_permanent_id = id(exclude_permanent) if exclude_permanent is not None else None
     for opponent in alive_opponents:
         for creature in removal_target_candidates(
             opponent,
@@ -25427,6 +25468,8 @@ def resolve_damage_any_target(
             controller=controller,
             source=source_card,
         ):
+            if excluded_permanent_id is not None and id(creature) == excluded_permanent_id:
+                continue
             if creature.get("indestructible"):
                 continue
             target_amount = apply_static_damage_replacements(
@@ -30490,6 +30533,113 @@ def _creature_damage_controller_reflect_permanents(all_players):
     return sources
 
 
+def _toralf_excess_noncombat_damage_permanents(all_players):
+    sources = []
+    seen_controllers = set()
+    for controller in all_players or []:
+        if controller is None or id(controller) in seen_controllers:
+            continue
+        seen_controllers.add(id(controller))
+        for permanent in list(getattr(controller, "battlefield", []) or []):
+            if not isinstance(permanent, dict):
+                continue
+            candidates = [permanent]
+            try:
+                effect_data = get_card_effect(permanent)
+            except Exception:
+                effect_data = {}
+            if isinstance(effect_data, dict) and effect_data is not permanent:
+                candidates.append({**permanent, **effect_data})
+            for candidate in candidates:
+                trigger = candidate.get("trigger")
+                trigger_effect = candidate.get("trigger_effect")
+                if (
+                    candidate.get("excess_noncombat_damage_to_opponent_permanent_reflect_any_target")
+                    or candidate.get("battle_model_scope")
+                    == "opponent_creature_excess_noncombat_damage_reflect_any_target_equipment_metadata_v1"
+                    or (
+                        trigger == "opponent_permanent_excess_noncombat_damage"
+                        and trigger_effect == "damage_any_target"
+                    )
+                ):
+                    sources.append((controller, permanent, candidate))
+                    break
+    return sources
+
+
+def trigger_toralf_excess_noncombat_damage(
+    all_players,
+    damage_source_controller,
+    damaged_controller,
+    source_card,
+    damaged_creature,
+    amount,
+    *,
+    turn=None,
+    phase=None,
+    damage_event="creature_damage",
+):
+    if damaged_controller is None or not is_battlefield_creature(damaged_creature):
+        return 0
+    if str(phase or "").lower() == "combat_damage" or str(damage_event or "").lower() == "combat_damage":
+        return 0
+    try:
+        damage_amount = max(0, int(amount or 0))
+    except Exception:
+        damage_amount = 0
+    toughness = card_toughness_value(damaged_creature, default=2)
+    excess_damage = max(0, damage_amount - toughness)
+    if excess_damage <= 0:
+        return 0
+
+    triggers = 0
+    for controller, permanent, effect_data in _toralf_excess_noncombat_damage_permanents(all_players):
+        if controller is damaged_controller:
+            continue
+        if not getattr(controller, "is_alive", lambda: True)():
+            continue
+        opponents_for_controller = [
+            participant
+            for participant in all_players or []
+            if participant is not None and participant is not controller
+        ]
+        result = resolve_damage_any_target(
+            controller,
+            opponents_for_controller,
+            permanent,
+            excess_damage,
+            turn=turn,
+            phase=phase,
+            exclude_permanent=damaged_creature,
+        )
+        triggers += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=getattr(controller, "name", None),
+            card=permanent.get("name", "?"),
+            trigger=effect_data.get("trigger") or "opponent_permanent_excess_noncombat_damage",
+            effect="damage_any_target",
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else source_card,
+            source_controller=getattr(damage_source_controller, "name", None),
+            damaged_creature=damaged_creature.get("name", "?"),
+            damaged_creature_controller=getattr(damaged_controller, "name", None),
+            original_damage_to_permanent=damage_amount,
+            target_toughness=toughness,
+            excess_damage=excess_damage,
+            amount=result.get("amount"),
+            damage_dealt=result.get("amount") if result.get("result") in {"player_damage", "creature_destroyed"} else 0,
+            target=result.get("target") or ("player" if result.get("target_player") else None),
+            target_player=result.get("target_player"),
+            result=result.get("result"),
+            destination=result.get("destination"),
+            damage_event=damage_event,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+    return triggers
+
+
 def trigger_creature_damage_controller_reflect(
     all_players,
     damage_source_controller,
@@ -30512,6 +30662,17 @@ def trigger_creature_damage_controller_reflect(
         return 0
 
     triggers = trigger_source_damaged_reflect_to_any_target(
+        all_players,
+        damage_source_controller,
+        damaged_controller,
+        source_card,
+        damaged_creature,
+        damage_amount,
+        turn=turn,
+        phase=phase,
+        damage_event=damage_event,
+    )
+    triggers += trigger_toralf_excess_noncombat_damage(
         all_players,
         damage_source_controller,
         damaged_controller,
