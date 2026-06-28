@@ -578,6 +578,17 @@ def deal_damage(player, amount, source=None):
 
 
 def gain_life(player, amount, cap=40):
+    if getattr(player, "cant_gain_life", False):
+        emit_replay_event(
+            "life_gain_prevented",
+            player=getattr(player, "name", "?"),
+            amount=amount,
+            source=getattr(player, "cant_gain_life_source", None),
+            prevention="cant_gain_life",
+            duration=getattr(player, "cant_gain_life_duration", "rest_of_game"),
+            turn=CURRENT_REPLAY_TURN,
+        )
+        return False
     gained = _gain_life(player, amount, cap=cap, emit_replay_event=emit_replay_event)
     if gained:
         refresh_life_total_threshold_statics_for_player(
@@ -4282,6 +4293,28 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:93e3f5684069bf77d7219e17f3e04a6c:sawhorn_nemesis_runtime_v1",
         }
     ),
+    "Screaming Nemesis": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered",
+            "cmc": 3.0,
+            "effect": "creature",
+            "mana_cost": "{2}{R}",
+            "colors": ["R"],
+            "type_line": "Creature - Spirit",
+            "power": 3,
+            "toughness": 3,
+            "subtypes": ["Spirit"],
+            "haste": True,
+            "trigger": "source_dealt_damage",
+            "trigger_effect": "damage_any_target",
+            "damage_amount_source": "damage_dealt_to_source",
+            "source_damage_reflect_to_any_target": True,
+            "player_hit_cant_gain_life_rest_of_game": True,
+            "battle_model_scope": "source_dealt_damage_reflect_to_any_other_target_player_hit_cant_gain_life_v1",
+            "_rule_oracle_hash": "77190ec2e1e1dcb8b15429e5d53e68bd",
+            "_rule_logical_key": "battle_rule_v1:77190ec2e1e1dcb8b15429e5d53e68bd:screaming_nemesis_runtime_v1",
+        }
+    ),
     "Single Combat": handcrafted_runtime_rule(
         {
             "ability_kind": "one_shot_and_rule_modifier",
@@ -4591,6 +4624,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Slickshot Show-Off",
     "Serra Ascendant",
     "Sawhorn Nemesis",
+    "Screaming Nemesis",
     "Single Combat",
     "The Walls of Ba Sing Se",
     "Ancient Copper Dragon",
@@ -4740,6 +4774,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed chosen-player damage-doubling replacement for that player and permanents they control.",
         ["manaloom_log_learning_audit_20260628_v25_after_serra_ascendant_runtime", "SawhornNemesis.java"],
         "2026-06-29T01:40:00Z",
+    ),
+    "Screaming Nemesis": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed haste, damage-to-source reflection, and rest-of-game life-gain prevention for damaged player.",
+        ["manaloom_log_learning_audit_20260628_v27_after_single_combat_runtime", "ScreamingNemesis.java"],
+        "2026-06-29T02:20:00Z",
     ),
     "Single Combat": manual_runtime_waiver_metadata(
         "Replace review_only draw_cards row with XMage-backed choose-one creature/planeswalker sacrifice and all-player creature/planeswalker cast lock.",
@@ -6486,6 +6525,9 @@ class Player:
         self.indestructible = False
         self.life_cant_change = False
         self.life_cant_change_source = None
+        self.cant_gain_life = False
+        self.cant_gain_life_source = None
+        self.cant_gain_life_duration = None
         self.protection_from_everything = False
         self.protection_from_everything_source = None
         self.cannot_lose_this_turn = False
@@ -30238,6 +30280,12 @@ def trigger_source_damaged_reflect_to_any_target(
         phase=phase,
         damage_event_type="player",
     )
+    cant_gain_life_applied = False
+    if dealt and effect_data.get("player_hit_cant_gain_life_rest_of_game"):
+        target_player.cant_gain_life = True
+        target_player.cant_gain_life_source = damaged_creature.get("name", "?")
+        target_player.cant_gain_life_duration = "rest_of_game"
+        cant_gain_life_applied = True
     emit_replay_event(
         "trigger_resolved",
         player=getattr(damaged_controller, "name", None),
@@ -30258,6 +30306,8 @@ def trigger_source_damaged_reflect_to_any_target(
         result="player_damage" if dealt else "prevented",
         life_before=life_before,
         life_after=getattr(target_player, "life", None),
+        cant_gain_life_applied=cant_gain_life_applied,
+        cant_gain_life_duration="rest_of_game" if cant_gain_life_applied else None,
         damage_event=damage_event,
         turn=turn,
         phase=phase,
