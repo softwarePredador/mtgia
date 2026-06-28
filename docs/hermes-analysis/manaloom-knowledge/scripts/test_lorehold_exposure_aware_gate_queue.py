@@ -183,6 +183,65 @@ def test_runtime_or_pg_blocked_added_card_wins_over_prior_negative():
     assert twinflame["readiness_blockers"][0]["status"] == "pg_precheck_blocked"
 
 
+def test_readiness_blocker_with_exact_negative_is_not_actionable_pg_work():
+    report = queue.build_report(
+        readiness_report=readiness_report(),
+        hypothesis_queue={
+            "queue": [
+                {
+                    "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+                    "status": "tested_negative_do_not_promote",
+                }
+            ]
+        },
+        planner_payload={"summary": {}},
+        registry_payload={"untested_queue": []},
+        package_definitions=package_definitions(),
+        cut_safety={"enabled": False},
+        prior_results={"enabled": False},
+        command_stem="test_gate_queue",
+    )
+
+    rows = {row["package_key"]: row for row in report["packages"]}
+    twinflame = rows["pg245_twinflame_damage_payoff_cut_thor"]
+    assert twinflame["status"] == "blocked_added_card_readiness"
+    assert "hypothesis_queue_exact_negative" in twinflame["blockers"]
+    assert report["summary"]["actionable_added_card_readiness_count"] == 0
+    assert report["summary"]["nonactionable_added_card_readiness_count"] == 1
+    assert report["summary"]["recommended_next_action"] == (
+        "no_package_ready; build_new_failure_targeted_package_or_cut_model"
+    )
+
+
+def test_readiness_blocker_without_exact_negative_remains_actionable_pg_work():
+    report = queue.build_report(
+        readiness_report=readiness_report(),
+        hypothesis_queue={
+            "queue": [
+                {
+                    "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+                    "status": "untested",
+                }
+            ]
+        },
+        planner_payload={"summary": {}},
+        registry_payload={"untested_queue": []},
+        package_definitions=package_definitions(),
+        cut_safety={"enabled": False},
+        prior_results={"enabled": False},
+        command_stem="test_gate_queue",
+    )
+
+    rows = {row["package_key"]: row for row in report["packages"]}
+    twinflame = rows["pg245_twinflame_damage_payoff_cut_thor"]
+    assert twinflame["status"] == "blocked_added_card_readiness"
+    assert twinflame["blockers"] == ["added_card_readiness_blocked"]
+    assert report["summary"]["actionable_added_card_readiness_count"] == 1
+    assert report["summary"]["recommended_next_action"] == (
+        "resolve_runtime_or_pg_readiness_before_more_battles"
+    )
+
+
 def test_extract_child_status_from_executor_stdout():
     stdout = """
 irrelevant package output

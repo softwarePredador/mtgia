@@ -1,0 +1,3430 @@
+{
+  "generated_at": "2026-06-28T10:21:44Z",
+  "package_count": 14,
+  "package_definition_files": [],
+  "packages": [
+    {
+      "adds": [
+        "Twinflame Tyrant"
+      ],
+      "blockers": [
+        "added_card_readiness_blocked",
+        "prior_exact_reject",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": -44.45,
+            "card_name": "Thor, God of Thunder",
+            "current_lane": "graveyard_recursion",
+            "effective_role": "spell_damage_engine",
+            "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+            "status": "locked_do_not_cut",
+            "worst_strong_seed_delta_pp": -55.56
+          }
+        ],
+        "reason": "PG245 same-slot damage payoff benchmark; isolated candidate only",
+        "status": "override_locked_cut_safety"
+      },
+      "cuts": [
+        "Thor, God of Thunder"
+      ],
+      "decision": "not_run_added_card_runtime_or_pg_blocked",
+      "family": "static_damage_modifier",
+      "hypothesis_negative": {
+        "adds": [
+          "Twinflame Tyrant"
+        ],
+        "cuts": [
+          "Thor, God of Thunder"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Twinflame Tyrant": 1
+          },
+          "baseline_losses": 2,
+          "baseline_wins": 7,
+          "candidate_losses": 5,
+          "candidate_wins": 4,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -33.34,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Twinflame Tyrant"
+            ],
+            "adds_signature": [
+              "twinflame tyrant"
+            ],
+            "baseline": {
+              "avg_win_turn": 16.14,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 16,
+                "graveyard_upkeep_return_self_to_hand": 5,
+                "lorehold_cost_paid": 137,
+                "lorehold_rummage_discard_to_top": 13,
+                "lorehold_spell_cast": 107,
+                "lorehold_spell_rummage": 18,
+                "lorehold_spell_rummage_discard_to_top": 3,
+                "lorehold_upkeep_rummage": 39,
+                "miracle_cast": 32,
+                "squee_return_after_known_graveyard_entry": 5,
+                "squee_to_graveyard": 7,
+                "squee_upkeep_return": 5,
+                "topdeck_manipulation_activated": 30
+              },
+              "win_rate": 77.78,
+              "wins": 7
+            },
+            "candidate": {
+              "avg_win_turn": 11.5,
+              "losses": 5,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 24,
+                "lorehold_cost_paid": 102,
+                "lorehold_rummage_discard_to_top": 16,
+                "lorehold_spell_cast": 91,
+                "lorehold_spell_rummage": 20,
+                "lorehold_spell_rummage_discard_to_top": 8,
+                "lorehold_upkeep_rummage": 29,
+                "miracle_cast": 16,
+                "topdeck_manipulation_activated": 20
+              },
+              "win_rate": 44.44,
+              "wins": 4
+            },
+            "cuts": [
+              "Thor, God of Thunder"
+            ],
+            "cuts_signature": [
+              "thor, god of thunder"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -33.34,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": false,
+                "all_cards_near_access": false,
+                "all_cards_used": false,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Thor, God of Thunder",
+                    "event_breakdown": {},
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 9,
+                        "losses": 2,
+                        "stalls": 0,
+                        "win_rate": 77.78,
+                        "wins": 7
+                      },
+                      "card_name": "Thor, God of Thunder",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 17
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):1",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 22
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):2",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 20
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 13
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):1",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 6
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):2",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 8
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 21
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):1",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 12
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):2",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 6
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "no_card_exposure_sample",
+                      "status_counts": {
+                        "not_observed": 9
+                      },
+                      "used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 0,
+                    "status": "not_observed"
+                  }
+                ],
+                "cards_with_access": 0,
+                "cards_with_near_access": 0,
+                "cards_with_recorded_use": 0,
+                "total_recorded_use_count": 0
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Twinflame Tyrant",
+                    "event_breakdown": {
+                      "cost_paid": 1,
+                      "spell_cast": 1,
+                      "spell_resolved": 1
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 1,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 1
+                      },
+                      "all_games": {
+                        "games": 9,
+                        "losses": 5,
+                        "stalls": 0,
+                        "win_rate": 44.44,
+                        "wins": 4
+                      },
+                      "card_name": "Twinflame Tyrant",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 12
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Vivi Ornitier #99 (real):1",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Vivi Ornitier #99 (real):2",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 6
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 6
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Sisay, Weatherlight Captain #61 (real):1",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 6
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Sisay, Weatherlight Captain #61 (real):2",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 6
+                        },
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1,
+                            "spell_resolved": 1
+                          },
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Winota, Joiner of Forces #39 (real):1",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 3,
+                          "result": "win",
+                          "turns": 16
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_pg245_twinflame_damage_payoff_cut_thor:Winota, Joiner of Forces #39 (real):2",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 12
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 1,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 1
+                      },
+                      "sample_quality": "card_used_sample",
+                      "status_counts": {
+                        "not_observed": 8,
+                        "used": 1
+                      },
+                      "used_games": {
+                        "games": 1,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 1
+                      }
+                    },
+                    "recorded_use_count": 3,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 3
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "static_damage_modifier",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1_pg245_twinflame_damage_payoff_cut_thor.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1_pg245_twinflame_damage_payoff_cut_thor.md",
+            "gate_returncode": 0,
+            "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 8,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -35,
+              "lorehold_rummage_discard_to_top": 3,
+              "lorehold_spell_cast": -16,
+              "lorehold_spell_rummage": 2,
+              "lorehold_spell_rummage_discard_to_top": 5,
+              "miracle_cast": -16,
+              "random_discard_after_tutor": 2,
+              "ritual_mana_added": -3,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -5,
+              "squee_to_graveyard": -7,
+              "squee_upkeep_return": -5,
+              "topdeck_manipulation_activated": -10,
+              "tutor_resolved": -2
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "readiness_blockers": [
+        {
+          "card_name": "Twinflame Tyrant",
+          "family_id": "static_damage_modifier",
+          "next_action": "Rerun PostgreSQL precheck; do not apply package until every selected card has a matched card row.",
+          "status": "pg_precheck_blocked"
+        }
+      ],
+      "status": "blocked_added_card_readiness"
+    },
+    {
+      "adds": [
+        "Verge Rangers"
+      ],
+      "blockers": [
+        "added_card_readiness_blocked",
+        "cut_safety_blocked",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Bender's Waterskin",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+            "status": "protected_until_same_function_replacement_wins",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "proposed cuts are registry-protected: Bender's Waterskin",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision": "not_run_added_card_runtime_or_pg_blocked",
+      "family": "topdeck_play",
+      "hypothesis_negative": {
+        "adds": [
+          "Verge Rangers"
+        ],
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Verge Rangers": 1
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 3,
+          "candidate_wins": 0,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -100.0,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_runtime_smoke_gate_20260628_pg245_smoke_v1.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "pg245_verge_rangers_topdeck_land_cut_waterskin",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "readiness_blockers": [
+        {
+          "card_name": "Verge Rangers",
+          "family_id": "topdeck_play",
+          "next_action": "Rerun PostgreSQL precheck; do not apply package until every selected card has a matched card row.",
+          "status": "pg_precheck_blocked"
+        }
+      ],
+      "status": "blocked_added_card_readiness"
+    },
+    {
+      "adds": [
+        "Dragon's Rage Channeler"
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": null,
+            "card_name": "The Scarlet Witch",
+            "current_lane": "registry_protected",
+            "effective_role": null,
+            "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+            "status": "protected_until_same_function_replacement_wins",
+            "worst_strong_seed_delta_pp": null
+          }
+        ],
+        "reason": "proposed cuts are registry-protected: The Scarlet Witch",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "The Scarlet Witch"
+      ],
+      "decision": "not_run_cut_safety_blocked",
+      "family": "topdeck_filter",
+      "hypothesis_negative": {
+        "adds": [
+          "Dragon's Rage Channeler"
+        ],
+        "cuts": [
+          "The Scarlet Witch"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Dragon's Rage Channeler": 2
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 3,
+          "candidate_wins": 0,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -100.0,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "dragon_rage_channeler_cut_scarlet_witch",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_cut_safety"
+    },
+    {
+      "adds": [
+        "Guttersnipe"
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "prior_exact_reject",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": null,
+            "card_name": "Prismari Pianist",
+            "current_lane": "registry_protected",
+            "effective_role": null,
+            "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+            "status": "protected_until_same_function_replacement_wins",
+            "worst_strong_seed_delta_pp": null
+          }
+        ],
+        "reason": "proposed cuts are registry-protected: Prismari Pianist",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Prismari Pianist"
+      ],
+      "decision": "not_run_cut_safety_blocked",
+      "family": "spellcast_payoff",
+      "hypothesis_negative": {
+        "adds": [
+          "Guttersnipe"
+        ],
+        "cuts": [
+          "Prismari Pianist"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Guttersnipe": 1
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 3,
+          "candidate_wins": 0,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -100.0,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "guttersnipe_spell_payoff_cut_prismari",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Guttersnipe"
+            ],
+            "adds_signature": [
+              "guttersnipe"
+            ],
+            "baseline": {},
+            "candidate": {},
+            "cuts": [
+              "Prismari Pianist"
+            ],
+            "cuts_signature": [
+              "prismari pianist"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": null,
+            "family": "registry_rejected",
+            "gate_json": null,
+            "gate_markdown": null,
+            "gate_returncode": null,
+            "package_key": "registry:tested:9:guttersnipe",
+            "registry_learning": "Guttersnipe increased topdeck event frequency but did not convert to wins. Replacing Prismari Pianist removed too much board-pressure payoff; Prismari Pianist remains protected until a same-function replacement wins.",
+            "registry_result": "1W/8L/0S, WR 11.11%, Winota 0W/3L, miracle games 8/9, topdeck games 5/9",
+            "registry_section": "tested",
+            "registry_status": "rejected",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json",
+            "strategic_delta": {}
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_cut_safety"
+    },
+    {
+      "adds": [
+        "Lapse of Certainty"
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": null,
+            "card_name": "Tibalt's Trickery",
+            "current_lane": "registry_protected",
+            "effective_role": null,
+            "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+            "status": "protected_until_same_function_replacement_wins",
+            "worst_strong_seed_delta_pp": null
+          }
+        ],
+        "reason": "proposed cuts are registry-protected: Tibalt's Trickery",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Tibalt's Trickery"
+      ],
+      "decision": "not_run_cut_safety_blocked",
+      "family": "approach_topdeck_combo",
+      "hypothesis_negative": {
+        "adds": [
+          "Lapse of Certainty"
+        ],
+        "cuts": [
+          "Tibalt's Trickery"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Lapse of Certainty": 3
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 2,
+          "candidate_wins": 1,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -66.67,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_lapse_approach_gate_20260627_v1_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "lapse_approach_topdeck_cut_tibalts_trickery",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_cut_safety"
+    },
+    {
+      "adds": [
+        "Monastery Mentor"
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": null,
+            "card_name": "Prismari Pianist",
+            "current_lane": "registry_protected",
+            "effective_role": null,
+            "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+            "status": "protected_until_same_function_replacement_wins",
+            "worst_strong_seed_delta_pp": null
+          }
+        ],
+        "reason": "proposed cuts are registry-protected: Prismari Pianist",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Prismari Pianist"
+      ],
+      "decision": "not_run_cut_safety_blocked",
+      "family": "spellcast_payoff",
+      "hypothesis_negative": {
+        "adds": [
+          "Monastery Mentor"
+        ],
+        "cuts": [
+          "Prismari Pianist"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Monastery Mentor": 1
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 2,
+          "candidate_wins": 1,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -66.67,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "monastery_mentor_spell_tokens_cut_prismari",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_cut_safety"
+    },
+    {
+      "adds": [
+        "Radiant Scrollwielder"
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": null,
+            "card_name": "The Scarlet Witch",
+            "current_lane": "registry_protected",
+            "effective_role": null,
+            "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+            "status": "protected_until_same_function_replacement_wins",
+            "worst_strong_seed_delta_pp": null
+          }
+        ],
+        "reason": "proposed cuts are registry-protected: The Scarlet Witch",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "The Scarlet Witch"
+      ],
+      "decision": "not_run_cut_safety_blocked",
+      "family": "graveyard_recursion",
+      "hypothesis_negative": {
+        "adds": [
+          "Radiant Scrollwielder"
+        ],
+        "cuts": [
+          "The Scarlet Witch"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Radiant Scrollwielder": 3
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 2,
+          "candidate_wins": 1,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -66.67,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "radiant_scrollwielder_cut_scarlet_witch",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_cut_safety"
+    },
+    {
+      "adds": [
+        "Young Pyromancer"
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": null,
+            "card_name": "Prismari Pianist",
+            "current_lane": "registry_protected",
+            "effective_role": null,
+            "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+            "status": "protected_until_same_function_replacement_wins",
+            "worst_strong_seed_delta_pp": null
+          }
+        ],
+        "reason": "proposed cuts are registry-protected: Prismari Pianist",
+        "status": "blocked_cut_safety"
+      },
+      "cuts": [
+        "Prismari Pianist"
+      ],
+      "decision": "not_run_cut_safety_blocked",
+      "family": "spellcast_payoff",
+      "hypothesis_negative": {
+        "adds": [
+          "Young Pyromancer"
+        ],
+        "cuts": [
+          "Prismari Pianist"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Young Pyromancer": 1
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 2,
+          "candidate_wins": 1,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -66.67,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "young_pyromancer_spell_tokens_cut_prismari",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_cut_safety"
+    },
+    {
+      "adds": [
+        "Akroma's Will"
+      ],
+      "blockers": [
+        "prior_exact_reject",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "decision": "not_run_prior_reject_blocked",
+      "family": "pressure_absorber",
+      "hypothesis_negative": {
+        "adds": [
+          "Akroma's Will"
+        ],
+        "cuts": [
+          "Avatar's Wrath"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Akroma's Will": 3
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 3,
+          "candidate_wins": 0,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -100.0,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "akromas_will_cut_avatar_wrath",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Akroma's Will"
+            ],
+            "adds_signature": [
+              "akroma's will"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "losses": 3,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 12,
+                "lorehold_cost_paid": 26,
+                "lorehold_rummage_discard_to_top": 12,
+                "lorehold_spell_cast": 25,
+                "lorehold_spell_rummage": 2,
+                "lorehold_upkeep_rummage": 20,
+                "miracle_cast": 4,
+                "topdeck_manipulation_activated": 3
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "cuts": [
+              "Avatar's Wrath"
+            ],
+            "cuts_signature": [
+              "avatar's wrath"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -100.0,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": false,
+                "all_cards_near_access": false,
+                "all_cards_used": false,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Avatar's Wrath",
+                    "event_breakdown": {},
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 3
+                      },
+                      "card_name": "Avatar's Wrath",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 17
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "no_card_exposure_sample",
+                      "status_counts": {
+                        "not_observed": 3
+                      },
+                      "used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 0,
+                    "status": "not_observed"
+                  }
+                ],
+                "cards_with_access": 0,
+                "cards_with_near_access": 0,
+                "cards_with_recorded_use": 0,
+                "total_recorded_use_count": 0
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Akroma's Will",
+                    "event_breakdown": {
+                      "cost_paid": 1,
+                      "spell_cast": 1,
+                      "spell_resolved": 1
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 1,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 3,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "card_name": "Akroma's Will",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_akromas_will_cut_avatar_wrath:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1,
+                            "spell_resolved": 1
+                          },
+                          "game_id": "synergy_akromas_will_cut_avatar_wrath:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 3,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_akromas_will_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 7
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 1,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "card_used_sample",
+                      "status_counts": {
+                        "not_observed": 2,
+                        "used": 1
+                      },
+                      "used_games": {
+                        "games": 1,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 3,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 3
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "pressure_absorber",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000_akromas_will_cut_avatar_wrath.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000_akromas_will_cut_avatar_wrath.md",
+            "gate_returncode": 0,
+            "package_key": "akromas_will_cut_avatar_wrath",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 12,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -35,
+              "lorehold_rummage_discard_to_top": 12,
+              "lorehold_spell_cast": -28,
+              "lorehold_spell_rummage": -14,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -9,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": -1,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -3,
+              "squee_to_graveyard": -4,
+              "squee_upkeep_return": -3,
+              "topdeck_manipulation_activated": -9,
+              "tutor_resolved": -4
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_prior_evidence"
+    },
+    {
+      "adds": [
+        "Grand Abolisher"
+      ],
+      "blockers": [
+        "prior_exact_reject",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Mother of Runes"
+      ],
+      "decision": "not_run_prior_reject_blocked",
+      "family": "spell_protection",
+      "hypothesis_negative": {
+        "adds": [
+          "Grand Abolisher"
+        ],
+        "cuts": [
+          "Mother of Runes"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Grand Abolisher": 1
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 3,
+          "candidate_wins": 0,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -100.0,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "grand_abolisher_cut_mother_of_runes",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Grand Abolisher"
+            ],
+            "adds_signature": [
+              "grand abolisher"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "losses": 3,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 15,
+                "lorehold_spell_cast": 12,
+                "lorehold_upkeep_rummage": 5,
+                "miracle_cast": 1
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "cuts": [
+              "Mother of Runes"
+            ],
+            "cuts_signature": [
+              "mother of runes"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -100.0,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": false,
+                "all_cards_near_access": false,
+                "all_cards_used": false,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Mother of Runes",
+                    "event_breakdown": {},
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 3
+                      },
+                      "card_name": "Mother of Runes",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 17
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "no_card_exposure_sample",
+                      "status_counts": {
+                        "not_observed": 3
+                      },
+                      "used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 0,
+                    "status": "not_observed"
+                  }
+                ],
+                "cards_with_access": 0,
+                "cards_with_near_access": 0,
+                "cards_with_recorded_use": 0,
+                "total_recorded_use_count": 0
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Grand Abolisher",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2,
+                      "spell_resolved": 1
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 2,
+                        "losses": 2,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 3,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "card_name": "Grand Abolisher",
+                      "games": [
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1
+                          },
+                          "game_id": "synergy_grand_abolisher_cut_mother_of_runes:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 2,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1,
+                            "spell_resolved": 1
+                          },
+                          "game_id": "synergy_grand_abolisher_cut_mother_of_runes:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 3,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_grand_abolisher_cut_mother_of_runes:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 5
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 2,
+                        "losses": 2,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "card_used_sample",
+                      "status_counts": {
+                        "not_observed": 1,
+                        "used": 2
+                      },
+                      "used_games": {
+                        "games": 2,
+                        "losses": 2,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 5,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 5
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "spell_protection",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000_grand_abolisher_cut_mother_of_runes.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000_grand_abolisher_cut_mother_of_runes.md",
+            "gate_returncode": 0,
+            "package_key": "grand_abolisher_cut_mother_of_runes",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -46,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -41,
+              "lorehold_spell_rummage": -16,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -12,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": -1,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -3,
+              "squee_to_graveyard": -4,
+              "squee_upkeep_return": -3,
+              "topdeck_manipulation_activated": -12,
+              "tutor_resolved": -7
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_prior_evidence"
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "blockers": [
+        "prior_natural_confirmation_reject"
+      ],
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "decision": "not_run_prior_natural_confirmation_reject",
+      "family": "fast_mana",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Mana Vault"
+            ],
+            "adds_signature": [
+              "mana vault"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 24.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 30,
+                "lorehold_spell_cast": 25,
+                "lorehold_upkeep_rummage": 9,
+                "miracle_cast": 7,
+                "topdeck_manipulation_activated": 11
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Arcane Signet"
+            ],
+            "cuts_signature": [
+              "arcane signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Arcane Signet",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 2,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 2
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 3
+                      },
+                      "card_name": "Arcane Signet",
+                      "games": [
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1
+                          },
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 2,
+                          "result": "win",
+                          "turns": 17
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        },
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1
+                          },
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 2,
+                          "result": "win",
+                          "turns": 14
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 2,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 2
+                      },
+                      "sample_quality": "card_used_sample",
+                      "status_counts": {
+                        "not_observed": 1,
+                        "used": 2
+                      },
+                      "used_games": {
+                        "games": 2,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 2
+                      }
+                    },
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Mana Vault",
+                    "event_breakdown": {
+                      "cost_paid": 1,
+                      "spell_cast": 1
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 1,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 2,
+                        "stalls": 0,
+                        "win_rate": 33.33,
+                        "wins": 1
+                      },
+                      "card_name": "Mana Vault",
+                      "games": [
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1
+                          },
+                          "game_id": "synergy_mana_vault_fast_mana_cut_arcane_signet:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 2,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_mana_vault_fast_mana_cut_arcane_signet:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_mana_vault_fast_mana_cut_arcane_signet:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 24
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 1,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "card_used_sample",
+                      "status_counts": {
+                        "not_observed": 2,
+                        "used": 1
+                      },
+                      "used_games": {
+                        "games": 1,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 2,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 2
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "fast_mana",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000_mana_vault_fast_mana_cut_arcane_signet.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000_mana_vault_fast_mana_cut_arcane_signet.md",
+            "gate_returncode": 0,
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -31,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -28,
+              "lorehold_spell_rummage": -16,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -6,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -3,
+              "squee_to_graveyard": -4,
+              "squee_upkeep_return": -3,
+              "topdeck_manipulation_activated": -1,
+              "tutor_resolved": -2
+            }
+          },
+          {
+            "adds": [
+              "Mana Vault"
+            ],
+            "adds_signature": [
+              "mana vault"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 15.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 11,
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 41,
+                "lorehold_rummage_discard_to_top": 11,
+                "lorehold_rummage_discards_squee": 2,
+                "lorehold_spell_cast": 35,
+                "lorehold_upkeep_rummage": 29,
+                "miracle_cast": 9,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 3,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Arcane Signet"
+            ],
+            "cuts_signature": [
+              "arcane signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Arcane Signet",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 2,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 2
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 3
+                      },
+                      "card_name": "Arcane Signet",
+                      "games": [
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1
+                          },
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 2,
+                          "result": "win",
+                          "turns": 17
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        },
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1
+                          },
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 2,
+                          "result": "win",
+                          "turns": 14
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 2,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 2
+                      },
+                      "sample_quality": "card_used_sample",
+                      "status_counts": {
+                        "not_observed": 1,
+                        "used": 2
+                      },
+                      "used_games": {
+                        "games": 2,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 2
+                      }
+                    },
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Mana Vault",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 2,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 50.0,
+                        "wins": 1
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 2,
+                        "stalls": 0,
+                        "win_rate": 33.33,
+                        "wins": 1
+                      },
+                      "card_name": "Mana Vault",
+                      "games": [
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1
+                          },
+                          "game_id": "synergy_mana_vault_fast_mana_cut_arcane_signet:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 2,
+                          "result": "win",
+                          "turns": 15
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_mana_vault_fast_mana_cut_arcane_signet:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 9
+                        },
+                        {
+                          "access_status": "used",
+                          "accessed": true,
+                          "dominant_zone": null,
+                          "event_breakdown": {
+                            "cost_paid": 1,
+                            "spell_cast": 1
+                          },
+                          "game_id": "synergy_mana_vault_fast_mana_cut_arcane_signet:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 2,
+                          "result": "loss",
+                          "turns": 6
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 2,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 50.0,
+                        "wins": 1
+                      },
+                      "sample_quality": "card_used_sample",
+                      "status_counts": {
+                        "not_observed": 1,
+                        "used": 2
+                      },
+                      "used_games": {
+                        "games": 2,
+                        "losses": 1,
+                        "stalls": 0,
+                        "win_rate": 50.0,
+                        "wins": 1
+                      }
+                    },
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "fast_mana",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000_mana_vault_fast_mana_cut_arcane_signet.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000_mana_vault_fast_mana_cut_arcane_signet.md",
+            "gate_returncode": 0,
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 11,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -20,
+              "lorehold_rummage_discard_to_top": 11,
+              "lorehold_spell_cast": -18,
+              "lorehold_spell_rummage": -16,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -4,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 0,
+              "tutor_resolved": -4
+            }
+          },
+          {
+            "adds": [
+              "Mana Vault"
+            ],
+            "adds_signature": [
+              "mana vault"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 15.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 11,
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 41,
+                "lorehold_rummage_discard_to_top": 11,
+                "lorehold_rummage_discards_squee": 2,
+                "lorehold_spell_cast": 35,
+                "lorehold_upkeep_rummage": 29,
+                "miracle_cast": 9,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 3,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Arcane Signet"
+            ],
+            "cuts_signature": [
+              "arcane signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 2,
+                      "accessed_trace_count": 79,
+                      "dominant_zone": "library",
+                      "drawn_games": 2,
+                      "drawn_trace_count": 2,
+                      "library_only_games": 1,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 32,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 218,
+                      "trace_games": 3,
+                      "zone_counts": {
+                        "battlefield": 77,
+                        "hand": 2,
+                        "library": 139
+                      }
+                    },
+                    "card_name": "Arcane Signet",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 218,
+                    "location_trace_games": 3,
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 2,
+                      "accessed_trace_count": 71,
+                      "dominant_zone": "library",
+                      "drawn_games": 1,
+                      "drawn_trace_count": 1,
+                      "library_only_games": 1,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 29,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 146,
+                      "trace_games": 3,
+                      "zone_counts": {
+                        "battlefield": 38,
+                        "exile": 29,
+                        "hand": 4,
+                        "library": 75
+                      }
+                    },
+                    "card_name": "Mana Vault",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 146,
+                    "location_trace_games": 3,
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "fast_mana",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237_mana_vault_fast_mana_cut_arcane_signet.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237_mana_vault_fast_mana_cut_arcane_signet.md",
+            "gate_returncode": 0,
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 11,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -20,
+              "lorehold_rummage_discard_to_top": 11,
+              "lorehold_spell_cast": -18,
+              "lorehold_spell_rummage": -16,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -4,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 0,
+              "tutor_resolved": -4
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_prior_evidence"
+    },
+    {
+      "adds": [
+        "Reprieve"
+      ],
+      "blockers": [
+        "prior_exact_reject",
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "decision": "not_run_prior_reject_blocked",
+      "family": "spell_protection",
+      "hypothesis_negative": {
+        "adds": [
+          "Reprieve"
+        ],
+        "cuts": [
+          "Avatar's Wrath"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Reprieve": 2
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 3,
+          "candidate_wins": 0,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -100.0,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "reprieve_cut_avatar_wrath",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Reprieve"
+            ],
+            "adds_signature": [
+              "reprieve"
+            ],
+            "baseline": {},
+            "candidate": {},
+            "cuts": [
+              "Avatar's Wrath"
+            ],
+            "cuts_signature": [
+              "avatar's wrath"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": null,
+            "family": "registry_rejected",
+            "gate_json": null,
+            "gate_markdown": null,
+            "gate_returncode": null,
+            "package_key": "registry:leader_follow_up_probes:2:reprieve",
+            "registry_learning": "Reprieve did not preserve the pressure-absorption shell that the Squee champion is using well. Avatar's Wrath remains the stronger protection slot in this shell.",
+            "registry_result": "0W/3L/0S, WR 0.00%, delta -88.89pp vs Squee baseline 88.89%",
+            "registry_section": "leader_follow_up_probes",
+            "registry_status": "rejected_probe",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json",
+            "strategic_delta": {}
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`",
+        "status": "blocked_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_prior_evidence"
+    },
+    {
+      "adds": [
+        "Perch Protection"
+      ],
+      "blockers": [
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "decision": "not_run_exact_pair_already_negative",
+      "family": "pressure_absorber",
+      "hypothesis_negative": {
+        "adds": [
+          "Perch Protection"
+        ],
+        "cuts": [
+          "Avatar's Wrath"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Perch Protection": 1
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 2,
+          "candidate_wins": 1,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -66.67,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "perch_protection_cut_avatar_wrath",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Perch Protection"
+            ],
+            "adds_signature": [
+              "perch protection"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 17.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 40,
+                "lorehold_spell_cast": 35,
+                "lorehold_spell_rummage": 4,
+                "lorehold_upkeep_rummage": 12,
+                "miracle_cast": 4,
+                "topdeck_manipulation_activated": 4
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Avatar's Wrath"
+            ],
+            "cuts_signature": [
+              "avatar's wrath"
+            ],
+            "decision": "inconclusive_low_exposure",
+            "delta_pp": -66.67,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": false,
+                "all_cards_near_access": false,
+                "all_cards_used": false,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Avatar's Wrath",
+                    "event_breakdown": {},
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 3
+                      },
+                      "card_name": "Avatar's Wrath",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 17
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "no_card_exposure_sample",
+                      "status_counts": {
+                        "not_observed": 3
+                      },
+                      "used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 0,
+                    "status": "not_observed"
+                  }
+                ],
+                "cards_with_access": 0,
+                "cards_with_near_access": 0,
+                "cards_with_recorded_use": 0,
+                "total_recorded_use_count": 0
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": false,
+                "all_cards_near_access": false,
+                "all_cards_used": false,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Perch Protection",
+                    "event_breakdown": {},
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 2,
+                        "stalls": 0,
+                        "win_rate": 33.33,
+                        "wins": 1
+                      },
+                      "card_name": "Perch Protection",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_perch_protection_cut_avatar_wrath:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_perch_protection_cut_avatar_wrath:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 17
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "no_card_exposure_sample",
+                      "status_counts": {
+                        "not_observed": 3
+                      },
+                      "used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 0,
+                    "status": "not_observed"
+                  }
+                ],
+                "cards_with_access": 0,
+                "cards_with_near_access": 0,
+                "cards_with_recorded_use": 0,
+                "total_recorded_use_count": 0
+              },
+              "low_candidate_added_card_access": true,
+              "low_candidate_added_card_use": true,
+              "next_step": "increase_sample_or_run_forced_access_gate",
+              "status": "candidate_added_card_low_access"
+            },
+            "family": "pressure_absorber",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000_perch_protection_cut_avatar_wrath.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000_perch_protection_cut_avatar_wrath.md",
+            "gate_returncode": 0,
+            "package_key": "perch_protection_cut_avatar_wrath",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -21,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -18,
+              "lorehold_spell_rummage": -12,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -9,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -3,
+              "squee_to_graveyard": -4,
+              "squee_upkeep_return": -3,
+              "topdeck_manipulation_activated": -8,
+              "tutor_resolved": -5
+            }
+          }
+        ],
+        "reason": "previous exact package result was not a reject blocker",
+        "status": "seen_no_blocker"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_hypothesis_queue_prior_negative"
+    },
+    {
+      "adds": [
+        "Silence"
+      ],
+      "blockers": [
+        "hypothesis_queue_exact_negative"
+      ],
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "decision": "not_run_exact_pair_already_negative",
+      "family": "spell_protection",
+      "hypothesis_negative": {
+        "adds": [
+          "Silence"
+        ],
+        "cuts": [
+          "Avatar's Wrath"
+        ],
+        "prior_gate": {
+          "added_rule_counts": {
+            "Silence": 1
+          },
+          "baseline_losses": 0,
+          "baseline_wins": 3,
+          "candidate_losses": 2,
+          "candidate_wins": 1,
+          "decision": "tested_negative_do_not_promote",
+          "delta_pp": -66.67,
+          "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_silence_fixed.json",
+          "status": "gated"
+        },
+        "status": "tested_negative_do_not_promote"
+      },
+      "natural_promotion_allowed": false,
+      "package_key": "silence_cut_avatar_wrath",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Silence"
+            ],
+            "adds_signature": [
+              "silence"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 17.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 15,
+                "graveyard_upkeep_return_self_to_hand": 2,
+                "lorehold_cost_paid": 46,
+                "lorehold_rummage_discard_to_top": 13,
+                "lorehold_rummage_discards_squee": 2,
+                "lorehold_spell_cast": 40,
+                "lorehold_spell_rummage": 8,
+                "lorehold_spell_rummage_discard_to_top": 2,
+                "lorehold_upkeep_rummage": 28,
+                "miracle_cast": 12,
+                "squee_return_after_known_graveyard_entry": 2,
+                "squee_to_graveyard": 3,
+                "squee_upkeep_return": 2,
+                "topdeck_manipulation_activated": 4
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Avatar's Wrath"
+            ],
+            "cuts_signature": [
+              "avatar's wrath"
+            ],
+            "decision": "inconclusive_low_exposure",
+            "delta_pp": -66.67,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": false,
+                "all_cards_near_access": false,
+                "all_cards_used": false,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Avatar's Wrath",
+                    "event_breakdown": {},
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 100.0,
+                        "wins": 3
+                      },
+                      "card_name": "Avatar's Wrath",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 17
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "deck_6:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 14
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "no_card_exposure_sample",
+                      "status_counts": {
+                        "not_observed": 3
+                      },
+                      "used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 0,
+                    "status": "not_observed"
+                  }
+                ],
+                "cards_with_access": 0,
+                "cards_with_near_access": 0,
+                "cards_with_recorded_use": 0,
+                "total_recorded_use_count": 0
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": false,
+                "all_cards_near_access": false,
+                "all_cards_used": false,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Silence",
+                    "event_breakdown": {},
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "outcome_summary": {
+                      "accessed_or_used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "all_games": {
+                        "games": 3,
+                        "losses": 2,
+                        "stalls": 0,
+                        "win_rate": 33.33,
+                        "wins": 1
+                      },
+                      "card_name": "Silence",
+                      "games": [
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_silence_cut_avatar_wrath:Vivi Ornitier #99 (real):0",
+                          "near_access": false,
+                          "opponent": "Vivi Ornitier #99 (real)",
+                          "recorded_use_count": 0,
+                          "result": "win",
+                          "turns": 17
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_silence_cut_avatar_wrath:Sisay, Weatherlight Captain #61 (real):0",
+                          "near_access": false,
+                          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 7
+                        },
+                        {
+                          "access_status": "not_observed",
+                          "accessed": false,
+                          "dominant_zone": null,
+                          "event_breakdown": {},
+                          "game_id": "synergy_silence_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0",
+                          "near_access": false,
+                          "opponent": "Winota, Joiner of Forces #39 (real)",
+                          "recorded_use_count": 0,
+                          "result": "loss",
+                          "turns": 8
+                        }
+                      ],
+                      "games_truncated": false,
+                      "near_access_or_better_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      },
+                      "sample_quality": "no_card_exposure_sample",
+                      "status_counts": {
+                        "not_observed": 3
+                      },
+                      "used_games": {
+                        "games": 0,
+                        "losses": 0,
+                        "stalls": 0,
+                        "win_rate": 0.0,
+                        "wins": 0
+                      }
+                    },
+                    "recorded_use_count": 0,
+                    "status": "not_observed"
+                  }
+                ],
+                "cards_with_access": 0,
+                "cards_with_near_access": 0,
+                "cards_with_recorded_use": 0,
+                "total_recorded_use_count": 0
+              },
+              "low_candidate_added_card_access": true,
+              "low_candidate_added_card_use": true,
+              "next_step": "increase_sample_or_run_forced_access_gate",
+              "status": "candidate_added_card_low_access"
+            },
+            "family": "spell_protection",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000_silence_cut_avatar_wrath.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000_silence_cut_avatar_wrath.md",
+            "gate_returncode": 0,
+            "package_key": "silence_cut_avatar_wrath",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 15,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -15,
+              "lorehold_rummage_discard_to_top": 13,
+              "lorehold_spell_cast": -13,
+              "lorehold_spell_rummage": -8,
+              "lorehold_spell_rummage_discard_to_top": 2,
+              "miracle_cast": -1,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": -1,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -1,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": -1,
+              "topdeck_manipulation_activated": -8,
+              "tutor_resolved": -4
+            }
+          }
+        ],
+        "reason": "previous exact package result was not a reject blocker",
+        "status": "seen_no_blocker"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_hypothesis_queue_prior_negative"
+    }
+  ],
+  "postgres_writes": false,
+  "readiness_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v6_current_miner.json",
+  "ready_queue": [],
+  "source_db_mutated": false,
+  "sources": {
+    "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v3_runtime_readiness.json",
+    "hypothesis_queue": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
+    "planner": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260628_v16_current_default_chain.json",
+    "prior_package_reports": [
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+    ],
+    "readiness_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260628_v1.json",
+    "registry": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json"
+  },
+  "summary": {
+    "actionable_added_card_readiness_count": 0,
+    "blocked_added_card_readiness_count": 2,
+    "forced_exposure_probe_ready_count": 0,
+    "natural_gate_ready_count": 0,
+    "nonactionable_added_card_readiness_count": 2,
+    "package_count": 14,
+    "prior_inconclusive_low_exposure_keys": [
+      "mana_vault_fast_mana_cut_arcane_signet"
+    ],
+    "ready_count": 0,
+    "recommended_next_action": "no_package_ready; build_new_failure_targeted_package_or_cut_model",
+    "status_counts": {
+      "blocked_added_card_readiness": 2,
+      "blocked_cut_safety": 6,
+      "blocked_hypothesis_queue_prior_negative": 2,
+      "blocked_prior_evidence": 4
+    }
+  }
+}

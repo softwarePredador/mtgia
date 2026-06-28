@@ -49,6 +49,12 @@ READY_STATUSES = {
     "natural_gate_preflight_ready",
     "forced_exposure_probe_ready",
 }
+READINESS_REWORK_BLOCKERS = {
+    "cut_safety_blocked",
+    "prior_exact_reject",
+    "prior_natural_confirmation_reject",
+    "hypothesis_queue_exact_negative",
+}
 
 
 def utc_now() -> str:
@@ -200,6 +206,13 @@ def prior_evidence_has_natural_confirmation_reject(prior_evidence: dict[str, Any
     return False
 
 
+def actionable_added_card_readiness_blocker(row: dict[str, Any]) -> bool:
+    if row.get("status") != "blocked_added_card_readiness":
+        return False
+    blockers = set(row.get("blockers") or [])
+    return not bool(blockers & READINESS_REWORK_BLOCKERS)
+
+
 def classify_package(
     *,
     package_key: str,
@@ -325,7 +338,7 @@ def recommended_next_action(rows: list[dict[str, Any]]) -> str:
         return "run_next_natural_gate_package"
     if any(row["status"] == "forced_exposure_probe_ready" for row in rows):
         return "run_forced_exposure_probe_before_natural_gate"
-    if any(row["status"] == "blocked_added_card_readiness" for row in rows):
+    if any(actionable_added_card_readiness_blocker(row) for row in rows):
         return "resolve_runtime_or_pg_readiness_before_more_battles"
     return "no_package_ready; build_new_failure_targeted_package_or_cut_model"
 
@@ -391,6 +404,9 @@ def build_report(
     rows.sort(key=lambda row: (priority.get(row["status"], 99), row["package_key"]))
     counts = Counter(row["status"] for row in rows)
     ready_rows = [row for row in rows if row["status"] in READY_STATUSES]
+    actionable_readiness_rows = [
+        row for row in rows if actionable_added_card_readiness_blocker(row)
+    ]
     return {
         "generated_at": utc_now(),
         "postgres_writes": False,
@@ -404,6 +420,10 @@ def build_report(
             "natural_gate_ready_count": counts.get("natural_gate_preflight_ready", 0),
             "forced_exposure_probe_ready_count": counts.get("forced_exposure_probe_ready", 0),
             "blocked_added_card_readiness_count": counts.get("blocked_added_card_readiness", 0),
+            "actionable_added_card_readiness_count": len(actionable_readiness_rows),
+            "nonactionable_added_card_readiness_count": (
+                counts.get("blocked_added_card_readiness", 0) - len(actionable_readiness_rows)
+            ),
             "prior_inconclusive_low_exposure_keys": sorted(inconclusive_low_exposure_keys),
             "recommended_next_action": recommended_next_action(rows),
         },
