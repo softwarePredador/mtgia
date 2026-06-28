@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-06-28T08:56:44Z",
+  "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json",
+  "packages": [
+    {
+      "adds": [
+        "Seething Song"
+      ],
+      "cut_safety_override_reason": "same-function ramp benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut-safety lane is early_mana",
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "ramp_benchmark",
+      "hypothesis": "Seething Song is an active-rule Lorehold variant ramp card. This benchmarks it as a same-function replacement for Bender's Waterskin before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
+      "registry_protected_cut_override_reason": "registry allows only a same-function replacement benchmark; candidate_role=ramp cut_role=ramp"
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "cut_safety_override_reason": "same-function ramp benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut-safety lane is early_mana",
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "ramp_benchmark",
+      "hypothesis": "Mana Vault is an active-rule Lorehold variant ramp card. This benchmarks it as a same-function replacement for Bender's Waterskin before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+      "registry_protected_cut_override_reason": "registry allows only a same-function replacement benchmark; candidate_role=ramp cut_role=ramp"
+    },
+    {
+      "adds": [
+        "Invoke Calamity"
+      ],
+      "allow_miracle_core_cuts": true,
+      "cut_safety_override_reason": "same-function big spell value benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut-safety lane is finisher_or_big_spell",
+      "cuts": [
+        "Creative Technique"
+      ],
+      "family": "big_spell_value_benchmark",
+      "hypothesis": "Invoke Calamity is an active-rule Lorehold variant big spell value card. This benchmarks it as a same-function replacement for Creative Technique before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "invoke_calamity_same_lane_benchmark_cut_creative_technique",
+      "registry_protected_cut_override_reason": "registry allows only a same-function replacement benchmark; candidate_role=big_spell_value cut_role=big_spell_value"
+    },
+    {
+      "adds": [
+        "Velomachus Lorehold"
+      ],
+      "allow_miracle_core_cuts": true,
+      "cut_safety_override_reason": "same-function big spell value benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut-safety lane is finisher_or_big_spell",
+      "cuts": [
+        "Creative Technique"
+      ],
+      "family": "big_spell_value_benchmark",
+      "hypothesis": "Velomachus Lorehold is an active-rule Lorehold variant big spell value card. This benchmarks it as a same-function replacement for Creative Technique before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
+      "registry_protected_cut_override_reason": "registry allows only a same-function replacement benchmark; candidate_role=big_spell_value cut_role=big_spell_value"
+    },
+    {
+      "adds": [
+        "Crackle with Power"
+      ],
+      "cut_safety_override_reason": "same-function spot removal benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut-safety lane is unknown",
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "family": "interaction_removal_benchmark",
+      "hypothesis": "Crackle with Power is an active-rule Lorehold variant spot removal card. This benchmarks it as a same-function replacement for Winds of Abandon before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "crackle_with_power_same_lane_benchmark_cut_winds_of_abandon"
+    },
+    {
+      "adds": [
+        "Lightning Helix"
+      ],
+      "cut_safety_override_reason": "same-function spot removal benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut-safety lane is unknown",
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "family": "interaction_removal_benchmark",
+      "hypothesis": "Lightning Helix is an active-rule Lorehold variant spot removal card. This benchmarks it as a same-function replacement for Winds of Abandon before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "lightning_helix_same_lane_benchmark_cut_winds_of_abandon"
+    }
+  ],
+  "postgres_writes": false,
+  "prior_package_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json"
+  ],
+  "source": "lorehold_profiled_cut_benchmark_generator",
+  "source_db_mutated": false
+}

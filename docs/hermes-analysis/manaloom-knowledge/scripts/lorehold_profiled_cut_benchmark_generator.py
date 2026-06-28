@@ -35,11 +35,19 @@ DEFAULT_MANUAL_REVIEW = (
 DEFAULT_VARIANT_DECK_IDS = tuple(range(608, 617))
 ACTIVE_EXECUTION_STATUSES = {"active", "auto", "reviewed", "verified"}
 ACTIVE_REVIEW_STATUSES = {"active", "needs_review", "reviewed", "verified"}
+GENERATOR_BLOCKED_DECISIONS = set(package_gate.PRIOR_PACKAGE_BLOCKED_DECISIONS) | {
+    "reject_regresses_strong_seed",
+}
 PROFILED_CUT_STATUSES = {
     "measured_cut_exposure_needs_same_lane_benchmark",
     "same_lane_only",
 }
-SUPPORTED_CUT_ROLES = {"spot_removal"}
+SUPPORTED_CUT_ROLES = {"big_spell_value", "ramp", "spot_removal"}
+ROLE_FAMILIES = {
+    "big_spell_value": "big_spell_value_benchmark",
+    "ramp": "ramp_benchmark",
+    "spot_removal": "interaction_removal_benchmark",
+}
 COLOR_HATE_PATTERNS = tuple(
     f"{prefix} {color}"
     for prefix in ("target", "destroy target", "counter target")
@@ -86,12 +94,16 @@ def card_signature(cards: Iterable[str]) -> tuple[str, ...]:
 
 
 def package_key(candidate: str, cut: str) -> str:
-    return f"{slug(candidate)}_interaction_benchmark_cut_{slug(cut)}"
+    return f"{slug(candidate)}_same_lane_benchmark_cut_{slug(cut)}"
 
 
 def rule_scope_tokens(rule: dict[str, Any]) -> set[str]:
-    effect_text = " ".join((rule.get("effects") or {}).keys()).lower()
-    scope_text = " ".join((rule.get("battle_model_scopes") or {}).keys()).lower()
+    effect_text = " ".join(
+        (rule.get("active_effects") or rule.get("effects") or {}).keys()
+    ).lower()
+    scope_text = " ".join(
+        (rule.get("active_battle_model_scopes") or rule.get("battle_model_scopes") or {}).keys()
+    ).lower()
     text = f"{effect_text} {scope_text}"
     tokens: set[str] = set()
     for token in (
@@ -112,8 +124,8 @@ def rule_scope_tokens(rule: dict[str, Any]) -> set[str]:
 
 
 def removal_role_from_rule(rule: dict[str, Any]) -> str:
-    effects = set((rule.get("effects") or {}).keys())
-    scopes = set((rule.get("battle_model_scopes") or {}).keys())
+    effects = set((rule.get("active_effects") or rule.get("effects") or {}).keys())
+    scopes = set((rule.get("active_battle_model_scopes") or rule.get("battle_model_scopes") or {}).keys())
     text = " ".join(sorted(effects | scopes)).lower()
     if (
         any(effect.startswith("remove") or "removal" in effect for effect in effects)
@@ -135,6 +147,9 @@ def load_rule_summaries(conn: sqlite3.Connection, names: Iterable[str]) -> dict[
             "active_rule_count": 0,
             "effects": Counter(),
             "battle_model_scopes": Counter(),
+            "active_effects": Counter(),
+            "active_battle_model_scopes": Counter(),
+            "active_effect_jsons": [],
             "execution_statuses": Counter(),
             "review_statuses": Counter(),
         }
@@ -160,7 +175,8 @@ def load_rule_summaries(conn: sqlite3.Connection, names: Iterable[str]) -> dict[
         summary["rule_count"] += 1
         summary["execution_statuses"][execution_status] += 1
         summary["review_statuses"][review_status] += 1
-        if execution_status in ACTIVE_EXECUTION_STATUSES and review_status in ACTIVE_REVIEW_STATUSES:
+        is_active_rule = execution_status in ACTIVE_EXECUTION_STATUSES and review_status in ACTIVE_REVIEW_STATUSES
+        if is_active_rule:
             summary["active_rule_count"] += 1
         try:
             effect_json = json.loads(row["effect_json"] or "{}")
@@ -169,14 +185,23 @@ def load_rule_summaries(conn: sqlite3.Connection, names: Iterable[str]) -> dict[
         if isinstance(effect_json, dict):
             if effect_json.get("effect"):
                 summary["effects"][str(effect_json["effect"])] += 1
+                if is_active_rule:
+                    summary["active_effects"][str(effect_json["effect"])] += 1
             if effect_json.get("battle_model_scope"):
                 summary["battle_model_scopes"][str(effect_json["battle_model_scope"])] += 1
+                if is_active_rule:
+                    summary["active_battle_model_scopes"][str(effect_json["battle_model_scope"])] += 1
+            if is_active_rule:
+                summary["active_effect_jsons"].append(effect_json)
     finalized: dict[str, dict[str, Any]] = {}
     for key, value in out.items():
         finalized[key] = {
             **value,
             "effects": dict(sorted(value["effects"].items())),
             "battle_model_scopes": dict(sorted(value["battle_model_scopes"].items())),
+            "active_effects": dict(sorted(value["active_effects"].items())),
+            "active_battle_model_scopes": dict(sorted(value["active_battle_model_scopes"].items())),
+            "active_effect_jsons": value["active_effect_jsons"],
             "execution_statuses": dict(sorted(value["execution_statuses"].items())),
             "review_statuses": dict(sorted(value["review_statuses"].items())),
         }
@@ -273,7 +298,7 @@ def exact_prior_rejects(prior_results: dict[str, Any]) -> set[tuple[str, str]]:
     rejected = set()
     for rows in (prior_results.get("by_signature") or {}).values():
         for row in rows:
-            if row.get("decision") not in package_gate.PRIOR_PACKAGE_BLOCKED_DECISIONS:
+            if row.get("decision") not in GENERATOR_BLOCKED_DECISIONS:
                 continue
             adds = card_signature(row.get("adds") or [])
             cuts = card_signature(row.get("cuts") or [])
@@ -282,10 +307,88 @@ def exact_prior_rejects(prior_results: dict[str, Any]) -> set[tuple[str, str]]:
     return rejected
 
 
+def normalized_cut_safety(cut_safety: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        normalize_key(name): row
+        for name, row in (cut_safety.get("cuts_by_name") or {}).items()
+        if isinstance(row, dict)
+    }
+
+
+def active_rule_text(rule: dict[str, Any]) -> str:
+    return json.dumps(rule.get("active_effect_jsons") or [], sort_keys=True).lower()
+
+
+def rule_has_annotation_only_runtime(rule: dict[str, Any], role: str | None = None) -> bool:
+    text = active_rule_text(rule)
+    if "annotation_only" not in text:
+        return False
+    if role == "ramp" and any(
+        marker in text
+        for marker in (
+            "mana_produced",
+            "spell_cast_add_mana",
+            "produces",
+            "cost_reduction",
+        )
+    ):
+        return False
+    return True
+
+
+def rule_has_effect(rule: dict[str, Any], needles: Iterable[str]) -> bool:
+    text = " ".join(
+        list((rule.get("active_effects") or {}).keys())
+        + list((rule.get("active_battle_model_scopes") or {}).keys())
+    ).lower()
+    return any(needle in text for needle in needles)
+
+
 def candidate_role(candidate: dict[str, Any], rule: dict[str, Any]) -> str:
-    if str(candidate.get("functional_tag") or "") == "removal":
+    functional_tags = {str(tag) for tag in candidate.get("functional_tags") or []}
+    functional_tag = str(candidate.get("functional_tag") or "")
+    oracle = str(candidate.get("oracle_text") or "").lower()
+    type_line = str(candidate.get("type_line") or "")
+    cmc = float(candidate.get("cmc") or 0)
+    if rule_has_effect(
+        rule,
+        (
+            "ramp_permanent",
+            "ramp_ritual",
+            "ramp_engine",
+            "treasure_maker",
+            "spell_cast_red_mana_trigger",
+        ),
+    ):
+        return "ramp"
+    if (
+        functional_tag == "ramp"
+        or "ramp" in functional_tags
+    ) and not rule_has_annotation_only_runtime(rule, "ramp"):
+        return "ramp"
+    if rule_has_effect(
+        rule,
+        (
+            "free_cast",
+            "exile_top_nonland_free_cast",
+            "exile_value",
+            "cast_without_paying",
+            "without_paying_mana",
+            "top_seven_instant_or_sorcery",
+        ),
+    ):
+        return "big_spell_value"
+    if cmc >= 5 and (
+        "cast without paying" in oracle
+        or "without paying" in oracle
+        or "free" in oracle
+        or "cascade" in oracle
+        or "exile the top" in oracle
+    ):
+        return "big_spell_value"
+    if functional_tag == "removal":
         return "spot_removal"
-    if "removal" in {str(tag) for tag in candidate.get("functional_tags") or []}:
+    if "removal" in functional_tags:
         return "spot_removal"
     return removal_role_from_rule(rule)
 
@@ -302,6 +405,116 @@ def compatible_removal_scope(cut_rule: dict[str, Any], candidate_rule: dict[str,
     return bool(cut_tokens & candidate_tokens & {"artifact", "creature", "enchantment", "planeswalker"})
 
 
+def compatible_ramp_scope(cut: dict[str, Any], candidate: dict[str, Any], candidate_rule: dict[str, Any]) -> bool:
+    candidate_type = str(candidate.get("type_line") or "")
+    candidate_cmc = float(candidate.get("cmc") or 0)
+    oracle = str(candidate.get("oracle_text") or "").lower()
+    active_scope_text = " ".join((candidate_rule.get("active_battle_model_scopes") or {}).keys()).lower()
+    text = " ".join(
+        [
+            active_rule_text(candidate_rule),
+            oracle,
+        ]
+    )
+    if "Land" in candidate_type:
+        return False
+    if candidate_cmc > 4:
+        return False
+    if "spells cost" in oracle and "you" not in oracle and "your" not in oracle:
+        return False
+    oracle_or_scope_directly_mana = any(
+        marker in oracle
+        for marker in (
+            "add one mana",
+            "add two mana",
+            "add three",
+            "add {",
+            "treasure",
+            "cost less",
+            "costs less",
+        )
+    ) or any(
+        marker in active_scope_text
+        for marker in (
+            "mana",
+            "ritual",
+            "treasure",
+            "cost_reduction",
+            "fast_mana",
+            "monolith",
+        )
+    )
+    if not oracle_or_scope_directly_mana:
+        return False
+    return any(
+        marker in text
+        for marker in (
+            "mana_produced",
+            "produces",
+            "spell_cast_add_mana",
+            "spell_cast_red_mana_trigger",
+            "cost_reduction",
+            "cost less",
+            "costs less",
+            "add one mana",
+            "add two mana",
+            "add three",
+            "add {",
+            "treasure",
+        )
+    )
+
+
+def compatible_big_spell_scope(cut: dict[str, Any], candidate: dict[str, Any], candidate_rule: dict[str, Any]) -> bool:
+    candidate_cmc = float(candidate.get("cmc") or 0)
+    candidate_type = str(candidate.get("type_line") or "")
+    active_effects = set((candidate_rule.get("active_effects") or {}).keys())
+    text = " ".join(
+        [
+            active_rule_text(candidate_rule),
+            str(candidate.get("oracle_text") or "").lower(),
+        ]
+    )
+    if "Land" in candidate_type:
+        return False
+    if candidate_cmc < 5:
+        return False
+    if "ripple" in text or "same name" in text:
+        return False
+    if "rebound" in text and "free_cast" not in active_effects:
+        return False
+    if active_effects == {"copy_spell"}:
+        return False
+    return any(
+        marker in text
+        for marker in (
+            "free_cast",
+            "cast_without_paying",
+            "without paying",
+            "exile_top_nonland_free_cast",
+            "cascade",
+            "top seven",
+            "top_seven",
+        )
+    )
+
+
+def compatible_same_lane_scope(
+    cut: dict[str, Any],
+    cut_rule: dict[str, Any],
+    candidate: dict[str, Any],
+    candidate_rule: dict[str, Any],
+) -> bool:
+    cut_role = effective_cut_role(cut)
+    if cut_role == "spot_removal":
+        return compatible_removal_scope(cut_rule, candidate_rule)
+    if cut_role == "ramp":
+        return compatible_ramp_scope(cut, candidate, candidate_rule)
+    if cut_role == "big_spell_value":
+        return compatible_big_spell_scope(cut, candidate, candidate_rule)
+    return False
+
+
 def is_narrow_color_hate(candidate: dict[str, Any], candidate_rule: dict[str, Any]) -> bool:
     text = " ".join(
         [
@@ -311,6 +524,15 @@ def is_narrow_color_hate(candidate: dict[str, Any], candidate_rule: dict[str, An
         ]
     ).lower()
     return any(pattern in text for pattern in COLOR_HATE_PATTERNS)
+
+
+def effective_cut_role(cut: dict[str, Any]) -> str:
+    cut_safety = cut.get("cut_safety") or {}
+    return (
+        cut_safety.get("effective_role")
+        or (cut.get("cut_exposure") or {}).get("inferred_role")
+        or "unmeasured"
+    )
 
 
 def score_candidate(
@@ -323,7 +545,7 @@ def score_candidate(
 ) -> dict[str, Any]:
     cut_name = str(cut.get("card_name") or "")
     candidate_name = str(candidate.get("card_name") or "")
-    cut_role = (cut.get("cut_exposure") or {}).get("inferred_role") or "unmeasured"
+    cut_role = effective_cut_role(cut)
     role = candidate_role(candidate, candidate_rule)
     blockers: list[str] = []
     score = 0
@@ -337,7 +559,9 @@ def score_candidate(
         blockers.append("candidate_missing_active_rule")
     else:
         score += 25
-    if not compatible_removal_scope(cut_rule, candidate_rule):
+    if role in {"big_spell_value", "ramp"} and rule_has_annotation_only_runtime(candidate_rule, role):
+        blockers.append("candidate_runtime_annotation_only")
+    if not compatible_same_lane_scope(cut, cut_rule, candidate, candidate_rule):
         blockers.append("candidate_scope_not_same_lane")
     else:
         score += 20
@@ -350,7 +574,10 @@ def score_candidate(
     cut_cmc = float((cut.get("cut_metadata") or {}).get("cmc") or 0)
     candidate_cmc = float(candidate.get("cmc") or 0)
     if candidate_cmc and cut_cmc:
-        if candidate_cmc <= cut_cmc:
+        if cut_role == "big_spell_value" and candidate_cmc < cut_cmc:
+            blockers.append("candidate_too_low_curve_for_big_spell_slot")
+            score -= 10
+        elif candidate_cmc <= cut_cmc:
             score += 8
         elif candidate_cmc > cut_cmc + 2:
             blockers.append("candidate_much_higher_cmc")
@@ -368,6 +595,7 @@ def score_candidate(
         "cut_role": cut_role,
         "candidate_metadata": candidate,
         "cut_metadata": cut.get("cut_metadata") or {},
+        "cut_safety": cut.get("cut_safety") or {},
         "candidate_rule": candidate_rule,
         "cut_rule": cut_rule,
         "blockers": blockers,
@@ -375,21 +603,32 @@ def score_candidate(
 
 
 def build_manifest_package(row: dict[str, Any], source_review: Path) -> dict[str, Any]:
-    return {
+    cut_safety = row.get("cut_safety") or {}
+    family = ROLE_FAMILIES.get(row["cut_role"], "same_lane_benchmark")
+    role_label = row["cut_role"].replace("_", " ")
+    package = {
         "package_key": row["package_key"],
-        "family": "interaction_removal_benchmark",
+        "family": family,
         "hypothesis": (
-            f"{row['candidate']} is an active-rule Lorehold variant interaction card. "
-            f"This benchmarks it as a same-lane replacement for measured moderate-exposure "
-            f"{row['cut']} before any deck promotion; high-exposure interaction slots remain protected."
+            f"{row['candidate']} is an active-rule Lorehold variant {role_label} card. "
+            f"This benchmarks it as a same-function replacement for {row['cut']} "
+            f"before any deck promotion; registry-protected cards remain protected unless this lane wins."
         ),
         "adds": [row["candidate"]],
         "cuts": [row["cut"]],
         "cut_safety_override_reason": (
-            "same-lane interaction benchmark required by "
-            f"{source_review.name}; cut has measured exposure and is not a blind flex slot"
+            f"same-function {role_label} benchmark required by {source_review.name}; "
+            f"cut-safety lane is {cut_safety.get('current_lane') or 'unknown'}"
         ),
     }
+    if row["cut_role"] == "big_spell_value":
+        package["allow_miracle_core_cuts"] = True
+    if cut_safety.get("status") == "protected_until_same_function_replacement_wins":
+        package["registry_protected_cut_override_reason"] = (
+            f"registry allows only a same-function replacement benchmark; "
+            f"candidate_role={row['candidate_role']} cut_role={row['cut_role']}"
+        )
+    return package
 
 
 def build_report(
@@ -397,6 +636,7 @@ def build_report(
     conn: sqlite3.Connection,
     manual_review: dict[str, Any],
     prior_results: dict[str, Any],
+    cut_safety: dict[str, Any] | None = None,
     db_path: Path = DEFAULT_DB,
     manual_review_path: Path = DEFAULT_MANUAL_REVIEW,
     deck_id: int = 6,
@@ -417,12 +657,14 @@ def build_report(
         list(cut_names) + [row["card_name"] for row in variant_candidates.values()],
     )
     prior_rejects = exact_prior_rejects(prior_results)
+    cut_safety_by_name = normalized_cut_safety(cut_safety or {})
     pair_rows = []
     for cut in cuts:
         cut_name = str(cut.get("card_name") or "")
         cut_key = normalize_key(cut_name)
         cut_with_metadata = {
             **cut,
+            "cut_safety": cut_safety_by_name.get(cut_key, {}),
             "cut_metadata": current_metadata.get(
                 cut_key,
                 {
@@ -471,10 +713,14 @@ def build_report(
             "status": row.get("status"),
             "recommended_action": row.get("recommended_action"),
             "cut_exposure": row.get("cut_exposure") or {},
+            "cut_safety": cut_safety_by_name.get(normalize_key(row.get("card_name")), {}),
             "reason": "no supported generator for this cut role yet",
         }
         for row in cuts
-        if (row.get("cut_exposure") or {}).get("inferred_role") not in SUPPORTED_CUT_ROLES
+        if (
+            (cut_safety_by_name.get(normalize_key(row.get("card_name")), {}).get("effective_role"))
+            or (row.get("cut_exposure") or {}).get("inferred_role")
+        ) not in SUPPORTED_CUT_ROLES
     ]
     return {
         "generated_at": utc_now(),
@@ -519,6 +765,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Generated at: `{payload['generated_at']}`",
         f"- Source DB: `{payload['source_db']}`",
         f"- Manual review: `{payload['manual_review']}`",
+        f"- Cut-safety report: `{payload.get('cut_safety_report')}`",
+        f"- Registry: `{payload.get('registry')}`",
         f"- Variant deck IDs: `{', '.join(str(deck_id) for deck_id in payload['variant_deck_ids'])}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
@@ -562,7 +810,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         for row in payload["blocked_cut_rows"]:
             lines.append(
                 f"- `{row['card_name']}`: {row['reason']} "
-                f"(role `{row.get('cut_exposure', {}).get('inferred_role', 'unmeasured')}`)"
+                f"(role `{effective_cut_role(row)}`)"
             )
     lines.extend(["", "## Top Pair Evaluations", ""])
     lines.extend(
@@ -588,6 +836,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--manual-review", type=Path, default=DEFAULT_MANUAL_REVIEW)
+    parser.add_argument("--cut-safety-report", type=Path, default=package_gate.DEFAULT_CUT_SAFETY_REPORT)
+    parser.add_argument("--registry", type=Path, default=package_gate.DEFAULT_REGISTRY)
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--max-per-cut", type=int, default=2)
     parser.add_argument("--stem", default="lorehold_profiled_cut_benchmark_generator_20260628_v1")
@@ -597,22 +847,34 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     manual_review = read_json(args.manual_review)
+    registry_path = args.registry.resolve()
     prior_paths = [
         path.resolve()
         for path in (args.prior_package_report or list(package_gate.DEFAULT_PRIOR_PACKAGE_REPORTS))
     ]
     prior_results = package_gate.load_prior_package_results(prior_paths)
-    registry_results = package_gate.load_registry_prior_results(package_gate.DEFAULT_REGISTRY.resolve())
+    registry_results = package_gate.load_registry_prior_results(registry_path)
     prior_results = package_gate.merge_registry_prior_results(prior_results, registry_results)
+    cut_safety_report = args.cut_safety_report.resolve()
+    cut_safety = package_gate.load_cut_safety_manifest(cut_safety_report)
+    cut_safety = package_gate.merge_registry_cut_guard(
+        cut_safety,
+        package_gate.load_registry_cut_guard(registry_path),
+    )
     with connect(args.db) as conn:
         payload = build_report(
             conn=conn,
             manual_review=manual_review,
             prior_results=prior_results,
+            cut_safety=cut_safety,
             db_path=args.db,
             manual_review_path=args.manual_review,
             max_per_cut=args.max_per_cut,
         )
+    payload["cut_safety_report"] = str(cut_safety_report)
+    payload["registry"] = str(registry_path)
+    payload["prior_package_reports"] = [str(path) for path in prior_paths]
+    payload["manifest"]["prior_package_reports"] = [str(path) for path in prior_paths]
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"
     md_path = REPORT_DIR / f"{args.stem}.md"

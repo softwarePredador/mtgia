@@ -1,0 +1,2033 @@
+{
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-28T08:58:07.430145+00:00",
+  "loaded_package_files": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_generator_20260628_v2_package_manifest.json"
+  ],
+  "opponent_limit": 3,
+  "opponent_seed": 20260626,
+  "package_status_counts": {
+    "matrix_run": 4
+  },
+  "packages": [
+    {
+      "adds": [
+        "Seething Song"
+      ],
+      "aggregate": {
+        "avg_seed_delta_pp": -22.22,
+        "baseline_record": "4-5",
+        "baseline_win_rate": 44.44,
+        "candidate_record": "2-7",
+        "candidate_win_rate": 22.22,
+        "decision": "reject_regresses_strong_seed",
+        "delta_pp_total": -22.22,
+        "games": 9,
+        "incomplete_seeds": [],
+        "package_key": "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
+        "strong_seed_regressions": [
+          42
+        ]
+      },
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Bender's Waterskin",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "registry allows only a same-function replacement benchmark; candidate_role=ramp cut_role=ramp",
+        "status": "override_risky_cut_safety"
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "ramp_benchmark",
+      "hypothesis": "Seething Song is an active-rule Lorehold variant ramp card. This benchmarks it as a same-function replacement for Bender's Waterskin before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
+      "prior_evidence": {
+        "latest_decision": null,
+        "latest_delta_pp": null,
+        "latest_source_report": null,
+        "match_count": 0,
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "seed_results": [
+        {
+          "decision": "tie_promote_to_deeper_gate",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "lorehold_cost_paid": 12,
+                  "lorehold_spell_cast": 8,
+                  "lorehold_upkeep_rummage": 4
+                },
+                "top_cards": [
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Victory Chimes"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Scroll Rack"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Swords to Plowshares"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Esper Sentinel"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Hexing Squelcher"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Sol Ring"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "lorehold_cost_paid": 20,
+                  "lorehold_spell_cast": 18,
+                  "lorehold_upkeep_rummage": 12,
+                  "miracle_cast": 2,
+                  "topdeck_manipulation_activated": 1
+                },
+                "top_cards": [
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Ruby Medallion"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 1,
+                    "key": "miracle:Tempt with Bunnies"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Artist's Talent"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Esper Sentinel"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Big Score"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Boros Signet"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Arcane Signet"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Fellwar Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Lightning Greaves"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "delta_pp": 0.0
+          },
+          "seed": 7,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "decision": "promote_to_deeper_gate",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 9.0,
+              "error": null,
+              "games": 3,
+              "losses": 2,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 8,
+                  "lorehold_cost_paid": 33,
+                  "lorehold_rummage_discard_to_top": 8,
+                  "lorehold_spell_cast": 27,
+                  "lorehold_spell_rummage": 2,
+                  "lorehold_upkeep_rummage": 14,
+                  "miracle_cast": 2
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "lorehold_rummage_to_top:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 7,
+                    "key": "discard_to_top:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 6,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Jeska's Will"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Fellwar Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Pearl Medallion"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Promise of Loyalty"
+                  },
+                  {
+                    "count": 1,
+                    "key": "lorehold_rummage_to_top:Tragic Arrogance"
+                  },
+                  {
+                    "count": 1,
+                    "key": "discard_to_top:Tragic Arrogance"
+                  }
+                ]
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 15.0,
+              "error": null,
+              "games": 3,
+              "losses": 1,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 7,
+                  "lorehold_cost_paid": 33,
+                  "lorehold_rummage_discard_to_top": 7,
+                  "lorehold_spell_cast": 27,
+                  "lorehold_upkeep_rummage": 10,
+                  "miracle_cast": 8,
+                  "topdeck_manipulation_activated": 5
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "lorehold_rummage_to_top:Creative Technique"
+                  },
+                  {
+                    "count": 7,
+                    "key": "discard_to_top:Creative Technique"
+                  },
+                  {
+                    "count": 5,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Mizzix's Mastery"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:The Mind Stone"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Sol Ring"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Library of Leng"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Ruby Medallion"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Mother of Runes"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Fellwar Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  }
+                ]
+              },
+              "win_rate": 66.67,
+              "wins": 2
+            },
+            "delta_pp": 33.34
+          },
+          "seed": 20260625,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "decision": "reject_or_rework",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "error": null,
+              "games": 3,
+              "losses": 0,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "graveyard_upkeep_return_self_to_hand": 3,
+                  "lorehold_cost_paid": 61,
+                  "lorehold_spell_cast": 53,
+                  "lorehold_spell_rummage": 16,
+                  "lorehold_spell_rummage_discards_squee": 4,
+                  "lorehold_upkeep_rummage": 8,
+                  "miracle_cast": 13,
+                  "squee_return_after_known_graveyard_entry": 3,
+                  "squee_to_graveyard": 4,
+                  "squee_upkeep_return": 3,
+                  "topdeck_manipulation_activated": 12
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 7,
+                    "key": "topdeck:Scroll Rack"
+                  },
+                  {
+                    "count": 5,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "spell_rummage_discard:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 4,
+                    "key": "squee_to_graveyard:trigger_resolved"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Talisman of Conviction"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 3,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:High Noon"
+                  },
+                  {
+                    "count": 2,
+                    "key": "miracle:Surge to Victory"
+                  }
+                ]
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "lorehold_cost_paid": 26,
+                  "lorehold_spell_cast": 23,
+                  "lorehold_spell_rummage": 2,
+                  "lorehold_upkeep_rummage": 10,
+                  "miracle_cast": 4,
+                  "topdeck_manipulation_activated": 2
+                },
+                "top_cards": [
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 2,
+                    "key": "topdeck:Scroll Rack"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Sol Ring"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Prismari Pianist"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Monument to Endurance"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:The Mind Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "miracle:Avatar's Wrath"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Artist's Talent"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Giver of Runes"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Scroll Rack"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "delta_pp": -100.0
+          },
+          "seed": 42,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        }
+      ],
+      "status": "matrix_run"
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "aggregate": {
+        "avg_seed_delta_pp": -22.22,
+        "baseline_record": "4-5",
+        "baseline_win_rate": 44.44,
+        "candidate_record": "2-7",
+        "candidate_win_rate": 22.22,
+        "decision": "reject_regresses_strong_seed",
+        "delta_pp_total": -22.22,
+        "games": 9,
+        "incomplete_seeds": [],
+        "package_key": "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+        "strong_seed_regressions": [
+          42
+        ]
+      },
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Bender's Waterskin",
+            "current_lane": "early_mana",
+            "effective_role": "ramp",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "registry allows only a same-function replacement benchmark; candidate_role=ramp cut_role=ramp",
+        "status": "override_risky_cut_safety"
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "ramp_benchmark",
+      "hypothesis": "Mana Vault is an active-rule Lorehold variant ramp card. This benchmarks it as a same-function replacement for Bender's Waterskin before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+      "prior_evidence": {
+        "latest_decision": null,
+        "latest_delta_pp": null,
+        "latest_source_report": null,
+        "match_count": 0,
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "seed_results": [
+        {
+          "decision": "tie_promote_to_deeper_gate",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "lorehold_cost_paid": 12,
+                  "lorehold_spell_cast": 8,
+                  "lorehold_upkeep_rummage": 4
+                },
+                "top_cards": [
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Victory Chimes"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Scroll Rack"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Swords to Plowshares"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Esper Sentinel"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Hexing Squelcher"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Sol Ring"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "graveyard_upkeep_return_self_to_hand": 3,
+                  "lorehold_cost_paid": 22,
+                  "lorehold_rummage_discards_squee": 2,
+                  "lorehold_spell_cast": 17,
+                  "lorehold_upkeep_rummage": 11,
+                  "squee_return_after_known_graveyard_entry": 3,
+                  "squee_to_graveyard": 4,
+                  "squee_upkeep_return": 3
+                },
+                "top_cards": [
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Victory Chimes"
+                  },
+                  {
+                    "count": 2,
+                    "key": "rummage_discard:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 2,
+                    "key": "squee_to_graveyard:lorehold_upkeep_rummage"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Fellwar Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Swords to Plowshares"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:High Noon"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Ruby Medallion"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Lightning Greaves"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "delta_pp": 0.0
+          },
+          "seed": 7,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "decision": "promote_to_deeper_gate",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 9.0,
+              "error": null,
+              "games": 3,
+              "losses": 2,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 8,
+                  "lorehold_cost_paid": 33,
+                  "lorehold_rummage_discard_to_top": 8,
+                  "lorehold_spell_cast": 27,
+                  "lorehold_spell_rummage": 2,
+                  "lorehold_upkeep_rummage": 14,
+                  "miracle_cast": 2
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "lorehold_rummage_to_top:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 7,
+                    "key": "discard_to_top:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 6,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Jeska's Will"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Fellwar Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Pearl Medallion"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Promise of Loyalty"
+                  },
+                  {
+                    "count": 1,
+                    "key": "lorehold_rummage_to_top:Tragic Arrogance"
+                  },
+                  {
+                    "count": 1,
+                    "key": "discard_to_top:Tragic Arrogance"
+                  }
+                ]
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 22.0,
+              "error": null,
+              "games": 3,
+              "losses": 1,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 12,
+                  "graveyard_upkeep_return_self_to_hand": 3,
+                  "lorehold_cost_paid": 44,
+                  "lorehold_rummage_discard_to_top": 12,
+                  "lorehold_rummage_discards_squee": 4,
+                  "lorehold_spell_cast": 37,
+                  "lorehold_upkeep_rummage": 23,
+                  "miracle_cast": 14,
+                  "squee_return_after_known_graveyard_entry": 3,
+                  "squee_to_graveyard": 4,
+                  "squee_upkeep_return": 3,
+                  "thor_cost_paid": 1,
+                  "thor_spell_cast": 1,
+                  "topdeck_manipulation_activated": 20
+                },
+                "top_cards": [
+                  {
+                    "count": 12,
+                    "key": "topdeck:Scroll Rack"
+                  },
+                  {
+                    "count": 8,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 7,
+                    "key": "lorehold_rummage_to_top:Creative Technique"
+                  },
+                  {
+                    "count": 7,
+                    "key": "discard_to_top:Creative Technique"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 4,
+                    "key": "rummage_discard:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 4,
+                    "key": "squee_to_graveyard:lorehold_upkeep_rummage"
+                  },
+                  {
+                    "count": 3,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Giver of Runes"
+                  },
+                  {
+                    "count": 3,
+                    "key": "lorehold_rummage_to_top:Everything Comes to Dust"
+                  },
+                  {
+                    "count": 3,
+                    "key": "discard_to_top:Everything Comes to Dust"
+                  }
+                ]
+              },
+              "win_rate": 66.67,
+              "wins": 2
+            },
+            "delta_pp": 33.34
+          },
+          "seed": 20260625,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "decision": "reject_or_rework",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "error": null,
+              "games": 3,
+              "losses": 0,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "graveyard_upkeep_return_self_to_hand": 3,
+                  "lorehold_cost_paid": 61,
+                  "lorehold_spell_cast": 53,
+                  "lorehold_spell_rummage": 16,
+                  "lorehold_spell_rummage_discards_squee": 4,
+                  "lorehold_upkeep_rummage": 8,
+                  "miracle_cast": 13,
+                  "squee_return_after_known_graveyard_entry": 3,
+                  "squee_to_graveyard": 4,
+                  "squee_upkeep_return": 3,
+                  "topdeck_manipulation_activated": 12
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 7,
+                    "key": "topdeck:Scroll Rack"
+                  },
+                  {
+                    "count": 5,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "spell_rummage_discard:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 4,
+                    "key": "squee_to_graveyard:trigger_resolved"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Talisman of Conviction"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 3,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:High Noon"
+                  },
+                  {
+                    "count": 2,
+                    "key": "miracle:Surge to Victory"
+                  }
+                ]
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "lorehold_cost_paid": 25,
+                  "lorehold_spell_cast": 19,
+                  "lorehold_spell_rummage": 1,
+                  "lorehold_upkeep_rummage": 13,
+                  "miracle_cast": 5,
+                  "topdeck_manipulation_activated": 3
+                },
+                "top_cards": [
+                  {
+                    "count": 5,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Sol Ring"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 2,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:The Mind Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "miracle:Avatar's Wrath"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Mana Vault"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Artist's Talent"
+                  },
+                  {
+                    "count": 1,
+                    "key": "miracle:Hit the Mother Lode"
+                  },
+                  {
+                    "count": 1,
+                    "key": "miracle:Generous Gift"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Giver of Runes"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Land Tax"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "delta_pp": -100.0
+          },
+          "seed": 42,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        }
+      ],
+      "status": "matrix_run"
+    },
+    {
+      "adds": [
+        "Invoke Calamity"
+      ],
+      "aggregate": {
+        "avg_seed_delta_pp": -22.22,
+        "baseline_record": "4-5",
+        "baseline_win_rate": 44.44,
+        "candidate_record": "2-7",
+        "candidate_win_rate": 22.22,
+        "decision": "reject_regresses_strong_seed",
+        "delta_pp_total": -22.22,
+        "games": 9,
+        "incomplete_seeds": [],
+        "package_key": "invoke_calamity_same_lane_benchmark_cut_creative_technique",
+        "strong_seed_regressions": [
+          42
+        ]
+      },
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Creative Technique",
+            "current_lane": "finisher_or_big_spell",
+            "effective_role": "big_spell_value",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "registry allows only a same-function replacement benchmark; candidate_role=big_spell_value cut_role=big_spell_value",
+        "status": "override_risky_cut_safety"
+      },
+      "cuts": [
+        "Creative Technique"
+      ],
+      "family": "big_spell_value_benchmark",
+      "hypothesis": "Invoke Calamity is an active-rule Lorehold variant big spell value card. This benchmarks it as a same-function replacement for Creative Technique before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "invoke_calamity_same_lane_benchmark_cut_creative_technique",
+      "prior_evidence": {
+        "latest_decision": null,
+        "latest_delta_pp": null,
+        "latest_source_report": null,
+        "match_count": 0,
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "seed_results": [
+        {
+          "decision": "promote_to_deeper_gate",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "lorehold_cost_paid": 12,
+                  "lorehold_spell_cast": 8,
+                  "lorehold_upkeep_rummage": 4
+                },
+                "top_cards": [
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Victory Chimes"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Scroll Rack"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Swords to Plowshares"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Esper Sentinel"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Hexing Squelcher"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Sol Ring"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "candidate": {
+              "avg_win_turn": 15.0,
+              "error": null,
+              "games": 3,
+              "losses": 2,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 16,
+                  "lorehold_cost_paid": 27,
+                  "lorehold_rummage_discard_to_top": 16,
+                  "lorehold_spell_cast": 23,
+                  "lorehold_upkeep_rummage": 23,
+                  "miracle_cast": 7,
+                  "thor_cost_paid": 1,
+                  "thor_spell_cast": 1
+                },
+                "top_cards": [
+                  {
+                    "count": 8,
+                    "key": "lorehold_rummage_to_top:Promise of Loyalty"
+                  },
+                  {
+                    "count": 8,
+                    "key": "discard_to_top:Promise of Loyalty"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 4,
+                    "key": "lorehold_rummage_to_top:Reforge the Soul"
+                  },
+                  {
+                    "count": 4,
+                    "key": "discard_to_top:Reforge the Soul"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Victory Chimes"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 2,
+                    "key": "miracle:Promise of Loyalty"
+                  },
+                  {
+                    "count": 2,
+                    "key": "lorehold_rummage_to_top:Jeska's Will"
+                  },
+                  {
+                    "count": 2,
+                    "key": "discard_to_top:Jeska's Will"
+                  },
+                  {
+                    "count": 2,
+                    "key": "lorehold_rummage_to_top:Redirect Lightning"
+                  },
+                  {
+                    "count": 2,
+                    "key": "discard_to_top:Redirect Lightning"
+                  }
+                ]
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "delta_pp": 33.33
+          },
+          "seed": 7,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "decision": "tie_promote_to_deeper_gate",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 9.0,
+              "error": null,
+              "games": 3,
+              "losses": 2,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 8,
+                  "lorehold_cost_paid": 33,
+                  "lorehold_rummage_discard_to_top": 8,
+                  "lorehold_spell_cast": 27,
+                  "lorehold_spell_rummage": 2,
+                  "lorehold_upkeep_rummage": 14,
+                  "miracle_cast": 2
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "lorehold_rummage_to_top:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 7,
+                    "key": "discard_to_top:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 6,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Jeska's Will"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Fellwar Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Pearl Medallion"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Promise of Loyalty"
+                  },
+                  {
+                    "count": 1,
+                    "key": "lorehold_rummage_to_top:Tragic Arrogance"
+                  },
+                  {
+                    "count": 1,
+                    "key": "discard_to_top:Tragic Arrogance"
+                  }
+                ]
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 19.0,
+              "error": null,
+              "games": 3,
+              "losses": 2,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "graveyard_upkeep_return_self_to_hand": 3,
+                  "lorehold_cost_paid": 35,
+                  "lorehold_rummage_discards_squee": 5,
+                  "lorehold_spell_cast": 31,
+                  "lorehold_upkeep_rummage": 21,
+                  "miracle_cast": 7,
+                  "squee_return_after_known_graveyard_entry": 3,
+                  "squee_to_graveyard": 5,
+                  "squee_upkeep_return": 3,
+                  "thor_cost_paid": 1,
+                  "thor_spell_cast": 1,
+                  "topdeck_manipulation_activated": 4
+                },
+                "top_cards": [
+                  {
+                    "count": 5,
+                    "key": "rummage_discard:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 5,
+                    "key": "squee_to_graveyard:lorehold_upkeep_rummage"
+                  },
+                  {
+                    "count": 4,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Boros Signet"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:The Mind Stone"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Bender's Waterskin"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Giver of Runes"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Emeria's Call // Emeria, Shattered Skyclave"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Winds of Abandon"
+                  }
+                ]
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "delta_pp": 0.0
+          },
+          "seed": 20260625,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "decision": "reject_or_rework",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "error": null,
+              "games": 3,
+              "losses": 0,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "graveyard_upkeep_return_self_to_hand": 3,
+                  "lorehold_cost_paid": 61,
+                  "lorehold_spell_cast": 53,
+                  "lorehold_spell_rummage": 16,
+                  "lorehold_spell_rummage_discards_squee": 4,
+                  "lorehold_upkeep_rummage": 8,
+                  "miracle_cast": 13,
+                  "squee_return_after_known_graveyard_entry": 3,
+                  "squee_to_graveyard": 4,
+                  "squee_upkeep_return": 3,
+                  "topdeck_manipulation_activated": 12
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 7,
+                    "key": "topdeck:Scroll Rack"
+                  },
+                  {
+                    "count": 5,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "spell_rummage_discard:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 4,
+                    "key": "squee_to_graveyard:trigger_resolved"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Talisman of Conviction"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 3,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:High Noon"
+                  },
+                  {
+                    "count": 2,
+                    "key": "miracle:Surge to Victory"
+                  }
+                ]
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "lorehold_cost_paid": 28,
+                  "lorehold_spell_cast": 25,
+                  "lorehold_spell_rummage": 1,
+                  "lorehold_upkeep_rummage": 20,
+                  "miracle_cast": 5,
+                  "topdeck_manipulation_activated": 6
+                },
+                "top_cards": [
+                  {
+                    "count": 6,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:The Mind Stone"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Lightning Greaves"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Sol Ring"
+                  },
+                  {
+                    "count": 1,
+                    "key": "miracle:Avatar's Wrath"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Artist's Talent"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Giver of Runes"
+                  },
+                  {
+                    "count": 1,
+                    "key": "miracle:Storm Herd"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Generous Gift"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Bender's Waterskin"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "delta_pp": -100.0
+          },
+          "seed": 42,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        }
+      ],
+      "status": "matrix_run"
+    },
+    {
+      "adds": [
+        "Velomachus Lorehold"
+      ],
+      "aggregate": {
+        "avg_seed_delta_pp": -22.22,
+        "baseline_record": "4-5",
+        "baseline_win_rate": 44.44,
+        "candidate_record": "2-7",
+        "candidate_win_rate": 22.22,
+        "decision": "reject_regresses_strong_seed",
+        "delta_pp_total": -22.22,
+        "games": 9,
+        "incomplete_seeds": [],
+        "package_key": "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
+        "strong_seed_regressions": [
+          42
+        ]
+      },
+      "cut_safety": {
+        "cuts": [
+          {
+            "best_delta_pp": 3.7,
+            "card_name": "Creative Technique",
+            "current_lane": "finisher_or_big_spell",
+            "effective_role": "big_spell_value",
+            "status": "risky_cut_only_same_lane",
+            "worst_strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "registry allows only a same-function replacement benchmark; candidate_role=big_spell_value cut_role=big_spell_value",
+        "status": "override_risky_cut_safety"
+      },
+      "cuts": [
+        "Creative Technique"
+      ],
+      "family": "big_spell_value_benchmark",
+      "hypothesis": "Velomachus Lorehold is an active-rule Lorehold variant big spell value card. This benchmarks it as a same-function replacement for Creative Technique before any deck promotion; registry-protected cards remain protected unless this lane wins.",
+      "package_key": "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
+      "prior_evidence": {
+        "latest_decision": null,
+        "latest_delta_pp": null,
+        "latest_source_report": null,
+        "match_count": 0,
+        "reason": "no previous package-key or add/cut signature result",
+        "status": "clear"
+      },
+      "seed_results": [
+        {
+          "decision": "tie_promote_to_deeper_gate",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "lorehold_cost_paid": 12,
+                  "lorehold_spell_cast": 8,
+                  "lorehold_upkeep_rummage": 4
+                },
+                "top_cards": [
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Victory Chimes"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Scroll Rack"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Swords to Plowshares"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Esper Sentinel"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Hexing Squelcher"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Sol Ring"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "error": null,
+              "games": 3,
+              "losses": 3,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 9,
+                  "graveyard_upkeep_return_self_to_hand": 2,
+                  "lorehold_cost_paid": 24,
+                  "lorehold_rummage_discard_to_top": 9,
+                  "lorehold_rummage_discards_squee": 1,
+                  "lorehold_spell_cast": 20,
+                  "lorehold_spell_rummage": 2,
+                  "lorehold_spell_rummage_discards_squee": 1,
+                  "lorehold_upkeep_rummage": 12,
+                  "miracle_cast": 5,
+                  "squee_return_after_known_graveyard_entry": 2,
+                  "squee_to_graveyard": 3,
+                  "squee_upkeep_return": 2,
+                  "topdeck_manipulation_activated": 2
+                },
+                "top_cards": [
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "lorehold_rummage_to_top:Surge to Victory"
+                  },
+                  {
+                    "count": 3,
+                    "key": "discard_to_top:Surge to Victory"
+                  },
+                  {
+                    "count": 3,
+                    "key": "lorehold_rummage_to_top:Big Score"
+                  },
+                  {
+                    "count": 3,
+                    "key": "discard_to_top:Big Score"
+                  },
+                  {
+                    "count": 3,
+                    "key": "lorehold_rummage_to_top:Storm Herd"
+                  },
+                  {
+                    "count": 3,
+                    "key": "discard_to_top:Storm Herd"
+                  },
+                  {
+                    "count": 2,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Scroll Rack"
+                  },
+                  {
+                    "count": 2,
+                    "key": "miracle:Farewell"
+                  },
+                  {
+                    "count": 2,
+                    "key": "topdeck:Scroll Rack"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Ruby Medallion"
+                  }
+                ]
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "delta_pp": 0.0
+          },
+          "seed": 7,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "decision": "tie_promote_to_deeper_gate",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 9.0,
+              "error": null,
+              "games": 3,
+              "losses": 2,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 8,
+                  "lorehold_cost_paid": 33,
+                  "lorehold_rummage_discard_to_top": 8,
+                  "lorehold_spell_cast": 27,
+                  "lorehold_spell_rummage": 2,
+                  "lorehold_upkeep_rummage": 14,
+                  "miracle_cast": 2
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "lorehold_rummage_to_top:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 7,
+                    "key": "discard_to_top:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 6,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Jeska's Will"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Library of Leng"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Fellwar Stone"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Pearl Medallion"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Promise of Loyalty"
+                  },
+                  {
+                    "count": 1,
+                    "key": "lorehold_rummage_to_top:Tragic Arrogance"
+                  },
+                  {
+                    "count": 1,
+                    "key": "discard_to_top:Tragic Arrogance"
+                  }
+                ]
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "candidate": {
+              "avg_win_turn": 24.0,
+              "error": null,
+              "games": 3,
+              "losses": 2,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "graveyard_upkeep_return_self_to_hand": 9,
+                  "lorehold_cost_paid": 43,
+                  "lorehold_rummage_discards_squee": 7,
+                  "lorehold_spell_cast": 35,
+                  "lorehold_spell_rummage": 3,
+                  "lorehold_spell_rummage_discards_squee": 2,
+                  "lorehold_upkeep_rummage": 24,
+                  "miracle_cast": 10,
+                  "squee_return_after_known_graveyard_entry": 9,
+                  "squee_to_graveyard": 9,
+                  "squee_upkeep_return": 9,
+                  "thor_cost_paid": 1,
+                  "thor_spell_cast": 1,
+                  "topdeck_manipulation_activated": 14
+                },
+                "top_cards": [
+                  {
+                    "count": 14,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 9,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 7,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 7,
+                    "key": "rummage_discard:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 7,
+                    "key": "squee_to_graveyard:lorehold_upkeep_rummage"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Fellwar Stone"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Bender's Waterskin"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Esper Sentinel"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Artist's Talent"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Talisman of Conviction"
+                  },
+                  {
+                    "count": 2,
+                    "key": "spell_rummage_discard:Squee, Goblin Nabob"
+                  }
+                ]
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "delta_pp": 0.0
+          },
+          "seed": 20260625,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "decision": "reject_or_rework",
+          "gate_returncode": 0,
+          "gate_summary": {
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "error": null,
+              "games": 3,
+              "losses": 0,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "graveyard_upkeep_return_self_to_hand": 3,
+                  "lorehold_cost_paid": 61,
+                  "lorehold_spell_cast": 53,
+                  "lorehold_spell_rummage": 16,
+                  "lorehold_spell_rummage_discards_squee": 4,
+                  "lorehold_upkeep_rummage": 8,
+                  "miracle_cast": 13,
+                  "squee_return_after_known_graveyard_entry": 3,
+                  "squee_to_graveyard": 4,
+                  "squee_upkeep_return": 3,
+                  "topdeck_manipulation_activated": 12
+                },
+                "top_cards": [
+                  {
+                    "count": 7,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 7,
+                    "key": "topdeck:Scroll Rack"
+                  },
+                  {
+                    "count": 5,
+                    "key": "topdeck:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Sensei's Divining Top"
+                  },
+                  {
+                    "count": 4,
+                    "key": "spell_rummage_discard:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 4,
+                    "key": "squee_to_graveyard:trigger_resolved"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Talisman of Conviction"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Path to Exile"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 3,
+                    "key": "graveyard_return:Squee, Goblin Nabob"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:High Noon"
+                  },
+                  {
+                    "count": 2,
+                    "key": "miracle:Surge to Victory"
+                  }
+                ]
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 11.0,
+              "error": null,
+              "games": 3,
+              "losses": 2,
+              "stalls": 0,
+              "status": "pass",
+              "telemetry": {
+                "strategic_event_counts": {
+                  "discard_to_top_replacement": 9,
+                  "graveyard_upkeep_return_self_to_hand": 1,
+                  "lorehold_cost_paid": 29,
+                  "lorehold_rummage_discard_to_top": 9,
+                  "lorehold_rummage_discards_squee": 1,
+                  "lorehold_spell_cast": 25,
+                  "lorehold_upkeep_rummage": 22,
+                  "miracle_cast": 5,
+                  "squee_return_after_known_graveyard_entry": 1,
+                  "squee_to_graveyard": 1,
+                  "squee_upkeep_return": 1
+                },
+                "top_cards": [
+                  {
+                    "count": 4,
+                    "key": "cost_paid:Lorehold, the Historian"
+                  },
+                  {
+                    "count": 4,
+                    "key": "lorehold_rummage_to_top:Rise of the Eldrazi"
+                  },
+                  {
+                    "count": 4,
+                    "key": "discard_to_top:Rise of the Eldrazi"
+                  },
+                  {
+                    "count": 3,
+                    "key": "cost_paid:High Noon"
+                  },
+                  {
+                    "count": 3,
+                    "key": "lorehold_rummage_to_top:Mizzix's Mastery"
+                  },
+                  {
+                    "count": 3,
+                    "key": "discard_to_top:Mizzix's Mastery"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Swiftfoot Boots"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Mizzix's Mastery"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Approach of the Second Sun"
+                  },
+                  {
+                    "count": 2,
+                    "key": "cost_paid:Land Tax"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Talisman of Conviction"
+                  },
+                  {
+                    "count": 1,
+                    "key": "cost_paid:Mother of Runes"
+                  }
+                ]
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "delta_pp": -66.67
+          },
+          "seed": 42,
+          "status": "gated",
+          "stderr_tail": "",
+          "stdout_tail": ""
+        }
+      ],
+      "status": "matrix_run"
+    }
+  ],
+  "postgres_writes": false,
+  "preflight_only": false,
+  "prior_package_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json"
+  ],
+  "seeds": [
+    7,
+    20260625,
+    42
+  ],
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "strong_seeds": [
+    42
+  ]
+}
