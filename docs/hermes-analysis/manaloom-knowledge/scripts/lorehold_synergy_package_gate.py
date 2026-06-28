@@ -2477,7 +2477,7 @@ def forced_access_confirmation_queue(payload: dict[str, Any]) -> list[dict[str, 
             f"--opponent-limit {max(1, int(payload.get('opponent_limit') or 1))} "
             f"--opponent-seed {int(payload.get('opponent_seed') or 20260626)} "
             f"--simulation-seed {int(payload.get('simulation_seed') or 42)} "
-            "--forced-access-mode none"
+            "--forced-access-mode none --ignore-prior-results"
         )
         queue.append(
             {

@@ -1155,6 +1155,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "forced_access_signal_requires_natural_confirmation",
         )
         self.assertIn("--forced-access-mode none", queue[0]["suggested_command"])
+        self.assertIn("--ignore-prior-results", queue[0]["suggested_command"])
 
     def test_side_card_exposure_distinguishes_library_only_low_access(self):
         row = {
