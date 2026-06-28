@@ -42,6 +42,8 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+    REPORT_DIR / "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
 )
 
 
@@ -660,6 +662,24 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
             "Allowed only by lorehold_mana_base_validator_20260627_v1: "
             "preflight_land_swap_ready with red_source_delta=0, "
             "white_source_delta=0, and etb_score_delta=+2."
+        ),
+    },
+    "plateau_timing_upgrade_cut_turbulent_steppe": {
+        "family": "mana_base",
+        "hypothesis": (
+            "After Plateau over Radiant Summit failed the real gate, the "
+            "mana-base validator still marks Plateau over Turbulent Steppe as "
+            "a separate strict timing upgrade: it preserves red and white "
+            "sources, keeps land count unchanged, and removes a late-game-only "
+            "conditional tapped dual without cutting fetches or utility lands."
+        ),
+        "adds": ["Plateau"],
+        "cuts": ["Turbulent Steppe"],
+        "cut_safety_override_reason": (
+            "Allowed only by lorehold_mana_base_validator_20260627_v2_plateau_rejected: "
+            "preflight_land_swap_ready with red_source_delta=0, "
+            "white_source_delta=0, etb_score_delta=+2, and no prior negative "
+            "exact package."
         ),
     },
     "biblioplex_topdeck_land": {

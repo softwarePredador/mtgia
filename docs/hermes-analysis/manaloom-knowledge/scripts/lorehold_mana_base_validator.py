@@ -14,6 +14,7 @@ import argparse
 import json
 import re
 import sqlite3
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -33,6 +34,8 @@ DEFAULT_MINER_REPORT = (
 DEFAULT_PRIOR_LAND_GATE_REPORTS = [
     REPORT_DIR
     / "lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+    REPORT_DIR / "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
 ]
 
 BOROS_COLORS = {"R", "W"}
@@ -366,6 +369,25 @@ def miner_cut_option_lookup(miner_report: dict[str, Any]) -> dict[tuple[str, str
 def previous_land_gate_lookup(reports: list[tuple[Path, dict[str, Any]]]) -> dict[tuple[str, str], dict[str, Any]]:
     out: dict[tuple[str, str], dict[str, Any]] = {}
     for path, payload in reports:
+        for row in payload.get("packages") or []:
+            adds = row.get("adds") or []
+            cuts = row.get("cuts") or []
+            gate_summary = row.get("gate_summary") or {}
+            delta_pp = gate_summary.get("delta_pp")
+            if len(adds) != 1 or len(cuts) != 1 or delta_pp is None:
+                continue
+            if float(delta_pp) >= 0:
+                continue
+            out[(normalize_key(adds[0]), normalize_key(cuts[0]))] = {
+                "source_report": str(path),
+                "package_key": row.get("package_key"),
+                "status": "prior_negative_land_gate",
+                "candidate_wins": (gate_summary.get("candidate") or {}).get("wins"),
+                "candidate_losses": (gate_summary.get("candidate") or {}).get("losses"),
+                "baseline_wins": (gate_summary.get("baseline") or {}).get("wins"),
+                "baseline_losses": (gate_summary.get("baseline") or {}).get("losses"),
+                "delta_pp": delta_pp,
+            }
         results = payload.get("results") or []
         for row in results:
             package_key = str(row.get("package_key") or "")
@@ -426,6 +448,7 @@ def evaluate_swap(
     *,
     miner_cut_option: dict[str, Any] | None = None,
     previous_land_gates: dict[tuple[str, str], dict[str, Any]] | None = None,
+    prior_negative_candidate_counts: dict[str, int] | None = None,
 ) -> dict[str, Any]:
     add_roles = set(add.get("utility_roles") or [])
     cut_roles = set(cut.get("utility_roles") or [])
@@ -439,8 +462,13 @@ def evaluate_swap(
     prior = (previous_land_gates or {}).get(
         (normalize_key(add["card_name"]), normalize_key(cut["card_name"]))
     )
+    prior_candidate_negative_count = int(
+        (prior_negative_candidate_counts or {}).get(normalize_key(add["card_name"])) or 0
+    )
     if prior:
         blockers.append("prior_negative_land_gate")
+    elif prior_candidate_negative_count >= 2:
+        blockers.append("candidate_has_multiple_prior_negative_land_gates")
     if add["source"] == "missing_oracle":
         blockers.append("missing_candidate_oracle")
     if "fetch_dual_access" in lost_roles:
@@ -492,6 +520,7 @@ def evaluate_swap(
         "miner_cut_option_status": (miner_cut_option or {}).get("status") or "",
         "miner_gate_readiness": (miner_cut_option or {}).get("gate_readiness") or "",
         "prior_land_gate": prior or {},
+        "prior_candidate_negative_gate_count": prior_candidate_negative_count,
     }
 
 
@@ -527,6 +556,7 @@ def build_report(
     candidate_profiles = [land_profile(row, rules) for row in candidates]
     miner_options = miner_cut_option_lookup(miner_report)
     prior_lookup = previous_land_gate_lookup(prior_land_gate_reports or [])
+    prior_negative_candidate_counts = Counter(candidate for candidate, _cut in prior_lookup)
 
     evaluations = []
     for add in candidate_profiles:
@@ -541,6 +571,7 @@ def build_report(
                         (normalize_key(add["card_name"]), normalize_key(cut["card_name"]))
                     ),
                     previous_land_gates=prior_lookup,
+                    prior_negative_candidate_counts=prior_negative_candidate_counts,
                 )
             )
     evaluations.sort(

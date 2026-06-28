@@ -35,13 +35,15 @@ DEFAULT_RECURSION_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json"
 ]
 DEFAULT_MANA_BASE_VALIDATOR_REPORTS = [
-    REPORT_DIR / "lorehold_mana_base_validator_20260627_v1.json"
+    REPORT_DIR / "lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json"
 ]
 DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+    REPORT_DIR / "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
 ]
 
 

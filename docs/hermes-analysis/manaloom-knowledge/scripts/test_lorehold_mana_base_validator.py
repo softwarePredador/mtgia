@@ -224,3 +224,101 @@ def test_prior_boseiju_reliquary_gate_blocks_repeat():
     }[("Boseiju, Who Shelters All", "Reliquary Tower")]
     assert "prior_negative_land_gate" in row["blockers"]
     assert row["prior_land_gate"]["candidate_wins"] == 3
+
+
+def test_generic_negative_package_gate_blocks_exact_land_swap():
+    conn = make_conn()
+    insert_land(
+        conn,
+        "Radiant Summit",
+        "Land - Mountain Plains",
+        "Tap: Add R or W. This land enters tapped unless you control two or more basic lands.",
+    )
+    insert_oracle(conn, "Plateau", "Land - Mountain Plains", "Tap: Add R or W.")
+    prior = {
+        "packages": [
+            {
+                "package_key": "plateau_timing_upgrade_cut_radiant_summit",
+                "adds": ["Plateau"],
+                "cuts": ["Radiant Summit"],
+                "gate_summary": {
+                    "baseline": {"wins": 8, "losses": 1},
+                    "candidate": {"wins": 2, "losses": 7},
+                    "delta_pp": -66.67,
+                },
+            }
+        ]
+    }
+
+    payload = validator.build_report(
+        conn=conn,
+        miner_report=miner_report("Plateau"),
+        prior_land_gate_reports=[(Path("prior.json"), prior)],
+        db_path=Path(":memory:"),
+        miner_path=Path("miner.json"),
+        deck_id=6,
+    )
+
+    row = {
+        (item["candidate"], item["cut"]): item
+        for item in payload["all_evaluations"]
+    }[("Plateau", "Radiant Summit")]
+    assert row["status"] == "blocked"
+    assert "prior_negative_land_gate" in row["blockers"]
+    assert row["prior_land_gate"]["delta_pp"] == -66.67
+
+
+def test_two_negative_land_gates_block_same_candidate_lane():
+    conn = make_conn()
+    insert_land(
+        conn,
+        "Sacred Foundry",
+        "Land - Mountain Plains",
+        "Tap: Add R or W. As this land enters, you may pay 2 life. If you don't, it enters tapped.",
+    )
+    insert_oracle(conn, "Plateau", "Land - Mountain Plains", "Tap: Add R or W.")
+    prior_one = {
+        "packages": [
+            {
+                "package_key": "plateau_timing_upgrade_cut_radiant_summit",
+                "adds": ["Plateau"],
+                "cuts": ["Radiant Summit"],
+                "gate_summary": {
+                    "baseline": {"wins": 8, "losses": 1},
+                    "candidate": {"wins": 2, "losses": 7},
+                    "delta_pp": -66.67,
+                },
+            }
+        ]
+    }
+    prior_two = {
+        "packages": [
+            {
+                "package_key": "plateau_timing_upgrade_cut_turbulent_steppe",
+                "adds": ["Plateau"],
+                "cuts": ["Turbulent Steppe"],
+                "gate_summary": {
+                    "baseline": {"wins": 8, "losses": 1},
+                    "candidate": {"wins": 3, "losses": 6},
+                    "delta_pp": -55.56,
+                },
+            }
+        ]
+    }
+
+    payload = validator.build_report(
+        conn=conn,
+        miner_report=miner_report("Plateau"),
+        prior_land_gate_reports=[(Path("prior_one.json"), prior_one), (Path("prior_two.json"), prior_two)],
+        db_path=Path(":memory:"),
+        miner_path=Path("miner.json"),
+        deck_id=6,
+    )
+
+    row = {
+        (item["candidate"], item["cut"]): item
+        for item in payload["all_evaluations"]
+    }[("Plateau", "Sacred Foundry")]
+    assert row["status"] == "blocked"
+    assert "candidate_has_multiple_prior_negative_land_gates" in row["blockers"]
+    assert row["prior_candidate_negative_gate_count"] == 2
