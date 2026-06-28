@@ -4217,6 +4217,30 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017",
         }
     ),
+    "Rem Karolus, Stalwart Slayer": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static_replacement",
+            "cmc": 3.0,
+            "effect": "creature",
+            "mana_cost": "{1}{R}{W}",
+            "colors": ["R", "W"],
+            "type_line": "Legendary Creature - Human Knight",
+            "power": 2,
+            "toughness": 3,
+            "subtypes": ["Human", "Knight"],
+            "flying": True,
+            "haste": True,
+            "prevent_spell_damage_to_you_and_permanents_you_control": True,
+            "spell_damage_to_opponents_and_permanents_they_control_bonus": 1,
+            "damage_bonus": 1,
+            "damage_modifier_source_kind": "spell",
+            "damage_modifier_targets": ["opponents", "opponent_permanents"],
+            "damage_modifier_duration": "while_on_battlefield",
+            "battle_model_scope": "spell_damage_to_opponents_plus_one_prevent_own_nonself_v1",
+            "_rule_oracle_hash": "7d58da0feedf10778e5f0a84b724e08c",
+            "_rule_logical_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+        }
+    ),
     "Stuffy Doll": handcrafted_runtime_rule(
         {
             "ability_kind": "static_triggered_and_activated",
@@ -4638,6 +4662,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Beacon of Immortality",
     "Boros Reckoner",
     "Repercussion",
+    "Rem Karolus, Stalwart Slayer",
     "Stuffy Doll",
     "Slickshot Show-Off",
     "Serra Ascendant",
@@ -4777,6 +4802,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed global creature-damage reflection to the damaged creature's controller.",
         ["manaloom_log_learning_audit_20260628_v31_runtime_waiver_drift", "Repercussion.java"],
         "2026-06-29T03:00:00Z",
+    ),
+    "Rem Karolus, Stalwart Slayer": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed spell-damage prevention for self/controlled permanents and +1 spell damage to opponents/opponent permanents.",
+        ["manaloom_log_learning_audit_20260628_v32_after_repercussion_runtime", "RemKarolusStalwartSlayer.java"],
+        "2026-06-29T03:25:00Z",
     ),
     "Stuffy Doll": manual_runtime_waiver_metadata(
         "Replace no_active runtime gap with XMage-backed chosen-player damage reflection, indestructible body, and tap self-damage ability.",
@@ -28786,6 +28816,9 @@ CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE = (
 CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE = (
     "chosen_player_or_permanents_they_control_damage_doubled_v1"
 )
+REM_KAROLUS_SPELL_DAMAGE_REPLACEMENT_SCOPE = (
+    "spell_damage_to_opponents_plus_one_prevent_own_nonself_v1"
+)
 
 
 def damage_source_reference(source_card, controller):
@@ -28829,12 +28862,18 @@ def _static_damage_modifier_effects(controller, target_controller=None):
             if isinstance(resolved, dict) and resolved is not permanent:
                 candidates.append({**permanent, **resolved})
             for effect_data in candidates:
-                if not effect_data.get("damage_multiplier"):
+                if not (
+                    effect_data.get("damage_multiplier")
+                    or effect_data.get("damage_bonus")
+                    or effect_data.get("spell_damage_to_opponents_and_permanents_they_control_bonus")
+                    or effect_data.get("prevent_spell_damage_to_you_and_permanents_you_control")
+                ):
                     continue
                 scope = str(effect_data.get("battle_model_scope") or "")
                 if scope not in {
                     CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE,
                     CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE,
+                    REM_KAROLUS_SPELL_DAMAGE_REPLACEMENT_SCOPE,
                 }:
                     continue
                 targets = effect_data.get("damage_modifier_targets") or []
@@ -28847,6 +28886,12 @@ def _static_damage_modifier_effects(controller, target_controller=None):
                     effect_data.get("damage_modifier_applies_to"),
                     tuple(sorted(str(target) for target in targets)),
                     int(effect_data.get("damage_multiplier") or 2),
+                    int(
+                        effect_data.get("damage_bonus")
+                        or effect_data.get("spell_damage_to_opponents_and_permanents_they_control_bonus")
+                        or 0
+                    ),
+                    bool(effect_data.get("prevent_spell_damage_to_you_and_permanents_you_control")),
                 )
                 if modifier_key in seen_modifier_keys:
                     continue
@@ -28865,11 +28910,21 @@ def _source_controlled_by(source_card, controller):
     return source_controller in (None, "", controller_name)
 
 
+def _is_spell_damage_source(source_card):
+    if not isinstance(source_card, dict):
+        return False
+    type_line = str(source_card.get("type_line") or "").lower()
+    if "instant" in type_line or "sorcery" in type_line:
+        return True
+    return bool(source_card.get("_copied_from_spell") and source_card.get("is_spell_copy"))
+
+
 def _static_damage_modifier_applies(
     modifier_controller,
     permanent,
     effect_data,
     target_controller,
+    target,
     source_card,
 ):
     scope = str(effect_data.get("battle_model_scope") or "")
@@ -28890,6 +28945,18 @@ def _static_damage_modifier_applies(
         if not chosen_player:
             return False
         return getattr(target_controller, "name", None) == chosen_player
+
+    if scope == REM_KAROLUS_SPELL_DAMAGE_REPLACEMENT_SCOPE:
+        if not _is_spell_damage_source(source_card):
+            return False
+        if target_controller is modifier_controller:
+            if isinstance(target, dict) and target is permanent:
+                return False
+            return bool(effect_data.get("prevent_spell_damage_to_you_and_permanents_you_control"))
+        return bool(
+            effect_data.get("damage_bonus")
+            or effect_data.get("spell_damage_to_opponents_and_permanents_they_control_bonus")
+        )
 
     return False
 
@@ -28924,8 +28991,41 @@ def apply_static_damage_replacements(
             permanent,
             effect_data,
             target_controller,
+            target,
             source_card,
         ):
+            continue
+        if (
+            str(effect_data.get("battle_model_scope") or "")
+            == REM_KAROLUS_SPELL_DAMAGE_REPLACEMENT_SCOPE
+            and target_controller is modifier_controller
+            and effect_data.get("prevent_spell_damage_to_you_and_permanents_you_control")
+        ):
+            modified_amount = 0
+            applied.append(
+                {
+                    "source": permanent.get("name", "?"),
+                    "controller": getattr(modifier_controller, "name", None),
+                    "scope": effect_data.get("battle_model_scope"),
+                    "prevention": "spell_damage_to_self_or_controlled_permanent",
+                }
+            )
+            continue
+        bonus = int(
+            effect_data.get("damage_bonus")
+            or effect_data.get("spell_damage_to_opponents_and_permanents_they_control_bonus")
+            or 0
+        )
+        if bonus > 0:
+            modified_amount += bonus
+            applied.append(
+                {
+                    "source": permanent.get("name", "?"),
+                    "controller": getattr(modifier_controller, "name", None),
+                    "scope": effect_data.get("battle_model_scope"),
+                    "bonus": bonus,
+                }
+            )
             continue
         multiplier = int(effect_data.get("damage_multiplier") or 2)
         if multiplier <= 1:
@@ -36712,6 +36812,38 @@ def apply_effect_immediate(
         permanent["effect"] = "copy_spell"
         player.battlefield.append(permanent)
         player.copy_engines += 1
+    elif effect == "damage_modifier":
+        permanent_payload = enrich_card({**card, **effect_data})
+        if permanent_payload.get("power") is not None and permanent_payload.get("toughness") is not None:
+            permanent_payload.setdefault("is_creature_permanent", True)
+        permanent = prepare_resolved_permanent(permanent_payload)
+        permanent["effect"] = "creature" if is_battlefield_creature(permanent) else "damage_modifier"
+        player.battlefield.append(permanent)
+        emit_replay_event(
+            "static_damage_modifier_entered",
+            player=player.name,
+            card=card.get("name", "?"),
+            is_creature=bool(is_battlefield_creature(permanent)),
+            damage_multiplier=permanent.get("damage_multiplier"),
+            damage_bonus=permanent.get("damage_bonus")
+            or permanent.get("spell_damage_to_opponents_and_permanents_they_control_bonus"),
+            prevention=bool(permanent.get("prevent_spell_damage_to_you_and_permanents_you_control")),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        if is_battlefield_creature(permanent):
+            emit_replay_event(
+                "creature_to_battlefield",
+                player=player.name,
+                card=card.get("name", "?"),
+                is_mana_source=bool(permanent.get("is_mana_source")),
+                mana_produced=permanent.get("mana_produced"),
+                summoning_sick=permanent.get("summoning_sick"),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
     elif effect == "tutor":
         target_type = effect_data.get("target", "any")
         found = None
