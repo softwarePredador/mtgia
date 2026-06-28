@@ -199,6 +199,13 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
             "subtype": "creature_damage_controller_reflect",
             "timing": "triggered",
         }
+    if effect_json.get("battle_model_scope") == "controlled_other_creature_enters_power_damage_any_target_v1":
+        return {
+            "category": "burn_engine",
+            "effect": "etb_power_damage",
+            "subtype": "controlled_creature_enters_power_damage_any_target",
+            "timing": "triggered",
+        }
     if effect == "creature" and (
         int(effect_json.get("etb_draw_count") or 0) > 0
         or int(effect_json.get("etb_discard_hand_then_draw_count") or 0) > 0

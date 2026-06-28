@@ -3405,6 +3405,52 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "TerrorOfThePeaks"
+        and card_types == {"CREATURE"}
+        and {"DamageTargetEffect", "TerrorOfThePeaksCostIncreaseEffect"}.issubset(effect_classes)
+        and {
+            "EntersBattlefieldControlledTriggeredAbility",
+            "FlyingAbility",
+            "SimpleStaticAbility",
+        }.issubset(ability_classes)
+        and "TargetAnyTarget" in target_classes
+        and (
+            "terrorofthepeaksvalue" in _normalized_rules_text(rules_text)
+            or _oracle_has(
+                rules_text,
+                "whenever another creature you control enters",
+                "deals damage equal to that creature's power to any target",
+            )
+        )
+    ):
+        return {
+            "effect": "creature",
+            "scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+            "fields": {
+                "trigger": "creature_you_control_enters",
+                "trigger_effect": "damage_any_target",
+                "trigger_damage_amount_source": "entering_creature_power",
+                "trigger_another_creature_you_control_enters": True,
+                "target": "any_target",
+                "target_constraints": {"scope": "any_target"},
+                "opponent_spells_targeting_this_additional_life_cost": 3,
+                "flying": True,
+                "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text) or 5,
+                "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text) or 4,
+            },
+            "reason": (
+                "XMage structure matches Terror of the Peaks: another controlled creature entering "
+                "triggers damage equal to that creature's power to any target."
+            ),
+            "signals": [
+                "EntersBattlefieldControlledTriggeredAbility",
+                "DamageTargetEffect",
+                "TerrorOfThePeaksValue",
+                "TargetAnyTarget",
+            ],
+        }
+
+    if (
         card_types == {"ENCHANTMENT"}
         and effect_classes == {"DamageTargetEffect"}
         and ability_classes == {"SimpleActivatedAbility"}

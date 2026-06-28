@@ -23122,6 +23122,165 @@ def process_combat_damage_resource_triggers(
     return resolved
 
 
+def resolve_damage_any_target(
+    controller,
+    opponents,
+    source_card,
+    amount,
+    *,
+    turn=None,
+    phase=None,
+):
+    alive_opponents = [opponent for opponent in (opponents or []) if opponent.is_alive()]
+    result = {
+        "amount": max(0, int(amount or 0)),
+        "target_player": None,
+        "target": None,
+        "result": "no_legal_target_or_zero_damage",
+        "destination": None,
+        "life_before": None,
+        "life_after": None,
+    }
+    if result["amount"] <= 0:
+        return result
+
+    lethal_player_options = [
+        (
+            opponent,
+            apply_static_damage_replacements(
+                controller,
+                opponent,
+                opponent,
+                source_card,
+                result["amount"],
+                damage_event_type="player",
+                turn=turn,
+                phase=phase,
+                emit=False,
+            ),
+        )
+        for opponent in alive_opponents
+    ]
+    lethal_player = min(
+        (
+            (opponent, target_amount)
+            for opponent, target_amount in lethal_player_options
+            if opponent.life <= target_amount
+        ),
+        key=lambda item: (item[0].life, item[0].name),
+        default=None,
+    )
+
+    killable_creatures = []
+    for opponent in alive_opponents:
+        for creature in removal_target_candidates(
+            opponent,
+            {"effect": "remove_creature", "target": "creature"},
+            controller=controller,
+            source=source_card,
+        ):
+            if creature.get("indestructible"):
+                continue
+            target_amount = apply_static_damage_replacements(
+                controller,
+                opponent,
+                creature,
+                source_card,
+                result["amount"],
+                damage_event_type="permanent",
+                turn=turn,
+                phase=phase,
+                emit=False,
+            )
+            if card_toughness_value(creature, default=2) <= target_amount:
+                killable_creatures.append((target_priority(creature), opponent, creature))
+
+    if lethal_player is not None:
+        target_player, _lethal_amount = lethal_player
+        result["life_before"] = target_player.life
+        damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+            controller,
+            target_player,
+            source_card,
+            result["amount"],
+            turn=turn,
+            phase=phase,
+            damage_event_type="player",
+        )
+        result.update(
+            {
+                "amount": target_amount,
+                "target_player": target_player.name,
+                "result": "player_damage" if dealt else "prevented",
+                "life_after": target_player.life,
+            }
+        )
+        return result
+
+    if killable_creatures:
+        _priority, target_controller, target_creature = max(
+            killable_creatures,
+            key=lambda item: item[0],
+        )
+        target_amount = apply_static_damage_replacements(
+            controller,
+            target_controller,
+            target_creature,
+            source_card,
+            result["amount"],
+            damage_event_type="permanent",
+            turn=turn,
+            phase=phase,
+        )
+        process_taii_wakeen_noncombat_damage_to_creature(
+            controller,
+            target_controller,
+            source_card,
+            target_creature,
+            target_amount,
+            turn=turn,
+            phase=phase,
+        )
+        destination = move_creature_from_battlefield(
+            target_controller,
+            target_creature,
+            reason="damage",
+            source=source_card,
+        )
+        result.update(
+            {
+                "amount": target_amount,
+                "target_player": target_controller.name,
+                "target": target_creature.get("name", "?"),
+                "result": "creature_destroyed",
+                "destination": destination,
+            }
+        )
+        return result
+
+    if alive_opponents:
+        target_player = min(alive_opponents, key=lambda opponent: (opponent.life, opponent.name))
+        result["life_before"] = target_player.life
+        damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+            controller,
+            target_player,
+            source_card,
+            result["amount"],
+            turn=turn,
+            phase=phase,
+            damage_event_type="player",
+        )
+        result.update(
+            {
+                "amount": target_amount,
+                "target_player": target_player.name,
+                "result": "player_damage" if dealt else "prevented",
+                "life_after": target_player.life,
+            }
+        )
+    return result
+
+
 def process_controlled_creature_enters_triggers(
     player,
     opponents,
@@ -23140,7 +23299,7 @@ def process_controlled_creature_enters_triggers(
         for permanent in list(getattr(player, "battlefield", []) or [])
         if isinstance(permanent, dict)
         and permanent.get("trigger") == "creature_you_control_enters"
-        and permanent.get("trigger_effect") == "damage_each_opponent"
+        and permanent.get("trigger_effect") in {"damage_each_opponent", "damage_any_target"}
     ]
     resolved = 0
     for permanent in trigger_sources:
@@ -23149,43 +23308,115 @@ def process_controlled_creature_enters_triggers(
             and permanent.get("trigger_another_creature_you_control_enters")
         ):
             continue
-        amount = int(permanent.get("trigger_damage_each_opponent") or permanent.get("damage") or 1)
+        if permanent.get("trigger_effect") == "damage_each_opponent":
+            amount = int(permanent.get("trigger_damage_each_opponent") or permanent.get("damage") or 1)
+            if amount <= 0:
+                continue
+
+            def resolve_creature_enters_damage_trigger(permanent=permanent, amount=amount):
+                damaged = []
+                for opponent in opponents or []:
+                    if not getattr(opponent, "is_alive", lambda: True)():
+                        continue
+                    damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+                        player,
+                        opponent,
+                        permanent,
+                        amount,
+                        turn=turn,
+                        phase="trigger_resolution",
+                        damage_event_type="player",
+                    )
+                    if dealt:
+                        damaged.append(
+                            {
+                                "player": opponent.name,
+                                "amount": target_amount,
+                                "dealt": damage_dealt,
+                                "life_after": opponent.life,
+                            }
+                        )
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="creature_you_control_enters",
+                    entering_creature=entering_permanent.get("name", "?"),
+                    source_event=source_event,
+                    effect="damage_each_opponent",
+                    amount=amount,
+                    damaged=damaged,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "creature_you_control_enters",
+                resolve_creature_enters_damage_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "entering_creature": entering_permanent.get("name", "?"),
+                    "source_event": source_event,
+                },
+            )
+            resolved += 1
+            continue
+
+        amount_source = str(permanent.get("trigger_damage_amount_source") or "")
+        if amount_source in {
+            "entering_creature_power",
+            "entered_creature_power",
+            "creature_power",
+        }:
+            amount = card_power_value(entering_permanent, default=0)
+        else:
+            amount = int(permanent.get("trigger_damage") or permanent.get("damage") or 1)
+        amount = apply_controller_noncombat_damage_modifiers(
+            player,
+            amount,
+            permanent,
+            turn=turn,
+            phase="trigger_resolution",
+            target=entering_permanent,
+        )
         if amount <= 0:
             continue
 
-        def resolve_creature_enters_damage_trigger(permanent=permanent, amount=amount):
-            damaged = []
-            for opponent in opponents or []:
-                if not getattr(opponent, "is_alive", lambda: True)():
-                    continue
-                damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
-                    player,
-                    opponent,
-                    permanent,
-                    amount,
-                    turn=turn,
-                    phase="trigger_resolution",
-                    damage_event_type="player",
-                )
-                if dealt:
-                    damaged.append(
-                        {
-                            "player": opponent.name,
-                            "amount": target_amount,
-                            "dealt": damage_dealt,
-                            "life_after": opponent.life,
-                        }
-                    )
+        def resolve_creature_enters_damage_any_target_trigger(
+            permanent=permanent,
+            amount=amount,
+            amount_source=amount_source,
+        ):
+            result = resolve_damage_any_target(
+                player,
+                opponents,
+                permanent,
+                amount,
+                turn=turn,
+                phase="trigger_resolution",
+            )
             emit_replay_event(
                 "trigger_resolved",
                 player=player.name,
                 card=permanent.get("name", "?"),
                 trigger="creature_you_control_enters",
                 entering_creature=entering_permanent.get("name", "?"),
+                entering_creature_power=card_power_value(entering_permanent, default=0),
                 source_event=source_event,
-                effect="damage_each_opponent",
-                amount=amount,
-                damaged=damaged,
+                effect="damage_any_target",
+                amount=result["amount"],
+                original_amount=amount,
+                amount_source=amount_source or "static",
+                target_player=result["target_player"],
+                target=result["target"],
+                result=result["result"],
+                destination=result["destination"],
+                life_before=result["life_before"],
+                life_after=result["life_after"],
                 turn=turn,
                 **replay_rule_fields(permanent),
             )
@@ -23194,7 +23425,7 @@ def process_controlled_creature_enters_triggers(
             player,
             permanent,
             "creature_you_control_enters",
-            resolve_creature_enters_damage_trigger,
+            resolve_creature_enters_damage_any_target_trigger,
             stack=stack,
             active_player=active_player,
             all_players=all_players,

@@ -167,12 +167,12 @@ def card_signal_group(card: dict[str, Any]) -> str:
 
 TARGETED_INTERACTION_SUBFAMILY_META = {
     "targeted_damage_etb_power_to_any_target": {
-        "status": "runtime_family_implementation_required",
+        "status": "runtime_supported_family",
         "implementation_unit": (
             "triggered damage equal to the entering controlled creature power, "
             "with target selection and optional opponent targeting tax"
         ),
-        "next_step": "implement Terror-of-the-Peaks style ETB power damage resolver and focused battle test",
+        "next_step": "prepare PG metadata package after PostgreSQL precheck, then gate Terror of the Peaks ETB damage lines",
         "family_tests": [
             "test_terror_of_the_peaks_damages_any_target_equal_to_entering_creature_power",
             "test_terror_of_the_peaks_applies_opponent_targeting_tax",
@@ -254,7 +254,9 @@ TARGETED_INTERACTION_SUBFAMILY_META = {
 def targeted_interaction_subfamily(card: dict[str, Any]) -> dict[str, Any] | None:
     if card.get("family_id") != "targeted_interaction":
         return None
-    if card.get("effect") != "direct_damage":
+    effect = str(card.get("effect") or "")
+    scope = str(card.get("battle_model_scope") or "")
+    if effect != "direct_damage" and scope != "controlled_other_creature_enters_power_damage_any_target_v1":
         return None
 
     abilities = set(card.get("xmage_ability_classes") or [])

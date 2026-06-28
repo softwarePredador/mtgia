@@ -444,6 +444,13 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         return "targeted_interaction"
     if (
         str(effect_json.get("battle_model_scope") or "")
+        == "controlled_other_creature_enters_power_damage_any_target_v1"
+        and effect_json.get("trigger") == "creature_you_control_enters"
+        and effect_json.get("trigger_effect") == "damage_any_target"
+    ):
+        return "targeted_interaction"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
         == "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
         and effect_json.get("effect") == "redirect_removal"
     ):
@@ -1323,6 +1330,29 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("trigger_effect") == "damage_each_opponent"
             and effect_json.get("target_controller") == "opponents"
             and not cost_classes.difference({"ManaCostsImpl", "ManaCost", "GenericManaCost"})
+        )
+
+    if effect == "creature" and scope == "controlled_other_creature_enters_power_damage_any_target_v1":
+        target_classes = xmage_target_classes(card)
+        return (
+            types == {"CREATURE"}
+            and {"DamageTargetEffect", "TerrorOfThePeaksCostIncreaseEffect"}.issubset(effect_classes)
+            and {
+                "EntersBattlefieldControlledTriggeredAbility",
+                "FlyingAbility",
+                "SimpleStaticAbility",
+            }.issubset(ability_classes)
+            and target_classes == {"TargetAnyTarget"}
+            and cost_classes == {"PayLifeCost"}
+            and int(effect_json.get("power") or 0) == 5
+            and int(effect_json.get("toughness") or 0) == 4
+            and bool(effect_json.get("flying"))
+            and effect_json.get("trigger") == "creature_you_control_enters"
+            and effect_json.get("trigger_effect") == "damage_any_target"
+            and effect_json.get("trigger_damage_amount_source") == "entering_creature_power"
+            and bool(effect_json.get("trigger_another_creature_you_control_enters"))
+            and effect_json.get("target") == "any_target"
+            and int(effect_json.get("opponent_spells_targeting_this_additional_life_cost") or 0) == 3
         )
 
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":

@@ -139,6 +139,7 @@ RECURRING_GATE_BASENAMES = {
     "battle_table_intent_audit.py",
     "battle_target_pressure_audit.py",
     "battle_unknown_template_backlog_audit.py",
+    "lorehold_variant_battle_gate.py",
     "test_battle_action_critic.py",
     "test_battle_decision_strategy_auditor.py",
     "test_battle_decision_trace_taxonomy_audit.py",
@@ -153,6 +154,7 @@ RECURRING_GATE_BASENAMES = {
     "test_battle_table_intent_audit.py",
     "test_battle_target_pressure_audit.py",
     "test_battle_unknown_template_backlog_audit.py",
+    "test_lorehold_variant_battle_gate.py",
 }
 
 RULE_REGISTRY_BASENAMES = {
@@ -200,6 +202,7 @@ OPTIMIZER_BASENAMES = {
     "master_optimizer_confirmation.py",
     "master_optimizer_handoff.py",
     "master_optimizer_loop.py",
+    "master_optimizer_gate_baseline.py",
     "master_optimizer_post_apply_gate.py",
     "master_optimizer_product_handoff.py",
     "master_optimizer_quality_gate.py",
@@ -207,8 +210,11 @@ OPTIMIZER_BASENAMES = {
     "slot_optimizer.py",
     "universal_optimizer.py",
     "test_master_optimizer_hashes.py",
+    "test_master_optimizer_gate_baseline.py",
     "test_slot_optimizer_real_roles.py",
     "test_universal_optimizer_known_cards.py",
+    "lorehold_optimizer_equal_gate.py",
+    "test_lorehold_optimizer_equal_gate.py",
 }
 
 FOCUSED_EVIDENCE_BASENAMES = {

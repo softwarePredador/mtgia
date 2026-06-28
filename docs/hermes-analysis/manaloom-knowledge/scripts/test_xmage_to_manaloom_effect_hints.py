@@ -4973,6 +4973,52 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["damage_amount_source"], "damage_dealt_to_creature")
         self.assertTrue(primary["global_creature_damage_reflect_to_controller"])
 
+    def test_terror_of_the_peaks_maps_to_etb_power_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TerrorOfThePeaks",
+                "effect_classes": ["DamageTargetEffect", "TerrorOfThePeaksCostIncreaseEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldControlledTriggeredAbility",
+                    "FlyingAbility",
+                    "SimpleStaticAbility",
+                    "SpellAbility",
+                ],
+                "cost_classes": ["PayLifeCost"],
+                "target_classes": ["TargetAnyTarget"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(5); this.toughness = new MageInt(4); "
+                    "this.addAbility(FlyingAbility.getInstance()); "
+                    "this.addAbility(new SimpleStaticAbility(new TerrorOfThePeaksCostIncreaseEffect())); "
+                    "Ability ability = new EntersBattlefieldControlledTriggeredAbility("
+                    "new DamageTargetEffect(TerrorOfThePeaksValue.instance), "
+                    "StaticFilters.FILTER_ANOTHER_CREATURE); "
+                    "ability.addTarget(new TargetAnyTarget());"
+                ),
+            },
+            (
+                "Flying. Spells your opponents cast that target Terror of the Peaks cost an additional 3 life to cast. "
+                "Whenever another creature you control enters, Terror of the Peaks deals damage equal to that creature's power to any target."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controlled_other_creature_enters_power_damage_any_target_v1",
+        )
+        self.assertEqual(primary["power"], 5)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertTrue(primary["flying"])
+        self.assertEqual(primary["trigger"], "creature_you_control_enters")
+        self.assertEqual(primary["trigger_effect"], "damage_any_target")
+        self.assertEqual(primary["trigger_damage_amount_source"], "entering_creature_power")
+        self.assertTrue(primary["trigger_another_creature_you_control_enters"])
+        self.assertEqual(primary["target"], "any_target")
+        self.assertEqual(primary["opponent_spells_targeting_this_additional_life_cost"], 3)
+
     def test_caldera_pyremaw_maps_to_counter_then_power_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

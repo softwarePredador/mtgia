@@ -1,0 +1,2114 @@
+{
+  "generated_at": "2026-06-28T11:08:24+00:00",
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+      "card_name": "Goliath Daydreamer",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "combo_value",
+        "effect": "free_cast",
+        "subtype": "cast_without_paying_mana",
+        "timing": "triggered_or_resolution"
+      },
+      "effect": "free_cast",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "attack_free_cast_counter_type": "dream",
+        "attack_may_cast_owned_exiled_card_with_counter_without_paying_mana": true,
+        "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+        "effect": "free_cast",
+        "exiled_counter_type": "dream",
+        "power": 4,
+        "spell_cast_from_hand_card_types": [
+          "instant",
+          "sorcery"
+        ],
+        "spell_cast_from_hand_exile_instead_of_graveyard": true,
+        "toughness": 4,
+        "trigger": "instant_sorcery_cast_from_hand_and_attack"
+      },
+      "execution_status": "review_only",
+      "family_id": "free_cast",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd",
+      "normalized_name": "goliath daydreamer",
+      "notes": "XMage batch proposal: exact local XMage class GoliathDaydreamer mapped to family free_cast; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "oracle_hash_required_before_batch_pg",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "GoliathDaydreamer",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GoliathDaydreamer.java"
+    },
+    {
+      "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+      "card_name": "Twinflame Tyrant",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "wincon",
+        "effect": "damage_modifier",
+        "subtype": "damage_doubler",
+        "timing": "static"
+      },
+      "effect": "damage_modifier",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+        "damage_modifier_applies_to": "sources_you_control",
+        "damage_modifier_duration": "while_on_battlefield",
+        "damage_modifier_targets": [
+          "opponents",
+          "opponent_permanents"
+        ],
+        "damage_multiplier": 2,
+        "effect": "damage_modifier",
+        "flying": true,
+        "power": 3,
+        "toughness": 5
+      },
+      "execution_status": "review_only",
+      "family_id": "static_damage_modifier",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:2b4bda8e443bbbf48e1654884d61355c",
+      "normalized_name": "twinflame tyrant",
+      "notes": "XMage batch proposal: exact local XMage class TwinflameTyrant mapped to family static_damage_modifier; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "oracle_hash_required_before_batch_pg",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "TwinflameTyrant",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TwinflameTyrant.java"
+    },
+    {
+      "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+      "card_name": "Verge Rangers",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "topdeck_play",
+        "subtype": "play_lands_from_library",
+        "timing": "static"
+      },
+      "effect": "topdeck_play",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+        "effect": "topdeck_play",
+        "keywords": [
+          "first_strike"
+        ],
+        "look_top_library_any_time": true,
+        "play_from_top_condition": "opponent_controls_more_lands",
+        "play_lands_from_top_library": true,
+        "power": 3,
+        "toughness": 3
+      },
+      "execution_status": "review_only",
+      "family_id": "topdeck_play",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:9cbcc91673241a282f321ffb94963ca1",
+      "normalized_name": "verge rangers",
+      "notes": "XMage batch proposal: exact local XMage class VergeRangers mapped to family topdeck_play; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "oracle_hash_required_before_batch_pg",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "VergeRangers",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VergeRangers.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Ancient Copper Dragon",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "ancient copper dragon",
+      "notes": "XMage batch proposal: exact local XMage class AncientCopperDragon mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "AncientCopperDragon",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AncientCopperDragon.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Beacon of Immortality",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:0ba87d76cfb1bf9e6a9d991f27628f16",
+      "normalized_name": "beacon of immortality",
+      "notes": "XMage batch proposal: exact local XMage class BeaconOfImmortality mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "BeaconOfImmortality",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BeaconOfImmortality.java"
+    },
+    {
+      "battle_model_scope": "targeted_damage_variant_v1",
+      "card_name": "Boros Reckoner",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "interaction",
+        "effect": "targeted_interaction",
+        "timing": "resolution"
+      },
+      "effect": "direct_damage",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "targeted_damage_variant_v1",
+        "effect": "direct_damage",
+        "target_constraints": {
+          "scope": "any_target"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "targeted_interaction",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:b94715b4dc5e6bddeb59533169db9997",
+      "normalized_name": "boros reckoner",
+      "notes": "XMage batch proposal: exact local XMage class BorosReckoner mapped to family targeted_interaction; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "split_family_scope_review_required",
+      "proposal_status": "split_family_scope_review_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "BorosReckoner",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BorosReckoner.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Heroes Remembered",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:0ba87d76cfb1bf9e6a9d991f27628f16",
+      "normalized_name": "heroes remembered",
+      "notes": "XMage batch proposal: exact local XMage class HeroesRemembered mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "HeroesRemembered",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HeroesRemembered.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Invincible Hymn",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:0ba87d76cfb1bf9e6a9d991f27628f16",
+      "normalized_name": "invincible hymn",
+      "notes": "XMage batch proposal: exact local XMage class InvincibleHymn mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "InvincibleHymn",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/i/InvincibleHymn.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Planetarium of Wan Shi Tong",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "planetarium of wan shi tong",
+      "notes": "XMage batch proposal: exact local XMage class PlanetariumOfWanShiTong mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "PlanetariumOfWanShiTong",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PlanetariumOfWanShiTong.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Semblance Anvil",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "semblance anvil",
+      "notes": "XMage batch proposal: exact local XMage class SemblanceAnvil mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "SemblanceAnvil",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SemblanceAnvil.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Taunt from the Rampart",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:16e15ea414a18410acd151d43276651c",
+      "normalized_name": "taunt from the rampart",
+      "notes": "XMage batch proposal: exact local XMage class TauntFromTheRampart mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "TauntFromTheRampart",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TauntFromTheRampart.java"
+    },
+    {
+      "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+      "card_name": "Terror of the Peaks",
+      "confidence": 0.94,
+      "deck_role_json": {
+        "category": "burn_engine",
+        "effect": "etb_power_damage",
+        "subtype": "controlled_creature_enters_power_damage_any_target",
+        "timing": "triggered"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+        "cmc": 5.0,
+        "effect": "creature",
+        "flying": true,
+        "opponent_spells_targeting_this_additional_life_cost": 3,
+        "power": 5,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "toughness": 4,
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_you_control_enters": true,
+        "trigger_damage_amount_source": "entering_creature_power",
+        "trigger_effect": "damage_any_target"
+      },
+      "execution_status": "auto",
+      "family_id": "targeted_interaction",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:b495892461d2521bc633d7e9ab5cd443",
+      "normalized_name": "terror of the peaks",
+      "notes": "XMage batch proposal: exact local XMage class TerrorOfThePeaks mapped to family targeted_interaction; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "90c007ac59cdd400f58e89c47d81440e",
+      "oracle_hash_source": "candidate_rule.oracle_hash",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TerrorOfThePeaks",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TerrorOfThePeaks.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Alhammarret's Archive",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "alhammarret's archive",
+      "notes": "XMage batch proposal: exact local XMage class AlhammarretsArchive mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "AlhammarretsArchive",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AlhammarretsArchive.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Ancient Gold Dragon",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "ancient gold dragon",
+      "notes": "XMage batch proposal: exact local XMage class AncientGoldDragon mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "AncientGoldDragon",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AncientGoldDragon.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Assemble the Players",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "assemble the players",
+      "notes": "XMage batch proposal: exact local XMage class AssembleThePlayers mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "AssembleThePlayers",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AssembleThePlayers.java"
+    },
+    {
+      "battle_model_scope": "targeted_damage_variant_v1",
+      "card_name": "Balefire Liege",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "interaction",
+        "effect": "targeted_interaction",
+        "timing": "resolution"
+      },
+      "effect": "direct_damage",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "targeted_damage_variant_v1",
+        "effect": "direct_damage",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "zone": "stack"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "targeted_interaction",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:53d2c812b8a251ec3bf80ecb96cb7eb1",
+      "normalized_name": "balefire liege",
+      "notes": "XMage batch proposal: exact local XMage class BalefireLiege mapped to family targeted_interaction; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "split_family_scope_review_required",
+      "proposal_status": "split_family_scope_review_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "BalefireLiege",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BalefireLiege.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Blood Moon",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "blood moon",
+      "notes": "XMage batch proposal: exact local XMage class BloodMoon mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "BloodMoon",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BloodMoon.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Chandra's Ignition",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "source_controller"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:a893aa2294f3052786ca64f6dc53ec87",
+      "normalized_name": "chandra's ignition",
+      "notes": "XMage batch proposal: exact local XMage class ChandrasIgnition mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "ChandrasIgnition",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ChandrasIgnition.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Chaos Wand",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "controller_scope": "opponent"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:c214ea1b7d0f4912be8fb39831650b55",
+      "normalized_name": "chaos wand",
+      "notes": "XMage batch proposal: exact local XMage class ChaosWand mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "ChaosWand",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ChaosWand.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Charmbreaker Devils",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "charmbreaker devils",
+      "notes": "XMage batch proposal: exact local XMage class CharmbreakerDevils mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "CharmbreakerDevils",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CharmbreakerDevils.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Cloud Key",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "cloud key",
+      "notes": "XMage batch proposal: exact local XMage class CloudKey mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "CloudKey",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CloudKey.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Codex Shredder",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "zone": "graveyard"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:289b502b74ee921a5963772aed040610",
+      "normalized_name": "codex shredder",
+      "notes": "XMage batch proposal: exact local XMage class CodexShredder mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "CodexShredder",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CodexShredder.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Currency Converter",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "currency converter",
+      "notes": "XMage batch proposal: exact local XMage class CurrencyConverter mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "CurrencyConverter",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CurrencyConverter.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Deathbellow War Cry",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:080d04fe2398cc4869422d836908ccd6",
+      "normalized_name": "deathbellow war cry",
+      "notes": "XMage batch proposal: exact local XMage class DeathbellowWarCry mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "DeathbellowWarCry",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeathbellowWarCry.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Eight-and-a-Half-Tails",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "controller_scope": "source_controller",
+          "zone": "stack"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:7842a809f047c54aae4043413fb5f5f1",
+      "normalized_name": "eight-and-a-half-tails",
+      "notes": "XMage batch proposal: exact local XMage class EightAndAHalfTails mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "EightAndAHalfTails",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/EightAndAHalfTails.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Ephemerate",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "source_controller"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:a893aa2294f3052786ca64f6dc53ec87",
+      "normalized_name": "ephemerate",
+      "notes": "XMage batch proposal: exact local XMage class Ephemerate mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "Ephemerate",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/Ephemerate.java"
+    },
+    {
+      "battle_model_scope": "targeted_damage_variant_v1",
+      "card_name": "Firesong and Sunspeaker",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "interaction",
+        "effect": "targeted_interaction",
+        "timing": "resolution"
+      },
+      "effect": "direct_damage",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "targeted_damage_variant_v1",
+        "effect": "direct_damage",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "targeted_interaction",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:388e42b26a9f7603e8a8b33bdae8f647",
+      "normalized_name": "firesong and sunspeaker",
+      "notes": "XMage batch proposal: exact local XMage class FiresongAndSunspeaker mapped to family targeted_interaction; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "split_family_scope_review_required",
+      "proposal_status": "split_family_scope_review_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "FiresongAndSunspeaker",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FiresongAndSunspeaker.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Ghoulcaller's Bell",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "controller_scope": "source_controller"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:526a7abbf8d4d96e1088702cb4363bf2",
+      "normalized_name": "ghoulcaller's bell",
+      "notes": "XMage batch proposal: exact local XMage class GhoulcallersBell mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "GhoulcallersBell",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GhoulcallersBell.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Gisela, Blade of Goldnight",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "gisela, blade of goldnight",
+      "notes": "XMage batch proposal: exact local XMage class GiselaBladeOfGoldnight mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "GiselaBladeOfGoldnight",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GiselaBladeOfGoldnight.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Karn's Sylex",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ]
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:d0e6afde67926c8db5ec820326385411",
+      "normalized_name": "karn's sylex",
+      "notes": "XMage batch proposal: exact local XMage class KarnsSylex mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "KarnsSylex",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnsSylex.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Karn, the Great Creator",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:59b65e207587e34686d186bf3428c0d2",
+      "normalized_name": "karn, the great creator",
+      "notes": "XMage batch proposal: exact local XMage class KarnTheGreatCreator mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "KarnTheGreatCreator",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnTheGreatCreator.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Kayla's Music Box",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:fc28f6911ccd20b67048cc95dd19479c",
+      "normalized_name": "kayla's music box",
+      "notes": "XMage batch proposal: exact local XMage class KaylasMusicBox mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "KaylasMusicBox",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KaylasMusicBox.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Lantern of Insight",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:fc28f6911ccd20b67048cc95dd19479c",
+      "normalized_name": "lantern of insight",
+      "notes": "XMage batch proposal: exact local XMage class LanternOfInsight mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "LanternOfInsight",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LanternOfInsight.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Lens of Clarity",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "lens of clarity",
+      "notes": "XMage batch proposal: exact local XMage class LensOfClarity mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "LensOfClarity",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LensOfClarity.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Leyline Dowser",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "source_controller"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:2b07a229cf6c8cef0d049900a0afc040",
+      "normalized_name": "leyline dowser",
+      "notes": "XMage batch proposal: exact local XMage class LeylineDowser mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "LeylineDowser",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LeylineDowser.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Naktamun Lorespinner // Wheel of Fortune",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "naktamun lorespinner // wheel of fortune",
+      "notes": "XMage batch proposal: exact local XMage class NaktamunLorespinner mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "NaktamunLorespinner",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NaktamunLorespinner.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Neheb, the Eternal",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "controller_scope": "source_controller"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:cf736feb62568c28cc87efe2dbac1b57",
+      "normalized_name": "neheb, the eternal",
+      "notes": "XMage batch proposal: exact local XMage class NehebTheEternal mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "NehebTheEternal",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NehebTheEternal.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Orcish Spy",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:fc28f6911ccd20b67048cc95dd19479c",
+      "normalized_name": "orcish spy",
+      "notes": "XMage batch proposal: exact local XMage class OrcishSpy mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "OrcishSpy",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/o/OrcishSpy.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Perpetual Timepiece",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "zone": "graveyard"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:289b502b74ee921a5963772aed040610",
+      "normalized_name": "perpetual timepiece",
+      "notes": "XMage batch proposal: exact local XMage class PerpetualTimepiece mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "PerpetualTimepiece",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PerpetualTimepiece.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Possibility Storm",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "possibility storm",
+      "notes": "XMage batch proposal: exact local XMage class PossibilityStorm mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "PossibilityStorm",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PossibilityStorm.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Prototype Portal",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "prototype portal",
+      "notes": "XMage batch proposal: exact local XMage class PrototypePortal mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "PrototypePortal",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrototypePortal.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Pyxis of Pandemonium",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:fc28f6911ccd20b67048cc95dd19479c",
+      "normalized_name": "pyxis of pandemonium",
+      "notes": "XMage batch proposal: exact local XMage class PyxisOfPandemonium mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "PyxisOfPandemonium",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PyxisOfPandemonium.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Radiant Performer",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "zone": "stack"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:fa12ce53b0a0c4b963f4071b4fde2c9b",
+      "normalized_name": "radiant performer",
+      "notes": "XMage batch proposal: exact local XMage class RadiantPerformer mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "RadiantPerformer",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RadiantPerformer.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Rem Karolus, Stalwart Slayer",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "rem karolus, stalwart slayer",
+      "notes": "XMage batch proposal: exact local XMage class RemKarolusStalwartSlayer mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "RemKarolusStalwartSlayer",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RemKarolusStalwartSlayer.java"
+    },
+    {
+      "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+      "card_name": "Repercussion",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "burn_engine",
+        "effect": "damage_reflection",
+        "subtype": "creature_damage_controller_reflect",
+        "timing": "triggered"
+      },
+      "effect": "direct_damage",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+        "damage_amount_source": "damage_dealt_to_creature",
+        "effect": "direct_damage",
+        "global_creature_damage_reflect_to_controller": true,
+        "trigger": "creature_dealt_damage",
+        "trigger_effect": "damage_creature_controller"
+      },
+      "execution_status": "review_only",
+      "family_id": "targeted_interaction",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:a6fe56dcf8e3e5f3ef4ae8d9ae83e73f",
+      "normalized_name": "repercussion",
+      "notes": "XMage batch proposal: exact local XMage class Repercussion mapped to family targeted_interaction; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "oracle_hash_required_before_batch_pg",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "Repercussion",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/Repercussion.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "rune-tail, kitsune ascendant // rune-tail's essence",
+      "notes": "XMage batch proposal: exact local XMage class RuneTailKitsuneAscendant mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "RuneTailKitsuneAscendant",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RuneTailKitsuneAscendant.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Sawhorn Nemesis",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "sawhorn nemesis",
+      "notes": "XMage batch proposal: exact local XMage class SawhornNemesis mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "SawhornNemesis",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SawhornNemesis.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Screaming Nemesis",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "scope": "any_target"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:48fbe72493a5e82784b837d4a9c131bf",
+      "normalized_name": "screaming nemesis",
+      "notes": "XMage batch proposal: exact local XMage class ScreamingNemesis mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "ScreamingNemesis",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/ScreamingNemesis.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Serra Ascendant",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "serra ascendant",
+      "notes": "XMage batch proposal: exact local XMage class SerraAscendant mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "SerraAscendant",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SerraAscendant.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Single Combat",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "source_controller"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:a893aa2294f3052786ca64f6dc53ec87",
+      "normalized_name": "single combat",
+      "notes": "XMage batch proposal: exact local XMage class SingleCombat mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "SingleCombat",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SingleCombat.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Slickshot Show-Off",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "slickshot show-off",
+      "notes": "XMage batch proposal: exact local XMage class SlickshotShowOff mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "SlickshotShowOff",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SlickshotShowOff.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Stuffy Doll",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+      "normalized_name": "stuffy doll",
+      "notes": "XMage batch proposal: exact local XMage class StuffyDoll mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "StuffyDoll",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/StuffyDoll.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "The Walls of Ba Sing Se",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "the walls of ba sing se",
+      "notes": "XMage batch proposal: exact local XMage class TheWallsOfBaSingSe mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "TheWallsOfBaSingSe",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheWallsOfBaSingSe.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "The Warring Triad",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:fc28f6911ccd20b67048cc95dd19479c",
+      "normalized_name": "the warring triad",
+      "notes": "XMage batch proposal: exact local XMage class TheWarringTriad mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "TheWarringTriad",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheWarringTriad.java"
+    },
+    {
+      "battle_model_scope": "targeted_damage_variant_v1",
+      "card_name": "Toralf, God of Fury // Toralf's Hammer",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "interaction",
+        "effect": "targeted_interaction",
+        "timing": "resolution"
+      },
+      "effect": "direct_damage",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "targeted_damage_variant_v1",
+        "effect": "direct_damage",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "scope": "any_target"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "targeted_interaction",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:733e913423b3c4471520195c8a814097",
+      "normalized_name": "toralf, god of fury // toralf's hammer",
+      "notes": "XMage batch proposal: exact local XMage class ToralfGodOfFury mapped to family targeted_interaction; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "split_family_scope_review_required",
+      "proposal_status": "split_family_scope_review_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "ToralfGodOfFury",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/ToralfGodOfFury.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Unstable Glyphbridge // Sandswirl Wanderglyph",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "source_controller",
+          "zone": "stack"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:f4168e92445f0a9b9b2de0ef32f4b78d",
+      "normalized_name": "unstable glyphbridge // sandswirl wanderglyph",
+      "notes": "XMage batch proposal: exact local XMage class UnstableGlyphbridge mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "UnstableGlyphbridge",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/u/UnstableGlyphbridge.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Vedalken Orrery",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "vedalken orrery",
+      "notes": "XMage batch proposal: exact local XMage class VedalkenOrrery mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "VedalkenOrrery",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VedalkenOrrery.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Wand of Vertebrae",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "zone": "graveyard"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:289b502b74ee921a5963772aed040610",
+      "normalized_name": "wand of vertebrae",
+      "notes": "XMage batch proposal: exact local XMage class WandOfVertebrae mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "WandOfVertebrae",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WandOfVertebrae.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Whispersilk Cloak",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model"
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
+      "normalized_name": "whispersilk cloak",
+      "notes": "XMage batch proposal: exact local XMage class WhispersilkCloak mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "WhispersilkCloak",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WhispersilkCloak.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Wild Ricochet",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "zone": "stack"
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:4626d63d2cf3165896c21f10151536e3",
+      "normalized_name": "wild ricochet",
+      "notes": "XMage batch proposal: exact local XMage class WildRicochet mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "WildRicochet",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WildRicochet.java"
+    },
+    {
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "card_name": "Zirda, the Dawnwaker",
+      "confidence": 0.7,
+      "deck_role_json": {
+        "category": "manual_review",
+        "effect": "external_reference_required_manual_model"
+      },
+      "effect": "external_reference_required_manual_model",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+        "effect": "external_reference_required_manual_model",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        }
+      },
+      "execution_status": "review_only",
+      "family_id": "manual_model",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:906ebae3bd74d12472e29e7b1ca22f29",
+      "normalized_name": "zirda, the dawnwaker",
+      "notes": "XMage batch proposal: exact local XMage class ZirdaTheDawnwaker mapped to family manual_model; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": null,
+      "oracle_hash_source": "missing_external_harvest",
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "proposal_status": "mapper_metadata_or_test_scenario_required",
+      "review_status": "needs_review",
+      "safe_for_batch_pg_package": false,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "generated",
+      "xmage_class": "ZirdaTheDawnwaker",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/z/ZirdaTheDawnwaker.java"
+    }
+  ],
+  "source": {
+    "deck_id": 6,
+    "external_harvest_status": "ready_for_manual_review",
+    "family_summary": {
+      "batch_metadata_candidate_count": 5,
+      "card_count": 61,
+      "family_count": 5,
+      "family_counts": {
+        "free_cast": 1,
+        "manual_model": 52,
+        "static_damage_modifier": 1,
+        "targeted_interaction": 6,
+        "topdeck_play": 1
+      },
+      "manual_or_blocked_count": 56,
+      "promotion_lane_counts": {
+        "batch_metadata_candidate_requires_pg_precheck": 5,
+        "mapper_metadata_or_test_scenario_required": 52,
+        "split_family_scope_review_required": 4
+      },
+      "runtime_family_required_count": 0
+    }
+  },
+  "status": "ready",
+  "summary": {
+    "blocked_missing_xmage_source_count": 0,
+    "family_counts": {
+      "free_cast": 1,
+      "manual_model": 52,
+      "static_damage_modifier": 1,
+      "targeted_interaction": 6,
+      "topdeck_play": 1
+    },
+    "proposal_count": 61,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 1,
+      "mapper_metadata_or_test_scenario_required": 52,
+      "oracle_hash_required_before_batch_pg": 4,
+      "split_family_scope_review_required": 4
+    },
+    "runtime_family_required_count": 0,
+    "safe_for_batch_pg_package_count": 1
+  }
+}

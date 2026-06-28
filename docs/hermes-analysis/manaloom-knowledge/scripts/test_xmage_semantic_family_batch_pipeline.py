@@ -8083,6 +8083,68 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             "creature_damage_controller_reflect",
         )
 
+    def test_classifier_and_generator_mark_terror_of_the_peaks_exact_scope_as_batch_safe(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Terror of the Peaks",
+                    "severity": "high",
+                    "oracle_hash": "terrorhash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "TerrorOfThePeaks",
+                        "path": "/xmage/TerrorOfThePeaks.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": [
+                            "DamageTargetEffect",
+                            "TerrorOfThePeaksCostIncreaseEffect",
+                        ],
+                        "ability_classes": [
+                            "EntersBattlefieldControlledTriggeredAbility",
+                            "FlyingAbility",
+                            "SimpleStaticAbility",
+                            "SpellAbility",
+                        ],
+                        "cost_classes": ["PayLifeCost"],
+                        "target_classes": ["TargetAnyTarget"],
+                        "primary_effect": {
+                            "effect": "creature",
+                            "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+                            "power": 5,
+                            "toughness": 4,
+                            "flying": True,
+                            "trigger": "creature_you_control_enters",
+                            "trigger_effect": "damage_any_target",
+                            "trigger_damage_amount_source": "entering_creature_power",
+                            "trigger_another_creature_you_control_enters": True,
+                            "target": "any_target",
+                            "target_constraints": {"scope": "any_target"},
+                            "opponent_spells_targeting_this_additional_life_cost": 3,
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "targeted_interaction")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        proposal_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = proposal_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "burn_engine")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "etb_power_damage")
+        self.assertEqual(
+            proposal["deck_role_json"]["subtype"],
+            "controlled_creature_enters_power_damage_any_target",
+        )
+
     def test_classifier_marks_tinder_wall_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
