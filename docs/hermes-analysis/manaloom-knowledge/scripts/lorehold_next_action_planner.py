@@ -34,6 +34,9 @@ DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
 DEFAULT_RECURSION_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json"
 ]
+DEFAULT_MANA_BASE_VALIDATOR_REPORTS = [
+    REPORT_DIR / "lorehold_mana_base_validator_20260627_v1.json"
+]
 DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
@@ -593,7 +596,25 @@ def build_recursion_action(
     }
 
 
-def build_mana_action(miner_report: dict[str, Any]) -> dict[str, Any] | None:
+def mana_swap_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "candidate": row.get("candidate"),
+            "cut": row.get("cut"),
+            "score": row.get("score"),
+            "deltas": row.get("deltas") or {},
+            "gained_roles": row.get("gained_roles") or [],
+            "lost_roles": row.get("lost_roles") or [],
+        }
+        for row in rows
+    ]
+
+
+def build_mana_action(
+    miner_report: dict[str, Any],
+    *,
+    mana_base_validator_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+) -> dict[str, Any] | None:
     pairings = pairing_rows(
         miner_report,
         status="blocked_no_safe_cut_in_lane",
@@ -603,6 +624,56 @@ def build_mana_action(miner_report: dict[str, Any]) -> dict[str, Any] | None:
         return None
     candidates = [str(row["candidate"]) for row in pairings[:6]]
     cuts = summarize_cut_options(pairings, limit=6)
+    if mana_base_validator_reports:
+        validator_path, validator_payload = mana_base_validator_reports[-1]
+        ready = list(validator_payload.get("ready_swaps") or [])
+        ready.sort(key=lambda row: (-int(row.get("score") or 0), row.get("candidate") or ""))
+        if ready:
+            top = ready[:5]
+            return {
+                "priority": 4,
+                "action_key": "run_mana_base_validated_preflight",
+                "status": "mana_base_preflight_ready",
+                "lane": "mana_base",
+                "candidate_cards": sorted({str(row["candidate"]) for row in top}),
+                "cut_cards": [str(row["cut"]) for row in top if row.get("cut")],
+                "why_now": (
+                    "The mana-base validator found deterministic land upgrades that preserve "
+                    "Boros color access and avoid protected utility cuts."
+                ),
+                "blockers": [],
+                "next_steps": [
+                    "Build the smallest exact land package from the top validator swap.",
+                    "Use package preflight rather than a noisy battle gate; only battle-test if the deterministic model is disputed.",
+                    "Do not cut fetches, Ancient Tomb, Command Beacon, or prior negative land-gate cuts.",
+                ],
+                "mana_base_validator_report": str(validator_path),
+                "ready_swap_count": int(
+                    (validator_payload.get("summary") or {}).get("ready_swap_count") or len(ready)
+                ),
+                "top_ready_swaps": mana_swap_summary(top),
+            }
+        return {
+            "priority": 90,
+            "action_key": "avoid_mana_base_without_safe_color_swap",
+            "status": "no_mana_base_preflight_ready",
+            "lane": "mana_base",
+            "candidate_cards": candidates,
+            "cut_cards": [str(row["card_name"]) for row in cuts if row.get("card_name")],
+            "why_now": (
+                "The mana-base validator found no deterministic swap that preserves color sources "
+                "and protected utility roles."
+            ),
+            "blockers": [
+                "no validator-ready land swap",
+                "battle gate cannot isolate mana consistency from game variance",
+            ],
+            "next_steps": [
+                "Move to runtime/XMage rule-gap batching before another land test.",
+                "Reopen mana base only with a new candidate or a cut that the validator marks preflight-ready.",
+            ],
+            "mana_base_validator_report": str(validator_path),
+        }
     return {
         "priority": 4,
         "action_key": "use_mana_base_validator_not_battle_gate",
@@ -699,6 +770,7 @@ def build_plan(
     tutor_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     hand_filter_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     recursion_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    mana_base_validator_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
@@ -747,7 +819,10 @@ def build_plan(
             exposures,
             recursion_cut_model_reports=recursion_cut_model_reports,
         ),
-        build_mana_action(miner_report),
+        build_mana_action(
+            miner_report,
+            mana_base_validator_reports=mana_base_validator_reports,
+        ),
         build_runtime_action(miner_report),
     ):
         if action:
@@ -768,6 +843,9 @@ def build_plan(
         ],
         "recursion_cut_model_reports": [
             str(path) for path, _payload in (recursion_cut_model_reports or [])
+        ],
+        "mana_base_validator_reports": [
+            str(path) for path, _payload in (mana_base_validator_reports or [])
         ],
         "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
         "postgres_writes": False,
@@ -808,6 +886,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
         f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
         f"- Recursion cut model reports: `{', '.join(payload.get('recursion_cut_model_reports') or []) or '-'}`",
+        f"- Mana-base validator reports: `{', '.join(payload.get('mana_base_validator_reports') or []) or '-'}`",
         f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
@@ -882,6 +961,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
     parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
     parser.add_argument("--recursion-cut-model-report", type=Path, action="append")
+    parser.add_argument("--mana-base-validator-report", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260627_v1")
     return parser.parse_args()
@@ -902,6 +982,9 @@ def main() -> int:
     recursion_cut_model_reports = read_existing_json(
         args.recursion_cut_model_report or DEFAULT_RECURSION_CUT_MODEL_REPORTS
     )
+    mana_base_validator_reports = read_existing_json(
+        args.mana_base_validator_report or DEFAULT_MANA_BASE_VALIDATOR_REPORTS
+    )
     prior_package_reports = read_existing_json(
         args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
     )
@@ -912,6 +995,7 @@ def main() -> int:
         tutor_cut_model_reports=tutor_cut_model_reports,
         hand_filter_cut_model_reports=hand_filter_cut_model_reports,
         recursion_cut_model_reports=recursion_cut_model_reports,
+        mana_base_validator_reports=mana_base_validator_reports,
         prior_package_reports=prior_package_reports,
         miner_path=args.miner_report,
         manual_path=args.manual_review,

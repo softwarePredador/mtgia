@@ -318,6 +318,33 @@ def recursion_blocked_model_report():
     )
 
 
+def mana_base_validator_report():
+    return (
+        planner.REPORT_DIR / "mana_base_validator_test.json",
+        {
+            "summary": {
+                "ready_swap_count": 1,
+                "recommended_next_action": "run_mana_base_validated_preflight",
+            },
+            "ready_swaps": [
+                {
+                    "candidate": "Plateau",
+                    "cut": "Turbulent Steppe",
+                    "score": 44,
+                    "deltas": {
+                        "red_source_delta": 0,
+                        "white_source_delta": 0,
+                        "boros_source_delta": 0,
+                        "etb_score_delta": 2,
+                    },
+                    "gained_roles": ["fetchable_boros_dual"],
+                    "lost_roles": [],
+                }
+            ],
+        },
+    )
+
+
 def test_next_action_planner_prioritizes_cut_models_before_gates():
     payload = planner.build_plan(
         miner_report=miner_report(),
@@ -428,3 +455,24 @@ def test_next_action_planner_moves_to_mana_after_recursion_rejects():
     assert recursion_action["status"] == "no_recursion_benchmark_ready"
     assert recursion_action["priority"] == 90
     assert recursion_action["blocked_prior_rejections"][0]["status"] == "blocked_prior_reject"
+
+
+def test_next_action_planner_uses_validated_mana_preflight_report():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        tutor_cut_model_reports=[tutor_cut_model_report()],
+        hand_filter_cut_model_reports=[hand_filter_blocked_model_report()],
+        recursion_cut_model_reports=[recursion_blocked_model_report()],
+        mana_base_validator_reports=[mana_base_validator_report()],
+        prior_package_reports=[prior_tutor_land_tax_report()],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == "run_mana_base_validated_preflight"
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    mana_action = actions["run_mana_base_validated_preflight"]
+    assert mana_action["status"] == "mana_base_preflight_ready"
+    assert mana_action["candidate_cards"] == ["Plateau"]
+    assert mana_action["cut_cards"] == ["Turbulent Steppe"]
+    assert mana_action["top_ready_swaps"][0]["deltas"]["etb_score_delta"] == 2

@@ -646,6 +646,22 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Boseiju, Who Shelters All"],
         "cuts": ["Reliquary Tower"],
     },
+    "plateau_timing_upgrade_cut_radiant_summit": {
+        "family": "mana_base",
+        "hypothesis": (
+            "The deterministic mana-base validator marks Plateau over Radiant "
+            "Summit as a strict Boros-source timing upgrade: it preserves red "
+            "and white access, keeps land count unchanged, and removes a "
+            "conditional tapped dual without cutting fetches or utility lands."
+        ),
+        "adds": ["Plateau"],
+        "cuts": ["Radiant Summit"],
+        "cut_safety_override_reason": (
+            "Allowed only by lorehold_mana_base_validator_20260627_v1: "
+            "preflight_land_swap_ready with red_source_delta=0, "
+            "white_source_delta=0, and etb_score_delta=+2."
+        ),
+    },
     "biblioplex_topdeck_land": {
         "family": "topdeck_land",
         "hypothesis": (
@@ -1458,6 +1474,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- opponent_seed: `{payload['opponent_seed']}`",
         f"- simulation_seed: `{payload['simulation_seed']}`",
         f"- preflight_only: `{payload.get('preflight_only')}`",
+        f"- apply_only: `{payload.get('apply_only')}`",
         f"- cut_safety_report: `{payload.get('cut_safety_report') or '-'}`",
         f"- prior_package_reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         f"- package_status_counts: `{json.dumps(payload.get('package_status_counts') or {}, sort_keys=True)}`",
@@ -1474,6 +1491,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "skipped_prior_evidence",
             "skipped_candidate_apply_error",
             "preflight_ready",
+            "apply_ready",
         }:
             lines.append(
                 "| {key} | {family} | {adds} | {cuts} | `{preflight}` | - | - | +0.00 | - | {status} |".format(
@@ -1550,6 +1568,7 @@ def main() -> int:
     parser.add_argument("--cut-safety-report", type=Path, default=DEFAULT_CUT_SAFETY_REPORT)
     parser.add_argument("--no-cut-safety", action="store_true")
     parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument("--apply-only", action="store_true")
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--ignore-prior-results", action="store_true")
     args = parser.parse_args()
@@ -1674,6 +1693,29 @@ def main() -> int:
             print(json.dumps(result, ensure_ascii=False, indent=2), flush=True)
             continue
 
+        if args.apply_only:
+            result = {
+                "package_key": package_key,
+                "family": definition.get("family") or "misc",
+                "hypothesis": definition["hypothesis"],
+                "adds": definition["adds"],
+                "cuts": definition["cuts"],
+                "status": "apply_ready",
+                "cut_safety": package_cut_safety,
+                "prior_evidence": package_prior_evidence,
+                "candidate_db": str(candidate_db),
+                "candidate_meta": candidate_meta,
+                "gate_json": None,
+                "gate_markdown": None,
+                "gate_returncode": None,
+                "gate_stdout_tail": "",
+                "gate_stderr_tail": "",
+                "gate_summary": {},
+            }
+            results.append(result)
+            print(json.dumps(result, ensure_ascii=False, indent=2), flush=True)
+            continue
+
         gate_stem = f"{args.stem}_{stamp}_{package_key}"
         completed = run_gate(
             source_db=source_db,
@@ -1729,6 +1771,7 @@ def main() -> int:
         "opponent_seed": args.opponent_seed,
         "simulation_seed": args.simulation_seed,
         "preflight_only": bool(args.preflight_only),
+        "apply_only": bool(args.apply_only),
         "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,
         "cut_safety_summary": cut_safety.get("summary") or {},
         "prior_package_reports": [str(path) for path in prior_package_reports],
@@ -1743,6 +1786,8 @@ def main() -> int:
     status = "ready"
     if args.preflight_only:
         status = "preflight_ready" if any(row.get("status") == "preflight_ready" for row in results) else "preflight_blocked"
+    elif args.apply_only:
+        status = "apply_ready" if any(row.get("status") == "apply_ready" for row in results) else "preflight_blocked"
     elif results and all(str(row.get("status", "")).startswith("skipped_") for row in results):
         status = "preflight_blocked"
     print(json.dumps({"status": status, "json": str(report_json), "markdown": str(report_md)}, indent=2))
