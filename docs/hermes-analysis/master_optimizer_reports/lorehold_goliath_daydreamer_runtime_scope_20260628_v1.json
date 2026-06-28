@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-06-28T10:45:24Z",
+  "status": "runtime_executor_implemented_metadata_pending_pg_or_mapper",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "card_name": "Goliath Daydreamer",
+  "runtime_gap_source": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v7_operational_queue.json",
+  "xmage_source": {
+    "root": "/Users/desenvolvimentomobile/Downloads/mage-master",
+    "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GoliathDaydreamer.java",
+    "class_name": "GoliathDaydreamer",
+    "effect_classes": [
+      "GoliathDaydreamerExileEffect",
+      "GoliathDaydreamerCastEffect"
+    ],
+    "observed_model": [
+      "When controller casts an instant or sorcery from hand, replace stack-to-graveyard resolution with exile and a dream counter.",
+      "When Goliath Daydreamer attacks, controller may cast a spell from owned exile cards with dream counters without paying mana cost."
+    ]
+  },
+  "battle_model": {
+    "effect": "creature",
+    "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+    "goliath_daydreamer_exile_resolved_instant_sorcery": true,
+    "goliath_daydreamer_attack_cast_dream_counter": true,
+    "runtime_events": [
+      "goliath_daydreamer_dream_counter_replacement_marked",
+      "replacement_exiled_on_resolution",
+      "goliath_daydreamer_free_cast",
+      "spell_cast",
+      "spell_resolved"
+    ]
+  },
+  "implementation": {
+    "runtime_files": [
+      "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+    ],
+    "test_files": [
+      "docs/hermes-analysis/manaloom-knowledge/scripts/test_goliath_daydreamer_runtime.py"
+    ],
+    "notes": [
+      "Runtime preserves cast context on the card during apply_effect_immediate so finish_resolved_spell can distinguish hand-cast spells from exile recasts.",
+      "Dream-counter spells are selected deterministically by effect score, mana value, and card name.",
+      "The dream-counter marker is cleared before the free cast resolves, so the recast spell resolves to the normal destination unless another effect replaces it."
+    ]
+  },
+  "validation": {
+    "focused_pytest": "python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_goliath_daydreamer_runtime.py docs/hermes-analysis/manaloom-knowledge/scripts/test_static_damage_modifier_runtime.py docs/hermes-analysis/manaloom-knowledge/scripts/test_topdeck_play_runtime.py -q",
+    "focused_pytest_result": "8 passed in 0.34s",
+    "neighbor_runtime_manual_checks": [
+      "PASS test_pg102_creative_technique_demonstrates_top_nonland_free_casts",
+      "PASS test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them",
+      "PASS test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit",
+      "PASS test_pg231_velomachus_attack_casts_best_eligible_top_seven_spell_without_paying_mana"
+    ]
+  },
+  "remaining_blockers": [
+    "No PostgreSQL card_battle_rules row was applied in this step.",
+    "Hermes/runtime metadata still needs PG-backed rule promotion or an approved local mapper package before Goliath Daydreamer can be trusted in deck gates.",
+    "No Lorehold deck swap should be generated from this card until metadata sync and exposure-aware gate evidence exist."
+  ],
+  "recommended_next_action": "prepare_goliath_daydreamer_metadata_package_or_mapper_then_sync_before_gate"
+}

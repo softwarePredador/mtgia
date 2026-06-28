@@ -2638,7 +2638,64 @@ def finish_countered_spell(player, card):
     return result
 
 
+GOLIATH_DAYDREAMER_SCOPE = "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1"
+
+
+def is_goliath_daydreamer_runtime_source(permanent):
+    if not isinstance(permanent, dict):
+        return False
+    effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+    return (
+        effect_data.get("battle_model_scope") == GOLIATH_DAYDREAMER_SCOPE
+        or bool(effect_data.get("goliath_daydreamer_exile_resolved_instant_sorcery"))
+        or bool(effect_data.get("goliath_daydreamer_attack_cast_dream_counter"))
+    )
+
+
+def first_goliath_daydreamer_source(player):
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if is_goliath_daydreamer_runtime_source(permanent):
+            return permanent
+    return None
+
+
+def mark_goliath_daydreamer_exile_on_resolution(player, card, effect_data, turn=None):
+    if not isinstance(card, dict) or card.get("_exile_on_resolution"):
+        return False
+    if not is_instant_or_sorcery_spell(card):
+        return False
+    cast_context = {}
+    if isinstance(effect_data, dict):
+        cast_context = effect_data.get("_cast_context") or {}
+    if not cast_context:
+        cast_context = card.get("_cast_context") or {}
+    source_zone = cast_context.get("source_zone") or _effect_source_zone(effect_data)
+    if source_zone != "hand":
+        return False
+    source = first_goliath_daydreamer_source(player)
+    if source is None:
+        return False
+    card["_exile_on_resolution"] = True
+    card["_exile_on_resolution_reason"] = "goliath_daydreamer_dream_counter"
+    card["_goliath_daydreamer_dream_counter"] = True
+    card["_goliath_daydreamer_source"] = source.get("name", "Goliath Daydreamer")
+    resolved_effect_data = effect_data if isinstance(effect_data, dict) and effect_data.get("effect") else None
+    if resolved_effect_data is None and card.get("effect"):
+        resolved_effect_data = card
+    card["_goliath_daydreamer_effect_data"] = copy.deepcopy(resolved_effect_data or get_card_effect(card))
+    emit_replay_event(
+        "goliath_daydreamer_dream_counter_replacement_marked",
+        player=player.name,
+        card=card.get("name", "?"),
+        source=source.get("name", "Goliath Daydreamer"),
+        turn=turn,
+        **replay_rule_fields(source),
+    )
+    return True
+
+
 def finish_resolved_spell(player, card, turn=None, effect_data=None):
+    mark_goliath_daydreamer_exile_on_resolution(player, card, effect_data, turn)
     if isinstance(card, dict) and card.get("_exile_on_resolution"):
         reason = card.get("_exile_on_resolution_reason") or "replacement_exile_on_resolution"
         move_to_exile(player, card, reason=reason, turn=turn)
@@ -13848,6 +13905,204 @@ def resolve_attack_top_library_free_cast_triggers(
             turn,
             rng,
             effect_data_override=chosen_effect,
+            stack=stack,
+            phase=phase,
+        )
+        cast_count += 1
+    return cast_count
+
+
+def goliath_daydreamer_dream_counter_candidates(player, opponents, all_players, turn):
+    candidates = []
+    for exiled_card in list(getattr(player, "exile", []) or []):
+        if not isinstance(exiled_card, dict):
+            continue
+        if not exiled_card.get("_goliath_daydreamer_dream_counter"):
+            continue
+        if not is_instant_or_sorcery_spell(exiled_card):
+            continue
+        candidate_effect = copy.deepcopy(
+            exiled_card.get("_goliath_daydreamer_effect_data") or get_card_effect(exiled_card)
+        )
+        if candidate_effect.get("effect") in {"unknown", "land", "counter"}:
+            continue
+        score = threat_score(
+            candidate_effect.get("effect", "unknown"),
+            exiled_card.get("name", "?"),
+            player,
+            all_players,
+            turn,
+        )
+        if candidate_effect.get("effect") in TARGETED_REMOVAL_EFFECTS:
+            targeted_effect, declared = prepare_declared_removal_targets(
+                player,
+                opponents,
+                exiled_card,
+                candidate_effect,
+            )
+            if not declared:
+                continue
+            candidate_effect = targeted_effect
+            score += 8
+        elif candidate_effect.get("effect") == "direct_damage":
+            score += int(candidate_effect.get("damage") or candidate_effect.get("amount") or 0)
+        elif candidate_effect.get("effect") in {"draw", "draw_cards"}:
+            score += 4 * int(candidate_effect.get("count") or 1)
+        candidates.append(
+            {
+                "card": exiled_card,
+                "effect_data": candidate_effect,
+                "score": score,
+                "mana_value": card_mana_value(exiled_card),
+            }
+        )
+    candidates.sort(
+        key=lambda row: (
+            float(row.get("score") or 0),
+            int(row.get("mana_value") or 0),
+            str((row.get("card") or {}).get("name", "")),
+        ),
+        reverse=True,
+    )
+    return candidates
+
+
+def resolve_goliath_daydreamer_dream_counter_attack_triggers(
+    player,
+    attackers,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="combat",
+    stack=None,
+):
+    cast_count = 0
+    for source in list(attackers or []):
+        if not isinstance(source, dict) or source not in getattr(player, "battlefield", []):
+            continue
+        if not is_goliath_daydreamer_runtime_source(source):
+            continue
+        source_effect_data = source if source.get("battle_model_scope") else get_card_effect(source)
+        candidates = goliath_daydreamer_dream_counter_candidates(player, opponents, all_players, turn)
+        if not candidates:
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=source.get("name", "?"),
+                trigger="attack",
+                effect="goliath_daydreamer_dream_counter_free_cast",
+                result="no_dream_counter_spell",
+                chosen=False,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(source_effect_data),
+            )
+            continue
+        selected = candidates[0]
+        selected_card = selected["card"]
+        selected_effect = selected["effect_data"]
+        cast_ctx = begin_cast_context(
+            player,
+            selected_card,
+            phase,
+            effect_data=selected_effect,
+            role="goliath_daydreamer",
+            modes=["cast_without_paying_mana", "dream_counter"],
+            alternative_cost="{0}",
+            source_zone="exile",
+            alternative_cost_kind="cast_without_paying_mana",
+        )
+        cast_ctx.is_legal = True
+        cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+        store_cast_context_fields(
+            selected_effect,
+            {
+                "phase": phase,
+                **cast_ctx.to_replay_fields(),
+            },
+        )
+        if not commit_cast_payment(cast_ctx):
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=source.get("name", "?"),
+                trigger="attack",
+                effect="goliath_daydreamer_dream_counter_free_cast",
+                chosen_card=selected_card.get("name", "?"),
+                result="cast_failed",
+                chosen=False,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(source_effect_data),
+            )
+            continue
+        if selected_card in player.exile:
+            player.exile.remove(selected_card)
+        dream_source = selected_card.get("_goliath_daydreamer_source")
+        for key in (
+            "_exile_on_resolution",
+            "_exile_on_resolution_reason",
+            "_goliath_daydreamer_dream_counter",
+            "_goliath_daydreamer_source",
+            "_goliath_daydreamer_effect_data",
+        ):
+            selected_card.pop(key, None)
+        emit_replay_event(
+            "goliath_daydreamer_free_cast",
+            player=player.name,
+            card=source.get("name", "?"),
+            cast_card=selected_card.get("name", "?"),
+            dream_counter_source=dream_source,
+            cast_effect=selected_effect.get("effect", "unknown"),
+            selected_mana_value=card_mana_value(selected_card),
+            cast_without_paying_mana_cost=True,
+            turn=turn,
+            phase=phase,
+            **cast_ctx.to_replay_fields(),
+            **replay_rule_fields(source_effect_data),
+        )
+        emit_replay_event(
+            "spell_cast",
+            player=player.name,
+            card=selected_card.get("name", "?"),
+            effect=selected_effect.get("effect", "unknown"),
+            type_line=selected_card.get("type_line", ""),
+            cmc=selected_card.get("cmc", 0),
+            turn=turn,
+            phase=phase,
+            **cast_ctx.to_replay_fields(),
+            **replay_rule_fields(selected_effect),
+        )
+        mark_cast_ledger_emitted(selected_effect)
+        trigger_spell_cast_engines(
+            player,
+            all_players,
+            selected_card,
+            turn,
+            phase,
+            stack=stack,
+            active_player=player,
+        )
+        trigger_opponent_spell_draw_engines(
+            player,
+            opponents,
+            selected_card,
+            turn,
+            phase,
+            rng,
+            stack=stack,
+            active_player=player,
+            all_players=all_players,
+        )
+        apply_effect_immediate(
+            player,
+            opponents,
+            selected_card,
+            turn,
+            rng,
+            effect_data_override=selected_effect,
             stack=stack,
             phase=phase,
         )
@@ -31176,6 +31431,8 @@ def apply_effect_immediate(
     """v8: Apply card effect (called when spell resolves from stack)."""
     effect_data = copy.deepcopy(effect_data_override) if effect_data_override else get_card_effect(card)
     effect_data = normalize_runtime_effect_aliases(card, effect_data)
+    if isinstance(card, dict) and isinstance(effect_data.get("_cast_context"), dict):
+        card["_cast_context"] = copy.deepcopy(effect_data["_cast_context"])
     effect = effect_data.get("effect", "unknown")
     if effect == "ramp_ritual" and effect_data.get("hand_exile_mana_ability"):
         activate_hand_exile_mana_ability(
@@ -35328,6 +35585,16 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         phase="combat",
     )
     resolve_attack_top_library_free_cast_triggers(
+        attacker,
+        attackers,
+        alive_defenders,
+        all_players,
+        turn,
+        rng,
+        phase="combat",
+        stack=stack,
+    )
+    resolve_goliath_daydreamer_dream_counter_attack_triggers(
         attacker,
         attackers,
         alive_defenders,
