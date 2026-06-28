@@ -15131,7 +15131,7 @@ def process_upkeep_utility_lands(player, turn, all_players=None):
                     scored_candidates = [
                         (
                             candidate,
-                            *tutor_candidate_score(candidate, "artifact", player, [], turn),
+                            *tutor_candidate_score(candidate, "artifact_cmc_1_or_less", player, [], turn),
                         )
                         for candidate in candidates
                     ]
@@ -18958,6 +18958,19 @@ def player_has_lorehold_miracle_engine(player):
     return miracle_engine_permanent(player) is not None
 
 
+def player_has_lorehold_game_plan(player):
+    if player_has_lorehold_miracle_engine(player):
+        return True
+    expected = "lorehold, the historian"
+    commander = getattr(player, "commander", None)
+    if isinstance(commander, dict) and normalize_card_name(commander.get("name", "")) == expected:
+        return True
+    for commander_card in getattr(player, "command_zone", []) or []:
+        if isinstance(commander_card, dict) and normalize_card_name(commander_card.get("name", "")) == expected:
+            return True
+    return False
+
+
 def lorehold_miracle_engine_permanent(player):
     permanents = _player_permanents_with_flag(player, "opponent_upkeep_rummage")
     if permanents:
@@ -21131,6 +21144,29 @@ def move_library_tutor_selection(player, selected_cards, target_type):
     return moved_cards, destination if moved_cards else None
 
 
+def lorehold_low_artifact_tutor_score(candidate, target_type, player):
+    if str(target_type or "").lower() != "artifact_cmc_1_or_less":
+        return None
+    if not player_has_lorehold_game_plan(player):
+        return None
+    normalized_name = normalize_card_name(candidate.get("name", ""))
+    effect_data = get_card_effect(candidate)
+    effect = str(effect_data.get("effect") or candidate.get("effect") or "unknown")
+    if normalized_name == "sensei's divining top":
+        return 180, "find_lorehold_topdeck_miracle_engine"
+    if normalized_name == "library of leng":
+        return 170, "find_lorehold_discard_to_top_engine"
+    if normalized_name == "sol ring":
+        return 150, "accelerate_lorehold_commander_miracle_plan"
+    if effect == "topdeck_manipulation":
+        return 145, "find_lorehold_topdeck_miracle_engine"
+    if effect_data.get("discard_effect_to_top_replacement"):
+        return 140, "find_lorehold_discard_to_top_engine"
+    if effect in {"ramp_permanent", "land_ramp", "ramp_engine"}:
+        return 125, "accelerate_lorehold_commander_miracle_plan"
+    return None
+
+
 def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     effect_data = get_card_effect(candidate)
     effect = str(effect_data.get("effect") or candidate.get("effect") or "unknown")
@@ -21181,6 +21217,9 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     elif str(target_type).endswith("_to_battlefield") and is_creature_card(candidate):
         score += max(20, cmc * 5)
         reason = "battlefield_tutor_prefers_material_impact"
+    lorehold_artifact_score = lorehold_low_artifact_tutor_score(candidate, target_type, player)
+    if lorehold_artifact_score is not None and lorehold_artifact_score[0] > score:
+        score, reason = lorehold_artifact_score
     return score, reason
 
 

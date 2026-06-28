@@ -10185,6 +10185,78 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_urzas_saga_prefers_topdeck_engine_for_lorehold_plan():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Lorehold")
+        commander = {
+            "name": "Lorehold, the Historian",
+            "cmc": 4,
+            "type_line": "Legendary Creature — Elder Dragon",
+            "color_identity": ["W", "R"],
+            "is_commander": True,
+        }
+        active.commander = commander
+        active.command_zone = [commander]
+        active.hand = [{"name": "Keep Spell", "cmc": 2, "type_line": "Sorcery"}]
+        active.library = [
+            {"name": "Esper Sentinel", "cmc": 1, "type_line": "Artifact Creature", "effect": "draw_engine"},
+            {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"},
+            {"name": "Library of Leng", "cmc": 1, "type_line": "Artifact"},
+            {"name": "Sensei's Divining Top", "cmc": 1, "type_line": "Artifact"},
+            {"name": "Drawn Card", "cmc": 2, "type_line": "Instant"},
+        ]
+        active.battlefield = [
+            {
+                "name": "Urza's Saga",
+                "effect": "land",
+                "type_line": "Enchantment Land — Urza's Saga",
+                "produces": "C",
+                "mana_produced": 1,
+                "lore_counters": 2,
+                "current_chapter": 2,
+                "final_chapter": 3,
+                "saga_last_lore_turn": 2,
+            },
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+        ]
+        opponent = player("Opponent")
+
+        battle.play_turn_v8(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=3,
+            rng=random.Random(104),
+            stack=battle.Stack(),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        assert any(
+            card.get("name") == "Sensei's Divining Top"
+            for card in active.battlefield
+            if isinstance(card, dict)
+        )
+        assert not any(
+            card.get("name") == "Esper Sentinel"
+            for card in active.battlefield
+            if isinstance(card, dict)
+        )
+        saga_event = next(
+            data
+            for event, data in events
+            if event == "saga_chapter_resolved" and data.get("card") == "Urza's Saga"
+        )
+        assert saga_event["found"] == "Sensei's Divining Top"
+        assert saga_event["candidate_names"][:4] == [
+            "Sensei's Divining Top",
+            "Library of Leng",
+            "Sol Ring",
+            "Esper Sentinel",
+        ]
+        assert saga_event["selected_reason"] == "find_lorehold_topdeck_miracle_engine"
+
     def test_blood_sun_draws_on_etb_and_enters_as_passive_enchantment():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -19133,6 +19205,7 @@ def register_tests(battle, player):
         test_urzas_saga_enters_with_initial_chapter_state,
         test_urzas_saga_creates_construct_on_chapter_two,
         test_urzas_saga_tutors_safe_artifact_then_sacrifices,
+        test_urzas_saga_prefers_topdeck_engine_for_lorehold_plan,
         test_blood_sun_draws_on_etb_and_enters_as_passive_enchantment,
         test_blood_sun_suppresses_war_room_activation_across_table,
         test_blood_sun_suppresses_urzas_saga_upkeep_progression,
