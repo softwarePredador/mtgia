@@ -193,6 +193,70 @@ class LoreholdLearningEvidenceLedgerTest(unittest.TestCase):
             self.assertEqual(group["latest_decision"], "preflight_blocked_protected_cut")
             self.assertNotIn(group, payload["actionable_confirmation_queue"])
 
+    def test_critical_matchup_regression_blocks_positive_aggregate_signal(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            registry = tmp / "registry.json"
+            write_json(registry, {"current_leader": "candidate_607_squee_v1"})
+            write_json(
+                tmp / "lorehold_ghostly_package_gate.json",
+                {
+                    "packages": [
+                        {
+                            "package_key": "ghostly_prison_pressure_cut_promise",
+                            "family": "combat_tax",
+                            "adds": ["Ghostly Prison"],
+                            "cuts": ["Promise of Loyalty"],
+                            "status": "gated",
+                            "gate_summary": {
+                                "baseline": {"games": 4, "wins": 1, "losses": 3, "stalls": 0, "win_rate": 25.0},
+                                "candidate": {"games": 4, "wins": 2, "losses": 2, "stalls": 0, "win_rate": 50.0},
+                                "delta_pp": 25.0,
+                            },
+                        }
+                    ],
+                },
+            )
+            write_json(
+                tmp / "lorehold_ghostly_package_gate_detail.json",
+                {
+                    "results": [
+                        {
+                            "deck_key": "deck_6",
+                            "wins": 1,
+                            "losses": 3,
+                            "stalls": 0,
+                            "win_rate": 25.0,
+                            "opponents": [
+                                {"opponent": "Winota, Joiner of Forces #39 (real)", "wins": 1, "losses": 1, "stalls": 0, "win_rate": 50.0},
+                                {"opponent": "Vivi Ornitier #99 (real)", "wins": 0, "losses": 2, "stalls": 0, "win_rate": 0.0},
+                            ],
+                        },
+                        {
+                            "deck_key": "synergy_ghostly_prison_pressure_cut_promise",
+                            "wins": 2,
+                            "losses": 2,
+                            "stalls": 0,
+                            "win_rate": 50.0,
+                            "opponents": [
+                                {"opponent": "Winota, Joiner of Forces #39 (real)", "wins": 0, "losses": 2, "stalls": 0, "win_rate": 0.0},
+                                {"opponent": "Vivi Ornitier #99 (real)", "wins": 1, "losses": 1, "stalls": 0, "win_rate": 50.0},
+                            ],
+                        },
+                    ]
+                },
+            )
+
+            payload = ledger.build_ledger(tmp, registry)
+
+            group = next(row for row in payload["package_groups"] if row["package_key"] == "ghostly_prison_pressure_cut_promise")
+            self.assertEqual(group["classification"], "critical_matchup_regression_needs_rework")
+            self.assertEqual(group["critical_improvement_count"], 1)
+            self.assertEqual(group["critical_regression_count"], 1)
+            self.assertEqual(group["winota_coverage_count"], 1)
+            self.assertEqual(group["winota_regression_count"], 1)
+            self.assertNotIn(group, payload["actionable_confirmation_queue"])
+
 
 if __name__ == "__main__":
     unittest.main()

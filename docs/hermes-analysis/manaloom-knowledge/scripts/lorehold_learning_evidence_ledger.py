@@ -15,6 +15,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
+CRITICAL_MATCHUP_TERMS = ("Winota", "Vivi", "Sisay")
 
 
 def utc_now() -> str:
@@ -171,6 +172,25 @@ def strategic_metric(row: Mapping[str, Any], metric: str) -> int:
     return integer(strategic_counts.get(metric) if metric in strategic_counts else event_counts.get(metric))
 
 
+def compact_opponent_result(row: Mapping[str, Any]) -> dict[str, Any]:
+    wins = integer(row.get("wins"))
+    losses = integer(row.get("losses"))
+    stalls = integer(row.get("stalls"))
+    return {
+        "wins": wins,
+        "losses": losses,
+        "stalls": stalls,
+        "games": wins + losses + stalls,
+        "win_rate": numeric(row.get("win_rate")),
+        "avg_win_turn": numeric(row.get("avg_win_turn")),
+        "win_reasons": row.get("win_reasons") or {},
+    }
+
+
+def critical_terms_for_opponent(opponent: str) -> list[str]:
+    return [term for term in CRITICAL_MATCHUP_TERMS if term.lower() in opponent.lower()]
+
+
 def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     results = payload.get("results") or []
     if not isinstance(results, list):
@@ -236,6 +256,71 @@ def collect_observations(reports_dir: Path) -> list[dict[str, Any]]:
     return observations
 
 
+def collect_synergy_critical_matchups(reports_dir: Path) -> dict[str, list[dict[str, Any]]]:
+    matchups_by_package: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for path in iter_gate_reports(reports_dir):
+        payload = load_json(path)
+        if not payload:
+            continue
+        results = payload.get("results") or []
+        if not isinstance(results, list):
+            continue
+        baseline = next((row for row in results if isinstance(row, dict) and row.get("deck_key") == "deck_6"), None)
+        if not isinstance(baseline, dict):
+            continue
+        baseline_opponents = {
+            str(row.get("opponent") or ""): row
+            for row in baseline.get("opponents") or []
+            if isinstance(row, dict) and row.get("opponent")
+        }
+        for row in results:
+            if not isinstance(row, dict):
+                continue
+            deck_key = str(row.get("deck_key") or "")
+            if not deck_key.startswith("synergy_"):
+                continue
+            package_key = deck_key.removeprefix("synergy_")
+            for candidate_opp in row.get("opponents") or []:
+                if not isinstance(candidate_opp, dict):
+                    continue
+                opponent = str(candidate_opp.get("opponent") or "")
+                terms = critical_terms_for_opponent(opponent)
+                if not terms:
+                    continue
+                baseline_opp = baseline_opponents.get(opponent) or {}
+                baseline_compact = compact_opponent_result(baseline_opp)
+                candidate_compact = compact_opponent_result(candidate_opp)
+                delta_win_rate = candidate_compact["win_rate"] - baseline_compact["win_rate"]
+                delta_wins = candidate_compact["wins"] - baseline_compact["wins"]
+                if delta_win_rate > 0:
+                    result = "improved"
+                elif delta_win_rate < 0:
+                    result = "regressed"
+                else:
+                    result = "tied"
+                matchups_by_package[package_key].append(
+                    {
+                        "source_path": str(path),
+                        "source_file": path.name,
+                        "source_mtime": path.stat().st_mtime,
+                        "generated_at": payload.get("generated_at"),
+                        "package_key": package_key,
+                        "deck_key": deck_key,
+                        "opponent": opponent,
+                        "critical_terms": terms,
+                        "baseline": baseline_compact,
+                        "candidate": candidate_compact,
+                        "delta_win_rate_pp": round(delta_win_rate, 2),
+                        "delta_wins": delta_wins,
+                        "result": result,
+                        "games_per_opponent": payload.get("games_per_opponent"),
+                        "opponent_seed": payload.get("opponent_seed"),
+                        "simulation_seed": payload.get("simulation_seed"),
+                    }
+                )
+    return matchups_by_package
+
+
 def canonical_package_key(package_key: str, current_leader: str) -> str:
     if current_leader.startswith("candidate_607_squee") and package_key.startswith("candidate_607_squee"):
         return current_leader
@@ -261,12 +346,32 @@ def registry_statuses(registry: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
     return statuses
 
 
-def summarize_group(package_key: str, observations: list[dict[str, Any]], registry: Mapping[str, Any]) -> dict[str, Any]:
+def summarize_group(
+    package_key: str,
+    observations: list[dict[str, Any]],
+    registry: Mapping[str, Any],
+    critical_matchups: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    critical_matchups = sorted(
+        critical_matchups or [],
+        key=lambda row: (
+            str(row.get("generated_at") or ""),
+            numeric(row.get("source_mtime")),
+            str(row.get("source_file") or ""),
+            str(row.get("opponent") or ""),
+        ),
+    )
     delta_rows = [row for row in observations if has_numeric(row.get("delta_pp"))]
     deltas = [numeric(row.get("delta_pp")) for row in delta_rows]
     positive = [row for row in delta_rows if numeric(row.get("delta_pp")) > 0]
     negative = [row for row in delta_rows if numeric(row.get("delta_pp")) < 0]
     ties = [row for row in delta_rows if numeric(row.get("delta_pp")) == 0]
+    critical_improvements = [row for row in critical_matchups if row.get("result") == "improved"]
+    critical_regressions = [row for row in critical_matchups if row.get("result") == "regressed"]
+    critical_ties = [row for row in critical_matchups if row.get("result") == "tied"]
+    winota_rows = [row for row in critical_matchups if "Winota" in (row.get("critical_terms") or [])]
+    winota_improvements = [row for row in winota_rows if row.get("result") == "improved"]
+    winota_regressions = [row for row in winota_rows if row.get("result") == "regressed"]
     latest = sorted(
         observations,
         key=lambda row: (
@@ -284,6 +389,7 @@ def summarize_group(package_key: str, observations: list[dict[str, Any]], regist
         tie_count=len(ties),
         latest_delta=numeric(latest.get("delta_pp")),
         latest_decision=str(latest.get("decision") or ""),
+        critical_regression_count=len(critical_regressions),
     )
     return {
         "package_key": package_key,
@@ -293,6 +399,14 @@ def summarize_group(package_key: str, observations: list[dict[str, Any]], regist
         "positive_count": len(positive),
         "negative_count": len(negative),
         "tie_count": len(ties),
+        "critical_matchup_count": len(critical_matchups),
+        "critical_improvement_count": len(critical_improvements),
+        "critical_regression_count": len(critical_regressions),
+        "critical_tie_count": len(critical_ties),
+        "winota_coverage_count": len(winota_rows),
+        "winota_improvement_count": len(winota_improvements),
+        "winota_regression_count": len(winota_regressions),
+        "critical_matchups": critical_matchups[-12:],
         "best_delta_pp": round(max(deltas), 2) if deltas else None,
         "worst_delta_pp": round(min(deltas), 2) if deltas else None,
         "latest_delta_pp": round(numeric(latest.get("delta_pp")), 2) if has_numeric(latest.get("delta_pp")) else None,
@@ -318,6 +432,7 @@ def classify_group(
     tie_count: int,
     latest_delta: float,
     latest_decision: str,
+    critical_regression_count: int = 0,
 ) -> str:
     if registry_status == "promoted_current_champion":
         return "current_champion"
@@ -335,6 +450,8 @@ def classify_group(
         return "preflight_ready_needs_gate"
     if registry_status.startswith("rejected") or registry_status == "rejected":
         return "registry_rejected"
+    if critical_regression_count > 0 and positive_count:
+        return "critical_matchup_regression_needs_rework"
     if latest_delta < 0 and negative_count:
         return "latest_rejected"
     if positive_count and negative_count:
@@ -349,6 +466,7 @@ def classify_group(
 def build_ledger(reports_dir: Path, registry_path: Path) -> dict[str, Any]:
     registry_payload = load_json(registry_path) or {}
     observations = collect_observations(reports_dir)
+    critical_matchups = collect_synergy_critical_matchups(reports_dir)
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     current_leader = str(registry_payload.get("current_leader") or "")
     for observation in observations:
@@ -358,7 +476,7 @@ def build_ledger(reports_dir: Path, registry_path: Path) -> dict[str, Any]:
             grouped[key].append(observation)
     statuses = registry_statuses(registry_payload)
     groups = [
-        summarize_group(package_key, rows, statuses)
+        summarize_group(package_key, rows, statuses, critical_matchups.get(package_key, []))
         for package_key, rows in sorted(grouped.items())
     ]
     classification_counts: dict[str, int] = {}
@@ -397,6 +515,7 @@ def build_ledger(reports_dir: Path, registry_path: Path) -> dict[str, Any]:
         },
         "summary": {
             "observation_count": len(observations),
+            "critical_matchup_observation_count": sum(len(rows) for rows in critical_matchups.values()),
             "package_group_count": len(groups),
             "classification_counts": dict(sorted(classification_counts.items())),
             "current_leader": current_leader,
@@ -431,6 +550,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- protected_baseline: `{registry.get('protected_baseline') or '-'}`",
         f"- untested_queue_count: `{registry.get('untested_queue_count')}`",
         f"- observation_count: `{summary.get('observation_count')}`",
+        f"- critical_matchup_observation_count: `{summary.get('critical_matchup_observation_count')}`",
         f"- package_group_count: `{summary.get('package_group_count')}`",
         f"- classification_counts: `{json.dumps(summary.get('classification_counts') or {}, sort_keys=True)}`",
         f"- hidden_retreat_classification: `{summary.get('hidden_retreat_classification') or '-'}`",
@@ -446,6 +566,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
             "## Current Read",
             "",
             "- The registry remains the authority for promotion status; raw positive gates below are treated as hypotheses until they clear the current-leader/equal-gate rule.",
+            "- Critical matchup rows track Winota, Vivi, and Sisay from detailed synergy gates; a positive aggregate gate with critical regression is held for rework.",
             "- Hidden Retreat is classified from the latest local overlay gate and is not promoted unless a later same-function gate reverses the result.",
             "",
             "## Actionable Confirmation Queue",
@@ -456,28 +577,46 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     if not actionable:
         lines.append("- None.")
     else:
-        lines.extend(["| Package | Class | Best Delta | Latest Delta | Latest Source |", "| --- | --- | ---: | ---: | --- |"])
+        lines.extend(
+            [
+                "| Package | Class | Best Delta | Latest Delta | Critical +/-/0 | Winota +/- | Latest Source |",
+                "| --- | --- | ---: | ---: | --- | --- | --- |",
+            ]
+        )
         for row in actionable[:20]:
             lines.append(
-                "| {package} | `{classification}` | {best:+.2f} | {latest:+.2f} | `{source}` |".format(
+                "| {package} | `{classification}` | {best:+.2f} | {latest:+.2f} | {crit_pos}/{crit_neg}/{crit_tie} | {winota_pos}/{winota_neg} | `{source}` |".format(
                     package=row.get("package_key"),
                     classification=row.get("classification"),
                     best=numeric(row.get("best_delta_pp")),
                     latest=numeric(row.get("latest_delta_pp")),
+                    crit_pos=row.get("critical_improvement_count") or 0,
+                    crit_neg=row.get("critical_regression_count") or 0,
+                    crit_tie=row.get("critical_tie_count") or 0,
+                    winota_pos=row.get("winota_improvement_count") or 0,
+                    winota_neg=row.get("winota_regression_count") or 0,
                     source=row.get("latest_source_file"),
                 )
             )
     lines.extend(["", "## Key Package Groups", ""])
-    lines.extend(["| Package | Class | Obs | +/-/0 | Best | Latest | Latest Source |", "| --- | --- | ---: | --- | ---: | ---: | --- |"])
+    lines.extend(
+        [
+            "| Package | Class | Obs | +/-/0 | Critical +/-/0 | Best | Latest | Latest Source |",
+            "| --- | --- | ---: | --- | --- | ---: | ---: | --- |",
+        ]
+    )
     for row in (payload.get("package_groups") or [])[:40]:
         lines.append(
-            "| {package} | `{classification}` | {obs} | {pos}/{neg}/{tie} | {best:+.2f} | {latest:+.2f} | `{source}` |".format(
+            "| {package} | `{classification}` | {obs} | {pos}/{neg}/{tie} | {crit_pos}/{crit_neg}/{crit_tie} | {best:+.2f} | {latest:+.2f} | `{source}` |".format(
                 package=row.get("package_key"),
                 classification=row.get("classification"),
                 obs=row.get("observation_count"),
                 pos=row.get("positive_count"),
                 neg=row.get("negative_count"),
                 tie=row.get("tie_count"),
+                crit_pos=row.get("critical_improvement_count") or 0,
+                crit_neg=row.get("critical_regression_count") or 0,
+                crit_tie=row.get("critical_tie_count") or 0,
                 best=numeric(row.get("best_delta_pp")),
                 latest=numeric(row.get("latest_delta_pp")),
                 source=row.get("latest_source_file"),

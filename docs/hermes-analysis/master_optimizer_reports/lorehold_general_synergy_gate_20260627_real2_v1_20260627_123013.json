@@ -1,0 +1,3690 @@
+{
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-27T12:52:30.915554+00:00",
+  "opponent_limit": 2,
+  "opponent_seed": 20260626,
+  "packages": [
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty": 1
+        },
+        "adds": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_birgi_spellchain_cut_squelcher games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 15.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 2,
+              "activated_ability_skipped": 14,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 7,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 1,
+              "attachment_sba": 1,
+              "board_wipe_resolved": 4,
+              "cast_announced": 85,
+              "cast_illegal": 2,
+              "combat": 30,
+              "combat_result": 32,
+              "combat_step": 175,
+              "commander_cast": 13,
+              "compensation_tokens_created": 1,
+              "composite_rule_component_resolved": 2,
+              "composite_rule_resolved": 1,
+              "cost_paid": 83,
+              "creature_cast": 12,
+              "creature_to_battlefield": 1,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "end_step_instant": 3,
+              "equipment_attached": 2,
+              "land_played": 35,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 4,
+              "lorehold_upkeep_rummage": 5,
+              "lorehold_upkeep_rummage_skipped": 15,
+              "mana_refreshed": 57,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 2,
+              "player_eliminated": 3,
+              "priority_pass": 477,
+              "protection_resolved": 2,
+              "random_discard_after_tutor": 1,
+              "redirect_removal_resolved": 4,
+              "removal_resolved": 7,
+              "replacement_applied": 9,
+              "ritual_mana_added": 2,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copied": 3,
+              "spell_copy_ceased_to_exist": 4,
+              "spell_countered": 4,
+              "spell_resolved": 43,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 22,
+              "trigger_resolved": 25,
+              "turn_end": 55,
+              "turn_start": 57,
+              "tutor_resolved": 4,
+              "utility_land_activated": 1,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 24,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Giver of Runes"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Avatar's Wrath"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Tragic Arrogance"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Mizzix's Mastery"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Birgi adds red mana on every spell cast, which should help Lorehold chain miracle spells without cutting the expensive spell package.",
+      "package_key": "birgi_spellchain_cut_squelcher"
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_waterskin/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty": 1
+        },
+        "adds": [
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "spellchain_mana",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_waterskin.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_waterskin.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_birgi_spellchain_cut_waterskin games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_waterskin.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_waterskin.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 7,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 1,
+              "attachment_sba": 1,
+              "cast_announced": 79,
+              "combat": 26,
+              "combat_result": 34,
+              "combat_step": 162,
+              "commander_cast": 7,
+              "compensation_tokens_created": 1,
+              "cost_paid": 79,
+              "creature_cast": 14,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "jeskas_will_resolved": 1,
+              "land_played": 35,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 12,
+              "lorehold_upkeep_rummage_skipped": 6,
+              "mana_refreshed": 48,
+              "miracle_cast": 4,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 8,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 460,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 4,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 60,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 42,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 2,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 31,
+              "trigger_resolved": 31,
+              "trigger_skipped": 2,
+              "turn_end": 45,
+              "turn_start": 48,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 24,
+              "miracle_cast": 4,
+              "topdeck_manipulation_activated": 2
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Avatar's Wrath"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Birgi may outperform a three-mana mana rock because the deck often casts several spells in a turn after a miracle setup.",
+      "package_key": "birgi_spellchain_cut_waterskin"
+    },
+    {
+      "adds": [
+        "Galvanoth"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_galvanoth_topdeck_freecast/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Galvanoth": 1
+        },
+        "adds": [
+          "Galvanoth"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "topdeck_freecast",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_galvanoth_topdeck_freecast.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_galvanoth_topdeck_freecast.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_galvanoth_topdeck_freecast games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_galvanoth_topdeck_freecast.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_galvanoth_topdeck_freecast.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 17.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 3,
+              "activated_ability_skipped": 51,
+              "additional_cost_paid": 2,
+              "approach_cast_tracked": 1,
+              "board_wipe_resolved": 2,
+              "cast_announced": 75,
+              "combat": 26,
+              "combat_result": 26,
+              "combat_step": 153,
+              "commander_cast": 8,
+              "compensation_tokens_created": 4,
+              "cost_paid": 75,
+              "creature_cast": 13,
+              "damage_resolved": 1,
+              "damage_wipe_resolved": 1,
+              "draw_cards_resolved": 3,
+              "end_step_instant": 2,
+              "equipment_unattached": 1,
+              "etb_recursion_resolved": 1,
+              "extra_turn_scheduled": 1,
+              "extra_turn_taken": 1,
+              "game_lost": 1,
+              "jeskas_will_resolved": 1,
+              "land_played": 40,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 9,
+              "lorehold_upkeep_rummage_skipped": 2,
+              "mana_refreshed": 55,
+              "miracle_cast": 2,
+              "one_ring_burden_life_loss": 3,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 488,
+              "protection_from_everything_granted": 2,
+              "random_discard_after_tutor": 1,
+              "redirect_removal_resolved": 1,
+              "removal_resolved": 7,
+              "replacement_applied": 5,
+              "spell_cast": 55,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "treasure_created": 2,
+              "trigger_put_on_stack": 34,
+              "trigger_resolved": 37,
+              "trigger_skipped": 8,
+              "turn_end": 53,
+              "turn_start": 55,
+              "tutor_resolved": 4,
+              "utility_artifact_activated": 2,
+              "utility_land_activated": 6,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 32,
+              "lorehold_spell_cast": 23,
+              "miracle_cast": 2
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 1,
+                "rate": 0.5
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 4,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 4,
+                "key": "cost_paid:Squee, Goblin Nabob"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Generous Gift"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Boros Signet"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Stroke of Midnight"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Monument to Endurance"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Swiftfoot Boots"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Library of Leng"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Galvanoth turns topdeck setup into free upkeep casts for the same expensive instant/sorcery package Lorehold wants to miracle.",
+      "package_key": "galvanoth_topdeck_freecast"
+    },
+    {
+      "adds": [
+        "Brainstone"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_brainstone_topdeck_miracle/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Brainstone": 1
+        },
+        "adds": [
+          "Brainstone"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "topdeck_setup",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_brainstone_topdeck_miracle.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_brainstone_topdeck_miracle.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_brainstone_topdeck_miracle games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_brainstone_topdeck_miracle.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_brainstone_topdeck_miracle.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 0,
+          "losses": 2,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 3,
+              "activated_ability_skipped": 20,
+              "additional_cost_paid": 1,
+              "approach_cast_tracked": 2,
+              "cast_announced": 63,
+              "combat": 23,
+              "combat_result": 23,
+              "combat_step": 133,
+              "commander_cast": 9,
+              "compensation_tokens_created": 1,
+              "cost_paid": 63,
+              "creature_cast": 7,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 5,
+              "end_step_instant": 3,
+              "equipment_unattached": 2,
+              "land_played": 33,
+              "land_ramp_resolved": 1,
+              "lorehold_upkeep_rummage": 4,
+              "lorehold_upkeep_rummage_skipped": 4,
+              "mana_refreshed": 47,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 2,
+              "priority_pass": 420,
+              "protection_from_everything_granted": 1,
+              "redirect_removal_resolved": 1,
+              "removal_resolved": 5,
+              "replacement_applied": 4,
+              "ritual_mana_added": 3,
+              "spell_cast": 48,
+              "spell_countered": 3,
+              "spell_resolved": 32,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 25,
+              "trigger_resolved": 25,
+              "trigger_skipped": 8,
+              "turn_end": 45,
+              "turn_start": 47,
+              "tutor_resolved": 4
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 15,
+              "lorehold_spell_cast": 11
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 4,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Swiftfoot Boots"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Monument to Endurance"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Boros Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sensei's Divining Top"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Talisman of Conviction"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Stroke of Midnight"
+              }
+            ]
+          },
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -50.0
+      },
+      "hypothesis": "Brainstone is another cheap topdeck manipulation artifact that can turn the first draw into a planned miracle window.",
+      "package_key": "brainstone_topdeck_miracle"
+    },
+    {
+      "adds": [
+        "Primal Amulet // Primal Wellspring"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Primal Amulet // Primal Wellspring": 1
+        },
+        "adds": [
+          "Primal Amulet // Primal Wellspring"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "cost_reduce_copy",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_primal_amulet_spell_engine games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 10.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 1,
+              "activated_ability_skipped": 14,
+              "attachment_sba": 1,
+              "cast_announced": 48,
+              "combat": 22,
+              "combat_result": 23,
+              "combat_step": 132,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 48,
+              "creature_cast": 3,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 2,
+              "end_step_instant": 2,
+              "imprint_resolved": 1,
+              "land_played": 24,
+              "land_tax_trigger_resolved": 2,
+              "land_tax_trigger_skipped": 5,
+              "lorehold_upkeep_rummage": 4,
+              "lorehold_upkeep_rummage_skipped": 2,
+              "mana_refreshed": 48,
+              "miracle_cast": 2,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 1,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 347,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 5,
+              "self_exiled_on_resolution": 1,
+              "spell_cast": 39,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_resolved": 26,
+              "tokens_created": 2,
+              "trigger_put_on_stack": 4,
+              "trigger_resolved": 4,
+              "turn_end": 45,
+              "turn_start": 48,
+              "tutor_life_loss_resolved": 1,
+              "tutor_resolved": 3
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 12,
+              "lorehold_spell_cast": 11,
+              "miracle_cast": 2
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 1,
+                "rate": 0.5
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 2,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Winds of Abandon"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:High Noon"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Hexing Squelcher"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Furygale Flocking"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Pearl Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:The Scarlet Witch"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Prismari Pianist"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Stroke of Midnight"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Primal Amulet reduces instant/sorcery costs and can transform into a spell-copying mana land, matching the deck's expensive spell plan.",
+      "package_key": "primal_amulet_spell_engine"
+    },
+    {
+      "adds": [
+        "Chandra, Hope's Beacon"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_chandra_copy_engine/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Chandra, Hope's Beacon": 1
+        },
+        "adds": [
+          "Chandra, Hope's Beacon"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "spell_copy",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_chandra_copy_engine.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_chandra_copy_engine.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_chandra_copy_engine games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_chandra_copy_engine.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_chandra_copy_engine.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 0,
+          "losses": 2,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 3,
+              "activated_ability_skipped": 20,
+              "additional_cost_paid": 1,
+              "approach_cast_tracked": 2,
+              "cast_announced": 63,
+              "combat": 23,
+              "combat_result": 23,
+              "combat_step": 133,
+              "commander_cast": 9,
+              "compensation_tokens_created": 1,
+              "cost_paid": 63,
+              "creature_cast": 7,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 5,
+              "end_step_instant": 3,
+              "equipment_unattached": 2,
+              "land_played": 33,
+              "land_ramp_resolved": 1,
+              "lorehold_upkeep_rummage": 4,
+              "lorehold_upkeep_rummage_skipped": 4,
+              "mana_refreshed": 47,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 2,
+              "priority_pass": 420,
+              "protection_from_everything_granted": 1,
+              "redirect_removal_resolved": 1,
+              "removal_resolved": 5,
+              "replacement_applied": 4,
+              "ritual_mana_added": 3,
+              "spell_cast": 48,
+              "spell_countered": 3,
+              "spell_resolved": 32,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 25,
+              "trigger_resolved": 25,
+              "trigger_skipped": 8,
+              "turn_end": 45,
+              "turn_start": 47,
+              "tutor_resolved": 4
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 15,
+              "lorehold_spell_cast": 11
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 4,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Swiftfoot Boots"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Monument to Endurance"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Boros Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sensei's Divining Top"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Talisman of Conviction"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Stroke of Midnight"
+              }
+            ]
+          },
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -50.0
+      },
+      "hypothesis": "Chandra, Hope's Beacon copies the first instant or sorcery each turn and can add mana, so it may turn one miracle spell into a win turn.",
+      "package_key": "chandra_copy_engine"
+    },
+    {
+      "adds": [
+        "Arcane Bombardment"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Arcane Bombardment": 2
+        },
+        "adds": [
+          "Arcane Bombardment"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "spell_copy_recursion",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_arcane_bombardment_engine games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 8.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability_skipped": 6,
+              "additional_cost_failed": 1,
+              "additional_cost_paid": 1,
+              "cast_announced": 48,
+              "combat": 19,
+              "combat_result": 20,
+              "combat_step": 111,
+              "commander_cast": 7,
+              "cost_paid": 48,
+              "creature_cast": 9,
+              "creature_to_battlefield": 1,
+              "draw_cards_resolved": 3,
+              "end_step_instant": 4,
+              "equipment_attached": 1,
+              "jeskas_will_resolved": 1,
+              "land_played": 28,
+              "land_ramp_resolved": 1,
+              "lorehold_upkeep_rummage": 4,
+              "lorehold_upkeep_rummage_skipped": 1,
+              "mana_refreshed": 39,
+              "miracle_cast": 3,
+              "multi_defender_attack": 1,
+              "player_eliminated": 3,
+              "priority_pass": 319,
+              "protection_from_everything_granted": 1,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 1,
+              "removal_resolved": 5,
+              "replacement_applied": 14,
+              "spell_cast": 33,
+              "spell_resolved": 25,
+              "tokens_created": 2,
+              "topdeck_manipulation_activated": 3,
+              "trigger_put_on_stack": 15,
+              "trigger_resolved": 15,
+              "turn_end": 36,
+              "turn_start": 39,
+              "tutor_resolved": 1,
+              "utility_land_activated": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 12,
+              "lorehold_spell_cast": 10,
+              "miracle_cast": 3,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 1,
+                "rate": 0.5
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "topdeck:Scroll Rack"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Boros Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:High Noon"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Library of Leng"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Smothering Tithe"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Fellwar Stone"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Storm Herd"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Scroll Rack"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Furygale Flocking"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Arcane Bombardment rewards repeated instant/sorcery casting by copying graveyard spells, which should scale with Lorehold chains.",
+      "package_key": "arcane_bombardment_engine"
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Past in Flames": 1
+        },
+        "adds": [
+          "Past in Flames"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Bender's Waterskin"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "family": "graveyard_recast",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_past_in_flames_recast games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 11.5,
+          "losses": 0,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 1,
+              "activated_ability_skipped": 11,
+              "approach_cast_tracked": 1,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "board_wipe_resolved": 1,
+              "cast_announced": 60,
+              "combat": 28,
+              "combat_result": 31,
+              "combat_step": 167,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "composite_rule_component_resolved": 3,
+              "composite_rule_resolved": 1,
+              "cost_paid": 60,
+              "creature_cast": 9,
+              "draw_cards_resolved": 3,
+              "extra_turn_taken": 1,
+              "imprint_resolved": 1,
+              "land_played": 36,
+              "land_tax_trigger_resolved": 2,
+              "land_tax_trigger_skipped": 5,
+              "lorehold_upkeep_rummage": 4,
+              "lorehold_upkeep_rummage_skipped": 16,
+              "mana_refreshed": 56,
+              "miracle_cast": 6,
+              "mizzix_mastery_copy_cast": 2,
+              "mizzix_mastery_resolved": 2,
+              "multi_defender_attack": 3,
+              "one_ring_burden_life_loss": 5,
+              "player_eliminated": 4,
+              "priority_pass": 458,
+              "protection_from_everything_granted": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 7,
+              "replacement_applied": 5,
+              "saga_chapter_progressed": 2,
+              "saga_chapter_resolved": 1,
+              "saga_sacrificed_by_sba": 1,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 45,
+              "spell_copy_ceased_to_exist": 2,
+              "spell_countered": 2,
+              "spell_resolved": 33,
+              "tokens_created": 3,
+              "trigger_put_on_stack": 22,
+              "trigger_resolved": 22,
+              "trigger_skipped": 3,
+              "turn_end": 51,
+              "turn_start": 56,
+              "tutor_life_loss_resolved": 1,
+              "tutor_resolved": 3,
+              "utility_artifact_activated": 2,
+              "utility_land_activated": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 21,
+              "lorehold_spell_cast": 18,
+              "miracle_cast": 6
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 2,
+                "key": "cost_paid:Winds of Abandon"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:High Noon"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Hexing Squelcher"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Furygale Flocking"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:The Scarlet Witch"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Prismari Pianist"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Stroke of Midnight"
+              }
+            ]
+          },
+          "win_rate": 100.0,
+          "wins": 2
+        },
+        "delta_pp": 50.0
+      },
+      "hypothesis": "Past in Flames turns the graveyard of used instant/sorcery cards into a second spell chain without removing a miracle payoff.",
+      "package_key": "past_in_flames_recast"
+    },
+    {
+      "adds": [
+        "Reverberate",
+        "Return the Favor",
+        "Flare of Duplication"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_copy_stack_package/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Flare of Duplication": 1,
+          "Return the Favor": 1,
+          "Reverberate": 1
+        },
+        "adds": [
+          "Reverberate",
+          "Return the Favor",
+          "Flare of Duplication"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Hexing Squelcher",
+          "Bender's Waterskin",
+          "Victory Chimes"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Hexing Squelcher",
+        "Bender's Waterskin",
+        "Victory Chimes"
+      ],
+      "family": "spell_copy",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_copy_stack_package.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_copy_stack_package.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_copy_stack_package games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_copy_stack_package.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_copy_stack_package.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 8.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 2,
+              "activated_ability_skipped": 13,
+              "additional_cost_paid": 2,
+              "approach_cast_tracked": 1,
+              "cast_announced": 63,
+              "combat": 25,
+              "combat_result": 29,
+              "combat_step": 144,
+              "commander_cast": 10,
+              "compensation_tokens_created": 2,
+              "cost_paid": 63,
+              "creature_cast": 11,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 2,
+              "end_step_instant": 1,
+              "game_won": 1,
+              "land_played": 29,
+              "land_ramp_resolved": 1,
+              "lorehold_upkeep_rummage": 8,
+              "lorehold_upkeep_rummage_skipped": 3,
+              "mana_refreshed": 43,
+              "miracle_cast": 1,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 1,
+              "priority_pass": 384,
+              "redirect_removal_resolved": 1,
+              "removal_resolved": 6,
+              "replacement_applied": 5,
+              "ritual_mana_added": 2,
+              "self_exiled_on_resolution": 1,
+              "spell_cast": 43,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 2,
+              "spell_resolved": 26,
+              "trigger_put_on_stack": 28,
+              "trigger_resolved": 28,
+              "trigger_skipped": 1,
+              "turn_end": 41,
+              "turn_start": 43,
+              "tutor_resolved": 2,
+              "utility_land_activated": 4
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 17,
+              "lorehold_spell_cast": 13,
+              "miracle_cast": 1
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 1,
+                "rate": 0.5
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Surge to Victory"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Boros Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Stroke of Midnight"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Swords to Plowshares"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "A compact copy package should make the deck's expensive miracle spells matter more without replacing the payoff suite itself.",
+      "package_key": "copy_stack_package"
+    },
+    {
+      "adds": [
+        "Overmaster"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_overmaster_protect_draw/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Overmaster": 1
+        },
+        "adds": [
+          "Overmaster"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Hexing Squelcher"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "family": "spell_protection",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_overmaster_protect_draw.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_overmaster_protect_draw.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_overmaster_protect_draw games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_overmaster_protect_draw.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_overmaster_protect_draw.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 18.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 2,
+              "activated_ability_skipped": 13,
+              "additional_cost_paid": 3,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "attachment_sba": 1,
+              "board_wipe_resolved": 2,
+              "cast_announced": 85,
+              "combat": 31,
+              "combat_result": 36,
+              "combat_step": 186,
+              "commander_cast": 15,
+              "compensation_tokens_created": 1,
+              "composite_rule_component_resolved": 3,
+              "composite_rule_resolved": 1,
+              "cost_paid": 85,
+              "creature_cast": 12,
+              "damage_wipe_resolved": 3,
+              "draw_cards_resolved": 3,
+              "end_step_instant": 1,
+              "equipment_attached": 1,
+              "etb_recursion_resolved": 1,
+              "extra_turn_taken": 1,
+              "jeskas_will_resolved": 1,
+              "land_played": 43,
+              "land_ramp_resolved": 1,
+              "lorehold_upkeep_rummage": 20,
+              "lorehold_upkeep_rummage_skipped": 2,
+              "mana_refreshed": 58,
+              "miracle_cast": 9,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 5,
+              "one_ring_burden_life_loss": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 507,
+              "protection_from_everything_granted": 1,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 4,
+              "removal_resolved": 8,
+              "replacement_applied": 13,
+              "ritual_mana_added": 1,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 61,
+              "spell_copied": 1,
+              "spell_copy_ceased_to_exist": 2,
+              "spell_countered": 2,
+              "spell_resolved": 47,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 8,
+              "treasure_created": 3,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 33,
+              "turn_end": 56,
+              "turn_start": 58,
+              "tutor_resolved": 1,
+              "utility_artifact_activated": 3,
+              "utility_land_activated": 1,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 38,
+              "lorehold_spell_cast": 29,
+              "miracle_cast": 9,
+              "topdeck_manipulation_activated": 8
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 2,
+                "rate": 1.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 8,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 7,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Blasphemous Act"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Squee, Goblin Nabob"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Library of Leng"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Overmaster protects the next key instant or sorcery and replaces itself, so it may be better than narrow anti-counter pressure.",
+      "package_key": "overmaster_protect_draw"
+    },
+    {
+      "adds": [
+        "Dance with Calamity"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Dance with Calamity": 2
+        },
+        "adds": [
+          "Dance with Calamity"
+        ],
+        "allow_miracle_core_cuts": true,
+        "cuts": [
+          "Storm Herd"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [
+          "Storm Herd"
+        ],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Storm Herd"
+      ],
+      "family": "payoff_challenge",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_core_challenge_dance_over_storm games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 14.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 36,
+              "additional_cost_paid": 2,
+              "airbend_creature_cast_from_exile": 4,
+              "airbend_other_creatures_resolved": 1,
+              "attachment_sba": 1,
+              "board_wipe_resolved": 2,
+              "cast_announced": 81,
+              "combat": 31,
+              "combat_result": 35,
+              "combat_step": 191,
+              "commander_cast": 13,
+              "composite_rule_component_resolved": 2,
+              "composite_rule_resolved": 1,
+              "cost_paid": 81,
+              "creature_cast": 11,
+              "damage_resolved": 1,
+              "damage_wipe_resolved": 1,
+              "draw_cards_resolved": 2,
+              "end_step_instant": 1,
+              "equipment_attached": 1,
+              "extra_turn_scheduled": 1,
+              "extra_turn_taken": 1,
+              "game_lost": 1,
+              "jeskas_will_resolved": 2,
+              "land_played": 40,
+              "land_ramp_resolved": 1,
+              "lorehold_upkeep_rummage": 5,
+              "lorehold_upkeep_rummage_skipped": 20,
+              "mana_refreshed": 65,
+              "miracle_cast": 7,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 618,
+              "protection_resolved": 3,
+              "random_discard_after_tutor": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 8,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 58,
+              "spell_copied": 1,
+              "spell_copy_ceased_to_exist": 2,
+              "spell_countered": 4,
+              "spell_resolved": 45,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 2,
+              "topdeck_manipulation_activated": 2,
+              "treasure_created": 2,
+              "trigger_put_on_stack": 52,
+              "trigger_resolved": 53,
+              "trigger_skipped": 4,
+              "turn_end": 63,
+              "turn_start": 65,
+              "tutor_resolved": 3,
+              "utility_land_activated": 3
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 26,
+              "lorehold_spell_cast": 24,
+              "miracle_cast": 7,
+              "topdeck_manipulation_activated": 2
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 4,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Giver of Runes"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Pearl Medallion"
+              },
+              {
+                "count": 2,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Smothering Tithe"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Jeska's Will"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Furygale Flocking"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Avatar's Wrath"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Blasphemous Act"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Lightning Greaves"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Dance with Calamity is an expensive sorcery payoff that may produce more immediate wins than Storm Herd when miracle makes it cheap.",
+      "package_key": "core_challenge_dance_over_storm"
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_past_over_tragic/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Past in Flames": 1
+        },
+        "adds": [
+          "Past in Flames"
+        ],
+        "allow_miracle_core_cuts": true,
+        "cuts": [
+          "Tragic Arrogance"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [
+          "Tragic Arrogance"
+        ],
+        "row_count": 94,
+        "total_cards": 100
+      },
+      "cuts": [
+        "Tragic Arrogance"
+      ],
+      "family": "payoff_challenge",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_past_over_tragic.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_past_over_tragic.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 2 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=2\nrunning synergy_core_challenge_past_over_tragic games=1 opponents=2\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_past_over_tragic.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_past_over_tragic.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "losses": 1,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 4,
+              "activated_ability_skipped": 9,
+              "additional_cost_paid": 1,
+              "airbend_creature_cast_from_exile": 2,
+              "airbend_other_creatures_resolved": 1,
+              "approach_cast_tracked": 2,
+              "approach_first_resolution": 1,
+              "attachment_sba": 1,
+              "cast_announced": 82,
+              "combat": 27,
+              "combat_result": 31,
+              "combat_step": 160,
+              "commander_cast": 8,
+              "compensation_tokens_created": 1,
+              "cost_paid": 82,
+              "creature_cast": 15,
+              "damage_resolved": 1,
+              "draw_cards_resolved": 3,
+              "equipment_attached": 2,
+              "land_played": 36,
+              "land_ramp_resolved": 1,
+              "land_tax_trigger_skipped": 6,
+              "lorehold_upkeep_rummage": 10,
+              "lorehold_upkeep_rummage_skipped": 8,
+              "mana_refreshed": 50,
+              "miracle_cast": 5,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 4,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 3,
+              "priority_pass": 469,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 2,
+              "removal_resolved": 6,
+              "replacement_applied": 3,
+              "self_exiled_on_resolution": 2,
+              "spell_cast": 59,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 3,
+              "spell_resolved": 41,
+              "surge_to_victory_resolved": 1,
+              "tokens_created": 1,
+              "topdeck_manipulation_activated": 3,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 30,
+              "trigger_resolved": 30,
+              "trigger_skipped": 2,
+              "turn_end": 47,
+              "turn_start": 50,
+              "tutor_resolved": 2,
+              "wheel_resolved": 1
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 28,
+              "lorehold_spell_cast": 22,
+              "miracle_cast": 5,
+              "topdeck_manipulation_activated": 3
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 0.5
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 3,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 2,
+                "key": "miracle:Approach of the Second Sun"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Sol Ring"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Path to Exile"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Ruby Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Generous Gift"
+              }
+            ]
+          },
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 0,
+          "losses": 2,
+          "stalls": 0,
+          "telemetry": {
+            "event_counts": {
+              "activated_ability": 3,
+              "activated_ability_skipped": 11,
+              "additional_cost_paid": 2,
+              "airbend_creature_cast_from_exile": 4,
+              "airbend_other_creatures_resolved": 2,
+              "attachment_sba": 1,
+              "cast_announced": 92,
+              "cast_illegal": 8,
+              "combat": 34,
+              "combat_result": 40,
+              "combat_step": 204,
+              "commander_cast": 12,
+              "compensation_tokens_created": 3,
+              "composite_rule_component_resolved": 4,
+              "composite_rule_resolved": 2,
+              "cost_paid": 84,
+              "creature_cast": 12,
+              "damage_resolved": 1,
+              "damage_wipe_resolved": 1,
+              "draw_cards_resolved": 3,
+              "end_step_instant": 1,
+              "equipment_attached": 1,
+              "flashback_cast": 3,
+              "flashback_exiled": 3,
+              "graveyard_flashback_granted": 1,
+              "land_played": 32,
+              "land_ramp_resolved": 2,
+              "land_tax_trigger_skipped": 7,
+              "lorehold_upkeep_rummage": 2,
+              "lorehold_upkeep_rummage_skipped": 11,
+              "mana_refreshed": 62,
+              "miracle_cast": 2,
+              "mizzix_mastery_copy_cast": 1,
+              "mizzix_mastery_resolved": 1,
+              "multi_defender_attack": 6,
+              "planeswalker_resolved": 1,
+              "player_eliminated": 2,
+              "priority_pass": 606,
+              "protection_resolved": 1,
+              "redirect_removal_resolved": 3,
+              "removal_resolved": 5,
+              "replacement_applied": 7,
+              "ritual_mana_added": 1,
+              "self_exiled_on_resolution": 3,
+              "spell_cast": 56,
+              "spell_copy_ceased_to_exist": 1,
+              "spell_countered": 2,
+              "spell_resolved": 42,
+              "tokens_created": 1,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 45,
+              "trigger_resolved": 45,
+              "trigger_skipped": 1,
+              "turn_end": 60,
+              "turn_start": 62,
+              "tutor_resolved": 4,
+              "utility_land_activated": 2
+            },
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 22,
+              "lorehold_spell_cast": 16,
+              "miracle_cast": 2
+            },
+            "strategic_games": {
+              "lorehold_cost_paid": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "lorehold_spell_cast": {
+                "games": 2,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 1,
+                "rate": 0.5
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Generous Gift"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Avatar's Wrath"
+              },
+              {
+                "count": 2,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Arcane Signet"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Smothering Tithe"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Blasphemous Act"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Mizzix's Mastery"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Pearl Medallion"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Past in Flames"
+              }
+            ]
+          },
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -50.0
+      },
+      "hypothesis": "Past in Flames may be a stronger spell-chain payoff than a generic five-mana cleanup sorcery in the current shell.",
+      "package_key": "core_challenge_past_over_tragic"
+    }
+  ],
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}

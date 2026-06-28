@@ -1,0 +1,427 @@
+{
+  "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher/knowledge_candidate.db",
+  "game_checkpoint_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher_game_checkpoint.json",
+  "game_checkpoint_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher_game_checkpoint.md",
+  "game_timeout_seconds": 90.0,
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-27T12:33:51Z",
+  "matrix": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260626_v1.json",
+  "opponent_kind": "real",
+  "opponent_seed": 20260626,
+  "opponents": [
+    "Vivi Ornitier #99 (real)",
+    "Sisay, Weatherlight Captain #61 (real)"
+  ],
+  "results": [
+    {
+      "archetype": "unknown",
+      "avg_win_turn": 11.0,
+      "battle_rank": 1,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": 6,
+      "deck_key": "deck_6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "deck_size": 100,
+      "games": 2,
+      "lands": 34,
+      "load_deck_id": 6,
+      "losses": 1,
+      "objective": "Miracle spellslinger shell that uses topdeck setup and hand filtering to turn Lorehold's commander text into discounted spell chains.",
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 11.0,
+          "losses": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 100.0,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 0,
+          "losses": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        }
+      ],
+      "primary_risks": [
+        "wincon_role"
+      ],
+      "ramp": 18,
+      "removal": 16,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": 138.25,
+      "structural_rank": 2,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 4,
+          "activated_ability_skipped": 9,
+          "additional_cost_paid": 1,
+          "airbend_creature_cast_from_exile": 2,
+          "airbend_other_creatures_resolved": 1,
+          "approach_cast_tracked": 2,
+          "approach_first_resolution": 1,
+          "attachment_sba": 1,
+          "cast_announced": 82,
+          "combat": 27,
+          "combat_result": 31,
+          "combat_step": 160,
+          "commander_cast": 8,
+          "compensation_tokens_created": 1,
+          "cost_paid": 82,
+          "creature_cast": 15,
+          "damage_resolved": 1,
+          "draw_cards_resolved": 3,
+          "equipment_attached": 2,
+          "land_played": 36,
+          "land_ramp_resolved": 1,
+          "land_tax_trigger_skipped": 6,
+          "lorehold_upkeep_rummage": 10,
+          "lorehold_upkeep_rummage_skipped": 8,
+          "mana_refreshed": 50,
+          "miracle_cast": 5,
+          "mizzix_mastery_copy_cast": 1,
+          "mizzix_mastery_resolved": 1,
+          "multi_defender_attack": 4,
+          "planeswalker_resolved": 1,
+          "player_eliminated": 3,
+          "priority_pass": 469,
+          "protection_resolved": 1,
+          "redirect_removal_resolved": 2,
+          "removal_resolved": 6,
+          "replacement_applied": 3,
+          "self_exiled_on_resolution": 2,
+          "spell_cast": 59,
+          "spell_copy_ceased_to_exist": 1,
+          "spell_countered": 3,
+          "spell_resolved": 41,
+          "surge_to_victory_resolved": 1,
+          "tokens_created": 1,
+          "topdeck_manipulation_activated": 3,
+          "treasure_created": 1,
+          "trigger_put_on_stack": 30,
+          "trigger_resolved": 30,
+          "trigger_skipped": 2,
+          "turn_end": 47,
+          "turn_start": 50,
+          "tutor_resolved": 2,
+          "wheel_resolved": 1
+        },
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 28,
+          "lorehold_spell_cast": 22,
+          "miracle_cast": 5,
+          "topdeck_manipulation_activated": 3
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 2,
+            "rate": 1.0
+          },
+          "lorehold_spell_cast": {
+            "games": 2,
+            "rate": 1.0
+          },
+          "miracle_cast": {
+            "games": 2,
+            "rate": 1.0
+          },
+          "topdeck_manipulation_activated": {
+            "games": 1,
+            "rate": 0.5
+          }
+        },
+        "top_cards": [
+          {
+            "count": 3,
+            "key": "cost_paid:Esper Sentinel"
+          },
+          {
+            "count": 3,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 3,
+            "key": "topdeck:Sensei's Divining Top"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Mizzix's Mastery"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Mother of Runes"
+          },
+          {
+            "count": 2,
+            "key": "miracle:Approach of the Second Sun"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Arcane Signet"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Sol Ring"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Land Tax"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Path to Exile"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Ruby Medallion"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Generous Gift"
+          }
+        ]
+      },
+      "win_rate": 50.0,
+      "win_reasons": {
+        "elimination": 1
+      },
+      "wins": 1
+    },
+    {
+      "archetype": "synergy-package",
+      "avg_win_turn": 15.0,
+      "battle_rank": 2,
+      "commander": "Lorehold, the Historian",
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Lorehold, the Historian"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "deck_id": null,
+      "deck_key": "synergy_birgi_spellchain_cut_squelcher",
+      "deck_name": "Lorehold synergy package: birgi_spellchain_cut_squelcher",
+      "deck_size": 100,
+      "games": 2,
+      "lands": 34,
+      "load_deck_id": 6,
+      "losses": 1,
+      "objective": null,
+      "opponents": [
+        {
+          "archetype": "combo",
+          "avg_win_turn": 15.0,
+          "losses": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 100.0,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 0,
+          "losses": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        }
+      ],
+      "primary_risks": [],
+      "ramp": 18,
+      "removal": 16,
+      "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_birgi_spellchain_cut_squelcher/knowledge_candidate.db",
+      "stalls": 0,
+      "status": "pass",
+      "strategy_score": null,
+      "structural_rank": null,
+      "telemetry": {
+        "event_counts": {
+          "activated_ability": 2,
+          "activated_ability_skipped": 14,
+          "additional_cost_paid": 1,
+          "airbend_creature_cast_from_exile": 7,
+          "airbend_other_creatures_resolved": 1,
+          "approach_cast_tracked": 1,
+          "attachment_sba": 1,
+          "board_wipe_resolved": 4,
+          "cast_announced": 85,
+          "cast_illegal": 2,
+          "combat": 30,
+          "combat_result": 32,
+          "combat_step": 175,
+          "commander_cast": 13,
+          "compensation_tokens_created": 1,
+          "composite_rule_component_resolved": 2,
+          "composite_rule_resolved": 1,
+          "cost_paid": 83,
+          "creature_cast": 12,
+          "creature_to_battlefield": 1,
+          "damage_resolved": 1,
+          "draw_cards_resolved": 3,
+          "end_step_instant": 3,
+          "equipment_attached": 2,
+          "land_played": 35,
+          "land_ramp_resolved": 1,
+          "land_tax_trigger_skipped": 4,
+          "lorehold_upkeep_rummage": 5,
+          "lorehold_upkeep_rummage_skipped": 15,
+          "mana_refreshed": 57,
+          "miracle_cast": 5,
+          "mizzix_mastery_copy_cast": 1,
+          "mizzix_mastery_resolved": 1,
+          "multi_defender_attack": 2,
+          "player_eliminated": 3,
+          "priority_pass": 477,
+          "protection_resolved": 2,
+          "random_discard_after_tutor": 1,
+          "redirect_removal_resolved": 4,
+          "removal_resolved": 7,
+          "replacement_applied": 9,
+          "ritual_mana_added": 2,
+          "self_exiled_on_resolution": 2,
+          "spell_cast": 59,
+          "spell_copied": 3,
+          "spell_copy_ceased_to_exist": 4,
+          "spell_countered": 4,
+          "spell_resolved": 43,
+          "surge_to_victory_resolved": 1,
+          "tokens_created": 1,
+          "treasure_created": 1,
+          "trigger_put_on_stack": 22,
+          "trigger_resolved": 25,
+          "turn_end": 55,
+          "turn_start": 57,
+          "tutor_resolved": 4,
+          "utility_land_activated": 1,
+          "wheel_resolved": 1
+        },
+        "strategic_event_counts": {
+          "lorehold_cost_paid": 24,
+          "lorehold_spell_cast": 22,
+          "miracle_cast": 5
+        },
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 2,
+            "rate": 1.0
+          },
+          "lorehold_spell_cast": {
+            "games": 2,
+            "rate": 1.0
+          },
+          "miracle_cast": {
+            "games": 2,
+            "rate": 1.0
+          },
+          "topdeck_manipulation_activated": {
+            "games": 0,
+            "rate": 0.0
+          }
+        },
+        "top_cards": [
+          {
+            "count": 3,
+            "key": "cost_paid:Lorehold, the Historian"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Giver of Runes"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Mother of Runes"
+          },
+          {
+            "count": 2,
+            "key": "cost_paid:Avatar's Wrath"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Arcane Signet"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Ruby Medallion"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Sol Ring"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Land Tax"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Path to Exile"
+          },
+          {
+            "count": 1,
+            "key": "miracle:Tragic Arrogance"
+          },
+          {
+            "count": 1,
+            "key": "cost_paid:Mizzix's Mastery"
+          }
+        ]
+      },
+      "win_rate": 50.0,
+      "win_reasons": {
+        "elimination": 1
+      },
+      "wins": 1
+    }
+  ],
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "status": "ready"
+}
