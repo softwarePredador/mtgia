@@ -1,0 +1,70 @@
+{
+  "artifact": "lorehold_dragon_runtime_waivers_20260628_v1",
+  "generated_at_utc": "2026-06-28T19:20:00Z",
+  "postgresql_writes": false,
+  "source_db_mutated": false,
+  "scope": "Lorehold decks 608-616 runtime gap closure for XMage-backed dragon cards",
+  "cards": [
+    {
+      "card": "Twinflame Tyrant",
+      "lorehold_variant_decks": [608, 611, 615],
+      "xmage_source": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TwinflameTyrant.java",
+      "runtime_effect": "damage_modifier",
+      "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+      "oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6",
+      "logical_rule_key": "battle_rule_v1:072370a98c9b332eef021390bfc1694a",
+      "before_runtime_status": "review_only passive",
+      "after_runtime_status": "manual_runtime_waiver verified auto",
+      "runtime_family_status": "supported"
+    },
+    {
+      "card": "Terror of the Peaks",
+      "lorehold_variant_decks": [608, 612],
+      "xmage_source": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TerrorOfThePeaks.java",
+      "runtime_effect": "creature trigger damage_any_target",
+      "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+      "oracle_hash": "90c007ac59cdd400f58e89c47d81440e",
+      "logical_rule_key": "battle_rule_v1:b495892461d2521bc633d7e9ab5cd443",
+      "before_runtime_status": "review_only passive",
+      "after_runtime_status": "manual_runtime_waiver verified auto",
+      "runtime_family_status": "supported"
+    }
+  ],
+  "runtime_bug_fixed": {
+    "issue": "static damage replacement candidates could include both the permanent effect and get_card_effect result for the same permanent, applying Twinflame-style modifiers twice",
+    "fix": "_static_damage_modifier_effects now deduplicates modifier candidates by permanent name, scope, targets, applies-to value, and multiplier"
+  },
+  "audit_methodology_fixed": {
+    "issue": "manaloom_log_learning_audit could scan older manaloom_log_learning_audit reports and recursively count stale audit output as current log evidence",
+    "fix": "self-report files named manaloom_log_learning_audit_* are excluded from report scans, and current manual runtime waivers are overlaid so waived cards are classified as runtime_waived_pending_pg_promotion instead of runtime_rule_missing",
+    "clean_audit": "docs/hermes-analysis/master_optimizer_reports/manaloom_log_learning_audit_20260628_v8_after_dragon_waivers.json",
+    "next_runtime_missing_after_overlay": [
+      "Goliath Daydreamer",
+      "Taunt from the Rampart",
+      "Semblance Anvil",
+      "Planetarium of Wan Shi Tong",
+      "Invincible Hymn"
+    ],
+    "runtime_waived_pending_pg_after_overlay": [
+      "Verge Rangers",
+      "Twinflame Tyrant",
+      "Terror of the Peaks",
+      "Ephemerate"
+    ]
+  },
+  "validation": [
+    {
+      "command": "python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_dragon_runtime_waivers.py docs/hermes-analysis/manaloom-knowledge/scripts/test_static_damage_modifier_runtime.py docs/hermes-analysis/manaloom-knowledge/scripts/test_terror_of_the_peaks_runtime.py -q",
+      "result": "9 passed"
+    },
+    {
+      "command": "python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_manaloom_log_learning_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_dragon_runtime_waivers.py docs/hermes-analysis/manaloom-knowledge/scripts/test_static_damage_modifier_runtime.py docs/hermes-analysis/manaloom-knowledge/scripts/test_terror_of_the_peaks_runtime.py -q",
+      "result": "15 passed"
+    },
+    {
+      "command": "python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/manaloom_log_learning_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_manaloom_log_learning_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_dragon_runtime_waivers.py",
+      "result": "passed"
+    }
+  ],
+  "promotion_status": "runtime waiver only; canonical PostgreSQL promotion still requires explicit approval and successful PG precheck/apply/sync"
+}

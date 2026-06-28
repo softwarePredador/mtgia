@@ -22,6 +22,7 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_STEM = "manaloom_log_learning_audit_20260628"
 SUPPORTED_SUFFIXES = {".json", ".jsonl", ".out", ".md", ".txt"}
+SELF_REPORT_PREFIXES = ("manaloom_log_learning_audit_",)
 SEVERITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 LOREHOLD_DECK_IDS = set(range(607, 617))
 STATUS_SEVERITY = {
@@ -98,6 +99,31 @@ def rel(path: Path) -> str:
         return str(path)
 
 
+_RUNTIME_WAIVER_CARDS_CACHE: dict[str, dict[str, Any]] | None = None
+
+
+def normalized_card_name(value: Any) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip().lower())
+
+
+def current_runtime_waiver_cards() -> dict[str, dict[str, Any]]:
+    global _RUNTIME_WAIVER_CARDS_CACHE
+    if _RUNTIME_WAIVER_CARDS_CACHE is not None:
+        return _RUNTIME_WAIVER_CARDS_CACHE
+    try:
+        import battle_analyst_v9
+
+        inventory = battle_analyst_v9.manual_runtime_waiver_inventory()
+    except Exception:
+        inventory = []
+    _RUNTIME_WAIVER_CARDS_CACHE = {
+        normalized_card_name(row.get("card")): dict(row)
+        for row in inventory
+        if isinstance(row, Mapping) and row.get("card")
+    }
+    return _RUNTIME_WAIVER_CARDS_CACHE
+
+
 def iter_report_files(
     reports_dir: Path,
     *,
@@ -108,6 +134,7 @@ def iter_report_files(
         path
         for path in reports_dir.rglob("*")
         if path.is_file() and path.suffix.lower() in SUPPORTED_SUFFIXES
+        and not path.name.startswith(SELF_REPORT_PREFIXES)
     ]
     if include_patterns:
         lowered = [item.lower() for item in include_patterns]
@@ -324,6 +351,11 @@ def analyze_coherence(path: Path, payload: Mapping[str, Any], issues: list[dict[
                         only_lorehold=True,
                         gap_kind="runtime_rule_missing",
                     ),
+                    "top_lorehold_runtime_waived_cards": coherence_top_cards(
+                        payload,
+                        only_lorehold=True,
+                        gap_kind="runtime_waived_pending_pg_promotion",
+                    ),
                     "top_overall_cards": coherence_top_cards(payload, only_lorehold=False),
                 },
                 next_action="prioritize_cards_with_no_active_or_no_trusted_rules_in_current_deck_scope",
@@ -369,6 +401,17 @@ def is_high_coherence_card(card: Mapping[str, Any]) -> bool:
 
 def coherence_gap_kind(card: Mapping[str, Any]) -> str:
     codes = set(high_finding_codes(card))
+    card_name = normalized_card_name(card.get("card_name") or card.get("name"))
+    if (
+        card_name in current_runtime_waiver_cards()
+        and codes
+        & {
+            "no_active_battle_rule",
+            "no_trusted_executable_rule",
+            "review_only_or_needs_review_rule",
+        }
+    ):
+        return "runtime_waived_pending_pg_promotion"
     if codes & {"no_active_battle_rule", "no_trusted_executable_rule"}:
         return "runtime_rule_missing"
     if "generic_effect_without_model_scope" in codes:
@@ -711,6 +754,17 @@ def render_example_evidence(example: Mapping[str, Any]) -> list[str]:
         if runtime_missing_names:
             lines.append(
                 f"     top_lorehold_runtime_missing: `{', '.join(runtime_missing_names)}`"
+            )
+    runtime_waived = evidence.get("top_lorehold_runtime_waived_cards") or []
+    if isinstance(runtime_waived, list) and runtime_waived:
+        runtime_waived_names = [
+            str(card.get("card_name"))
+            for card in runtime_waived[:5]
+            if isinstance(card, Mapping)
+        ]
+        if runtime_waived_names:
+            lines.append(
+                f"     top_lorehold_runtime_waived_pending_pg: `{', '.join(runtime_waived_names)}`"
             )
     codes = evidence.get("top_finding_codes") or []
     if isinstance(codes, list) and codes:

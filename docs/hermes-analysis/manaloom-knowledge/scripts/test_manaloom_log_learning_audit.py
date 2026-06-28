@@ -94,6 +94,21 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
                             "total_quantity": 4,
                         },
                         {
+                            "card_name": "Goliath Daydreamer",
+                            "deck_count": 3,
+                            "deck_ids": [613, 614, 615],
+                            "findings": [
+                                {
+                                    "code": "no_trusted_executable_rule",
+                                    "severity": "high",
+                                }
+                            ],
+                            "priority_score": 7153,
+                            "severity": "high",
+                            "total_quantity": 3,
+                            "trusted_executable_rule_count": 0,
+                        },
+                        {
                             "active_rule_count": 2,
                             "card_name": "Verge Rangers",
                             "deck_count": 3,
@@ -152,14 +167,22 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             )
             top_codes = {row["code"]: row["count"] for row in evidence["top_finding_codes"]}
             self.assertEqual(top_codes["generic_effect_without_model_scope"], 1)
-            self.assertEqual(top_codes["no_trusted_executable_rule"], 2)
+            self.assertEqual(top_codes["no_trusted_executable_rule"], 3)
             self.assertEqual(
                 evidence["top_lorehold_runtime_missing_cards"][0]["card_name"],
-                "Verge Rangers",
+                "Goliath Daydreamer",
             )
             self.assertEqual(
                 evidence["top_lorehold_runtime_missing_cards"][0]["gap_kind"],
                 "runtime_rule_missing",
+            )
+            waived_cards = {
+                row["card_name"]: row["gap_kind"]
+                for row in evidence["top_lorehold_runtime_waived_cards"]
+            }
+            self.assertEqual(
+                waived_cards["Verge Rangers"],
+                "runtime_waived_pending_pg_promotion",
             )
 
     def test_build_audit_finds_text_failures(self) -> None:
@@ -221,6 +244,56 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             self.assertNotIn("text_test_failure", issue_types)
             self.assertNotIn("text_runtime_traceback", issue_types)
             self.assertEqual(report["superseded_issue_count"], 2)
+
+    def test_build_audit_ignores_prior_log_learning_audit_reports(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_name:
+            tmp = Path(tmp_name)
+            write_json(
+                tmp / "manaloom_log_learning_audit_20260628_v5.json",
+                {
+                    "severity_counts": {"critical": 2, "high": 81},
+                    "action_queue": [
+                        {
+                            "severity": "critical",
+                            "category": "runtime_rule_gap",
+                            "issue_type": "coherence_critical_high_findings",
+                        }
+                    ],
+                },
+            )
+            write_json(
+                tmp / "deck_card_battle_rule_coherence_audit_current.json",
+                {
+                    "deck_id": 608,
+                    "cards": [
+                        {
+                            "card_name": "Goliath Daydreamer",
+                            "deck_ids": [613, 614, 615],
+                            "findings": [
+                                {
+                                    "code": "no_trusted_executable_rule",
+                                    "severity": "high",
+                                }
+                            ],
+                            "priority_score": 7153,
+                            "severity": "high",
+                            "trusted_executable_rule_count": 0,
+                        }
+                    ],
+                    "severity_counts": {"high": 1},
+                },
+            )
+
+            report = audit.build_audit(tmp, max_files=None, include_patterns=[])
+
+            self.assertEqual(report["files_scanned"], 1)
+            sources = {
+                Path(example["source_path"]).name
+                for row in report["action_queue"]
+                for example in row.get("examples", [])
+            }
+            self.assertNotIn("manaloom_log_learning_audit_20260628_v5.json", sources)
+            self.assertIn("deck_card_battle_rule_coherence_audit_current.json", sources)
 
 
 if __name__ == "__main__":

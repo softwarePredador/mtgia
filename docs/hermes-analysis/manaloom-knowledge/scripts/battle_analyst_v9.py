@@ -3859,6 +3859,43 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "battle_model_scope": "neoform_sacrifice_creature_tutor_waiver_v1",
         }
     ),
+    "Twinflame Tyrant": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 5.0,
+            "effect": "damage_modifier",
+            "power": 3,
+            "toughness": 5,
+            "flying": True,
+            "damage_modifier_applies_to": "sources_you_control",
+            "damage_modifier_targets": ["opponents", "opponent_permanents"],
+            "damage_modifier_duration": "while_on_battlefield",
+            "damage_multiplier": 2,
+            "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+            "_rule_oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6",
+            "_rule_logical_key": "battle_rule_v1:072370a98c9b332eef021390bfc1694a",
+        }
+    ),
+    "Terror of the Peaks": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered",
+            "cmc": 5.0,
+            "effect": "creature",
+            "power": 5,
+            "toughness": 4,
+            "flying": True,
+            "opponent_spells_targeting_this_additional_life_cost": 3,
+            "trigger": "creature_you_control_enters",
+            "trigger_effect": "damage_any_target",
+            "trigger_damage_amount_source": "entering_creature_power",
+            "trigger_another_creature_you_control_enters": True,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+            "_rule_oracle_hash": "90c007ac59cdd400f58e89c47d81440e",
+            "_rule_logical_key": "battle_rule_v1:b495892461d2521bc633d7e9ab5cd443",
+        }
+    ),
     "Verge Rangers": handcrafted_runtime_rule(
         {
             "cmc": 3.0,
@@ -3897,6 +3934,8 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Vivi Ornitier",
     "Faeburrow Elder",
     "Neoform",
+    "Twinflame Tyrant",
+    "Terror of the Peaks",
     "Verge Rangers",
 }
 
@@ -3983,6 +4022,16 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace stale/heuristic tutor evidence with sacrifice, MV+1 battlefield tutor, and counter semantics.",
         ["20260619_202217", "20260619_202628"],
         "2026-06-19T20:26:28Z",
+    ),
+    "Twinflame Tyrant": manual_runtime_waiver_metadata(
+        "Replace review_only passive evidence with XMage-backed controlled-source damage-doubling semantics.",
+        ["manaloom_log_learning_audit_20260628_v5", "TwinflameTyrant.java", "pg245_lorehold_topdeck_damage_runtime_20260628"],
+        "2026-06-28T19:10:00Z",
+    ),
+    "Terror of the Peaks": manual_runtime_waiver_metadata(
+        "Replace review_only passive evidence with XMage-backed another-creature ETB power damage semantics.",
+        ["manaloom_log_learning_audit_20260628_v5", "TerrorOfThePeaks.java", "pg_terror_runtime_20260628_terror_runtime"],
+        "2026-06-28T19:10:00Z",
     ),
     "Verge Rangers": manual_runtime_waiver_metadata(
         "Replace generated review_only topdeck_manipulation evidence with XMage-backed top-library land play semantics.",
@@ -26365,6 +26414,7 @@ def damage_source_reference(source_card, controller):
 
 def _static_damage_modifier_effects(controller):
     effects = []
+    seen_modifier_keys = set()
     for permanent in getattr(controller, "battlefield", []) or []:
         if not isinstance(permanent, dict):
             continue
@@ -26390,6 +26440,16 @@ def _static_damage_modifier_effects(controller):
                 targets = read_json_list(targets) or [targets]
             if targets and not {"opponents", "opponent_permanents"}.issubset(set(targets)):
                 continue
+            modifier_key = (
+                permanent.get("name") or effect_data.get("name") or id(permanent),
+                effect_data.get("battle_model_scope"),
+                effect_data.get("damage_modifier_applies_to") or "sources_you_control",
+                tuple(sorted(str(target) for target in targets)),
+                int(effect_data.get("damage_multiplier") or 2),
+            )
+            if modifier_key in seen_modifier_keys:
+                continue
+            seen_modifier_keys.add(modifier_key)
             effects.append((permanent, effect_data))
     return effects
 
