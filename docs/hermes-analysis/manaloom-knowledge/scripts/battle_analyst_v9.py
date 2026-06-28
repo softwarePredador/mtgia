@@ -3859,6 +3859,23 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "battle_model_scope": "neoform_sacrifice_creature_tutor_waiver_v1",
         }
     ),
+    "Goliath Daydreamer": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered",
+            "effect": "free_cast",
+            "power": 4,
+            "toughness": 4,
+            "trigger": "instant_sorcery_cast_from_hand_and_attack",
+            "spell_cast_from_hand_card_types": ["instant", "sorcery"],
+            "spell_cast_from_hand_exile_instead_of_graveyard": True,
+            "exiled_counter_type": "dream",
+            "attack_free_cast_counter_type": "dream",
+            "attack_may_cast_owned_exiled_card_with_counter_without_paying_mana": True,
+            "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+            "_rule_oracle_hash": "715d2c178b304a7c5e6beed655883851",
+            "_rule_logical_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd",
+        }
+    ),
     "Twinflame Tyrant": handcrafted_runtime_rule(
         {
             "ability_kind": "static",
@@ -3934,6 +3951,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Vivi Ornitier",
     "Faeburrow Elder",
     "Neoform",
+    "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
     "Verge Rangers",
@@ -4022,6 +4040,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace stale/heuristic tutor evidence with sacrifice, MV+1 battlefield tutor, and counter semantics.",
         ["20260619_202217", "20260619_202628"],
         "2026-06-19T20:26:28Z",
+    ),
+    "Goliath Daydreamer": manual_runtime_waiver_metadata(
+        "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
+        ["manaloom_log_learning_audit_20260628_v8_after_dragon_waivers", "GoliathDaydreamer.java", "pg246_goliath_daydreamer_free_cast"],
+        "2026-06-28T19:35:00Z",
     ),
     "Twinflame Tyrant": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed controlled-source damage-doubling semantics.",

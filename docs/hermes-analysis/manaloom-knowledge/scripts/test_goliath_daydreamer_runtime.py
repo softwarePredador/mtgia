@@ -53,6 +53,28 @@ def draw_spell(name="Dream Cantrip"):
     }
 
 
+def test_goliath_daydreamer_get_card_effect_is_runtime_source():
+    battle = load_battle()
+    effect = battle.get_card_effect(
+        {"name": "Goliath Daydreamer", "type_line": "Creature - Giant Wizard", "cmc": 4}
+    )
+    permanent = {"name": "Goliath Daydreamer", "type_line": "Creature - Giant Wizard", **effect}
+
+    assert effect["effect"] == "free_cast"
+    assert effect["battle_model_scope"] == (
+        "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1"
+    )
+    assert effect["spell_cast_from_hand_card_types"] == ["instant", "sorcery"]
+    assert effect["spell_cast_from_hand_exile_instead_of_graveyard"] is True
+    assert effect["exiled_counter_type"] == "dream"
+    assert effect["attack_may_cast_owned_exiled_card_with_counter_without_paying_mana"] is True
+    assert effect["_rule_logical_key"] == "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd"
+    assert effect["_rule_oracle_hash"] == "715d2c178b304a7c5e6beed655883851"
+    assert effect["_rule_review_status"] == "verified"
+    assert effect["_rule_execution_status"] == "auto"
+    assert battle.is_goliath_daydreamer_runtime_source(permanent) is True
+
+
 def test_goliath_daydreamer_exiles_hand_spell_then_attack_free_casts_it():
     battle = load_battle()
     events = []
@@ -161,6 +183,7 @@ def test_goliath_daydreamer_does_not_exile_non_hand_recast_spell():
 
 
 if __name__ == "__main__":
+    test_goliath_daydreamer_get_card_effect_is_runtime_source()
     test_goliath_daydreamer_exiles_hand_spell_then_attack_free_casts_it()
     test_goliath_daydreamer_does_not_exile_non_hand_recast_spell()
     print("PASS test_goliath_daydreamer_runtime")

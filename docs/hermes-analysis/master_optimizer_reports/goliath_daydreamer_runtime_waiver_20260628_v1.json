@@ -1,0 +1,45 @@
+{
+  "artifact": "goliath_daydreamer_runtime_waiver_20260628_v1",
+  "generated_at_utc": "2026-06-28T19:55:00Z",
+  "postgresql_writes": false,
+  "source_db_mutated": false,
+  "scope": "Lorehold runtime gap closure for Goliath Daydreamer",
+  "card": {
+    "card": "Goliath Daydreamer",
+    "lorehold_variant_decks": [613, 614, 615],
+    "xmage_source": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GoliathDaydreamer.java",
+    "runtime_effect": "free_cast",
+    "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+    "oracle_hash": "715d2c178b304a7c5e6beed655883851",
+    "logical_rule_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd",
+    "before_runtime_status": "review_only passive",
+    "after_runtime_status": "manual_runtime_waiver verified auto",
+    "runtime_family_status": "supported"
+  },
+  "validation": [
+    {
+      "command": "python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_goliath_daydreamer_runtime.py docs/hermes-analysis/manaloom-knowledge/scripts/test_manaloom_log_learning_audit.py -q",
+      "result": "9 passed"
+    },
+    {
+      "command": "python3 -m py_compile docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py docs/hermes-analysis/manaloom-knowledge/scripts/test_goliath_daydreamer_runtime.py docs/hermes-analysis/manaloom-knowledge/scripts/test_manaloom_log_learning_audit.py",
+      "result": "passed"
+    }
+  ],
+  "clean_audit": "docs/hermes-analysis/master_optimizer_reports/manaloom_log_learning_audit_20260628_v9_after_goliath_waiver.json",
+  "next_runtime_missing_after_overlay": [
+    "Taunt from the Rampart",
+    "Semblance Anvil",
+    "Planetarium of Wan Shi Tong",
+    "Invincible Hymn",
+    "Heroes Remembered"
+  ],
+  "runtime_waived_pending_pg_after_overlay": [
+    "Verge Rangers",
+    "Twinflame Tyrant",
+    "Terror of the Peaks",
+    "Goliath Daydreamer",
+    "Ephemerate"
+  ],
+  "promotion_status": "runtime waiver only; canonical PostgreSQL promotion still requires explicit approval and successful PG precheck/apply/sync"
+}
