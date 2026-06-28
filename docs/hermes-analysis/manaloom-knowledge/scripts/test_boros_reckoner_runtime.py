@@ -22,27 +22,14 @@ def player(battle, name):
     return battle.Player(name, None, [], strategy="midrange")
 
 
-def boros_reckoner():
-    return {
+def boros_reckoner(battle):
+    card = {
         "name": "Boros Reckoner",
-        "effect": "creature",
         "type_line": "Creature - Minotaur Wizard",
         "mana_cost": "{R/W}{R/W}{R/W}",
-        "colors": ["R", "W"],
-        "power": 3,
-        "toughness": 3,
-        "battle_model_scope": "source_dealt_damage_reflect_to_any_target_v1",
-        "trigger": "source_dealt_damage",
-        "trigger_effect": "damage_any_target",
-        "damage_amount_source": "damage_dealt_to_source",
-        "source_damage_reflect_to_any_target": True,
-        "target": "any_target",
-        "target_constraints": {"scope": "any_target"},
-        "activated_gain_first_strike_until_eot": True,
-        "first_strike_activation_cost": "{R/W}",
-        "_rule_logical_key": "battle_rule_v1:boros_reckoner_runtime_test",
-        "_rule_oracle_hash": "boros-reckoner-runtime-test-hash",
+        "cmc": 3,
     }
+    return {**card, **battle.get_card_effect(card)}
 
 
 def damage_wipe(name, amount):
@@ -52,6 +39,32 @@ def damage_wipe(name, amount):
     )
 
 
+def test_boros_reckoner_get_card_effect_is_runtime_source():
+    battle = load_battle()
+
+    effect = battle.get_card_effect(
+        {
+            "name": "Boros Reckoner",
+            "type_line": "Creature - Minotaur Wizard",
+            "mana_cost": "{R/W}{R/W}{R/W}",
+            "cmc": 3,
+        }
+    )
+
+    assert effect["effect"] == "creature"
+    assert effect["battle_model_scope"] == "source_dealt_damage_reflect_to_any_target_v1"
+    assert effect["trigger"] == "source_dealt_damage"
+    assert effect["trigger_effect"] == "damage_any_target"
+    assert effect["damage_amount_source"] == "damage_dealt_to_source"
+    assert effect["source_damage_reflect_to_any_target"] is True
+    assert effect["activated_gain_first_strike_until_eot"] is True
+    assert effect["_rule_logical_key"] == "battle_rule_v1:f1540009e5e8a14128cf83a2f494a0db"
+    assert effect["_rule_oracle_hash"] == "8cb6c980428b2501343f3f38dc686efb"
+    assert effect["_rule_review_status"] == "verified"
+    assert effect["_rule_execution_status"] == "auto"
+    assert "Boros Reckoner" in battle.MANUAL_RULE_RUNTIME_WAIVERS
+
+
 def test_boros_reckoner_reflects_damage_to_selected_any_target():
     battle = load_battle()
     events = []
@@ -59,7 +72,7 @@ def test_boros_reckoner_reflects_damage_to_selected_any_target():
     try:
         active = player(battle, "Lorehold")
         opponent = player(battle, "Opponent")
-        active.battlefield = [boros_reckoner()]
+        active.battlefield = [boros_reckoner(battle)]
         spell, effect = damage_wipe("Pyroclasm", 2)
 
         battle.apply_damage_wipe(opponent, [active], spell, effect, turn=4)
@@ -92,7 +105,7 @@ def test_boros_reckoner_reflection_uses_saved_damage_amount():
     try:
         active = player(battle, "Lorehold")
         opponent = player(battle, "Opponent")
-        active.battlefield = [boros_reckoner()]
+        active.battlefield = [boros_reckoner(battle)]
         spell, effect = damage_wipe("Blasphemous Act", 13)
 
         battle.apply_damage_wipe(opponent, [active], spell, effect, turn=7)

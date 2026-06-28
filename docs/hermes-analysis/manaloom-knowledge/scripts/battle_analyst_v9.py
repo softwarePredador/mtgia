@@ -3996,6 +3996,29 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:655c7da1b9d381d24b94b64487226598",
         }
     ),
+    "Boros Reckoner": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered_and_activated",
+            "cmc": 3.0,
+            "effect": "creature",
+            "mana_cost": "{R/W}{R/W}{R/W}",
+            "colors": ["R", "W"],
+            "power": 3,
+            "toughness": 3,
+            "subtypes": ["Minotaur", "Wizard"],
+            "trigger": "source_dealt_damage",
+            "trigger_effect": "damage_any_target",
+            "damage_amount_source": "damage_dealt_to_source",
+            "source_damage_reflect_to_any_target": True,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activated_gain_first_strike_until_eot": True,
+            "first_strike_activation_cost": "{R/W}",
+            "battle_model_scope": "source_dealt_damage_reflect_to_any_target_v1",
+            "_rule_oracle_hash": "8cb6c980428b2501343f3f38dc686efb",
+            "_rule_logical_key": "battle_rule_v1:f1540009e5e8a14128cf83a2f494a0db",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4110,6 +4133,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Invincible Hymn",
     "Heroes Remembered",
     "Beacon of Immortality",
+    "Boros Reckoner",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4225,6 +4249,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace generated finisher review_only evidence with XMage-backed target-player life doubling and self-shuffle semantics.",
         ["manaloom_log_learning_audit_20260628_v12_after_planetarium_runtime", "BeaconOfImmortality.java"],
         "2026-06-28T21:05:00Z",
+    ),
+    "Boros Reckoner": manual_runtime_waiver_metadata(
+        "Promote the existing source-damaged reflection executor to the real XMage-backed Boros Reckoner card lookup while PG metadata remains pending.",
+        ["manaloom_log_learning_audit_20260628_v13_after_life_total_runtime", "BorosReckoner.java", "pg_boros_reckoner_runtime_20260628"],
+        "2026-06-28T21:35:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
