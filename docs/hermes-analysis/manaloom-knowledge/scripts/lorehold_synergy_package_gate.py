@@ -1425,6 +1425,7 @@ def classify_package_prior_evidence(
     package_key: str,
     definition: dict[str, Any],
     prior_results: dict[str, Any],
+    forced_access_mode: str = "none",
 ) -> dict[str, Any]:
     if not prior_results.get("enabled"):
         return {"status": "not_checked", "reason": "prior package evidence disabled", "matches": []}
@@ -1481,6 +1482,15 @@ def classify_package_prior_evidence(
     override_reason = str(definition.get("prior_evidence_override_reason") or "").strip()
     if blocking and not override_reason:
         latest = blocking[-1]
+        if forced_access_mode and forced_access_mode != "none":
+            return {
+                "status": "forced_access_diagnostic_despite_prior_reject",
+                "reason": (
+                    f"exact package already produced `{latest.get('decision')}`, "
+                    "but forced-access mode is diagnostic and still needs natural confirmation"
+                ),
+                "matches": blocking,
+            }
         return {
             "status": "blocked_prior_reject",
             "reason": f"exact package already produced `{latest.get('decision')}`",
@@ -2622,7 +2632,12 @@ def main() -> int:
     for package_key in package_keys:
         definition = package_definitions[package_key]
         package_cut_safety = classify_package_cut_safety(definition, cut_safety)
-        package_prior_evidence = classify_package_prior_evidence(package_key, definition, prior_results)
+        package_prior_evidence = classify_package_prior_evidence(
+            package_key,
+            definition,
+            prior_results,
+            forced_access_mode=args.forced_access_mode,
+        )
         if package_cut_safety["status"] == "blocked_cut_safety":
             result = {
                 "package_key": package_key,

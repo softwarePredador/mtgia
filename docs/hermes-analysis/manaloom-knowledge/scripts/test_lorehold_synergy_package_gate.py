@@ -642,6 +642,36 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(classification["status"], "blocked_prior_reject")
         self.assertIn("reject_or_rework", classification["reason"])
 
+    def test_forced_access_diagnostic_does_not_require_prior_ignore_flag(self):
+        prior_results = {
+            "enabled": True,
+            "by_package_key": {
+                "mana_vault_fast_mana_cut_arcane_signet": [
+                    {
+                        "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+                        "adds": ["Mana Vault"],
+                        "cuts": ["Arcane Signet"],
+                        "decision": "reject_or_rework",
+                        "delta_pp": -66.67,
+                        "source_report": "/tmp/prior.json",
+                    }
+                ]
+            },
+        }
+
+        classification = gate.classify_package_prior_evidence(
+            "mana_vault_fast_mana_cut_arcane_signet",
+            gate.PACKAGE_DEFINITIONS["mana_vault_fast_mana_cut_arcane_signet"],
+            prior_results,
+            forced_access_mode="opening_hand",
+        )
+
+        self.assertEqual(
+            classification["status"],
+            "forced_access_diagnostic_despite_prior_reject",
+        )
+        self.assertIn("diagnostic", classification["reason"])
+
     def test_prior_evidence_does_not_block_same_key_with_different_signature(self):
         prior_results = {
             "enabled": True,
