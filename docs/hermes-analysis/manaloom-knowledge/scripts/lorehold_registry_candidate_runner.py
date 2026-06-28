@@ -30,6 +30,11 @@ DEFAULT_BATTLE_PRIOR_JSON = (
     REPORT_DIR / "seventeenlands_replay_profile_lci_premierdraft_sample_20260628.json"
 )
 PRIORITY_RANK = {"P0": 0, "P1": 1, "P2": 2, "P3": 3, "P4": 4}
+BATTLE_PRIOR_EVIDENCE_GAP_STATUSES = {
+    "inconclusive_candidate_unobserved",
+    "needs_more_evidence",
+}
+BATTLE_PRIOR_WARNING_STATUSES = {"battle_prior_warning"}
 
 
 def utc_now() -> str:
@@ -143,8 +148,16 @@ def battle_prior_summary(
 ) -> dict[str, Any]:
     comparison = report.get("comparison") or {}
     observed = report.get("observed_summary") or {}
+    candidate_observations = observed.get("candidate_observations") or {}
+    if not isinstance(candidate_observations, Mapping):
+        candidate_observations = {}
     return {
-        "candidate_observations": observed.get("candidate_observations") or {},
+        "candidate_observations": candidate_observations,
+        "candidate_unobserved_cards": [
+            card
+            for card, payload in candidate_observations.items()
+            if isinstance(payload, Mapping) and not payload.get("observed")
+        ],
         "flags_count": len(comparison.get("flags") or []),
         "json": str(json_path),
         "markdown": str(md_path),
@@ -152,6 +165,58 @@ def battle_prior_summary(
         "source_db_mutated": False,
         "status": report.get("status"),
     }
+
+
+def classify_battle_prior_summary(prior_gate: Mapping[str, Any]) -> dict[str, str]:
+    prior_status = str(prior_gate.get("status") or "")
+    unobserved_cards = [str(card) for card in prior_gate.get("candidate_unobserved_cards") or []]
+    card_suffix = f": {', '.join(unobserved_cards[:3])}" if unobserved_cards else ""
+    if prior_status in BATTLE_PRIOR_EVIDENCE_GAP_STATUSES or "inconclusive" in prior_status:
+        return {
+            "next_action": "rerun_with_forced_focus_access_or_larger_natural_sample_until_candidate_accessed",
+            "reason": "candidate card was not accessed in the gate; do not score or promote this swap"
+            + card_suffix,
+            "status": "needs_more_evidence_candidate_unobserved",
+        }
+    if prior_status in BATTLE_PRIOR_WARNING_STATUSES or "warning" in prior_status:
+        return {
+            "next_action": "inspect_battle_prior_rhythm_flags_before_using_result",
+            "reason": "candidate was observed, but the battle cadence is outside the 17Lands prior",
+            "status": "battle_prior_warning",
+        }
+    if prior_status == "battle_prior_passed":
+        return {
+            "next_action": "eligible_for_strategy_review",
+            "reason": "candidate was observed and battle-prior cadence passed",
+            "status": "executed_battle_prior_passed",
+        }
+    if prior_status:
+        return {
+            "next_action": "inspect_unknown_battle_prior_status",
+            "reason": f"unhandled battle-prior status: {prior_status}",
+            "status": f"executed_{prior_status}",
+        }
+    return {
+        "next_action": "rerun_battle_prior_gate",
+        "reason": "battle-prior gate did not return a status",
+        "status": "needs_more_evidence_missing_battle_prior_status",
+    }
+
+
+def aggregate_report_status(row_statuses: list[str]) -> str:
+    status = "ready"
+    if any("failed" in value for value in row_statuses):
+        status = "failed"
+    elif any(
+        value.startswith("needs_more_evidence") or "inconclusive" in value
+        for value in row_statuses
+    ):
+        status = "needs_more_evidence"
+    elif any("warning" in value for value in row_statuses):
+        status = "warning"
+    elif any(value.startswith("blocked") for value in row_statuses):
+        status = "blocked"
+    return status
 
 
 def command_payloads(
@@ -283,13 +348,14 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         "",
         "## Queue Results",
         "",
-        "| Key | Priority | Status | Plan | Reason |",
-        "| --- | --- | --- | --- | --- |",
+        "| Key | Priority | Status | Plan | Reason | Next Action |",
+        "| --- | --- | --- | --- | --- | --- |",
     ]
     for row in report.get("results") or []:
         lines.append(
             f"| `{row.get('key')}` | {row.get('priority')} | `{row.get('status')}` | "
-            f"`{row.get('plan') or ''}` | {row.get('reason')} |"
+            f"`{row.get('plan') or ''}` | {row.get('reason')} | "
+            f"`{row.get('next_action') or ''}` |"
         )
     for row in report.get("results") or []:
         commands = row.get("commands") or {}
@@ -426,7 +492,10 @@ def main() -> int:
                                 json_path=battle_prior_json_path,
                                 md_path=battle_prior_md_path,
                             )
-                            row["status"] = f"executed_{prior_report['status']}"
+                            prior_decision = classify_battle_prior_summary(row["battle_prior_gate"])
+                            row["status"] = prior_decision["status"]
+                            row["reason"] = prior_decision["reason"]
+                            row["next_action"] = prior_decision["next_action"]
                 else:
                     row["status"] = "candidate_generation_failed"
             else:
@@ -442,15 +511,7 @@ def main() -> int:
         results.append(row)
 
     row_statuses = [str(row.get("status", "")) for row in results]
-    status = "ready"
-    if any("failed" in value for value in row_statuses):
-        status = "failed"
-    elif any("inconclusive" in value for value in row_statuses):
-        status = "needs_more_evidence"
-    elif any("warning" in value for value in row_statuses):
-        status = "warning"
-    elif any(value.startswith("blocked") for value in row_statuses):
-        status = "blocked"
+    status = aggregate_report_status(row_statuses)
 
     report = {
         "generated_at": utc_now(),

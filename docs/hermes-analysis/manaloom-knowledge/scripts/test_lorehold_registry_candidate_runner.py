@@ -72,6 +72,39 @@ class LoreholdRegistryCandidateRunnerTest(unittest.TestCase):
         self.assertIn("--gate-report-json", commands["battle_prior_command"])
         self.assertIn("--candidate-card", commands["battle_prior_command"])
 
+    def test_battle_prior_unobserved_candidate_blocks_scoring(self):
+        prior_gate = {
+            "candidate_observations": {
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+                    "evidence_level": "library_only",
+                    "observed": False,
+                }
+            },
+            "candidate_unobserved_cards": [
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+            ],
+            "status": "inconclusive_candidate_unobserved",
+        }
+
+        decision = runner.classify_battle_prior_summary(prior_gate)
+
+        self.assertEqual(decision["status"], "needs_more_evidence_candidate_unobserved")
+        self.assertEqual(
+            decision["next_action"],
+            "rerun_with_forced_focus_access_or_larger_natural_sample_until_candidate_accessed",
+        )
+        self.assertIn("Birgi, God of Storytelling", decision["reason"])
+
+    def test_aggregate_status_treats_evidence_gap_as_not_ready(self):
+        self.assertEqual(
+            runner.aggregate_report_status(["needs_more_evidence_candidate_unobserved"]),
+            "needs_more_evidence",
+        )
+        self.assertEqual(
+            runner.aggregate_report_status(["executed_battle_prior_passed"]),
+            "ready",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
