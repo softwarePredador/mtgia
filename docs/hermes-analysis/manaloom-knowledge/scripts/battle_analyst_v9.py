@@ -1055,6 +1055,23 @@ STATIC_COST_REDUCTION_SCOPE = "static_cost_reduction_for_matching_spells_v1"
 POWER_BASED_INSTANT_SORCERY_COST_REDUCTION_SCOPE = (
     "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1"
 )
+IMPRINT_SHARED_CARD_TYPE_COST_REDUCTION_SCOPE = (
+    "imprint_nonland_card_reduce_spells_sharing_card_type_v1"
+)
+SHARED_CARD_TYPE_COST_REDUCTION_APPLIES_TO = (
+    "spells_you_cast_sharing_imprinted_card_type"
+)
+MTG_SHARED_CARD_TYPES = {
+    "artifact",
+    "battle",
+    "creature",
+    "enchantment",
+    "instant",
+    "kindred",
+    "planeswalker",
+    "sorcery",
+    "tribal",
+}
 MEDALLION_COLOR_RESTRICTIONS = {
     "pearl medallion": "W",
     "sapphire medallion": "U",
@@ -1239,6 +1256,28 @@ def _static_cost_reduction_card_types(effect_data):
     return []
 
 
+def shared_card_types(card):
+    if not isinstance(card, dict):
+        return []
+    type_line = str(card.get("type_line") or "").lower()
+    found = []
+    for card_type in sorted(MTG_SHARED_CARD_TYPES):
+        if re.search(rf"\b{re.escape(card_type)}\b", type_line):
+            found.append(card_type)
+    return found
+
+
+def source_imprinted_card_types(source):
+    for key in ("imprinted_card_types", "imprinted_types", "imprint_card_types"):
+        values = [str(value).lower() for value in _as_list((source or {}).get(key)) if value]
+        if values:
+            return sorted(set(values) & MTG_SHARED_CARD_TYPES)
+    imprinted_card = (source or {}).get("imprinted_card_object")
+    if isinstance(imprinted_card, dict):
+        return shared_card_types(imprinted_card)
+    return []
+
+
 def _static_cost_reduction_min_mana_value(effect_data):
     for key in (
         "minimum_mana_value",
@@ -1335,8 +1374,18 @@ def _static_cost_reduction_matches_spell(source, effect_data, card, *, controlle
     colors = _static_cost_reduction_color_restrictions(source, effect_data)
     if colors and not any(_spell_has_color(card, color) for color in colors):
         return None
+    applies_to = str(effect_data.get("cost_reduction_applies_to") or "").strip().lower()
+    shared_types = []
+    imprinted_types = []
+    spell_types = []
+    if applies_to == SHARED_CARD_TYPE_COST_REDUCTION_APPLIES_TO:
+        imprinted_types = source_imprinted_card_types(source)
+        spell_types = shared_card_types(card)
+        shared_types = sorted(set(imprinted_types) & set(spell_types))
+        if not shared_types:
+            return None
     card_types = _static_cost_reduction_card_types(effect_data)
-    if not _card_type_matches(card, card_types):
+    if not shared_types and not _card_type_matches(card, card_types):
         return None
     min_mana_value = _static_cost_reduction_min_mana_value(effect_data)
     if min_mana_value is not None and card_mana_value(card) < min_mana_value:
@@ -1351,6 +1400,10 @@ def _static_cost_reduction_matches_spell(source, effect_data, card, *, controlle
         "applies_to_card_types": card_types,
         "minimum_mana_value": min_mana_value,
         "amount_source": amount_source or "fixed",
+        "cost_reduction_applies_to": applies_to,
+        "imprinted_card_types": imprinted_types,
+        "spell_card_types": spell_types,
+        "shared_card_types": shared_types,
     }
 
 
@@ -3866,6 +3919,20 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "battle_model_scope": "neoform_sacrifice_creature_tutor_waiver_v1",
         }
     ),
+    "Semblance Anvil": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 3.0,
+            "effect": "static_cost_reduction",
+            "requires_imprint_nonland_card": True,
+            "imprint_selection": "nonland_card_from_hand",
+            "cost_reduction_applies_to": SHARED_CARD_TYPE_COST_REDUCTION_APPLIES_TO,
+            "cost_reduction_generic": 2,
+            "battle_model_scope": IMPRINT_SHARED_CARD_TYPE_COST_REDUCTION_SCOPE,
+            "_rule_oracle_hash": "32a67417a2ff0e86b36986f3d0973d8c",
+            "_rule_logical_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -3975,6 +4042,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Vivi Ornitier",
     "Faeburrow Elder",
     "Neoform",
+    "Semblance Anvil",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4065,6 +4133,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace stale/heuristic tutor evidence with sacrifice, MV+1 battlefield tutor, and counter semantics.",
         ["20260619_202217", "20260619_202628"],
         "2026-06-19T20:26:28Z",
+    ),
+    "Semblance Anvil": manual_runtime_waiver_metadata(
+        "Replace generated ramp_permanent review_only evidence with XMage-backed imprint and shared-card-type cost reduction semantics.",
+        ["manaloom_log_learning_audit_20260628_v10_after_taunt_runtime", "SemblanceAnvil.java"],
+        "2026-06-28T20:25:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -12865,6 +12938,122 @@ def resolve_chrome_mox_imprint(player, permanent, source_card, *, turn=None):
         card=source_card.get("name", "?"),
         imprinted=imprint.get("name", "?"),
         imprinted_colors=colors,
+        turn=turn,
+        imprint_options=options,
+        selection_reason=reason,
+        strategic_risk_flags=risk_flags,
+    )
+    return True
+
+
+def is_semblance_anvil_imprint_candidate(card):
+    if not isinstance(card, dict):
+        return False
+    if card.get("is_commander"):
+        return False
+    if is_land(card) or is_effective_land(card):
+        return False
+    return bool(shared_card_types(card))
+
+
+def choose_semblance_anvil_imprint_card(player, source_card):
+    candidates = [
+        candidate
+        for candidate in player.hand
+        if candidate is not source_card and is_semblance_anvil_imprint_candidate(candidate)
+    ]
+    critical_effects = {
+        "approach",
+        "board_wipe",
+        "counter",
+        "finisher",
+        "protection",
+        "remove_creature",
+        "remove_permanent",
+        "tutor",
+        "wincon",
+        "worldfire_reset",
+    }
+    options = []
+    for candidate in candidates:
+        candidate_types = shared_card_types(candidate)
+        matching_future_cards = []
+        for other in player.hand:
+            if other is candidate or other is source_card or not isinstance(other, dict):
+                continue
+            if set(candidate_types) & set(shared_card_types(other)):
+                matching_future_cards.append(other.get("name", "?"))
+        effect_data = get_card_effect(candidate)
+        effect = str(effect_data.get("effect") or candidate.get("effect") or "unknown")
+        cmc = _opening_hand_card_cmc(candidate)
+        risk_flags = []
+        risk_penalty = 0
+        if effect in critical_effects:
+            risk_flags.append("imprinting_high_value_card")
+            risk_penalty += 100
+        if cmc >= 5:
+            risk_penalty += min(25, int(cmc) * 3)
+        selection_score = len(matching_future_cards) * 50 - risk_penalty
+        options.append(
+            {
+                "card": candidate.get("name", "?"),
+                "cmc": cmc,
+                "effect": effect,
+                "card_types": candidate_types,
+                "matching_future_cards": sorted(matching_future_cards),
+                "selection_score": selection_score,
+                "risk_flags": risk_flags,
+            }
+        )
+    options.sort(
+        key=lambda option: (
+            -int(option["selection_score"]),
+            len(option["risk_flags"]),
+            option["cmc"],
+            option["card"],
+        )
+    )
+    if not options:
+        return None, [], ["no_valid_imprint_card"], "no_nonland_card_with_supported_card_type"
+    chosen_name = options[0]["card"]
+    chosen = next(candidate for candidate in candidates if candidate.get("name") == chosen_name)
+    return (
+        chosen,
+        options,
+        list(options[0].get("risk_flags") or []),
+        "prefer_lowest_risk_nonland_card_that_unlocks_future_shared_type_spells",
+    )
+
+
+def resolve_semblance_anvil_imprint(player, permanent, source_card, *, turn=None):
+    imprint, options, risk_flags, reason = choose_semblance_anvil_imprint_card(player, source_card)
+    if not imprint:
+        emit_replay_event(
+            "imprint_failed",
+            player=player.name,
+            card=source_card.get("name", "?"),
+            cost="imprint_nonland_card",
+            reason=reason,
+            turn=turn,
+            imprint_options=options,
+            strategic_risk_flags=risk_flags,
+        )
+        return False
+    player.hand.remove(imprint)
+    player.exile.append(imprint)
+    imprinted_types = shared_card_types(imprint)
+    permanent["imprinted_card"] = imprint.get("name", "?")
+    permanent["imprinted_card_types"] = imprinted_types
+    permanent["imprinted_card_object"] = {
+        "name": imprint.get("name", "?"),
+        "type_line": imprint.get("type_line", ""),
+    }
+    emit_replay_event(
+        "imprint_resolved",
+        player=player.name,
+        card=source_card.get("name", "?"),
+        imprinted=imprint.get("name", "?"),
+        imprinted_card_types=imprinted_types,
         turn=turn,
         imprint_options=options,
         selection_reason=reason,
@@ -32627,6 +32816,12 @@ def apply_effect_immediate(
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "static_cost_reduction"
             player.battlefield.append(permanent)
+            if (
+                effect_data.get("requires_imprint_nonland_card")
+                or str(effect_data.get("cost_reduction_applies_to") or "").strip().lower()
+                == SHARED_CARD_TYPE_COST_REDUCTION_APPLIES_TO
+            ):
+                resolve_semblance_anvil_imprint(player, permanent, card, turn=turn)
     elif effect == "discard_trigger_modal_draw_treasure_opponent_life_loss":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = effect
