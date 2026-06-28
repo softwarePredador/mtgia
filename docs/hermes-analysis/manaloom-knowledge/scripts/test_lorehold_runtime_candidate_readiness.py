@@ -1,0 +1,139 @@
+import lorehold_runtime_candidate_readiness as readiness
+
+
+def runtime_queue():
+    return {
+        "family_queue": [
+            {
+                "family_id": "static_damage_modifier",
+                "support_status": "runtime_supported_family",
+                "batch_strategy": "metadata_batch_after_pg_precheck",
+                "cards": [
+                    {
+                        "card_name": "Twinflame Tyrant",
+                        "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+                        "effect": "damage_modifier",
+                        "battle_model_scope": "damage_doubled_v1",
+                        "ready_for_structured_pull": True,
+                        "candidate_lane": "finisher_or_big_spell",
+                        "candidate_score": 10,
+                        "variant_decks": [608],
+                        "variant_deck_count": 1,
+                        "xmage_class": "TwinflameTyrant",
+                    }
+                ],
+            },
+            {
+                "family_id": "targeted_interaction",
+                "support_status": "runtime_family_partially_supported_review_required",
+                "batch_strategy": "split_by_scope_before_metadata_batch",
+                "cards": [
+                    {
+                        "card_name": "Boros Reckoner",
+                        "promotion_lane": "split_family_scope_review_required",
+                        "effect": "direct_damage",
+                        "battle_model_scope": "targeted_damage_variant_v1",
+                        "ready_for_structured_pull": True,
+                        "candidate_lane": "contextual",
+                        "candidate_score": 3,
+                    }
+                ],
+            },
+        ]
+    }
+
+
+def access_model():
+    return {
+        "candidates": [
+            {
+                "card_name": "Hidden Retreat",
+                "lane": "topdeck_protection",
+                "score": 0,
+                "access_targets": ["Sensei's Divining Top"],
+                "blockers": ["candidate_runtime_review_only"],
+                "rule_summary": {
+                    "active_rule_count": 0,
+                    "review_only_rule_count": 2,
+                },
+                "variant_usage": {"deck_count": 0, "deck_ids": []},
+            }
+        ]
+    }
+
+
+def hypothesis_queue():
+    return {
+        "queue": [
+            {
+                "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+                "status": "tested_negative_do_not_promote",
+                "adds": ["Twinflame Tyrant"],
+                "cuts": ["Thor, God of Thunder"],
+                "lane": "spell_chain_conversion",
+                "prior_gate": {"decision": "tested_negative_do_not_promote", "delta_pp": -33.34},
+                "runtime_package_readiness": {
+                    "Twinflame Tyrant": {"readiness": "runtime_ready_pg_precheck_blocked"}
+                },
+            }
+        ]
+    }
+
+
+def test_pg_precheck_blocked_is_not_global_card_reject(tmp_path):
+    manifest_path = tmp_path / "pg245_manifest.json"
+    blocker_path = tmp_path / "pg245_blocked.json"
+    manifests = [
+        (
+            manifest_path,
+            {
+                "deploy_id": "PG245",
+                "status": "prepared_read_only_pending_apply_approval",
+                "selected_card_names": ["Twinflame Tyrant"],
+                "files": {"apply": "apply.sql"},
+            },
+        )
+    ]
+    blockers = [
+        (
+            blocker_path,
+            {
+                "deploy_id": "PG245",
+                "status": "postgres_precheck_blocked_connection_closed",
+                "blocked_step": "precheck",
+                "selected_cards": ["Twinflame Tyrant"],
+                "sanitized_error": "server closed the connection unexpectedly",
+            },
+        )
+    ]
+
+    report = readiness.build_report(
+        runtime_queue=runtime_queue(),
+        access_model=access_model(),
+        hypothesis_queue=hypothesis_queue(),
+        manifests=manifests,
+        precheck_blockers=blockers,
+    )
+
+    rows = {row["card_name"]: row for row in report["cards"]}
+    twinflame = rows["Twinflame Tyrant"]
+    assert twinflame["status"] == "pg_precheck_blocked"
+    assert twinflame["card_global_reject"] is False
+    assert twinflame["cut_specific_negative_count"] == 1
+    assert twinflame["cut_specific_negatives"][0]["cuts"] == ["Thor, God of Thunder"]
+    assert report["summary"]["pg_precheck_blocked_count"] == 1
+
+
+def test_split_scope_and_access_runtime_blockers_get_separate_statuses():
+    report = readiness.build_report(
+        runtime_queue=runtime_queue(),
+        access_model=access_model(),
+        hypothesis_queue={"queue": []},
+        manifests=[],
+        precheck_blockers=[],
+    )
+
+    rows = {row["card_name"]: row for row in report["cards"]}
+    assert rows["Boros Reckoner"]["status"] == "split_scope_review_required"
+    assert rows["Hidden Retreat"]["status"] == "runtime_model_blocked"
+    assert rows["Hidden Retreat"]["runtime_blockers"] == ["candidate_runtime_review_only"]
