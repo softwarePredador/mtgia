@@ -61,10 +61,15 @@ python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
   --report "$sync_report"
 
 battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_$(date -u +%Y%m%d_%H%M%S).json"
-python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
-  --sqlite-db "$SCRIPT_DIR/knowledge.db" \
-  --apply-pg \
-  --report "$battle_rules_pg_report"
+if [[ "${MANALOOM_BATTLE_RULES_APPLY_PG:-0}" == "1" ]]; then
+  python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
+    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --apply-pg \
+    --report "$battle_rules_pg_report"
+else
+  printf '{"apply_pg":false,"skipped":true,"reason":"MANALOOM_BATTLE_RULES_APPLY_PG not set to 1; PostgreSQL remains source of truth"}\n' \
+    > "$battle_rules_pg_report"
+fi
 
 battle_rules_report="$ARTIFACT_DIR/battle_card_rules_cache_sync_$(date -u +%Y%m%d_%H%M%S).json"
 python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \

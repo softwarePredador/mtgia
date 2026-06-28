@@ -28,6 +28,23 @@ DEFAULT_SOURCE_DB = SCRIPT_DIR / "knowledge.db"
 DEFAULT_PLAN = "penance_v1"
 
 RESEARCH_PLANS = {
+    "squee_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "added": [{"card_name": "Squee, Goblin Nabob", "source_deck_id": 609}],
+        "removed": ["Insurrection"],
+        "intent": (
+            "Regenerate the current Squee champion candidate from the live "
+            "deck_607 baseline. This preserves the rest of the 607 shell and "
+            "replaces the expensive Insurrection finisher with repeatable "
+            "graveyard recursion fodder for Lorehold rummage lines."
+        ),
+        "external_signals": [
+            "The local active-learning registry marks +Squee, -Insurrection as the current champion after repeated equal gates.",
+            "Squee has a verified/auto graveyard upkeep return rule in the local battle runtime.",
+            "Earlier Squee diagnostics showed the swap is promising but still needs current-state confirmation and access-density follow-up.",
+        ],
+    },
     "birgi_v1": {
         "base_deck_id": 607,
         "candidate_deck_id": 6,
@@ -341,6 +358,11 @@ def main() -> int:
     parser.add_argument("--source-db", type=Path, default=DEFAULT_SOURCE_DB)
     parser.add_argument("--plan", choices=sorted(RESEARCH_PLANS), default=DEFAULT_PLAN)
     parser.add_argument("--out-dir", type=Path, default=None)
+    parser.add_argument(
+        "--report-stem",
+        default=None,
+        help="Override report basename. Defaults to the historical 20260626 stem for compatibility.",
+    )
     args = parser.parse_args()
 
     plan = RESEARCH_PLANS[args.plan]
@@ -387,8 +409,9 @@ def main() -> int:
         **metadata,
         **summarize_cards(rows),
     }
-    json_path = REPORT_DIR / f"lorehold_607_research_candidate_20260626_{args.plan}.json"
-    md_path = REPORT_DIR / f"lorehold_607_research_candidate_20260626_{args.plan}.md"
+    report_stem = args.report_stem or f"lorehold_607_research_candidate_20260626_{args.plan}"
+    json_path = REPORT_DIR / f"{report_stem}.json"
+    md_path = REPORT_DIR / f"{report_stem}.md"
     json_path.write_text(json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
     md_path.write_text(render_markdown(report), encoding="utf-8")
     print(

@@ -15,6 +15,117 @@ Regra operacional: toda falha deve ter evidencia concreta antes de virar
 implementacao. Nao aplicar swaps, nao alterar PostgreSQL e nao tratar WR ou
 replay aprovado como prova absoluta sem auditoria.
 
+## PG247 Seething Song Oracle Hash Drift - Verified 2026-06-28 12:12 UTC
+
+Escopo:
+
+- Fechar a regressao atual do auditor deck `6` em `Seething Song`.
+- A falha era `trusted_rule_without_oracle_hash` na linha executavel
+  `verified/auto`; nao era falha de executor.
+- Nenhum deck swap, learned-deck promotion, commit, push ou replay multi-seed
+  foi executado.
+
+Evidencia de regra:
+
+- Oracle PostgreSQL: `Add {R}{R}{R}{R}{R}.`
+- Hash esperado: `ccd492289c6f1c14c8fb7a248d7bbf32`.
+- Linha ativa preservada:
+  `battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7`,
+  `effect=ramp_ritual`, `battle_model_scope=single_shot_red_ritual_v1`,
+  `review_status=verified`, `execution_status=auto`.
+- PG247 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg247_seething_song_oracle_hash_drift_precheck_20260628_121000.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg247_seething_song_oracle_hash_drift_apply_20260628_121000.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pg247_seething_song_oracle_hash_drift_postcheck_20260628_121000.out`.
+
+Evidencia de runtime/evento:
+
+- `test_pg058_simple_red_ritual_family_rule_provenance`: pass.
+- `test_pg058_simple_red_ritual_family_runtime_adds_one_shot_mana`: pass.
+- O teste focado prova que `Seething Song` usa
+  `rule_logical_key=battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7` e adiciona
+  `5` mana como ritual one-shot.
+
+Resultado:
+
+- PostgreSQL -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg247_seething_song_20260628_121100.json`.
+- Auditor deck `6` pos-sync:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg247_post_20260628_121200.json`
+  com `severity_counts={"pass": 100}`.
+- `Seething Song` fechado como L2 hash-only/provenance. Sem mudanca de regra de
+  battle.
+
+## PGC001 Seething Song Oracle Hash Restore - Verified 2026-06-28 12:37 UTC
+
+Escopo:
+
+- Corrigir a deriva que voltou a remover o `oracle_hash` de `Seething Song`
+  apos uma sync legacy PG-prefixed.
+- Preservar a mesma linha executavel `verified/auto` e o mesmo
+  `battle_model_scope=single_shot_red_ritual_v1`.
+
+Evidencia:
+
+- PGC001 precheck/apply/postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_precheck_20260628_123500.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_apply_20260628_123500.out`,
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_postcheck_20260628_123500.out`.
+- Recentes `PG###` verificados antes de numerar: `PG246`, `PG247`, `PG248`.
+- Sync PostgreSQL -> Hermes:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pgc001_seething_song_20260628_123600.json`.
+- Post-audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pgc001_post_20260628_123700.json`
+  com `severity_counts={"pass": 100}`;
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pgc001_post_20260628_123700.json`
+  com `severity_counts={"pass": 81}`.
+
+Resultado:
+
+- `Seething Song` voltou a carregar
+  `oracle_hash=ccd492289c6f1c14c8fb7a248d7bbf32`.
+- Sem mudanca de regra de battle, deck, learned deck ou baseline.
+- O artefato `pgc001_battle_analyst_v10_3_tests_20260628_123700.out` contem
+  apenas linhas `PASS` para os testes executados.
+
+## Lorehold 607 Squee Current Rebaseline - 2026-06-28 12:25 UTC
+
+Escopo:
+
+- Regerar candidato isolado `candidate_607_squee_current_pg247_v1` a partir do
+  `knowledge.db` atual.
+- Comparar `+Squee, Goblin Nabob; -Insurrection` contra o deck `607`, sem
+  alterar PostgreSQL, deck real ou `knowledge.db` fonte.
+
+Evidencia:
+
+- Candidato:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260628_squee_v1_current.json`.
+- Resumo compacto:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_squee_current_pg247_rebaseline_20260628_summary.json`.
+- Gate seed42 g3:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_squee_current_pg247_gate_seed42_g3_20260628_v1.md`.
+- Gate seed99 g3:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_squee_current_pg247_gate_seed99_g3_20260628_v1.md`.
+
+Resultado:
+
+- Seed42 g3: Squee `4W/5L/0S`; deck `607` `4W/5L/0S`.
+- Seed99 g3: Squee `0W/9L/0S`; deck `607` `2W/7L/0S`.
+- Agregado dos dois gates maiores: Squee `4W/14L/0S`; deck `607`
+  `6W/12L/0S`.
+- A sinergia de Squee executou de forma rastreavel: `10` entradas no cemiterio,
+  `7` retornos de upkeep e `0` retornos inexplicados nos dois gates maiores.
+- Mesmo assim, o corte de `Insurrection` nao provou vantagem de vitoria e
+  reduziu a conversao miracle/finisher no estado atual.
+
+Status:
+
+- `candidate_607_squee_v1` rebaixado para hipotese ativa, nao lider.
+- Deck `607` volta a ser baseline protegido.
+- `Insurrection` fica protegido ate uma substituicao de mesma funcao vencer
+  gate comparativo atual.
+
 ## Checkpoint Auditor Central - replay.txt final hand cards - 2026-06-22 10:21 -0300
 
 Escopo:

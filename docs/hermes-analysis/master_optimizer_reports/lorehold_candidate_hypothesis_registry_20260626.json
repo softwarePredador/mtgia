@@ -1,8 +1,8 @@
 {
   "status": "active_learning_registry",
   "protected_baseline": "deck_607",
-  "current_leader": "candidate_607_squee_v1",
-  "current_leader_priority_residual": "exhausted_no_upgrade_20260627",
+  "current_leader": "deck_607",
+  "current_leader_priority_residual": "squee_rebaseline_regressed_current_pg247_20260628",
   "acceptance_rule": [
     "candidate must tie or beat deck_607 on same real-opponent gate",
     "candidate must not regress the Winota matchup",
@@ -118,9 +118,9 @@
     {
       "key": "candidate_607_squee_v1",
       "swap_or_scope": "+Squee, Goblin Nabob; -Insurrection",
-      "status": "promoted_current_champion",
-      "result": "scoped probe 3W/0L/0S; equal gate rerun seed42 7W/1L/1S vs deck_607 5W/4L/0S; equal gate seed99 2W/7L/0S vs deck_607 1W/8L/0S",
-      "learning": "Squee cleared the relevant-opponent probe and then beat deck_607 in two completed equal gates. The seed42 rerun preserved the baseline at 55.56% while Squee climbed to 77.78%, and the harsher seed99 gate still left Squee ahead while doubling miracle and topdeck event frequency over the baseline. This is the first tested swap that has actually dethroned deck_607 on repeated real-opponent evidence."
+      "status": "superseded_rebaseline_regressed",
+      "result": "historical scoped probe 3W/0L/0S; historical equal gate rerun seed42 7W/1L/1S vs deck_607 5W/4L/0S; historical equal gate seed99 2W/7L/0S vs deck_607 1W/8L/0S; current PG247/PG248 rebaseline seed42 g3 tied 4W/5L/0S vs deck_607 4W/5L/0S; current seed99 g3 lost 0W/9L/0S vs deck_607 2W/7L/0S; current aggregate 4W/14L/0S vs deck_607 6W/12L/0S",
+      "learning": "Squee remains a coherent recursion hypothesis and the runtime proved known graveyard entries and explained upkeep returns, but the current rebaseline no longer proves a deck upgrade. Cutting Insurrection reduced miracle/finisher conversion in the larger current gates, so deck_607 returns to protected baseline and Insurrection is protected until a same-function replacement wins."
     }
   ],
   "leader_follow_up_probes": [
@@ -206,6 +206,7 @@
     "High Noon",
     "Prismari Pianist",
     "Reforge the Soul",
-    "Storm Herd"
+    "Storm Herd",
+    "Insurrection"
   ]
 }

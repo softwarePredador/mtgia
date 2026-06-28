@@ -1,0 +1,13 @@
+-- file docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_apply.sql
+-- statement 1
+rowcount=-1
+-- statement 2
+rowcount=-1
+-- statement 3
+rowcount=1
+-- statement 4
+updated_rows
+1
+(1 rows)
+-- statement 5
+rowcount=-1

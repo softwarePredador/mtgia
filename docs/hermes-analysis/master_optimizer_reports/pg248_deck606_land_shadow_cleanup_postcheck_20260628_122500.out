@@ -1,0 +1,36 @@
+-- file docs/hermes-analysis/master_optimizer_reports/pg248_deck606_land_shadow_cleanup_postcheck.sql
+-- statement 1
+target_cards	trusted_land_rows	rejected_generated_shadow_rows	remaining_review_shadow_rows	backup_rows
+7	7	7	0	14
+(1 rows)
+-- statement 2
+name	logical_rule_key	source	review_status	execution_status	effect_json	notes_tail
+Boros Garrison	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	lays.
+PG248 2026-06-28: deck 606 L1 land gate accepted as generic land-only runtime. This is not a utility-land executor for ETB tapped, bounce, uncounterable mana, channel damage, commander-zone recursion, max hand size, or Valakut damage.
+Boros Garrison	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	rejected	disabled	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	 runtime.
+PG248 2026-06-28: rejected generated land shadow for deck 606 L1 cleanup. Current trusted runtime remains curated land-only. Utility clauses are not promoted by this package and require separate oracle-specific executor if needed.
+Boseiju, Who Shelters All	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	lays.
+PG248 2026-06-28: deck 606 L1 land gate accepted as generic land-only runtime. This is not a utility-land executor for ETB tapped, bounce, uncounterable mana, channel damage, commander-zone recursion, max hand size, or Valakut damage.
+Boseiju, Who Shelters All	battle_rule_v1:2be7a9b6c891893428bd34f4866a48a8	generated	rejected	disabled	{'cmc': 0.0, 'effect': 'land', 'uncounterable': True}	 runtime.
+PG248 2026-06-28: rejected generated land shadow for deck 606 L1 cleanup. Current trusted runtime remains curated land-only. Utility clauses are not promoted by this package and require separate oracle-specific executor if needed.
+Command Beacon	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	lays.
+PG248 2026-06-28: deck 606 L1 land gate accepted as generic land-only runtime. This is not a utility-land executor for ETB tapped, bounce, uncounterable mana, channel damage, commander-zone recursion, max hand size, or Valakut damage.
+Command Beacon	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	rejected	disabled	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	 runtime.
+PG248 2026-06-28: rejected generated land shadow for deck 606 L1 cleanup. Current trusted runtime remains curated land-only. Utility clauses are not promoted by this package and require separate oracle-specific executor if needed.
+Eiganjo, Seat of the Empire	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	lays.
+PG248 2026-06-28: deck 606 L1 land gate accepted as generic land-only runtime. This is not a utility-land executor for ETB tapped, bounce, uncounterable mana, channel damage, commander-zone recursion, max hand size, or Valakut damage.
+Eiganjo, Seat of the Empire	battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167	generated	rejected	disabled	{'cmc': 0.0, 'effect': 'land'}	 runtime.
+PG248 2026-06-28: rejected generated land shadow for deck 606 L1 cleanup. Current trusted runtime remains curated land-only. Utility clauses are not promoted by this package and require separate oracle-specific executor if needed.
+Furycalm Snarl	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	lays.
+PG248 2026-06-28: deck 606 L1 land gate accepted as generic land-only runtime. This is not a utility-land executor for ETB tapped, bounce, uncounterable mana, channel damage, commander-zone recursion, max hand size, or Valakut damage.
+Furycalm Snarl	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	rejected	disabled	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	 runtime.
+PG248 2026-06-28: rejected generated land shadow for deck 606 L1 cleanup. Current trusted runtime remains curated land-only. Utility clauses are not promoted by this package and require separate oracle-specific executor if needed.
+Reliquary Tower	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	lays.
+PG248 2026-06-28: deck 606 L1 land gate accepted as generic land-only runtime. This is not a utility-land executor for ETB tapped, bounce, uncounterable mana, channel damage, commander-zone recursion, max hand size, or Valakut damage.
+Reliquary Tower	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	rejected	disabled	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	 runtime.
+PG248 2026-06-28: rejected generated land shadow for deck 606 L1 cleanup. Current trusted runtime remains curated land-only. Utility clauses are not promoted by this package and require separate oracle-specific executor if needed.
+Valakut, the Molten Pinnacle	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	lays.
+PG248 2026-06-28: deck 606 L1 land gate accepted as generic land-only runtime. This is not a utility-land executor for ETB tapped, bounce, uncounterable mana, channel damage, commander-zone recursion, max hand size, or Valakut damage.
+Valakut, the Molten Pinnacle	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	rejected	disabled	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	 runtime.
+PG248 2026-06-28: rejected generated land shadow for deck 606 L1 cleanup. Current trusted runtime remains curated land-only. Utility clauses are not promoted by this package and require separate oracle-specific executor if needed.
+(14 rows)

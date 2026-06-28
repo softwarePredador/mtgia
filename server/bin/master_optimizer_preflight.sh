@@ -55,10 +55,15 @@ sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_$(date -u +%Y%m%d_%H%M%S).json
   --report "$sync_report"
 
 battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_$(date -u +%Y%m%d_%H%M%S).json"
-"$PYTHON_BIN" "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
-  --sqlite-db "$SQLITE_DB" \
-  --apply-pg \
-  --report "$battle_rules_pg_report"
+if [[ "${MANALOOM_BATTLE_RULES_APPLY_PG:-0}" == "1" ]]; then
+  "$PYTHON_BIN" "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
+    --sqlite-db "$SQLITE_DB" \
+    --apply-pg \
+    --report "$battle_rules_pg_report"
+else
+  printf '{"apply_pg":false,"skipped":true,"reason":"MANALOOM_BATTLE_RULES_APPLY_PG not set to 1; PostgreSQL remains source of truth"}\n' \
+    > "$battle_rules_pg_report"
+fi
 
 battle_rules_report="$ARTIFACT_DIR/battle_card_rules_cache_sync_$(date -u +%Y%m%d_%H%M%S).json"
 "$PYTHON_BIN" "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \

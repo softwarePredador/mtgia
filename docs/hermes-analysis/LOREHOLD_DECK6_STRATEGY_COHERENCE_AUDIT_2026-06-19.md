@@ -10,6 +10,28 @@ future commander deck audits.
 This is a read-only audit. No PostgreSQL writes, swaps, migrations, or commits
 were applied.
 
+## Latest Strategy Checkpoint - 2026-06-28
+
+- Deck `607` is the protected baseline again after current-state Squee
+  rebaseline.
+- The isolated `+Squee, Goblin Nabob; -Insurrection` candidate was regenerated
+  from the current PG247/PG248 local state and tested without mutating
+  PostgreSQL, deck `607`, deck `6`, or the source `knowledge.db`.
+- Larger gates did not prove Squee as a better deck:
+  - seed42 g3: Squee `4W/5L/0S`; deck `607` `4W/5L/0S`.
+  - seed99 g3: Squee `0W/9L/0S`; deck `607` `2W/7L/0S`.
+  - aggregate: Squee `4W/14L/0S`; deck `607` `6W/12L/0S`.
+- Squee's recursion itself worked when accessed (`10` graveyard entries and
+  `7` explained upkeep returns across the two larger gates), but cutting
+  `Insurrection` reduced current win conversion. Treat Squee as an active
+  synergy hypothesis, not as the current best-list promotion.
+- Evidence:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260628_squee_v1_current.json`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_squee_current_pg247_rebaseline_20260628_summary.json`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_squee_current_pg247_gate_seed42_g3_20260628_v1.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_squee_current_pg247_gate_seed99_g3_20260628_v1.md`.
+
 ## Sources Checked
 
 - PostgreSQL `halder.public` via `server/.env`, read-only transaction.

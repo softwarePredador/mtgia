@@ -2,16 +2,16 @@
 
 Owner: Auditor Central / single operator
 Controller: Auditor Central
-Status: active register. Latest current card-rule/source-of-truth package in
-this thread is PG219, applied, postchecked, synced from PostgreSQL to Hermes
-SQLite/canonical snapshot, tested, strategy-audited, and documented on
-2026-06-25/2026-06-26. PG217 promoted
-`Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`,
-`The Locust God`, and `Biotransference` to Oracle/XMage-backed Saga,
-draw-trigger token, and static artifact-spell token runtime rules; PG218
-promoted `Warleader's Call`; PG219 promoted the `Purphoros, God of the Forge`
-creature-enter trigger while preserving orthogonal shadow rows. This was not a
-deck swap, learned-deck promotion, or battle rebaseline.
+Status: active register. Latest applied current card-rule/source-of-truth
+package in this thread is PGC001, applied, postchecked, synced from PostgreSQL
+to Hermes SQLite/canonical snapshot, tested, and documented on 2026-06-28.
+PGC001 restored `Seething Song` `oracle_hash` provenance after a legacy
+PG-prefixed automation sync drifted the field back to null; it did not change
+the executor, oracle text, logical rule key, deck contents, learned deck, or
+battle baseline.
+This agent now uses the `PGC###` namespace for card oracle/rule packages and
+must inspect recent parallel-agent `PG###` artifacts before creating a new
+`PGC###` package.
 
 ## Purpose
 
@@ -48,6 +48,131 @@ evidence of an already-executed approved deck/data correction, not standing
 authorization for any future swap.
 
 ## Current Database Deploy Queue
+
+### PGC001 Seething Song Oracle Hash Restore - Applied 2026-06-28 12:35 UTC
+
+Status: `applied_postchecked_synced_tested_documented`
+
+Namespace:
+
+- First package in this agent's `PGC###` namespace.
+- Recent `PG###` artifacts checked before numbering: `PG246`, `PG247`, and
+  `PG248`.
+
+Scope:
+
+- Card: `Seething Song`.
+- Rule: `battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7`.
+- Table: `public.card_battle_rules`.
+- Durable change: restore `oracle_hash=ccd492289c6f1c14c8fb7a248d7bbf32`
+  after PG248-era sync drift.
+- Behavior change: none. Runtime remains `single_shot_red_ritual_v1`.
+- No deck swap, learned-deck promotion, or battle baseline change.
+
+Evidence:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_package.md`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_precheck_20260628_123500.out`
+  reported `target_rows=1`, `safe_target_rows=1`, and `missing_hash_rows=1`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_apply_20260628_123500.out`
+  reported `updated_rows=1`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_postcheck_20260628_123500.out`
+  reported `target_rows=1`, `matching_oracle_hash_rows=1`,
+  `verified_auto_scope_rows=1`, and `backup_rows=1`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_rollback.sql`.
+- PostgreSQL -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pgc001_seething_song_20260628_123600.json`.
+- Post-audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pgc001_post_20260628_123700.json`
+  with `severity_counts={"pass": 100}` and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pgc001_post_20260628_123700.json`
+  with `severity_counts={"pass": 81}`.
+- Runtime tests:
+  `docs/hermes-analysis/master_optimizer_reports/pgc001_battle_analyst_v10_3_tests_20260628_123700.out`.
+
+### PG248 Deck 606 Land Shadow Cleanup - Applied 2026-06-28 12:27 UTC
+
+Status: `applied_postchecked_synced_tested_documented`
+
+Scope:
+
+- Cards: `Boros Garrison`, `Boseiju, Who Shelters All`, `Command Beacon`,
+  `Eiganjo, Seat of the Empire`, `Furycalm Snarl`, `Reliquary Tower`, and
+  `Valakut, the Molten Pinnacle`.
+- Table: `public.card_battle_rules`.
+- Durable change: reject/disable generated `needs_review/review_only` land
+  shadows when a trusted curated land-only row already exists.
+- Behavior change: generic land-only runtime remains trusted. PG248 does not
+  implement ETB tapped/bounce, uncounterable mana, channel damage,
+  commander-zone movement, max hand size, or Valakut damage.
+
+Evidence:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg248_deck606_land_shadow_cleanup_package.md`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg248_deck606_land_shadow_cleanup_precheck_20260628_122500.out`
+  reported `target_cards=7`, `generated_review_only_rows=7`, and
+  `trusted_land_rows=7`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg248_deck606_land_shadow_cleanup_apply_20260628_122500.out`
+  reported `rejected_shadow_rows=7` and `annotated_trusted_land_rows=7`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg248_deck606_land_shadow_cleanup_postcheck_20260628_122500.out`
+  reported `target_cards=7`, `trusted_land_rows=7`,
+  `rejected_generated_shadow_rows=7`, `remaining_review_shadow_rows=0`, and
+  `backup_rows=14`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg248_deck606_land_shadow_cleanup_rollback.sql`.
+- PostgreSQL -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg248_deck606_land_shadow_20260628_122600.json`.
+- Post-audits:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck606_pg248_post_20260628_122700.json`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_pg248_post_20260628_122700.json`.
+- Runtime tests:
+  `docs/hermes-analysis/master_optimizer_reports/pg248_battle_analyst_v10_3_tests_20260628_122700.out`.
+
+### PG247 Seething Song Oracle Hash Drift - Applied 2026-06-28 12:12 UTC
+
+Status: `applied_postchecked_synced_tested_documented`
+
+Scope:
+
+- Card: `Seething Song`.
+- Rule: `battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7`.
+- Table: `public.card_battle_rules`.
+- Durable change: restore `oracle_hash=ccd492289c6f1c14c8fb7a248d7bbf32`.
+- Behavior change: none. Runtime remains `single_shot_red_ritual_v1`.
+- No deck swap, learned-deck promotion, commit, push, or battle rebaseline.
+
+Evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg247_seething_song_oracle_hash_drift_precheck_20260628_121000.out`
+  reported `target_rows=1`, `safe_target_rows=1`, and `missing_hash_rows=1`.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/pg247_seething_song_oracle_hash_drift_apply_20260628_121000.out`
+  reported `updated_rows=1`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/pg247_seething_song_oracle_hash_drift_postcheck_20260628_121000.out`
+  reported `target_rows=1`, `matching_oracle_hash_rows=1`,
+  `verified_auto_scope_rows=1`, and `backup_rows=1`.
+- Rollback:
+  `docs/hermes-analysis/master_optimizer_reports/pg247_seething_song_oracle_hash_drift_rollback.sql`.
+- PostgreSQL -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg247_seething_song_20260628_121100.json`.
+- Deck `6` post-audit:
+  `docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck6_pg247_post_20260628_121200.json`
+  with `severity_counts={"pass": 100}`.
+- Focused tests:
+  `test_sync_battle_card_rules_pg_selection.py -v` passed `16` tests, and the
+  selected `pg058_simple_red_ritual_family` battle tests passed `2` tests.
 
 ### Lorehold canonical Wheel apply - 2026-06-20 15:15 -0300
 

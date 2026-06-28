@@ -1,0 +1,39 @@
+-- statement 1
+name	type_line	oracle_text	normalized_name	logical_rule_key	source	review_status	execution_status	effect_json	deck_role_json	notes
+Boros Garrison	Land	This land enters tapped.
+When this land enters, return a land you control to its owner's hand.
+{T}: Add {R}{W}.	boros garrison	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	{'effect': 'land', 'category': 'land'}	Curated bulk rule from authoritative cards.type_line containing Land; battle treats land faces as land plays.
+Boros Garrison	Land	This land enters tapped.
+When this land enters, return a land you control to its owner's hand.
+{T}: Add {R}{W}.	boros garrison	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	needs_review	review_only	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	{'effect': 'land', 'category': 'land'}	Seeded from known_cards_generated.json; audit before trusting. Oracle-normalized to match battle runtime.
+Boseiju, Who Shelters All	Legendary Land	Boseiju enters tapped.
+{T}, Pay 2 life: Add {C}. If that mana is spent on an instant or sorcery spell, that spell can't be countered.	boseiju, who shelters all	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	{'effect': 'land', 'category': 'land'}	Curated bulk rule from authoritative cards.type_line containing Land; battle treats land faces as land plays.
+Boseiju, Who Shelters All	Legendary Land	Boseiju enters tapped.
+{T}, Pay 2 life: Add {C}. If that mana is spent on an instant or sorcery spell, that spell can't be countered.	boseiju, who shelters all	battle_rule_v1:2be7a9b6c891893428bd34f4866a48a8	generated	needs_review	review_only	{'cmc': 0.0, 'effect': 'land', 'uncounterable': True}	{'effect': 'land', 'category': 'land'}	Seeded from known_cards_generated.json; audit before trusting. Oracle-normalized to match battle runtime.
+Command Beacon	Land	{T}: Add {C}.
+{T}, Sacrifice this land: Put your commander into your hand from the command zone.	command beacon	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	{'effect': 'land', 'category': 'land'}	Curated bulk rule from authoritative cards.type_line containing Land; battle treats land faces as land plays.
+Command Beacon	Land	{T}: Add {C}.
+{T}, Sacrifice this land: Put your commander into your hand from the command zone.	command beacon	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	needs_review	review_only	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	{'effect': 'land', 'category': 'land'}	Seeded from known_cards_generated.json; audit before trusting. Oracle-normalized to match battle runtime.
+Eiganjo, Seat of the Empire	Legendary Land	{T}: Add {W}.
+Channel — {2}{W}, Discard this card: It deals 4 damage to target attacking or blocking creature. This ability costs {1} less to activate for each legendary creature you control.	eiganjo, seat of the empire	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	{'effect': 'land', 'category': 'land'}	Curated bulk rule from authoritative cards.type_line containing Land; battle treats land faces as land plays.
+Eiganjo, Seat of the Empire	Legendary Land	{T}: Add {W}.
+Channel — {2}{W}, Discard this card: It deals 4 damage to target attacking or blocking creature. This ability costs {1} less to activate for each legendary creature you control.	eiganjo, seat of the empire	battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167	generated	needs_review	review_only	{'cmc': 0.0, 'effect': 'land'}	{'effect': 'land', 'category': 'land'}	Seeded from known_cards_generated.json; audit before trusting. Oracle-normalized to match battle runtime.
+Furycalm Snarl	Land	As this land enters, you may reveal a Mountain or Plains card from your hand. If you don't, this land enters tapped.
+{T}: Add {R} or {W}.	furycalm snarl	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	{'effect': 'land', 'category': 'land'}	Curated bulk rule from authoritative cards.type_line containing Land; battle treats land faces as land plays.
+Furycalm Snarl	Land	As this land enters, you may reveal a Mountain or Plains card from your hand. If you don't, this land enters tapped.
+{T}: Add {R} or {W}.	furycalm snarl	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	needs_review	review_only	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	{'effect': 'land', 'category': 'land'}	Seeded from known_cards_generated.json; audit before trusting. Oracle-normalized to match battle runtime.
+Reliquary Tower	Land	You have no maximum hand size.
+{T}: Add {C}.	reliquary tower	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	{'effect': 'land', 'category': 'land'}	Curated bulk rule from authoritative cards.type_line containing Land; battle treats land faces as land plays.
+Reliquary Tower	Land	You have no maximum hand size.
+{T}: Add {C}.	reliquary tower	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	needs_review	review_only	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	{'effect': 'land', 'category': 'land'}	Seeded from known_cards_generated.json; audit before trusting. Oracle-normalized to match battle runtime.
+Valakut, the Molten Pinnacle	Land	This land enters tapped.
+Whenever a Mountain you control enters, if you control at least five other Mountains, you may have this land deal 3 damage to any target.
+{T}: Add {R}.	valakut, the molten pinnacle	battle_rule_v1:603c776839827f2f21cef8b62e22a1be	curated	verified	auto	{'effect': 'land'}	{'effect': 'land', 'category': 'land'}	Curated bulk rule from authoritative cards.type_line containing Land; battle treats land faces as land plays.
+Valakut, the Molten Pinnacle	Land	This land enters tapped.
+Whenever a Mountain you control enters, if you control at least five other Mountains, you may have this land deal 3 damage to any target.
+{T}: Add {R}.	valakut, the molten pinnacle	battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d	generated	needs_review	review_only	{'cmc': 0.0, 'effect': 'land', 'mana_produced': 1}	{'effect': 'land', 'category': 'land'}	Seeded from known_cards_generated.json; audit before trusting. Oracle-normalized to match battle runtime.
+(14 rows)
+-- statement 2
+target_cards	generated_review_only_rows	trusted_land_rows
+7	7	7
+(1 rows)

@@ -4,6 +4,13 @@ import lorehold_607_research_candidate as research
 
 
 class Lorehold607ResearchCandidateTest(unittest.TestCase):
+    def test_squee_plan_regenerates_current_champion_swap(self):
+        plan = research.RESEARCH_PLANS["squee_v1"]
+        self.assertEqual(plan["base_deck_id"], 607)
+        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["added"], [{"card_name": "Squee, Goblin Nabob", "source_deck_id": 609}])
+        self.assertEqual(plan["removed"], ["Insurrection"])
+
     def test_penance_plan_is_one_card_ablation(self):
         plan = research.RESEARCH_PLANS["penance_v1"]
         self.assertEqual(plan["base_deck_id"], 607)

@@ -1,0 +1,17 @@
+-- file docs/hermes-analysis/master_optimizer_reports/pg248_deck606_land_shadow_cleanup_apply.sql
+-- statement 1
+rowcount=-1
+-- statement 2
+rowcount=-1
+-- statement 3
+rowcount=14
+-- statement 4
+rejected_shadow_rows
+7
+(1 rows)
+-- statement 5
+annotated_trusted_land_rows
+7
+(1 rows)
+-- statement 6
+rowcount=-1
