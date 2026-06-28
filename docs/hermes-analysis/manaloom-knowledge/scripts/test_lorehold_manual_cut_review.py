@@ -39,6 +39,7 @@ def memory_db():
         ("Austere Command", "board_wipe", "austere_command_choose_two_destroy_modes_v1"),
         ("Gamble", "tutor", "any_card_to_hand_then_random_discard_v1"),
         ("Enlightened Tutor", "tutor", "artifact_enchantment_tutor_to_library_top_v1"),
+        ("Manual Flex", "draw", "manual_flex_draw_probe_v1"),
     ]:
         conn.execute(
             "INSERT INTO battle_card_rules VALUES (?, ?, ?, ?, ?, ?)",
@@ -55,6 +56,10 @@ def memory_db():
             "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)",
             (6, name, 1, "engine", 3.0, "Sorcery", '["engine"]'),
         )
+    conn.execute(
+        "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (607, "Manual Flex", 1, "draw", 2.0, "Enchantment", '["draw"]'),
+    )
     return conn
 
 
@@ -78,6 +83,15 @@ def strategy_audit():
                     "effective_role": "unknown",
                     "package_lane": "pressure_absorber_or_protection",
                     "status": "materialization_gap_ready_rule",
+                    "rule_materialized_in_equal_gate_candidate": False,
+                },
+                {
+                    "card_name": "Manual Flex",
+                    "decision": "manual_review",
+                    "decision_reason": "weakly classified flex slot",
+                    "effective_role": "draw",
+                    "package_lane": "contextual",
+                    "status": "manual_role_review",
                     "rule_materialized_in_equal_gate_candidate": False,
                 },
             ]
@@ -117,6 +131,27 @@ def strategy_audit():
                 }
             }
         },
+    }
+
+
+def safe_cut_report():
+    return {
+        "summary": {
+            "manifest_ready_count": 0,
+            "followup_count": 2,
+        },
+        "followups": [
+            {
+                "source_package_key": "past_in_flames_recast",
+                "cuts": ["Manual Flex"],
+                "blockers": ["missing_cut_safety_row"],
+            },
+            {
+                "source_package_key": "gods_willing_commander_shield_cut_promise",
+                "cuts": ["Squee, Goblin Nabob"],
+                "blockers": ["cut_not_flex_decision", "missing_cut_safety_row"],
+            },
+        ],
     }
 
 
@@ -250,3 +285,23 @@ def test_manual_cut_review_safe_next_action_is_dynamic_after_tradeoff_removed():
     safe_next_action = payload["summary"]["safe_next_action"]
     assert "Austere" not in safe_next_action
     assert "seed-safe tutor cut" in safe_next_action
+
+
+def test_manual_cut_review_builds_cut_evidence_expansion_from_safe_cut_report():
+    with memory_db() as conn:
+        payload = review.build_review(
+            strategy_audit=strategy_audit(),
+            cut_model=cut_model(),
+            safe_cut_report=safe_cut_report(),
+            conn=conn,
+        )
+
+    expansion = payload["cut_evidence_expansion"]
+    rows = {row["card_name"]: row for row in expansion["rows"]}
+    assert rows["Manual Flex"]["status"] == "cut_exposure_candidate"
+    assert rows["Manual Flex"]["recommended_action"] == "model_cut_exposure"
+    assert rows["Manual Flex"]["lorehold_variant_presence"]["deck_count"] == 1
+    assert rows["Manual Flex"]["safe_cut_replanner_evidence"]["blocker_counts"] == {
+        "missing_cut_safety_row": 1
+    }
+    assert payload["summary"]["cut_evidence_expansion"]["model_cut_exposure_count"] >= 1

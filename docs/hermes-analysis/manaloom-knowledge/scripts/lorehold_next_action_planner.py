@@ -25,7 +25,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
-DEFAULT_MANUAL_REVIEW = REPORT_DIR / "lorehold_manual_cut_review_20260627_v3_role_fix.json"
+DEFAULT_MANUAL_REVIEW = REPORT_DIR / "lorehold_manual_cut_review_20260628_v1_safe_cut_expansion.json"
 DEFAULT_EXPOSURE_PROFILES = [REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json"]
 DEFAULT_STRATEGY_AUDIT = (
     REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
@@ -745,6 +745,40 @@ def build_runtime_action(miner_report: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+def build_cut_exposure_action(manual_review: dict[str, Any]) -> dict[str, Any] | None:
+    expansion = manual_review.get("cut_evidence_expansion") or {}
+    summary = expansion.get("summary") or {}
+    top_rows = list(expansion.get("top_exposure_candidates") or [])
+    if int(summary.get("model_cut_exposure_count") or 0) <= 0 or not top_rows:
+        return None
+    top = top_rows[:8]
+    return {
+        "priority": -3,
+        "action_key": "model_low_exposure_cut_slots_before_gate",
+        "status": "cut_safety_expansion_required",
+        "lane": "cut_modeling",
+        "candidate_cards": [],
+        "cut_cards": [str(row.get("card_name") or "") for row in top],
+        "why_now": (
+            "The safe-cut replanner found zero gate-ready packages because current cuts lack "
+            "explicit safety evidence or hit protected structure. The next useful work is to "
+            "model the lowest-risk cut slots before another card package gate."
+        ),
+        "blockers": [
+            "safe-cut manifest_ready_count is zero",
+            "current proposed cuts are blocked by structure, prior rejection, or missing cut-safety rows",
+            "battle gates without cut exposure would retest blind cuts",
+        ],
+        "next_steps": [
+            "Build an exposure profile for the top cut slots from current replays and deck comparison.",
+            "Only promote a cut to package preflight if exposure shows low strategic dependency and no prior rejection.",
+            "Prefer same-lane replacement gates after cut exposure, not cross-lane swaps.",
+        ],
+        "cut_evidence_summary": summary,
+        "top_cut_exposure_candidates": top,
+    }
+
+
 def deck_contains(strategy_audit: dict[str, Any], card_name: str) -> bool:
     wanted = normalize_key(card_name)
     for summary in (strategy_audit.get("deck_summaries") or {}).values():
@@ -994,6 +1028,9 @@ def build_plan(
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
     actions = []
+    cut_exposure_action = build_cut_exposure_action(manual_review)
+    if cut_exposure_action:
+        actions.append(cut_exposure_action)
     trace_action = build_focus_access_trace_action(trace_audit)
     if trace_action:
         actions.append(trace_action)

@@ -21,17 +21,26 @@ from typing import Any, Iterable
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260627_v3.json"
-DEFAULT_CUT_MODEL = REPORT_DIR / "lorehold_variant_gap_miner_20260627_v2_cut_model.json"
-DEFAULT_EXPOSURE_PROFILE = REPORT_DIR / "lorehold_card_exposure_profile_20260627_v1.json"
+DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
+DEFAULT_CUT_MODEL = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
+DEFAULT_EXPOSURE_PROFILE = REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json"
+DEFAULT_SAFE_CUT_REPLANNER = REPORT_DIR / "lorehold_safe_cut_replanner_20260628_v4.json"
 DEFAULT_DB = (
     REPORT_DIR
     / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
     / "knowledge_candidate.db"
 )
+DEFAULT_LOREHOLD_VARIANT_DECK_IDS = tuple(range(607, 617))
 
 ACTIVE_EXECUTION_STATUSES = {"active", "verified", "auto", "reviewed"}
 ACTIVE_REVIEW_STATUSES = {"verified", "active", "needs_review", "reviewed"}
+SAFE_CUT_DECISIONS = {"engine_flex", "manual_review", "support_flex"}
+STRUCTURAL_BLOCKERS = {
+    "cut_is_early_mana_floor_support",
+    "cut_is_miracle_core_big_spell",
+    "cut_is_protection_shell",
+    "never_cut_lane",
+}
 
 EXTERNAL_RESEARCH_SOURCES = [
     {
@@ -41,6 +50,7 @@ EXTERNAL_RESEARCH_SOURCES = [
             "Lorehold's core loop is first-draw miracle timing, opponent-upkeep rummage, "
             "topdeck manipulation, Library of Leng, and high-impact instant/sorcery hits."
         ),
+        "use": "heuristic_context_only",
     },
     {
         "title": "EDHREC - Lorehold, the Historian: Boros Miracles on a Budget",
@@ -49,6 +59,7 @@ EXTERNAL_RESEARCH_SOURCES = [
             "The deck needs a high instant/sorcery density so miracle draws do not become dead "
             "non-spell hits."
         ),
+        "use": "heuristic_context_only",
     },
     {
         "title": "Card Kingdom - 10 Crazy Synergy Cards for Lorehold, the Historian",
@@ -57,6 +68,7 @@ EXTERNAL_RESEARCH_SOURCES = [
             "Community deck tech highlights Library of Leng and reanimation/discard routes as "
             "real Lorehold subpackages."
         ),
+        "use": "heuristic_context_only",
     },
     {
         "title": "Reddit r/EDHBrews - Commander Deck Tech: Lorehold, the Historian",
@@ -65,6 +77,7 @@ EXTERNAL_RESEARCH_SOURCES = [
             "Community discussion reinforces discard, topdeck control, suspend/miracle, and "
             "reanimation as plausible lanes, but not as promotion evidence by itself."
         ),
+        "use": "heuristic_context_only",
     },
 ]
 
@@ -216,6 +229,124 @@ def load_deck_presence(conn: sqlite3.Connection, names: Iterable[str]) -> dict[s
     return presence
 
 
+def table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
+    return {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+
+
+def load_current_deck_cards(conn: sqlite3.Connection, deck_id: int = 6) -> list[dict[str, Any]]:
+    columns = table_columns(conn, "deck_cards")
+    select_columns = [
+        "deck_id",
+        "card_name",
+        "quantity",
+        "functional_tag",
+        "cmc",
+        "type_line",
+    ]
+    optional = {
+        "is_commander": "0 AS is_commander",
+        "functional_tags_json": "'[]' AS functional_tags_json",
+        "oracle_text": "'' AS oracle_text",
+    }
+    select_sql = []
+    for column in select_columns:
+        select_sql.append(column if column in columns else f"NULL AS {column}")
+    for column, fallback in optional.items():
+        select_sql.append(column if column in columns else fallback)
+    rows = conn.execute(
+        f"""
+        SELECT {", ".join(select_sql)}
+        FROM deck_cards
+        WHERE deck_id=?
+        ORDER BY is_commander DESC, card_name
+        """,
+        (deck_id,),
+    ).fetchall()
+    out = []
+    for row in rows:
+        out.append(
+            {
+                "deck_id": int(row["deck_id"] or deck_id),
+                "card_name": row["card_name"],
+                "quantity": int(row["quantity"] or 1),
+                "functional_tag": row["functional_tag"],
+                "cmc": float(row["cmc"] or 0),
+                "type_line": row["type_line"],
+                "is_commander": bool(row["is_commander"]),
+                "functional_tags_json": row["functional_tags_json"],
+                "oracle_text": row["oracle_text"],
+            }
+        )
+    return out
+
+
+def lorehold_variant_presence(
+    conn: sqlite3.Connection,
+    names: Iterable[str],
+    variant_deck_ids: Iterable[int] = DEFAULT_LOREHOLD_VARIANT_DECK_IDS,
+) -> dict[str, dict[str, Any]]:
+    wanted = {normalize_key(name): str(name) for name in names if str(name).strip()}
+    out: dict[str, dict[str, Any]] = {
+        key: {"card_name": name, "deck_count": 0, "deck_ids": []}
+        for key, name in wanted.items()
+    }
+    if not wanted:
+        return out
+    deck_ids = list(variant_deck_ids)
+    deck_placeholders = ",".join("?" for _ in deck_ids)
+    rows = conn.execute(
+        f"""
+        SELECT card_name, deck_id
+        FROM deck_cards
+        WHERE deck_id IN ({deck_placeholders})
+        ORDER BY card_name, deck_id
+        """,
+        deck_ids,
+    ).fetchall()
+    for row in rows:
+        key = normalize_key(row["card_name"])
+        if key in out:
+            out[key]["deck_ids"].append(int(row["deck_id"]))
+    for row in out.values():
+        row["deck_ids"] = sorted(set(row["deck_ids"]))
+        row["deck_count"] = len(row["deck_ids"])
+    return out
+
+
+def safe_cut_blockers_by_card(safe_cut_report: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    if not safe_cut_report:
+        return out
+    for row in safe_cut_report.get("followups") or []:
+        cuts = row.get("cuts") or []
+        if not cuts:
+            continue
+        key = normalize_key(cuts[0])
+        entry = out.setdefault(
+            key,
+            {
+                "card_name": cuts[0],
+                "followup_count": 0,
+                "blocker_counts": Counter(),
+                "source_packages": Counter(),
+            },
+        )
+        entry["followup_count"] += 1
+        for blocker in row.get("blockers") or []:
+            entry["blocker_counts"][str(blocker)] += 1
+        if row.get("source_package_key"):
+            entry["source_packages"][str(row["source_package_key"])] += 1
+    finalized: dict[str, dict[str, Any]] = {}
+    for key, value in out.items():
+        finalized[key] = {
+            "card_name": value["card_name"],
+            "followup_count": value["followup_count"],
+            "blocker_counts": dict(sorted(value["blocker_counts"].items())),
+            "source_packages": dict(sorted(value["source_packages"].items())),
+        }
+    return finalized
+
+
 def finalize_counter_dicts(value: dict[str, Any]) -> dict[str, Any]:
     finalized = dict(value)
     for key in ("execution_statuses", "review_statuses", "sources", "effects", "battle_model_scopes"):
@@ -313,16 +444,168 @@ def classify_contextual_candidate(
     ]
 
 
+def is_miracle_core_slot(card: dict[str, Any], decision: dict[str, Any]) -> bool:
+    functional_tag = str(card.get("functional_tag") or "")
+    type_line = str(card.get("type_line") or "")
+    oracle_text = str(card.get("oracle_text") or "").lower()
+    cmc = float(card.get("cmc") or 0)
+    tags: set[str] = set()
+    try:
+        decoded = json.loads(str(card.get("functional_tags_json") or "[]"))
+        if isinstance(decoded, list):
+            tags = {str(tag) for tag in decoded}
+    except Exception:
+        tags = set()
+    effective_role = str(decision.get("effective_role") or "")
+    package_lane = str(decision.get("package_lane") or "")
+    if functional_tag in {"board_wipe", "wincon"} or effective_role in {"board_wipe", "wincon"}:
+        return True
+    if tags & {"board_wipe", "wincon", "topdeck_miracle_setup"}:
+        return True
+    if package_lane == "topdeck_miracle_setup":
+        return True
+    if ("Instant" in type_line or "Sorcery" in type_line) and cmc >= 4:
+        return True
+    if "instant or sorcery" in oracle_text and functional_tag in {"draw", "engine", "wincon"}:
+        return True
+    return False
+
+
+def classify_cut_slot(
+    *,
+    card: dict[str, Any],
+    decision: dict[str, Any],
+    safety: dict[str, Any],
+    variant_presence: dict[str, Any],
+    safe_cut_evidence: dict[str, Any],
+) -> tuple[str, str, list[str]]:
+    reasons: list[str] = []
+    blockers = set((safe_cut_evidence.get("blocker_counts") or {}).keys())
+    decision_key = str(decision.get("decision") or "")
+    lane = str(decision.get("package_lane") or "")
+    effective_role = str(decision.get("effective_role") or card.get("functional_tag") or "")
+    type_line = str(card.get("type_line") or "")
+    if card.get("is_commander"):
+        return "never_cut", "commander", ["Commander defines the deck objective."]
+    if "Land" in type_line or lane == "mana_base":
+        return "never_cut", "mana_base", ["Mana base must be tuned as a package, not blind one-for-one cuts."]
+    if safety.get("status") in {"locked_do_not_cut", "protected_until_same_lane_win", "protected_until_same_function_replacement_wins"}:
+        reasons.append(f"Cut-safety status is {safety.get('status')}.")
+        return "blocked_by_cut_safety", "blocked", reasons
+    if safety.get("status") == "risky_cut_only_same_lane":
+        reasons.append("Cut-safety permits only a same-lane win after prior strong-seed regression.")
+        return "same_lane_only", "requires_same_lane_gate", reasons
+    if "prior_rejected_cut" in blockers:
+        reasons.append("Safe-cut replanner found prior rejected evidence for this cut slot.")
+        return "blocked_by_prior_rejection", "blocked", reasons
+    if STRUCTURAL_BLOCKERS & blockers:
+        reasons.append("Safe-cut replanner marks this as structural: " + ", ".join(sorted(STRUCTURAL_BLOCKERS & blockers)) + ".")
+        return "structural_dependency", "blocked", reasons
+    if effective_role == "protection" or lane == "pressure_absorber_or_protection":
+        reasons.append("Protection/pressure lane keeps the commander alive through setup turns.")
+        return "structural_dependency", "blocked", reasons
+    if is_miracle_core_slot(card, decision):
+        reasons.append("Slot contributes to instant/sorcery density, miracle setup, wipe, or wincon plan.")
+        return "structural_dependency", "blocked", reasons
+    if decision_key and decision_key not in SAFE_CUT_DECISIONS:
+        reasons.append(f"Strategy decision is {decision_key}, not a flex decision.")
+        if "missing_cut_safety_row" in blockers:
+            reasons.append("No explicit cut-safety row exists yet.")
+        return "needs_exposure_before_cut", "model_cut_exposure", reasons
+    if "missing_cut_safety_row" in blockers:
+        reasons.append("No explicit cut-safety row exists yet.")
+        if int(variant_presence.get("deck_count") or 0) <= 2:
+            reasons.append("Low Lorehold variant presence makes it a reasonable exposure-model candidate.")
+            return "cut_exposure_candidate", "model_cut_exposure", reasons
+        return "needs_exposure_before_cut", "model_cut_exposure", reasons
+    reasons.append("Flex decision exists and no current blocker was found, but no automatic package is ready.")
+    return "manual_same_lane_probe_candidate", "manual_same_lane_only", reasons
+
+
+def build_cut_evidence_expansion(
+    *,
+    conn: sqlite3.Connection,
+    strategy_audit: dict[str, Any],
+    cut_safety: dict[str, dict[str, Any]],
+    safe_cut_report: dict[str, Any] | None,
+    deck_id: int = 6,
+) -> dict[str, Any]:
+    decisions = card_decision_lookup(strategy_audit)
+    deck_cards = load_current_deck_cards(conn, deck_id)
+    variant_presence = lorehold_variant_presence(conn, [row["card_name"] for row in deck_cards])
+    safe_cut_by_card = safe_cut_blockers_by_card(safe_cut_report)
+    rows = []
+    status_counts: Counter[str] = Counter()
+    action_counts: Counter[str] = Counter()
+    for card in deck_cards:
+        key = normalize_key(card["card_name"])
+        status, action, reasons = classify_cut_slot(
+            card=card,
+            decision=decisions.get(key, {}),
+            safety=cut_safety.get(key, {}),
+            variant_presence=variant_presence.get(key, {}),
+            safe_cut_evidence=safe_cut_by_card.get(key, {}),
+        )
+        status_counts[status] += 1
+        action_counts[action] += 1
+        rows.append(
+            {
+                "card_name": card["card_name"],
+                "status": status,
+                "recommended_action": action,
+                "reasons": reasons,
+                "strategy_decision": {
+                    key_name: value
+                    for key_name, value in (decisions.get(key) or {}).items()
+                    if key_name in {"decision", "effective_role", "package_lane", "status", "tags"}
+                },
+                "cut_safety": cut_safety.get(key, {}),
+                "lorehold_variant_presence": variant_presence.get(key, {}),
+                "safe_cut_replanner_evidence": safe_cut_by_card.get(key, {}),
+            }
+        )
+    rows.sort(
+        key=lambda row: (
+            {
+                "cut_exposure_candidate": 0,
+                "manual_same_lane_probe_candidate": 1,
+                "needs_exposure_before_cut": 2,
+                "same_lane_only": 3,
+            }.get(row["status"], 9),
+            int((row.get("lorehold_variant_presence") or {}).get("deck_count") or 0),
+            row["card_name"],
+        )
+    )
+    return {
+        "summary": {
+            "deck_card_count": len(deck_cards),
+            "lorehold_variant_deck_ids": list(DEFAULT_LOREHOLD_VARIANT_DECK_IDS),
+            "status_counts": dict(sorted(status_counts.items())),
+            "recommended_action_counts": dict(sorted(action_counts.items())),
+            "model_cut_exposure_count": action_counts.get("model_cut_exposure", 0),
+            "manual_same_lane_only_count": action_counts.get("manual_same_lane_only", 0),
+        },
+        "rows": rows,
+        "top_exposure_candidates": [
+            row
+            for row in rows
+            if row["status"] in {"cut_exposure_candidate", "needs_exposure_before_cut"}
+        ][:20],
+    }
+
+
 def build_review(
     *,
     strategy_audit: dict[str, Any],
     cut_model: dict[str, Any],
-    exposure_profile: dict[str, Any] | None = None,
     conn: sqlite3.Connection,
+    exposure_profile: dict[str, Any] | None = None,
+    safe_cut_report: dict[str, Any] | None = None,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
     cut_model_path: Path = DEFAULT_CUT_MODEL,
     db_path: Path = DEFAULT_DB,
     exposure_profile_path: Path | None = DEFAULT_EXPOSURE_PROFILE,
+    safe_cut_report_path: Path | None = DEFAULT_SAFE_CUT_REPLANNER,
 ) -> dict[str, Any]:
     card_decisions = card_decision_lookup(strategy_audit)
     cut_safety = cut_safety_lookup(strategy_audit)
@@ -348,6 +631,12 @@ def build_review(
                 relevant_names.add(cut["card_name"])
     rule_summaries = load_rule_summaries(conn, sorted(relevant_names))
     deck_presence = load_deck_presence(conn, sorted(relevant_names))
+    cut_evidence_expansion = build_cut_evidence_expansion(
+        conn=conn,
+        strategy_audit=strategy_audit,
+        cut_safety=cut_safety,
+        safe_cut_report=safe_cut_report,
+    )
 
     manual_reviews = []
     for pairing in manual_pairings:
@@ -450,6 +739,7 @@ def build_review(
         "strategy_audit": str(strategy_path),
         "cut_model": str(cut_model_path),
         "exposure_profile": str(exposure_profile_path) if exposure_profile else "",
+        "safe_cut_replanner": str(safe_cut_report_path) if safe_cut_report else "",
         "source_db": str(db_path),
         "postgres_writes": False,
         "source_db_mutated": False,
@@ -459,10 +749,12 @@ def build_review(
             "contextual_lane_review_count": len(contextual_reviews),
             "decision_counts": dict(sorted(status_counts.items())),
             "automatic_gate_ready_count": 0,
+            "cut_evidence_expansion": cut_evidence_expansion["summary"],
             "safe_next_action": safe_next_action,
         },
         "manual_cut_reviews": manual_reviews,
         "contextual_lane_reviews": contextual_reviews,
+        "cut_evidence_expansion": cut_evidence_expansion,
         "next_actions": [
             {
                 "priority": 1,
@@ -499,13 +791,15 @@ def recommended_cut_search(candidate: str, evidence: list[dict[str, Any]]) -> st
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
+    cut_summary = payload.get("cut_evidence_expansion", {}).get("summary") or {}
     lines = [
-        "# Lorehold Manual Cut Review - 2026-06-27",
+        "# Lorehold Manual Cut Review - 2026-06-28",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Strategy audit: `{payload['strategy_audit']}`",
         f"- Cut model: `{payload['cut_model']}`",
         f"- Exposure profile: `{payload['exposure_profile'] or 'none'}`",
+        f"- Safe-cut replanner: `{payload.get('safe_cut_replanner') or 'none'}`",
         f"- Source DB: `{payload['source_db']}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
@@ -516,13 +810,38 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Contextual lane reviews: `{payload['summary']['contextual_lane_review_count']}`",
         f"- Decision counts: `{json.dumps(payload['summary']['decision_counts'], sort_keys=True)}`",
         f"- Automatic gate-ready count: `{payload['summary']['automatic_gate_ready_count']}`",
+        f"- Cut evidence status counts: `{json.dumps(cut_summary.get('status_counts') or {}, sort_keys=True)}`",
+        f"- Cut evidence action counts: `{json.dumps(cut_summary.get('recommended_action_counts') or {}, sort_keys=True)}`",
         f"- Safe next action: {payload['summary']['safe_next_action']}",
         "",
         "## External Research Used As Heuristic Context",
         "",
     ]
     for source in payload["external_research_sources"]:
-        lines.append(f"- [{source['title']}]({source['url']}): {source['finding']}")
+        lines.append(
+            f"- [{source['title']}]({source['url']}): {source['finding']} "
+            f"Use: `{source.get('use', 'heuristic_context_only')}`."
+        )
+    lines.extend(
+        [
+            "",
+            "## Cut Evidence Expansion",
+            "",
+            "| Card | Status | Action | Lorehold Variants | Reasons |",
+            "| --- | --- | --- | ---: | --- |",
+        ]
+    )
+    for row in (payload.get("cut_evidence_expansion") or {}).get("top_exposure_candidates") or []:
+        presence = row.get("lorehold_variant_presence") or {}
+        lines.append(
+            "| {card} | `{status}` | `{action}` | {variants} | {reasons} |".format(
+                card=row["card_name"],
+                status=row["status"],
+                action=row["recommended_action"],
+                variants=int(presence.get("deck_count") or 0),
+                reasons="; ".join(row.get("reasons") or []),
+            )
+        )
     lines.extend(
         [
             "",
@@ -581,8 +900,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--strategy-audit", type=Path, default=DEFAULT_STRATEGY_AUDIT)
     parser.add_argument("--cut-model", type=Path, default=DEFAULT_CUT_MODEL)
     parser.add_argument("--exposure-profile", type=Path, default=DEFAULT_EXPOSURE_PROFILE)
+    parser.add_argument("--safe-cut-replanner", type=Path, default=DEFAULT_SAFE_CUT_REPLANNER)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
-    parser.add_argument("--stem", default="lorehold_manual_cut_review_20260627_v1")
+    parser.add_argument("--stem", default="lorehold_manual_cut_review_20260628_v1_safe_cut_expansion")
     return parser.parse_args()
 
 
@@ -591,16 +911,19 @@ def main() -> int:
     strategy_audit = read_json(args.strategy_audit)
     cut_model = read_json(args.cut_model)
     exposure_profile = read_optional_json(args.exposure_profile)
+    safe_cut_report = read_optional_json(args.safe_cut_replanner)
     with connect(args.db) as conn:
         payload = build_review(
             strategy_audit=strategy_audit,
             cut_model=cut_model,
-            exposure_profile=exposure_profile,
             conn=conn,
+            exposure_profile=exposure_profile,
+            safe_cut_report=safe_cut_report,
             strategy_path=args.strategy_audit,
             cut_model_path=args.cut_model,
             db_path=args.db,
             exposure_profile_path=args.exposure_profile,
+            safe_cut_report_path=args.safe_cut_replanner,
         )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

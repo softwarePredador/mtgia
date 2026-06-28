@@ -132,6 +132,34 @@ def manual_review():
     }
 
 
+def manual_review_with_cut_evidence():
+    payload = manual_review()
+    payload["cut_evidence_expansion"] = {
+        "summary": {
+            "model_cut_exposure_count": 2,
+            "status_counts": {"needs_exposure_before_cut": 2},
+            "recommended_action_counts": {"model_cut_exposure": 2},
+        },
+        "top_exposure_candidates": [
+            {
+                "card_name": "Winds of Abandon",
+                "status": "needs_exposure_before_cut",
+                "recommended_action": "model_cut_exposure",
+                "lorehold_variant_presence": {"deck_count": 1, "deck_ids": [607]},
+                "reasons": ["No explicit cut-safety row exists yet."],
+            },
+            {
+                "card_name": "Stroke of Midnight",
+                "status": "needs_exposure_before_cut",
+                "recommended_action": "model_cut_exposure",
+                "lorehold_variant_presence": {"deck_count": 3, "deck_ids": [607, 608, 609]},
+                "reasons": ["No explicit cut-safety row exists yet."],
+            },
+        ],
+    }
+    return payload
+
+
 def trace_audit_report():
     return {
         "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
@@ -499,6 +527,22 @@ def test_next_action_planner_prioritizes_cut_models_before_gates():
     assert actions["batch_xmage_runtime_rule_gaps"]["candidate_count"] == 2
     guardrails = {row["guardrail_key"] for row in payload["guardrails"]}
     assert "austere_emeria_tradeoff_rejected" in guardrails
+
+
+def test_next_action_planner_prioritizes_cut_exposure_when_safe_cut_queue_is_empty():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review_with_cut_evidence(),
+        exposure_profiles=[exposure_profile()],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "model_low_exposure_cut_slots_before_gate"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -3
+    assert action["status"] == "cut_safety_expansion_required"
+    assert action["cut_cards"] == ["Winds of Abandon", "Stroke of Midnight"]
 
 
 def test_next_action_planner_moves_past_rejected_land_tax_tutor_benchmarks():
