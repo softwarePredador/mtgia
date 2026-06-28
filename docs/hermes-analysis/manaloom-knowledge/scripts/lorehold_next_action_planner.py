@@ -53,6 +53,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
     REPORT_DIR / "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_brass_bounty_recurring_seed_window_20260628_v1_run.json",
 ]
 
 
@@ -185,7 +186,12 @@ def summarize_cut_options(pairings: list[dict[str, Any]], limit: int = 5) -> lis
 
 def infer_package_decision(result: dict[str, Any]) -> str:
     if result.get("decision"):
-        return str(result["decision"])
+        decision = str(result["decision"])
+        return "reject_or_rework" if decision.startswith("reject") else decision
+    aggregate = result.get("aggregate") or {}
+    aggregate_decision = str(aggregate.get("decision") or "")
+    if aggregate_decision:
+        return "reject_or_rework" if aggregate_decision.startswith("reject") else aggregate_decision
     gate = result.get("gate_summary") or {}
     baseline = gate.get("baseline") or {}
     candidate = gate.get("candidate") or {}
@@ -217,15 +223,17 @@ def rejected_package_evidence(
             if decision != "reject_or_rework":
                 continue
             gate = result.get("gate_summary") or {}
+            aggregate = result.get("aggregate") or {}
             rejected[key] = {
                 "package_key": key,
                 "source_report": str(path),
                 "adds": result.get("adds") or [],
                 "cuts": result.get("cuts") or [],
                 "decision": decision,
-                "delta_pp": gate.get("delta_pp"),
+                "delta_pp": gate.get("delta_pp", aggregate.get("delta_pp_total")),
                 "baseline": gate.get("baseline") or {},
                 "candidate": gate.get("candidate") or {},
+                "aggregate": aggregate,
             }
     return rejected
 
@@ -902,8 +910,10 @@ def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
     hypothesis_queue: dict[str, Any] | None = None,
+    prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
 ) -> list[dict[str, Any]]:
     negative = miner_report.get("negative_exact_packages") or []
+    prior_rejections = rejected_package_evidence(prior_package_reports or [])
     guardrails = [
         {
             "guardrail_key": "no_automatic_gate_without_safe_cut",
@@ -918,6 +928,18 @@ def build_guardrails(
             "reason": "Prior negative add/cut evidence must demote exact retests until the cut model changes.",
         },
     ]
+    if prior_rejections:
+        guardrails.append(
+            {
+                "guardrail_key": "prior_package_reports_have_rejections",
+                "rejected_package_count": len(prior_rejections),
+                "rejected_package_keys": sorted(prior_rejections),
+                "reason": (
+                    "Loaded prior package reports include explicit rejected package evidence; "
+                    "the planner must not recommend those exact add/cut packages as fresh gates."
+                ),
+            }
+        )
     if "Austere" in json.dumps(negative) or "Emeria" in json.dumps(negative):
         guardrails.append(
             {
@@ -1030,6 +1052,7 @@ def build_plan(
     actions.sort(key=lambda row: (int(row.get("priority") or 0), row.get("action_key") or ""))
     status_counts = Counter(str(row.get("status") or "") for row in actions)
     recommended = actions[0]["action_key"] if actions else "rerun_variant_gap_miner"
+    prior_rejections = rejected_package_evidence(prior_package_reports or [])
     return {
         "generated_at": utc_now(),
         "miner_report": str(miner_path),
@@ -1058,6 +1081,8 @@ def build_plan(
             "action_count": len(actions),
             "action_status_counts": dict(sorted(status_counts.items())),
             "recommended_next_action": recommended,
+            "prior_rejected_package_count": len(prior_rejections),
+            "prior_rejected_package_keys": sorted(prior_rejections),
             "miner_candidate_status_counts": (miner_report.get("summary") or {}).get(
                 "candidate_status_counts",
                 {},
@@ -1074,7 +1099,12 @@ def build_plan(
             ).get("trace_status_counts", {}),
         },
         "action_queue": actions,
-        "guardrails": build_guardrails(miner_report, manual_review, hypothesis_queue),
+        "guardrails": build_guardrails(
+            miner_report,
+            manual_review,
+            hypothesis_queue,
+            prior_package_reports,
+        ),
         "method_notes": [
             "This planner is a decision layer, not a promotion engine.",
             "A runtime-ready card is not gate-ready unless a safe cut model exists.",
@@ -1111,6 +1141,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Action count: `{payload['summary']['action_count']}`",
         f"- Action statuses: `{json.dumps(payload['summary']['action_status_counts'], sort_keys=True)}`",
         f"- Recommended next action: `{payload['summary']['recommended_next_action']}`",
+        f"- Prior rejected packages loaded: `{payload['summary']['prior_rejected_package_count']}`",
+        f"- Prior rejected package keys: `{', '.join(payload['summary']['prior_rejected_package_keys']) or '-'}`",
         f"- Miner candidate statuses: `{json.dumps(payload['summary']['miner_candidate_status_counts'], sort_keys=True)}`",
         f"- Miner pairing statuses: `{json.dumps(payload['summary']['miner_pairing_status_counts'], sort_keys=True)}`",
         "",

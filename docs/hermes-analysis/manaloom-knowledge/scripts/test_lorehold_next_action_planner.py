@@ -243,6 +243,27 @@ def prior_tutor_land_tax_report():
     )
 
 
+def prior_brass_seed_matrix_report():
+    return (
+        planner.REPORT_DIR / "lorehold_brass_bounty_recurring_seed_window_20260628_v1_run.json",
+        {
+            "packages": [
+                {
+                    "package_key": "brass_bounty_cut_boros_signet",
+                    "adds": ["Brass's Bounty"],
+                    "cuts": ["Boros Signet"],
+                    "aggregate": {
+                        "decision": "reject_regresses_strong_seed",
+                        "delta_pp_total": -4.17,
+                        "baseline_record": "14-34",
+                        "candidate_record": "12-36",
+                    },
+                }
+            ]
+        },
+    )
+
+
 def hand_filter_cut_model_report():
     return (
         planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0],
@@ -499,6 +520,25 @@ def test_next_action_planner_moves_past_rejected_land_tax_tutor_benchmarks():
         "gamble_access_benchmark_cut_land_tax",
         "enlightened_access_benchmark_cut_land_tax",
     }
+
+
+def test_next_action_planner_imports_seed_matrix_aggregate_rejections():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        prior_package_reports=[prior_brass_seed_matrix_report()],
+    )
+
+    assert payload["summary"]["prior_rejected_package_count"] == 1
+    assert payload["summary"]["prior_rejected_package_keys"] == [
+        "brass_bounty_cut_boros_signet"
+    ]
+    guardrails = {row["guardrail_key"]: row for row in payload["guardrails"]}
+    assert "prior_package_reports_have_rejections" in guardrails
+    assert guardrails["prior_package_reports_have_rejections"]["rejected_package_keys"] == [
+        "brass_bounty_cut_boros_signet"
+    ]
 
 
 def test_next_action_planner_prioritizes_focus_access_trace_review():
