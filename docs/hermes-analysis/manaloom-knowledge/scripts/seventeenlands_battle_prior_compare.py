@@ -562,7 +562,112 @@ def compare_gate_to_prior(prior: dict[str, Any], observed: dict[str, Any]) -> di
     }
 
 
-def battle_prior_status(comparison: Mapping[str, Any]) -> str:
+def candidate_scoreability(observed: Mapping[str, Any]) -> dict[str, Any]:
+    observations = observed.get("candidate_observations") or {}
+    if not isinstance(observations, Mapping) or not observations:
+        return {
+            "candidate_count": 0,
+            "candidate_accessed_not_used_cards": [],
+            "candidate_near_access_only_cards": [],
+            "candidate_unobserved_cards": [],
+            "candidate_used_cards": [],
+            "recommended_next_action": "inspect_battle_prior_rhythm_only",
+            "scoring_allowed": True,
+            "status": "not_applicable",
+        }
+
+    cards: dict[str, dict[str, Any]] = {}
+    used_cards: list[str] = []
+    accessed_not_used_cards: list[str] = []
+    near_access_only_cards: list[str] = []
+    unobserved_cards: list[str] = []
+
+    for card, payload in observations.items():
+        if not isinstance(payload, Mapping):
+            continue
+        direct_events = int(numeric_count(payload.get("direct_card_events")))
+        if "direct_card_events" not in payload:
+            direct_events = int(numeric_count(payload.get("total_events")))
+        accessed_games = int(numeric_count(payload.get("accessed_games")))
+        drawn_games = int(numeric_count(payload.get("drawn_games")))
+        opening_hand_games = int(numeric_count(payload.get("opening_hand_games")))
+        near_access_games = int(numeric_count(payload.get("near_access_games")))
+        observed_flag = bool(payload.get("observed"))
+        accessed = any(value > 0 for value in (accessed_games, drawn_games, opening_hand_games))
+        if "accessed_games" not in payload and observed_flag:
+            accessed = True
+
+        if direct_events > 0:
+            evidence_status = "used"
+            used_cards.append(str(card))
+        elif accessed:
+            evidence_status = "accessed_not_used"
+            accessed_not_used_cards.append(str(card))
+        elif near_access_games > 0:
+            evidence_status = "near_access_not_used"
+            near_access_only_cards.append(str(card))
+        else:
+            evidence_status = "unobserved"
+            unobserved_cards.append(str(card))
+
+        cards[str(card)] = {
+            "accessed_games": accessed_games,
+            "direct_card_events": direct_events,
+            "drawn_games": drawn_games,
+            "evidence_status": evidence_status,
+            "near_access_games": near_access_games,
+            "observed": observed_flag,
+            "opening_hand_games": opening_hand_games,
+        }
+
+    if not cards:
+        return {
+            "candidate_count": 0,
+            "candidate_accessed_not_used_cards": [],
+            "candidate_near_access_only_cards": [],
+            "candidate_unobserved_cards": [],
+            "candidate_used_cards": [],
+            "recommended_next_action": "inspect_battle_prior_rhythm_only",
+            "scoring_allowed": True,
+            "status": "not_applicable",
+        }
+
+    if unobserved_cards:
+        status = "candidate_unobserved"
+        next_action = "rerun_with_forced_focus_access_or_larger_natural_sample_until_candidate_accessed"
+    elif accessed_not_used_cards or near_access_only_cards:
+        status = "candidate_not_used"
+        next_action = "rerun_with_forced_focus_access_and_usage_or_inspect_play_heuristic"
+    else:
+        status = "candidate_used"
+        next_action = "eligible_for_strategy_scoring_subject_to_rhythm_flags"
+
+    return {
+        "candidate_count": len(cards),
+        "candidate_accessed_not_used_cards": accessed_not_used_cards,
+        "candidate_near_access_only_cards": near_access_only_cards,
+        "candidate_unobserved_cards": unobserved_cards,
+        "candidate_used_cards": used_cards,
+        "cards": cards,
+        "recommended_next_action": next_action,
+        "scoring_allowed": status == "candidate_used",
+        "status": status,
+    }
+
+
+def battle_prior_status(
+    comparison: Mapping[str, Any],
+    observed: Mapping[str, Any] | None = None,
+) -> str:
+    if observed is not None:
+        scoreability = candidate_scoreability(observed)
+        if scoreability["candidate_unobserved_cards"]:
+            return "inconclusive_candidate_unobserved"
+        if (
+            scoreability["candidate_accessed_not_used_cards"]
+            or scoreability["candidate_near_access_only_cards"]
+        ):
+            return "inconclusive_candidate_not_used"
     flags = comparison.get("flags") or []
     if any(isinstance(flag, Mapping) and flag.get("metric") == "candidate_observation" for flag in flags):
         return "inconclusive_candidate_unobserved"
@@ -599,6 +704,17 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.extend(["", "## Candidate Observations", ""])
     for card, payload in report["observed_summary"]["candidate_observations"].items():
         lines.append(f"- {card}: `{payload}`")
+    scoreability = report.get("candidate_scoreability") or {}
+    if scoreability:
+        lines.extend(["", "## Candidate Scoreability", ""])
+        lines.append(f"- status: `{scoreability.get('status')}`")
+        lines.append(f"- scoring_allowed: `{scoreability.get('scoring_allowed')}`")
+        lines.append(f"- next_action: `{scoreability.get('recommended_next_action')}`")
+        lines.append(
+            f"- accessed_not_used: `{scoreability.get('candidate_accessed_not_used_cards')}`"
+        )
+        lines.append(f"- unobserved: `{scoreability.get('candidate_unobserved_cards')}`")
+        lines.append(f"- used: `{scoreability.get('candidate_used_cards')}`")
     lines.extend(["", "## Turn Comparison", ""])
     if report["comparison"].get("comparison_by_turn"):
         for turn, payload in list(report["comparison"]["comparison_by_turn"].items())[:12]:
@@ -628,13 +744,15 @@ def run(
         player_slots=inferred_player_slots,
     )
     comparison = compare_to_prior(prior, observed)
+    scoreability = candidate_scoreability(observed)
     return {
+        "candidate_scoreability": scoreability,
         "comparison": comparison,
         "events_path": str(events_path),
         "observed_summary": observed,
         "postgres_writes": False,
         "prior_path": str(prior_path),
-        "status": battle_prior_status(comparison),
+        "status": battle_prior_status(comparison, observed),
         "source_db_mutated": False,
     }
 
@@ -656,14 +774,16 @@ def run_gate_report(
         player_slots=player_slots,
     )
     comparison = compare_gate_to_prior(prior, observed)
+    scoreability = candidate_scoreability(observed)
     return {
+        "candidate_scoreability": scoreability,
         "candidate_key": candidate_key,
         "comparison": comparison,
         "gate_report_path": str(gate_report_path),
         "observed_summary": observed,
         "postgres_writes": False,
         "prior_path": str(prior_path),
-        "status": battle_prior_status(comparison),
+        "status": battle_prior_status(comparison, observed),
         "source_db_mutated": False,
     }
 

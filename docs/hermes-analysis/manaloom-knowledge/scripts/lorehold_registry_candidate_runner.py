@@ -31,6 +31,7 @@ DEFAULT_BATTLE_PRIOR_JSON = (
 )
 PRIORITY_RANK = {"P0": 0, "P1": 1, "P2": 2, "P3": 3, "P4": 4}
 BATTLE_PRIOR_EVIDENCE_GAP_STATUSES = {
+    "inconclusive_candidate_not_used",
     "inconclusive_candidate_unobserved",
     "needs_more_evidence",
 }
@@ -148,11 +149,17 @@ def battle_prior_summary(
 ) -> dict[str, Any]:
     comparison = report.get("comparison") or {}
     observed = report.get("observed_summary") or {}
+    scoreability = report.get("candidate_scoreability") or {}
     candidate_observations = observed.get("candidate_observations") or {}
     if not isinstance(candidate_observations, Mapping):
         candidate_observations = {}
     return {
         "candidate_observations": candidate_observations,
+        "candidate_scoreability": scoreability,
+        "candidate_unused_cards": list(
+            scoreability.get("candidate_accessed_not_used_cards") or []
+        )
+        + list(scoreability.get("candidate_near_access_only_cards") or []),
         "candidate_unobserved_cards": [
             card
             for card, payload in candidate_observations.items()
@@ -170,7 +177,16 @@ def battle_prior_summary(
 def classify_battle_prior_summary(prior_gate: Mapping[str, Any]) -> dict[str, str]:
     prior_status = str(prior_gate.get("status") or "")
     unobserved_cards = [str(card) for card in prior_gate.get("candidate_unobserved_cards") or []]
+    unused_cards = [str(card) for card in prior_gate.get("candidate_unused_cards") or []]
     card_suffix = f": {', '.join(unobserved_cards[:3])}" if unobserved_cards else ""
+    unused_suffix = f": {', '.join(unused_cards[:3])}" if unused_cards else ""
+    if prior_status == "inconclusive_candidate_not_used":
+        return {
+            "next_action": "rerun_with_forced_focus_access_and_usage_or_inspect_play_heuristic",
+            "reason": "candidate card was accessed or near-accessed but no direct use was observed; do not score or promote this swap"
+            + unused_suffix,
+            "status": "needs_more_evidence_candidate_not_used",
+        }
     if prior_status in BATTLE_PRIOR_EVIDENCE_GAP_STATUSES or "inconclusive" in prior_status:
         return {
             "next_action": "rerun_with_forced_focus_access_or_larger_natural_sample_until_candidate_accessed",

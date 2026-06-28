@@ -46,9 +46,10 @@ def fixture_events() -> list[dict[str, object]]:
     ]
 
 
-def fixture_gate_report(*, accessed: bool) -> dict[str, object]:
+def fixture_gate_report(*, accessed: bool, used: bool = False) -> dict[str, object]:
+    card_name = "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
     focus_summary = {
-        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+        card_name: {
             "accessed_games": 1 if accessed else 0,
             "dominant_zone": "hand" if accessed else "library",
             "drawn_games": 1 if accessed else 0,
@@ -60,6 +61,12 @@ def fixture_gate_report(*, accessed: bool) -> dict[str, object]:
             "zone_counts": {"hand": 2} if accessed else {"library": 4},
         }
     }
+    event_counts = {
+        "combat_damage": 2,
+        "creature_cast": 3,
+        "land_played": 4,
+        "spell_cast": 1,
+    }
     return {
         "results": [
             {"deck_key": "current_607", "games": 2, "telemetry": {}},
@@ -67,13 +74,9 @@ def fixture_gate_report(*, accessed: bool) -> dict[str, object]:
                 "deck_key": "candidate_607_birgi_v1",
                 "games": 2,
                 "telemetry": {
-                    "card_event_counts": {},
+                    "card_event_counts": {f"{card_name}|cast": 1} if used else {},
                     "card_strategy_counts": {},
-                    "event_counts": {
-                        "land_played": 4,
-                        "spell_cast": 3,
-                        "miracle_cast": 1,
-                    },
+                    "event_counts": event_counts,
                     "focus_card_access_summary": focus_summary,
                 },
             },
@@ -133,7 +136,7 @@ def test_run_reads_json_and_jsonl() -> None:
         assert report["observed_summary"]["game_count"] == 2
 
 
-def test_run_gate_report_marks_accessed_candidate_as_observed() -> None:
+def test_run_gate_report_marks_accessed_candidate_without_use_as_inconclusive() -> None:
     with tempfile.TemporaryDirectory() as tmp_name:
         tmp = Path(tmp_name)
         prior = tmp / "prior.json"
@@ -149,7 +152,29 @@ def test_run_gate_report_marks_accessed_candidate_as_observed() -> None:
         )
         observations = report["observed_summary"]["candidate_observations"]
         assert observations["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]["observed"] is True
-        assert report["status"] in {"battle_prior_passed", "battle_prior_warning"}
+        assert report["candidate_scoreability"]["status"] == "candidate_not_used"
+        assert report["candidate_scoreability"]["scoring_allowed"] is False
+        assert report["status"] == "inconclusive_candidate_not_used"
+
+
+def test_run_gate_report_allows_used_candidate_for_scoring() -> None:
+    with tempfile.TemporaryDirectory() as tmp_name:
+        tmp = Path(tmp_name)
+        prior = tmp / "prior.json"
+        gate = tmp / "gate.json"
+        prior.write_text(json.dumps(fixture_prior()) + "\n", encoding="utf-8")
+        gate.write_text(json.dumps(fixture_gate_report(accessed=True, used=True)) + "\n", encoding="utf-8")
+        report = compare.run_gate_report(
+            prior_path=prior,
+            gate_report_path=gate,
+            candidate_key="candidate_607_birgi_v1",
+            candidate_cards=["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+            player_slots=2,
+        )
+
+        assert report["candidate_scoreability"]["status"] == "candidate_used"
+        assert report["candidate_scoreability"]["scoring_allowed"] is True
+        assert report["status"] == "battle_prior_passed"
         assert report["postgres_writes"] is False
 
 
@@ -178,6 +203,7 @@ if __name__ == "__main__":
     test_summarize_events_counts_turn_metrics_and_candidate_observations()
     test_compare_to_prior_flags_missing_candidate()
     test_run_reads_json_and_jsonl()
-    test_run_gate_report_marks_accessed_candidate_as_observed()
+    test_run_gate_report_marks_accessed_candidate_without_use_as_inconclusive()
+    test_run_gate_report_allows_used_candidate_for_scoring()
     test_run_gate_report_marks_library_only_candidate_inconclusive()
-    print("5 tests passed")
+    print("6 tests passed")

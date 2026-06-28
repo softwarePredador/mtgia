@@ -95,9 +95,37 @@ class LoreholdRegistryCandidateRunnerTest(unittest.TestCase):
         )
         self.assertIn("Birgi, God of Storytelling", decision["reason"])
 
+    def test_battle_prior_accessed_but_unused_candidate_blocks_scoring(self):
+        prior_gate = {
+            "candidate_scoreability": {
+                "candidate_accessed_not_used_cards": [
+                    "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+                ],
+                "candidate_near_access_only_cards": [],
+                "status": "candidate_not_used",
+            },
+            "candidate_unused_cards": [
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+            ],
+            "status": "inconclusive_candidate_not_used",
+        }
+
+        decision = runner.classify_battle_prior_summary(prior_gate)
+
+        self.assertEqual(decision["status"], "needs_more_evidence_candidate_not_used")
+        self.assertEqual(
+            decision["next_action"],
+            "rerun_with_forced_focus_access_and_usage_or_inspect_play_heuristic",
+        )
+        self.assertIn("no direct use was observed", decision["reason"])
+
     def test_aggregate_status_treats_evidence_gap_as_not_ready(self):
         self.assertEqual(
             runner.aggregate_report_status(["needs_more_evidence_candidate_unobserved"]),
+            "needs_more_evidence",
+        )
+        self.assertEqual(
+            runner.aggregate_report_status(["needs_more_evidence_candidate_not_used"]),
             "needs_more_evidence",
         )
         self.assertEqual(
