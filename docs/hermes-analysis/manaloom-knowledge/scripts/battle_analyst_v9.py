@@ -160,6 +160,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "gift_hexproof_indestructible",
     "graveyard_flashback_grant",
     "land_tax",
+    "life_total_change",
     "overload_recursion",
     "protection",
     "remove_creature",
@@ -3952,6 +3953,49 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:a2082ebdf6e7e169b97eccecbb22b36a",
         }
     ),
+    "Invincible Hymn": handcrafted_runtime_rule(
+        {
+            "ability_kind": "one_shot",
+            "cmc": 8.0,
+            "effect": "life_total_change",
+            "sorcery": True,
+            "life_total_becomes_library_size": True,
+            "target": "self",
+            "battle_model_scope": "controller_life_total_becomes_library_size_v1",
+            "_rule_oracle_hash": "1ef3fc195072cd1c0c2f7dd03fa875f6",
+            "_rule_logical_key": "battle_rule_v1:de6504fa068c924a1bad5f1ada35a026",
+        }
+    ),
+    "Heroes Remembered": handcrafted_runtime_rule(
+        {
+            "ability_kind": "one_shot",
+            "cmc": 9.0,
+            "effect": "life_total_change",
+            "sorcery": True,
+            "life_gain_amount": 20,
+            "suspend": True,
+            "suspend_time_counters": 10,
+            "suspend_cost": "{W}",
+            "battle_model_scope": "controller_gain_20_life_suspend_10_w_v1",
+            "_rule_oracle_hash": "0a349cd92e9d1e5f0f4887e6f12c75b7",
+            "_rule_logical_key": "battle_rule_v1:4978416393dc912bc2d6d090afde8dc8",
+        }
+    ),
+    "Beacon of Immortality": handcrafted_runtime_rule(
+        {
+            "ability_kind": "one_shot",
+            "cmc": 6.0,
+            "effect": "life_total_change",
+            "instant": True,
+            "target": "player",
+            "target_preference": "self",
+            "double_target_player_life_total": True,
+            "shuffle_self_into_library_on_resolution": True,
+            "battle_model_scope": "double_target_player_life_total_shuffle_self_v1",
+            "_rule_oracle_hash": "642c17cb019f4299d5af9954f812f8a6",
+            "_rule_logical_key": "battle_rule_v1:655c7da1b9d381d24b94b64487226598",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4063,6 +4107,9 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Neoform",
     "Semblance Anvil",
     "Planetarium of Wan Shi Tong",
+    "Invincible Hymn",
+    "Heroes Remembered",
+    "Beacon of Immortality",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4163,6 +4210,21 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace generated topdeck_manipulation review_only evidence with XMage-backed scry activation and once-per-turn top-library free-cast trigger.",
         ["manaloom_log_learning_audit_20260628_v11_after_semblance_runtime", "PlanetariumOfWanShiTong.java"],
         "2026-06-28T20:45:00Z",
+    ),
+    "Invincible Hymn": manual_runtime_waiver_metadata(
+        "Replace generated finisher review_only evidence with XMage-backed controller life-total becomes library-size semantics.",
+        ["manaloom_log_learning_audit_20260628_v12_after_planetarium_runtime", "InvincibleHymn.java"],
+        "2026-06-28T21:05:00Z",
+    ),
+    "Heroes Remembered": manual_runtime_waiver_metadata(
+        "Replace generated draw_cards review_only evidence with XMage-backed gain-20-life and suspend metadata.",
+        ["manaloom_log_learning_audit_20260628_v12_after_planetarium_runtime", "HeroesRemembered.java"],
+        "2026-06-28T21:05:00Z",
+    ),
+    "Beacon of Immortality": manual_runtime_waiver_metadata(
+        "Replace generated finisher review_only evidence with XMage-backed target-player life doubling and self-shuffle semantics.",
+        ["manaloom_log_learning_audit_20260628_v12_after_planetarium_runtime", "BeaconOfImmortality.java"],
+        "2026-06-28T21:05:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -8538,6 +8600,7 @@ SILENCE_PROTECTED_PAYOFF_EFFECTS = {
     "finisher",
     "gift_destroy_all_creatures_return_own_destroyed_creature",
     "graveyard_flashback_grant",
+    "life_total_change",
     "overload_recursion",
     "redistribute_life_totals",
     "steal_all_creatures",
@@ -10344,6 +10407,16 @@ def threat_score(effect_name, card_name, controller, all_players, turn):
         if controller.life > 30:
             return 60  # Storm Herd = 15+ tokens
         return 35
+
+    if effect_name == "life_total_change":
+        opposing_power = sum(
+            table_visible_board_power(player)
+            for player in all_players
+            if player != controller and player.is_alive()
+        )
+        if getattr(controller, "life", 40) <= 20 or opposing_power >= max(1, getattr(controller, "life", 40)):
+            return 55
+        return 28
 
     if effect_name == "overload_recursion":
         spells_in_grave = sum(1 for c in controller.graveyard if isinstance(c, dict) and c.get("cmc", 0) > 0)
@@ -23043,7 +23116,7 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     elif effect in ("draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax") and turn <= 5:
         score += 50
         reason = "establish_value_engine"
-    elif effect in ("wincon", "approach", "finisher", "overload_recursion", "worldfire_reset") and turn >= 5:
+    elif effect in ("wincon", "approach", "finisher", "overload_recursion", "worldfire_reset", "life_total_change") and turn >= 5:
         score += 70
         reason = "find_closing_line"
     elif str(target_type).endswith("_to_battlefield") and is_creature_card(candidate):
@@ -32829,6 +32902,67 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
     return {"applied": applied, "skipped": skipped}
 
 
+def _life_total_change_target(player, opponents, effect_data):
+    target = str((effect_data or {}).get("target") or "self").lower()
+    if target in {"self", "controller"}:
+        return player
+    if target == "player" and (effect_data or {}).get("target_preference") == "self":
+        return player
+    return player
+
+
+def resolve_life_total_change(player, opponents, card, effect_data, turn, rng):
+    target = _life_total_change_target(player, opponents, effect_data)
+    life_before = int(getattr(target, "life", 0) or 0)
+    mode = "unknown"
+    requested_delta = 0
+    expected_life_after = life_before
+
+    if effect_data.get("life_total_becomes_library_size"):
+        mode = "life_total_becomes_library_size"
+        expected_life_after = len(getattr(target, "library", []) or [])
+        requested_delta = expected_life_after - life_before
+    elif effect_data.get("double_target_player_life_total"):
+        mode = "double_target_player_life_total"
+        expected_life_after = life_before * 2
+        requested_delta = expected_life_after - life_before
+    else:
+        mode = "gain_life"
+        requested_delta = int(effect_data.get("life_gain_amount") or 0)
+        expected_life_after = life_before + requested_delta
+
+    changed = change_life(target, requested_delta) if requested_delta else False
+    life_after = int(getattr(target, "life", life_before) or 0)
+    emit_replay_event(
+        "life_total_changed",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=getattr(target, "name", None),
+        mode=mode,
+        requested_delta=requested_delta,
+        life_before=life_before,
+        expected_life_after=expected_life_after,
+        life_after=life_after,
+        changed=changed,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+
+    if effect_data.get("shuffle_self_into_library_on_resolution"):
+        player.library.append(card)
+        player.shuffle(rng)
+        emit_replay_event(
+            "spell_shuffled_into_library_on_resolution",
+            player=player.name,
+            card=card.get("name", "?"),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+    else:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return changed
+
+
 def apply_effect_immediate(
     player,
     opponents,
@@ -32932,6 +33066,8 @@ def apply_effect_immediate(
             move_to_exile(player, card, reason="spell_exiles_self", turn=turn)
         else:
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    elif effect == "life_total_change":
+        resolve_life_total_change(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_prevention_reflect":
         chosen_source = effect_data.get("_chosen_damage_source") or {}
         chosen_source_name = (

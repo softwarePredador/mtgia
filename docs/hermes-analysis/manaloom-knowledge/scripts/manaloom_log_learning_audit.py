@@ -854,10 +854,11 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def write_report(report: Mapping[str, Any], stem: str) -> tuple[Path, Path]:
-    REPORT_DIR.mkdir(parents=True, exist_ok=True)
-    json_path = REPORT_DIR / f"{stem}.json"
-    md_path = REPORT_DIR / f"{stem}.md"
+def write_report(report: Mapping[str, Any], stem: str, output_dir: Path | None = None) -> tuple[Path, Path]:
+    target_dir = output_dir or REPORT_DIR
+    target_dir.mkdir(parents=True, exist_ok=True)
+    json_path = target_dir / f"{stem}.json"
+    md_path = target_dir / f"{stem}.md"
     json_path.write_text(stable_json(report) + "\n", encoding="utf-8")
     md_path.write_text(render_markdown(report), encoding="utf-8")
     return json_path, md_path
@@ -883,7 +884,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.no_write:
         print(stable_json(report))
     else:
-        json_path, md_path = write_report(report, args.stem)
+        json_path, md_path = write_report(report, args.stem, args.reports_dir)
         print(stable_json({"status": "ready", "json": str(json_path), "markdown": str(md_path)}))
     return 0
 

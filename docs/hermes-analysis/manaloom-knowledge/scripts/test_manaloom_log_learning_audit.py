@@ -169,6 +169,36 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
                             "trusted_executable_rule_count": 0,
                         },
                         {
+                            "card_name": "Heroes Remembered",
+                            "deck_count": 2,
+                            "deck_ids": [614, 615],
+                            "findings": [
+                                {
+                                    "code": "no_trusted_executable_rule",
+                                    "severity": "high",
+                                }
+                            ],
+                            "priority_score": 7098,
+                            "severity": "high",
+                            "total_quantity": 2,
+                            "trusted_executable_rule_count": 0,
+                        },
+                        {
+                            "card_name": "Beacon of Immortality",
+                            "deck_count": 2,
+                            "deck_ids": [610, 615],
+                            "findings": [
+                                {
+                                    "code": "no_trusted_executable_rule",
+                                    "severity": "high",
+                                }
+                            ],
+                            "priority_score": 7097,
+                            "severity": "high",
+                            "total_quantity": 2,
+                            "trusted_executable_rule_count": 0,
+                        },
+                        {
                             "active_rule_count": 2,
                             "card_name": "Verge Rangers",
                             "deck_count": 3,
@@ -227,15 +257,8 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             )
             top_codes = {row["code"]: row["count"] for row in evidence["top_finding_codes"]}
             self.assertEqual(top_codes["generic_effect_without_model_scope"], 1)
-            self.assertEqual(top_codes["no_trusted_executable_rule"], 7)
-            self.assertEqual(
-                evidence["top_lorehold_runtime_missing_cards"][0]["card_name"],
-                "Invincible Hymn",
-            )
-            self.assertEqual(
-                evidence["top_lorehold_runtime_missing_cards"][0]["gap_kind"],
-                "runtime_rule_missing",
-            )
+            self.assertEqual(top_codes["no_trusted_executable_rule"], 9)
+            self.assertEqual(evidence["top_lorehold_runtime_missing_cards"], [])
             waived_cards = {
                 row["card_name"]: row["gap_kind"]
                 for row in evidence["top_lorehold_runtime_waived_cards"]
@@ -258,6 +281,18 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             )
             self.assertEqual(
                 waived_cards["Planetarium of Wan Shi Tong"],
+                "runtime_waived_pending_pg_promotion",
+            )
+            self.assertEqual(
+                waived_cards["Invincible Hymn"],
+                "runtime_waived_pending_pg_promotion",
+            )
+            self.assertEqual(
+                waived_cards["Heroes Remembered"],
+                "runtime_waived_pending_pg_promotion",
+            )
+            self.assertEqual(
+                waived_cards["Beacon of Immortality"],
                 "runtime_waived_pending_pg_promotion",
             )
 
@@ -370,6 +405,28 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             }
             self.assertNotIn("manaloom_log_learning_audit_20260628_v5.json", sources)
             self.assertIn("deck_card_battle_rule_coherence_audit_current.json", sources)
+
+    def test_write_report_uses_requested_output_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_name:
+            tmp = Path(tmp_name)
+            report = {
+                "action_queue": [],
+                "category_counts": {},
+                "files_scanned": 0,
+                "generated_at": "2026-06-28T00:00:00Z",
+                "issue_count": 0,
+                "postgres_writes": False,
+                "reports_dir": str(tmp),
+                "severity_counts": {},
+                "source_db_mutated": False,
+            }
+
+            json_path, md_path = audit.write_report(report, "custom_report", tmp)
+
+            self.assertEqual(json_path.parent, tmp)
+            self.assertEqual(md_path.parent, tmp)
+            self.assertTrue(json_path.exists())
+            self.assertTrue(md_path.exists())
 
 
 if __name__ == "__main__":
