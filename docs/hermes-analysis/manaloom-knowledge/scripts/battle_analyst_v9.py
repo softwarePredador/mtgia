@@ -15113,7 +15113,19 @@ def process_upkeep_utility_lands(player, turn, all_players=None):
                         player=player.name,
                         card=permanent.get("name", "?"),
                         chapter=3,
+                        target_type="artifact_cmc_1_or_less",
                         found=found.get("name", "?") if found is not None else None,
+                        candidate_count=len(scored_candidates),
+                        candidate_names=[
+                            candidate.get("name", "?")
+                            for candidate, _score, _reason in scored_candidates[:10]
+                        ],
+                        legal_target_count=len(candidates),
+                        legal_target_names=[
+                            candidate.get("name", "?")
+                            for candidate in candidates[:20]
+                        ],
+                        selected_reason=found_reason,
                         turn=turn,
                     )
                 permanent["chapter_ability_pending"] = False

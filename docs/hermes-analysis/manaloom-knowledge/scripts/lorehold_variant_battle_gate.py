@@ -50,6 +50,31 @@ CARD_EXPOSURE_EVENTS = {
     "treasure_created",
     "trigger_resolved",
 }
+FOCUS_TRACE_CARDS = {
+    "Urza's Saga",
+    "Library of Leng",
+    "Sensei's Divining Top",
+    "Scroll Rack",
+    "Squee, Goblin Nabob",
+    "The Mind Stone",
+    "Land Tax",
+    "Lorehold, the Historian",
+}
+FOCUS_TRACE_EVENTS = {
+    "activated_ability",
+    "cost_paid",
+    "land_tax_trigger_resolved",
+    "land_tax_trigger_skipped",
+    "lorehold_upkeep_rummage",
+    "replacement_applied",
+    "saga_chapter_progressed",
+    "saga_chapter_resolved",
+    "saga_sacrificed_by_sba",
+    "topdeck_manipulation_activated",
+    "trigger_resolved",
+    "trigger_skipped",
+    "utility_artifact_activated",
+}
 
 
 class GameTimeoutError(TimeoutError):
@@ -245,6 +270,9 @@ class GateTelemetry:
         self.squee_game_traces: dict[str, list[dict[str, Any]]] = {}
         self.squee_anomalies: list[dict[str, Any]] = []
         self.squee_trace_samples: list[dict[str, Any]] = []
+        self.focus_card_game_traces: dict[str, list[dict[str, Any]]] = {}
+        self.focus_card_trace_samples: list[dict[str, Any]] = []
+        self.focus_card_trace_card_counts_by_game: dict[str, Counter[str]] = defaultdict(Counter)
         self.event_sequence = 0
 
     def begin(self, game_id: str) -> None:
@@ -441,6 +469,117 @@ class GateTelemetry:
             return
         self.squee_trace_samples.append(trace)
 
+    def _focus_card_matches(self, event: str, data: Mapping[str, Any]) -> list[str]:
+        raw = json.dumps(data, sort_keys=True, default=str)
+        matches = {
+            card
+            for card in FOCUS_TRACE_CARDS
+            if card in raw or data.get("card") == card
+        }
+        if event == "lorehold_upkeep_rummage" and data.get("player") == "Lorehold":
+            matches.add("Lorehold, the Historian")
+            if (
+                data.get("replacement_used")
+                or data.get("discard_destination") in {"top_of_library", "library_top"}
+                or self._discard_to_top_names(data)
+            ):
+                matches.add("Library of Leng")
+        if event == "replacement_applied" and data.get("player") == "Lorehold":
+            matches.add("Library of Leng")
+        if event == "topdeck_manipulation_activated" and data.get("card") in {
+            "Sensei's Divining Top",
+            "Scroll Rack",
+        }:
+            matches.add(str(data.get("card")))
+        if event in {"land_tax_trigger_resolved", "land_tax_trigger_skipped"} and data.get("card") == "Land Tax":
+            matches.add("Land Tax")
+        if event.startswith("saga_") and data.get("card") == "Urza's Saga":
+            matches.add("Urza's Saga")
+        if data.get("card") == "The Mind Stone" and (
+            event == "utility_artifact_activated" or data.get("effect") == "harnessed_blink"
+        ):
+            matches.add("The Mind Stone")
+        if "Squee, Goblin Nabob" in raw:
+            matches.add("Squee, Goblin Nabob")
+        return sorted(matches)
+
+    def _focus_trace_payload(
+        self,
+        event: str,
+        data: Mapping[str, Any],
+        *,
+        cards: list[str],
+    ) -> dict[str, Any]:
+        keep_keys = (
+            "player",
+            "card",
+            "effect",
+            "trigger",
+            "activation_kind",
+            "phase",
+            "turn",
+            "chapter",
+            "target_type",
+            "found",
+            "found_cards",
+            "found_count",
+            "candidate_count",
+            "candidate_names",
+            "legal_target_names",
+            "legal_target_count",
+            "selected_reason",
+            "top_before",
+            "top_after",
+            "hand_to_top",
+            "hand_gained",
+            "first_draw",
+            "drawn",
+            "putback",
+            "discarded",
+            "discarded_cards",
+            "discarded_to_graveyard",
+            "discarded_to_top",
+            "discard_destination",
+            "replacement_used",
+            "blink_target",
+            "blink_target_score",
+            "blinked",
+            "returned",
+            "condition",
+            "condition_met",
+            "player_land_count",
+            "opponent_land_counts",
+            "max_opponent_land_count",
+            "reason",
+            "source",
+            "rule_logical_key",
+            "rule_oracle_hash",
+            "rule_review_status",
+            "battle_model_scope",
+        )
+        return {
+            "seq": self.event_sequence,
+            "game_id": self.current_game,
+            "event": event,
+            "cards": list(cards),
+            "data": {key: data.get(key) for key in keep_keys if key in data},
+        }
+
+    def _record_focus_trace(self, event: str, data: Mapping[str, Any]) -> None:
+        if event not in FOCUS_TRACE_EVENTS:
+            return
+        cards = self._focus_card_matches(event, data)
+        if not cards:
+            return
+        trace = self._focus_trace_payload(event, data, cards=cards)
+        traces = self.focus_card_game_traces.setdefault(self.current_game, [])
+        if len(traces) < 160:
+            traces.append(trace)
+        for card in cards:
+            self.focus_card_trace_card_counts_by_game[self.current_game][card] += 1
+        if len(self.focus_card_trace_samples) < 30:
+            self.focus_card_trace_samples.append(trace)
+
     def record(self, event: str, data: Mapping[str, Any]) -> None:
         self.event_sequence += 1
         self.events[event] += 1
@@ -589,6 +728,7 @@ class GateTelemetry:
                 balance_before=squee_balance_before,
                 balance_after=self.squee_known_graveyard_balance_by_game[self.current_game],
             )
+        self._record_focus_trace(event, data)
         for key, count in self.strategic_events.items():
             delta = count - strategic_before.get(key, 0)
             if delta:
@@ -607,6 +747,10 @@ class GateTelemetry:
             ),
             "squee_known_graveyard_balance": int(self.squee_known_graveyard_balance_by_game.get(game_id, 0)),
             "squee_trace_count": len(self.squee_game_traces.get(game_id, [])),
+            "focus_card_trace_count": len(self.focus_card_game_traces.get(game_id, [])),
+            "focus_card_trace_card_counts": dict(
+                self.focus_card_trace_card_counts_by_game.get(game_id, {})
+            ),
             "squee_anomaly_count": sum(
                 1 for item in self.squee_anomalies if item.get("game_id") == game_id
             ),
@@ -667,6 +811,15 @@ class GateTelemetry:
             },
             "squee_anomalies": list(self.squee_anomalies),
             "squee_known_graveyard_balance_by_game": dict(self.squee_known_graveyard_balance_by_game),
+            "focus_card_trace_samples": list(self.focus_card_trace_samples),
+            "focus_card_game_traces": {
+                key: value
+                for key, value in sorted(self.focus_card_game_traces.items())
+            },
+            "focus_card_trace_card_counts_by_game": {
+                key: dict(value)
+                for key, value in sorted(self.focus_card_trace_card_counts_by_game.items())
+            },
         }
 
 

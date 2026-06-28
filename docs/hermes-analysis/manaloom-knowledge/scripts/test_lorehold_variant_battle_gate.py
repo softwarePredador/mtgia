@@ -260,6 +260,77 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["squee_known_graveyard_balance_by_game"]["game-mill"], 0)
         self.assertEqual(payload["squee_anomalies"], [])
 
+    def test_gate_telemetry_records_focus_card_trace_payload(self):
+        telemetry = gate.GateTelemetry()
+        telemetry.begin("game-focus")
+        telemetry.record(
+            "saga_chapter_resolved",
+            {
+                "player": "Lorehold",
+                "card": "Urza's Saga",
+                "chapter": 3,
+                "target_type": "artifact_cmc_1_or_less",
+                "found": "Sol Ring",
+                "candidate_names": ["Sol Ring", "Sensei's Divining Top"],
+                "legal_target_names": ["Sol Ring", "Sensei's Divining Top"],
+                "selected_reason": "mana_priority",
+                "turn": 4,
+            },
+        )
+        telemetry.record(
+            "topdeck_manipulation_activated",
+            {
+                "player": "Lorehold",
+                "card": "Sensei's Divining Top",
+                "activation_kind": "peek_reorder_for_lorehold",
+                "top_before": "Mountain",
+                "top_after": "Approach of the Second Sun",
+                "turn": 5,
+            },
+        )
+        telemetry.record(
+            "utility_artifact_activated",
+            {
+                "player": "Lorehold",
+                "card": "The Mind Stone",
+                "activation_kind": "harness",
+                "blink_target": "Esper Sentinel",
+                "blink_target_score": 18,
+                "turn": 6,
+            },
+        )
+        telemetry.record(
+            "land_tax_trigger_resolved",
+            {
+                "player": "Lorehold",
+                "card": "Land Tax",
+                "found_cards": ["Plains", "Mountain"],
+                "condition_met": True,
+                "turn": 7,
+            },
+        )
+
+        payload = telemetry.as_json(1)
+
+        traces = payload["focus_card_game_traces"]["game-focus"]
+        self.assertEqual(len(traces), 4)
+        self.assertEqual(
+            payload["focus_card_trace_card_counts_by_game"]["game-focus"]["Urza's Saga"],
+            1,
+        )
+        self.assertEqual(
+            payload["focus_card_trace_card_counts_by_game"]["game-focus"]["The Mind Stone"],
+            1,
+        )
+        saga_trace = next(row for row in traces if row["event"] == "saga_chapter_resolved")
+        self.assertEqual(saga_trace["data"]["candidate_names"], ["Sol Ring", "Sensei's Divining Top"])
+        self.assertIn("Urza's Saga", saga_trace["cards"])
+        self.assertEqual(telemetry.game_summary("game-focus")["focus_card_trace_count"], 4)
+        self.assertEqual(
+            telemetry.game_summary("game-focus")["focus_card_trace_card_counts"]["Land Tax"],
+            1,
+        )
+
     def test_gate_telemetry_does_not_count_spell_target_as_squee_graveyard_entry(self):
         telemetry = gate.GateTelemetry()
         telemetry.begin("game-target")

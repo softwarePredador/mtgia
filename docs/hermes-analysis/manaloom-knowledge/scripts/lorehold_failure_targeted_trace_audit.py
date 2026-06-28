@@ -32,9 +32,9 @@ DEFAULT_GATE_PATHS = [
 ]
 
 DEFAULT_DIAGNOSTIC_GATE_PATHS = [
-    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
-    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json",
-    REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed42_20260627_v1.json",
+    REPORT_DIR / "lorehold_focus_trace_diag_seed7_20260628_v1.json",
+    REPORT_DIR / "lorehold_focus_trace_diag_seed20260625_20260628_v1.json",
+    REPORT_DIR / "lorehold_focus_trace_diag_seed42_candidate_only_20260628_v1.json",
 ]
 
 DEFAULT_FOCUS_CARDS = [
@@ -324,6 +324,84 @@ def summarize_squee_traces(result: Mapping[str, Any], focus_cards: Iterable[str]
     }
 
 
+def summarize_focus_traces(result: Mapping[str, Any], focus_cards: Iterable[str]) -> dict[str, Any]:
+    telemetry = result.get("telemetry") or {}
+    traces = telemetry.get("focus_card_game_traces") or {}
+    focus_lookup = {normalize_key(card): card for card in focus_cards}
+    event_counts: Counter[str] = Counter()
+    matched_cards: dict[str, Counter[str]] = defaultdict(Counter)
+    payload_field_counts: dict[str, Counter[str]] = defaultdict(Counter)
+    game_counts: dict[str, Counter[str]] = defaultdict(Counter)
+    samples: list[dict[str, Any]] = []
+
+    for game_id, rows in traces.items():
+        for row in rows or []:
+            event = str(row.get("event") or "")
+            event_counts[event] += 1
+            game_counts[str(game_id)][event] += 1
+            cards = [
+                focus_lookup.get(normalize_key(card), str(card))
+                for card in row.get("cards") or []
+                if str(card).strip()
+            ]
+            data = row.get("data") or {}
+            if not isinstance(data, Mapping):
+                data = {}
+            for card in cards:
+                matched_cards[card][event] += 1
+                for field, value in data.items():
+                    if value not in (None, "", [], {}):
+                        payload_field_counts[card][str(field)] += 1
+            if len(samples) < 30:
+                samples.append(
+                    {
+                        "game_id": game_id,
+                        "seq": row.get("seq"),
+                        "event": event,
+                        "cards": cards,
+                        "data": {
+                            key: data.get(key)
+                            for key in (
+                                "card",
+                                "activation_kind",
+                                "chapter",
+                                "target_type",
+                                "found",
+                                "found_cards",
+                                "candidate_count",
+                                "candidate_names",
+                                "legal_target_names",
+                                "selected_reason",
+                                "top_before",
+                                "top_after",
+                                "hand_to_top",
+                                "discarded",
+                                "discard_destination",
+                                "blink_target",
+                                "blinked",
+                                "condition_met",
+                                "reason",
+                                "turn",
+                            )
+                            if data.get(key) not in (None, "", [], {})
+                        },
+                    }
+                )
+
+    return {
+        "trace_game_count": len(traces),
+        "trace_row_count": sum(event_counts.values()),
+        "event_counts": dict(sorted(event_counts.items())),
+        "matched_cards": {card: dict(sorted(counts.items())) for card, counts in sorted(matched_cards.items())},
+        "payload_field_counts": {
+            card: dict(sorted(counts.items()))
+            for card, counts in sorted(payload_field_counts.items())
+        },
+        "game_event_counts": {game_id: dict(sorted(counts.items())) for game_id, counts in sorted(game_counts.items())},
+        "samples": samples,
+    }
+
+
 def card_observation(
     *,
     card: str,
@@ -333,6 +411,7 @@ def card_observation(
     strategic_games: Mapping[str, dict[str, Any]],
     per_game: Mapping[str, Any],
     squee_trace: Mapping[str, Any],
+    focus_trace: Mapping[str, Any],
 ) -> dict[str, Any]:
     card_events = CARD_EVENT_KEYS.get(card, [])
     aggregate_event_counts: dict[str, int] = {}
@@ -348,11 +427,14 @@ def card_observation(
     games_with = {key: value for key, value in games_with.items() if value}
 
     trace_matches = (squee_trace.get("matched_cards") or {}).get(card) or {}
+    focus_trace_matches = (focus_trace.get("matched_cards") or {}).get(card) or {}
     metrics = list(top_metrics.get(card) or [])
     has_game_results = int(per_game.get("game_count") or 0) > 0
     has_squee_trace = int(squee_trace.get("trace_game_count") or 0) > 0
 
-    if trace_matches:
+    if focus_trace_matches:
+        evidence_level = "focus_card_trace_available"
+    elif trace_matches:
         evidence_level = "partial_game_trace_available"
     elif has_game_results and (games_with or aggregate_event_counts):
         evidence_level = "per_game_event_counts_indirect"
@@ -374,6 +456,10 @@ def card_observation(
         "aggregate_event_counts": dict(sorted(aggregate_event_counts.items())),
         "games_with": dict(sorted(games_with.items())),
         "squee_trace_matches": dict(sorted(trace_matches.items())),
+        "focus_trace_matches": dict(sorted(focus_trace_matches.items())),
+        "focus_trace_payload_fields": dict(
+            sorted(((focus_trace.get("payload_field_counts") or {}).get(card) or {}).items())
+        ),
     }
 
 
@@ -393,6 +479,7 @@ def compact_seed_source(
     strategic_events = subset_counts(telemetry.get("strategic_event_counts") or {})
     top_metrics = top_card_metrics_by_card(result, focus_cards)
     squee_trace = summarize_squee_traces(result, focus_cards)
+    focus_trace = summarize_focus_traces(result, focus_cards)
 
     if per_game["game_count"]:
         trace_data_level = "per_game_event_counts"
@@ -412,6 +499,7 @@ def compact_seed_source(
             strategic_games=strategic_games,
             per_game=per_game,
             squee_trace=squee_trace,
+            focus_trace=focus_trace,
         )
         for card in focus_cards
     ]
@@ -440,6 +528,7 @@ def compact_seed_source(
         },
         "per_game_samples": per_game["games"][:9],
         "squee_trace_summary": squee_trace,
+        "focus_trace_summary": focus_trace,
         "card_observations": observations,
     }
 
@@ -570,10 +659,6 @@ def hypothesis_status(
     if not_observed:
         reasons.append("not observed in current artifact: " + ", ".join(not_observed[:10]))
 
-    required = CARD_TRACE_REQUIRED_FIELDS.get(key) or []
-    if required:
-        reasons.append("missing required payload fields: " + "; ".join(required))
-
     if key == "audit_squee_graveyard_entry_route":
         squee_discards = 0
         squee_trace_games = 0
@@ -585,13 +670,47 @@ def hypothesis_status(
             return "trace_evidence_supports_sequencing_gap", reasons
 
     if key == "audit_urzas_saga_artifact_tutor_scope":
+        if focus_payload_available(
+            seed_records,
+            seeds,
+            "Urza's Saga",
+            {"target_type", "candidate_names", "legal_target_names", "selected_reason"},
+        ):
+            reasons.append(
+                "Saga focus trace includes target_type, candidate_names, legal_target_names, and selected_reason"
+            )
+            return "runtime_trace_payload_available_review_model_scope", reasons
+        required = CARD_TRACE_REQUIRED_FIELDS.get(key) or []
+        if required:
+            reasons.append("missing required payload fields: " + "; ".join(required))
         return "runtime_trace_partial_missing_tutor_payload", reasons
+
+    required = CARD_TRACE_REQUIRED_FIELDS.get(key) or []
+    if required:
+        reasons.append("missing required payload fields: " + "; ".join(required))
 
     if not_observed or required:
         return "trace_partial_missing_payload", reasons
     if observed_levels["partial_game_trace_available"] or observed_levels["per_game_event_counts_indirect"]:
         return "trace_partial_per_game_events", reasons
     return "trace_partial_aggregate_only", reasons
+
+
+def focus_payload_available(
+    seed_records: Mapping[str, dict[str, Any]],
+    seeds: Iterable[str],
+    card_name: str,
+    required_fields: set[str],
+) -> bool:
+    for seed in seeds:
+        observations = {
+            row.get("card_name"): row
+            for row in seed_records.get(str(seed), {}).get("card_observations") or []
+        }
+        fields = set((observations.get(card_name) or {}).get("focus_trace_payload_fields") or {})
+        if required_fields <= fields:
+            return True
+    return False
 
 
 def build_hypothesis_assessments(
@@ -639,6 +758,8 @@ def build_hypothesis_assessments(
 def next_action_for_status(status: str) -> str:
     if status == "trace_evidence_supports_sequencing_gap":
         return "add sequencing/runtime probe for Squee graveyard entry before testing another card swap"
+    if status == "runtime_trace_payload_available_review_model_scope":
+        return "review Saga target scope against trace payload before changing cards"
     if status == "runtime_trace_partial_missing_tutor_payload":
         return "extend Urza's Saga trace payload with chapter, tutor target, and legal target set"
     if status == "trace_partial_missing_payload":
@@ -697,6 +818,8 @@ def build_report(
 def recommended_next_action(status_counts: Mapping[str, int]) -> str:
     if status_counts.get("runtime_trace_partial_missing_tutor_payload"):
         return "extend_focus_card_trace_payload_then_rerun_seed_diagnostics"
+    if status_counts.get("runtime_trace_payload_available_review_model_scope"):
+        return "review_focus_trace_payload_then_define_next_runtime_or_package_test"
     if status_counts.get("trace_partial_missing_payload"):
         return "rerun_failure_seed_diagnostics_with_focus_card_payload"
     if status_counts.get("trace_source_missing"):
@@ -771,14 +894,21 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
                 f"{key}={value}"
                 for key, value in (obs.get("squee_trace_matches") or {}).items()
             ]
+            focus_bits = [
+                f"{key}={value}"
+                for key, value in (obs.get("focus_trace_matches") or {}).items()
+            ]
+            field_bits = sorted((obs.get("focus_trace_payload_fields") or {}).keys())
             lines.append(
-                "- `{card}`: level=`{level}`, metrics=`{metrics}`, events=`{events}`, games_with=`{games}`, trace=`{trace}`".format(
+                "- `{card}`: level=`{level}`, metrics=`{metrics}`, events=`{events}`, games_with=`{games}`, trace=`{trace}`, focus_trace=`{focus}`, focus_fields=`{fields}`".format(
                     card=obs["card_name"],
                     level=obs["evidence_level"],
                     metrics=", ".join(metric_bits) or "-",
                     events=", ".join(event_bits) or "-",
                     games=", ".join(game_bits) or "-",
                     trace=", ".join(trace_bits) or "-",
+                    focus=", ".join(focus_bits) or "-",
+                    fields=", ".join(field_bits) or "-",
                 )
             )
         lines.append("")

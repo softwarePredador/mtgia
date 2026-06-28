@@ -42,7 +42,7 @@ def synthesis_payload():
     }
 
 
-def result(seed, wins, losses, *, game_results=False, squee_trace=False):
+def result(seed, wins, losses, *, game_results=False, squee_trace=False, focus_trace=False):
     telemetry = {
         "event_counts": {
             "saga_chapter_progressed": 2,
@@ -75,6 +75,7 @@ def result(seed, wins, losses, *, game_results=False, squee_trace=False):
         "squee_game_traces": {},
         "squee_known_graveyard_balance_by_game": {},
         "squee_anomalies": [],
+        "focus_card_game_traces": {},
     }
     if squee_trace:
         telemetry["squee_game_traces"] = {
@@ -98,6 +99,27 @@ def result(seed, wins, losses, *, game_results=False, squee_trace=False):
             ]
         }
         telemetry["top_cards"].append({"key": "cost_paid:Squee, Goblin Nabob", "count": 1})
+    if focus_trace:
+        telemetry["focus_card_game_traces"] = {
+            "candidate:opponent:0": [
+                {
+                    "seq": 1,
+                    "game_id": "candidate:opponent:0",
+                    "event": "saga_chapter_resolved",
+                    "cards": ["Urza's Saga"],
+                    "data": {
+                        "player": "Lorehold",
+                        "card": "Urza's Saga",
+                        "chapter": 3,
+                        "target_type": "artifact_cmc_1_or_less",
+                        "found": "Sol Ring",
+                        "candidate_names": ["Sol Ring", "Sensei's Divining Top"],
+                        "legal_target_names": ["Sol Ring", "Sensei's Divining Top"],
+                        "selected_reason": "mana_priority",
+                    },
+                }
+            ]
+        }
 
     payload = {
         "deck_key": audit.CANDIDATE_KEY,
@@ -135,11 +157,20 @@ def result(seed, wins, losses, *, game_results=False, squee_trace=False):
     return payload
 
 
-def gate(seed, wins, losses, *, game_results=False, squee_trace=False):
+def gate(seed, wins, losses, *, game_results=False, squee_trace=False, focus_trace=False):
     return {
         "simulation_seed": seed,
         "status": "ready",
-        "results": [result(seed, wins, losses, game_results=game_results, squee_trace=squee_trace)],
+        "results": [
+            result(
+                seed,
+                wins,
+                losses,
+                game_results=game_results,
+                squee_trace=squee_trace,
+                focus_trace=focus_trace,
+            )
+        ],
     }
 
 
@@ -198,3 +229,29 @@ def test_urza_scope_remains_partial_without_tutor_payload(tmp_path):
     urza = by_key["audit_urzas_saga_artifact_tutor_scope"]
     assert urza["trace_status"] == "runtime_trace_partial_missing_tutor_payload"
     assert "artifact tutor target identity" in " ".join(urza["current_limitations"])
+
+
+def test_urza_scope_uses_focus_trace_payload_when_available(tmp_path):
+    diagnostic7 = write_json(
+        tmp_path / "seed7_diag.json",
+        gate(7, 0, 3, game_results=True, focus_trace=True),
+    )
+    diagnostic42 = write_json(
+        tmp_path / "seed42_diag.json",
+        gate(42, 2, 1, game_results=True, focus_trace=True),
+    )
+
+    report = audit.build_report(
+        synthesis=synthesis_payload(),
+        gate_paths=[],
+        diagnostic_gate_paths=[diagnostic7, diagnostic42],
+    )
+
+    by_key = {row["hypothesis_key"]: row for row in report["hypothesis_assessments"]}
+    urza = by_key["audit_urzas_saga_artifact_tutor_scope"]
+    assert urza["trace_status"] == "runtime_trace_payload_available_review_model_scope"
+
+    seed7 = report["primary_seed_records"]["7"]
+    urza_obs = next(row for row in seed7["card_observations"] if row["card_name"] == "Urza's Saga")
+    assert urza_obs["evidence_level"] == "focus_card_trace_available"
+    assert "candidate_names" in urza_obs["focus_trace_payload_fields"]
