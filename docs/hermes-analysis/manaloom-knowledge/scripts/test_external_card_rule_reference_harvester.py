@@ -28,6 +28,23 @@ class ExternalCardRuleReferenceHarvesterTests(unittest.TestCase):
             "3bfb7f30f7e9beaf850032862f2996fc",
         )
 
+    def test_actionable_cards_can_be_restricted_by_card_name(self) -> None:
+        report = {
+            "cards": [
+                {"card_name": "Pearl Medallion", "severity": "high"},
+                {"card_name": "Repercussion", "severity": "medium"},
+                {"card_name": "Manual Low", "severity": "low"},
+            ]
+        }
+
+        cards = harvester.actionable_cards(
+            report,
+            limit=5,
+            card_names={"  repercussion  "},
+        )
+
+        self.assertEqual([card["card_name"] for card in cards], ["Repercussion"])
+
     def test_gap_bucket_uses_external_reference_for_review_promotions(self) -> None:
         card = {
             "findings": [

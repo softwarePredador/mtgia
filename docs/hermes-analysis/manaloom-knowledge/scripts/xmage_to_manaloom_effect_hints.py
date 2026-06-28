@@ -6430,6 +6430,48 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         )
 
     if (
+        card_types == {"ENCHANTMENT"}
+        and effect_classes == {"DamageTargetEffect"}
+        and "DealtDamageAnyTriggeredAbility" in ability_classes
+        and (
+            xmage_class_name == "Repercussion"
+            or (
+                "saveddamagevalue.much" in normalized_text
+                and "settargetpointer.player" in normalized_text
+            )
+            or _oracle_has(
+                rules_text,
+                "whenever a creature is dealt damage",
+                "deals that much damage to that creature's controller",
+            )
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="direct_damage",
+                scope="creature_damage_controller_reflect_global_v1",
+                reason=(
+                    "XMage structure matches Repercussion: whenever any creature is dealt damage, "
+                    "the source enchantment deals that much damage to that creature's controller."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "trigger": "creature_dealt_damage",
+                    "trigger_effect": "damage_creature_controller",
+                    "damage_amount_source": "damage_dealt_to_creature",
+                    "global_creature_damage_reflect_to_controller": True,
+                },
+                matched_signals=[
+                    "DealtDamageAnyTriggeredAbility",
+                    "DamageTargetEffect",
+                    "SavedDamageValue.MUCH",
+                    "SetTargetPointer.PLAYER",
+                ],
+            )
+        )
+
+    if (
         xmage_class_name == "TroubleInPairs"
         and card_types == {"ENCHANTMENT"}
         and effect_classes == {"DrawCardSourceControllerEffect"}

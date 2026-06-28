@@ -107,3 +107,163 @@ def test_family_queue_groups_cards_with_candidate_priority_context() -> None:
     card = family_queue[0]["cards"][0]
     assert card["candidate_score"] == 24
     assert card["variant_decks"] == [608, 609]
+
+
+def test_targeted_interaction_queue_splits_direct_damage_subfamilies() -> None:
+    rows = [
+        {
+            "card_name": "Terror of the Peaks",
+            "status": "blocked_runtime_rule_gap",
+            "score": 0,
+            "lane": "contextual",
+            "variant_decks": [608, 612],
+            "variant_deck_count": 2,
+        },
+        {
+            "card_name": "Balefire Liege",
+            "status": "blocked_runtime_rule_gap",
+            "score": -10,
+            "lane": "contextual",
+            "variant_decks": [616],
+            "variant_deck_count": 1,
+        },
+        {
+            "card_name": "Firesong and Sunspeaker",
+            "status": "blocked_runtime_rule_gap",
+            "score": -10,
+            "lane": "finisher_or_big_spell",
+            "variant_decks": [616],
+            "variant_deck_count": 1,
+        },
+        {
+            "card_name": "Boros Reckoner",
+            "status": "blocked_runtime_rule_gap",
+            "score": 0,
+            "lane": "contextual",
+            "variant_decks": [612, 616],
+            "variant_deck_count": 2,
+        },
+        {
+            "card_name": "Repercussion",
+            "status": "blocked_runtime_rule_gap",
+            "score": -10,
+            "lane": "contextual",
+            "variant_decks": [612],
+            "variant_deck_count": 1,
+        },
+        {
+            "card_name": "Toralf, God of Fury // Toralf's Hammer",
+            "status": "blocked_runtime_rule_gap",
+            "score": -10,
+            "lane": "contextual",
+            "variant_decks": [612],
+            "variant_deck_count": 1,
+        },
+    ]
+    family_report = {
+        "families": [
+            {
+                "family_id": "targeted_interaction",
+                "support_status": "runtime_family_partially_supported_review_required",
+                "batch_strategy": "split_by_scope_before_metadata_batch",
+                "implementation_unit": "target legality, resolution, zone transition, and event provenance",
+                "family_tests": [],
+                "cards": [
+                    targeted_damage_card(
+                        "Terror of the Peaks",
+                        abilities=["EntersBattlefieldControlledTriggeredAbility"],
+                        effects=["DamageTargetEffect", "TerrorOfThePeaksCostIncreaseEffect"],
+                        targets=["TargetAnyTarget"],
+                    ),
+                    targeted_damage_card(
+                        "Balefire Liege",
+                        abilities=["SpellCastControllerTriggeredAbility"],
+                        effects=["BoostControlledEffect", "DamageTargetEffect", "GainLifeEffect"],
+                        targets=["TargetPlayerOrPlaneswalker"],
+                    ),
+                    targeted_damage_card(
+                        "Firesong and Sunspeaker",
+                        abilities=["FiresongAndSunspeakerTriggeredAbility"],
+                        effects=["DamageTargetEffect", "GainAbilityControlledSpellsEffect"],
+                        targets=["TargetCreatureOrPlayer"],
+                    ),
+                    targeted_damage_card(
+                        "Boros Reckoner",
+                        abilities=["DealtDamageToSourceTriggeredAbility"],
+                        effects=["DamageTargetEffect", "GainAbilitySourceEffect"],
+                        targets=["TargetAnyTarget"],
+                    ),
+                    targeted_damage_card(
+                        "Repercussion",
+                        abilities=["DealtDamageAnyTriggeredAbility"],
+                        effects=["DamageTargetEffect"],
+                        targets=[],
+                    ),
+                    targeted_damage_card(
+                        "Toralf, God of Fury // Toralf's Hammer",
+                        abilities=["BatchTriggeredAbility", "ToralfGodOfFuryTriggeredAbility"],
+                        effects=["DamageTargetEffect", "ToralfsHammerEffect"],
+                        targets=["TargetAnyTarget"],
+                        conditions=["AttachedToMatchesFilterCondition"],
+                    ),
+                ],
+            }
+        ]
+    }
+
+    family_queue = queue.build_family_queue(
+        family_report=family_report,
+        blocked_rows=rows,
+    )
+
+    family = family_queue[0]
+    assert family["targeted_interaction_subfamily_status_counts"] == {
+        "runtime_family_implementation_required": 5,
+        "runtime_supported_family": 1,
+    }
+    assert family["targeted_interaction_subfamily_counts"] == {
+        "creature_damage_controller_reflect_global": 1,
+        "excess_damage_redirect_to_any_target": 1,
+        "instant_sorcery_lifelink_lifegain_damage_engine": 1,
+        "source_damaged_reflect_to_any_target": 1,
+        "spell_color_trigger_damage_life_engine": 1,
+        "targeted_damage_etb_power_to_any_target": 1,
+    }
+    by_card = {
+        card["card_name"]: card["targeted_interaction_subfamily"]
+        for card in family["cards"]
+    }
+    assert by_card["Repercussion"]["subfamily_id"] == "creature_damage_controller_reflect_global"
+    assert by_card["Repercussion"]["status"] == "runtime_supported_family"
+    assert by_card["Toralf, God of Fury // Toralf's Hammer"]["requires_condition_model"] is True
+    assert by_card["Terror of the Peaks"]["subfamily_id"] == "targeted_damage_etb_power_to_any_target"
+    assert by_card["Balefire Liege"]["family_tests"] == [
+        "test_balefire_liege_red_spell_deals_three_to_target_player_or_planeswalker",
+        "test_balefire_liege_white_spell_gains_three_life",
+    ]
+
+
+def targeted_damage_card(
+    name: str,
+    *,
+    abilities: list[str],
+    effects: list[str],
+    targets: list[str],
+    conditions: list[str] | None = None,
+) -> dict:
+    return {
+        "card_name": name,
+        "promotion_lane": "split_family_scope_review_required",
+        "family_support_status": "runtime_family_partially_supported_review_required",
+        "effect": "direct_damage",
+        "battle_model_scope": "targeted_damage_variant_v1",
+        "ready_for_structured_pull": True,
+        "valid_xmage_source": True,
+        "xmage_class": name.replace(" ", ""),
+        "xmage_path": f"/tmp/{name}.java",
+        "xmage_ability_classes": abilities,
+        "xmage_effect_classes": effects,
+        "xmage_target_classes": targets,
+        "xmage_condition_classes": conditions or [],
+        "focused_test_scenario_count": 1,
+    }

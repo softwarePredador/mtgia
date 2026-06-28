@@ -240,12 +240,28 @@ def load_report_from_sqlite(sqlite_db: Path, deck_id: int | None) -> dict[str, A
         return coherence.build_report(conn, deck_id=deck_id)
 
 
-def actionable_cards(report: dict[str, Any], limit: int) -> list[dict[str, Any]]:
+def normalize_card_name(value: str) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip().lower())
+
+
+def actionable_cards(
+    report: dict[str, Any],
+    limit: int,
+    *,
+    card_names: set[str] | None = None,
+) -> list[dict[str, Any]]:
+    normalized_filter = {normalize_card_name(name) for name in card_names or set() if name}
     cards = [
         card
         for card in report.get("cards", [])
         if card.get("severity") in {"critical", "high", "medium"}
     ]
+    if normalized_filter:
+        cards = [
+            card
+            for card in cards
+            if normalize_card_name(str(card.get("card_name") or "")) in normalized_filter
+        ]
     return cards[:limit]
 
 
@@ -479,6 +495,7 @@ def build_harvest_report(
     limit: int,
     offline: bool = False,
     xmage_root: Path | None = None,
+    card_names: set[str] | None = None,
 ) -> dict[str, Any]:
     xmage_class_index = xmage_local_rule_indexer.build_card_class_index(xmage_root) if xmage_root else None
     cards = [
@@ -488,7 +505,7 @@ def build_harvest_report(
             xmage_root=xmage_root,
             xmage_class_index=xmage_class_index,
         )
-        for card in actionable_cards(source_report, limit)
+        for card in actionable_cards(source_report, limit, card_names=card_names)
     ]
     return {
         "generated_at": utc_now(),
@@ -590,6 +607,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--from-report", help="Use an existing deck_card_battle_rule_coherence_audit JSON report.")
     parser.add_argument("--xmage-root", help="Prefer a local XMage checkout before remote XMage URL fallback.")
     parser.add_argument("--limit", type=int, default=5)
+    parser.add_argument("--card-name", action="append", default=[], help="Restrict harvest to this card name; can be repeated.")
     parser.add_argument("--offline", action="store_true", help="Skip network fetches and emit local candidates only.")
     parser.add_argument("--output-json")
     parser.add_argument("--output-md")
@@ -608,6 +626,7 @@ def main() -> int:
         limit=args.limit,
         offline=args.offline,
         xmage_root=xmage_root,
+        card_names=set(args.card_name or []),
     )
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     deck_part = f"_deck{source_report.get('deck_id')}" if source_report.get("deck_id") is not None else ""

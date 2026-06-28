@@ -192,6 +192,13 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
     if effect:
         role.setdefault("effect", effect)
     effect_json = dict(card.get("effect_json") or {})
+    if effect_json.get("battle_model_scope") == "creature_damage_controller_reflect_global_v1":
+        return {
+            "category": "burn_engine",
+            "effect": "damage_reflection",
+            "subtype": "creature_damage_controller_reflect",
+            "timing": "triggered",
+        }
     if effect == "creature" and (
         int(effect_json.get("etb_draw_count") or 0) > 0
         or int(effect_json.get("etb_discard_hand_then_draw_count") or 0) > 0

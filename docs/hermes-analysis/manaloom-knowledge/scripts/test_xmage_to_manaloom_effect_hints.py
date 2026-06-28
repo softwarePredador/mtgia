@@ -4948,6 +4948,31 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target"], "any_target")
         self.assertTrue(primary["instant"])
 
+    def test_repercussion_maps_to_global_creature_damage_reflect_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Repercussion",
+                "effect_classes": ["DamageTargetEffect"],
+                "ability_classes": ["DealtDamageAnyTriggeredAbility"],
+                "target_classes": [],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new DealtDamageAnyTriggeredAbility("
+                    "new DamageTargetEffect(SavedDamageValue.MUCH), "
+                    "StaticFilters.FILTER_PERMANENT_A_CREATURE, SetTargetPointer.PLAYER, false));"
+                ),
+            },
+            "Whenever a creature is dealt damage, Repercussion deals that much damage to that creature's controller.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "direct_damage")
+        self.assertEqual(primary["battle_model_scope"], "creature_damage_controller_reflect_global_v1")
+        self.assertEqual(primary["trigger"], "creature_dealt_damage")
+        self.assertEqual(primary["trigger_effect"], "damage_creature_controller")
+        self.assertEqual(primary["damage_amount_source"], "damage_dealt_to_creature")
+        self.assertTrue(primary["global_creature_damage_reflect_to_controller"])
+
     def test_caldera_pyremaw_maps_to_counter_then_power_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

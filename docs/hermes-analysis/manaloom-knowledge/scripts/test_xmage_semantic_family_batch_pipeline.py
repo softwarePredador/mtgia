@@ -8000,6 +8000,89 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_repercussion_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Repercussion",
+                        "severity": "high",
+                        "oracle_hash": "repercussionhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "Repercussion",
+                            "path": "/xmage/Repercussion.java",
+                            "types": ["ENCHANTMENT"],
+                            "effect_classes": ["DamageTargetEffect"],
+                            "ability_classes": ["DealtDamageAnyTriggeredAbility"],
+                            "cost_classes": [],
+                            "target_classes": [],
+                            "primary_effect": {
+                                "effect": "direct_damage",
+                                "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+                                "trigger": "creature_dealt_damage",
+                                "trigger_effect": "damage_creature_controller",
+                                "damage_amount_source": "damage_dealt_to_creature",
+                                "global_creature_damage_reflect_to_controller": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "targeted_interaction")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_generator_marks_repercussion_as_burn_engine_when_scope_is_exact(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Repercussion",
+                    "severity": "high",
+                    "oracle_hash": "repercussionhash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "Repercussion",
+                        "path": "/xmage/Repercussion.java",
+                        "types": ["ENCHANTMENT"],
+                        "effect_classes": ["DamageTargetEffect"],
+                        "ability_classes": ["DealtDamageAnyTriggeredAbility"],
+                        "cost_classes": [],
+                        "target_classes": [],
+                        "primary_effect": {
+                            "effect": "direct_damage",
+                            "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+                            "trigger": "creature_dealt_damage",
+                            "trigger_effect": "damage_creature_controller",
+                            "damage_amount_source": "damage_dealt_to_creature",
+                            "global_creature_damage_reflect_to_controller": True,
+                        },
+                    },
+                }
+            ]
+        }
+
+        report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = report["proposals"][0]
+
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "burn_engine")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "damage_reflection")
+        self.assertEqual(
+            proposal["deck_role_json"]["subtype"],
+            "creature_damage_controller_reflect",
+        )
+
     def test_classifier_marks_tinder_wall_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

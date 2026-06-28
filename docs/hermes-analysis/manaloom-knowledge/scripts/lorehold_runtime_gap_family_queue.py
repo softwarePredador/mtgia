@@ -165,6 +165,132 @@ def card_signal_group(card: dict[str, Any]) -> str:
     return ";".join(signals) if signals else "no_structural_signal"
 
 
+TARGETED_INTERACTION_SUBFAMILY_META = {
+    "targeted_damage_etb_power_to_any_target": {
+        "status": "runtime_family_implementation_required",
+        "implementation_unit": (
+            "triggered damage equal to the entering controlled creature power, "
+            "with target selection and optional opponent targeting tax"
+        ),
+        "next_step": "implement Terror-of-the-Peaks style ETB power damage resolver and focused battle test",
+        "family_tests": [
+            "test_terror_of_the_peaks_damages_any_target_equal_to_entering_creature_power",
+            "test_terror_of_the_peaks_applies_opponent_targeting_tax",
+        ],
+        "priority": 20,
+    },
+    "spell_color_trigger_damage_life_engine": {
+        "status": "runtime_family_implementation_required",
+        "implementation_unit": (
+            "red/white spell-cast triggers that separately deal targeted damage, "
+            "gain life, and annotate static creature boosts"
+        ),
+        "next_step": "split Balefire Liege red and white spell triggers before PG metadata promotion",
+        "family_tests": [
+            "test_balefire_liege_red_spell_deals_three_to_target_player_or_planeswalker",
+            "test_balefire_liege_white_spell_gains_three_life",
+        ],
+        "priority": 15,
+    },
+    "instant_sorcery_lifelink_lifegain_damage_engine": {
+        "status": "runtime_family_implementation_required",
+        "implementation_unit": (
+            "instant/sorcery lifelink grant plus white instant/sorcery lifegain trigger "
+            "that deals three damage to a target"
+        ),
+        "next_step": "implement Firesong and Sunspeaker lifelink/lifegain trigger as a standalone battle family",
+        "family_tests": [
+            "test_firesong_grants_lifelink_to_red_instant_and_sorcery_spells",
+            "test_firesong_white_instant_lifegain_triggers_three_damage",
+        ],
+        "priority": 15,
+    },
+    "source_damaged_reflect_to_any_target": {
+        "status": "runtime_family_implementation_required",
+        "implementation_unit": (
+            "source-creature dealt-damage trigger that deals the same amount to any chosen target"
+        ),
+        "next_step": "implement Boros-Reckoner style damage reflection and target choice tests",
+        "family_tests": [
+            "test_boros_reckoner_reflects_damage_to_selected_any_target",
+            "test_boros_reckoner_reflection_uses_saved_damage_amount",
+        ],
+        "priority": 25,
+    },
+    "creature_damage_controller_reflect_global": {
+        "status": "runtime_supported_family",
+        "implementation_unit": (
+            "global creature-damaged trigger that deals the same damage to that creature controller"
+        ),
+        "next_step": "prepare PG metadata package after PostgreSQL precheck, then gate Repercussion sweeper synergy",
+        "family_tests": [
+            "test_repercussion_damages_creature_controller_after_survived_creature_damage",
+            "test_repercussion_stacks_with_blasphemous_act_board_damage",
+        ],
+        "priority": 35,
+    },
+    "excess_damage_redirect_to_any_target": {
+        "status": "runtime_family_implementation_required",
+        "implementation_unit": (
+            "excess noncombat damage trigger that redirects overflow damage to another target"
+        ),
+        "next_step": "implement Toralf excess-damage batch trigger and MDFC hammer activated damage separately",
+        "family_tests": [
+            "test_toralf_redirects_excess_noncombat_damage_to_any_target",
+            "test_toralf_hammer_deals_three_and_returns_to_hand_after_unattach",
+        ],
+        "priority": 30,
+    },
+    "targeted_interaction_split_review": {
+        "status": "split_family_scope_review_required",
+        "implementation_unit": "targeted direct-damage variant requires manual subfamily assignment",
+        "next_step": "inspect XMage ability/effect/target classes and add a deterministic subfamily mapping",
+        "family_tests": [],
+        "priority": 5,
+    },
+}
+
+
+def targeted_interaction_subfamily(card: dict[str, Any]) -> dict[str, Any] | None:
+    if card.get("family_id") != "targeted_interaction":
+        return None
+    if card.get("effect") != "direct_damage":
+        return None
+
+    abilities = set(card.get("xmage_ability_classes") or [])
+    effects = set(card.get("xmage_effect_classes") or [])
+    targets = set(card.get("xmage_target_classes") or [])
+    conditions = set(card.get("xmage_condition_classes") or [])
+
+    if "ToralfGodOfFuryTriggeredAbility" in abilities or "ToralfsHammerEffect" in effects:
+        subfamily_id = "excess_damage_redirect_to_any_target"
+    elif "DealtDamageAnyTriggeredAbility" in abilities:
+        subfamily_id = "creature_damage_controller_reflect_global"
+    elif "DealtDamageToSourceTriggeredAbility" in abilities:
+        subfamily_id = "source_damaged_reflect_to_any_target"
+    elif "FiresongAndSunspeakerTriggeredAbility" in abilities:
+        subfamily_id = "instant_sorcery_lifelink_lifegain_damage_engine"
+    elif "SpellCastControllerTriggeredAbility" in abilities and {
+        "GainLifeEffect",
+        "DamageTargetEffect",
+    }.issubset(effects):
+        subfamily_id = "spell_color_trigger_damage_life_engine"
+    elif (
+        "EntersBattlefieldControlledTriggeredAbility" in abilities
+        and "DamageTargetEffect" in effects
+        and "TargetAnyTarget" in targets
+    ):
+        subfamily_id = "targeted_damage_etb_power_to_any_target"
+    else:
+        subfamily_id = "targeted_interaction_split_review"
+
+    meta = dict(TARGETED_INTERACTION_SUBFAMILY_META[subfamily_id])
+    meta["subfamily_id"] = subfamily_id
+    meta["signal_group"] = card_signal_group(card)
+    meta["requires_condition_model"] = bool(conditions)
+    return meta
+
+
 def xmage_signal_groups(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[str, list[dict[str, Any]]] = {}
     for card in cards:
@@ -209,6 +335,7 @@ def build_family_queue(
             cards.append(
                 {
                     "card_name": card.get("card_name"),
+                    "family_id": family.get("family_id"),
                     "candidate_score": int(source.get("score") or 0),
                     "candidate_lane": source.get("lane") or "unknown",
                     "variant_decks": list(source.get("variant_decks") or []),
@@ -228,10 +355,24 @@ def build_family_queue(
                     "focused_test_scenario_count": int(card.get("focused_test_scenario_count") or 0),
                 }
             )
+            subfamily = targeted_interaction_subfamily(cards[-1])
+            if subfamily:
+                cards[-1]["targeted_interaction_subfamily"] = subfamily
         lane_counts = Counter(card["candidate_lane"] for card in cards)
         promotion_counts = Counter(card["promotion_lane"] for card in cards)
+        subfamily_counts = Counter(
+            (card.get("targeted_interaction_subfamily") or {}).get("subfamily_id")
+            for card in cards
+            if card.get("targeted_interaction_subfamily")
+        )
+        subfamily_status_counts = Counter(
+            (card.get("targeted_interaction_subfamily") or {}).get("status")
+            for card in cards
+            if card.get("targeted_interaction_subfamily")
+        )
         cards.sort(
             key=lambda card: (
+                -int((card.get("targeted_interaction_subfamily") or {}).get("priority") or 0),
                 -int(card.get("candidate_score") or 0),
                 -int(card.get("variant_deck_count") or 0),
                 str(card.get("card_name") or ""),
@@ -247,6 +388,10 @@ def build_family_queue(
                 "batch_strategy": family.get("batch_strategy"),
                 "implementation_unit": family.get("implementation_unit"),
                 "family_tests": list(family.get("family_tests") or []),
+                "targeted_interaction_subfamily_counts": dict(sorted(subfamily_counts.items())),
+                "targeted_interaction_subfamily_status_counts": dict(
+                    sorted(subfamily_status_counts.items())
+                ),
                 "xmage_signal_groups": xmage_signal_groups(cards),
                 "cards": cards,
             }
@@ -294,6 +439,18 @@ def build_queue_report(
         for family in family_queue
         for card in family.get("cards") or []
     )
+    targeted_subfamily_counts = Counter(
+        (card.get("targeted_interaction_subfamily") or {}).get("subfamily_id")
+        for family in family_queue
+        for card in family.get("cards") or []
+        if card.get("targeted_interaction_subfamily")
+    )
+    targeted_subfamily_status_counts = Counter(
+        (card.get("targeted_interaction_subfamily") or {}).get("status")
+        for family in family_queue
+        for card in family.get("cards") or []
+        if card.get("targeted_interaction_subfamily")
+    )
     candidate_lane_counts = Counter(row.get("lane") or "unknown" for row in blocked_rows)
     return {
         "generated_at": utc_now(),
@@ -312,6 +469,10 @@ def build_queue_report(
             "validity_summary": validity_report.get("summary") or {},
             "family_summary": family_report.get("summary") or {},
             "promotion_lane_counts": dict(sorted(promotion_counts.items())),
+            "targeted_interaction_subfamily_counts": dict(sorted(targeted_subfamily_counts.items())),
+            "targeted_interaction_subfamily_status_counts": dict(
+                sorted(targeted_subfamily_status_counts.items())
+            ),
             "family_count": len(family_queue),
         },
         "blocked_coherence_report": coherence_report,
@@ -334,6 +495,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Blocked runtime cards: `{summary.get('blocked_runtime_rule_gap_count')}`",
         f"- Candidate lanes: `{json.dumps(summary.get('candidate_lane_counts'), sort_keys=True)}`",
         f"- Promotion lanes: `{json.dumps(summary.get('promotion_lane_counts'), sort_keys=True)}`",
+        f"- Targeted interaction subfamilies: `{json.dumps(summary.get('targeted_interaction_subfamily_counts'), sort_keys=True)}`",
+        f"- Targeted interaction subfamily statuses: `{json.dumps(summary.get('targeted_interaction_subfamily_status_counts'), sort_keys=True)}`",
         f"- Family count: `{summary.get('family_count')}`",
         "",
         "## Family Queue",
@@ -363,6 +526,8 @@ def render_markdown(report: dict[str, Any]) -> str:
                 f"- Support: `{family.get('support_status')}`",
                 f"- Batch strategy: `{family.get('batch_strategy')}`",
                 f"- Family tests: `{json.dumps(family.get('family_tests'), sort_keys=True)}`",
+                f"- Targeted interaction subfamilies: `{json.dumps(family.get('targeted_interaction_subfamily_counts'), sort_keys=True)}`",
+                f"- Targeted interaction subfamily statuses: `{json.dumps(family.get('targeted_interaction_subfamily_status_counts'), sort_keys=True)}`",
                 "",
                 "Signal groups:",
                 "",
@@ -380,18 +545,21 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.extend(
             [
                 "",
-                "| Card | Score | Variant decks | Lane | Promotion | Effect | Scope | XMage class |",
-                "| --- | ---: | --- | --- | --- | --- | --- | --- |",
+                "| Card | Score | Variant decks | Lane | Promotion | Subfamily | Next step | Effect | Scope | XMage class |",
+                "| --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |",
             ]
         )
         for card in family.get("cards") or []:
+            subfamily = card.get("targeted_interaction_subfamily") or {}
             lines.append(
-                "| `{card}` | {score} | `{decks}` | `{lane}` | `{promotion}` | `{effect}` | `{scope}` | `{klass}` |".format(
+                "| `{card}` | {score} | `{decks}` | `{lane}` | `{promotion}` | `{subfamily}` | {step} | `{effect}` | `{scope}` | `{klass}` |".format(
                     card=card.get("card_name"),
                     score=card.get("candidate_score"),
                     decks=", ".join(str(deck_id) for deck_id in card.get("variant_decks") or []),
                     lane=card.get("candidate_lane"),
                     promotion=card.get("promotion_lane"),
+                    subfamily=subfamily.get("subfamily_id") or "",
+                    step=subfamily.get("next_step") or "",
                     effect=card.get("effect"),
                     scope=card.get("battle_model_scope"),
                     klass=card.get("xmage_class"),

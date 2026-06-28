@@ -25841,6 +25841,17 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 turn=turn,
                 phase="resolution",
             )
+            trigger_creature_damage_controller_reflect(
+                [player, *list(opponents)],
+                player,
+                opp,
+                card,
+                target,
+                target_amount,
+                turn=turn,
+                phase="resolution",
+                damage_event="direct_damage",
+            )
             process_taii_wakeen_noncombat_damage_to_creature(
                 player,
                 opp,
@@ -26178,9 +26189,6 @@ def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, e
             if not is_battlefield_creature(permanent):
                 continue
             creatures_seen += 1
-            if permanent.get("indestructible"):
-                protected.append({"controller": opponent.name, "name": permanent.get("name", "?")})
-                continue
             permanent_amount = apply_static_damage_replacements(
                 player,
                 opponent,
@@ -26191,6 +26199,26 @@ def apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, e
                 turn=turn,
                 phase="resolution",
             )
+            trigger_creature_damage_controller_reflect(
+                [player, *list(opponents)],
+                player,
+                opponent,
+                card,
+                permanent,
+                permanent_amount,
+                turn=turn,
+                phase="resolution",
+                damage_event="damage_each_opponent_and_opponent_creatures",
+            )
+            if permanent.get("indestructible"):
+                protected.append(
+                    {
+                        "controller": opponent.name,
+                        "name": permanent.get("name", "?"),
+                        "damage_amount": permanent_amount,
+                    }
+                )
+                continue
             toughness = _damage_sweep_creature_toughness(permanent)
             if toughness > permanent_amount:
                 survived_damage.append(
@@ -26276,17 +26304,44 @@ def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
             if not is_battlefield_creature(permanent):
                 continue
             creatures_seen += 1
+            permanent_amount = apply_static_damage_replacements(
+                player,
+                participant,
+                permanent,
+                card,
+                amount,
+                damage_event_type="permanent",
+                turn=turn,
+                phase="resolution",
+            )
+            trigger_creature_damage_controller_reflect(
+                [player, *list(opponents)],
+                player,
+                participant,
+                card,
+                permanent,
+                permanent_amount,
+                turn=turn,
+                phase="resolution",
+                damage_event="damage_wipe_treasure",
+            )
             if permanent.get("indestructible"):
-                protected.append(permanent.get("name", "?"))
+                protected.append(
+                    {
+                        "controller": participant.name,
+                        "name": permanent.get("name", "?"),
+                        "damage_amount": permanent_amount,
+                    }
+                )
                 continue
-            if _damage_sweep_creature_toughness(permanent) > amount:
+            if _damage_sweep_creature_toughness(permanent) > permanent_amount:
                 continue
             process_taii_wakeen_noncombat_damage_to_creature(
                 player,
                 participant,
                 card,
                 permanent,
-                amount,
+                permanent_amount,
                 turn=turn,
                 phase="resolution",
             )
@@ -26382,14 +26437,6 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                 if damage_scope == "each_untapped_creature" and bool(permanent.get("tapped")):
                     continue
                 creatures_seen += 1
-                if permanent.get("indestructible"):
-                    protected.append(
-                        {
-                            "controller": participant.name,
-                            "name": permanent.get("name", "?"),
-                        }
-                    )
-                    continue
                 permanent_amount = apply_static_damage_replacements(
                     player,
                     participant,
@@ -26400,6 +26447,26 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                     turn=turn,
                     phase="resolution",
                 )
+                trigger_creature_damage_controller_reflect(
+                    [player, *list(opponents)],
+                    player,
+                    participant,
+                    card,
+                    permanent,
+                    permanent_amount,
+                    turn=turn,
+                    phase="resolution",
+                    damage_event="damage_wipe",
+                )
+                if permanent.get("indestructible"):
+                    protected.append(
+                        {
+                            "controller": participant.name,
+                            "name": permanent.get("name", "?"),
+                            "damage_amount": permanent_amount,
+                        }
+                    )
+                    continue
                 toughness = _damage_sweep_creature_toughness(permanent)
                 if toughness > permanent_amount:
                     survived_damage.append(
@@ -27169,6 +27236,100 @@ def process_taii_wakeen_noncombat_damage_to_creature(
     return triggers
 
 
+def _creature_damage_controller_reflect_permanents(all_players):
+    sources = []
+    seen_controllers = set()
+    for controller in all_players or []:
+        if controller is None or id(controller) in seen_controllers:
+            continue
+        seen_controllers.add(id(controller))
+        for permanent in list(getattr(controller, "battlefield", []) or []):
+            if not isinstance(permanent, dict):
+                continue
+            candidates = [permanent]
+            try:
+                effect_data = get_card_effect(permanent)
+            except Exception:
+                effect_data = {}
+            if isinstance(effect_data, dict) and effect_data is not permanent:
+                candidates.append({**permanent, **effect_data})
+            for candidate in candidates:
+                trigger = candidate.get("trigger")
+                trigger_effect = candidate.get("trigger_effect")
+                if (
+                    candidate.get("global_creature_damage_reflect_to_controller")
+                    or candidate.get("battle_model_scope") == "creature_damage_controller_reflect_global_v1"
+                    or (
+                        trigger in {"creature_dealt_damage", "creature_damaged"}
+                        and trigger_effect in {"damage_creature_controller", "damage_controller"}
+                    )
+                ):
+                    sources.append((controller, permanent, candidate))
+                    break
+    return sources
+
+
+def trigger_creature_damage_controller_reflect(
+    all_players,
+    damage_source_controller,
+    damaged_controller,
+    source_card,
+    damaged_creature,
+    amount,
+    *,
+    turn=None,
+    phase=None,
+    damage_event="creature_damage",
+):
+    if damaged_controller is None or not is_battlefield_creature(damaged_creature):
+        return 0
+    try:
+        damage_amount = max(0, int(amount or 0))
+    except Exception:
+        damage_amount = 0
+    if damage_amount <= 0:
+        return 0
+
+    triggers = 0
+    for controller, permanent, effect_data in _creature_damage_controller_reflect_permanents(all_players):
+        if not getattr(damaged_controller, "is_alive", lambda: True)():
+            continue
+        life_before = getattr(damaged_controller, "life", None)
+        damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+            controller,
+            damaged_controller,
+            permanent,
+            damage_amount,
+            turn=turn,
+            phase=phase,
+            damage_event_type="player",
+        )
+        triggers += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=getattr(controller, "name", None),
+            card=permanent.get("name", "?"),
+            trigger=effect_data.get("trigger") or "creature_dealt_damage",
+            effect="damage_creature_controller",
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else source_card,
+            source_controller=getattr(damage_source_controller, "name", None),
+            damaged_creature=damaged_creature.get("name", "?"),
+            damaged_creature_controller=getattr(damaged_controller, "name", None),
+            target_player=getattr(damaged_controller, "name", None),
+            original_damage_to_creature=damage_amount,
+            amount=target_amount,
+            damage_dealt=damage_dealt,
+            result="player_damage" if dealt else "prevented",
+            life_before=life_before,
+            life_after=getattr(damaged_controller, "life", None),
+            damage_event=damage_event,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+    return triggers
+
+
 def trigger_spell_damage_token_engines(
     player,
     opponents,
@@ -27302,9 +27463,6 @@ def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn
         if not is_battlefield_creature(permanent):
             continue
         creatures_seen += 1
-        if permanent.get("indestructible"):
-            protected.append(permanent.get("name", "?"))
-            continue
         permanent_amount = apply_static_damage_replacements(
             player,
             target,
@@ -27315,6 +27473,26 @@ def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn
             turn=turn,
             phase="resolution",
         )
+        trigger_creature_damage_controller_reflect(
+            [player, *list(opponents)],
+            player,
+            target,
+            card,
+            permanent,
+            permanent_amount,
+            turn=turn,
+            phase="resolution",
+            damage_event="damage_player_and_creatures",
+        )
+        if permanent.get("indestructible"):
+            protected.append(
+                {
+                    "controller": target.name,
+                    "name": permanent.get("name", "?"),
+                    "damage_amount": permanent_amount,
+                }
+            )
+            continue
         if _damage_sweep_creature_toughness(permanent) > permanent_amount:
             continue
         process_taii_wakeen_noncombat_damage_to_creature(
@@ -35357,6 +35535,17 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
             phase="combat_damage",
         )
         marked_damage[id(damaged)] += final_amount
+        trigger_creature_damage_controller_reflect(
+            all_players or [attacker, *list(opponents or []), target],
+            source_controller,
+            damaged_controller,
+            source,
+            damaged,
+            final_amount,
+            turn=turn,
+            phase="combat_damage",
+            damage_event="combat_damage",
+        )
         if source.get("deathtouch"):
             deathtouch_damage.add(id(damaged))
 

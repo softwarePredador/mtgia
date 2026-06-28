@@ -3120,6 +3120,18 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target") == "any_target"
         )
 
+    if effect == "direct_damage" and scope == "creature_damage_controller_reflect_global_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"DamageTargetEffect"}
+            and "DealtDamageAnyTriggeredAbility" in ability_classes
+            and not target_classes
+            and effect_json.get("trigger") == "creature_dealt_damage"
+            and effect_json.get("trigger_effect") == "damage_creature_controller"
+            and effect_json.get("damage_amount_source") == "damage_dealt_to_creature"
+            and bool(effect_json.get("global_creature_damage_reflect_to_controller"))
+        )
+
     if effect == "artifact" and scope == "etb_exile_graveyard_card_or_sacrifice_for_mass_graveyard_exile_or_draw_v1":
         return (
             types == {"ARTIFACT"}
