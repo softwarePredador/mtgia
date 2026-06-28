@@ -1830,6 +1830,49 @@ def _build_exact_runtime_variant_fields(
 
     if (
         card_types == {"ENCHANTMENT"}
+        and xmage_class_name == "HiddenRetreat"
+        and effect_classes == {"HiddenRetreatEffect"}
+        and ability_classes == {"SimpleActivatedAbility"}
+        and cost_classes == {"PutCardFromHandOnTopOfLibraryCost"}
+        and "TargetSpell" in target_classes
+        and (
+            "target instant or sorcery spell" in normalized
+            or "filter_spell_instant_or_sorcery" in normalized
+            or "isinstantorsorcery" in normalized
+        )
+    ):
+        return {
+            "effect": "damage_prevention_shield",
+            "scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+            "fields": {
+                "activated_prevent_damage_from_target_spell": True,
+                "activation_cost": "put_card_from_hand_on_top_of_library",
+                "activation_cost_generic": 0,
+                "activation_requires_put_card_from_hand_on_top_library": True,
+                "can_setup_lorehold_miracle_draw": True,
+                "prevent_damage_from_target_spell": True,
+                "prevent_damage_target_type": "instant_or_sorcery_spell",
+                "prevent_damage_duration": "until_end_of_turn",
+                "prevent_damage_amount": 999,
+                "spell_target_required": True,
+                "target_spell_card_types": ["instant", "sorcery"],
+            },
+            "reason": (
+                "XMage structure matches Hidden Retreat: a SimpleActivatedAbility with "
+                "PutCardFromHandOnTopOfLibraryCost, TargetSpell filtered to instant or "
+                "sorcery spells, and a prevention effect that blanks damage from that "
+                "target spell this turn."
+            ),
+            "signals": [
+                "SimpleActivatedAbility",
+                "PutCardFromHandOnTopOfLibraryCost",
+                "TargetSpell(StaticFilters.FILTER_SPELL_INSTANT_OR_SORCERY)",
+                "HiddenRetreatEffect extends PreventionEffectImpl(Duration.EndOfTurn, Integer.MAX_VALUE, false, false)",
+            ],
+        }
+
+    if (
+        card_types == {"ENCHANTMENT"}
         and xmage_class_name == "AuthorityOfTheConsuls"
         and {"GainLifeEffect", "PermanentsEnterBattlefieldTappedEffect"}.issubset(effect_classes)
         and {"EntersBattlefieldOpponentTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)

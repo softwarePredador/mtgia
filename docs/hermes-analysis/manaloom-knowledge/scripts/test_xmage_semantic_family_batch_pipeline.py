@@ -9171,6 +9171,70 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "damage_prevention_shield")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_generator_marks_hidden_retreat_as_protection_not_manual_review(self) -> None:
+        card = {
+            "card_name": "Hidden Retreat",
+            "severity": "high",
+            "oracle_hash": "hiddenhash",
+            "status": "ready_for_structured_xmage_pull_review_required",
+            "ready_for_structured_pull": True,
+            "valid_xmage_source": True,
+            "coherence_findings": ["review_only_or_needs_review_rule"],
+            "checks": {"focused_test_scenario_count": 1},
+            "xmage": {
+                "class_name": "HiddenRetreat",
+                "path": "/xmage/HiddenRetreat.java",
+                "types": ["ENCHANTMENT"],
+                "effect_classes": ["HiddenRetreatEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "target_classes": ["TargetSpell"],
+                "cost_classes": ["PutCardFromHandOnTopOfLibraryCost"],
+                "primary_effect": {
+                    "effect": "damage_prevention_shield",
+                    "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+                    "activated_prevent_damage_from_target_spell": True,
+                    "activation_cost": "put_card_from_hand_on_top_of_library",
+                    "activation_cost_generic": 0,
+                    "activation_requires_put_card_from_hand_on_top_library": True,
+                    "can_setup_lorehold_miracle_draw": True,
+                    "prevent_damage_from_target_spell": True,
+                    "prevent_damage_target_type": "instant_or_sorcery_spell",
+                    "prevent_damage_duration": "until_end_of_turn",
+                    "prevent_damage_amount": 999,
+                    "spell_target_required": True,
+                    "target_spell_card_types": ["instant", "sorcery"],
+                },
+            },
+        }
+        family_report = classifier.build_family_report({"cards": [card]})
+        self.assertEqual(family_report["cards"][0]["family_id"], "damage_prevention_shield")
+        self.assertEqual(
+            family_report["cards"][0]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
+
+        proposal_report = generator.build_generator_report(
+            batch_audit={"cards": [card]},
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Hidden Retreat",
+                        "external_references": {
+                            "scryfall": {
+                                "mana_cost": "{2}{W}",
+                                "oracle_hash_md5_raw": "hiddenhash",
+                            }
+                        },
+                    }
+                ]
+            },
+        )
+        proposal = proposal_report["proposals"][0]
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+        self.assertEqual(proposal["deck_role_json"]["category"], "protection")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "damage_prevention_shield")
+        self.assertEqual(proposal["deck_role_json"]["subtype"], "targeted_damage_prevention")
+
     def test_classifier_marks_magmakin_artillerist_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

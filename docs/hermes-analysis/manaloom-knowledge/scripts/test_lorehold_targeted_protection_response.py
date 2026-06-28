@@ -61,6 +61,29 @@ def penance_permanent():
     }
 
 
+def hidden_retreat_permanent():
+    return {
+        "name": "Hidden Retreat",
+        "cmc": 3,
+        "type_line": "Enchantment",
+        "effect": "damage_prevention_shield",
+        "activation_cost": "put_card_from_hand_on_top_of_library",
+        "activation_cost_generic": 0,
+        "activation_requires_put_card_from_hand_on_top_library": True,
+        "activated_prevent_damage_from_target_spell": True,
+        "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+        "can_setup_lorehold_miracle_draw": True,
+        "prevent_damage_amount": 999,
+        "prevent_damage_duration": "until_end_of_turn",
+        "prevent_damage_from_target_spell": True,
+        "prevent_damage_target_type": "instant_or_sorcery_spell",
+        "spell_target_required": True,
+        "target_spell_card_types": ["instant", "sorcery"],
+        "rule_source": "test",
+        "review_status": "verified",
+    }
+
+
 def test_lorehold_uses_penance_as_proactive_miracle_topdeck_setup():
     commander = lorehold_commander()
     lorehold = player("Lorehold", commander=commander, is_human=True)
@@ -109,6 +132,137 @@ def test_lorehold_uses_penance_as_proactive_miracle_topdeck_setup():
         event == "topdeck_manipulation_activated"
         and data.get("card") == "Penance"
         and data.get("activation_kind") == "hand_to_top_for_lorehold_miracle_setup"
+        for event, data in events
+    )
+
+
+def test_lorehold_does_not_use_hidden_retreat_as_proactive_upkeep_setup_without_target_spell():
+    commander = lorehold_commander()
+    lorehold = player("Lorehold", commander=commander, is_human=True)
+    opponent = player("Opponent")
+    hidden_retreat = hidden_retreat_permanent()
+    storm_herd = {
+        "name": "Storm Herd",
+        "cmc": 10,
+        "type_line": "Sorcery",
+    }
+    plains = {
+        "name": "Plains",
+        "cmc": 0,
+        "type_line": "Basic Land — Plains",
+    }
+    lorehold.battlefield = [commander, hidden_retreat]
+    lorehold.hand = [storm_herd]
+    lorehold.library = [plains]
+
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        activated = battle.activate_lorehold_topdeck_artifacts(
+            lorehold,
+            turn=5,
+            rng=random.Random(4),
+            phase="opponent_upkeep",
+            all_players=[opponent, lorehold],
+            stack=battle.Stack(),
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert activated == 0
+    assert storm_herd in lorehold.hand
+    assert lorehold.library[0] is plains
+    assert not hidden_retreat.get("utility_artifact_used_this_turn")
+    assert not any(event == "hand_to_topdeck_activation" for event, _ in events)
+
+
+def test_lorehold_uses_hidden_retreat_against_target_instant_or_sorcery_damage_spell():
+    commander = lorehold_commander()
+    lorehold = player("Lorehold", commander=commander, is_human=True)
+    opponent = player("Opponent")
+    hidden_retreat = hidden_retreat_permanent()
+    storm_herd = {
+        "name": "Storm Herd",
+        "cmc": 10,
+        "type_line": "Sorcery",
+    }
+    plains = {
+        "name": "Plains",
+        "cmc": 0,
+        "type_line": "Basic Land — Plains",
+    }
+    damage_spell = {
+        "name": "Flame Rift",
+        "cmc": 2,
+        "type_line": "Instant",
+        "colors": ["R"],
+    }
+    damage_effect = {
+        "effect": "damage_each_opponent",
+        "amount": 5,
+        "instant": True,
+    }
+    lorehold.life = 5
+    opponent.life = 20
+    lorehold.battlefield = [commander, hidden_retreat]
+    lorehold.hand = [storm_herd]
+    lorehold.library = [plains]
+    stack = battle.Stack()
+    stack.push(damage_spell, opponent, damage_effect)
+
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        responded = battle.priority_round(
+            opponent,
+            [opponent, lorehold],
+            stack,
+            turn=4,
+            rng=random.Random(8),
+            phase="precombat_main",
+        )
+        resolved = battle.priority_round(
+            opponent,
+            [opponent, lorehold],
+            stack,
+            turn=4,
+            rng=random.Random(9),
+            phase="precombat_main",
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert responded is True
+    assert resolved is False
+    assert stack.empty()
+    assert lorehold.life == 5
+    assert storm_herd not in lorehold.hand
+    assert lorehold.library[0] is storm_herd
+    assert hidden_retreat["utility_artifact_used_this_turn"] is True
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Hidden Retreat"
+        and data.get("activation_kind") == "put_card_from_hand_on_top_library_prevent_target_spell_damage"
+        and data.get("target_spell") == "Flame Rift"
+        for event, data in events
+    )
+    assert any(
+        event == "replacement_applied"
+        and data.get("affected_player") == "Lorehold"
+        and data.get("source") == "Flame Rift"
+        and data.get("prevented") is True
+        for event, data in events
+    )
+    assert any(
+        event == "damage_each_opponent_resolved"
+        and data.get("card") == "Flame Rift"
+        and any(
+            result.get("player") == "Lorehold"
+            and result.get("result") == "prevented"
+            for result in data.get("damage_results", [])
+        )
         for event, data in events
     )
 

@@ -50,6 +50,12 @@ DECK_ROLE_BY_FAMILY: dict[str, dict[str, Any]] = {
     "dig_spell": {"category": "draw", "effect": "dig_to_hand", "subtype": "library_selection", "timing": "resolution"},
     "pile_selection_spell": {"category": "draw", "effect": "pile_selection_draw", "subtype": "two_pile_reveal", "timing": "resolution"},
     "draw_engine": {"category": "draw", "effect": "draw_engine", "timing": "static_or_activated"},
+    "damage_prevention_shield": {
+        "category": "protection",
+        "effect": "damage_prevention_shield",
+        "subtype": "targeted_damage_prevention",
+        "timing": "activated_response",
+    },
     "opponent_damage_spell": {"category": "burn", "effect": "damage_each_opponent", "subtype": "opponent_damage", "timing": "resolution"},
     "controlled_creature_etb_damage_engine": {"category": "burn_engine", "effect": "damage_each_opponent", "subtype": "creature_enter_trigger", "timing": "triggered"},
     "static_damage_modifier": {"category": "wincon", "effect": "damage_modifier", "subtype": "damage_doubler", "timing": "static"},

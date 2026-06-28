@@ -30,6 +30,9 @@ DEFAULT_DB = (
 DEFAULT_STRATEGY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_SEED_MATRIX = REPORT_DIR / "lorehold_seed_matrix_all_20260628_v1_run.json"
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
+DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST = (
+    REPORT_DIR / "pg244_hidden_retreat_runtime_scope_20260628_v1_manifest.json"
+)
 DEFAULT_CANDIDATES = [
     "Brainstone",
     "Penance",
@@ -565,6 +568,11 @@ def build_model(
     status_counts = Counter(row["status"] for row in pair_rows)
     preflight_rows = [row for row in pair_rows if row["status"] == "preflight_access_candidate_ready"]
     manual_rows = [row for row in pair_rows if row["status"] in {"manual_same_lane_cut_required", "manual_review_required"}]
+    hidden_retreat_package_status = (
+        "prepared_read_only_pending_apply_approval"
+        if DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST.exists()
+        else "not_prepared"
+    )
     return {
         "generated_at": utc_now(),
         "source_db": str(db_path),
@@ -593,7 +601,17 @@ def build_model(
             "recommended_next_action": (
                 f"gate_{preflight_rows[0]['candidate']}_over_{preflight_rows[0]['cut']}"
                 if preflight_rows
-                else "no_access_swap_ready; build_new_seed_safe_cut_or_upgrade_hidden_retreat_runtime"
+                else (
+                    "no_access_swap_ready; apply_or_sync_hidden_retreat_package_then_gate_new_seed_safe_cut"
+                    if hidden_retreat_package_status == "prepared_read_only_pending_apply_approval"
+                    else "no_access_swap_ready; build_new_seed_safe_cut_or_upgrade_hidden_retreat_runtime"
+                )
+            ),
+            "hidden_retreat_package_status": hidden_retreat_package_status,
+            "hidden_retreat_package_manifest": (
+                str(DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST)
+                if hidden_retreat_package_status == "prepared_read_only_pending_apply_approval"
+                else ""
             ),
         },
         "access_density_context": {
@@ -620,7 +638,10 @@ def build_model(
             },
             {
                 "guardrail_key": "hidden_retreat_runtime_first",
-                "reason": "Hidden Retreat currently has only review_only rules in the local runtime, so it is not battle-gate reliable yet.",
+                "reason": (
+                    "Hidden Retreat now has a focused battle runtime path and a prepared PG package, "
+                    "but the local candidate DB still exposes only review_only rules until apply/sync."
+                ),
             },
         ],
     }
@@ -649,6 +670,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- squee_probe_status: `{payload['summary'].get('squee_probe_status') or '-'}`",
         f"- target_access_cards: `{', '.join(payload['summary']['target_access_cards'])}`",
         f"- recommended_next_action: `{payload['summary']['recommended_next_action']}`",
+        f"- hidden_retreat_package_status: `{payload['summary'].get('hidden_retreat_package_status') or '-'}`",
+        f"- hidden_retreat_package_manifest: `{payload['summary'].get('hidden_retreat_package_manifest') or '-'}`",
         "",
         "## Access Candidates",
         "",

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import unittest
 
+import xmage_semantic_family_classifier as classifier
 import xmage_to_manaloom_effect_hints as hints
 
 
@@ -6469,6 +6470,65 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["prevent_damage_amount"], 999)
         self.assertTrue(primary["source_choice_required"])
         self.assertEqual(primary["source_color_filter"], ["black", "red"])
+
+    def test_hidden_retreat_maps_to_exact_spell_prevention_topdeck_scope(self) -> None:
+        entry = {
+            "xmage_class_name": "HiddenRetreat",
+            "effect_classes": ["HiddenRetreatEffect"],
+            "ability_classes": ["SimpleActivatedAbility"],
+            "cost_classes": ["PutCardFromHandOnTopOfLibraryCost"],
+            "target_classes": ["TargetSpell"],
+            "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+            "raw_excerpt": (
+                "Ability ability = new SimpleActivatedAbility(new HiddenRetreatEffect(), "
+                "new PutCardFromHandOnTopOfLibraryCost()); "
+                "ability.addTarget(new TargetSpell(StaticFilters.FILTER_SPELL_INSTANT_OR_SORCERY)); "
+                "class HiddenRetreatEffect extends PreventionEffectImpl { "
+                "super(Duration.EndOfTurn, Integer.MAX_VALUE, false, false); "
+                "game.getObject(source.getFirstTarget()).isInstantOrSorcery(game);"
+            ),
+        }
+        result = hints.build_effect_hints(
+            entry,
+            "Put a card from your hand on top of your library: Prevent all damage that "
+            "would be dealt by target instant or sorcery spell this turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "damage_prevention_shield")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+        )
+        self.assertTrue(primary["activated_prevent_damage_from_target_spell"])
+        self.assertEqual(primary["activation_cost"], "put_card_from_hand_on_top_of_library")
+        self.assertEqual(primary["activation_cost_generic"], 0)
+        self.assertTrue(primary["activation_requires_put_card_from_hand_on_top_library"])
+        self.assertTrue(primary["can_setup_lorehold_miracle_draw"])
+        self.assertTrue(primary["prevent_damage_from_target_spell"])
+        self.assertEqual(primary["prevent_damage_target_type"], "instant_or_sorcery_spell")
+        self.assertEqual(primary["prevent_damage_duration"], "until_end_of_turn")
+        self.assertEqual(primary["prevent_damage_amount"], 999)
+        self.assertTrue(primary["spell_target_required"])
+        self.assertEqual(primary["target_spell_card_types"], ["instant", "sorcery"])
+
+        card = {
+            "card_name": "Hidden Retreat",
+            "ready_for_structured_pull": True,
+            "status": "xmage_source_valid_mapper_required",
+            "xmage": {
+                "types": ["ENCHANTMENT"],
+                "ability_classes": entry["ability_classes"],
+                "effect_classes": entry["effect_classes"],
+                "cost_classes": entry["cost_classes"],
+                "target_classes": entry["target_classes"],
+                "primary_effect": primary,
+            },
+        }
+        self.assertTrue(classifier.exact_scope_batch_safe(card))
+        classified = classifier.classify_card(card)
+        self.assertEqual(classified["family_id"], "damage_prevention_shield")
+        self.assertEqual(classified["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
     def test_magmakin_artillerist_maps_to_exact_discard_damage_scope(self) -> None:
         result = hints.build_effect_hints(

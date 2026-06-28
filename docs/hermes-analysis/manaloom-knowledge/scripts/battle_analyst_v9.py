@@ -8314,6 +8314,212 @@ def cannot_lose_turn_stack_response_context(player, top_item):
     return None
 
 
+def stack_spell_damage_prevention_context(player, top_item):
+    if not top_item or top_item.controller is player:
+        return None
+    source_card = getattr(top_item, "card", None) or {}
+    effect_data = getattr(top_item, "effect_data", None) or {}
+    if not is_instant_or_sorcery_spell(source_card):
+        return None
+    top_effect = str(effect_data.get("effect") or "").lower()
+    projected_damage = 0
+    affects_player = False
+    if top_effect == "damage_player_and_creatures":
+        projected_damage = _numeric_effect_amount(effect_data.get("amount"), 4)
+        affects_player = True
+    elif top_effect in {"damage_each_opponent", "damage_each_opponent_and_opponent_creatures"}:
+        projected_damage = _numeric_effect_amount(
+            effect_data.get("amount") or effect_data.get("damage"),
+            0,
+        )
+        affects_player = True
+    elif top_effect in {"deal_damage", "direct_damage"}:
+        projected_damage = _numeric_effect_amount(
+            effect_data.get("amount") or effect_data.get("damage"),
+            0,
+        )
+        affects_player = projected_damage > 0 and direct_damage_targets_player(effect_data)
+    if not affects_player or projected_damage <= 0:
+        return None
+    return {
+        "source_card": source_card,
+        "source_name": source_card.get("name", "?"),
+        "source_controller": getattr(getattr(top_item, "controller", None), "name", None),
+        "source_effect": top_effect,
+        "projected_damage": projected_damage,
+        "lethal": projected_damage >= max(1, int(getattr(player, "life", 0) or 0)),
+        "reason": "prevent_target_instant_or_sorcery_spell_damage",
+    }
+
+
+def best_hand_to_top_card_for_spell_prevention(player, context):
+    hand_cards = [card for card in getattr(player, "hand", []) or [] if isinstance(card, dict)]
+    if not hand_cards:
+        return None, []
+    miracle_candidates = [card for card in hand_cards if miracle_card_scope_allows(player, card)]
+    candidates = miracle_candidates or (hand_cards if context.get("lethal") else [])
+    scored = sorted(
+        (
+            {
+                "card": card,
+                "score": lorehold_draw_priority(card, player),
+            }
+            for card in candidates
+        ),
+        key=lambda item: (
+            -item["score"],
+            -int(_opening_hand_card_cmc(item["card"]) or 0),
+            item["card"].get("name", "?"),
+        ),
+    )
+    if not scored:
+        return None, []
+    chosen = scored[0]
+    if context.get("lethal"):
+        return chosen, scored
+    top_before = player.library[0] if getattr(player, "library", None) else None
+    top_before_score = lorehold_draw_priority(top_before, player) if top_before else -999
+    if chosen["score"] < 130 or chosen["score"] <= top_before_score:
+        return None, scored
+    return chosen, scored
+
+
+def activate_stack_spell_damage_prevention_permanent(player, permanent, top_item, context, turn, phase):
+    effect_data = {**get_card_effect(permanent), **permanent}
+    if effect_data.get("effect") != "damage_prevention_shield":
+        return False
+    if permanent.get("utility_artifact_used_this_turn"):
+        return False
+    if not effect_data.get("activated_prevent_damage_from_target_spell"):
+        return False
+    if not effect_data.get("spell_target_required"):
+        return False
+    if effect_data.get("prevent_damage_target_type") != "instant_or_sorcery_spell":
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    chosen, scored = best_hand_to_top_card_for_spell_prevention(player, context)
+    if chosen is None:
+        return False
+    payment_card = chosen["card"]
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_colors = list(effect_data.get("activation_cost_colors") or [])
+    activation_cost_text = ""
+    if activation_cost_generic > 0:
+        activation_cost_text += "{%d}" % activation_cost_generic
+    activation_cost_text += "".join("{%s}" % color for color in activation_colors)
+    if not activation_cost_text:
+        activation_cost_text = "{0}"
+    if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+        return False
+    top_before = player.library[0] if getattr(player, "library", None) else None
+    player.hand.remove(payment_card)
+    player.library.insert(0, payment_card)
+    permanent["utility_artifact_used_this_turn"] = True
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    add_damage_prevention_shield(
+        player,
+        int(effect_data.get("prevent_damage_amount") or 999),
+        source=permanent.get("name", "damage_prevention_shield"),
+        source_match="chosen_source",
+        chosen_source_name=context.get("source_name"),
+        chosen_source_controller=context.get("source_controller"),
+        consume_once=True,
+        turn=turn,
+    )
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="response",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                item["card"],
+                score=item["score"],
+                action="put_card_from_hand_on_top",
+                effect="target_spell_damage_prevention",
+            )
+            for item in scored[:8]
+        ],
+        chosen_option=decision_card_option(
+            payment_card,
+            score=chosen["score"],
+            action="activate_target_spell_damage_prevention",
+            effect="target_spell_damage_prevention",
+        ),
+        rejected_options=[
+            decision_card_option(
+                item["card"],
+                score=item["score"],
+                action="leave_in_hand",
+                effect="target_spell_damage_prevention",
+            )
+            for item in scored[1:8]
+        ],
+        score_components={
+            "projected_damage": context.get("projected_damage"),
+            "life_before_damage": player.life,
+            "lethal": int(bool(context.get("lethal"))),
+            "top_before": top_before.get("name", "?") if top_before else None,
+            "top_after": payment_card.get("name", "?"),
+            "target_spell": context.get("source_name"),
+            "target_spell_controller": context.get("source_controller"),
+        },
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(int(context.get("projected_damage") or 0), chosen["score"]),
+        actual_outcome="target_spell_damage_prevention_shield_created",
+        reason=context.get("reason"),
+        strategic_principle="use target-spell prevention only when a legal instant or sorcery damage source is on the stack",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        risk_flags=["requires_target_spell_on_stack", "hand_card_moved_to_library"],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect=effect_data.get("effect", "unknown"),
+        activation_kind="put_card_from_hand_on_top_library_prevent_target_spell_damage",
+        activation_cost=effect_data.get("activation_cost", "put_card_from_hand_on_top_of_library"),
+        target_spell=context.get("source_name"),
+        target_spell_controller=context.get("source_controller"),
+        projected_damage=context.get("projected_damage"),
+        topdecked_card=payment_card.get("name", "?"),
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    emit_replay_event(
+        "damage_prevention_shield_created",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        chosen_source=context.get("source_name"),
+        chosen_source_controller=context.get("source_controller"),
+        prevention_amount=int(effect_data.get("prevent_damage_amount") or 999),
+        topdecked_card=payment_card.get("name", "?"),
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    emit_replay_event(
+        "hand_to_topdeck_activation",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="put_card_from_hand_on_top_for_target_spell_prevention",
+        top_before=top_before.get("name", "?") if top_before else None,
+        top_after=payment_card.get("name", "?"),
+        hand_to_top=payment_card.get("name", "?"),
+        activation_cost=activation_cost_text,
+        phase=phase,
+        turn=turn,
+        **fields,
+    )
+    return True
+
+
 def blue_devotion(player):
     devotion = 0
     for permanent in getattr(player, "battlefield", []) or []:
@@ -9006,6 +9212,27 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells
             top_effect = top_item.effect_data.get("effect", "")
+            spell_damage_context = stack_spell_damage_prevention_context(player, top_item)
+            if spell_damage_context:
+                prevention_permanents = [
+                    permanent
+                    for permanent in player.battlefield
+                    if isinstance(permanent, dict)
+                    and (
+                        permanent.get("activated_prevent_damage_from_target_spell")
+                        or get_card_effect(permanent).get("activated_prevent_damage_from_target_spell")
+                    )
+                ]
+                for permanent in prevention_permanents:
+                    if activate_stack_spell_damage_prevention_permanent(
+                        player,
+                        permanent,
+                        top_item,
+                        spell_damage_context,
+                        turn,
+                        phase,
+                    ):
+                        return True
             targeted_protection_context = targeted_stack_protection_context(player, top_item)
             own_stack_protection_targets = {
                 "board_wipe",
@@ -19353,6 +19580,8 @@ def activate_lorehold_topdeck_artifacts(
         for permanent in player.battlefield
         if isinstance(permanent, dict)
         and permanent.get("activation_requires_put_card_from_hand_on_top_library")
+        and not permanent.get("spell_target_required")
+        and permanent.get("prevent_damage_target_type") != "instant_or_sorcery_spell"
         and not permanent.get("utility_artifact_used_this_turn")
     ]
     if phase in {"upkeep", "opponent_upkeep"} and hand_to_top_permanents:

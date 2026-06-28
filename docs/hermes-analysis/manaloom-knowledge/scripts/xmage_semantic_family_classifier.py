@@ -1181,6 +1181,30 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
         )
 
     if (
+        effect == "damage_prevention_shield"
+        and scope
+        == "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1"
+    ):
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"HiddenRetreatEffect"}
+            and ability_classes == {"SimpleActivatedAbility"}
+            and cost_classes == {"PutCardFromHandOnTopOfLibraryCost"}
+            and "TargetSpell" in target_classes
+            and bool(effect_json.get("activated_prevent_damage_from_target_spell"))
+            and effect_json.get("activation_cost") == "put_card_from_hand_on_top_of_library"
+            and int(effect_json.get("activation_cost_generic") or 0) == 0
+            and bool(effect_json.get("activation_requires_put_card_from_hand_on_top_library"))
+            and bool(effect_json.get("can_setup_lorehold_miracle_draw"))
+            and bool(effect_json.get("prevent_damage_from_target_spell"))
+            and effect_json.get("prevent_damage_target_type") == "instant_or_sorcery_spell"
+            and effect_json.get("prevent_damage_duration") == "until_end_of_turn"
+            and int(effect_json.get("prevent_damage_amount") or 0) == 999
+            and bool(effect_json.get("spell_target_required"))
+            and effect_json.get("target_spell_card_types") == ["instant", "sorcery"]
+        )
+
+    if (
         effect == "redirect_removal"
         and scope == "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
     ):

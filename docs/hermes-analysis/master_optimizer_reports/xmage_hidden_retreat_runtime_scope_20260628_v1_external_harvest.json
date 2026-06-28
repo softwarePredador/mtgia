@@ -1,0 +1,21 @@
+{
+  "cards": [
+    {
+      "card_name": "Hidden Retreat",
+      "external_references": {
+        "scryfall": {
+          "id": "5be86f1f-c85a-4396-aa16-a39fbf493c96",
+          "mana_cost": "{2}{W}",
+          "name": "Hidden Retreat",
+          "oracle_hash_md5_raw": "816f631d821b5a48e187fafe519845d7",
+          "oracle_id": "a116329a-343e-4f10-a122-38bf8b5ac2c8",
+          "oracle_text": "Put a card from your hand on top of your library: Prevent all damage that would be dealt by target instant or sorcery spell this turn.",
+          "scryfall_uri": "https://scryfall.com/card/sth/6/hidden-retreat?utm_source=api",
+          "type_line": "Enchantment"
+        }
+      }
+    }
+  ],
+  "generated_at": "2026-06-28T00:00:00Z",
+  "source": "scryfall_named_api_focused_hidden_retreat"
+}

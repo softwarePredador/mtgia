@@ -1,0 +1,84 @@
+{
+  "generated_at": "2026-06-28T06:57:15+00:00",
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+      "card_name": "Hidden Retreat",
+      "confidence": 0.94,
+      "deck_role_json": {
+        "category": "protection",
+        "effect": "damage_prevention_shield",
+        "subtype": "targeted_damage_prevention",
+        "timing": "activated_response"
+      },
+      "effect": "damage_prevention_shield",
+      "effect_json": {
+        "ability_kind": "activated",
+        "activated_prevent_damage_from_target_spell": true,
+        "activation_cost": "put_card_from_hand_on_top_of_library",
+        "activation_cost_generic": 0,
+        "activation_requires_put_card_from_hand_on_top_library": true,
+        "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+        "can_setup_lorehold_miracle_draw": true,
+        "cmc": 3.0,
+        "effect": "damage_prevention_shield",
+        "prevent_damage_amount": 999,
+        "prevent_damage_duration": "until_end_of_turn",
+        "prevent_damage_from_target_spell": true,
+        "prevent_damage_target_type": "instant_or_sorcery_spell",
+        "spell_target_required": true,
+        "target_spell_card_types": [
+          "instant",
+          "sorcery"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "damage_prevention_shield",
+      "focused_test_scenario_count": 1,
+      "logical_rule_key": "battle_rule_v1:7148a419f22524cca81db7d14deeb043",
+      "normalized_name": "hidden retreat",
+      "notes": "XMage batch proposal: exact local XMage class HiddenRetreat mapped to family damage_prevention_shield; requires Oracle/hash precheck, ManaLoom review, and approved PG apply before product use.",
+      "oracle_hash": "816f631d821b5a48e187fafe519845d7",
+      "oracle_hash_source": "scryfall.oracle_hash_md5_raw",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "HiddenRetreat",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HiddenRetreat.java"
+    }
+  ],
+  "source": {
+    "deck_id": null,
+    "external_harvest_status": null,
+    "family_summary": {
+      "batch_metadata_candidate_count": 1,
+      "card_count": 1,
+      "family_count": 1,
+      "family_counts": {
+        "damage_prevention_shield": 1
+      },
+      "manual_or_blocked_count": 0,
+      "promotion_lane_counts": {
+        "batch_metadata_candidate_requires_pg_precheck": 1
+      },
+      "runtime_family_required_count": 0
+    }
+  },
+  "status": "ready",
+  "summary": {
+    "blocked_missing_xmage_source_count": 0,
+    "family_counts": {
+      "damage_prevention_shield": 1
+    },
+    "proposal_count": 1,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 1
+    },
+    "runtime_family_required_count": 0,
+    "safe_for_batch_pg_package_count": 1
+  }
+}
