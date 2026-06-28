@@ -62,6 +62,9 @@ DEFAULT_RUNTIME_PACKAGE_MANIFESTS = [
 DEFAULT_RUNTIME_PACKAGE_BLOCKERS = [
     REPORT_DIR / "pg245_lorehold_topdeck_damage_runtime_20260628_precheck_blocked.json",
 ]
+DEFAULT_RUNTIME_CANDIDATE_READINESS = (
+    REPORT_DIR / "lorehold_runtime_candidate_readiness_20260628_v1.json"
+)
 DEFAULT_POST_SQUEE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
     REPORT_DIR / "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
@@ -694,6 +697,7 @@ def aggregate_runtime_package_readiness(
     proposal_paths: list[Path],
     manifest_paths: list[Path],
     blocker_paths: list[Path],
+    candidate_readiness_path: Path | None = None,
 ) -> dict[str, Any]:
     """Summarize runtime-backed cards that are package-ready but not yet durable."""
     blocked_by_card: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -773,10 +777,38 @@ def aggregate_runtime_package_readiness(
         family_counts[str(row.get("family_id") or "unknown")] += 1
         readiness_counts[str(row.get("readiness") or "unknown")] += 1
 
+    candidate_readiness_payload = read_json(candidate_readiness_path) if candidate_readiness_path else {}
+    candidate_readiness_cards = []
+    candidate_readiness_summary = candidate_readiness_payload.get("summary") or {}
+    candidate_status_counts: Counter[str] = Counter()
+    candidate_promotion_counts: Counter[str] = Counter()
+    for row in candidate_readiness_payload.get("cards") or []:
+        status = str(row.get("status") or "unknown")
+        promotion_lane = str(row.get("promotion_lane") or "unknown")
+        candidate_status_counts[status] += 1
+        candidate_promotion_counts[promotion_lane] += 1
+        candidate_readiness_cards.append(
+            {
+                "card_name": row.get("card_name"),
+                "status": status,
+                "family_id": row.get("family_id"),
+                "promotion_lane": row.get("promotion_lane"),
+                "effect": row.get("effect"),
+                "battle_model_scope": row.get("battle_model_scope"),
+                "next_action": row.get("next_action"),
+                "cut_specific_negative_count": int(row.get("cut_specific_negative_count") or 0),
+                "card_global_reject": bool(row.get("card_global_reject")),
+                "runtime_blockers": row.get("runtime_blockers") or [],
+                "pg_package_count": len(row.get("pg_packages") or []),
+                "pg_precheck_blocker_count": len(row.get("pg_precheck_blockers") or []),
+            }
+        )
+
     return {
         "proposal_paths": [str(path) for path in proposal_paths],
         "manifest_paths": [str(path) for path in manifest_paths],
         "blocker_paths": [str(path) for path in blocker_paths],
+        "candidate_readiness_path": str(candidate_readiness_path) if candidate_readiness_path else "",
         "summary": {
             "card_count": len(cards_by_name),
             "family_counts": dict(sorted(family_counts.items())),
@@ -786,8 +818,20 @@ def aggregate_runtime_package_readiness(
             ),
             "manifest_count": len(manifests),
             "blocker_count": len(blockers),
+            "candidate_readiness_card_count": int(candidate_readiness_summary.get("card_count") or len(candidate_readiness_cards)),
+            "candidate_readiness_status_counts": dict(sorted(candidate_status_counts.items())),
+            "candidate_readiness_promotion_lane_counts": dict(sorted(candidate_promotion_counts.items())),
+            "candidate_readiness_recommended_next_action": candidate_readiness_summary.get("recommended_next_action"),
+            "pg_precheck_blocked_count": int(candidate_readiness_summary.get("pg_precheck_blocked_count") or 0),
+            "pg_package_prepared_pending_apply_approval_count": int(
+                candidate_readiness_summary.get("pg_package_prepared_pending_apply_approval_count") or 0
+            ),
+            "split_scope_review_required_count": int(candidate_readiness_summary.get("split_scope_review_required_count") or 0),
+            "manual_mapper_required_count": int(candidate_readiness_summary.get("manual_mapper_required_count") or 0),
+            "cut_specific_negative_count": int(candidate_readiness_summary.get("cut_specific_negative_count") or 0),
         },
         "cards": sorted(cards_by_name.values(), key=lambda item: item.get("card_name") or ""),
+        "candidate_readiness_cards": candidate_readiness_cards,
         "manifests": manifests,
         "blockers": blockers,
     }
@@ -1257,6 +1301,13 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"`{runtime_summary.get('card_count')}` cards, families "
             f"`{json.dumps(runtime_summary.get('family_counts', {}), sort_keys=True)}`, readiness "
             f"`{json.dumps(runtime_summary.get('readiness_counts', {}), sort_keys=True)}`."
+        )
+    if runtime_summary.get("candidate_readiness_card_count"):
+        lines.append(
+            "- Consolidated runtime-candidate readiness now separates card readiness from bad cut evidence: "
+            f"`{runtime_summary.get('candidate_readiness_card_count')}` cards, statuses "
+            f"`{json.dumps(runtime_summary.get('candidate_readiness_status_counts', {}), sort_keys=True)}`, "
+            f"cut-specific negatives `{runtime_summary.get('cut_specific_negative_count', 0)}`."
         )
     lines.append("- The broad synergy-confirm gate rejected the tested Past in Flames, Overmaster, and combined spellchain packages; do not promote them from the current evidence.")
     safe_queue = report.get("safe_package_gates") or {}
@@ -1728,6 +1779,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.append("")
     runtime_readiness = report.get("runtime_package_readiness") or {}
     runtime_cards = runtime_readiness.get("cards") or []
+    runtime_candidate_cards = runtime_readiness.get("candidate_readiness_cards") or []
     if runtime_cards:
         lines.append("## Runtime Package Readiness")
         lines.append("")
@@ -1771,6 +1823,37 @@ def render_markdown(report: dict[str, Any]) -> str:
             "Read: `runtime_ready_pg_precheck_blocked` means the card should stay in the hypothesis pool, not be discarded as unmodeled. "
             "The next valid evidence is either successful PG precheck/apply/postcheck plus Hermes sync, or a clearly isolated candidate DB where the same rule rows are materialized for battle gates."
         )
+        lines.append("")
+    if runtime_candidate_cards:
+        lines.append("## Runtime Candidate Readiness Queue")
+        lines.append("")
+        lines.append(
+            "This is the broader queue used to avoid judging strategy before the battle runtime can execute the relevant effect family. "
+            "A cut-specific negative means the tested add/cut pair failed; it is not a global rejection of the card."
+        )
+        lines.append("")
+        summary = runtime_readiness.get("summary") or {}
+        lines.append(f"- Source: `{runtime_readiness.get('candidate_readiness_path')}`")
+        lines.append(
+            "- Summary: "
+            f"`{json.dumps({key: summary.get(key) for key in ['candidate_readiness_card_count', 'candidate_readiness_status_counts', 'candidate_readiness_promotion_lane_counts', 'candidate_readiness_recommended_next_action', 'cut_specific_negative_count']}, sort_keys=True)}`"
+        )
+        lines.append("")
+        lines.append("| Rank | Card | Status | Family | Lane | Cut-specific negatives | Global reject | Next action |")
+        lines.append("| ---: | --- | --- | --- | --- | ---: | --- | --- |")
+        for index, row in enumerate(runtime_candidate_cards[:24], start=1):
+            lines.append(
+                "| {rank} | {card} | `{status}` | `{family}` | `{lane}` | {negatives} | `{global_reject}` | {action} |".format(
+                    rank=index,
+                    card=row.get("card_name"),
+                    status=row.get("status"),
+                    family=row.get("family_id"),
+                    lane=row.get("promotion_lane"),
+                    negatives=int(row.get("cut_specific_negative_count") or 0),
+                    global_reject=str(bool(row.get("card_global_reject"))).lower(),
+                    action=row.get("next_action") or "",
+                )
+            )
         lines.append("")
     lines.append("## Variant Learning")
     lines.append("")
@@ -2489,6 +2572,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         proposal_paths=args.runtime_package_proposal,
         manifest_paths=args.runtime_package_manifest,
         blocker_paths=args.runtime_package_blocker,
+        candidate_readiness_path=args.runtime_candidate_readiness,
     )
     post_squee_package_gates = aggregate_post_squee_package_gates(args.post_squee_package_gate)
     safe_package_gates = aggregate_safe_package_gates(args.safe_package_gate)
@@ -2524,6 +2608,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Re-test 615 and 614 only as controlled packages against the 607+Squee champion; their full-deck changes are too broad to diagnose one cause.",
         "Keep runtime-rule readiness in the decision loop; a card with a good paper function cannot be rejected until the battle model understands the relevant effect family.",
         "Treat PG245 cards as modeled-but-not-durable hypotheses: Twinflame Tyrant and Verge Rangers now have runtime-backed package proposals, but PostgreSQL precheck is blocked, so they need PG apply/sync or isolated materialized gates before deck-value judgment.",
+        "Use the consolidated runtime-candidate readiness queue as the strategy gatekeeper: Hidden Retreat is package-prepared pending PG approval, Twinflame Tyrant and Verge Rangers are precheck-blocked, and split-scope/manual-mapper cards should not be treated as strategic failures yet.",
         "Library of Leng is now measurable in battle telemetry; separate missing-engine games from games where discard-to-top happens but fails to convert before life-total pressure.",
         "The first Library/pressure retest rejected Brainstone, Ghostly Prison, and The One Ring over Hexing Squelcher; future tests need a new cut logic or a narrower per-game failure target.",
         "Angel's Grace over Dawn's Truce confirms that one-mana life-floor protection can improve a weak seed but is not free; cutting the existing protection shell breaks seed 42 completely.",
@@ -2556,6 +2641,8 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "Use the generated card-role manifest to mark each card as core, flex, or unresolved before proposing the next swap.",
         "Use deck-wide rule materialization in the equal-gate loader for every candidate snapshot, then run battle-card-specific tests only for cards with no active reviewed/runtime rule row.",
         "For PG245 runtime-package cards, rerun PostgreSQL precheck first; if PG remains unavailable, test them only through an isolated candidate DB with the generated rule rows materialized and clearly labelled as non-durable.",
+        "For PG244 Hidden Retreat, apply only after explicit precheck/apply/postcheck approval and then sync Hermes before judging the topdeck-protection/access package in battle.",
+        "For split-scope runtime families, start with the seven non-manual candidates before touching the 52 manual mapper rows, because they can reduce the queue through focused runtime tests instead of one-card strategy guessing.",
         "For Thor, the next decisive test is a stratified exposure gate or larger sample; temporary graveyard recast from ETB is still a separate runtime/model gap.",
     ]
 
@@ -2626,6 +2713,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--runtime-package-proposal", type=Path, action="append")
     parser.add_argument("--runtime-package-manifest", type=Path, action="append")
     parser.add_argument("--runtime-package-blocker", type=Path, action="append")
+    parser.add_argument("--runtime-candidate-readiness", type=Path)
     parser.add_argument("--general-synergy-confirm", type=Path, default=DEFAULT_GENERAL_SYNERGY_CONFIRM)
     parser.add_argument("--post-squee-package-gate", type=Path, action="append")
     parser.add_argument("--safe-package-gate", type=Path, action="append")
@@ -2653,6 +2741,8 @@ def main() -> int:
         args.runtime_package_manifest = DEFAULT_RUNTIME_PACKAGE_MANIFESTS
     if not args.runtime_package_blocker:
         args.runtime_package_blocker = DEFAULT_RUNTIME_PACKAGE_BLOCKERS
+    if not args.runtime_candidate_readiness:
+        args.runtime_candidate_readiness = DEFAULT_RUNTIME_CANDIDATE_READINESS
 
     report = build_report(args)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)

@@ -382,6 +382,7 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
             proposal_path = tmp_path / "proposals.json"
             manifest_path = tmp_path / "manifest.json"
             blocker_path = tmp_path / "blocked.json"
+            readiness_path = tmp_path / "runtime_candidate_readiness.json"
             proposal_path.write_text(
                 json.dumps(
                     {
@@ -434,22 +435,103 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
+            readiness_path.write_text(
+                json.dumps(
+                    {
+                        "summary": {
+                            "card_count": 4,
+                            "status_counts": {
+                                "pg_precheck_blocked": 1,
+                                "pg_package_prepared_pending_apply_approval": 1,
+                                "split_scope_review_required": 1,
+                                "manual_mapper_required": 1,
+                            },
+                            "promotion_lane_counts": {
+                                "batch_metadata_candidate_requires_pg_precheck": 1,
+                                "access_density_candidate": 1,
+                                "split_family_scope_review_required": 1,
+                                "mapper_metadata_or_test_scenario_required": 1,
+                            },
+                            "pg_precheck_blocked_count": 1,
+                            "pg_package_prepared_pending_apply_approval_count": 1,
+                            "split_scope_review_required_count": 1,
+                            "manual_mapper_required_count": 1,
+                            "cut_specific_negative_count": 1,
+                            "recommended_next_action": "rerun_pg245_precheck_then_sync_or_split_scope_runtime_families",
+                        },
+                        "cards": [
+                            {
+                                "card_name": "Twinflame Tyrant",
+                                "status": "pg_precheck_blocked",
+                                "family_id": "static_damage_modifier",
+                                "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+                                "effect": "damage_modifier",
+                                "battle_model_scope": "damage_doubled_v1",
+                                "cut_specific_negative_count": 1,
+                                "card_global_reject": False,
+                                "next_action": "Rerun PostgreSQL precheck.",
+                                "pg_packages": [{}],
+                                "pg_precheck_blockers": [{}],
+                            },
+                            {
+                                "card_name": "Hidden Retreat",
+                                "status": "pg_package_prepared_pending_apply_approval",
+                                "family_id": "access_density",
+                                "promotion_lane": "access_density_candidate",
+                                "cut_specific_negative_count": 0,
+                                "card_global_reject": False,
+                                "next_action": "Apply after approval.",
+                                "pg_packages": [{}],
+                            },
+                            {
+                                "card_name": "Boros Reckoner",
+                                "status": "split_scope_review_required",
+                                "family_id": "targeted_interaction",
+                                "promotion_lane": "split_family_scope_review_required",
+                                "cut_specific_negative_count": 0,
+                                "card_global_reject": False,
+                                "next_action": "Split the family scope.",
+                            },
+                            {
+                                "card_name": "Manual Card",
+                                "status": "manual_mapper_required",
+                                "family_id": "manual_model",
+                                "promotion_lane": "mapper_metadata_or_test_scenario_required",
+                                "cut_specific_negative_count": 0,
+                                "card_global_reject": False,
+                                "next_action": "Add mapper metadata.",
+                            },
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
 
             result = audit.aggregate_runtime_package_readiness(
                 proposal_paths=[proposal_path],
                 manifest_paths=[manifest_path],
                 blocker_paths=[blocker_path],
+                candidate_readiness_path=readiness_path,
             )
 
         self.assertEqual(result["summary"]["card_count"], 1)
         self.assertEqual(result["summary"]["blocked_card_count"], 1)
         self.assertEqual(result["summary"]["readiness_counts"]["runtime_ready_pg_precheck_blocked"], 1)
+        self.assertEqual(result["summary"]["candidate_readiness_card_count"], 4)
+        self.assertEqual(result["summary"]["candidate_readiness_status_counts"]["pg_precheck_blocked"], 1)
+        self.assertEqual(result["summary"]["pg_package_prepared_pending_apply_approval_count"], 1)
+        self.assertEqual(result["summary"]["split_scope_review_required_count"], 1)
+        self.assertEqual(result["summary"]["manual_mapper_required_count"], 1)
+        self.assertEqual(result["summary"]["cut_specific_negative_count"], 1)
         card = result["cards"][0]
         self.assertEqual(card["card_name"], "Twinflame Tyrant")
         self.assertEqual(card["family_id"], "static_damage_modifier")
         self.assertEqual(card["readiness"], "runtime_ready_pg_precheck_blocked")
         self.assertEqual(card["package_manifests"][0]["deploy_id"], "PG245")
         self.assertEqual(card["blockers"][0]["blocked_step"], "precheck")
+        by_name = {row["card_name"]: row for row in result["candidate_readiness_cards"]}
+        self.assertEqual(by_name["Hidden Retreat"]["status"], "pg_package_prepared_pending_apply_approval")
+        self.assertFalse(by_name["Twinflame Tyrant"]["card_global_reject"])
 
     def test_strategy_dependency_map_turns_gates_into_next_hypothesis_contract(self):
         result = audit.build_strategy_dependency_map(
