@@ -1032,6 +1032,8 @@ def can_cast_in_phase(card, effect_data, phase, controller=None):
         return False
     if str(effect_data.get("effect") or "").lower() in COUNTERLIKE_EFFECTS:
         return False
+    if spell_type_cast_lock_for_card(controller, card, effect_data):
+        return False
     if phase not in MAIN_PHASES and controller_casts_nonland_as_flash(controller, card):
         return True
     if effect_data.get("effect") == "creature" and phase not in MAIN_PHASES:
@@ -2262,6 +2264,83 @@ def clear_expired_non_hand_cast_locks(active_player, all_players, turn):
                 continue
             kept.append(lock)
         participant.non_hand_cast_locks = kept
+
+
+def spell_type_cast_lock_for_card(player, card, effect_data=None):
+    if player is None or not isinstance(card, dict):
+        return None
+    effect_data = effect_data or {}
+    type_line = str(card.get("type_line") or "").lower()
+    effect_name = str(effect_data.get("effect") or card.get("effect") or "").lower()
+    card_types = set()
+    if "creature" in type_line or effect_name == "creature" or is_creature_card(card):
+        card_types.add("creature")
+    if "planeswalker" in type_line or effect_name == "planeswalker":
+        card_types.add("planeswalker")
+    if not card_types:
+        return None
+    for lock in list(getattr(player, "spell_type_cast_locks", []) or []):
+        if not isinstance(lock, dict):
+            continue
+        locked_types = {
+            str(card_type).strip().lower()
+            for card_type in lock.get("card_types", []) or []
+            if str(card_type).strip()
+        }
+        if card_types & locked_types:
+            return lock
+    return None
+
+
+def add_spell_type_cast_lock(
+    participant,
+    *,
+    source,
+    source_player,
+    started_turn,
+    card_types,
+    duration,
+):
+    lock = {
+        "source": source,
+        "source_player": source_player,
+        "started_turn": int(started_turn),
+        "expires_after_source_turn": int(started_turn) + 1,
+        "restriction": "cannot_cast_spell_types",
+        "card_types": list(card_types),
+        "duration": duration,
+    }
+    participant.spell_type_cast_locks = list(getattr(participant, "spell_type_cast_locks", []) or [])
+    participant.spell_type_cast_locks.append(lock)
+    return lock
+
+
+def clear_expired_spell_type_cast_locks_after_turn(active_player, all_players, turn):
+    source_name = getattr(active_player, "name", None)
+    for participant in all_players:
+        locks = list(getattr(participant, "spell_type_cast_locks", []) or [])
+        if not locks:
+            continue
+        kept = []
+        for lock in locks:
+            if not isinstance(lock, dict):
+                continue
+            try:
+                expires_after = int(lock.get("expires_after_source_turn") or 0)
+            except (TypeError, ValueError):
+                expires_after = 0
+            if lock.get("source_player") == source_name and expires_after <= int(turn):
+                emit_replay_event(
+                    "spell_type_cast_lock_expired",
+                    player=getattr(participant, "name", "?"),
+                    source=lock.get("source"),
+                    source_player=source_name,
+                    card_types=lock.get("card_types", []),
+                    turn=turn,
+                )
+                continue
+            kept.append(lock)
+        participant.spell_type_cast_locks = kept
 
 
 def remember_until_next_turn(card, key, *, source_player, turn):
@@ -4203,6 +4282,23 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:93e3f5684069bf77d7219e17f3e04a6c:sawhorn_nemesis_runtime_v1",
         }
     ),
+    "Single Combat": handcrafted_runtime_rule(
+        {
+            "ability_kind": "one_shot_and_rule_modifier",
+            "cmc": 5.0,
+            "effect": "single_combat",
+            "sorcery": True,
+            "mana_cost": "{3}{W}{W}",
+            "colors": ["W"],
+            "each_player_chooses_one_creature_or_planeswalker_sacrifices_rest": True,
+            "spell_type_cast_lock_card_types": ["creature", "planeswalker"],
+            "spell_type_cast_lock_applies_to": "all_players",
+            "spell_type_cast_lock_duration": "until_end_of_your_next_turn",
+            "battle_model_scope": "each_player_keep_one_creature_or_planeswalker_sacrifice_rest_then_creature_planeswalker_cast_lock_v1",
+            "_rule_oracle_hash": "be6bde23599b29cf800eefe5f11416f6",
+            "_rule_logical_key": "battle_rule_v1:45c2a4f6d6d4930fb4cb54b8fa886bc2",
+        }
+    ),
     "The Walls of Ba Sing Se": handcrafted_runtime_rule(
         {
             "ability_kind": "static",
@@ -4495,6 +4591,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Slickshot Show-Off",
     "Serra Ascendant",
     "Sawhorn Nemesis",
+    "Single Combat",
     "The Walls of Ba Sing Se",
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
@@ -4643,6 +4740,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed chosen-player damage-doubling replacement for that player and permanents they control.",
         ["manaloom_log_learning_audit_20260628_v25_after_serra_ascendant_runtime", "SawhornNemesis.java"],
         "2026-06-29T01:40:00Z",
+    ),
+    "Single Combat": manual_runtime_waiver_metadata(
+        "Replace review_only draw_cards row with XMage-backed choose-one creature/planeswalker sacrifice and all-player creature/planeswalker cast lock.",
+        ["manaloom_log_learning_audit_20260628_v26_after_sawhorn_nemesis_runtime", "SingleCombat.java"],
+        "2026-06-29T02:00:00Z",
     ),
     "The Walls of Ba Sing Se": manual_runtime_waiver_metadata(
         "Replace review_only runtime gap with XMage-backed defender body and other-controlled-permanents indestructible static.",
@@ -6393,6 +6495,7 @@ class Player:
         self.silenced_opponents = False
         self.silenced_opponents_until_eot = False
         self.non_hand_cast_locks = []
+        self.spell_type_cast_locks = []
         self.approach_count = 0
         self.treasures = 0
         self.draw_engines = 0
@@ -16294,6 +16397,148 @@ def resolve_starfall_invocation(player, opponents, card, effect_data, turn, rng)
         live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
         actual_asymmetry=actual_asymmetry,
         risk_flags=risk_flags,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
+def is_creature_or_planeswalker_permanent(permanent):
+    return is_battlefield_creature(permanent) or is_planeswalker_permanent(permanent)
+
+
+def resolve_single_combat(player, opponents, card, effect_data, turn):
+    players = [player] + list(opponents or [])
+    context = board_wipe_decision_context(player, opponents)
+    choices = []
+    sacrificed_cards = []
+    permanents_seen = 0
+    own_permanents_sacrificed = 0
+    opponent_permanents_sacrificed = 0
+    live_opponent_permanents_sacrificed = 0
+
+    for controller in players:
+        is_self = controller is player
+        is_live_opponent = (not is_self) and controller.is_alive()
+        candidates = [
+            permanent
+            for permanent in list(getattr(controller, "battlefield", []) or [])
+            if is_creature_or_planeswalker_permanent(permanent)
+        ]
+        permanents_seen += len(candidates)
+        if not candidates:
+            continue
+        chosen = max(candidates, key=target_priority)
+        choices.append(
+            {
+                "controller": controller.name,
+                "name": chosen.get("name", "?"),
+                "type_line": chosen.get("type_line", ""),
+                "target_score": list(target_priority(chosen)),
+            }
+        )
+        chosen_id = id(chosen)
+        for permanent in candidates:
+            if id(permanent) == chosen_id:
+                continue
+            if is_battlefield_creature(permanent):
+                destination = move_creature_from_battlefield(
+                    controller,
+                    permanent,
+                    reason="single_combat_sacrifice",
+                    source=card,
+                )
+            else:
+                destination = move_permanent_from_battlefield(
+                    controller,
+                    permanent,
+                    reason="single_combat_sacrifice",
+                    source=card,
+                )
+            sacrificed_cards.append(
+                {
+                    "controller": controller.name,
+                    "name": permanent.get("name", "?"),
+                    "type_line": permanent.get("type_line", ""),
+                    "destination": destination,
+                }
+            )
+            if is_self:
+                own_permanents_sacrificed += 1
+            else:
+                opponent_permanents_sacrificed += 1
+                if is_live_opponent:
+                    live_opponent_permanents_sacrificed += 1
+
+    locked_players = []
+    card_types = list(effect_data.get("spell_type_cast_lock_card_types") or ["creature", "planeswalker"])
+    for participant in players:
+        add_spell_type_cast_lock(
+            participant,
+            source=card.get("name", "?"),
+            source_player=player.name,
+            started_turn=turn,
+            card_types=card_types,
+            duration=effect_data.get("spell_type_cast_lock_duration") or "until_end_of_your_next_turn",
+        )
+        locked_players.append(participant.name)
+
+    actual_asymmetry = live_opponent_permanents_sacrificed - own_permanents_sacrificed
+    resolution_context = {
+        **context,
+        "creature_or_planeswalker_permanents_seen": permanents_seen,
+        "choices_made": len(choices),
+        "actual_sacrificed": len(sacrificed_cards),
+        "own_permanents_sacrificed": own_permanents_sacrificed,
+        "opponent_permanents_sacrificed": opponent_permanents_sacrificed,
+        "live_opponent_permanents_sacrificed": live_opponent_permanents_sacrificed,
+        "effective_opponent_creatures_destroyed": live_opponent_permanents_sacrificed,
+        "actual_asymmetry": actual_asymmetry,
+        "locked_players": locked_players,
+        "locked_card_types": card_types,
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or live_opponent_permanents_sacrificed > own_permanents_sacrificed
+        ),
+    }
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_single_combat"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(card, effect_data, action="resolve_single_combat"),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(0, actual_asymmetry * 10)
+        + min(live_opponent_permanents_sacrificed * 5, 35),
+        actual_outcome="board_wipe_resolved",
+        reason="each_player_keeps_best_creature_or_planeswalker_and_sacrifices_rest_then_cast_lock",
+        strategic_principle="collapse excess creature_planeswalker boards and pause rebuilds until source next turn ends",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=[] if resolution_context["timing_justified"] else ["wipe_without_timing_justification"],
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "single_combat_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        choices=choices[:24],
+        sacrificed_cards=sacrificed_cards[:24],
+        sacrificed=len(sacrificed_cards),
+        creature_or_planeswalker_permanents_seen=permanents_seen,
+        locked_players=locked_players,
+        locked_card_types=card_types,
+        lock_duration=effect_data.get("spell_type_cast_lock_duration") or "until_end_of_your_next_turn",
         turn=turn,
         **fields,
     )
@@ -35500,6 +35745,8 @@ def apply_effect_immediate(
         apply_equipment_static_attachment(player, card, effect_data, turn)
     elif effect == "vow_counter_each_player_sacrifice_rest":
         resolve_promise_of_loyalty(player, opponents, card, effect_data, turn)
+    elif effect == "single_combat":
+        resolve_single_combat(player, opponents, card, effect_data, turn)
     elif effect == "gift_destroy_all_creatures_return_own_destroyed_creature":
         resolve_starfall_invocation(player, opponents, card, effect_data, turn, rng)
     elif effect == "selective_nonland_sacrifice":
@@ -39381,6 +39628,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         discarded=discarded,
         discarded_cards=discarded_cards,
     )
+
+    clear_expired_spell_type_cast_locks_after_turn(player, all_players, turn)
 
     for participant in all_players:
         clear_until_eot(participant)
