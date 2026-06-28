@@ -8,6 +8,7 @@ import os
 import sqlite3
 import tempfile
 import unittest
+from contextlib import nullcontext
 from pathlib import Path
 from unittest import mock
 
@@ -37,6 +38,33 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
                 functional_tag TEXT,
                 functional_tags_json TEXT,
                 type_line TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE slot_benchmarks (
+                deck_id INTEGER,
+                baseline_id INTEGER,
+                baseline_hash TEXT,
+                category TEXT,
+                card_added TEXT,
+                card_removed TEXT,
+                wr REAL,
+                delta_pp REAL,
+                phase TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE swap_benchmarks (
+                deck_id INTEGER,
+                baseline_id INTEGER,
+                baseline_hash TEXT,
+                card_added TEXT,
+                card_removed TEXT,
+                phase TEXT
             )
             """
         )
@@ -186,6 +214,142 @@ class SlotOptimizerRealRolesTests(unittest.TestCase):
         self.assertIn("mystic peak", allowed)
         self.assertNotIn("manual card", allowed)
         self.assertNotIn("watch card", allowed)
+
+    def test_normalize_optimizer_category_maps_noncanonical_aliases(self) -> None:
+        self.assertEqual(
+            slot_optimizer.normalize_optimizer_category("board_presence", "creature"),
+            "wincon",
+        )
+        self.assertEqual(
+            slot_optimizer.normalize_optimizer_category("combo_value", "copy_spell"),
+            "engine",
+        )
+        self.assertEqual(
+            slot_optimizer.normalize_optimizer_category("recursion", "recursion"),
+            "engine",
+        )
+
+    def test_normalize_optimizer_category_prefers_effect_for_placeholder_buckets(self) -> None:
+        self.assertEqual(
+            slot_optimizer.normalize_optimizer_category("manual_review", "copy_spell"),
+            "engine",
+        )
+        self.assertEqual(
+            slot_optimizer.normalize_optimizer_category("manual_review", "tutor"),
+            "tutor",
+        )
+        self.assertEqual(
+            slot_optimizer.normalize_optimizer_category("interaction", "counter"),
+            "protection",
+        )
+
+    def test_existing_benchmark_pairs_include_slot_and_swap_history(self) -> None:
+        conn = self._conn()
+        conn.execute(
+            """
+            INSERT INTO slot_benchmarks
+                (deck_id, baseline_id, baseline_hash, card_added, card_removed, phase)
+            VALUES (?,?,?,?,?,?)
+            """,
+            (607, 11, "hash-1", "Ashling, Flame Dancer", "Storm Herd", "phase1"),
+        )
+        conn.execute(
+            """
+            INSERT INTO swap_benchmarks
+                (deck_id, baseline_id, baseline_hash, card_added, card_removed, phase)
+            VALUES (?,?,?,?,?,?)
+            """,
+            (607, 11, "hash-1", "Flashback", "Reforge the Soul", "confirmation"),
+        )
+
+        pairs = slot_optimizer.existing_benchmark_pairs(
+            conn,
+            deck_id=607,
+            baseline_id=11,
+            baseline_hash="hash-1",
+        )
+
+        self.assertIn(("Ashling, Flame Dancer", "Storm Herd"), pairs)
+        self.assertIn(("Flashback", "Reforge the Soul"), pairs)
+
+    def test_main_blocks_battle_timeout_without_crashing_batch(self) -> None:
+        conn = self._conn()
+        slot_optimizer.ensure_optimizer_tables(conn)
+        baseline = {
+            "id": 11,
+            "deck_hash": "hash-1",
+            "semantics_hash": "sem-1",
+            "ruleset_hash": "rules-1",
+            "wr": 33.3,
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            lock_path = Path(tmpdir) / "slot.lock"
+            argv = [
+                "slot_optimizer.py",
+                "--deck-id",
+                "607",
+                "--games",
+                "1",
+                "--battle-timeout-seconds",
+                "7",
+            ]
+            with (
+                mock.patch.object(slot_optimizer, "LOCK_FILE", lock_path),
+                mock.patch.object(slot_optimizer, "connect", return_value=nullcontext(conn)),
+                mock.patch.object(slot_optimizer, "latest_baseline", return_value=baseline),
+                mock.patch.object(slot_optimizer, "assert_current_deck_matches_baseline"),
+                mock.patch.object(slot_optimizer, "load_known_cards", return_value={}),
+                mock.patch.object(slot_optimizer, "load_candidate_allowlist", return_value=set()),
+                mock.patch.object(slot_optimizer, "deck_rows", return_value=[]),
+                mock.patch.object(slot_optimizer, "load_real_roles", return_value={}),
+                mock.patch.object(
+                    slot_optimizer,
+                    "build_deck_categories",
+                    return_value={"draw": [("Artist's Talent", 3.0)]},
+                ),
+                mock.patch.object(
+                    slot_optimizer,
+                    "legal_candidates",
+                    return_value=({"draw": [("Wheel of Fate", 0.0, "draw_cards", {})]}, {}),
+                ),
+                mock.patch.object(
+                    slot_optimizer,
+                    "choose_swap_targets",
+                    return_value={"draw": "Artist's Talent"},
+                ),
+                mock.patch.object(slot_optimizer, "existing_benchmark_pairs", return_value=set()),
+                mock.patch.object(
+                    slot_optimizer,
+                    "quality_gate_candidate",
+                    return_value={"status": "passed", "reasons": [], "warnings": []},
+                ),
+                mock.patch.object(slot_optimizer, "temporary_swap", return_value=nullcontext()),
+                mock.patch.object(
+                    slot_optimizer,
+                    "run_battle",
+                    side_effect=slot_optimizer.BattleRunTimeout(7),
+                ),
+                mock.patch("sys.argv", argv),
+            ):
+                exit_code = slot_optimizer.main()
+
+        rows = conn.execute("SELECT COUNT(*) FROM slot_benchmarks").fetchone()[0]
+        review = conn.execute(
+            """
+            SELECT status, reasons_json
+            FROM optimizer_quality_reviews
+            WHERE deck_id=? AND card_added=? AND card_removed=?
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (607, "Wheel of Fate", "Artist's Talent"),
+        ).fetchone()
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(rows, 0)
+        self.assertIsNotNone(review)
+        self.assertEqual(review["status"], "blocked")
+        self.assertEqual(json.loads(review["reasons_json"]), ["battle_timeout_7s"])
 
 
 if __name__ == "__main__":

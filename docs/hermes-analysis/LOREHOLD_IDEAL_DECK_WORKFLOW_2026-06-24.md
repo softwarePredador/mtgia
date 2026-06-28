@@ -51,60 +51,61 @@ It does not mutate deck rows, SQLite, or PostgreSQL.
 
 ## Current Checkpoint
 
-Post-PG242 Lorehold-focused rule-routing checkpoint generated on 2026-06-26
-after closing `Magmakin Artillerist` end to end: exact XMage mapper,
-batch-safe discard-damage creature scope, PostgreSQL promotion, SQLite/Hermes
-sync, and fresh queue/matrix/audits from the post-sync state:
+Post-PG243 Lorehold-focused rule-routing checkpoint generated on 2026-06-26
+after closing the `Millikin` + `Tablet of Discovery` mini-batch end to end:
+exact XMage mappers, batch-safe mana-source scopes, PostgreSQL promotion,
+SQLite/Hermes sync, and fresh queue/matrix/audits from the post-sync state:
 
 - current matrix:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg242_magmakin_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg243_millikin_tablet_postsync_v1.json`
 - current proposal report:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg242_magmakin_postsync_v1_proposals.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg243_millikin_tablet_postsync_v1_proposals.json`
 - current effective queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg242_magmakin_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_20260626_pg243_millikin_tablet_postsync_v1.json`
 - current strategy audit:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg242_magmakin_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260626_pg243_millikin_tablet_postsync_v1.json`
 - latest generated candidate still under benchmark hold:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg234_lorehold_ready_batch_four_postsync_v1.json`
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg241_current_v1.json`
 - current slice evidence:
-  `docs/hermes-analysis/master_optimizer_reports/pg242_magmakin_discard_damage_progress_20260626.md`
+  `docs/hermes-analysis/master_optimizer_reports/pg243_millikin_tablet_mana_sources_progress_20260626.md`
 
 Current operational result:
 
 - effective queue:
   - `package_ready_unprepared=0`
   - `package_already_prepared=1`
-  - `manual_mapper_backlog=315`
+  - `manual_mapper_backlog=313`
   - `split_scope_backlog=59`
   - `runtime_family_backlog=4`
   - `blocked_missing_xmage_source=4`
 - strategy consistency audit:
   - `18/18 pass`
 - matrix:
-  - `battle_ready=527`
-  - `needs_rule_before_strategy=182`
-  - `watchlist_candidate=226`
+  - `battle_ready=529`
+  - `needs_rule_before_strategy=180`
+  - `watchlist_candidate=228`
 
 Key routing delta:
 
-- `Magmakin Artillerist` moved from
+- `Millikin` and `Tablet of Discovery` moved from
   `needs_rule_before_strategy / mapper_manual`
   to
   `battle_ready / watchlist_candidate`.
 - `Coruscation Mage`, `Vivi Ornitier`, `Bolt Bend`, `Penance`, and now
-  `Magmakin Artillerist` are all closed in the post-sync rule-ready pool.
-- the new `Magmakin Artillerist` slice closed the live
+  `Magmakin Artillerist`, `Millikin`, and `Tablet of Discovery` are all
+  closed in the post-sync rule-ready pool.
+- the new `Millikin` + `Tablet of Discovery` slice closed the live
   `package_ready_unprepared` residual it created inside the same run:
-  `1 -> 0`.
+  `2 -> 0`.
 - Lorehold-touching rule readiness improved from:
-  - `battle_ready: 328 -> 329`
-  - `mapper_manual: 59 -> 58`
+  - `battle_ready: 329 -> 331`
+  - `mapper_manual: 58 -> 56`
   - `split_scope: 6 -> 6`
-  - `package_ready: 1 -> 0`
-- Lorehold-touching `needs_rule_before_strategy` improved from `67` to `66`.
+  - `package_ready: 2 -> 0`
+- Lorehold-touching `needs_rule_before_strategy` improved from `66` to `64`.
 - the next highest-ROI Lorehold rule-first targets are now:
   `Currency Converter`, `Firesong and Sunspeaker`, `Radiant Scrollwielder`,
-  `Deathbellow War Cry`, and `Millikin`.
+  `Deathbellow War Cry`, and `Single Combat`.
 - the benchmark/generation phase was intentionally not rerun here because the
   workflow still prioritizes closing more Lorehold-touching
   `needs_rule_before_strategy` rows before new slot benchmarking.

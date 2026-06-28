@@ -14,6 +14,15 @@ SLOT_CATEGORY="${MANALOOM_SLOT_CATEGORY:-}"
 SLOT_PHASE="${MANALOOM_SLOT_PHASE:-phase1}"
 LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-1}"
 
+if [[ -z "${HERMES_KNOWLEDGE_BACKUP_DIR:-}" ]]; then
+  if [[ -d /data/manaloom-ops ]]; then
+    export HERMES_KNOWLEDGE_BACKUP_DIR="/data/manaloom-ops/knowledge-backups"
+  else
+    export HERMES_KNOWLEDGE_BACKUP_DIR="$SCRIPT_DIR/knowledge-backups"
+  fi
+fi
+export HERMES_KNOWLEDGE_BACKUP_KEEP="${HERMES_KNOWLEDGE_BACKUP_KEEP:-${MANALOOM_KNOWLEDGE_BACKUP_KEEP:-5}}"
+
 mkdir -p "$ARTIFACT_DIR"
 
 if [[ -f "$LOCK_FILE" ]]; then

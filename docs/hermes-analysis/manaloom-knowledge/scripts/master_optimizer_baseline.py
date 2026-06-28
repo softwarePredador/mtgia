@@ -55,13 +55,22 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--deck-id", type=int, default=6)
     parser.add_argument("--games", type=int, default=50)
+    parser.add_argument("--opponent-limit", type=int, default=3)
+    parser.add_argument("--opponent-seed", type=int, default=20260626)
+    parser.add_argument("--simulation-seed", type=int, default=42)
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
 
     with connect() as conn:
         ensure_optimizer_tables(conn)
         deck_summary = get_deck_summary(conn, args.deck_id)
-        result = run_battle(args.games, deck_id=args.deck_id)
+        result = run_battle(
+            args.games,
+            deck_id=args.deck_id,
+            opponent_limit=max(1, int(args.opponent_limit)),
+            opponent_seed=int(args.opponent_seed),
+            simulation_seed=int(args.simulation_seed),
+        )
         created_at = utc_now()
         payload = {
             "deck": deck_summary,

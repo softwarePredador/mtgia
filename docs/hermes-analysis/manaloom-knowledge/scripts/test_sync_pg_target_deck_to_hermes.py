@@ -6,6 +6,7 @@ from __future__ import annotations
 import sqlite3
 import tempfile
 import unittest
+from argparse import Namespace
 from pathlib import Path
 
 import sync_pg_target_deck_to_hermes as sync
@@ -260,6 +261,31 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
         self.assertIn("group by cbr.card_id", sql)
         self.assertNotIn("left join lateral", sql)
         self.assertNotIn("limit 1", sql)
+
+    def test_selected_deck_sql_requires_explicit_commander_fallback(self) -> None:
+        args = Namespace(
+            pg_deck_id="",
+            deck_name_like="%Runtime Lorehold Learned%",
+            include_commander_fallback=False,
+        )
+
+        where_sql, params = sync.selected_deck_sql(args)
+
+        self.assertEqual(where_sql, "WHERE d.name ILIKE %s")
+        self.assertEqual(params, ("%Runtime Lorehold Learned%",))
+
+    def test_selected_deck_sql_can_opt_into_commander_fallback(self) -> None:
+        args = Namespace(
+            pg_deck_id="",
+            deck_name_like="%Runtime Lorehold Learned%",
+            include_commander_fallback=True,
+        )
+
+        where_sql, params = sync.selected_deck_sql(args)
+
+        self.assertIn("d.name ILIKE %s", where_sql)
+        self.assertIn("c2.name ILIKE '%%Lorehold%%'", where_sql)
+        self.assertEqual(params, ("%Runtime Lorehold Learned%",))
 
     def test_normalize_battle_rules_dedupes_equivalent_rules_by_logical_key(self) -> None:
         rules = sync.normalize_battle_rules(

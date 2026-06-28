@@ -196,6 +196,9 @@ def register_tests(battle, player, card):
         assert any(event == "saga_sacrificed_by_sba" for event, _ in events)
 
     def test_zone_change_records_lki_and_advances_zone_identity():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
         active = player("Active")
         creature = {
             "name": "Tracked Creature",
@@ -208,7 +211,10 @@ def register_tests(battle, player, card):
         }
         active.battlefield = [creature]
 
-        destination = battle.move_creature_from_battlefield(active, creature, reason="destroyed")
+        try:
+            destination = battle.move_creature_from_battlefield(active, creature, reason="destroyed")
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
 
         assert destination == "graveyard"
         assert creature not in active.battlefield
@@ -216,6 +222,11 @@ def register_tests(battle, player, card):
         assert creature["_zone_id"] == 8
         assert creature["_last_zone"] == "battlefield"
         assert battle.get_lki(creature)["power"] == 4
+        move_event = next(data for event, data in events if event == "permanent_moved_from_battlefield")
+        assert move_event["card"] == "Tracked Creature"
+        assert move_event["from_zone"] == "battlefield"
+        assert move_event["to_zone"] == "graveyard"
+        assert move_event["destination"] == "graveyard"
         assert battle.move_creature_from_battlefield(active, "not a permanent") == "none"
 
     def test_noncreature_permanent_zone_change_uses_generic_helper():

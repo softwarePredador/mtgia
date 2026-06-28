@@ -49,6 +49,68 @@ class GenerateLoreholdCandidateDeckTests(unittest.TestCase):
             generator.candidate_hash(changed),
         )
 
+    def test_effective_score_preserves_active_pressure_absorber(self):
+        active_names = {"crawlspace"}
+        crawlspace = {
+            "card_name": "Crawlspace",
+            "score": 46.0,
+            "recommendation_lane": "core_keep",
+            "deck_ids": [6, 610],
+            "roles": ["protection", "stax"],
+        }
+        generic_protection = {
+            "card_name": "Hexing Squelcher",
+            "score": 56.0,
+            "recommendation_lane": "priority_benchmark_candidate",
+            "deck_ids": [606, 607, 609, 613, 614, 615, 616],
+            "roles": ["protection"],
+        }
+        crawlspace_oracle = {
+            "cmc": 3,
+            "type_line": "Artifact",
+            "oracle_text": "No more than two creatures can attack you each combat.",
+        }
+        generic_oracle = {
+            "cmc": 2,
+            "type_line": "Creature",
+            "oracle_text": "When this enters, counter target activated or triggered ability.",
+        }
+
+        crawlspace_score = generator.effective_score(
+            crawlspace,
+            crawlspace_oracle,
+            active_names=active_names,
+        )
+        generic_score = generator.effective_score(
+            generic_protection,
+            generic_oracle,
+            active_names=active_names,
+        )
+
+        self.assertGreater(crawlspace_score, generic_score)
+
+    def test_active_core_keep_nonland_is_forced(self):
+        self.assertTrue(
+            generator.force_keep_active_core(
+                {
+                    "card_name": "Orim's Chant",
+                    "in_active_deck": True,
+                    "is_land": False,
+                    "recommendation_lane": "core_keep",
+                }
+            )
+        )
+        self.assertFalse(
+            generator.force_keep_active_core(
+                {
+                    "card_name": "Ancient Den",
+                    "in_active_deck": True,
+                    "is_land": True,
+                    "recommendation_lane": "core_keep",
+                }
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,6 +7,7 @@ import argparse
 import json
 
 from master_optimizer_common import (
+    BattleRunTimeout,
     assert_current_deck_matches_baseline,
     battle_gate_report_lines,
     candidate_rows,
@@ -87,6 +88,10 @@ def main() -> int:
     parser.add_argument("--candidate-limit", type=int, default=25)
     parser.add_argument("--run-limit", type=int, default=3)
     parser.add_argument("--games", type=int, default=10)
+    parser.add_argument("--battle-timeout-seconds", type=int, default=1200)
+    parser.add_argument("--opponent-limit", type=int, default=3)
+    parser.add_argument("--opponent-seed", type=int, default=20260626)
+    parser.add_argument("--simulation-seed", type=int, default=42)
     parser.add_argument("--min-scan-delta", type=float, default=-2.0)
     parser.add_argument(
         "--phase",
@@ -195,7 +200,35 @@ def main() -> int:
                 row["card_removed"],
                 row["category"],
             ):
-                result = run_battle(args.games, deck_id=args.deck_id)
+                try:
+                    result = run_battle(
+                        args.games,
+                        deck_id=args.deck_id,
+                        timeout_seconds=max(1, int(args.battle_timeout_seconds)),
+                        opponent_limit=max(1, int(args.opponent_limit)),
+                        opponent_seed=int(args.opponent_seed),
+                        simulation_seed=int(args.simulation_seed),
+                    )
+                except BattleRunTimeout as exc:
+                    blocked.append(
+                        {
+                            "card_added": row["card_added"],
+                            "card_removed": row["card_removed"],
+                            "scan_wr": row["wr"],
+                            "reasons": [f"battle_timeout_{exc.timeout_seconds}s"],
+                        }
+                    )
+                    continue
+                except RuntimeError as exc:
+                    blocked.append(
+                        {
+                            "card_added": row["card_added"],
+                            "card_removed": row["card_removed"],
+                            "scan_wr": row["wr"],
+                            "reasons": [f"battle_failed:{str(exc).strip() or type(exc).__name__}"],
+                        }
+                    )
+                    continue
 
             delta = result.win_rate - baseline_wr
             conn.execute(

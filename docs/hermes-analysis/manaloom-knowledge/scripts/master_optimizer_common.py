@@ -111,6 +111,16 @@ class BattleResult:
         return self.wins + self.losses + self.stalls
 
 
+class BattleRunTimeout(RuntimeError):
+    def __init__(self, timeout_seconds: int, output_tail: str = "") -> None:
+        self.timeout_seconds = int(timeout_seconds)
+        self.output_tail = output_tail
+        detail = f"battle run timed out after {self.timeout_seconds}s"
+        if output_tail:
+            detail = f"{detail}: {output_tail[-400:]}"
+        super().__init__(detail)
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -541,11 +551,19 @@ def run_battle(
     battle_path: Path = DEFAULT_BATTLE,
     *,
     deck_id: int = 6,
+    timeout_seconds: int = 1200,
+    opponent_limit: int | None = None,
+    opponent_seed: int | None = None,
+    simulation_seed: int | None = None,
 ) -> BattleResult:
     env_extra = {
         "MANALOOM_BATTLE_EVALUATION_TARGET_PLAYER": "Lorehold",
         "MANALOOM_BATTLE_DECK_ID": str(deck_id),
     }
+    if opponent_limit is not None and int(opponent_limit) > 0:
+        env_extra["MANALOOM_BATTLE_REAL_OPPONENT_LIMIT"] = str(int(opponent_limit))
+    if opponent_seed is not None:
+        env_extra["MANALOOM_BATTLE_REAL_OPPONENT_SEED"] = str(int(opponent_seed))
     metrics_dir = os.environ.get("MANALOOM_ENGINE_METRICS_DIR")
     if metrics_dir:
         Path(metrics_dir).mkdir(parents=True, exist_ok=True)
@@ -554,19 +572,34 @@ def run_battle(
             Path(metrics_dir)
             / f"battle_engine_metrics_{battle_path.stem}_{games_per_opponent}_{stamp}.json"
         )
-    code, output = run_command(
-        [
-            sys.executable,
-            str(battle_path),
-            "--games",
-            str(games_per_opponent),
-            "--deck-id",
-            str(deck_id),
-        ],
-        cwd=SCRIPT_DIR,
-        timeout=1200,
-        env_extra=env_extra,
-    )
+    command = [
+        sys.executable,
+        str(battle_path),
+        "--games",
+        str(games_per_opponent),
+        "--deck-id",
+        str(deck_id),
+    ]
+    if simulation_seed is not None:
+        command.extend(["--seed", str(int(simulation_seed))])
+    try:
+        code, output = run_command(
+            command,
+            cwd=SCRIPT_DIR,
+            timeout=timeout_seconds,
+            env_extra=env_extra,
+        )
+    except subprocess.TimeoutExpired as exc:
+        output = ""
+        if isinstance(exc.stdout, bytes):
+            output += exc.stdout.decode("utf-8", errors="replace")
+        elif exc.stdout:
+            output += str(exc.stdout)
+        if isinstance(exc.stderr, bytes):
+            output += "\n" + exc.stderr.decode("utf-8", errors="replace")
+        elif exc.stderr:
+            output += "\n" + str(exc.stderr)
+        raise BattleRunTimeout(timeout_seconds, output.strip()) from exc
     if code != 0:
         raise RuntimeError(output[-2000:])
     return parse_battle_output(output, games_per_opponent)

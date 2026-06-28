@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import sqlite3
 from collections import Counter
@@ -30,6 +31,8 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
 DEFAULT_DECK_ID = 6
+DEFAULT_BACKUP_KEEP = 5
+RUNTIME_BACKUP_DIR = Path("/data/manaloom-ops/knowledge-backups")
 
 DOCUMENTED_SERVER_HASH = "12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08"
 DOCUMENTED_SERVER_WR = "87.3%"
@@ -40,7 +43,7 @@ DOCUMENTED_REVERTED_OUT = "Rise of the Eldrazi"
 
 
 def utc_stamp() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    return datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
 
 
 def normalize(name: str) -> str:
@@ -107,18 +110,71 @@ def load_card_metadata(conn: sqlite3.Connection, card_name: str) -> dict[str, ob
     }
 
 
-def backup_db(db_path: Path) -> Path:
-    backup = db_path.with_suffix(db_path.suffix + f".bak_lorehold_canonical_{utc_stamp()}")
+def positive_int(value: str) -> int:
+    parsed = int(value)
+    if parsed < 1:
+        raise argparse.ArgumentTypeError("must be >= 1")
+    return parsed
+
+
+def default_backup_keep() -> int:
+    value = os.environ.get("HERMES_KNOWLEDGE_BACKUP_KEEP") or os.environ.get(
+        "MANALOOM_KNOWLEDGE_BACKUP_KEEP"
+    )
+    if not value:
+        return DEFAULT_BACKUP_KEEP
+    return positive_int(value)
+
+
+def resolve_backup_dir(db_path: Path, requested_dir: Path | None) -> Path:
+    if requested_dir:
+        return requested_dir
+
+    env_dir = os.environ.get("HERMES_KNOWLEDGE_BACKUP_DIR") or os.environ.get(
+        "MANALOOM_KNOWLEDGE_BACKUP_DIR"
+    )
+    if env_dir:
+        return Path(env_dir)
+
+    if RUNTIME_BACKUP_DIR.parent.exists():
+        return RUNTIME_BACKUP_DIR
+
+    return db_path.parent
+
+
+def prune_backups(backup_dir: Path, db_path: Path, keep: int) -> list[Path]:
+    backups = sorted(
+        backup_dir.glob(f"{db_path.name}.bak_lorehold_canonical_*"),
+        key=lambda path: (path.stat().st_mtime_ns, path.name),
+        reverse=True,
+    )
+    pruned: list[Path] = []
+    for old_backup in backups[keep:]:
+        old_backup.unlink()
+        pruned.append(old_backup)
+    return pruned
+
+
+def backup_db(db_path: Path, backup_dir: Path, keep: int) -> tuple[Path, list[Path]]:
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    backup = backup_dir / f"{db_path.name}.bak_lorehold_canonical_{utc_stamp()}"
     shutil.copy2(db_path, backup)
-    return backup
+    pruned = prune_backups(backup_dir, db_path, keep)
+    return backup, pruned
 
 
-def apply_documented_swap(conn: sqlite3.Connection, db_path: Path, deck_id: int) -> tuple[str, Path | None]:
+def apply_documented_swap(
+    conn: sqlite3.Connection,
+    db_path: Path,
+    deck_id: int,
+    backup_dir: Path,
+    backup_keep: int,
+) -> tuple[str, Path | None, list[Path]]:
     in_count = card_count(conn, deck_id, DOCUMENTED_SWAP_IN)
     out_count = card_count(conn, deck_id, DOCUMENTED_SWAP_OUT)
 
     if in_count == 1 and out_count == 0:
-        return "already_aligned", None
+        return "already_aligned", None, []
     if in_count > 0 and out_count > 0:
         raise RuntimeError(
             f"Unsafe state: both {DOCUMENTED_SWAP_IN} and {DOCUMENTED_SWAP_OUT} are present"
@@ -128,7 +184,7 @@ def apply_documented_swap(conn: sqlite3.Connection, db_path: Path, deck_id: int)
             f"Unsafe state: expected exactly one {DOCUMENTED_SWAP_OUT}, found {out_count}"
         )
 
-    backup = backup_db(db_path)
+    backup, pruned = backup_db(db_path, backup_dir, backup_keep)
     metadata = load_card_metadata(conn, DOCUMENTED_SWAP_IN)
     conn.execute(
         """
@@ -152,7 +208,7 @@ def apply_documented_swap(conn: sqlite3.Connection, db_path: Path, deck_id: int)
         ),
     )
     conn.commit()
-    return "applied_local_sqlite", backup
+    return "applied_local_sqlite", backup, pruned
 
 
 def deck_rows(conn: sqlite3.Connection, deck_id: int) -> list[sqlite3.Row]:
@@ -207,7 +263,15 @@ def validate(conn: sqlite3.Connection, deck_id: int) -> list[str]:
     return errors
 
 
-def build_snapshot(conn: sqlite3.Connection, deck_id: int, status: str, backup: Path | None) -> dict[str, object]:
+def build_snapshot(
+    conn: sqlite3.Connection,
+    deck_id: int,
+    status: str,
+    backup: Path | None,
+    backup_dir: Path,
+    backup_keep: int,
+    pruned_backups: list[Path],
+) -> dict[str, object]:
     rows = deck_rows(conn, deck_id)
     summary = get_deck_summary(conn, deck_id)
     role_counts = Counter()
@@ -233,6 +297,9 @@ def build_snapshot(conn: sqlite3.Connection, deck_id: int, status: str, backup: 
         "status": "approved" if not errors else "blocked",
         "local_sqlite_action": status,
         "local_backup": str(backup) if backup else None,
+        "local_backup_dir": str(backup_dir),
+        "local_backup_retention_keep": backup_keep,
+        "local_backup_pruned": [str(path) for path in pruned_backups],
         "deck_id": deck_id,
         "documented_server_hash": DOCUMENTED_SERVER_HASH,
         "documented_server_wr": DOCUMENTED_SERVER_WR,
@@ -269,6 +336,9 @@ def render_markdown(snapshot: dict[str, object]) -> str:
         f"- deck_id: {snapshot['deck_id']}",
         f"- local_sqlite_action: {snapshot['local_sqlite_action']}",
         f"- local_backup: `{snapshot['local_backup']}`",
+        f"- local_backup_dir: `{snapshot['local_backup_dir']}`",
+        f"- local_backup_retention_keep: {snapshot['local_backup_retention_keep']}",
+        f"- local_backup_pruned: {len(snapshot['local_backup_pruned'])}",
         f"- documented_server_hash: `{snapshot['documented_server_hash']}`",
         f"- documented_server_wr: {snapshot['documented_server_wr']}",
         f"- local_hash: `{summary['hash']}`",
@@ -312,6 +382,12 @@ def main() -> int:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--deck-id", type=int, default=DEFAULT_DECK_ID)
     parser.add_argument("--apply-local-sqlite", action="store_true")
+    parser.add_argument("--backup-dir", type=Path)
+    parser.add_argument(
+        "--backup-retention",
+        type=positive_int,
+        default=default_backup_keep(),
+    )
     parser.add_argument("--out-dir", type=Path, default=REPORT_DIR)
     parser.add_argument("--prefix", default="lorehold_canonical_snapshot_20260614")
     args = parser.parse_args()
@@ -325,9 +401,25 @@ def main() -> int:
     try:
         action = "validated_only"
         backup = None
+        pruned_backups: list[Path] = []
+        backup_dir = resolve_backup_dir(args.db, args.backup_dir)
         if args.apply_local_sqlite:
-            action, backup = apply_documented_swap(conn, args.db, args.deck_id)
-        snapshot = build_snapshot(conn, args.deck_id, action, backup)
+            action, backup, pruned_backups = apply_documented_swap(
+                conn,
+                args.db,
+                args.deck_id,
+                backup_dir,
+                args.backup_retention,
+            )
+        snapshot = build_snapshot(
+            conn,
+            args.deck_id,
+            action,
+            backup,
+            backup_dir,
+            args.backup_retention,
+            pruned_backups,
+        )
     finally:
         conn.close()
 

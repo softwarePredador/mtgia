@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sqlite3
+import subprocess
 import tempfile
 import unittest
 from unittest import mock
@@ -170,6 +171,76 @@ class MasterOptimizerHashTests(unittest.TestCase):
         )
         self.assertEqual(result.win_rate, 100.0)
         self.assertEqual(result.total_games, 1)
+
+    def test_run_battle_accepts_custom_timeout(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_run_command(command, cwd=None, timeout=900, env_extra=None):
+            captured["timeout"] = timeout
+            return (
+                0,
+                "\n".join(
+                    [
+                        "vs Test Opponent WR= 100.0% W=1 L=0 S=0 T=4.0 [elimination]",
+                        "OVERALL v9: WR=100.0% (1W/0L/0S)",
+                    ]
+                ),
+            )
+
+        with mock.patch.object(optimizer, "run_command", side_effect=fake_run_command):
+            optimizer.run_battle(1, deck_id=607, timeout_seconds=321)
+
+        self.assertEqual(captured["timeout"], 321)
+
+    def test_run_battle_supports_scoped_real_opponents_and_seed(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_run_command(command, cwd=None, timeout=900, env_extra=None):
+            captured["command"] = command
+            captured["env_extra"] = env_extra
+            return (
+                0,
+                "\n".join(
+                    [
+                        "vs Test Opponent WR= 100.0% W=1 L=0 S=0 T=4.0 [elimination]",
+                        "OVERALL v9: WR=100.0% (1W/0L/0S)",
+                    ]
+                ),
+            )
+
+        with mock.patch.object(optimizer, "run_command", side_effect=fake_run_command):
+            optimizer.run_battle(
+                1,
+                deck_id=607,
+                opponent_limit=3,
+                opponent_seed=20260626,
+                simulation_seed=99,
+            )
+
+        self.assertEqual(
+            captured["command"][-4:],
+            ["--deck-id", "607", "--seed", "99"],
+        )
+        self.assertEqual(captured["env_extra"]["MANALOOM_BATTLE_REAL_OPPONENT_LIMIT"], "3")
+        self.assertEqual(captured["env_extra"]["MANALOOM_BATTLE_REAL_OPPONENT_SEED"], "20260626")
+
+    def test_run_battle_wraps_subprocess_timeout(self) -> None:
+        timeout_exc = subprocess.TimeoutExpired(
+            cmd=["python3", "battle_analyst_v9.py"],
+            timeout=1200,
+        )
+        timeout_exc.stdout = "partial stdout"
+        timeout_exc.stderr = "partial stderr"
+        with mock.patch.object(
+            optimizer,
+            "run_command",
+            side_effect=timeout_exc,
+        ):
+            with self.assertRaises(optimizer.BattleRunTimeout) as raised:
+                optimizer.run_battle(1, deck_id=607, timeout_seconds=1200)
+
+        self.assertEqual(raised.exception.timeout_seconds, 1200)
+        self.assertIn("partial stdout", raised.exception.output_tail)
 
     def test_battle_rule_deck_categories_preserve_multiple_roles_same_name(self) -> None:
         optimizer.battle_rule_registry.ensure_battle_card_rules(self.conn)

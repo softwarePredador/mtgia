@@ -3963,6 +3963,52 @@ def register_tests(battle, player):
         active.refresh_mana_sources(turn=2)
         assert active.available_mana() == 2
 
+    def test_pg243_millikin_counts_as_colorless_mana_source():
+        active = player("Lorehold")
+        millikin = {
+            "name": "Millikin",
+            "effect": "creature",
+            "type_line": "Artifact Creature - Construct",
+            "power": 0,
+            "toughness": 1,
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "C",
+            "mana_source_mill_count": 1,
+            "mana_source_mill_status": "annotation_only",
+            "_rule_logical_key": "battle_rule_v1:millikin-test",
+        }
+        active.battlefield = [millikin]
+
+        assert battle.mana_source_production_for_state(active, millikin) == 1
+        active.refresh_mana_sources(turn=1)
+        assert active.available_mana() == 1
+        assert active.mana_pool.colorless == 1
+
+    def test_pg243_tablet_of_discovery_counts_as_red_mana_source():
+        active = player("Lorehold")
+        tablet = {
+            "name": "Tablet of Discovery",
+            "effect": "ramp_permanent",
+            "type_line": "Artifact",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "R",
+            "etb_mill_count": 1,
+            "etb_milled_card_playable_this_turn": True,
+            "etb_milled_card_play_status": "annotation_only",
+            "conditional_instant_sorcery_mana_produced": 2,
+            "conditional_instant_sorcery_mana_color": "R",
+            "conditional_instant_sorcery_mana_status": "annotation_only",
+            "_rule_logical_key": "battle_rule_v1:tablet-of-discovery-test",
+        }
+        active.battlefield = [tablet]
+
+        assert battle.mana_source_production_for_state(active, tablet) == 1
+        active.refresh_mana_sources(turn=1)
+        assert active.available_mana() == 1
+        assert active.mana_pool.red == 1
+
     def test_silence_effect_blocks_counterspell_responses():
         active = player("Active")
         active.silenced_opponents = True
@@ -19188,6 +19234,8 @@ def register_tests(battle, player):
         test_pg099_avatars_wrath_airbends_all_other_creatures_and_locks_nonhand_casts,
         test_akromas_will_keywords_are_until_end_of_turn_without_power_boost,
         test_mox_amber_only_counts_mana_with_live_legend,
+        test_pg243_millikin_counts_as_colorless_mana_source,
+        test_pg243_tablet_of_discovery_counts_as_red_mana_source,
         test_silence_effect_blocks_counterspell_responses,
         test_lorehold_miracle_ignores_lands_and_creatures,
         test_lorehold_miracle_rejects_flash_creatures,

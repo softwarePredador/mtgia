@@ -100,6 +100,16 @@ def parse_args() -> argparse.Namespace:
         "--deck-name-like",
         default=os.environ.get("MANALOOM_TARGET_DECK_NAME_LIKE", "%Runtime Lorehold Learned%"),
     )
+    parser.add_argument(
+        "--include-commander-fallback",
+        action="store_true",
+        help=(
+            "When --pg-deck-id is absent, also allow selecting the newest deck "
+            "whose commander name contains Lorehold. Use only for deliberate "
+            "variant imports; the default name filter protects deck_id=6 from "
+            "being overwritten by the newest Lorehold variant."
+        ),
+    )
     parser.add_argument("--target-deck-id", type=int, default=6)
     parser.add_argument("--min-total-cards", type=int, default=90)
     parser.add_argument("--apply", action="store_true")
@@ -676,6 +686,8 @@ def has_pg_relation(cur: Any, relation_name: str) -> bool:
 def selected_deck_sql(args: argparse.Namespace) -> tuple[str, tuple[Any, ...]]:
     if args.pg_deck_id:
         return "WHERE d.id = %s", (args.pg_deck_id,)
+    if not args.include_commander_fallback:
+        return "WHERE d.name ILIKE %s", (args.deck_name_like,)
     return (
         """
         WHERE d.name ILIKE %s

@@ -17,6 +17,7 @@ from pathlib import Path
 
 from known_cards_fallback_snapshot import load_layered_known_cards
 from master_optimizer_common import (
+    BattleRunTimeout,
     DEFAULT_DB,
     SCRIPT_DIR,
     assert_current_deck_matches_baseline,
@@ -68,9 +69,11 @@ EFFECT_TO_CATEGORY = {
     "remove_creature": "removal",
     "remove_permanent": "removal",
     "remove_artifact_or_3dmg": "removal",
+    "selective_nonland_sacrifice": "wipe",
     "copy_spell": "engine",
     "recursion": "engine",
     "ripple_engine": "engine",
+    "static_cost_reduction": "ramp",
 }
 # Roles reais do card_deck_analysis → categorias do optimizer
 # Prioridade maxima: evita swaps entre categorias diferentes
@@ -249,6 +252,33 @@ CATEGORY_TARGET_FALLBACKS = {
     "wipe": ("interaction", "removal"),
 }
 
+NONCANONICAL_DECK_CATEGORY_ALIASES = {
+    "board_development": "wincon",
+    "board_presence": "wincon",
+    "combo_value": "engine",
+    "interaction": "removal",
+    "recursion": "engine",
+    "support": "engine",
+}
+
+CANONICAL_CATEGORIES = {
+    "draw",
+    "engine",
+    "land",
+    "protection",
+    "ramp",
+    "removal",
+    "tutor",
+    "wincon",
+    "wipe",
+}
+
+EFFECT_FIRST_CATEGORY_BUCKETS = {
+    *NONCANONICAL_DECK_CATEGORY_ALIASES,
+    "manual_review",
+    "unknown",
+}
+
 
 _REAL_ROLES_CACHE = {}
 
@@ -303,6 +333,19 @@ def choose_primary_category(categories: list[str]) -> str | None:
         if category in present:
             return category
     return categories[0] if categories else None
+
+
+def normalize_optimizer_category(raw_category: str, effect: str) -> str:
+    category = str(raw_category or "").strip()
+    effect = str(effect or "").strip()
+    normalized = NONCANONICAL_DECK_CATEGORY_ALIASES.get(category, category)
+    if category in EFFECT_FIRST_CATEGORY_BUCKETS and effect in EFFECT_TO_CATEGORY:
+        return EFFECT_TO_CATEGORY[effect]
+    if normalized in CANONICAL_CATEGORIES:
+        return normalized
+    if effect in EFFECT_TO_CATEGORY:
+        return EFFECT_TO_CATEGORY[effect]
+    return "unknown"
 
 
 def load_known_cards() -> dict[str, dict[str, object]]:
@@ -416,11 +459,11 @@ def category_for_card(name: str, row, known_cards: dict[str, dict[str, object]])
     real_role = _REAL_ROLES_CACHE.get(normalize_name(name), "")
     if real_role:
         return real_role
-    if entry.get("deck_category"):
-        return str(entry["deck_category"])
     effect = str(entry.get("effect") or "")
-    if effect in EFFECT_TO_CATEGORY:
-        return EFFECT_TO_CATEGORY[effect]
+    deck_category = str(entry.get("deck_category") or "")
+    normalized = normalize_optimizer_category(deck_category, effect)
+    if normalized != "unknown":
+        return normalized
     tag_map = {
         "ramp": "ramp",
         "draw": "draw",
@@ -593,7 +636,7 @@ def legal_candidates(
             stats["not_in_candidate_matrix"] += 1
             continue
         effect = str(entry.get("effect") or "unknown")
-        category = str(entry.get("deck_category") or EFFECT_TO_CATEGORY.get(effect, "unknown"))
+        category = normalize_optimizer_category(str(entry.get("deck_category") or ""), effect)
         if category == "unknown":
             stats["unknown_category"] += 1
             continue
@@ -628,10 +671,88 @@ def legal_candidates(
     return selected, stats
 
 
+def existing_benchmark_pairs(
+    conn,
+    *,
+    deck_id: int,
+    baseline_id: int,
+    baseline_hash: str,
+) -> set[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for table in ("slot_benchmarks", "swap_benchmarks"):
+        try:
+            rows = conn.execute(
+                f"""
+                SELECT card_added, card_removed
+                FROM {table}
+                WHERE deck_id=? AND baseline_id=? AND baseline_hash=?
+                """,
+                (deck_id, baseline_id, baseline_hash),
+            ).fetchall()
+        except Exception:
+            continue
+        pairs.update(
+            (str(row["card_added"]), str(row["card_removed"]))
+            for row in rows
+            if row["card_added"] and row["card_removed"]
+        )
+    return pairs
+
+
+def record_runtime_block(
+    conn,
+    *,
+    deck_id: int,
+    card_added: str,
+    card_removed: str,
+    phase: str,
+    reasons: list[str],
+) -> None:
+    conn.execute(
+        """
+        INSERT INTO optimizer_quality_reviews
+            (deck_id, card_added, card_removed, source_phase, status,
+             reasons_json, warnings_json, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            deck_id,
+            card_added,
+            card_removed,
+            phase,
+            "blocked",
+            json.dumps(reasons, ensure_ascii=True),
+            json.dumps([], ensure_ascii=True),
+            utc_now(),
+        ),
+    )
+    conn.commit()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--deck-id", type=int, default=int(os.environ.get("MANALOOM_OPTIMIZER_DECK_ID", "6")))
     parser.add_argument("--games", type=int, default=int(os.environ.get("MANALOOM_SLOT_GAMES", "10")))
+    parser.add_argument(
+        "--battle-timeout-seconds",
+        type=int,
+        default=int(os.environ.get("MANALOOM_SLOT_BATTLE_TIMEOUT_SECONDS", "1200")),
+    )
+    parser.add_argument(
+        "--opponent-limit",
+        type=int,
+        default=int(os.environ.get("MANALOOM_SLOT_OPPONENT_LIMIT", "3")),
+    )
+    parser.add_argument(
+        "--opponent-seed",
+        type=int,
+        default=int(os.environ.get("MANALOOM_SLOT_OPPONENT_SEED", "20260626")),
+    )
+    parser.add_argument(
+        "--simulation-seed",
+        type=int,
+        default=int(os.environ.get("MANALOOM_SLOT_SIMULATION_SEED", "42")),
+    )
     parser.add_argument("--max-per-category", type=int, default=int(os.environ.get("MANALOOM_SLOT_MAX_PER_CATEGORY", "15")))
     parser.add_argument("--category", default="")
     parser.add_argument("--candidate-matrix", default="")
@@ -714,16 +835,12 @@ def main() -> int:
             for category, target in sorted(targets.items()):
                 print(f"  {category:<12s} -> {target}")
 
-            already_tested = {
-                (row["card_added"], row["card_removed"])
-                for row in conn.execute(
-                    """
-                    SELECT card_added, card_removed FROM slot_benchmarks
-                    WHERE deck_id=? AND baseline_id=? AND baseline_hash=? AND phase=?
-                    """,
-                    (args.deck_id, baseline_id, baseline_hash, args.phase),
-                )
-            }
+            already_tested = existing_benchmark_pairs(
+                conn,
+                deck_id=args.deck_id,
+                baseline_id=baseline_id,
+                baseline_hash=baseline_hash,
+            )
 
             tested = 0
             blocked = 0
@@ -746,7 +863,42 @@ def main() -> int:
                         blocked += 1
                         continue
                     with temporary_swap(conn, args.deck_id, name, target, category):
-                        result = run_battle(args.games, deck_id=args.deck_id)
+                        try:
+                            result = run_battle(
+                                args.games,
+                                deck_id=args.deck_id,
+                                timeout_seconds=max(1, int(args.battle_timeout_seconds)),
+                                opponent_limit=max(1, int(args.opponent_limit)),
+                                opponent_seed=int(args.opponent_seed),
+                                simulation_seed=int(args.simulation_seed),
+                            )
+                        except BattleRunTimeout as exc:
+                            reason = f"battle_timeout_{exc.timeout_seconds}s"
+                            record_runtime_block(
+                                conn,
+                                deck_id=args.deck_id,
+                                card_added=name,
+                                card_removed=target,
+                                phase=args.phase,
+                                reasons=[reason],
+                            )
+                            print(f"  !{name:<36s} blocked: {reason}")
+                            blocked += 1
+                            continue
+                        except RuntimeError as exc:
+                            detail = str(exc).strip() or type(exc).__name__
+                            reason = f"battle_failed:{detail}"
+                            record_runtime_block(
+                                conn,
+                                deck_id=args.deck_id,
+                                card_added=name,
+                                card_removed=target,
+                                phase=args.phase,
+                                reasons=[reason],
+                            )
+                            print(f"  !{name:<36s} blocked: {reason}")
+                            blocked += 1
+                            continue
                     delta = result.win_rate - baseline_wr
                     conn.execute(
                         """

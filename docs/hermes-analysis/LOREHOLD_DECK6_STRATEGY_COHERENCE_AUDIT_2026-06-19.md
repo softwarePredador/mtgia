@@ -23299,3 +23299,95 @@ Active pending list after PG112/PG113:
   high metadata drift item.
 - PG112 and PG113 are closed as applied, postchecked, synced, and audited.
   Do not reuse these package numbers. Next package number is PG114.
+
+## Lorehold Final Deck Static Generation Attempt - 2026-06-25
+
+Scope:
+
+- Generated a read-only static draft for active deck `6` from the latest
+  available Lorehold candidate matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260625_pg212_ultima_postsync_v1.json`.
+- No PostgreSQL writes, no SQLite writes to the live DB, no deck swaps applied,
+  and no commit/push.
+- The live deck `6` hash remains
+  `8f719f40b096e17644e1e9308c8f1be9ea2a6c122344d61967cad9fedd358d9f`.
+
+Generated draft evidence:
+
+- Draft report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_final_deck_generation_attempt_20260625_pg212_static_v3.md`.
+- Structured artifact:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_final_deck_generation_attempt_20260625_pg212_static_v3.json`.
+- Draft hash:
+  `238037e26305a99a2c1d787669ac23954539eec93ad4f207fdc77221aaed64fa`.
+- Static validation: final quantity `100`, distinct cards `100`, commander
+  quantity `1`, singleton nonbasic duplicate violations `[]`,
+  selected additions battle-ready `True`, quality gates pass `True`, final rule
+  status counts `{"battle_ready": 100}`.
+
+Proposed static swaps, not applied:
+
+- Add `Library of Leng`; cut `Mox Amber`.
+- Add `Restoration Seminar`; cut `Sphere of Safety`.
+- Add `Reforge the Soul`; cut `Magus of the Moat`.
+- Add `Increasing Vengeance`; cut `Windborn Muse`.
+
+Battle smoke evidence:
+
+- Isolated candidate DB:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_final_deck_generation_attempt_20260625_pg212_static_v3_battle_smoke/knowledge_candidate.db`.
+- Smoke summary:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_final_deck_generation_attempt_20260625_pg212_static_v3_battle_smoke/battle_smoke_summary.json`.
+- The isolated DB was built successfully with deck `6` rows `100`, quantity
+  `100`, and commander quantity `1`.
+- `battle_analyst_v9.py --games 1` against the isolated DB timed out after the
+  controlled timeout with no stdout/stderr. Treat this as a battle harness/WR
+  evidence blocker, not as failure of static deck generation.
+- Lightweight battle loader validation:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_final_deck_generation_attempt_20260625_pg212_static_v3_battle_smoke/battle_load_deck_summary.json`;
+  status `completed`, loaded `1` commander, `99` main-deck cards, total `100`.
+
+Active conclusion:
+
+- Static generation now succeeds for a conservative first draft.
+- WR/battle approval is still not established. Before applying anything to
+  deck `6`, either fix/refreeze the optimizer baseline path or run a controlled
+  isolated battle harness that completes and emits replay evidence.
+
+## PG222 Matrix Rehydration Checkpoint - 2026-06-26
+
+Scope:
+
+- Re-ran the Lorehold ideal candidate matrix against the live SQLite cache after
+  PG222 recursion-family promotion instead of relying on the stale first
+  `pg222` matrix artifact.
+- No PostgreSQL writes, no live deck swaps, and no deck `6` mutation.
+- Generated a new isolated candidate deck and replay smoke from the regenerated
+  matrix only.
+
+Evidence:
+
+- regenerated matrix:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_matrix_20260626_pg222_recursion_mass_postsync_v2.json`.
+- regenerated candidate:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg222_v2.json`.
+- smoke summary:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg222_v2_smoke.md`.
+- isolated battle log:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_generated_candidate_20260626_pg222_v2/knowledge_dir/decks/lorehold-the-historian/BATTLE_LOG.md`.
+
+Operational result:
+
+- The live matrix now reports
+  `battle_ready=309`, `priority_benchmark_candidate=44`,
+  `watchlist_candidate=115`, and `needs_rule_before_strategy=86`.
+- `Open the Vaults`, `Roar of Reclamation`, and `Triumphant Reckoning` are no
+  longer trapped in stale `no_rule_signal`; they now resolve as
+  `battle_ready`.
+- The stale PG221/first-PG222 carry-forward candidate hash
+  `a6128298aafade21fd2177eccafe51d756e4b4382e0cf09ea1f7a43c8cf08dbd`
+  changed to the real post-rehydration candidate hash
+  `a2a5793c8c7586bcf2b99860f54afeb0200a93ad127b0b71239fc3ff048d6579`.
+- Short real-opponent smoke on the regenerated candidate completed
+  `1W/2L/0S`; treat this as routing and candidate-evidence only, not as deck
+  approval.

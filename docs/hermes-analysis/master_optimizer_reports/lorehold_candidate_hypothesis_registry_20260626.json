@@ -1,6 +1,8 @@
 {
   "status": "active_learning_registry",
   "protected_baseline": "deck_607",
+  "current_leader": "candidate_607_squee_v1",
+  "current_leader_priority_residual": "exhausted_no_upgrade_20260627",
   "acceptance_rule": [
     "candidate must tie or beat deck_607 on same real-opponent gate",
     "candidate must not regress the Winota matchup",
@@ -77,6 +79,116 @@
       "status": "rejected",
       "result": "1W/8L/0S, WR 11.11%, Winota 0W/3L, miracle games 8/9, topdeck games 5/9",
       "learning": "Guttersnipe increased topdeck event frequency but did not convert to wins. Replacing Prismari Pianist removed too much board-pressure payoff; Prismari Pianist remains protected until a same-function replacement wins."
+    },
+    {
+      "key": "candidate_607_ashling_v1",
+      "swap_or_scope": "+Ashling, Flame Dancer; -Storm Herd",
+      "status": "rejected",
+      "result": "3W/6L/0S, WR 33.33%, Winota 0W/3L, miracle games 4/9, topdeck games 2/9",
+      "learning": "Ashling spiked the short probe but failed the equal gate. The cut improved neither Winota nor the miracle/topdeck cadence, so Storm Herd stays ahead on the current real-opponent package."
+    },
+    {
+      "key": "candidate_607_underworld_breach_v1",
+      "swap_or_scope": "+Underworld Breach; -Reforge the Soul",
+      "status": "rejected",
+      "result": "3W/6L/0S, WR 33.33%, Vivi 0W/3L, Winota 2W/1L",
+      "learning": "Underworld Breach produced another short-probe false positive. Losing all three Vivi games while only side-grading the rest confirms that Reforge the Soul still holds the stronger cross-matchup engine slot."
+    },
+    {
+      "key": "candidate_607_sevinne_v1",
+      "swap_or_scope": "+Sevinne's Reclamation; -Reforge the Soul",
+      "status": "rejected",
+      "result": "1W/7L/1S, WR 11.11%, Vivi 0W/2L/1S, Winota 0W/3L",
+      "learning": "Sevinne looked coherent and battle-ready, but the equal gate collapsed immediately in both pressure matchups. Reforge the Soul remains the better engine slot until a same-function replacement actually survives Vivi and Winota."
+    },
+    {
+      "key": "candidate_607_authority_v1",
+      "swap_or_scope": "+Authority of the Consuls; -Reforge the Soul",
+      "status": "rejected",
+      "result": "3W/6L/0S, WR 33.33%, Vivi 2W/1L, Winota 0W/3L",
+      "learning": "Authority improved the Vivi slice and produced an early Approach line, but zero wins into Winota makes it a metagame sidegrade, not a better main-deck replacement for the current champion shell."
+    },
+    {
+      "key": "candidate_607_wheel_of_fate_v1",
+      "swap_or_scope": "+Wheel of Fate; -Artist's Talent",
+      "status": "rejected",
+      "result": "2W/7L/0S, WR 22.22%, Vivi 0W/3L, Winota 1W/2L, miracle games 5/9, topdeck games 0/9",
+      "learning": "Wheel of Fate looked positive in the wide short probe, but the equal gate collapsed across all three core matchups and completely removed the topdeck setup cadence. Artist's Talent remains ahead in the current draw slot."
+    },
+    {
+      "key": "candidate_607_squee_v1",
+      "swap_or_scope": "+Squee, Goblin Nabob; -Insurrection",
+      "status": "promoted_current_champion",
+      "result": "scoped probe 3W/0L/0S; equal gate rerun seed42 7W/1L/1S vs deck_607 5W/4L/0S; equal gate seed99 2W/7L/0S vs deck_607 1W/8L/0S",
+      "learning": "Squee cleared the relevant-opponent probe and then beat deck_607 in two completed equal gates. The seed42 rerun preserved the baseline at 55.56% while Squee climbed to 77.78%, and the harsher seed99 gate still left Squee ahead while doubling miracle and topdeck event frequency over the baseline. This is the first tested swap that has actually dethroned deck_607 on repeated real-opponent evidence."
+    }
+  ],
+  "leader_follow_up_probes": [
+    {
+      "leader": "candidate_607_squee_v1",
+      "phase": "squee_priority_removal_probe_20260627_v1",
+      "swap_or_scope": "+Olórin's Searing Light; -Pinnacle Monk // Mystic Peak",
+      "status": "rejected_probe",
+      "result": "2W/1L/0S, WR 66.67%, delta -22.22pp vs Squee baseline 88.89%",
+      "learning": "The first clean priority probe on top of the Squee shell still regressed sharply from the new leader. The Squee champion did not want to trade Pinnacle Monk for Olórin's Searing Light."
+    },
+    {
+      "leader": "candidate_607_squee_v1",
+      "phase": "squee_priority_ramp_probe_20260627_v1",
+      "swap_or_scope": "+Ragavan, Nimble Pilferer; -Hit the Mother Lode",
+      "status": "rejected_probe",
+      "result": "0W/3L/0S, WR 0.00%, delta -88.89pp vs Squee baseline 88.89%",
+      "learning": "The Squee shell punished the Ragavan speed swap immediately. Hit the Mother Lode remains clearly ahead in the current ramp slot."
+    },
+    {
+      "leader": "candidate_607_squee_v1",
+      "phase": "squee_priority_protection_probe_20260627_v1",
+      "swap_or_scope": "+Reprieve; -Avatar's Wrath",
+      "status": "rejected_probe",
+      "result": "0W/3L/0S, WR 0.00%, delta -88.89pp vs Squee baseline 88.89%",
+      "learning": "Reprieve did not preserve the pressure-absorption shell that the Squee champion is using well. Avatar's Wrath remains the stronger protection slot in this shell."
+    },
+    {
+      "leader": "candidate_607_squee_v1",
+      "phase": "squee_priority_draw_probe_20260627_v1",
+      "swap_or_scope": "+Wheel of Fate / +Cool but Rude; -Artist's Talent",
+      "status": "rejected_probe_batch",
+      "result": "Wheel of Fate 0W/3L/0S, WR 0.00%; Cool but Rude 2W/1L/0S, WR 66.67%; both below Squee baseline 88.89%",
+      "learning": "The Squee champion still wants Artist's Talent. Wheel collapsed entirely and Cool but Rude improved less often than the baseline deck itself."
+    },
+    {
+      "leader": "candidate_607_squee_v1",
+      "phase": "squee_priority_wincon_probe_20260627_v1",
+      "swap_or_scope": "+Ashling, Flame Dancer / +Sand Scout / +Perch Protection; -Emeria's Call // Emeria, Shattered Skyclave",
+      "status": "rejected_probe_batch",
+      "result": "Ashling 0W/3L/0S, WR 0.00%; Sand Scout 1W/2L/0S, WR 33.33%; Perch Protection 1W/2L/0S, WR 33.33%; all below Squee baseline 88.89%",
+      "learning": "After Squee took the main wincon slot, the remaining priority wincon sidegrades all failed. Emeria's Call stayed ahead as the next best wincon/support slot in the champion shell."
+    }
+  ],
+  "leader_watchlist_probes": [
+    {
+      "leader": "candidate_607_squee_v1",
+      "phase": "squee_watch_draw_probe_20260627_v1",
+      "swap_or_scope": "+Borrowed Knowledge / +Cathartic Reunion / +Dragon's Rage Channeler / +Archivist of Oghma / +Palantir of Orthanc; -Artist's Talent",
+      "status": "rejected_probe_batch",
+      "result": "Borrowed Knowledge 2W/1L/0S, WR 66.67%; Cathartic Reunion 2W/1L/0S, WR 66.67%; Archivist of Oghma 1W/2L/0S, WR 33.33%; Dragon's Rage Channeler 0W/3L/0S; Palantir of Orthanc 0W/3L/0S",
+      "learning": "The first draw-oriented watchlist batch still could not improve the Squee champion. Artist's Talent stayed ahead as the draw/topdeck glue piece."
+    },
+    {
+      "leader": "candidate_607_squee_v1",
+      "phase": "squee_watch_protection_probe_20260627_v1",
+      "swap_or_scope": "+Gods Willing / +Angel's Grace / +Sejiri Shelter // Sejiri Glacier / +Commander's Plate / +Clever Concealment; -Avatar's Wrath",
+      "status": "rejected_probe_batch",
+      "result": "Gods Willing 1W/2L/0S, WR 33.33%; Angel's Grace 1W/2L/0S, WR 33.33%; Sejiri Shelter 1W/2L/0S, WR 33.33%; Commander's Plate 1W/2L/0S, WR 33.33%; Clever Concealment 0W/3L/0S",
+      "learning": "The champion shell strongly preferred Avatar's Wrath over the first protection watchlist package. None of those swaps preserved the pressure-defense profile."
+    },
+    {
+      "leader": "candidate_607_squee_v1",
+      "phase": "squee_watch_removal_probe_20260627_v1",
+      "swap_or_scope": "+Erode / +Vandalblast / +Lightning Bolt / +Abrade / +Wear // Tear; -Pinnacle Monk // Mystic Peak",
+      "status": "rejected_probe_batch",
+      "result": "Abrade 1W/2L/0S, WR 33.33%; Erode 0W/3L/0S; Vandalblast 0W/3L/0S; Lightning Bolt 0W/3L/0S; Wear // Tear 0W/3L/0S",
+      "learning": "The first removal watchlist batch failed hard on the Squee shell. Pinnacle Monk remained better than the tested removal sidegrades."
     }
   ],
   "untested_queue": [],
@@ -92,6 +204,8 @@
     "Tibalt's Trickery",
     "Creative Technique",
     "High Noon",
-    "Prismari Pianist"
+    "Prismari Pianist",
+    "Reforge the Soul",
+    "Storm Herd"
   ]
 }

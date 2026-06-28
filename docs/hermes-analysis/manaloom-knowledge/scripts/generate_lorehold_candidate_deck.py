@@ -31,6 +31,15 @@ from master_optimizer_common import (
     ruleset_hash,
     semantics_hash,
 )
+from lorehold_strategy_profile import (
+    STRATEGY_VERSION,
+    force_keep_active_anchor,
+    strategy_counts,
+    strategy_score as card_strategy_score,
+    strategy_score_breakdown,
+    strategy_shortfalls,
+    strategy_tags_for_card,
+)
 
 
 COMMANDER = "Lorehold, the Historian"
@@ -210,6 +219,7 @@ def effective_score(
     *,
     active_names: set[str],
     current_counts: Counter[str] | None = None,
+    current_strategy_counts: Counter[str] | None = None,
     is_land_card: bool = False,
 ) -> float:
     score = float(row.get("score") or 0)
@@ -222,6 +232,20 @@ def effective_score(
     if "unknown" in card_roles:
         score -= 10.0
     cmc = float((oracle["cmc"] if oracle else row.get("cmc")) or 0)
+    card_view = {
+        "card_name": row.get("card_name"),
+        "roles": sorted(card_roles),
+        "type_line": (oracle["type_line"] if oracle else row.get("type_line")) or "",
+        "oracle_text": (oracle["oracle_text"] if oracle else row.get("oracle_text")) or "",
+        "cmc": cmc,
+        "is_land": is_land_card,
+        "in_active_deck": normalize_name(str(row.get("card_name") or "")) in active_names,
+    }
+    score += card_strategy_score(
+        card_view,
+        current_counts=current_strategy_counts,
+        in_active_deck=card_view["in_active_deck"],
+    )
     if not is_land_card:
         if cmc <= 2:
             score += 2.0
@@ -246,6 +270,16 @@ def to_candidate_item(
     active_names: set[str],
 ) -> dict[str, Any]:
     land = is_land(row, oracle)
+    card_view = {
+        "card_name": str(row["card_name"]),
+        "roles": sorted(roles_for(row)),
+        "is_land": land,
+        "cmc": float(oracle["cmc"] or 0),
+        "type_line": oracle["type_line"] or row.get("type_line") or "",
+        "oracle_text": oracle["oracle_text"] or "",
+        "in_active_deck": bool(row.get("in_active_deck"))
+        or normalize_name(str(row["card_name"])) in active_names,
+    }
     return {
         "card_name": str(row["card_name"]),
         "normalized_name": normalize_name(str(row["card_name"])),
@@ -267,7 +301,17 @@ def to_candidate_item(
         "color_identity": sorted(color_identity(oracle)),
         "in_active_deck": bool(row.get("in_active_deck"))
         or normalize_name(str(row["card_name"])) in active_names,
+        "strategy_tags": sorted(strategy_tags_for_card(card_view)),
+        "strategy_score_breakdown": strategy_score_breakdown(card_view),
     }
+
+
+def force_keep_active_core(item: dict[str, Any]) -> bool:
+    return (
+        bool(item.get("in_active_deck"))
+        and not bool(item.get("is_land"))
+        and item.get("recommendation_lane") == "core_keep"
+    )
 
 
 def select_deck(
@@ -308,16 +352,26 @@ def select_deck(
         selected.append(item)
         selected_names.add(item["normalized_name"])
 
-    forced_keep = {
+    protected_keep = {
         normalize_name(card)
         for card in PROTECTED_CARDS
         if card != COMMANDER
     }
     novel_count = 0
     by_name = {item["normalized_name"]: item for item in nonlands}
-    for name in sorted(forced_keep):
+    active_forced_keep = {
+        item["normalized_name"]
+        for item in nonlands
+        if force_keep_active_anchor(item) or force_keep_active_core(item)
+    }
+    forced_keep_order = sorted(active_forced_keep) + sorted(protected_keep - active_forced_keep)
+    for name in forced_keep_order:
+        if len([card for card in selected if not card["is_land"]]) >= NONLAND_TARGET:
+            break
         item = by_name.get(name)
         if not item or item["normalized_name"] in selected_names:
+            continue
+        if item["normalized_name"] not in active_names and novel_count >= max_novel:
             continue
         selected.append(item)
         selected_names.add(item["normalized_name"])
@@ -326,6 +380,9 @@ def select_deck(
 
     while len([card for card in selected if not card["is_land"]]) < NONLAND_TARGET:
         current_counts = role_metric_counts([card for card in selected if not card["is_land"]])
+        current_strategy_counts = strategy_counts(
+            [card for card in selected if not card["is_land"]]
+        )
         scored = []
         for item in nonlands:
             if item["normalized_name"] in selected_names:
@@ -338,6 +395,7 @@ def select_deck(
                 oracle[item["normalized_name"]],
                 active_names=active_names,
                 current_counts=current_counts,
+                current_strategy_counts=current_strategy_counts,
                 is_land_card=False,
             )
             scored.append((score, item["score"], item["card_name"], item))
@@ -370,6 +428,20 @@ def select_deck(
         "oracle_text": (commander_oracle["oracle_text"] if commander_oracle else "") or "",
         "color_identity": sorted(color_identity(commander_oracle)),
         "in_active_deck": True,
+        "strategy_tags": sorted(
+            strategy_tags_for_card(
+                {
+                    "card_name": COMMANDER,
+                    "roles": sorted(roles_for(commander_row or {"roles": ["engine", "draw"]})),
+                    "type_line": (commander_oracle["type_line"] if commander_oracle else "")
+                    or "Legendary Creature",
+                    "oracle_text": (commander_oracle["oracle_text"] if commander_oracle else "") or "",
+                    "cmc": float((commander_oracle["cmc"] if commander_oracle else 5) or 0),
+                    "in_active_deck": True,
+                }
+            )
+        ),
+        "strategy_score_breakdown": {},
     }
     final = [commander_item]
     for item in sorted(selected, key=lambda card: (not card["is_land"], card["card_name"])):
@@ -404,6 +476,10 @@ def validate_deck(final: list[dict[str, Any]]) -> dict[str, Any]:
         for role in card["roles"]:
             roles[role] += 1
     metric_counts = role_metric_counts([card for card in final if not card["is_commander"]])
+    strategy_metric_counts = strategy_counts([card for card in final if not card["is_commander"]])
+    strategy_package_shortfalls = strategy_shortfalls(
+        [card for card in final if not card["is_commander"]]
+    )
     role_shortfalls = {
         role: {"actual": metric_counts[role], "minimum": minimum}
         for role, minimum in ROLE_MINIMUMS.items()
@@ -442,6 +518,8 @@ def validate_deck(final: list[dict[str, Any]]) -> dict[str, Any]:
         "role_counts": dict(sorted(roles.items())),
         "role_metric_counts": dict(sorted(metric_counts.items())),
         "role_shortfalls": role_shortfalls,
+        "strategy_package_counts": dict(sorted(strategy_metric_counts.items())),
+        "strategy_package_shortfalls": strategy_package_shortfalls,
         "color_identity_issues": color_issues,
         "battle_ready_cards": len(final),
     }
@@ -578,6 +656,11 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"- {role}: `{validation['role_metric_counts'].get(role, 0)}` "
             f"(minimum `{minimum}`)"
         )
+    lines.extend(["", "## Strategy Package Counts", ""])
+    for package, count in validation["strategy_package_counts"].items():
+        shortfall = validation["strategy_package_shortfalls"].get(package)
+        suffix = f" (minimum `{shortfall['minimum']}`)" if shortfall else ""
+        lines.append(f"- {package}: `{count}`{suffix}")
     lines.extend(["", "## Deck List", ""])
     for card in report["final_deck"]:
         lines.append(f"1 {card['card_name']}")
@@ -650,6 +733,7 @@ def main() -> int:
         "postgres_writes": False,
         "source_db_mutated": False,
         "max_novel": args.max_novel,
+        "strategy_version": STRATEGY_VERSION,
         "candidate_hash": candidate_hash(final),
         "current_deck_summary": current_deck_summary,
         "candidate_deck_summary": candidate_deck_summary,

@@ -163,7 +163,6 @@ class BattleRuleAlternativesTests(unittest.TestCase):
                     battle.replay_rule_fields(resolved).get("rule_runtime_selection_mode"),
                     "composite_resolution",
                 )
-
                 battle.apply_effect_immediate(
                     player,
                     [opponent],
@@ -183,6 +182,19 @@ class BattleRuleAlternativesTests(unittest.TestCase):
             2,
         )
         self.assertTrue(any(event == "composite_rule_resolved" for event, _ in events))
+
+    def test_replay_rule_fields_does_not_duplicate_source_zone(self) -> None:
+        fields = battle.replay_rule_fields(
+            {
+                "_rule_source": "curated",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+                "_rule_confidence": 1.0,
+                "source_zone": "graveyard",
+            }
+        )
+
+        self.assertNotIn("source_zone", fields)
 
     def test_runtime_marks_activated_alternative_as_executor_gap(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

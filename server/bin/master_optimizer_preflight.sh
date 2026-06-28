@@ -12,6 +12,15 @@ DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"
 LOREHOLD_CANONICAL_OVERRIDE="${MANALOOM_LOREHOLD_CANONICAL_OVERRIDE:-1}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 
+if [[ -z "${HERMES_KNOWLEDGE_BACKUP_DIR:-}" ]]; then
+  if [[ -d /data/manaloom-ops ]]; then
+    export HERMES_KNOWLEDGE_BACKUP_DIR="/data/manaloom-ops/knowledge-backups"
+  else
+    export HERMES_KNOWLEDGE_BACKUP_DIR="$SCRIPT_DIR/knowledge-backups"
+  fi
+fi
+export HERMES_KNOWLEDGE_BACKUP_KEEP="${HERMES_KNOWLEDGE_BACKUP_KEEP:-${MANALOOM_KNOWLEDGE_BACKUP_KEEP:-5}}"
+
 mkdir -p "$REPORT_DIR" "$ARTIFACT_DIR"
 
 if [[ -f "$SECRET_ENV" ]]; then
