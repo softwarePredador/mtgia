@@ -33,6 +33,7 @@ def package_report(
     added_used: dict | None = None,
     cut_used: dict | None = None,
     low_candidate_use: bool = False,
+    forced_access_mode: str = "none",
 ) -> dict:
     added_used = added_used if added_used is not None else used_record(2, 1, 1)
     cut_used = cut_used if cut_used is not None else used_record(2, 2, 0)
@@ -44,6 +45,7 @@ def package_report(
                 "family": "fast_mana",
                 "adds": [add],
                 "cuts": [cut],
+                "forced_access_mode": forced_access_mode,
                 "decision": "reject_or_rework",
                 "gate_summary": {
                     "baseline": {
@@ -99,6 +101,54 @@ def package_report(
                     },
                 },
             }
+        ],
+    }
+
+
+def variant_gate_report_for_mana_vault() -> dict:
+    return {
+        "generated_at": "2026-06-28T00:00:00Z",
+        "forced_access_mode": "none",
+        "results": [
+            {
+                "deck_key": "deck_6",
+                "status": "pass",
+                "wins": 1,
+                "losses": 1,
+                "stalls": 0,
+                "win_rate": 50.0,
+                "game_results": [
+                    {"game_id": "base-1", "result": "win", "turns": 5},
+                    {"game_id": "base-2", "result": "loss", "turns": 6},
+                ],
+                "telemetry": {
+                    "card_event_counts": {"cost_paid:Arcane Signet": 2},
+                    "card_event_counts_by_game": {
+                        "base-1": {"cost_paid:Arcane Signet": 1},
+                        "base-2": {"cost_paid:Arcane Signet": 1},
+                    }
+                },
+            },
+            {
+                "deck_key": "synergy_mana_vault_fast_mana_cut_arcane_signet",
+                "status": "pass",
+                "forced_access_mode": "none",
+                "wins": 2,
+                "losses": 0,
+                "stalls": 0,
+                "win_rate": 100.0,
+                "game_results": [
+                    {"game_id": "cand-1", "result": "win", "turns": 4},
+                    {"game_id": "cand-2", "result": "win", "turns": 5},
+                ],
+                "telemetry": {
+                    "card_event_counts": {"cost_paid:Mana Vault": 2},
+                    "card_event_counts_by_game": {
+                        "cand-1": {"cost_paid:Mana Vault": 1},
+                        "cand-2": {"cost_paid:Mana Vault": 1},
+                    }
+                },
+            },
         ],
     }
 
@@ -172,6 +222,38 @@ class LoreholdExposureOutcomeAuditTest(unittest.TestCase):
             self.assertTrue(row["outcome_decision"]["promotion_allowed"])
             self.assertEqual(payload["summary"]["deeper_gate_candidate_count"], 1)
 
+    def test_forced_access_positive_sample_requires_natural_confirmation(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "gate.json"
+            write_json(
+                path,
+                package_report(
+                    baseline_wins=1,
+                    baseline_losses=2,
+                    candidate_wins=3,
+                    candidate_losses=0,
+                    delta_pp=66.67,
+                    added_used=used_record(2, 2, 0),
+                    cut_used=used_record(2, 1, 1),
+                    forced_access_mode="opening_hand",
+                ),
+            )
+
+            payload = audit.build_report([path])
+
+            decision = payload["packages"][0]["outcome_decision"]
+            self.assertEqual(
+                decision["decision"],
+                "forced_access_card_outcome_signal_requires_natural_confirmation",
+            )
+            self.assertFalse(decision["promotion_allowed"])
+            self.assertEqual(payload["summary"]["deeper_gate_candidate_count"], 0)
+            self.assertEqual(payload["summary"]["forced_access_signal_count"], 1)
+            self.assertEqual(
+                payload["summary"]["recommended_next_action"],
+                "run_natural_confirmation_for_forced_access_signal",
+            )
+
     def test_missing_card_rows_are_not_labeled_multi_card_review(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "gate.json"
@@ -190,6 +272,24 @@ class LoreholdExposureOutcomeAuditTest(unittest.TestCase):
                 report["packages"][0]["outcome_decision"]["decision"],
                 "missing_per_card_outcome_data",
             )
+
+    def test_variant_gate_results_are_synthesized_as_package_observations(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "variant_gate.json"
+            write_json(path, variant_gate_report_for_mana_vault())
+
+            report = audit.build_report([path])
+
+            self.assertEqual(report["summary"]["loaded_package_observation_count"], 1)
+            row = report["packages"][0]
+            self.assertEqual(row["package_key"], "mana_vault_fast_mana_cut_arcane_signet")
+            self.assertEqual(row["adds"], ["Mana Vault"])
+            self.assertEqual(row["cuts"], ["Arcane Signet"])
+            self.assertEqual(
+                row["outcome_decision"]["decision"],
+                "card_outcome_supports_deeper_gate",
+            )
+            self.assertEqual(row["outcome_decision"]["used_delta_pp"], 50.0)
 
     def test_markdown_reports_used_delta(self):
         payload = audit.build_report([])

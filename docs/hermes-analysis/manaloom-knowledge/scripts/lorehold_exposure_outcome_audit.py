@@ -65,9 +65,67 @@ def default_source_reports() -> list[Path]:
     return unique_paths([*package_gate.DEFAULT_PRIOR_PACKAGE_REPORTS, *DEFAULT_EXTRA_REPORTS])
 
 
+def package_rows_from_variant_gate_results(payload: Mapping[str, Any]) -> list[dict[str, Any]]:
+    results = payload.get("results") or []
+    if not isinstance(results, list):
+        return []
+    rows: list[dict[str, Any]] = []
+    definitions = package_gate.PACKAGE_DEFINITIONS
+    for result in results:
+        if not isinstance(result, Mapping):
+            continue
+        deck_key = str(result.get("deck_key") or "")
+        if not deck_key.startswith("synergy_"):
+            continue
+        package_key = deck_key.removeprefix("synergy_")
+        definition = definitions.get(package_key) or {}
+        adds = list(definition.get("adds") or [])
+        cuts = list(definition.get("cuts") or [])
+        gate = package_gate.summarize_gate(dict(payload), deck_key)
+        if not (gate.get("baseline") and gate.get("candidate")):
+            continue
+        exposure = (
+            package_gate.package_exposure_summary(gate, adds=adds, cuts=cuts)
+            if adds
+            else {}
+        )
+        forced_access_mode = (
+            result.get("forced_access_mode")
+            or payload.get("forced_access_mode")
+            or "none"
+        )
+        decision = (
+            package_gate.gate_decision(
+                gate,
+                exposure,
+                forced_access_mode=str(forced_access_mode),
+            )
+            if exposure
+            else "missing_package_definition_for_variant_gate"
+        )
+        rows.append(
+            {
+                "package_key": package_key,
+                "source_section": "variant_gate_results",
+                "family": definition.get("family") or "misc",
+                "adds": adds,
+                "cuts": cuts,
+                "forced_access_mode": forced_access_mode,
+                "decision": decision,
+                "gate_summary": gate,
+                "exposure_summary": exposure,
+            }
+        )
+    return rows
+
+
 def package_rows_from_payload(payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     rows = payload.get("packages") or []
-    return [row for row in rows if isinstance(row, dict) and row.get("package_key")]
+    package_rows = [row for row in rows if isinstance(row, dict) and row.get("package_key")]
+    if package_rows:
+        return package_rows
+    return package_rows_from_variant_gate_results(payload)
+
 
 
 def load_detailed_gate(result: Mapping[str, Any]) -> dict[str, Any]:
@@ -177,6 +235,7 @@ def classify_outcome(
     cut_card: Mapping[str, Any],
     exposure: Mapping[str, Any],
     multi_card_package: bool,
+    forced_access_mode: str = "none",
 ) -> dict[str, Any]:
     if not added_card.get("card_name") or not cut_card.get("card_name"):
         return {
@@ -218,6 +277,23 @@ def classify_outcome(
 
     used_delta = round(numeric(added_used.get("win_rate")) - numeric(cut_used.get("win_rate")), 2)
     aggregate_delta = numeric(aggregate_delta_pp) if aggregate_delta_pp is not None else 0.0
+    if forced_access_mode and forced_access_mode != "none":
+        if aggregate_delta > 0 and used_delta > 0:
+            return {
+                "decision": "forced_access_card_outcome_signal_requires_natural_confirmation",
+                "promotion_allowed": False,
+                "next_action": "run_natural_gate_without_forced_access_before_promoting",
+                "used_delta_pp": used_delta,
+                "reason": "forced-access probes can diagnose potential but cannot promote a deck swap",
+            }
+        return {
+            "decision": "forced_access_card_outcome_no_lift_reject_or_rework",
+            "promotion_allowed": False,
+            "next_action": "do_not_promote_from_forced_access_probe",
+            "used_delta_pp": used_delta,
+            "reason": "forced-access probe did not produce a positive card-outcome signal",
+        }
+
     if aggregate_delta > 0 and used_delta > 0:
         decision = "card_outcome_supports_deeper_gate"
         next_action = "confirm_with_larger_natural_gate_and_critical_matchups"
@@ -273,6 +349,7 @@ def audit_package(path: Path, payload: Mapping[str, Any], result: Mapping[str, A
         cut_card=cut_primary,
         exposure=exposure,
         multi_card_package=len(added_cards) != 1 or len(cut_cards) != 1,
+        forced_access_mode=str(result.get("forced_access_mode") or "none"),
     )
     return {
         "source_report": str(path),
@@ -336,6 +413,12 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
         for row in packages
         if str((row.get("outcome_decision") or {}).get("decision") or "").startswith("inconclusive")
     ]
+    forced_signals = [
+        row
+        for row in packages
+        if (row.get("outcome_decision") or {}).get("decision")
+        == "forced_access_card_outcome_signal_requires_natural_confirmation"
+    ]
     return {
         "generated_at": utc_now(),
         "postgres_writes": False,
@@ -348,11 +431,14 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
             "missing_report_count": len(missing),
             "decision_counts": dict(sorted(decision_counts.items())),
             "deeper_gate_candidate_count": len(promoted),
+            "forced_access_signal_count": len(forced_signals),
             "rejected_current_pair_count": len(rejected),
             "inconclusive_no_used_sample_count": len(inconclusive),
             "recommended_next_action": (
                 "run_best_card_outcome_supported_deeper_gate"
                 if promoted
+                else "run_natural_confirmation_for_forced_access_signal"
+                if forced_signals and not rejected
                 else "avoid_repeating_rejected_pairs_and_generate_new_trace_targeted_package"
                 if rejected
                 else "increase_exposure_before_more_card_swap_decisions"
@@ -362,6 +448,7 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
             "aggregate deck record is not card-level proof by itself",
             "candidate card must have a used-game sample before a package can be promoted",
             "used-game comparison is candidate-added card record versus baseline-cut card record",
+            "forced-access probes can diagnose access but require natural confirmation before promotion",
             "multi-card packages require split or manual review before per-card outcome promotion",
             "Hermes gate evidence is lab evidence; PostgreSQL state is not mutated by this report",
         ],
