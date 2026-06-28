@@ -13,6 +13,34 @@ def write_json(path: Path, payload: dict) -> None:
 
 
 class ManaLoomLogLearningScoreabilityTest(unittest.TestCase):
+    def test_runtime_waiver_source_parser_reads_set_literal(self) -> None:
+        cards = audit.runtime_waiver_cards_from_source_text(
+            """
+MANUAL_RULE_RUNTIME_WAIVERS = {
+    "Wand of Vertebrae",
+    'Vedalken Orrery',
+}
+""",
+            source="unit",
+        )
+
+        self.assertEqual(cards["wand of vertebrae"]["card"], "Wand of Vertebrae")
+        self.assertEqual(cards["vedalken orrery"]["source"], "unit")
+
+    def test_runtime_waiver_drift_names_find_committed_not_worktree(self) -> None:
+        worktree = {
+            "vedalken orrery": {"card": "Vedalken Orrery"},
+        }
+        committed = {
+            "vedalken orrery": {"card": "Vedalken Orrery"},
+            "wand of vertebrae": {"card": "Wand of Vertebrae"},
+        }
+
+        self.assertEqual(
+            audit.runtime_waiver_drift_names(worktree, committed),
+            ["Wand of Vertebrae"],
+        )
+
     def test_build_audit_finds_accessed_but_unused_candidate(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_name:
             tmp = Path(tmp_name)

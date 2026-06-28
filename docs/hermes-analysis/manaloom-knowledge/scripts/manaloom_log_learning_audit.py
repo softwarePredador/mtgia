@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -25,6 +26,7 @@ SUPPORTED_SUFFIXES = {".json", ".jsonl", ".out", ".md", ".txt"}
 SELF_REPORT_PREFIXES = ("manaloom_log_learning_audit_",)
 SEVERITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 LOREHOLD_DECK_IDS = set(range(607, 617))
+BATTLE_ANALYST_PATH = SCRIPT_DIR / "battle_analyst_v9.py"
 STATUS_SEVERITY = {
     "fail": "critical",
     "failed": "critical",
@@ -101,28 +103,111 @@ def rel(path: Path) -> str:
 
 
 _RUNTIME_WAIVER_CARDS_CACHE: dict[str, dict[str, Any]] | None = None
+_COMMITTED_RUNTIME_WAIVER_CARDS_CACHE: dict[str, dict[str, Any]] | None = None
+_WORKTREE_RUNTIME_WAIVER_CARDS_CACHE: dict[str, dict[str, Any]] | None = None
 
 
 def normalized_card_name(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value or "").strip().lower())
 
 
-def current_runtime_waiver_cards() -> dict[str, dict[str, Any]]:
-    global _RUNTIME_WAIVER_CARDS_CACHE
-    if _RUNTIME_WAIVER_CARDS_CACHE is not None:
-        return _RUNTIME_WAIVER_CARDS_CACHE
+def runtime_waiver_cards_from_source_text(
+    text: str,
+    *,
+    source: str,
+) -> dict[str, dict[str, Any]]:
+    match = re.search(r"MANUAL_RULE_RUNTIME_WAIVERS\s*=\s*\{", text)
+    if not match:
+        return {}
+    start = match.end()
+    depth = 1
+    index = start
+    while index < len(text) and depth:
+        char = text[index]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+        index += 1
+    block = text[start : index - 1]
+    cards: dict[str, dict[str, Any]] = {}
+    for raw in re.findall(r"""["']([^"']+)["']""", block):
+        name = raw.strip()
+        if not name:
+            continue
+        cards[normalized_card_name(name)] = {"card": name, "source": source}
+    return cards
+
+
+def imported_runtime_waiver_cards() -> dict[str, dict[str, Any]]:
     try:
         import battle_analyst_v9
 
         inventory = battle_analyst_v9.manual_runtime_waiver_inventory()
     except Exception:
         inventory = []
-    _RUNTIME_WAIVER_CARDS_CACHE = {
+    return {
         normalized_card_name(row.get("card")): dict(row)
         for row in inventory
         if isinstance(row, Mapping) and row.get("card")
     }
+
+
+def worktree_runtime_waiver_cards() -> dict[str, dict[str, Any]]:
+    global _WORKTREE_RUNTIME_WAIVER_CARDS_CACHE
+    if _WORKTREE_RUNTIME_WAIVER_CARDS_CACHE is not None:
+        return _WORKTREE_RUNTIME_WAIVER_CARDS_CACHE
+    cards = imported_runtime_waiver_cards()
+    if not cards and BATTLE_ANALYST_PATH.exists():
+        cards = runtime_waiver_cards_from_source_text(
+            read_text(BATTLE_ANALYST_PATH),
+            source="worktree_source",
+        )
+    _WORKTREE_RUNTIME_WAIVER_CARDS_CACHE = cards
+    return cards
+
+
+def committed_runtime_waiver_cards() -> dict[str, dict[str, Any]]:
+    global _COMMITTED_RUNTIME_WAIVER_CARDS_CACHE
+    if _COMMITTED_RUNTIME_WAIVER_CARDS_CACHE is not None:
+        return _COMMITTED_RUNTIME_WAIVER_CARDS_CACHE
+    try:
+        text = subprocess.check_output(
+            [
+                "git",
+                "show",
+                f"HEAD:{BATTLE_ANALYST_PATH.relative_to(REPO_ROOT)}",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        text = read_text(BATTLE_ANALYST_PATH) if BATTLE_ANALYST_PATH.exists() else ""
+    _COMMITTED_RUNTIME_WAIVER_CARDS_CACHE = runtime_waiver_cards_from_source_text(
+        text,
+        source="git_head_source",
+    )
+    return _COMMITTED_RUNTIME_WAIVER_CARDS_CACHE
+
+
+def current_runtime_waiver_cards() -> dict[str, dict[str, Any]]:
+    global _RUNTIME_WAIVER_CARDS_CACHE
+    if _RUNTIME_WAIVER_CARDS_CACHE is not None:
+        return _RUNTIME_WAIVER_CARDS_CACHE
+    cards: dict[str, dict[str, Any]] = {}
+    cards.update(committed_runtime_waiver_cards())
+    cards.update(worktree_runtime_waiver_cards())
+    _RUNTIME_WAIVER_CARDS_CACHE = cards
     return _RUNTIME_WAIVER_CARDS_CACHE
+
+
+def runtime_waiver_drift_names(
+    worktree_cards: Mapping[str, Mapping[str, Any]],
+    committed_cards: Mapping[str, Mapping[str, Any]],
+) -> list[str]:
+    missing = sorted(set(committed_cards) - set(worktree_cards))
+    return [str(committed_cards[name].get("card") or name) for name in missing]
 
 
 def iter_report_files(
@@ -710,6 +795,33 @@ def analyze_path(path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     return issues, meta
 
 
+def analyze_runtime_waiver_drift(issues: list[dict[str, Any]]) -> None:
+    if not BATTLE_ANALYST_PATH.exists():
+        return
+    missing = runtime_waiver_drift_names(
+        worktree_runtime_waiver_cards(),
+        committed_runtime_waiver_cards(),
+    )
+    if not missing:
+        return
+    add_issue(
+        issues,
+        severity="high",
+        category="runtime_environment_drift",
+        issue_type="worktree_runtime_waiver_drift",
+        path=BATTLE_ANALYST_PATH,
+        detail=(
+            "worktree battle_analyst_v9.py is missing committed runtime waivers "
+            f"from HEAD: {len(missing)} cards"
+        ),
+        evidence={
+            "missing_committed_waiver_count": len(missing),
+            "sample_cards": missing[:20],
+        },
+        next_action="sync_or_reapply_committed_runtime_waivers_before_running_local_audits",
+    )
+
+
 def issue_signature(issue: Mapping[str, Any]) -> tuple[str, str, str, str]:
     detail = str(issue.get("detail") or "")
     detail = re.sub(r"\d+", "#", detail)
@@ -820,6 +932,12 @@ def build_audit(
     status_counts: Counter[str] = Counter()
     suffix_counts: Counter[str] = Counter()
     passed_tests = collect_passed_tests(files)
+    try:
+        official_reports_dir = reports_dir.resolve() == REPORT_DIR.resolve()
+    except OSError:
+        official_reports_dir = False
+    if official_reports_dir:
+        analyze_runtime_waiver_drift(raw_issues)
     for path in files:
         suffix_counts[path.suffix.lower()] += 1
         issues, meta = analyze_path(path)
