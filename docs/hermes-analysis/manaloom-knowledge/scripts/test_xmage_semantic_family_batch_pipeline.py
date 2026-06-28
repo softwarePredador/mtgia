@@ -3383,6 +3383,9 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                                 "battle_model_scope": (
                                     "look_top_library_play_lands_from_top_if_opponent_more_lands_v1"
                                 ),
+                                "look_top_library_any_time": True,
+                                "play_lands_from_top_library": True,
+                                "play_from_top_condition": "opponent_controls_more_lands",
                             },
                         },
                     },
@@ -3418,7 +3421,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_card["Verge Rangers"]["family_id"], "topdeck_play")
         self.assertEqual(
             by_card["Verge Rangers"]["promotion_lane"],
-            "runtime_family_implementation_required",
+            "batch_metadata_candidate_requires_pg_precheck",
         )
         self.assertEqual(by_card["Twinflame Tyrant"]["family_id"], "static_damage_modifier")
         self.assertEqual(

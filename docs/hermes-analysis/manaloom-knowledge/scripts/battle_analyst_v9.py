@@ -13149,6 +13149,136 @@ def controlled_land_count(player):
     return sum(1 for permanent in player.battlefield if isinstance(permanent, dict) and is_effective_land(permanent))
 
 
+TOPDECK_LAND_PLAY_SCOPE = "look_top_library_play_lands_from_top_if_opponent_more_lands_v1"
+
+
+def _topdeck_land_play_effects(permanent):
+    if not isinstance(permanent, dict):
+        return []
+    effects = [permanent]
+    try:
+        resolved = get_card_effect(permanent)
+    except Exception:
+        resolved = {}
+    if isinstance(resolved, dict) and resolved is not permanent:
+        effects.append(resolved)
+    return effects
+
+
+def topdeck_land_play_permission(player, opponents):
+    """Return the permanent granting top-library land play, if active."""
+    own_lands = controlled_land_count(player)
+    live_opponents = [
+        opponent
+        for opponent in opponents or []
+        if opponent is not None and (not hasattr(opponent, "is_alive") or opponent.is_alive())
+    ]
+    for permanent in getattr(player, "battlefield", []) or []:
+        for effect_data in _topdeck_land_play_effects(permanent):
+            scope = str(effect_data.get("battle_model_scope") or "")
+            if effect_data.get("effect") != "topdeck_play" or scope != TOPDECK_LAND_PLAY_SCOPE:
+                continue
+            if not effect_data.get("play_lands_from_top_library"):
+                continue
+            condition = str(effect_data.get("play_from_top_condition") or "")
+            if condition != "opponent_controls_more_lands":
+                continue
+            if any(controlled_land_count(opponent) > own_lands for opponent in live_opponents):
+                return {
+                    "source": permanent,
+                    "effect_data": effect_data,
+                    "scope": scope,
+                    "condition": condition,
+                }
+    return None
+
+
+def choose_land_play_candidate(player, opponents):
+    if player.lands_played_this_turn >= player.max_lands_per_turn:
+        return None
+    lands_in_hand = [card for card in player.hand if is_effective_land(card)]
+    if lands_in_hand:
+        return {
+            "card": lands_in_hand[0],
+            "source_zone": "hand",
+            "topdeck_permission": None,
+        }
+    permission = topdeck_land_play_permission(player, opponents)
+    if permission and player.library and is_effective_land(player.library[0]):
+        return {
+            "card": player.library[0],
+            "source_zone": "library",
+            "topdeck_permission": permission,
+        }
+    return None
+
+
+def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
+    if not candidate:
+        return False
+    land = candidate["card"]
+    source_zone = candidate.get("source_zone") or "hand"
+    if source_zone == "library":
+        if player.library and player.library[0] is land:
+            player.library.pop(0)
+        elif land in player.library:
+            player.library.remove(land)
+        else:
+            return False
+    else:
+        if land not in player.hand:
+            return False
+        player.hand.remove(land)
+
+    eff = get_card_effect(land)
+    land_permanent = enrich_card({**land, **eff, "effect": "land"})
+    initialize_special_land_runtime_state(land_permanent, turn)
+    player.battlefield.append(land_permanent)
+    player.lands_played_this_turn += 1
+    player.mana_pool.add(
+        source_colors(land_permanent)[0],
+        int(land_permanent.get("mana_produced") or 1),
+    )
+    trigger_landfall(
+        player,
+        land_permanent,
+        turn,
+        "land_played",
+        opponents=opponents,
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
+    trigger_opponent_land_play_engines(
+        player,
+        opponents,
+        land_permanent,
+        turn,
+        stack=stack,
+        all_players=all_players,
+    )
+    permission = candidate.get("topdeck_permission") or {}
+    permission_source = permission.get("source") or {}
+    emit_replay_event(
+        "land_played",
+        player=player.name,
+        card=land.get("name", "?"),
+        effect=eff.get("effect", "land"),
+        type_line=land_permanent.get("type_line", ""),
+        mana_produced=int(land_permanent.get("mana_produced") or 1),
+        mana_pool_after=player.mana_pool.snapshot(),
+        board_snapshot=[replay_card_snapshot(card) for card in player.battlefield],
+        life_after=player.life,
+        source_zone=source_zone,
+        played_from_top_library=source_zone == "library",
+        topdeck_play_source=permission_source.get("name") if permission_source else None,
+        topdeck_play_scope=permission.get("scope"),
+        turn=turn,
+        **replay_rule_fields(eff),
+    )
+    return True
+
+
 def battlefield_creature_stats(player):
     creatures = [
         permanent
@@ -33823,50 +33953,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         if turn_ended_by_effect(player):
             return
     total_mana = player.available_mana()
-    lands_in_hand = [c for c in player.hand if is_effective_land(c)]  # v10.2
-    if lands_in_hand and player.lands_played_this_turn < player.max_lands_per_turn:
-        land = lands_in_hand[0]
-        eff = get_card_effect(land)
-        player.hand.remove(land)
-        land_permanent = enrich_card({**land, **eff, "effect": "land"})
-        initialize_special_land_runtime_state(land_permanent, turn)
-        player.battlefield.append(land_permanent)
-        player.lands_played_this_turn += 1
-        player.mana_pool.add(
-            source_colors(land_permanent)[0],
-            int(land_permanent.get("mana_produced") or 1),
-        )
-        trigger_landfall(
-            player,
-            land_permanent,
-            turn,
-            "land_played",
-            opponents=opponents,
-            stack=stack,
-            active_player=player,
-            all_players=all_players,
-        )
-        trigger_opponent_land_play_engines(
-            player,
-            opponents,
-            land_permanent,
-            turn,
-            stack=stack,
-            all_players=all_players,
-        )
-        emit_replay_event(
-            "land_played",
-            player=player.name,
-            card=land.get("name", "?"),
-            effect=eff.get("effect", "land"),
-            type_line=land_permanent.get("type_line", ""),
-            mana_produced=int(land_permanent.get("mana_produced") or 1),
-            mana_pool_after=player.mana_pool.snapshot(),
-            board_snapshot=[replay_card_snapshot(card) for card in player.battlefield],
-            life_after=player.life,
-            turn=turn,
-            **replay_rule_fields(eff),
-        )
+    land_candidate = choose_land_play_candidate(player, opponents)
+    if play_land_candidate(player, opponents, all_players, turn, stack, land_candidate):
         while not stack.empty() or _pending_triggers:
             priority_round(player, all_players, stack, turn, rng)
             if turn_ended_by_effect(player):

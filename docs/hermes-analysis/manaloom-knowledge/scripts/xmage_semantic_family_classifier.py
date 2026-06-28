@@ -791,6 +791,20 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("trigger_gain_life") or 0) == 1
         )
 
+    if effect == "topdeck_play" and scope == "look_top_library_play_lands_from_top_if_opponent_more_lands_v1":
+        return (
+            types == {"CREATURE"}
+            and {
+                "LookAtTopCardOfLibraryAnyTimeEffect",
+                "PlayFromTopOfLibraryEffect",
+                "VergeRangersEffect",
+            }.issubset(effect_classes)
+            and "SimpleStaticAbility" in ability_classes
+            and bool(effect_json.get("look_top_library_any_time"))
+            and bool(effect_json.get("play_lands_from_top_library"))
+            and effect_json.get("play_from_top_condition") == "opponent_controls_more_lands"
+        )
+
     if effect == "creature" and scope == "rishkar_counter_mana_creature_waiver_v1":
         return (
             types == {"CREATURE"}
