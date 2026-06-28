@@ -28,8 +28,13 @@ DEFAULT_MINER_REPORT = (
 DEFAULT_MANUAL_REVIEW = REPORT_DIR / "lorehold_manual_cut_review_20260627_v2.json"
 DEFAULT_EXPOSURE_PROFILES = [REPORT_DIR / "lorehold_card_exposure_profile_20260627_v1.json"]
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260627_v1.json"]
+DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
+    REPORT_DIR / "lorehold_hand_filter_cut_model_20260627_v3_big_score_rejected.json"
+]
 DEFAULT_PRIOR_PACKAGE_REPORTS = [
-    REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+    REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
 ]
 
 
@@ -215,6 +220,14 @@ def latest_tutor_cut_model(
     return tutor_cut_model_reports[-1]
 
 
+def latest_hand_filter_cut_model(
+    hand_filter_cut_model_reports: list[tuple[Path, dict[str, Any]]],
+) -> tuple[Path, dict[str, Any]] | None:
+    if not hand_filter_cut_model_reports:
+        return None
+    return hand_filter_cut_model_reports[-1]
+
+
 def build_tutor_action(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -261,7 +274,7 @@ def build_tutor_action(
             and land_tax_package_keys.issubset(land_tax_rejections)
         ):
             return {
-                "priority": 1,
+                "priority": 90,
                 "action_key": "avoid_rejected_tutor_land_tax_swaps",
                 "status": "tutor_land_tax_benchmarks_rejected",
                 "lane": "tutor_access",
@@ -350,6 +363,7 @@ def build_tutor_action(
 def build_hand_filter_action(
     miner_report: dict[str, Any],
     exposures: dict[str, dict[str, Any]],
+    hand_filter_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
 ) -> dict[str, Any] | None:
     pairings = pairing_rows(
         miner_report,
@@ -358,6 +372,62 @@ def build_hand_filter_action(
     )
     if not pairings:
         return None
+    hand_filter_model = latest_hand_filter_cut_model(hand_filter_cut_model_reports or [])
+    if hand_filter_model:
+        model_path, model_payload = hand_filter_model
+        preflight_rows = [
+            row
+            for row in model_payload.get("preflight_benchmark_candidates") or []
+            if row.get("status") == "preflight_benchmark_ready"
+        ]
+        blocked_prior = [
+            row
+            for row in model_payload.get("pair_evaluations") or []
+            if row.get("status") == "blocked_prior_reject"
+        ]
+        if preflight_rows:
+            top = preflight_rows[0]
+            return {
+                "priority": 2,
+                "action_key": "run_hand_filter_benchmark_gate",
+                "status": "same_lane_benchmark_ready",
+                "lane": "hand_filter",
+                "candidate_cards": [str(top.get("candidate") or "")],
+                "cut_cards": [str(top.get("cut") or "")],
+                "why_now": (
+                    "The hand-filter cut model has exposure evidence and has skipped prior exact rejects; "
+                    "the next pair needs package preflight plus a small equal gate."
+                ),
+                "blockers": [
+                    "the proposed cut is still a benchmark, not a promotion",
+                    "Big Score provides ramp, discard, draw, and Treasure, so a win-rate gate must prove the tradeoff",
+                ],
+                "next_steps": [
+                    "Run the exact package preflight to check prior-negative evidence.",
+                    "Run the smallest equal gate only if preflight is clear.",
+                    "If rejected, add the exact report to prior package defaults and rerun this model.",
+                ],
+                "hand_filter_cut_model_report": str(model_path),
+                "preflight_benchmark_candidates": preflight_rows[:5],
+                "blocked_prior_rejections": blocked_prior[:5],
+            }
+        return {
+            "priority": 90,
+            "action_key": "avoid_hand_filter_without_new_cut",
+            "status": "no_hand_filter_benchmark_ready",
+            "lane": "hand_filter",
+            "candidate_cards": [],
+            "cut_cards": [],
+            "why_now": (
+                "The hand-filter cut model found no clean benchmark after prior rejects and protected cuts."
+            ),
+            "blockers": ["no preflight_benchmark_ready hand-filter pair remains"],
+            "next_steps": [
+                "Search for a different non-core cut or a multi-card package before another hand-filter gate.",
+            ],
+            "hand_filter_cut_model_report": str(model_path),
+            "blocked_prior_rejections": blocked_prior[:5],
+        }
     candidates = [str(row["candidate"]) for row in pairings[:5]]
     cuts = summarize_cut_options(pairings, limit=6)
     cut_names = [str(row["card_name"]) for row in cuts if row.get("card_name")]
@@ -558,6 +628,7 @@ def build_plan(
     manual_review: dict[str, Any],
     exposure_profiles: list[tuple[Path, dict[str, Any]]],
     tutor_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    hand_filter_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
@@ -595,7 +666,11 @@ def build_plan(
             tutor_cut_model_reports=tutor_cut_model_reports,
             prior_package_reports=prior_package_reports,
         ),
-        build_hand_filter_action(miner_report, exposures),
+        build_hand_filter_action(
+            miner_report,
+            exposures,
+            hand_filter_cut_model_reports=hand_filter_cut_model_reports,
+        ),
         build_recursion_action(miner_report, manual_review, exposures),
         build_mana_action(miner_report),
         build_runtime_action(miner_report),
@@ -612,6 +687,9 @@ def build_plan(
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
         "tutor_cut_model_reports": [
             str(path) for path, _payload in (tutor_cut_model_reports or [])
+        ],
+        "hand_filter_cut_model_reports": [
+            str(path) for path, _payload in (hand_filter_cut_model_reports or [])
         ],
         "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
         "postgres_writes": False,
@@ -650,6 +728,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Manual review: `{payload['manual_review']}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
         f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
+        f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
         f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
@@ -722,6 +801,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--manual-review", type=Path, default=DEFAULT_MANUAL_REVIEW)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
+    parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260627_v1")
     return parser.parse_args()
@@ -736,6 +816,9 @@ def main() -> int:
     tutor_cut_model_reports = read_existing_json(
         args.tutor_cut_model_report or DEFAULT_TUTOR_CUT_MODEL_REPORTS
     )
+    hand_filter_cut_model_reports = read_existing_json(
+        args.hand_filter_cut_model_report or DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS
+    )
     prior_package_reports = read_existing_json(
         args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
     )
@@ -744,6 +827,7 @@ def main() -> int:
         manual_review=manual_review,
         exposure_profiles=exposure_profiles,
         tutor_cut_model_reports=tutor_cut_model_reports,
+        hand_filter_cut_model_reports=hand_filter_cut_model_reports,
         prior_package_reports=prior_package_reports,
         miner_path=args.miner_report,
         manual_path=args.manual_review,

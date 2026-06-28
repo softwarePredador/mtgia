@@ -276,6 +276,29 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             ],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["wheel_hand_filter_cut_big_score"]["family"],
+            "hand_filter_benchmark",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["wheel_hand_filter_cut_big_score"]["adds"],
+            ["Wheel of Fortune"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["wheel_hand_filter_cut_big_score"]["cuts"],
+            ["Big Score"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["wheel_hand_filter_cut_big_score"][
+                "allow_miracle_core_cuts"
+            ],
+        )
+        self.assertIn(
+            "lorehold_hand_filter_cut_model_20260627_v2_prior_aware",
+            gate.PACKAGE_DEFINITIONS["wheel_hand_filter_cut_big_score"][
+                "cut_safety_override_reason"
+            ],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )
@@ -503,6 +526,10 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         )
         self.assertIn(
             "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
             default_names,
         )
 

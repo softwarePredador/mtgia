@@ -33,6 +33,10 @@ DEFAULT_MINER_REPORT = (
 DEFAULT_EXPOSURE_PROFILES = [
     REPORT_DIR / "lorehold_hand_filter_cut_candidate_exposure_profile_20260627_v1.json",
 ]
+DEFAULT_PRIOR_PACKAGE_REPORTS = [
+    REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+]
 HIGH_EXPOSURE_CUTOFF = 200
 PROTECTED_EXPOSURE_CUTOFF = 80
 
@@ -111,6 +115,54 @@ def hand_filter_pairings(miner_report: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def infer_package_decision(result: dict[str, Any]) -> str:
+    if result.get("decision"):
+        return str(result["decision"])
+    gate = result.get("gate_summary") or {}
+    baseline = gate.get("baseline") or {}
+    candidate = gate.get("candidate") or {}
+    baseline_wins = int(baseline.get("wins") or 0)
+    candidate_wins = int(candidate.get("wins") or 0)
+    delta = float(gate.get("delta_pp") or 0.0)
+    if delta < 0 or candidate_wins < baseline_wins:
+        return "reject_or_rework"
+    if delta > 0 or candidate_wins > baseline_wins:
+        return "promote_to_deeper_gate"
+    return "tie_or_unknown"
+
+
+def rejected_pair_lookup(
+    prior_package_reports: list[tuple[Path, dict[str, Any]]],
+) -> dict[tuple[str, str], dict[str, Any]]:
+    rejected: dict[tuple[str, str], dict[str, Any]] = {}
+    for path, payload in prior_package_reports:
+        packages = payload.get("packages") or []
+        if not isinstance(packages, list):
+            continue
+        for result in packages:
+            if not isinstance(result, dict):
+                continue
+            adds = [normalize_key(card) for card in (result.get("adds") or []) if normalize_key(card)]
+            cuts = [normalize_key(card) for card in (result.get("cuts") or []) if normalize_key(card)]
+            if len(adds) != 1 or len(cuts) != 1:
+                continue
+            decision = infer_package_decision(result)
+            if decision != "reject_or_rework":
+                continue
+            gate = result.get("gate_summary") or {}
+            rejected[(adds[0], cuts[0])] = {
+                "package_key": result.get("package_key"),
+                "source_report": str(path),
+                "adds": result.get("adds") or [],
+                "cuts": result.get("cuts") or [],
+                "decision": decision,
+                "delta_pp": gate.get("delta_pp"),
+                "baseline": gate.get("baseline") or {},
+                "candidate": gate.get("candidate") or {},
+            }
+    return rejected
+
+
 def profile_summary(card_name: str, exposures: dict[str, dict[str, Any]]) -> dict[str, Any]:
     row = exposures.get(normalize_key(card_name)) or {}
     rule = row.get("rule_summary") or {}
@@ -186,9 +238,15 @@ def classify_pair(
     cut_option: dict[str, Any],
     deck_cards: dict[str, dict[str, Any]],
     exposures: dict[str, dict[str, Any]],
+    rejected_pairs: dict[tuple[str, str], dict[str, Any]] | None = None,
+    rejected_cut_counts: dict[str, int] | None = None,
 ) -> dict[str, Any]:
     candidate_name = str(pairing.get("candidate") or "")
     cut_name = str(cut_option.get("card_name") or "")
+    prior_rejection = (rejected_pairs or {}).get(
+        (normalize_key(candidate_name), normalize_key(cut_name))
+    )
+    cut_reject_count = int((rejected_cut_counts or {}).get(normalize_key(cut_name), 0))
     candidate = profile_summary(candidate_name, exposures)
     cut_profile = profile_summary(cut_name, exposures)
     cut = deck_cards.get(normalize_key(cut_name), {"card_name": cut_name})
@@ -197,7 +255,13 @@ def classify_pair(
     base_score = int(pairing.get("candidate_score") or 0)
     score = base_score + candidate_score + cut_score
     blockers = sorted(set(candidate_blockers + cut_blockers))
-    if "candidate_missing_active_runtime_rule" in blockers or "candidate_missing_exposure_profile" in blockers:
+    if prior_rejection:
+        blockers.append("prior_exact_package_reject")
+        status = "blocked_prior_reject"
+    elif cut_reject_count >= 2:
+        blockers.append(f"cut_repeated_prior_rejects:{cut_reject_count}")
+        status = "blocked_cut_repeated_benchmark_reject"
+    elif "candidate_missing_active_runtime_rule" in blockers or "candidate_missing_exposure_profile" in blockers:
         status = "blocked_candidate_runtime_or_profile"
     elif any(blocker.startswith("cut_is") or blocker.startswith("cut_high") for blocker in blockers):
         status = "blocked_cut_core_or_high_exposure"
@@ -220,6 +284,8 @@ def classify_pair(
         "cut_inventory_status": cut_option.get("status"),
         "cut_gate_readiness": cut_option.get("gate_readiness"),
         "readiness_reason": cut_option.get("readiness_reason"),
+        "prior_rejection": prior_rejection or {},
+        "cut_prior_reject_count": cut_reject_count,
     }
 
 
@@ -228,10 +294,13 @@ def build_model(
     conn: sqlite3.Connection,
     miner_report: dict[str, Any],
     exposure_profiles: list[tuple[Path, dict[str, Any]]],
+    prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     db_path: Path = DEFAULT_DB,
     miner_path: Path = DEFAULT_MINER_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
+    rejected_pairs = rejected_pair_lookup(prior_package_reports or [])
+    rejected_cut_counts = Counter(cut for _candidate, cut in rejected_pairs)
     deck_cards = deck_card_lookup(conn)
     pair_rows: list[dict[str, Any]] = []
     for pairing in hand_filter_pairings(miner_report):
@@ -242,6 +311,8 @@ def build_model(
                     cut_option=cut_option,
                     deck_cards=deck_cards,
                     exposures=exposures,
+                    rejected_pairs=rejected_pairs,
+                    rejected_cut_counts=rejected_cut_counts,
                 )
             )
     pair_rows.sort(key=lambda row: (-int(row["score"]), row["status"], row["candidate"], row["cut"]))
@@ -252,12 +323,15 @@ def build_model(
         "source_db": str(db_path),
         "miner_report": str(miner_path),
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
+        "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
             "candidate_count": len({row["candidate"] for row in pair_rows}),
             "evaluated_pair_count": len(pair_rows),
             "preflight_benchmark_ready_count": len(preflight_rows),
+            "prior_rejected_pair_count": len(rejected_pairs),
+            "prior_rejected_cut_counts": dict(sorted(rejected_cut_counts.items())),
             "status_counts": dict(sorted(status_counts.items())),
             "recommended_next_action": (
                 f"preflight_{preflight_rows[0]['candidate']}_over_{preflight_rows[0]['cut']}"
@@ -289,6 +363,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Source DB: `{payload['source_db']}`",
         f"- Miner report: `{payload['miner_report']}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
+        f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -297,6 +372,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Candidate count: `{payload['summary']['candidate_count']}`",
         f"- Evaluated pairs: `{payload['summary']['evaluated_pair_count']}`",
         f"- Preflight benchmark-ready pairs: `{payload['summary']['preflight_benchmark_ready_count']}`",
+        f"- Prior rejected exact pairs: `{payload['summary']['prior_rejected_pair_count']}`",
+        f"- Prior rejected cut counts: `{json.dumps(payload['summary']['prior_rejected_cut_counts'], sort_keys=True)}`",
         f"- Status counts: `{json.dumps(payload['summary']['status_counts'], sort_keys=True)}`",
         f"- Recommended next action: `{payload['summary']['recommended_next_action']}`",
         "",
@@ -360,6 +437,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
+    parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--stem", default="lorehold_hand_filter_cut_model_20260627_v1")
     return parser.parse_args()
 
@@ -368,12 +446,16 @@ def main() -> int:
     args = parse_args()
     exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
     exposure_profiles = read_existing_json(exposure_paths)
+    prior_package_reports = read_existing_json(
+        args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
+    )
     miner_report = read_json(args.miner_report)
     with connect(args.db) as conn:
         payload = build_model(
             conn=conn,
             miner_report=miner_report,
             exposure_profiles=exposure_profiles,
+            prior_package_reports=prior_package_reports,
             db_path=args.db,
             miner_path=args.miner_report,
         )

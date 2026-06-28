@@ -210,6 +210,35 @@ def prior_tutor_land_tax_report():
     )
 
 
+def hand_filter_cut_model_report():
+    return (
+        planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0],
+        {
+            "summary": {
+                "preflight_benchmark_ready_count": 1,
+                "prior_rejected_pair_count": 1,
+                "recommended_next_action": "preflight_Wheel of Fortune_over_Big Score",
+            },
+            "preflight_benchmark_candidates": [
+                {
+                    "candidate": "Wheel of Fortune",
+                    "cut": "Big Score",
+                    "status": "preflight_benchmark_ready",
+                    "score": 118,
+                    "blockers": ["cut_removes_ramp_or_treasure_role"],
+                }
+            ],
+            "pair_evaluations": [
+                {
+                    "candidate": "Valakut Awakening // Valakut Stoneforge",
+                    "cut": "Big Score",
+                    "status": "blocked_prior_reject",
+                }
+            ],
+        },
+    )
+
+
 def test_next_action_planner_prioritizes_cut_models_before_gates():
     payload = planner.build_plan(
         miner_report=miner_report(),
@@ -251,12 +280,34 @@ def test_next_action_planner_moves_past_rejected_land_tax_tutor_benchmarks():
         prior_package_reports=[prior_tutor_land_tax_report()],
     )
 
-    assert payload["summary"]["recommended_next_action"] == "avoid_rejected_tutor_land_tax_swaps"
+    assert payload["summary"]["recommended_next_action"] == "profile_hand_filter_cut_benchmarks"
     actions = {row["action_key"]: row for row in payload["action_queue"]}
     tutor_action = actions["avoid_rejected_tutor_land_tax_swaps"]
     assert tutor_action["status"] == "tutor_land_tax_benchmarks_rejected"
+    assert tutor_action["priority"] == 90
     assert tutor_action["cut_cards"] == ["Land Tax"]
     assert set(tutor_action["land_tax_benchmark_rejections"]) == {
         "gamble_access_benchmark_cut_land_tax",
         "enlightened_access_benchmark_cut_land_tax",
     }
+
+
+def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        tutor_cut_model_reports=[tutor_cut_model_report()],
+        hand_filter_cut_model_reports=[hand_filter_cut_model_report()],
+        prior_package_reports=[prior_tutor_land_tax_report()],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == "run_hand_filter_benchmark_gate"
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    hand_filter_action = actions["run_hand_filter_benchmark_gate"]
+    assert hand_filter_action["status"] == "same_lane_benchmark_ready"
+    assert hand_filter_action["candidate_cards"] == ["Wheel of Fortune"]
+    assert hand_filter_action["cut_cards"] == ["Big Score"]
+    assert hand_filter_action["blocked_prior_rejections"][0]["candidate"] == (
+        "Valakut Awakening // Valakut Stoneforge"
+    )

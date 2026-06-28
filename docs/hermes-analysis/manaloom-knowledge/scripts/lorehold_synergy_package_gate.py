@@ -40,6 +40,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
 )
 
 
@@ -550,6 +551,22 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "allow_miracle_core_cuts": True,
         "cut_safety_override_reason": (
             "preflight benchmark required by lorehold_hand_filter_cut_model_20260627_v1"
+        ),
+    },
+    "wheel_hand_filter_cut_big_score": {
+        "family": "hand_filter_benchmark",
+        "hypothesis": (
+            "After Valakut over Big Score failed, the prior-aware hand-filter cut "
+            "model ranked Wheel of Fortune as the next exact benchmark. Wheel has "
+            "verified multiplayer discard/draw runtime and strong Lorehold variant "
+            "exposure, but this remains an explicit wheel-over-ramp tradeoff because "
+            "Big Score provides discard, draw, and Treasure."
+        ),
+        "adds": ["Wheel of Fortune"],
+        "cuts": ["Big Score"],
+        "allow_miracle_core_cuts": True,
+        "cut_safety_override_reason": (
+            "preflight benchmark required by lorehold_hand_filter_cut_model_20260627_v2_prior_aware"
         ),
     },
     "guttersnipe_spell_payoff_cut_prismari": {

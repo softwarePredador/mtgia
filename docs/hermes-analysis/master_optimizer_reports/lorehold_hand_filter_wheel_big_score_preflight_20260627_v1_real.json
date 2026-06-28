@@ -1,0 +1,66 @@
+{
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260627_v1.json",
+  "cut_safety_summary": {
+    "blocked_cut_count": 11,
+    "status_counts": {
+      "locked_do_not_cut": 9,
+      "risky_cut_only_same_lane": 2
+    },
+    "tested_cut_count": 11,
+    "untested_flex_pool_count": 6
+  },
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-28T00:25:06.283772+00:00",
+  "opponent_limit": 3,
+  "opponent_seed": 20260626,
+  "package_status_counts": {
+    "preflight_ready": 1
+  },
+  "packages": [
+    {
+      "adds": [
+        "Wheel of Fortune"
+      ],
+      "candidate_db": null,
+      "candidate_meta": {},
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Big Score"
+      ],
+      "family": "hand_filter_benchmark",
+      "gate_json": null,
+      "gate_markdown": null,
+      "gate_returncode": null,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "",
+      "gate_summary": {},
+      "hypothesis": "After Valakut over Big Score failed, the prior-aware hand-filter cut model ranked Wheel of Fortune as the next exact benchmark. Wheel has verified multiplayer discard/draw runtime and strong Lorehold variant exposure, but this remains an explicit wheel-over-ramp tradeoff because Big Score provides discard, draw, and Treasure.",
+      "package_key": "wheel_hand_filter_cut_big_score",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "no previous package-key result",
+        "status": "clear"
+      },
+      "status": "preflight_ready"
+    }
+  ],
+  "preflight_only": true,
+  "prior_package_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json"
+  ],
+  "prior_package_summary": {
+    "loaded_report_count": 4,
+    "missing_report_count": 0,
+    "package_key_count": 17
+  },
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}

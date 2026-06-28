@@ -63,6 +63,20 @@ def miner_report():
     }
 
 
+def miner_report_with_two_candidates():
+    payload = miner_report()
+    payload["pairing_hypotheses"].append(
+        {
+            "candidate": "Wheel of Fortune",
+            "candidate_score": 92,
+            "lane": "hand_filter",
+            "status": "blocked_no_safe_cut_in_lane",
+            "cut_options": payload["pairing_hypotheses"][0]["cut_options"],
+        }
+    )
+    return payload
+
+
 def exposure_profiles():
     def profile(
         card_name,
@@ -103,6 +117,15 @@ def exposure_profiles():
                         scopes=["impulse_top_seven_plus_hand_cast_mana_annotation_v1"],
                     ),
                     profile(
+                        "Wheel of Fortune",
+                        exposure=86,
+                        direct=86,
+                        role="draw_filter_value",
+                        active_rules=1,
+                        effects=["draw_cards"],
+                        scopes=["multiplayer_discard_draw_v1"],
+                    ),
+                    profile(
                         "Big Score",
                         exposure=34,
                         direct=10,
@@ -135,6 +158,46 @@ def exposure_profiles():
     ]
 
 
+def prior_apex_reject_report():
+    return (
+        model.DEFAULT_PRIOR_PACKAGE_REPORTS[0],
+        {
+            "packages": [
+                {
+                    "package_key": "apex_hand_filter_cut_big_score",
+                    "adds": ["Apex of Power"],
+                    "cuts": ["Big Score"],
+                    "gate_summary": {
+                        "delta_pp": -100.0,
+                        "baseline": {"wins": 3, "losses": 0, "stalls": 0},
+                        "candidate": {"wins": 0, "losses": 3, "stalls": 0},
+                    },
+                }
+            ]
+        },
+    )
+
+
+def prior_reject_report(package_key, candidate, cut="Big Score"):
+    return (
+        model.DEFAULT_PRIOR_PACKAGE_REPORTS[0],
+        {
+            "packages": [
+                {
+                    "package_key": package_key,
+                    "adds": [candidate],
+                    "cuts": [cut],
+                    "gate_summary": {
+                        "delta_pp": -100.0,
+                        "baseline": {"wins": 3, "losses": 0, "stalls": 0},
+                        "candidate": {"wins": 0, "losses": 3, "stalls": 0},
+                    },
+                }
+            ]
+        },
+    )
+
+
 def test_hand_filter_model_selects_apex_big_score_benchmark_and_blocks_core_cuts():
     with memory_db() as conn:
         payload = model.build_model(
@@ -160,3 +223,56 @@ def test_hand_filter_model_selects_apex_big_score_benchmark_and_blocks_core_cuts
     assert "cut_high_exposure:612" in by_pair[("Apex of Power", "Esper Sentinel")]["blockers"]
     assert by_pair[("Apex of Power", "Rise of the Eldrazi")]["status"] == "blocked_cut_core_or_high_exposure"
     assert "cut_is_wincon" in by_pair[("Apex of Power", "Rise of the Eldrazi")]["blockers"]
+
+
+def test_hand_filter_model_skips_prior_exact_reject_and_recommends_next_pair():
+    with memory_db() as conn:
+        payload = model.build_model(
+            conn=conn,
+            miner_report=miner_report_with_two_candidates(),
+            exposure_profiles=exposure_profiles(),
+            prior_package_reports=[prior_apex_reject_report()],
+        )
+
+    assert payload["summary"]["prior_rejected_pair_count"] == 1
+    assert payload["summary"]["preflight_benchmark_ready_count"] == 1
+    assert payload["summary"]["recommended_next_action"] == "preflight_Wheel of Fortune_over_Big Score"
+
+    by_pair = {
+        (row["candidate"], row["cut"]): row
+        for row in payload["pair_evaluations"]
+    }
+    assert by_pair[("Apex of Power", "Big Score")]["status"] == "blocked_prior_reject"
+    assert "prior_exact_package_reject" in by_pair[("Apex of Power", "Big Score")]["blockers"]
+    assert by_pair[("Wheel of Fortune", "Big Score")]["status"] == "preflight_benchmark_ready"
+
+
+def test_hand_filter_model_blocks_cut_after_repeated_benchmark_rejects():
+    with memory_db() as conn:
+        payload = model.build_model(
+            conn=conn,
+            miner_report=miner_report_with_two_candidates(),
+            exposure_profiles=exposure_profiles(),
+            prior_package_reports=[
+                prior_reject_report(
+                    "valakut_hand_filter_cut_big_score",
+                    "Valakut Awakening // Valakut Stoneforge",
+                ),
+                prior_reject_report("wheel_hand_filter_cut_big_score", "Wheel of Fortune"),
+            ],
+        )
+
+    assert payload["summary"]["preflight_benchmark_ready_count"] == 0
+    assert payload["summary"]["prior_rejected_cut_counts"] == {"big score": 2}
+    assert payload["summary"]["recommended_next_action"] == (
+        "do_not_gate_hand_filter_without_new_cut_or_runtime_evidence"
+    )
+
+    by_pair = {
+        (row["candidate"], row["cut"]): row
+        for row in payload["pair_evaluations"]
+    }
+    apex_big_score = by_pair[("Apex of Power", "Big Score")]
+    assert apex_big_score["status"] == "blocked_cut_repeated_benchmark_reject"
+    assert "cut_repeated_prior_rejects:2" in apex_big_score["blockers"]
+    assert by_pair[("Wheel of Fortune", "Big Score")]["status"] == "blocked_prior_reject"
