@@ -436,6 +436,99 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["attack_cast_mana_value_max_source"], "source_power")
         self.assertTrue(primary["attack_put_rest_bottom_random"])
 
+    def test_goliath_daydreamer_maps_to_dream_counter_attack_free_cast_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "GoliathDaydreamer",
+                "effect_classes": [
+                    "GoliathDaydreamerCastEffect",
+                    "GoliathDaydreamerExileEffect",
+                    "OneShotEffect",
+                ],
+                "ability_classes": [
+                    "AttacksTriggeredAbility",
+                    "SpellCastControllerTriggeredAbility",
+                ],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            (
+                "Whenever you cast an instant or sorcery spell from your hand, exile that card "
+                "with a dream counter on it instead of putting it into your graveyard as it resolves. "
+                "Whenever this creature attacks, you may cast a spell from among cards you own in exile "
+                "with dream counters on them without paying its mana cost. CounterType.DREAM"
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "free_cast")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+        )
+        self.assertEqual(primary["power"], 4)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertEqual(primary["spell_cast_from_hand_card_types"], ["instant", "sorcery"])
+        self.assertTrue(primary["spell_cast_from_hand_exile_instead_of_graveyard"])
+        self.assertEqual(primary["exiled_counter_type"], "dream")
+        self.assertTrue(primary["attack_may_cast_owned_exiled_card_with_counter_without_paying_mana"])
+
+    def test_twinflame_tyrant_maps_to_static_damage_modifier_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TwinflameTyrant",
+                "effect_classes": ["TwinflameTyrantEffect"],
+                "ability_classes": ["FlyingAbility", "SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            (
+                "If a source you control would deal damage to an opponent or a permanent an opponent controls, "
+                "it deals double that damage instead. GameEvent.EventType.DAMAGE_PLAYER "
+                "GameEvent.EventType.DAMAGE_PERMANENT"
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "damage_modifier")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+        )
+        self.assertEqual(primary["damage_multiplier"], 2)
+        self.assertEqual(primary["damage_modifier_applies_to"], "sources_you_control")
+        self.assertEqual(primary["damage_modifier_targets"], ["opponents", "opponent_permanents"])
+
+    def test_verge_rangers_maps_to_topdeck_land_play_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "VergeRangers",
+                "effect_classes": [
+                    "LookAtTopCardOfLibraryAnyTimeEffect",
+                    "PlayFromTopOfLibraryEffect",
+                    "VergeRangersEffect",
+                ],
+                "ability_classes": ["FirstStrikeAbility", "SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            (
+                "You may look at the top card of your library any time. "
+                "As long as an opponent controls more lands than you, you may play lands from the top of your library."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "topdeck_play")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+        )
+        self.assertEqual(primary["keywords"], ["first_strike"])
+        self.assertTrue(primary["look_top_library_any_time"])
+        self.assertTrue(primary["play_lands_from_top_library"])
+        self.assertEqual(primary["play_from_top_condition"], "opponent_controls_more_lands")
+
     def test_vanquish_the_horde_maps_to_exact_cost_reduced_board_wipe_scope(self) -> None:
         result = hints.build_effect_hints(
             {
@@ -6415,6 +6508,75 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["cycling_status"], "annotation_only")
         self.assertEqual(primary["cycle_trigger_damage_each_opponent"], 1)
         self.assertEqual(primary["cycle_trigger_status"], "annotation_only")
+
+    def test_millikin_maps_to_exact_mana_creature_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Millikin",
+                "effect_classes": [],
+                "ability_classes": ["ColorlessManaAbility"],
+                "cost_classes": ["MillCardsCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT", "CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(0); "
+                    "this.toughness = new MageInt(1); "
+                    "ColorlessManaAbility ability = new ColorlessManaAbility(); "
+                    "ability.addCost(new MillCardsCost()); "
+                    "ability.setUndoPossible(false);"
+                ),
+            },
+            "{T}, Put the top card of your library into your graveyard: Add {C}.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "zero_one_colorless_mana_dork_mill_one_v1")
+        self.assertEqual(primary["power"], 0)
+        self.assertEqual(primary["toughness"], 1)
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "C")
+        self.assertEqual(primary["mana_source_mill_count"], 1)
+        self.assertEqual(primary["mana_source_mill_status"], "annotation_only")
+
+    def test_tablet_of_discovery_maps_to_exact_red_spell_mana_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TabletOfDiscovery",
+                "effect_classes": ["OneShotEffect", "TabletOfDiscoveryEffect"],
+                "ability_classes": [
+                    "ConditionalColoredManaAbility",
+                    "EntersBattlefieldTriggeredAbility",
+                    "RedManaAbility",
+                ],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility(new TabletOfDiscoveryEffect())); "
+                    "this.addAbility(new RedManaAbility()); "
+                    "Ability ability = new ConditionalColoredManaAbility(new Mana(0, 0, 0, 2, 0, 0, 0, 0), "
+                    "new InstantOrSorcerySpellManaBuilder());"
+                ),
+            },
+            "When this artifact enters, mill a card. You may play that card this turn. {T}: Add {R}. "
+            "{T}: Add {R}{R}. Spend this mana only to cast instant and sorcery spells.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "artifact_etb_mill_one_play_milled_card_this_turn_red_spell_mana_v1",
+        )
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["produces"], "R")
+        self.assertEqual(primary["etb_mill_count"], 1)
+        self.assertTrue(primary["etb_milled_card_playable_this_turn"])
+        self.assertEqual(primary["etb_milled_card_play_status"], "annotation_only")
+        self.assertEqual(primary["conditional_instant_sorcery_mana_produced"], 2)
+        self.assertEqual(primary["conditional_instant_sorcery_mana_color"], "R")
+        self.assertEqual(primary["conditional_instant_sorcery_mana_status"], "annotation_only")
 
     def test_fable_maps_to_exact_saga_transform_copy_scope(self) -> None:
         result = hints.build_effect_hints(

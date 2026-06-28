@@ -6267,6 +6267,126 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     candidates: list[dict[str, Any]] = []
 
     if (
+        xmage_class_name == "GoliathDaydreamer"
+        and card_types == {"CREATURE"}
+        and {
+            "GoliathDaydreamerCastEffect",
+            "GoliathDaydreamerExileEffect",
+            "OneShotEffect",
+        }.issubset(effect_classes)
+        and {
+            "AttacksTriggeredAbility",
+            "SpellCastControllerTriggeredAbility",
+        }.issubset(ability_classes)
+        and ("DREAM" in counter_types or "countertype.dream" in normalized_text)
+    ):
+        candidates.append(
+            _candidate(
+                effect="free_cast",
+                scope="instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+                reason=(
+                    "XMage structure matches Goliath Daydreamer: instant/sorcery spells cast from hand are "
+                    "exiled with dream counters instead of going to graveyard, then its attack trigger may "
+                    "cast a spell from owned exiled dream-counter cards without paying mana."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 4,
+                    "toughness": 4,
+                    "trigger": "instant_sorcery_cast_from_hand_and_attack",
+                    "spell_cast_from_hand_card_types": ["instant", "sorcery"],
+                    "spell_cast_from_hand_exile_instead_of_graveyard": True,
+                    "exiled_counter_type": "dream",
+                    "attack_may_cast_owned_exiled_card_with_counter_without_paying_mana": True,
+                    "attack_free_cast_counter_type": "dream",
+                },
+                matched_signals=[
+                    "SpellCastControllerTriggeredAbility",
+                    "AttacksTriggeredAbility",
+                    "GoliathDaydreamerExileEffect",
+                    "GoliathDaydreamerCastEffect",
+                    "CounterType.DREAM",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "TwinflameTyrant"
+        and card_types == {"CREATURE"}
+        and "TwinflameTyrantEffect" in effect_classes
+        and "SimpleStaticAbility" in ability_classes
+        and "damage_player" in normalized_text
+        and "damage_permanent" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="damage_modifier",
+                scope="controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+                reason=(
+                    "XMage structure matches Twinflame Tyrant: a static replacement effect doubles damage "
+                    "from sources you control to opponents and permanents opponents control."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 3,
+                    "toughness": 5,
+                    "flying": True,
+                    "damage_multiplier": 2,
+                    "damage_modifier_applies_to": "sources_you_control",
+                    "damage_modifier_targets": ["opponents", "opponent_permanents"],
+                    "damage_modifier_duration": "while_on_battlefield",
+                },
+                matched_signals=[
+                    "SimpleStaticAbility",
+                    "TwinflameTyrantEffect",
+                    "GameEvent.EventType.DAMAGE_PLAYER",
+                    "GameEvent.EventType.DAMAGE_PERMANENT",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "VergeRangers"
+        and card_types == {"CREATURE"}
+        and {
+            "LookAtTopCardOfLibraryAnyTimeEffect",
+            "PlayFromTopOfLibraryEffect",
+            "VergeRangersEffect",
+        }.issubset(effect_classes)
+        and "SimpleStaticAbility" in ability_classes
+        and "opponent controls more lands" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="topdeck_play",
+                scope="look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+                reason=(
+                    "XMage structure matches Verge Rangers: controller may look at the top card any time and "
+                    "may play lands from the top while an opponent controls more lands."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 3,
+                    "toughness": 3,
+                    "keywords": ["first_strike"],
+                    "look_top_library_any_time": True,
+                    "play_lands_from_top_library": True,
+                    "play_from_top_condition": "opponent_controls_more_lands",
+                },
+                matched_signals=[
+                    "LookAtTopCardOfLibraryAnyTimeEffect",
+                    "PlayFromTopOfLibraryEffect",
+                    "VergeRangersEffect",
+                    "SimpleStaticAbility",
+                    "OpponentControlsMoreLands",
+                ],
+            )
+        )
+
+    if (
         xmage_class_name == "TroubleInPairs"
         and card_types == {"ENCHANTMENT"}
         and effect_classes == {"DrawCardSourceControllerEffect"}
@@ -6398,6 +6518,85 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "SearchLibraryPutInPlayEffect",
                     "Zone.BATTLEFIELD",
                     "tapped",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "Millikin"
+        and card_types == {"ARTIFACT", "CREATURE"}
+        and effect_classes == set()
+        and ability_classes == {"ColorlessManaAbility"}
+        and cost_classes == {"MillCardsCost"}
+    ):
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="zero_one_colorless_mana_dork_mill_one_v1",
+                reason=(
+                    "XMage structure matches Millikin: a 0/1 artifact creature that taps for {C} "
+                    "with a self-mill rider that ManaLoom preserves as annotation."
+                ),
+                ability_kind="activated",
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "power": 0,
+                    "toughness": 1,
+                    "is_mana_source": True,
+                    "mana_produced": 1,
+                    "produces": "C",
+                    "mana_source_mill_count": 1,
+                    "mana_source_mill_status": "annotation_only",
+                },
+                matched_signals=[
+                    "ColorlessManaAbility",
+                    "MillCardsCost",
+                    "mana_source",
+                    "self_mill_annotation",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "TabletOfDiscovery"
+        and card_types == {"ARTIFACT"}
+        and {"OneShotEffect", "TabletOfDiscoveryEffect"}.issubset(effect_classes)
+        and {
+            "ConditionalColoredManaAbility",
+            "EntersBattlefieldTriggeredAbility",
+            "RedManaAbility",
+        }.issubset(ability_classes)
+        and not cost_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="ramp_permanent",
+                scope="artifact_etb_mill_one_play_milled_card_this_turn_red_spell_mana_v1",
+                reason=(
+                    "XMage structure matches Tablet of Discovery: an artifact that mills one on ETB, "
+                    "lets you play that card this turn, taps for {R}, and has a spell-only {R}{R} "
+                    "mana mode that ManaLoom preserves as annotation for now."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "is_mana_source": True,
+                    "mana_produced": 1,
+                    "produces": "R",
+                    "etb_mill_count": 1,
+                    "etb_milled_card_playable_this_turn": True,
+                    "etb_milled_card_play_status": "annotation_only",
+                    "conditional_instant_sorcery_mana_produced": 2,
+                    "conditional_instant_sorcery_mana_color": "R",
+                    "conditional_instant_sorcery_mana_status": "annotation_only",
+                },
+                matched_signals=[
+                    "EntersBattlefieldTriggeredAbility",
+                    "TabletOfDiscoveryEffect",
+                    "RedManaAbility",
+                    "ConditionalColoredManaAbility",
+                    "mana_source",
+                    "etb_mill_annotation",
                 ],
             )
         )

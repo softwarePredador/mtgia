@@ -752,6 +752,7 @@ def build_report(
                 count for status, count in pairing_counts.items() if status.startswith("blocked")
             ),
         },
+        "all_variant_candidates": candidates,
         "top_variant_candidates": candidates[:60],
         "cut_inventory": cuts,
         "pairing_hypotheses": pairings,
@@ -803,6 +804,28 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 negative=row["negative_add_count"],
             )
         )
+    all_candidates = payload.get("all_variant_candidates") or payload["top_variant_candidates"]
+    blocked_runtime = [
+        row for row in all_candidates if row.get("status") == "blocked_runtime_rule_gap"
+    ]
+    lines.extend(["", "## Runtime Rule Gap Queue", ""])
+    if not blocked_runtime:
+        lines.append("- No variant-only candidate is currently blocked by a runtime rule gap.")
+    else:
+        lines.append("| Rank | Card | Score | Decks | Lane | Review-only Rules | Disabled Rules |")
+        lines.append("| ---: | --- | ---: | --- | --- | ---: | ---: |")
+        for index, row in enumerate(blocked_runtime[:40], start=1):
+            lines.append(
+                "| {rank} | `{card}` | {score} | {decks} | `{lane}` | {review_only} | {disabled} |".format(
+                    rank=index,
+                    card=row["card_name"],
+                    score=row["score"],
+                    decks=", ".join(str(deck_id) for deck_id in row["variant_decks"]),
+                    lane=row["lane"],
+                    review_only=row.get("review_only_rule_count") or 0,
+                    disabled=row.get("disabled_rule_count") or 0,
+                )
+            )
     lines.extend(["", "## Cut Risk Inventory", ""])
     lines.append("| Card | Status | Lane | Negative Cut Count | Negative Packages |")
     lines.append("| --- | --- | --- | ---: | --- |")

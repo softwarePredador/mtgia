@@ -3310,6 +3310,122 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "free_cast")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_groups_goliath_daydreamer_free_cast_as_split_family(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Goliath Daydreamer",
+                        "severity": "high",
+                        "oracle_hash": "goliathhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "GoliathDaydreamer",
+                            "path": "/xmage/GoliathDaydreamer.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "GoliathDaydreamerCastEffect",
+                                "GoliathDaydreamerExileEffect",
+                                "OneShotEffect",
+                            ],
+                            "ability_classes": [
+                                "AttacksTriggeredAbility",
+                                "SpellCastControllerTriggeredAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "free_cast",
+                                "battle_model_scope": (
+                                    "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1"
+                                ),
+                                "trigger": "instant_sorcery_cast_from_hand_and_attack",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "free_cast")
+        self.assertEqual(card["promotion_lane"], "split_family_scope_review_required")
+
+    def test_classifier_groups_topdeck_play_and_damage_modifier_as_runtime_required(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Verge Rangers",
+                        "severity": "high",
+                        "oracle_hash": "vergehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "VergeRangers",
+                            "path": "/xmage/VergeRangers.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "LookAtTopCardOfLibraryAnyTimeEffect",
+                                "PlayFromTopOfLibraryEffect",
+                                "VergeRangersEffect",
+                            ],
+                            "ability_classes": ["SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "topdeck_play",
+                                "battle_model_scope": (
+                                    "look_top_library_play_lands_from_top_if_opponent_more_lands_v1"
+                                ),
+                            },
+                        },
+                    },
+                    {
+                        "card_name": "Twinflame Tyrant",
+                        "severity": "high",
+                        "oracle_hash": "twinflamehash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "TwinflameTyrant",
+                            "path": "/xmage/TwinflameTyrant.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["TwinflameTyrantEffect"],
+                            "ability_classes": ["SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "damage_modifier",
+                                "battle_model_scope": (
+                                    "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
+                                ),
+                            },
+                        },
+                    },
+                ]
+            }
+        )
+
+        by_card = {card["card_name"]: card for card in report["cards"]}
+        self.assertEqual(by_card["Verge Rangers"]["family_id"], "topdeck_play")
+        self.assertEqual(
+            by_card["Verge Rangers"]["promotion_lane"],
+            "runtime_family_implementation_required",
+        )
+        self.assertEqual(by_card["Twinflame Tyrant"]["family_id"], "static_damage_modifier")
+        self.assertEqual(
+            by_card["Twinflame Tyrant"]["promotion_lane"],
+            "runtime_family_implementation_required",
+        )
+
     def test_classifier_marks_lightning_helix_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {
@@ -9089,6 +9205,92 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             }
         )
         self.assertEqual(report["cards"][0]["family_id"], "creature")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_millikin_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Millikin",
+                        "severity": "high",
+                        "oracle_hash": "millikinhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "Millikin",
+                            "path": "/xmage/Millikin.java",
+                            "types": ["ARTIFACT", "CREATURE"],
+                            "effect_classes": [],
+                            "ability_classes": ["ColorlessManaAbility"],
+                            "target_classes": [],
+                            "cost_classes": ["MillCardsCost"],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": "zero_one_colorless_mana_dork_mill_one_v1",
+                                "power": 0,
+                                "toughness": 1,
+                                "is_mana_source": True,
+                                "mana_produced": 1,
+                                "produces": "C",
+                                "mana_source_mill_count": 1,
+                                "mana_source_mill_status": "annotation_only",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "creature")
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+    def test_classifier_marks_tablet_of_discovery_exact_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Tablet of Discovery",
+                        "severity": "high",
+                        "oracle_hash": "tablethash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "TabletOfDiscovery",
+                            "path": "/xmage/TabletOfDiscovery.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": ["OneShotEffect", "TabletOfDiscoveryEffect"],
+                            "ability_classes": [
+                                "ConditionalColoredManaAbility",
+                                "EntersBattlefieldTriggeredAbility",
+                                "RedManaAbility",
+                            ],
+                            "target_classes": [],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "ramp_permanent",
+                                "battle_model_scope": "artifact_etb_mill_one_play_milled_card_this_turn_red_spell_mana_v1",
+                                "is_mana_source": True,
+                                "mana_produced": 1,
+                                "produces": "R",
+                                "etb_mill_count": 1,
+                                "etb_milled_card_playable_this_turn": True,
+                                "etb_milled_card_play_status": "annotation_only",
+                                "conditional_instant_sorcery_mana_produced": 2,
+                                "conditional_instant_sorcery_mana_color": "R",
+                                "conditional_instant_sorcery_mana_status": "annotation_only",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+        self.assertEqual(report["cards"][0]["family_id"], "ramp_permanent")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
     def test_classifier_marks_fable_exact_scope_as_batch_safe(self) -> None:

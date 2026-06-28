@@ -217,6 +217,9 @@ def test_variant_gap_miner_blocks_review_only_and_marks_prior_negative(tmp_path)
     assert "Candidate Partial" not in {
         row["candidate"] for row in payload["pairing_hypotheses"]
     }
+    assert len(payload["all_variant_candidates"]) == 5
+    all_by_card = {row["card_name"]: row for row in payload["all_variant_candidates"]}
+    assert all_by_card["Needs Rule"]["status"] == "blocked_runtime_rule_gap"
 
 
 def test_variant_gap_miner_imports_negative_package_gate_history(tmp_path):

@@ -123,6 +123,20 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
+    "topdeck_play": {
+        "effects": {"topdeck_play"},
+        "support_status": "runtime_family_required",
+        "implementation_unit": "top-of-library visibility and permission to play cards from library under board-state conditions",
+        "family_tests": [],
+        "batch_strategy": "implement_family_before_metadata_batch",
+    },
+    "static_damage_modifier": {
+        "effects": {"damage_modifier"},
+        "support_status": "runtime_family_required",
+        "implementation_unit": "continuous replacement effects that modify damage amounts by source controller and target ownership",
+        "family_tests": [],
+        "batch_strategy": "implement_family_before_metadata_batch",
+    },
     "mill_spell": {
         "effects": {"brain_freeze", "mill_cards", "mill_engine"},
         "support_status": "runtime_family_partially_supported_review_required",
@@ -1286,6 +1300,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("cycling_status") == "annotation_only"
             and int(effect_json.get("cycle_trigger_damage_each_opponent") or 0) == 1
             and effect_json.get("cycle_trigger_status") == "annotation_only"
+        )
+
+    if effect == "creature" and scope == "zero_one_colorless_mana_dork_mill_one_v1":
+        return (
+            types == {"ARTIFACT", "CREATURE"}
+            and effect_classes == set()
+            and ability_classes == {"ColorlessManaAbility"}
+            and cost_classes == {"MillCardsCost"}
+            and int(effect_json.get("power") or 0) == 0
+            and int(effect_json.get("toughness") or 0) == 1
+            and bool(effect_json.get("is_mana_source"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "C"
+            and int(effect_json.get("mana_source_mill_count") or 0) == 1
+            and effect_json.get("mana_source_mill_status") == "annotation_only"
         )
 
     if effect in {"creature", "passive"} and scope in {
@@ -2595,6 +2624,27 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("produces") == "C"
             and bool(effect_json.get("does_not_untap_in_untap_step"))
             and int(effect_json.get("activated_untap_cost_generic") or 0) in {3, 4}
+        )
+
+    if effect == "ramp_permanent" and scope == "artifact_etb_mill_one_play_milled_card_this_turn_red_spell_mana_v1":
+        return (
+            types == {"ARTIFACT"}
+            and {"OneShotEffect", "TabletOfDiscoveryEffect"}.issubset(effect_classes)
+            and {
+                "ConditionalColoredManaAbility",
+                "EntersBattlefieldTriggeredAbility",
+                "RedManaAbility",
+            }.issubset(ability_classes)
+            and not cost_classes
+            and bool(effect_json.get("is_mana_source"))
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "R"
+            and int(effect_json.get("etb_mill_count") or 0) == 1
+            and bool(effect_json.get("etb_milled_card_playable_this_turn"))
+            and effect_json.get("etb_milled_card_play_status") == "annotation_only"
+            and int(effect_json.get("conditional_instant_sorcery_mana_produced") or 0) == 2
+            and effect_json.get("conditional_instant_sorcery_mana_color") == "R"
+            and effect_json.get("conditional_instant_sorcery_mana_status") == "annotation_only"
         )
 
     if effect == "land_ramp" and scope == "sacrifice_land_for_any_land_to_battlefield_untapped_v1":
