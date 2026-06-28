@@ -1,382 +1,8 @@
 {
-  "generated_at": "2026-06-28T10:03:35Z",
+  "generated_at": "2026-06-28T10:16:25Z",
   "package_count": 14,
   "package_definition_files": [],
   "packages": [
-    {
-      "adds": [
-        "Mana Vault"
-      ],
-      "blockers": [],
-      "command": [
-        "python3",
-        "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
-        "--packages",
-        "mana_vault_fast_mana_cut_arcane_signet",
-        "--games",
-        "1",
-        "--opponent-limit",
-        "3",
-        "--opponent-seed",
-        "20260626",
-        "--simulation-seed",
-        "42",
-        "--stem",
-        "lorehold_exposure_aware_gate_queue_20260628_v2_run",
-        "--forced-access-mode",
-        "opening_hand"
-      ],
-      "command_text": "python3 /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages mana_vault_fast_mana_cut_arcane_signet --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260628_v2_run --forced-access-mode opening_hand",
-      "cut_safety": {
-        "cuts": [],
-        "reason": "no proposed cut has previous blocker evidence",
-        "status": "clear"
-      },
-      "cuts": [
-        "Arcane Signet"
-      ],
-      "decision": "diagnostic_only_low_exposure_requires_card_access",
-      "family": "fast_mana",
-      "forced_access_mode": "opening_hand",
-      "hypothesis_negative": {},
-      "natural_promotion_allowed": false,
-      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
-      "prior_evidence": {
-        "matches": [
-          {
-            "adds": [
-              "Mana Vault"
-            ],
-            "adds_signature": [
-              "mana vault"
-            ],
-            "baseline": {
-              "avg_win_turn": 15.0,
-              "losses": 0,
-              "stalls": 0,
-              "strategic_event_counts": {
-                "graveyard_upkeep_return_self_to_hand": 3,
-                "lorehold_cost_paid": 61,
-                "lorehold_spell_cast": 53,
-                "lorehold_spell_rummage": 16,
-                "lorehold_spell_rummage_discards_squee": 4,
-                "lorehold_upkeep_rummage": 8,
-                "miracle_cast": 13,
-                "squee_return_after_known_graveyard_entry": 3,
-                "squee_to_graveyard": 4,
-                "squee_upkeep_return": 3,
-                "topdeck_manipulation_activated": 12
-              },
-              "win_rate": 100.0,
-              "wins": 3
-            },
-            "candidate": {
-              "avg_win_turn": 24.0,
-              "losses": 2,
-              "stalls": 0,
-              "strategic_event_counts": {
-                "lorehold_cost_paid": 30,
-                "lorehold_spell_cast": 25,
-                "lorehold_upkeep_rummage": 9,
-                "miracle_cast": 7,
-                "topdeck_manipulation_activated": 11
-              },
-              "win_rate": 33.33,
-              "wins": 1
-            },
-            "cuts": [
-              "Arcane Signet"
-            ],
-            "cuts_signature": [
-              "arcane signet"
-            ],
-            "decision": "reject_or_rework",
-            "delta_pp": -66.67,
-            "exposure_summary": {
-              "baseline_cut_cards": {
-                "all_cards_accessed": true,
-                "all_cards_near_access": true,
-                "all_cards_used": true,
-                "card_count": 1,
-                "cards": [
-                  {
-                    "access_profile": {
-                      "accessed_games": 0,
-                      "accessed_trace_count": 0,
-                      "dominant_zone": null,
-                      "drawn_games": 0,
-                      "drawn_trace_count": 0,
-                      "library_only_games": 0,
-                      "near_access_games": 0,
-                      "near_access_trace_count": 0,
-                      "opening_hand_games": 0,
-                      "opening_hand_trace_count": 0,
-                      "trace_count": 0,
-                      "trace_games": 0,
-                      "zone_counts": {}
-                    },
-                    "card_name": "Arcane Signet",
-                    "event_breakdown": {
-                      "cost_paid": 2,
-                      "spell_cast": 2
-                    },
-                    "location_trace_count": 0,
-                    "location_trace_games": 0,
-                    "recorded_use_count": 4,
-                    "status": "used"
-                  }
-                ],
-                "cards_with_access": 1,
-                "cards_with_near_access": 1,
-                "cards_with_recorded_use": 1,
-                "total_recorded_use_count": 4
-              },
-              "candidate_added_cards": {
-                "all_cards_accessed": true,
-                "all_cards_near_access": true,
-                "all_cards_used": true,
-                "card_count": 1,
-                "cards": [
-                  {
-                    "access_profile": {
-                      "accessed_games": 0,
-                      "accessed_trace_count": 0,
-                      "dominant_zone": null,
-                      "drawn_games": 0,
-                      "drawn_trace_count": 0,
-                      "library_only_games": 0,
-                      "near_access_games": 0,
-                      "near_access_trace_count": 0,
-                      "opening_hand_games": 0,
-                      "opening_hand_trace_count": 0,
-                      "trace_count": 0,
-                      "trace_games": 0,
-                      "zone_counts": {}
-                    },
-                    "card_name": "Mana Vault",
-                    "event_breakdown": {
-                      "cost_paid": 1,
-                      "spell_cast": 1
-                    },
-                    "location_trace_count": 0,
-                    "location_trace_games": 0,
-                    "recorded_use_count": 2,
-                    "status": "used"
-                  }
-                ],
-                "cards_with_access": 1,
-                "cards_with_near_access": 1,
-                "cards_with_recorded_use": 1,
-                "total_recorded_use_count": 2
-              },
-              "low_candidate_added_card_access": false,
-              "low_candidate_added_card_use": false,
-              "next_step": "evaluate_winrate_and_strategy_delta",
-              "status": "candidate_added_cards_used"
-            },
-            "family": "fast_mana",
-            "forced_access_mode": "none",
-            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000_mana_vault_fast_mana_cut_arcane_signet.json",
-            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000_mana_vault_fast_mana_cut_arcane_signet.md",
-            "gate_returncode": 0,
-            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
-            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
-            "source_section": null,
-            "strategic_delta": {
-              "birgi_spell_cast_mana": 0,
-              "damage_prevention_shield_created": 0,
-              "discard_to_top_replacement": 0,
-              "hand_to_topdeck_activation": 0,
-              "lorehold_cost_paid": -31,
-              "lorehold_rummage_discard_to_top": 0,
-              "lorehold_spell_cast": -28,
-              "lorehold_spell_rummage": -16,
-              "lorehold_spell_rummage_discard_to_top": 0,
-              "miracle_cast": -6,
-              "random_discard_after_tutor": -1,
-              "ritual_mana_added": 0,
-              "spell_cast_mana_trigger": 0,
-              "squee_return_after_known_graveyard_entry": -3,
-              "squee_to_graveyard": -4,
-              "squee_upkeep_return": -3,
-              "topdeck_manipulation_activated": -1,
-              "tutor_resolved": -2
-            }
-          },
-          {
-            "adds": [
-              "Mana Vault"
-            ],
-            "adds_signature": [
-              "mana vault"
-            ],
-            "baseline": {
-              "avg_win_turn": 15.0,
-              "losses": 0,
-              "stalls": 0,
-              "strategic_event_counts": {
-                "graveyard_upkeep_return_self_to_hand": 3,
-                "lorehold_cost_paid": 61,
-                "lorehold_spell_cast": 53,
-                "lorehold_spell_rummage": 16,
-                "lorehold_spell_rummage_discards_squee": 4,
-                "lorehold_upkeep_rummage": 8,
-                "miracle_cast": 13,
-                "squee_return_after_known_graveyard_entry": 3,
-                "squee_to_graveyard": 4,
-                "squee_upkeep_return": 3,
-                "topdeck_manipulation_activated": 12
-              },
-              "win_rate": 100.0,
-              "wins": 3
-            },
-            "candidate": {
-              "avg_win_turn": 15.0,
-              "losses": 2,
-              "stalls": 0,
-              "strategic_event_counts": {
-                "discard_to_top_replacement": 11,
-                "graveyard_upkeep_return_self_to_hand": 3,
-                "lorehold_cost_paid": 41,
-                "lorehold_rummage_discard_to_top": 11,
-                "lorehold_rummage_discards_squee": 2,
-                "lorehold_spell_cast": 35,
-                "lorehold_upkeep_rummage": 29,
-                "miracle_cast": 9,
-                "squee_return_after_known_graveyard_entry": 3,
-                "squee_to_graveyard": 3,
-                "squee_upkeep_return": 3,
-                "topdeck_manipulation_activated": 12
-              },
-              "win_rate": 33.33,
-              "wins": 1
-            },
-            "cuts": [
-              "Arcane Signet"
-            ],
-            "cuts_signature": [
-              "arcane signet"
-            ],
-            "decision": "reject_or_rework",
-            "delta_pp": -66.67,
-            "exposure_summary": {
-              "baseline_cut_cards": {
-                "all_cards_accessed": true,
-                "all_cards_near_access": true,
-                "all_cards_used": true,
-                "card_count": 1,
-                "cards": [
-                  {
-                    "access_profile": {
-                      "accessed_games": 0,
-                      "accessed_trace_count": 0,
-                      "dominant_zone": null,
-                      "drawn_games": 0,
-                      "drawn_trace_count": 0,
-                      "library_only_games": 0,
-                      "near_access_games": 0,
-                      "near_access_trace_count": 0,
-                      "opening_hand_games": 0,
-                      "opening_hand_trace_count": 0,
-                      "trace_count": 0,
-                      "trace_games": 0,
-                      "zone_counts": {}
-                    },
-                    "card_name": "Arcane Signet",
-                    "event_breakdown": {
-                      "cost_paid": 2,
-                      "spell_cast": 2
-                    },
-                    "location_trace_count": 0,
-                    "location_trace_games": 0,
-                    "recorded_use_count": 4,
-                    "status": "used"
-                  }
-                ],
-                "cards_with_access": 1,
-                "cards_with_near_access": 1,
-                "cards_with_recorded_use": 1,
-                "total_recorded_use_count": 4
-              },
-              "candidate_added_cards": {
-                "all_cards_accessed": true,
-                "all_cards_near_access": true,
-                "all_cards_used": true,
-                "card_count": 1,
-                "cards": [
-                  {
-                    "access_profile": {
-                      "accessed_games": 0,
-                      "accessed_trace_count": 0,
-                      "dominant_zone": null,
-                      "drawn_games": 0,
-                      "drawn_trace_count": 0,
-                      "library_only_games": 0,
-                      "near_access_games": 0,
-                      "near_access_trace_count": 0,
-                      "opening_hand_games": 0,
-                      "opening_hand_trace_count": 0,
-                      "trace_count": 0,
-                      "trace_games": 0,
-                      "zone_counts": {}
-                    },
-                    "card_name": "Mana Vault",
-                    "event_breakdown": {
-                      "cost_paid": 2,
-                      "spell_cast": 2
-                    },
-                    "location_trace_count": 0,
-                    "location_trace_games": 0,
-                    "recorded_use_count": 4,
-                    "status": "used"
-                  }
-                ],
-                "cards_with_access": 1,
-                "cards_with_near_access": 1,
-                "cards_with_recorded_use": 1,
-                "total_recorded_use_count": 4
-              },
-              "low_candidate_added_card_access": false,
-              "low_candidate_added_card_use": false,
-              "next_step": "evaluate_winrate_and_strategy_delta",
-              "status": "candidate_added_cards_used"
-            },
-            "family": "fast_mana",
-            "forced_access_mode": "none",
-            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000_mana_vault_fast_mana_cut_arcane_signet.json",
-            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000_mana_vault_fast_mana_cut_arcane_signet.md",
-            "gate_returncode": 0,
-            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
-            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
-            "source_section": null,
-            "strategic_delta": {
-              "birgi_spell_cast_mana": 0,
-              "damage_prevention_shield_created": 0,
-              "discard_to_top_replacement": 11,
-              "hand_to_topdeck_activation": 0,
-              "lorehold_cost_paid": -20,
-              "lorehold_rummage_discard_to_top": 11,
-              "lorehold_spell_cast": -18,
-              "lorehold_spell_rummage": -16,
-              "lorehold_spell_rummage_discard_to_top": 0,
-              "miracle_cast": -4,
-              "random_discard_after_tutor": -1,
-              "ritual_mana_added": 0,
-              "spell_cast_mana_trigger": 0,
-              "squee_return_after_known_graveyard_entry": 0,
-              "squee_to_graveyard": -1,
-              "squee_upkeep_return": 0,
-              "topdeck_manipulation_activated": 0,
-              "tutor_resolved": -4
-            }
-          }
-        ],
-        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
-        "status": "forced_access_diagnostic_despite_prior_reject"
-      },
-      "readiness_blockers": [],
-      "status": "forced_exposure_probe_ready"
-    },
     {
       "adds": [
         "Twinflame Tyrant"
@@ -1491,6 +1117,538 @@
     },
     {
       "adds": [
+        "Mana Vault"
+      ],
+      "blockers": [
+        "prior_natural_confirmation_reject"
+      ],
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "decision": "not_run_prior_natural_confirmation_reject",
+      "family": "fast_mana",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Mana Vault"
+            ],
+            "adds_signature": [
+              "mana vault"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 24.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 30,
+                "lorehold_spell_cast": 25,
+                "lorehold_upkeep_rummage": 9,
+                "miracle_cast": 7,
+                "topdeck_manipulation_activated": 11
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Arcane Signet"
+            ],
+            "cuts_signature": [
+              "arcane signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Arcane Signet",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Mana Vault",
+                    "event_breakdown": {
+                      "cost_paid": 1,
+                      "spell_cast": 1
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "recorded_use_count": 2,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 2
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "fast_mana",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000_mana_vault_fast_mana_cut_arcane_signet.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000_mana_vault_fast_mana_cut_arcane_signet.md",
+            "gate_returncode": 0,
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -31,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -28,
+              "lorehold_spell_rummage": -16,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -6,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -3,
+              "squee_to_graveyard": -4,
+              "squee_upkeep_return": -3,
+              "topdeck_manipulation_activated": -1,
+              "tutor_resolved": -2
+            }
+          },
+          {
+            "adds": [
+              "Mana Vault"
+            ],
+            "adds_signature": [
+              "mana vault"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 15.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 11,
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 41,
+                "lorehold_rummage_discard_to_top": 11,
+                "lorehold_rummage_discards_squee": 2,
+                "lorehold_spell_cast": 35,
+                "lorehold_upkeep_rummage": 29,
+                "miracle_cast": 9,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 3,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Arcane Signet"
+            ],
+            "cuts_signature": [
+              "arcane signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Arcane Signet",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 0,
+                      "accessed_trace_count": 0,
+                      "dominant_zone": null,
+                      "drawn_games": 0,
+                      "drawn_trace_count": 0,
+                      "library_only_games": 0,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 0,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 0,
+                      "trace_games": 0,
+                      "zone_counts": {}
+                    },
+                    "card_name": "Mana Vault",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 0,
+                    "location_trace_games": 0,
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "fast_mana",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000_mana_vault_fast_mana_cut_arcane_signet.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000_mana_vault_fast_mana_cut_arcane_signet.md",
+            "gate_returncode": 0,
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 11,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -20,
+              "lorehold_rummage_discard_to_top": 11,
+              "lorehold_spell_cast": -18,
+              "lorehold_spell_rummage": -16,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -4,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 0,
+              "tutor_resolved": -4
+            }
+          },
+          {
+            "adds": [
+              "Mana Vault"
+            ],
+            "adds_signature": [
+              "mana vault"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 15.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 11,
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 41,
+                "lorehold_rummage_discard_to_top": 11,
+                "lorehold_rummage_discards_squee": 2,
+                "lorehold_spell_cast": 35,
+                "lorehold_upkeep_rummage": 29,
+                "miracle_cast": 9,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 3,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Arcane Signet"
+            ],
+            "cuts_signature": [
+              "arcane signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {
+              "baseline_cut_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 2,
+                      "accessed_trace_count": 79,
+                      "dominant_zone": "library",
+                      "drawn_games": 2,
+                      "drawn_trace_count": 2,
+                      "library_only_games": 1,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 32,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 218,
+                      "trace_games": 3,
+                      "zone_counts": {
+                        "battlefield": 77,
+                        "hand": 2,
+                        "library": 139
+                      }
+                    },
+                    "card_name": "Arcane Signet",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 218,
+                    "location_trace_games": 3,
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "candidate_added_cards": {
+                "all_cards_accessed": true,
+                "all_cards_near_access": true,
+                "all_cards_used": true,
+                "card_count": 1,
+                "cards": [
+                  {
+                    "access_profile": {
+                      "accessed_games": 2,
+                      "accessed_trace_count": 71,
+                      "dominant_zone": "library",
+                      "drawn_games": 1,
+                      "drawn_trace_count": 1,
+                      "library_only_games": 1,
+                      "near_access_games": 0,
+                      "near_access_trace_count": 29,
+                      "opening_hand_games": 0,
+                      "opening_hand_trace_count": 0,
+                      "trace_count": 146,
+                      "trace_games": 3,
+                      "zone_counts": {
+                        "battlefield": 38,
+                        "exile": 29,
+                        "hand": 4,
+                        "library": 75
+                      }
+                    },
+                    "card_name": "Mana Vault",
+                    "event_breakdown": {
+                      "cost_paid": 2,
+                      "spell_cast": 2
+                    },
+                    "location_trace_count": 146,
+                    "location_trace_games": 3,
+                    "recorded_use_count": 4,
+                    "status": "used"
+                  }
+                ],
+                "cards_with_access": 1,
+                "cards_with_near_access": 1,
+                "cards_with_recorded_use": 1,
+                "total_recorded_use_count": 4
+              },
+              "low_candidate_added_card_access": false,
+              "low_candidate_added_card_use": false,
+              "next_step": "evaluate_winrate_and_strategy_delta",
+              "status": "candidate_added_cards_used"
+            },
+            "family": "fast_mana",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237_mana_vault_fast_mana_cut_arcane_signet.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237_mana_vault_fast_mana_cut_arcane_signet.md",
+            "gate_returncode": 0,
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 11,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -20,
+              "lorehold_rummage_discard_to_top": 11,
+              "lorehold_spell_cast": -18,
+              "lorehold_spell_rummage": -16,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -4,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": 0,
+              "tutor_resolved": -4
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "blocked_prior_evidence"
+    },
+    {
+      "adds": [
         "Reprieve"
       ],
       "blockers": [
@@ -1990,399 +2148,58 @@
   ],
   "postgres_writes": false,
   "readiness_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v6_current_miner.json",
-  "ready_queue": [
-    {
-      "adds": [
-        "Mana Vault"
-      ],
-      "blockers": [],
-      "command": [
-        "python3",
-        "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
-        "--packages",
-        "mana_vault_fast_mana_cut_arcane_signet",
-        "--games",
-        "1",
-        "--opponent-limit",
-        "3",
-        "--opponent-seed",
-        "20260626",
-        "--simulation-seed",
-        "42",
-        "--stem",
-        "lorehold_exposure_aware_gate_queue_20260628_v2_run",
-        "--forced-access-mode",
-        "opening_hand"
-      ],
-      "command_text": "python3 /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages mana_vault_fast_mana_cut_arcane_signet --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260628_v2_run --forced-access-mode opening_hand",
-      "cut_safety": {
-        "cuts": [],
-        "reason": "no proposed cut has previous blocker evidence",
-        "status": "clear"
-      },
-      "cuts": [
-        "Arcane Signet"
-      ],
-      "decision": "diagnostic_only_low_exposure_requires_card_access",
-      "family": "fast_mana",
-      "forced_access_mode": "opening_hand",
-      "hypothesis_negative": {},
-      "natural_promotion_allowed": false,
-      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
-      "prior_evidence": {
-        "matches": [
-          {
-            "adds": [
-              "Mana Vault"
-            ],
-            "adds_signature": [
-              "mana vault"
-            ],
-            "baseline": {
-              "avg_win_turn": 15.0,
-              "losses": 0,
-              "stalls": 0,
-              "strategic_event_counts": {
-                "graveyard_upkeep_return_self_to_hand": 3,
-                "lorehold_cost_paid": 61,
-                "lorehold_spell_cast": 53,
-                "lorehold_spell_rummage": 16,
-                "lorehold_spell_rummage_discards_squee": 4,
-                "lorehold_upkeep_rummage": 8,
-                "miracle_cast": 13,
-                "squee_return_after_known_graveyard_entry": 3,
-                "squee_to_graveyard": 4,
-                "squee_upkeep_return": 3,
-                "topdeck_manipulation_activated": 12
-              },
-              "win_rate": 100.0,
-              "wins": 3
-            },
-            "candidate": {
-              "avg_win_turn": 24.0,
-              "losses": 2,
-              "stalls": 0,
-              "strategic_event_counts": {
-                "lorehold_cost_paid": 30,
-                "lorehold_spell_cast": 25,
-                "lorehold_upkeep_rummage": 9,
-                "miracle_cast": 7,
-                "topdeck_manipulation_activated": 11
-              },
-              "win_rate": 33.33,
-              "wins": 1
-            },
-            "cuts": [
-              "Arcane Signet"
-            ],
-            "cuts_signature": [
-              "arcane signet"
-            ],
-            "decision": "reject_or_rework",
-            "delta_pp": -66.67,
-            "exposure_summary": {
-              "baseline_cut_cards": {
-                "all_cards_accessed": true,
-                "all_cards_near_access": true,
-                "all_cards_used": true,
-                "card_count": 1,
-                "cards": [
-                  {
-                    "access_profile": {
-                      "accessed_games": 0,
-                      "accessed_trace_count": 0,
-                      "dominant_zone": null,
-                      "drawn_games": 0,
-                      "drawn_trace_count": 0,
-                      "library_only_games": 0,
-                      "near_access_games": 0,
-                      "near_access_trace_count": 0,
-                      "opening_hand_games": 0,
-                      "opening_hand_trace_count": 0,
-                      "trace_count": 0,
-                      "trace_games": 0,
-                      "zone_counts": {}
-                    },
-                    "card_name": "Arcane Signet",
-                    "event_breakdown": {
-                      "cost_paid": 2,
-                      "spell_cast": 2
-                    },
-                    "location_trace_count": 0,
-                    "location_trace_games": 0,
-                    "recorded_use_count": 4,
-                    "status": "used"
-                  }
-                ],
-                "cards_with_access": 1,
-                "cards_with_near_access": 1,
-                "cards_with_recorded_use": 1,
-                "total_recorded_use_count": 4
-              },
-              "candidate_added_cards": {
-                "all_cards_accessed": true,
-                "all_cards_near_access": true,
-                "all_cards_used": true,
-                "card_count": 1,
-                "cards": [
-                  {
-                    "access_profile": {
-                      "accessed_games": 0,
-                      "accessed_trace_count": 0,
-                      "dominant_zone": null,
-                      "drawn_games": 0,
-                      "drawn_trace_count": 0,
-                      "library_only_games": 0,
-                      "near_access_games": 0,
-                      "near_access_trace_count": 0,
-                      "opening_hand_games": 0,
-                      "opening_hand_trace_count": 0,
-                      "trace_count": 0,
-                      "trace_games": 0,
-                      "zone_counts": {}
-                    },
-                    "card_name": "Mana Vault",
-                    "event_breakdown": {
-                      "cost_paid": 1,
-                      "spell_cast": 1
-                    },
-                    "location_trace_count": 0,
-                    "location_trace_games": 0,
-                    "recorded_use_count": 2,
-                    "status": "used"
-                  }
-                ],
-                "cards_with_access": 1,
-                "cards_with_near_access": 1,
-                "cards_with_recorded_use": 1,
-                "total_recorded_use_count": 2
-              },
-              "low_candidate_added_card_access": false,
-              "low_candidate_added_card_use": false,
-              "next_step": "evaluate_winrate_and_strategy_delta",
-              "status": "candidate_added_cards_used"
-            },
-            "family": "fast_mana",
-            "forced_access_mode": "none",
-            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000_mana_vault_fast_mana_cut_arcane_signet.json",
-            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000_mana_vault_fast_mana_cut_arcane_signet.md",
-            "gate_returncode": 0,
-            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
-            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
-            "source_section": null,
-            "strategic_delta": {
-              "birgi_spell_cast_mana": 0,
-              "damage_prevention_shield_created": 0,
-              "discard_to_top_replacement": 0,
-              "hand_to_topdeck_activation": 0,
-              "lorehold_cost_paid": -31,
-              "lorehold_rummage_discard_to_top": 0,
-              "lorehold_spell_cast": -28,
-              "lorehold_spell_rummage": -16,
-              "lorehold_spell_rummage_discard_to_top": 0,
-              "miracle_cast": -6,
-              "random_discard_after_tutor": -1,
-              "ritual_mana_added": 0,
-              "spell_cast_mana_trigger": 0,
-              "squee_return_after_known_graveyard_entry": -3,
-              "squee_to_graveyard": -4,
-              "squee_upkeep_return": -3,
-              "topdeck_manipulation_activated": -1,
-              "tutor_resolved": -2
-            }
-          },
-          {
-            "adds": [
-              "Mana Vault"
-            ],
-            "adds_signature": [
-              "mana vault"
-            ],
-            "baseline": {
-              "avg_win_turn": 15.0,
-              "losses": 0,
-              "stalls": 0,
-              "strategic_event_counts": {
-                "graveyard_upkeep_return_self_to_hand": 3,
-                "lorehold_cost_paid": 61,
-                "lorehold_spell_cast": 53,
-                "lorehold_spell_rummage": 16,
-                "lorehold_spell_rummage_discards_squee": 4,
-                "lorehold_upkeep_rummage": 8,
-                "miracle_cast": 13,
-                "squee_return_after_known_graveyard_entry": 3,
-                "squee_to_graveyard": 4,
-                "squee_upkeep_return": 3,
-                "topdeck_manipulation_activated": 12
-              },
-              "win_rate": 100.0,
-              "wins": 3
-            },
-            "candidate": {
-              "avg_win_turn": 15.0,
-              "losses": 2,
-              "stalls": 0,
-              "strategic_event_counts": {
-                "discard_to_top_replacement": 11,
-                "graveyard_upkeep_return_self_to_hand": 3,
-                "lorehold_cost_paid": 41,
-                "lorehold_rummage_discard_to_top": 11,
-                "lorehold_rummage_discards_squee": 2,
-                "lorehold_spell_cast": 35,
-                "lorehold_upkeep_rummage": 29,
-                "miracle_cast": 9,
-                "squee_return_after_known_graveyard_entry": 3,
-                "squee_to_graveyard": 3,
-                "squee_upkeep_return": 3,
-                "topdeck_manipulation_activated": 12
-              },
-              "win_rate": 33.33,
-              "wins": 1
-            },
-            "cuts": [
-              "Arcane Signet"
-            ],
-            "cuts_signature": [
-              "arcane signet"
-            ],
-            "decision": "reject_or_rework",
-            "delta_pp": -66.67,
-            "exposure_summary": {
-              "baseline_cut_cards": {
-                "all_cards_accessed": true,
-                "all_cards_near_access": true,
-                "all_cards_used": true,
-                "card_count": 1,
-                "cards": [
-                  {
-                    "access_profile": {
-                      "accessed_games": 0,
-                      "accessed_trace_count": 0,
-                      "dominant_zone": null,
-                      "drawn_games": 0,
-                      "drawn_trace_count": 0,
-                      "library_only_games": 0,
-                      "near_access_games": 0,
-                      "near_access_trace_count": 0,
-                      "opening_hand_games": 0,
-                      "opening_hand_trace_count": 0,
-                      "trace_count": 0,
-                      "trace_games": 0,
-                      "zone_counts": {}
-                    },
-                    "card_name": "Arcane Signet",
-                    "event_breakdown": {
-                      "cost_paid": 2,
-                      "spell_cast": 2
-                    },
-                    "location_trace_count": 0,
-                    "location_trace_games": 0,
-                    "recorded_use_count": 4,
-                    "status": "used"
-                  }
-                ],
-                "cards_with_access": 1,
-                "cards_with_near_access": 1,
-                "cards_with_recorded_use": 1,
-                "total_recorded_use_count": 4
-              },
-              "candidate_added_cards": {
-                "all_cards_accessed": true,
-                "all_cards_near_access": true,
-                "all_cards_used": true,
-                "card_count": 1,
-                "cards": [
-                  {
-                    "access_profile": {
-                      "accessed_games": 0,
-                      "accessed_trace_count": 0,
-                      "dominant_zone": null,
-                      "drawn_games": 0,
-                      "drawn_trace_count": 0,
-                      "library_only_games": 0,
-                      "near_access_games": 0,
-                      "near_access_trace_count": 0,
-                      "opening_hand_games": 0,
-                      "opening_hand_trace_count": 0,
-                      "trace_count": 0,
-                      "trace_games": 0,
-                      "zone_counts": {}
-                    },
-                    "card_name": "Mana Vault",
-                    "event_breakdown": {
-                      "cost_paid": 2,
-                      "spell_cast": 2
-                    },
-                    "location_trace_count": 0,
-                    "location_trace_games": 0,
-                    "recorded_use_count": 4,
-                    "status": "used"
-                  }
-                ],
-                "cards_with_access": 1,
-                "cards_with_near_access": 1,
-                "cards_with_recorded_use": 1,
-                "total_recorded_use_count": 4
-              },
-              "low_candidate_added_card_access": false,
-              "low_candidate_added_card_use": false,
-              "next_step": "evaluate_winrate_and_strategy_delta",
-              "status": "candidate_added_cards_used"
-            },
-            "family": "fast_mana",
-            "forced_access_mode": "none",
-            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000_mana_vault_fast_mana_cut_arcane_signet.json",
-            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000_mana_vault_fast_mana_cut_arcane_signet.md",
-            "gate_returncode": 0,
-            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
-            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
-            "source_section": null,
-            "strategic_delta": {
-              "birgi_spell_cast_mana": 0,
-              "damage_prevention_shield_created": 0,
-              "discard_to_top_replacement": 11,
-              "hand_to_topdeck_activation": 0,
-              "lorehold_cost_paid": -20,
-              "lorehold_rummage_discard_to_top": 11,
-              "lorehold_spell_cast": -18,
-              "lorehold_spell_rummage": -16,
-              "lorehold_spell_rummage_discard_to_top": 0,
-              "miracle_cast": -4,
-              "random_discard_after_tutor": -1,
-              "ritual_mana_added": 0,
-              "spell_cast_mana_trigger": 0,
-              "squee_return_after_known_graveyard_entry": 0,
-              "squee_to_graveyard": -1,
-              "squee_upkeep_return": 0,
-              "topdeck_manipulation_activated": 0,
-              "tutor_resolved": -4
-            }
-          }
-        ],
-        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
-        "status": "forced_access_diagnostic_despite_prior_reject"
-      },
-      "readiness_blockers": [],
-      "status": "forced_exposure_probe_ready"
-    }
-  ],
+  "ready_queue": [],
   "source_db_mutated": false,
+  "sources": {
+    "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v3_runtime_readiness.json",
+    "hypothesis_queue": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
+    "planner": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260628_v16_current_default_chain.json",
+    "prior_package_reports": [
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+    ],
+    "readiness_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260628_v1.json",
+    "registry": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json"
+  },
   "summary": {
     "blocked_added_card_readiness_count": 2,
-    "forced_exposure_probe_ready_count": 1,
+    "forced_exposure_probe_ready_count": 0,
     "natural_gate_ready_count": 0,
     "package_count": 14,
     "prior_inconclusive_low_exposure_keys": [
       "mana_vault_fast_mana_cut_arcane_signet"
     ],
-    "ready_count": 1,
-    "recommended_next_action": "run_forced_exposure_probe_before_natural_gate",
+    "ready_count": 0,
+    "recommended_next_action": "resolve_runtime_or_pg_readiness_before_more_battles",
     "status_counts": {
       "blocked_added_card_readiness": 2,
       "blocked_cut_safety": 6,
       "blocked_hypothesis_queue_prior_negative": 2,
-      "blocked_prior_evidence": 3,
-      "forced_exposure_probe_ready": 1
+      "blocked_prior_evidence": 4
     }
   }
 }

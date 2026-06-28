@@ -1,23 +1,25 @@
 # Lorehold Exposure-Aware Gate Queue - 2026-06-28
 
-- Generated at: `2026-06-28T10:03:35Z`
+- Generated at: `2026-06-28T10:16:25Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
+- Readiness report: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260628_v1.json`
+- Hypothesis queue: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json`
+- Planner: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260628_v16_current_default_chain.json`
+- Cut safety report: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v3_runtime_readiness.json`
 
 ## Summary
 
 - Packages reviewed: `14`
-- Status counts: `{"blocked_added_card_readiness": 2, "blocked_cut_safety": 6, "blocked_hypothesis_queue_prior_negative": 2, "blocked_prior_evidence": 3, "forced_exposure_probe_ready": 1}`
-- Ready packages: `1`
+- Status counts: `{"blocked_added_card_readiness": 2, "blocked_cut_safety": 6, "blocked_hypothesis_queue_prior_negative": 2, "blocked_prior_evidence": 4}`
+- Ready packages: `0`
 - Natural gate ready: `0`
-- Forced-exposure diagnostic ready: `1`
-- Recommended next action: `run_forced_exposure_probe_before_natural_gate`
+- Forced-exposure diagnostic ready: `0`
+- Recommended next action: `resolve_runtime_or_pg_readiness_before_more_battles`
 
 ## Ready Queue
 
-| Rank | Package | Status | Adds | Cuts | Promotion allowed | Command |
-| ---: | --- | --- | --- | --- | --- | --- |
-| 1 | `mana_vault_fast_mana_cut_arcane_signet` | `forced_exposure_probe_ready` | `Mana Vault` | `Arcane Signet` | `false` | `python3 /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages mana_vault_fast_mana_cut_arcane_signet --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260628_v2_run --forced-access-mode opening_hand` |
+- No package is ready for execution.
 
 ## Blocked Queue
 
@@ -33,6 +35,7 @@
 | `young_pyromancer_spell_tokens_cut_prismari` | `blocked_cut_safety` | `Young Pyromancer` | `Prismari Pianist` | `cut_safety_blocked`, `hypothesis_queue_exact_negative` |
 | `akromas_will_cut_avatar_wrath` | `blocked_prior_evidence` | `Akroma's Will` | `Avatar's Wrath` | `prior_exact_reject`, `hypothesis_queue_exact_negative` |
 | `grand_abolisher_cut_mother_of_runes` | `blocked_prior_evidence` | `Grand Abolisher` | `Mother of Runes` | `prior_exact_reject`, `hypothesis_queue_exact_negative` |
+| `mana_vault_fast_mana_cut_arcane_signet` | `blocked_prior_evidence` | `Mana Vault` | `Arcane Signet` | `prior_natural_confirmation_reject` |
 | `reprieve_cut_avatar_wrath` | `blocked_prior_evidence` | `Reprieve` | `Avatar's Wrath` | `prior_exact_reject`, `hypothesis_queue_exact_negative` |
 | `perch_protection_cut_avatar_wrath` | `blocked_hypothesis_queue_prior_negative` | `Perch Protection` | `Avatar's Wrath` | `hypothesis_queue_exact_negative` |
 | `silence_cut_avatar_wrath` | `blocked_hypothesis_queue_prior_negative` | `Silence` | `Avatar's Wrath` | `hypothesis_queue_exact_negative` |

@@ -67,6 +67,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
     REPORT_DIR / "lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
     REPORT_DIR / "lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+    REPORT_DIR / "lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
     REPORT_DIR / "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
     REPORT_DIR / "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
     REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",

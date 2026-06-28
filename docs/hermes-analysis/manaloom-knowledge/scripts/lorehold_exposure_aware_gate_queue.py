@@ -185,6 +185,21 @@ def extract_child_status(stdout: str) -> dict[str, Any]:
         return {}
 
 
+def prior_evidence_has_natural_confirmation_reject(prior_evidence: dict[str, Any]) -> bool:
+    for match in prior_evidence.get("matches") or []:
+        if not isinstance(match, dict):
+            continue
+        source = Path(str(match.get("source_report") or "")).name
+        mode = str(match.get("forced_access_mode") or "none")
+        if (
+            "natural_confirmation" in source
+            and mode == "none"
+            and match.get("decision") in package_gate.PRIOR_PACKAGE_BLOCKED_DECISIONS
+        ):
+            return True
+    return False
+
+
 def classify_package(
     *,
     package_key: str,
@@ -219,6 +234,11 @@ def classify_package(
         prior_results,
         forced_access_mode=forced_access_mode,
     )
+    natural_confirmation_prior_reject = (
+        low_exposure_diagnostic
+        and prior_evidence.get("status") == "forced_access_diagnostic_despite_prior_reject"
+        and prior_evidence_has_natural_confirmation_reject(prior_evidence)
+    )
     negative = negative_by_key.get(package_key)
     blockers: list[str] = []
     if readiness_blockers:
@@ -227,6 +247,8 @@ def classify_package(
         blockers.append("cut_safety_blocked")
     if prior_evidence.get("status") == "blocked_prior_reject":
         blockers.append("prior_exact_reject")
+    if natural_confirmation_prior_reject:
+        blockers.append("prior_natural_confirmation_reject")
     if negative:
         blockers.append("hypothesis_queue_exact_negative")
 
@@ -237,6 +259,9 @@ def classify_package(
         elif "cut_safety_blocked" in blockers:
             status = "blocked_cut_safety"
             decision = "not_run_cut_safety_blocked"
+        elif "prior_natural_confirmation_reject" in blockers:
+            status = "blocked_prior_evidence"
+            decision = "not_run_prior_natural_confirmation_reject"
         elif "prior_exact_reject" in blockers:
             status = "blocked_prior_evidence"
             decision = "not_run_prior_reject_blocked"

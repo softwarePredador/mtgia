@@ -96,6 +96,19 @@ def blocking_prior_results():
     }
 
 
+def natural_confirmation_blocking_prior_results():
+    prior = blocking_prior_results()
+    row = prior["by_package_key"]["mana_vault_fast_mana_cut_arcane_signet"][0]
+    row["source_report"] = (
+        "/tmp/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json"
+    )
+    row["forced_access_mode"] = "none"
+    prior["by_signature"] = {
+        "mana vault|arcane signet": [row],
+    }
+    return prior
+
+
 def test_low_exposure_package_becomes_forced_exposure_diagnostic():
     report = build_report()
 
@@ -127,6 +140,28 @@ def test_low_exposure_diagnostic_can_override_prior_reject_blocker():
     assert mana_vault["status"] == "forced_exposure_probe_ready"
     assert mana_vault["prior_evidence"]["status"] == (
         "forced_access_diagnostic_despite_prior_reject"
+    )
+
+
+def test_low_exposure_diagnostic_is_blocked_after_natural_confirmation_reject():
+    report = queue.build_report(
+        readiness_report=readiness_report(),
+        hypothesis_queue={"queue": []},
+        planner_payload=planner_payload(),
+        registry_payload={"untested_queue": []},
+        package_definitions=package_definitions(),
+        cut_safety={"enabled": False},
+        prior_results=natural_confirmation_blocking_prior_results(),
+        command_stem="test_gate_queue",
+    )
+
+    rows = {row["package_key"]: row for row in report["packages"]}
+    mana_vault = rows["mana_vault_fast_mana_cut_arcane_signet"]
+    assert mana_vault["status"] == "blocked_prior_evidence"
+    assert mana_vault["decision"] == "not_run_prior_natural_confirmation_reject"
+    assert "prior_natural_confirmation_reject" in mana_vault["blockers"]
+    assert report["summary"]["recommended_next_action"] == (
+        "no_package_ready; build_new_failure_targeted_package_or_cut_model"
     )
 
 
