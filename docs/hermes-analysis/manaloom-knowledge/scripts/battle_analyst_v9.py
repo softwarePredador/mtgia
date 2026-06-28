@@ -4070,6 +4070,27 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:45c3e1db1be4f2f97a3337ce3de8f767",
         }
     ),
+    "Wild Ricochet": handcrafted_runtime_rule(
+        {
+            "ability_kind": "one_shot",
+            "cmc": 4.0,
+            "effect": "copy_spell",
+            "instant": True,
+            "mana_cost": "{2}{R}{R}",
+            "colors": ["R"],
+            "target": "instant_or_sorcery_on_stack",
+            "target_spell_card_types": ["instant", "sorcery"],
+            "may_choose_new_targets_for_target_spell": True,
+            "choose_new_targets_for_target_spell_status": "annotation_only",
+            "copy_target_stack_object": True,
+            "copy_is_not_cast": True,
+            "may_choose_new_targets": True,
+            "choose_new_targets_status": "annotation_only",
+            "battle_model_scope": "copy_target_instant_or_sorcery_stack_spell_change_original_and_copy_targets_annotation_v1",
+            "_rule_oracle_hash": "c7d62b1c3e0178970919cd0fc3b6b995",
+            "_rule_logical_key": "battle_rule_v1:bb9ee6595d8b30aa87f1a15879e2703a",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4187,6 +4208,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Boros Reckoner",
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
+    "Wild Ricochet",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4317,6 +4339,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active battle-rule gap with XMage-backed activated-ability cost reduction and activated can't-block metadata.",
         ["manaloom_log_learning_audit_20260628_v15_after_ancient_copper_runtime", "ZirdaTheDawnwaker.java"],
         "2026-06-28T22:20:00Z",
+    ),
+    "Wild Ricochet": manual_runtime_waiver_metadata(
+        "Replace no_active battle-rule gap with XMage-backed target instant/sorcery retarget annotation plus executable stack-copy semantics.",
+        ["manaloom_log_learning_audit_20260628_v16_after_zirda_runtime", "WildRicochet.java"],
+        "2026-06-28T22:45:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -9878,6 +9905,12 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 locked_cost=replay_cost_snapshot(locked_cost),
                 alternative_cost=alternative_cost,
                 alternative_cost_kind=alternative_cost_kind,
+                may_choose_new_targets_for_target_spell=bool(
+                    eff.get("may_choose_new_targets_for_target_spell")
+                ),
+                choose_new_targets_for_target_spell_status=eff.get(
+                    "choose_new_targets_for_target_spell_status"
+                ),
                 **copy_target,
                 **fields,
             )
@@ -9919,6 +9952,12 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 copy_stack_depth=len(stack.items),
                 may_choose_new_targets=bool(eff.get("may_choose_new_targets")),
                 choose_new_targets_status=eff.get("choose_new_targets_status"),
+                may_choose_new_targets_for_target_spell=bool(
+                    eff.get("may_choose_new_targets_for_target_spell")
+                ),
+                choose_new_targets_for_target_spell_status=eff.get(
+                    "choose_new_targets_for_target_spell_status"
+                ),
                 turn=turn,
                 phase=phase,
                 **copy_target,

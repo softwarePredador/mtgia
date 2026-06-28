@@ -249,6 +249,21 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
                             "trusted_executable_rule_count": 0,
                         },
                         {
+                            "card_name": "Wild Ricochet",
+                            "deck_count": 1,
+                            "deck_ids": [612],
+                            "findings": [
+                                {
+                                    "code": "no_active_battle_rule",
+                                    "severity": "high",
+                                }
+                            ],
+                            "priority_score": 7093,
+                            "severity": "high",
+                            "total_quantity": 1,
+                            "trusted_executable_rule_count": 0,
+                        },
+                        {
                             "active_rule_count": 2,
                             "card_name": "Verge Rangers",
                             "deck_count": 3,
@@ -307,7 +322,7 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             )
             top_codes = {row["code"]: row["count"] for row in evidence["top_finding_codes"]}
             self.assertEqual(top_codes["generic_effect_without_model_scope"], 1)
-            self.assertEqual(top_codes["no_active_battle_rule"], 2)
+            self.assertEqual(top_codes["no_active_battle_rule"], 3)
             self.assertEqual(top_codes["no_trusted_executable_rule"], 10)
             self.assertEqual(top_codes["review_only_or_needs_review_rule"], 2)
             self.assertEqual(evidence["top_lorehold_runtime_missing_cards"], [])
@@ -357,6 +372,10 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             )
             self.assertEqual(
                 waived_cards["Zirda, the Dawnwaker"],
+                "runtime_waived_pending_pg_promotion",
+            )
+            self.assertEqual(
+                waived_cards["Wild Ricochet"],
                 "runtime_waived_pending_pg_promotion",
             )
 
