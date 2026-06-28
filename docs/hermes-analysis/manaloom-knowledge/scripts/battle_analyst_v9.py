@@ -3859,6 +3859,22 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "battle_model_scope": "neoform_sacrifice_creature_tutor_waiver_v1",
         }
     ),
+    "Verge Rangers": handcrafted_runtime_rule(
+        {
+            "cmc": 3.0,
+            "effect": "topdeck_play",
+            "is_creature_permanent": True,
+            "power": 3,
+            "toughness": 3,
+            "first_strike": True,
+            "look_at_top_library_any_time": True,
+            "play_lands_from_top_library": True,
+            "play_from_top_condition": "opponent_controls_more_lands",
+            "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+            "_rule_oracle_hash": "44aa2eeb2eeb517fb30478aec7cec42f",
+            "_rule_logical_key": "battle_rule_v1:c795721c1dc42d0f9ee3fa23349500e1",
+        }
+    ),
 }
 HANDCRAFTED_KNOWN_CARDS = set(HANDCRAFTED_KNOWN_CARD_RULES)
 
@@ -3881,12 +3897,13 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Vivi Ornitier",
     "Faeburrow Elder",
     "Neoform",
+    "Verge Rangers",
 }
 
 
 _WAIVER_OWNER = "battle-engine-data-governance"
 _WAIVER_PROMOTION_TARGET = "card_battle_rules"
-_WAIVER_EXPIRES_AT_UTC = "2026-06-26T23:59:59Z"
+_WAIVER_EXPIRES_AT_UTC = "2026-07-05T23:59:59Z"
 
 
 def manual_runtime_waiver_metadata(reason, source_runs, opened_at_utc):
@@ -3966,6 +3983,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace stale/heuristic tutor evidence with sacrifice, MV+1 battlefield tutor, and counter semantics.",
         ["20260619_202217", "20260619_202628"],
         "2026-06-19T20:26:28Z",
+    ),
+    "Verge Rangers": manual_runtime_waiver_metadata(
+        "Replace generated review_only topdeck_manipulation evidence with XMage-backed top-library land play semantics.",
+        ["manaloom_log_learning_audit_20260628_v5", "VergeRangers.java"],
+        "2026-06-28T18:40:00Z",
     ),
 }
 

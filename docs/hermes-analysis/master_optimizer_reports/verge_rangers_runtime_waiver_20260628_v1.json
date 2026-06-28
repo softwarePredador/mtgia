@@ -1,0 +1,27 @@
+{
+  "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+  "card": "Verge Rangers",
+  "committed_runtime_surface": "manual_runtime_waiver_until_card_battle_rules_promoted",
+  "evidence": {
+    "direct_runtime_probe": {
+      "effect": "topdeck_play",
+      "execution_status": "auto",
+      "expires_at_utc": "2026-07-05T23:59:59Z",
+      "logical_rule_key": "battle_rule_v1:c795721c1dc42d0f9ee3fa23349500e1",
+      "opened_at_utc": "2026-06-28T18:40:00Z",
+      "oracle_hash": "44aa2eeb2eeb517fb30478aec7cec42f",
+      "review_status": "verified"
+    },
+    "focused_tests": [
+      "test_verge_rangers_runtime_rule_grants_top_library_land_play",
+      "test_verge_rangers_plays_top_land_only_when_opponent_has_more_lands",
+      "test_verge_rangers_does_not_play_top_land_when_not_behind_on_lands"
+    ],
+    "test_command": "python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_verge_rangers_runtime.py -q",
+    "test_result": "3 passed",
+    "xmage_source": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VergeRangers.java"
+  },
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "status": "ready"
+}
