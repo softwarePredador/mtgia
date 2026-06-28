@@ -4111,6 +4111,62 @@ def register_tests(battle, player):
         battle.clear_until_eot(active)
         assert active.silenced_opponents_until_eot is False
 
+    def test_proactive_silence_requires_payoff_after_paying_silence():
+        active = player("Lorehold")
+        silence = {"name": "Silence", "cmc": 1, "type_line": "Instant"}
+        approach = {"name": "Approach of the Second Sun", "cmc": 7, "type_line": "Sorcery"}
+        active.hand = [silence, approach]
+        active.approach_count = 1
+
+        active.battlefield = ["land"] * 7
+        active.refresh_mana_sources(turn=5)
+        assert not battle.has_immediate_silence_payoff(
+            active,
+            "precombat_main",
+            silence_card=silence,
+        )
+
+        active.battlefield = ["land"] * 8
+        active.refresh_mana_sources(turn=5)
+        plan = battle.silence_payoff_plan(
+            active,
+            "precombat_main",
+            silence_card=silence,
+        )
+        assert plan["payoff_card"] == "Approach of the Second Sun"
+
+    def test_proactive_silence_casts_before_second_approach():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Lorehold")
+        active.approach_count = 1
+        active.hand = [
+            {"name": "Silence", "cmc": 1, "type_line": "Instant"},
+            {"name": "Approach of the Second Sun", "cmc": 7, "type_line": "Sorcery"},
+        ]
+        active.battlefield = ["land"] * 8
+        active.refresh_mana_sources(turn=5)
+        opponent = player("Opponent")
+        stack = battle.Stack()
+
+        battle.run_priority_loop(
+            active,
+            [active, opponent],
+            stack,
+            5,
+            "precombat_main",
+            random.Random(99),
+        )
+        battle.REPLAY_EVENT_HANDLER = None
+
+        casts = [
+            data.get("card")
+            for event, data in events
+            if event == "spell_cast"
+        ]
+        assert casts[:2] == ["Silence", "Approach of the Second Sun"]
+        assert active.has_won() is True
+
     def test_pg054_silence_lock_family_rule_provenance():
         cases = [
             (
@@ -19091,6 +19147,8 @@ def register_tests(battle, player):
         test_lorehold_miracle_ignores_lands_and_creatures,
         test_lorehold_miracle_rejects_flash_creatures,
         test_silence_spell_blocks_responses_until_cleanup_only,
+        test_proactive_silence_requires_payoff_after_paying_silence,
+        test_proactive_silence_casts_before_second_approach,
         test_pg054_silence_lock_family_rule_provenance,
         test_pg055_artifact_mana_rock_family_rule_provenance,
         test_pg058_simple_red_ritual_family_rule_provenance,

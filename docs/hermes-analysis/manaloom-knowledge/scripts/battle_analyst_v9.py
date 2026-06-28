@@ -8073,26 +8073,125 @@ def game_winner(all_players):
 
 
 MAIN_PHASES = {"precombat_main", "postcombat_main"}
+SILENCE_PROTECTED_PAYOFF_EFFECTS = {
+    "airbend_other_creatures",
+    "approach",
+    "board_wipe",
+    "brain_freeze",
+    "damage_each_opponent_and_opponent_creatures",
+    "damage_player_and_creatures",
+    "damage_wipe",
+    "damage_wipe_treasure",
+    "exile_artifact_enchantment_creature_convoke_wipe",
+    "exile_top_nonland_free_cast",
+    "extra_turn",
+    "fated_clash_protect_then_destroy",
+    "finisher",
+    "gift_destroy_all_creatures_return_own_destroyed_creature",
+    "graveyard_flashback_grant",
+    "overload_recursion",
+    "redistribute_life_totals",
+    "steal_all_creatures",
+    "thassa_oracle",
+    "wincon",
+    "worldfire_reset",
+}
 
 
-def has_immediate_silence_payoff(player, phase):
+def _restore_payoff_snapshot(player, pool_snapshot, restricted_snapshot, treasures_snapshot, life_snapshot):
+    for color, amount in pool_snapshot.items():
+        setattr(player.mana_pool, color, amount)
+    player.restricted_mana = restricted_snapshot
+    player.treasures = treasures_snapshot
+    player.life = life_snapshot
+
+
+def silence_payoff_plan(player, phase, silence_card=None):
     if phase not in MAIN_PHASES:
-        return False
-    payoff_effects = {
-        "approach",
-        "extra_turn",
-        "finisher",
-        "overload_recursion",
-        "wincon",
-        "worldfire_reset",
-    }
+        return None
+    pool_snapshot = player.mana_pool.snapshot()
+    restricted_snapshot = copy.deepcopy(player.restricted_mana)
+    treasures_snapshot = player.treasures
+    life_snapshot = player.life
+    if silence_card is not None:
+        if not player.can_pay_card(silence_card):
+            return None
+        if not player.spend_card_mana(silence_card):
+            _restore_payoff_snapshot(
+                player,
+                pool_snapshot,
+                restricted_snapshot,
+                treasures_snapshot,
+                life_snapshot,
+            )
+            return None
+    best = None
     for candidate in getattr(player, "hand", []) or []:
-        if not isinstance(candidate, dict) or is_effective_land(candidate):
+        if (
+            candidate is silence_card
+            or not isinstance(candidate, dict)
+            or is_effective_land(candidate)
+        ):
             continue
         effect = str(get_card_effect(candidate).get("effect") or "").lower()
-        if effect in payoff_effects and player.can_pay_card(candidate):
-            return True
-    return False
+        if (
+            effect in COUNTERLIKE_EFFECTS
+            or effect in SILENCE_WINDOW_EFFECTS
+            or effect in RESPONSE_WINDOW_ONLY_EFFECTS
+            or effect not in SILENCE_PROTECTED_PAYOFF_EFFECTS
+        ):
+            continue
+        effect_data = get_card_effect(candidate)
+        if not can_cast_in_phase(candidate, effect_data, phase):
+            continue
+        if should_hold_squee_for_lorehold_recursion(player, candidate, phase):
+            continue
+        if not spell_has_required_library_target(player, effect_data):
+            continue
+        cast_plan = runtime_cast_plan_for_card(player, candidate, effect_data)
+        if cast_plan is None:
+            continue
+        if not additional_card_costs_are_payable(
+            player,
+            candidate,
+            effect_data,
+            cast_plan.get("cost_context"),
+        ):
+            continue
+        all_players = [player] + [
+            opponent
+            for opponent in getattr(player, "_current_opponents", []) or []
+            if opponent is not player
+        ]
+        score = threat_score(
+            effect,
+            candidate.get("name", ""),
+            player,
+            all_players,
+            CURRENT_REPLAY_TURN or 0,
+        )
+        if effect == "approach" and getattr(player, "approach_count", 0) >= 1:
+            score = max(score, 100)
+        plan = {
+            "payoff_card": candidate.get("name", "?"),
+            "payoff_effect": effect,
+            "payoff_score": score,
+            "payoff_cmc": candidate.get("cmc", 0),
+        }
+        if best is None or score > best["payoff_score"]:
+            best = plan
+    _restore_payoff_snapshot(
+        player,
+        pool_snapshot,
+        restricted_snapshot,
+        treasures_snapshot,
+        life_snapshot,
+    )
+    return best
+
+
+def has_immediate_silence_payoff(player, phase, silence_card=None):
+    return silence_payoff_plan(player, phase, silence_card=silence_card) is not None
 
 
 def should_hold_for_response_window(player, card, effect_data, phase):
@@ -8107,7 +8206,11 @@ def should_hold_for_response_window(player, card, effect_data, phase):
         return True
     if effect == "silence_opponents" and not is_instant(card):
         return False
-    if effect in SILENCE_WINDOW_EFFECTS and not has_immediate_silence_payoff(player, phase):
+    if effect in SILENCE_WINDOW_EFFECTS and not has_immediate_silence_payoff(
+        player,
+        phase,
+        silence_card=card,
+    ):
         return True
     return False
 
@@ -30091,6 +30194,145 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 mana = player.available_mana()
                 if note_action():
                     return True
+
+    # 2.5. Proactive silence before a same-turn high-impact payoff.
+    if is_main_phase:
+        silence_options = []
+        for c in list(player.hand):
+            eff = get_card_effect(c)
+            effect_name = str(eff.get("effect") or c.get("effect") or "").lower()
+            if effect_name not in SILENCE_WINDOW_EFFECTS or not is_instant(c):
+                continue
+            cast_plan = runtime_cast_plan_for_card(player, c, eff)
+            if cast_plan is None:
+                continue
+            payoff_plan = silence_payoff_plan(player, phase, silence_card=c)
+            if not payoff_plan:
+                continue
+            silence_options.append((c, eff, cast_plan, payoff_plan))
+        if silence_options:
+            silence_options.sort(
+                key=lambda item: (
+                    -int(item[3].get("payoff_score") or 0),
+                    int(item[0].get("cmc") or 0),
+                    str(item[0].get("name") or ""),
+                )
+            )
+            c, eff, cast_plan, payoff_plan = silence_options[0]
+            if c in player.hand:
+                cast_ctx = begin_cast_context(
+                    player,
+                    c,
+                    phase,
+                    effect_data=eff,
+                    role="proactive_silence",
+                    x_value=cast_plan.get("x_value", 0),
+                    additional_costs=cast_plan.get("additional_costs"),
+                    locked_cost_override=cast_plan.get("locked_cost"),
+                )
+                if commit_cast_payment(cast_ctx):
+                    fields = replay_rule_fields(eff)
+                    chosen_score = max(60, int(payoff_plan.get("payoff_score") or 0))
+                    emit_decision_trace(
+                        decision_type="cast_spell",
+                        player=player,
+                        turn=turn,
+                        phase=phase,
+                        available_options=[
+                            decision_card_option(
+                                option_card,
+                                option_eff,
+                                score=max(60, int(option_plan.get("payoff_score") or 0)),
+                                action="cast_proactive_silence",
+                            )
+                            for option_card, option_eff, _option_cast_plan, option_plan in silence_options[:8]
+                        ],
+                        chosen_option=decision_card_option(
+                            c,
+                            eff,
+                            score=chosen_score,
+                            action="cast_proactive_silence",
+                        ),
+                        rejected_options=[
+                            decision_card_option(
+                                option_card,
+                                option_eff,
+                                score=max(60, int(option_plan.get("payoff_score") or 0)),
+                                action="defer_proactive_silence",
+                            )
+                            for option_card, option_eff, _option_cast_plan, option_plan in silence_options
+                            if option_card is not c
+                        ][:8],
+                        score_components={
+                            "role": "proactive_silence",
+                            "mana_before": mana,
+                            "payoff_card": payoff_plan.get("payoff_card"),
+                            "payoff_effect": payoff_plan.get("payoff_effect"),
+                            "payoff_score": payoff_plan.get("payoff_score"),
+                            "payoff_cmc": payoff_plan.get("payoff_cmc"),
+                        },
+                        rule_source=fields.get("rule_source", "battle_heuristic"),
+                        rule_status=fields.get("rule_review_status", "heuristic"),
+                        confidence="medium",
+                        expected_benefit_score=chosen_score,
+                        actual_outcome="cast_to_stack",
+                        reason="protect_same_turn_high_impact_payoff",
+                        expected_payoff_reason=(
+                            f"protect {payoff_plan.get('payoff_card')} from opponent responses"
+                        ),
+                        strategic_principle="cast_silence_before_same_turn_decisive_spell",
+                        heuristic_version=DECISION_STRATEGY_VERSION,
+                    )
+                    player.hand.remove(c)
+                    emit_replay_event(
+                        "spell_cast",
+                        player=player.name,
+                        card=c.get("name", "?"),
+                        effect=eff.get("effect", "unknown"),
+                        type_line=c.get("type_line", ""),
+                        cmc=c.get("cmc", 0),
+                        turn=turn,
+                        phase=phase,
+                        proactive_silence=True,
+                        payoff_card=payoff_plan.get("payoff_card"),
+                        payoff_effect=payoff_plan.get("payoff_effect"),
+                        payoff_score=payoff_plan.get("payoff_score"),
+                        **cast_ctx.to_replay_fields(),
+                        **replay_rule_fields(eff),
+                    )
+                    mark_cast_ledger_emitted(eff)
+                    if not pay_additional_card_costs(
+                        player,
+                        c,
+                        eff,
+                        turn=turn,
+                        cost_context=cast_plan.get("cost_context"),
+                    ):
+                        player.graveyard.append(c)
+                        return False
+                    trigger_spell_cast_engines(
+                        player, all_players, c, turn, phase, stack=stack, active_player=player
+                    )
+                    trigger_opponent_spell_draw_engines(
+                        player,
+                        opponents,
+                        c,
+                        turn,
+                        phase,
+                        rng,
+                        stack=stack,
+                        active_player=player,
+                        all_players=all_players,
+                    )
+                    stack.push(c, player, eff)
+                    priority_round(player, all_players, stack, turn, rng, phase=phase)
+                    while not stack.empty():
+                        priority_round(player, all_players, stack, turn, rng, phase=phase)
+                        if game_winner(all_players):
+                            return True
+                    mana = player.available_mana()
+                    if note_action():
+                        return True
 
     # 3. Cast spells to stack
     castable = [
