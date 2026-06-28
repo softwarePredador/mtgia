@@ -27,6 +27,10 @@ DEFAULT_MINER_REPORT = (
 )
 DEFAULT_MANUAL_REVIEW = REPORT_DIR / "lorehold_manual_cut_review_20260627_v2.json"
 DEFAULT_EXPOSURE_PROFILES = [REPORT_DIR / "lorehold_card_exposure_profile_20260627_v1.json"]
+DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260627_v1.json"]
+DEFAULT_PRIOR_PACKAGE_REPORTS = [
+    REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+]
 
 
 def utc_now() -> str:
@@ -156,10 +160,67 @@ def summarize_cut_options(pairings: list[dict[str, Any]], limit: int = 5) -> lis
     return cards
 
 
+def infer_package_decision(result: dict[str, Any]) -> str:
+    if result.get("decision"):
+        return str(result["decision"])
+    gate = result.get("gate_summary") or {}
+    baseline = gate.get("baseline") or {}
+    candidate = gate.get("candidate") or {}
+    baseline_wins = int(baseline.get("wins") or 0)
+    candidate_wins = int(candidate.get("wins") or 0)
+    delta = float(gate.get("delta_pp") or 0.0)
+    if delta < 0 or candidate_wins < baseline_wins:
+        return "reject_or_rework"
+    if delta > 0 or candidate_wins > baseline_wins:
+        return "promote_to_deeper_gate"
+    return "tie_or_unknown"
+
+
+def rejected_package_evidence(
+    prior_package_reports: list[tuple[Path, dict[str, Any]]],
+) -> dict[str, dict[str, Any]]:
+    rejected: dict[str, dict[str, Any]] = {}
+    for path, payload in prior_package_reports:
+        packages = payload.get("packages") or []
+        if not isinstance(packages, list):
+            continue
+        for result in packages:
+            if not isinstance(result, dict):
+                continue
+            key = str(result.get("package_key") or "")
+            if not key:
+                continue
+            decision = infer_package_decision(result)
+            if decision != "reject_or_rework":
+                continue
+            gate = result.get("gate_summary") or {}
+            rejected[key] = {
+                "package_key": key,
+                "source_report": str(path),
+                "adds": result.get("adds") or [],
+                "cuts": result.get("cuts") or [],
+                "decision": decision,
+                "delta_pp": gate.get("delta_pp"),
+                "baseline": gate.get("baseline") or {},
+                "candidate": gate.get("candidate") or {},
+            }
+    return rejected
+
+
+def latest_tutor_cut_model(
+    tutor_cut_model_reports: list[tuple[Path, dict[str, Any]]],
+) -> tuple[Path, dict[str, Any]] | None:
+    if not tutor_cut_model_reports:
+        return None
+    return tutor_cut_model_reports[-1]
+
+
 def build_tutor_action(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
     exposures: dict[str, dict[str, Any]],
+    tutor_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
 ) -> dict[str, Any] | None:
     context = manual_context_by_candidate(manual_review)
     candidates = []
@@ -175,6 +236,79 @@ def build_tutor_action(
     if not candidates:
         return None
     names = [str(row["candidate"]) for row in candidates]
+    tutor_model = latest_tutor_cut_model(tutor_cut_model_reports or [])
+    rejected_packages = rejected_package_evidence(prior_package_reports or [])
+    land_tax_package_keys = {
+        "gamble_access_benchmark_cut_land_tax",
+        "enlightened_access_benchmark_cut_land_tax",
+    }
+    land_tax_rejections = {
+        key: rejected_packages[key]
+        for key in land_tax_package_keys
+        if key in rejected_packages
+    }
+    if tutor_model:
+        model_path, model_payload = tutor_model
+        model_summary = model_payload.get("summary") or {}
+        land_tax_benchmarks = [
+            row
+            for row in model_payload.get("top_manual_benchmarks") or []
+            if normalize_key(row.get("cut")) == normalize_key("Land Tax")
+            and normalize_key(row.get("candidate")) in {normalize_key("Gamble"), normalize_key("Enlightened Tutor")}
+        ]
+        if (
+            int(model_summary.get("direct_gate_ready_count") or 0) == 0
+            and land_tax_package_keys.issubset(land_tax_rejections)
+        ):
+            return {
+                "priority": 1,
+                "action_key": "avoid_rejected_tutor_land_tax_swaps",
+                "status": "tutor_land_tax_benchmarks_rejected",
+                "lane": "tutor_access",
+                "candidate_cards": names,
+                "cut_cards": ["Land Tax"],
+                "why_now": (
+                    "The tutor cut model found no direct seed-safe swap, and the highest "
+                    "same-access Land Tax benchmarks already lost the equal gate."
+                ),
+                "blockers": [
+                    "Gamble over Land Tax was rejected by prior gate evidence",
+                    "Enlightened Tutor over Land Tax was rejected by prior gate evidence",
+                    "Thor and Creative Technique tutor cuts already have prior regression evidence",
+                ],
+                "next_steps": [
+                    "Do not rerun exact tutor-over-Land-Tax packages without a changed shell or explicit override.",
+                    "Search for an additive tutor/access package or a different low-exposure non-access cut.",
+                    "Rerun the tutor cut model after any new shell change before another tutor gate.",
+                ],
+                "candidate_exposure": card_exposure_summary(names, exposures),
+                "tutor_cut_model_report": str(model_path),
+                "land_tax_benchmark_rejections": land_tax_rejections,
+            }
+        if int(model_summary.get("direct_gate_ready_count") or 0) == 0 and land_tax_benchmarks:
+            return {
+                "priority": 1,
+                "action_key": "run_tutor_land_tax_benchmark_gate",
+                "status": "same_access_benchmark_required_before_next_tutor_attempt",
+                "lane": "tutor_access",
+                "candidate_cards": names,
+                "cut_cards": ["Land Tax"],
+                "why_now": (
+                    "The tutor cut model is built and ranks Land Tax as the highest same-access "
+                    "benchmark, but that benchmark has not been resolved in prior package evidence."
+                ),
+                "blockers": [
+                    "no direct gate-ready tutor pair exists",
+                    "Land Tax is protected support until the same-access benchmark resolves",
+                ],
+                "next_steps": [
+                    "Run the explicit Gamble/Enlightened Tutor over Land Tax benchmark packages.",
+                    "Promote only if the package beats baseline without seed regression.",
+                    "If rejected, mark exact packages as prior-negative and move to additive access modeling.",
+                ],
+                "candidate_exposure": card_exposure_summary(names, exposures),
+                "tutor_cut_model_report": str(model_path),
+            }
     manual_notes = {
         str(row["candidate"]): {
             "decision": (context.get(normalize_key(row["candidate"])) or {}).get("decision"),
@@ -423,6 +557,8 @@ def build_plan(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
     exposure_profiles: list[tuple[Path, dict[str, Any]]],
+    tutor_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
 ) -> dict[str, Any]:
@@ -452,7 +588,13 @@ def build_plan(
             }
         )
     for action in (
-        build_tutor_action(miner_report, manual_review, exposures),
+        build_tutor_action(
+            miner_report,
+            manual_review,
+            exposures,
+            tutor_cut_model_reports=tutor_cut_model_reports,
+            prior_package_reports=prior_package_reports,
+        ),
         build_hand_filter_action(miner_report, exposures),
         build_recursion_action(miner_report, manual_review, exposures),
         build_mana_action(miner_report),
@@ -468,6 +610,10 @@ def build_plan(
         "miner_report": str(miner_path),
         "manual_review": str(manual_path),
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
+        "tutor_cut_model_reports": [
+            str(path) for path, _payload in (tutor_cut_model_reports or [])
+        ],
+        "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -503,6 +649,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Miner report: `{payload['miner_report']}`",
         f"- Manual review: `{payload['manual_review']}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
+        f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
+        f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -573,6 +721,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--manual-review", type=Path, default=DEFAULT_MANUAL_REVIEW)
     parser.add_argument("--exposure-profile", type=Path, action="append")
+    parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
+    parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260627_v1")
     return parser.parse_args()
 
@@ -583,10 +733,18 @@ def main() -> int:
     manual_review = read_json(args.manual_review)
     exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
     exposure_profiles = read_existing_json(exposure_paths)
+    tutor_cut_model_reports = read_existing_json(
+        args.tutor_cut_model_report or DEFAULT_TUTOR_CUT_MODEL_REPORTS
+    )
+    prior_package_reports = read_existing_json(
+        args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
+    )
     payload = build_plan(
         miner_report=miner_report,
         manual_review=manual_review,
         exposure_profiles=exposure_profiles,
+        tutor_cut_model_reports=tutor_cut_model_reports,
+        prior_package_reports=prior_package_reports,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
     )

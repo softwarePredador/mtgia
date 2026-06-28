@@ -217,6 +217,42 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             ["Thor, God of Thunder"],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["gamble_access_benchmark_cut_land_tax"]["family"],
+            "tutor_access_benchmark",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["gamble_access_benchmark_cut_land_tax"]["adds"],
+            ["Gamble"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["gamble_access_benchmark_cut_land_tax"]["cuts"],
+            ["Land Tax"],
+        )
+        self.assertIn(
+            "lorehold_tutor_cut_model_20260627_v1",
+            gate.PACKAGE_DEFINITIONS["gamble_access_benchmark_cut_land_tax"][
+                "cut_safety_override_reason"
+            ],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["enlightened_access_benchmark_cut_land_tax"]["family"],
+            "tutor_access_benchmark",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["enlightened_access_benchmark_cut_land_tax"]["adds"],
+            ["Enlightened Tutor"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["enlightened_access_benchmark_cut_land_tax"]["cuts"],
+            ["Land Tax"],
+        )
+        self.assertIn(
+            "lorehold_tutor_cut_model_20260627_v1",
+            gate.PACKAGE_DEFINITIONS["enlightened_access_benchmark_cut_land_tax"][
+                "cut_safety_override_reason"
+            ],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )
@@ -434,6 +470,14 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
 
         self.assertEqual(classification["status"], "same_key_different_signature")
         self.assertIn("different add/cut signature", classification["reason"])
+
+    def test_default_prior_reports_include_land_tax_tutor_benchmark_rejects(self):
+        default_names = {path.name for path in gate.DEFAULT_PRIOR_PACKAGE_REPORTS}
+
+        self.assertIn(
+            "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+            default_names,
+        )
 
     def test_render_markdown_handles_preflight_only_rows_without_gate(self):
         markdown = gate.render_markdown(

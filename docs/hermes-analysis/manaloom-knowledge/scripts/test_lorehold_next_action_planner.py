@@ -160,6 +160,56 @@ def exposure_profile():
     )
 
 
+def tutor_cut_model_report():
+    return (
+        planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0],
+        {
+            "summary": {
+                "direct_gate_ready_count": 0,
+                "recommended_next_action": (
+                    "do_not_gate_direct_tutor_swap; benchmark same-access cuts or build additive package"
+                ),
+            },
+            "top_manual_benchmarks": [
+                {
+                    "candidate": "Enlightened Tutor",
+                    "cut": "Land Tax",
+                    "status": "protected_benchmark_required",
+                },
+                {
+                    "candidate": "Gamble",
+                    "cut": "Land Tax",
+                    "status": "protected_benchmark_required",
+                },
+            ],
+        },
+    )
+
+
+def prior_tutor_land_tax_report():
+    def package(key, add):
+        return {
+            "package_key": key,
+            "adds": [add],
+            "cuts": ["Land Tax"],
+            "gate_summary": {
+                "delta_pp": -66.67,
+                "baseline": {"wins": 3, "losses": 0, "stalls": 0, "win_rate": 100.0},
+                "candidate": {"wins": 1, "losses": 2, "stalls": 0, "win_rate": 33.33},
+            },
+        }
+
+    return (
+        planner.DEFAULT_PRIOR_PACKAGE_REPORTS[0],
+        {
+            "packages": [
+                package("gamble_access_benchmark_cut_land_tax", "Gamble"),
+                package("enlightened_access_benchmark_cut_land_tax", "Enlightened Tutor"),
+            ]
+        },
+    )
+
+
 def test_next_action_planner_prioritizes_cut_models_before_gates():
     payload = planner.build_plan(
         miner_report=miner_report(),
@@ -190,3 +240,23 @@ def test_next_action_planner_prioritizes_cut_models_before_gates():
     assert actions["batch_xmage_runtime_rule_gaps"]["candidate_count"] == 2
     guardrails = {row["guardrail_key"] for row in payload["guardrails"]}
     assert "austere_emeria_tradeoff_rejected" in guardrails
+
+
+def test_next_action_planner_moves_past_rejected_land_tax_tutor_benchmarks():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        tutor_cut_model_reports=[tutor_cut_model_report()],
+        prior_package_reports=[prior_tutor_land_tax_report()],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == "avoid_rejected_tutor_land_tax_swaps"
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    tutor_action = actions["avoid_rejected_tutor_land_tax_swaps"]
+    assert tutor_action["status"] == "tutor_land_tax_benchmarks_rejected"
+    assert tutor_action["cut_cards"] == ["Land Tax"]
+    assert set(tutor_action["land_tax_benchmark_rejections"]) == {
+        "gamble_access_benchmark_cut_land_tax",
+        "enlightened_access_benchmark_cut_land_tax",
+    }

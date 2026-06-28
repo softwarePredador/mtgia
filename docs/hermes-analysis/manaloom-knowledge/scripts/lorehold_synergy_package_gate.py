@@ -38,6 +38,7 @@ DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260
 DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
     REPORT_DIR / "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+    REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
 )
 
 
@@ -184,6 +185,37 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Enlightened Tutor"],
         "cuts": ["Thor, God of Thunder"],
         "allow_miracle_core_cuts": True,
+    },
+    "gamble_access_benchmark_cut_land_tax": {
+        "family": "tutor_access_benchmark",
+        "hypothesis": (
+            "The tutor cut model found no seed-safe direct tutor swap, but ranked "
+            "Land Tax as the highest same-access benchmark. This is not a promotion "
+            "candidate by itself: it tests whether Gamble's any-card access can "
+            "outperform Land Tax's upkeep basic-land access without repeating the "
+            "failed Thor or Creative Technique cuts."
+        ),
+        "adds": ["Gamble"],
+        "cuts": ["Land Tax"],
+        "cut_safety_override_reason": (
+            "same-access benchmark required by lorehold_tutor_cut_model_20260627_v1"
+        ),
+    },
+    "enlightened_access_benchmark_cut_land_tax": {
+        "family": "tutor_access_benchmark",
+        "hypothesis": (
+            "The tutor cut model found no seed-safe direct tutor swap, but ranked "
+            "Land Tax as the highest same-access benchmark. Enlightened Tutor is "
+            "the lower-randomness comparison: it cannot find Approach directly, "
+            "but it can put artifact/enchantment engines on top for Lorehold's "
+            "miracle draw window while preserving the failed Thor and Creative "
+            "Technique slots."
+        ),
+        "adds": ["Enlightened Tutor"],
+        "cuts": ["Land Tax"],
+        "cut_safety_override_reason": (
+            "same-access benchmark required by lorehold_tutor_cut_model_20260627_v1"
+        ),
     },
     "galvanoth_topdeck_freecast": {
         "family": "topdeck_freecast",
