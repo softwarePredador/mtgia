@@ -125,17 +125,21 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
     },
     "topdeck_play": {
         "effects": {"topdeck_play"},
-        "support_status": "runtime_family_required",
+        "support_status": "runtime_supported_family",
         "implementation_unit": "top-of-library visibility and permission to play cards from library under board-state conditions",
-        "family_tests": [],
-        "batch_strategy": "implement_family_before_metadata_batch",
+        "family_tests": ["test_verge_rangers_plays_top_library_land_when_opponent_has_more_lands"],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
     },
     "static_damage_modifier": {
         "effects": {"damage_modifier"},
-        "support_status": "runtime_family_required",
+        "support_status": "runtime_supported_family",
         "implementation_unit": "continuous replacement effects that modify damage amounts by source controller and target ownership",
-        "family_tests": [],
-        "batch_strategy": "implement_family_before_metadata_batch",
+        "family_tests": [
+            "test_twinflame_tyrant_doubles_damage_to_each_opponent",
+            "test_twinflame_tyrant_doubles_wipe_damage_only_to_opponent_permanents",
+            "test_twinflame_tyrant_doubles_combat_damage_and_commander_damage",
+        ],
+        "batch_strategy": "metadata_batch_after_pg_precheck",
     },
     "mill_spell": {
         "effects": {"brain_freeze", "mill_cards", "mill_engine"},

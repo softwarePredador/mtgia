@@ -9457,6 +9457,97 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "token_maker")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_generator_assigns_roles_for_lorehold_runtime_families(self) -> None:
+        batch_audit = {
+            "source": {"deck_id": 607},
+            "cards": [
+                {
+                    "card_name": "Twinflame Tyrant",
+                    "severity": "high",
+                    "oracle_hash": None,
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 1},
+                    "xmage": {
+                        "class_name": "TwinflameTyrant",
+                        "path": "/xmage/TwinflameTyrant.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": ["DamageMultipleReplacementEffect"],
+                        "ability_classes": ["SimpleStaticAbility"],
+                        "target_classes": [],
+                        "primary_effect": {
+                            "ability_kind": "static",
+                            "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+                            "damage_modifier_applies_to": "sources_you_control",
+                            "damage_modifier_duration": "while_on_battlefield",
+                            "damage_modifier_targets": ["opponents", "opponent_permanents"],
+                            "damage_multiplier": 2,
+                            "effect": "damage_modifier",
+                            "flying": True,
+                            "power": 3,
+                            "toughness": 5,
+                        },
+                    },
+                },
+                {
+                    "card_name": "Verge Rangers",
+                    "severity": "high",
+                    "oracle_hash": None,
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 1},
+                    "xmage": {
+                        "class_name": "VergeRangers",
+                        "path": "/xmage/VergeRangers.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": ["PlayFromNotOwnHandZoneAllEffect"],
+                        "ability_classes": ["SimpleStaticAbility"],
+                        "condition_classes": ["ControlsMoreLandsThanYouCondition"],
+                        "target_classes": [],
+                        "primary_effect": {
+                            "ability_kind": "static",
+                            "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+                            "effect": "topdeck_play",
+                            "keywords": ["first_strike"],
+                            "look_top_library_any_time": True,
+                            "play_from_top_condition": "opponent_controls_more_lands",
+                            "play_lands_from_top_library": True,
+                            "power": 3,
+                            "toughness": 3,
+                        },
+                    },
+                },
+            ],
+        }
+        external_harvest = {
+            "status": "ready_for_manual_review",
+            "cards": [
+                {"card_name": "Twinflame Tyrant", "candidate_rule": {"oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6"}},
+                {"card_name": "Verge Rangers", "candidate_rule": {"oracle_hash": "44aa2eeb2eeb517fb30478aec7cec42f"}},
+            ],
+        }
+
+        report = generator.build_generator_report(batch_audit=batch_audit, external_harvest=external_harvest)
+        by_name = {proposal["card_name"]: proposal for proposal in report["proposals"]}
+
+        twinflame = by_name["Twinflame Tyrant"]
+        self.assertTrue(twinflame["safe_for_batch_pg_package"])
+        self.assertEqual(twinflame["family_id"], "static_damage_modifier")
+        self.assertEqual(twinflame["deck_role_json"]["category"], "wincon")
+        self.assertEqual(twinflame["deck_role_json"]["effect"], "damage_modifier")
+        self.assertEqual(twinflame["deck_role_json"]["subtype"], "damage_doubler")
+
+        verge = by_name["Verge Rangers"]
+        self.assertTrue(verge["safe_for_batch_pg_package"])
+        self.assertEqual(verge["family_id"], "topdeck_play")
+        self.assertEqual(verge["deck_role_json"]["category"], "ramp")
+        self.assertEqual(verge["deck_role_json"]["effect"], "topdeck_play")
+        self.assertEqual(verge["deck_role_json"]["subtype"], "play_lands_from_library")
+
 
 if __name__ == "__main__":
     unittest.main()

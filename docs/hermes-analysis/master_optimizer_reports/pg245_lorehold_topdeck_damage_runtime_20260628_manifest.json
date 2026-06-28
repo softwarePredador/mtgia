@@ -1,0 +1,26 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg245_lorehold_topdeck_damage_runtime_20260628_015359",
+  "deploy_id": "PG245",
+  "family_counts": {
+    "static_damage_modifier": 1,
+    "topdeck_play": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg245_lorehold_topdeck_damage_runtime_20260628_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg245_lorehold_topdeck_damage_runtime_20260628_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg245_lorehold_topdeck_damage_runtime_20260628_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg245_lorehold_topdeck_damage_runtime_20260628_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg245_lorehold_topdeck_damage_runtime_20260628_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg245_lorehold_topdeck_damage_runtime_20260628_rollback.sql"
+  },
+  "generated_at": "2026-06-28T01:53:59+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Twinflame Tyrant",
+    "Verge Rangers"
+  ],
+  "selected_count": 2,
+  "slug": "lorehold_topdeck_damage_runtime",
+  "status": "prepared_read_only_pending_apply_approval"
+}
