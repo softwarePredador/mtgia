@@ -253,6 +253,29 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             ],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["valakut_hand_filter_cut_big_score"]["family"],
+            "hand_filter_benchmark",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["valakut_hand_filter_cut_big_score"]["adds"],
+            ["Valakut Awakening // Valakut Stoneforge"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["valakut_hand_filter_cut_big_score"]["cuts"],
+            ["Big Score"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["valakut_hand_filter_cut_big_score"][
+                "allow_miracle_core_cuts"
+            ],
+        )
+        self.assertIn(
+            "lorehold_hand_filter_cut_model_20260627_v1",
+            gate.PACKAGE_DEFINITIONS["valakut_hand_filter_cut_big_score"][
+                "cut_safety_override_reason"
+            ],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )
@@ -471,11 +494,15 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(classification["status"], "same_key_different_signature")
         self.assertIn("different add/cut signature", classification["reason"])
 
-    def test_default_prior_reports_include_land_tax_tutor_benchmark_rejects(self):
+    def test_default_prior_reports_include_rejected_benchmark_gates(self):
         default_names = {path.name for path in gate.DEFAULT_PRIOR_PACKAGE_REPORTS}
 
         self.assertIn(
             "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
             default_names,
         )
 

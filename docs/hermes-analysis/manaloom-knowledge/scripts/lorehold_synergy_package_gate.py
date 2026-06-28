@@ -39,6 +39,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
     REPORT_DIR / "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
 )
 
 
@@ -534,6 +535,22 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         ),
         "adds": ["Lapse of Certainty"],
         "cuts": ["Tibalt's Trickery"],
+    },
+    "valakut_hand_filter_cut_big_score": {
+        "family": "hand_filter_benchmark",
+        "hypothesis": (
+            "The hand-filter cut model ranked Valakut Awakening over Big Score "
+            "as the first benchmark: Valakut has measured hand-filter exposure "
+            "and a verified MDFC rule, while Big Score is the least-exposed "
+            "visible protected cut but still provides discard, draw, and Treasure. "
+            "This is an explicit hand-filter-over-ramp tradeoff, not a free cut."
+        ),
+        "adds": ["Valakut Awakening // Valakut Stoneforge"],
+        "cuts": ["Big Score"],
+        "allow_miracle_core_cuts": True,
+        "cut_safety_override_reason": (
+            "preflight benchmark required by lorehold_hand_filter_cut_model_20260627_v1"
+        ),
     },
     "guttersnipe_spell_payoff_cut_prismari": {
         "family": "spellcast_payoff",
