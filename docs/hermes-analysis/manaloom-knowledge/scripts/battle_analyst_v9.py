@@ -4114,6 +4114,31 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:e7b60d9805dbf2701195f627c6ca1600",
         }
     ),
+    "Slickshot Show-Off": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered_and_alternate_casting",
+            "cmc": 2.0,
+            "effect": "creature",
+            "mana_cost": "{1}{R}",
+            "colors": ["R"],
+            "type_line": "Creature - Bird Wizard",
+            "power": 1,
+            "toughness": 2,
+            "subtypes": ["Bird", "Wizard"],
+            "flying": True,
+            "haste": True,
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "boost_source_until_eot",
+            "trigger_power_bonus_until_eot": 2,
+            "trigger_toughness_bonus_until_eot": 0,
+            "plot": True,
+            "plot_cost": "{1}{R}",
+            "plot_status": "metadata_only_cast_from_exile_timing_not_selected_by_ai",
+            "battle_model_scope": "noncreature_spell_cast_boost_source_plus_2_0_until_eot_plot_v1",
+            "_rule_oracle_hash": "24ce626e7e7957d8e01f615ea00d9d08",
+            "_rule_logical_key": "battle_rule_v1:9fd2ff72170533330fc8ba9165bd99b4",
+        }
+    ),
     "Ancient Copper Dragon": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4382,6 +4407,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Beacon of Immortality",
     "Boros Reckoner",
     "Stuffy Doll",
+    "Slickshot Show-Off",
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
     "Wild Ricochet",
@@ -4514,6 +4540,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed chosen-player damage reflection, indestructible body, and tap self-damage ability.",
         ["manaloom_log_learning_audit_20260628_v21_after_warring_triad_runtime", "StuffyDoll.java"],
         "2026-06-29T00:25:00Z",
+    ),
+    "Slickshot Show-Off": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed flying, haste, noncreature-spell self pump, and plot metadata.",
+        ["manaloom_log_learning_audit_20260628_v22_after_stuffy_doll_runtime", "SlickshotShowOff.java"],
+        "2026-06-29T00:40:00Z",
     ),
     "Ancient Copper Dragon": manual_runtime_waiver_metadata(
         "Replace passive review_only evidence with XMage-backed combat-damage d20 Treasure trigger semantics.",
@@ -29777,6 +29808,59 @@ def trigger_spell_cast_engines(
             continue
         spell_is_creature = is_creature_card(spell) or "creature" in str(spell.get("type_line") or "").lower()
         if trigger_kind == "noncreature_spell_cast" and spell_is_creature:
+            continue
+        if permanent.get("trigger_effect") == "boost_source_until_eot":
+            power_bonus = int(permanent.get("trigger_power_bonus_until_eot") or 0)
+            toughness_bonus = int(permanent.get("trigger_toughness_bonus_until_eot") or 0)
+            if power_bonus == 0 and toughness_bonus == 0:
+                continue
+
+            def resolve_spell_cast_boost_source_trigger(
+                permanent=permanent,
+                power_bonus=power_bonus,
+                toughness_bonus=toughness_bonus,
+                trigger_kind=trigger_kind,
+            ):
+                power_before = int(float(permanent.get("power") or 0))
+                toughness_before = int(float(permanent.get("toughness") or 0))
+                if power_bonus:
+                    remember_until_eot(permanent, "power")
+                    permanent["power"] = power_before + power_bonus
+                if toughness_bonus:
+                    remember_until_eot(permanent, "toughness")
+                    permanent["toughness"] = toughness_before + toughness_bonus
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    effect="boost_source_until_eot",
+                    power_bonus=power_bonus,
+                    toughness_bonus=toughness_bonus,
+                    power_before=power_before,
+                    power_after=permanent.get("power"),
+                    toughness_before=toughness_before,
+                    toughness_after=permanent.get("toughness"),
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_spell_cast_boost_source_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "trigger_spell": spell.get("name", "?"),
+                    "power_bonus": power_bonus,
+                    "toughness_bonus": toughness_bonus,
+                },
+            )
             continue
         if permanent.get("trigger_effect") == "spell_color_damage_life":
             red_damage = int(permanent.get("red_spell_trigger_damage") or 0)
