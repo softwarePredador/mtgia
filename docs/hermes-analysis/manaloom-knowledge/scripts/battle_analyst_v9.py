@@ -4019,6 +4019,26 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:f1540009e5e8a14128cf83a2f494a0db",
         }
     ),
+    "Ancient Copper Dragon": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered",
+            "cmc": 6.0,
+            "effect": "ramp_engine",
+            "mana_cost": "{4}{R}{R}",
+            "is_creature_permanent": True,
+            "power": 6,
+            "toughness": 5,
+            "flying": True,
+            "subtypes": ["Elder", "Dragon"],
+            "trigger": "combat_damage_to_player",
+            "trigger_source_deals_combat_damage_to_player": True,
+            "treasure_count_source": "d20_result",
+            "die_sides": 20,
+            "battle_model_scope": "source_combat_damage_player_roll_d20_create_treasure_equal_result_v1",
+            "_rule_oracle_hash": "776a45094149ed3e1cc8c1a408fb6318",
+            "_rule_logical_key": "battle_rule_v1:e2ac43c9f6e03e11e9fab994a5c15258",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4134,6 +4154,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Heroes Remembered",
     "Beacon of Immortality",
     "Boros Reckoner",
+    "Ancient Copper Dragon",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4254,6 +4275,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Promote the existing source-damaged reflection executor to the real XMage-backed Boros Reckoner card lookup while PG metadata remains pending.",
         ["manaloom_log_learning_audit_20260628_v13_after_life_total_runtime", "BorosReckoner.java", "pg_boros_reckoner_runtime_20260628"],
         "2026-06-28T21:35:00Z",
+    ),
+    "Ancient Copper Dragon": manual_runtime_waiver_metadata(
+        "Replace passive review_only evidence with XMage-backed combat-damage d20 Treasure trigger semantics.",
+        ["manaloom_log_learning_audit_20260628_v14_after_boros_reckoner_runtime", "AncientCopperDragon.java"],
+        "2026-06-28T21:55:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -23829,6 +23855,7 @@ def process_combat_damage_resource_triggers(
     *,
     stack=None,
     phase="combat_damage",
+    rng=None,
 ):
     if not damaging_creatures:
         return 0
@@ -23846,17 +23873,30 @@ def process_combat_damage_resource_triggers(
             continue
         if permanent.get("trigger") != "combat_damage_to_player":
             continue
-        if not permanent.get("trigger_creatures_you_control"):
+        source_specific = bool(permanent.get("trigger_source_deals_combat_damage_to_player"))
+        if not permanent.get("trigger_creatures_you_control") and not source_specific:
             continue
-        treasure_count = max(1, int(permanent.get("treasure_count") or 1))
+        if source_specific and permanent not in damaging_creatures:
+            continue
+        if source_specific:
+            trigger_names = [permanent.get("name", "?")]
+        else:
+            trigger_names = list(trigger_creature_names)
 
         def resolve_combat_damage_treasure_trigger(
             permanent=permanent,
-            treasure_count=treasure_count,
-            trigger_creature_names=tuple(trigger_creature_names),
+            trigger_creature_names=tuple(trigger_names),
             damaged_player_name=damaged_player_name,
         ):
             treasures_before = player.treasures
+            die_roll = None
+            die_sides = None
+            if permanent.get("treasure_count_source") == "d20_result":
+                die_sides = int(permanent.get("die_sides") or 20)
+                die_roll = (rng or random.Random(turn or 0)).randint(1, die_sides)
+                treasure_count = die_roll
+            else:
+                treasure_count = max(1, int(permanent.get("treasure_count") or 1))
             player.treasures += treasure_count
             emit_replay_event(
                 "trigger_resolved",
@@ -23867,6 +23907,9 @@ def process_combat_damage_resource_triggers(
                 damaged_player=damaged_player_name,
                 effect="ramp_engine",
                 treasures_created=treasure_count,
+                treasure_count_source=permanent.get("treasure_count_source"),
+                die_roll=die_roll,
+                die_sides=die_sides,
                 treasures_before=treasures_before,
                 treasures_after=player.treasures,
                 turn=turn,
@@ -37076,6 +37119,7 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                 turn,
                 stack=stack,
                 phase="first_strike_damage" if first_strike_phase else "combat_damage",
+                rng=rng,
             )
         destroy_lethal_creatures()
 
