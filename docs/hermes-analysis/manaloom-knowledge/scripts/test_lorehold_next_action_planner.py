@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import lorehold_next_action_planner as planner
 
 
@@ -959,7 +961,7 @@ def test_next_action_planner_defaults_include_exposure_contract_report():
     default_names = {path.name for path in planner.DEFAULT_PRIOR_PACKAGE_REPORTS}
 
     assert "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json" in default_names
-    assert "lorehold_exposure_outcome_audit_20260628_min_used_sample_v2.json" in default_names
+    assert "lorehold_exposure_outcome_audit_20260628_actionability_v1.json" in default_names
 
 
 def test_next_action_planner_default_prior_reports_include_profiled_history():
@@ -1035,6 +1037,52 @@ def test_next_action_planner_downgrades_insufficient_used_sample_to_inconclusive
     assert action["status"] == "resolve_strategy_gate_low_exposure_before_next_swap"
     assert action["packages"][0]["decision"] == "insufficient_card_outcome_used_sample"
     assert action["packages"][0]["candidate_added_card_statuses"][0]["used_games"] == 1
+
+
+def test_next_action_planner_routes_accessed_without_use_rollup_to_inconclusive_queue():
+    payload = {
+        "package_rollups": [
+            {
+                "package_key": "silence_cut_avatar_wrath",
+                "status": "accessed_without_use_conversion_review",
+                "adds": ["Silence"],
+                "cuts": ["Avatar's Wrath"],
+                "worst_aggregate_delta_pp": 100.0,
+            }
+        ],
+    }
+    reports = [(Path("outcome.json"), payload)]
+
+    rejected = planner.rejected_package_evidence(reports)
+    inconclusive = planner.inconclusive_package_evidence(reports)
+
+    assert "silence_cut_avatar_wrath" not in rejected
+    assert inconclusive["silence_cut_avatar_wrath"]["decision"] == (
+        "candidate_accessed_without_used_sample"
+    )
+
+
+def test_next_action_planner_routes_near_access_without_use_rollup_to_inconclusive_queue():
+    payload = {
+        "package_rollups": [
+            {
+                "package_key": "wheel_hand_filter_cut_big_score",
+                "status": "near_access_without_use_access_window_review",
+                "adds": ["Wheel of Fortune"],
+                "cuts": ["Big Score"],
+                "worst_aggregate_delta_pp": 100.0,
+            }
+        ],
+    }
+    reports = [(Path("outcome.json"), payload)]
+
+    rejected = planner.rejected_package_evidence(reports)
+    inconclusive = planner.inconclusive_package_evidence(reports)
+
+    assert "wheel_hand_filter_cut_big_score" not in rejected
+    assert inconclusive["wheel_hand_filter_cut_big_score"]["decision"] == (
+        "candidate_near_access_without_used_sample"
+    )
 
 
 def test_next_action_planner_prefers_package_rollups_over_raw_observations():

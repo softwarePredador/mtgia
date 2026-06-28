@@ -72,7 +72,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
     DEFAULT_STRATEGY_AUDIT,
     REPORT_DIR / "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json",
-    REPORT_DIR / "lorehold_exposure_outcome_audit_20260628_min_used_sample_v2.json",
+    REPORT_DIR / "lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
 ]
 INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "inconclusive_low_exposure",
@@ -81,6 +81,8 @@ INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "forced_access_insufficient_card_outcome_sample",
     "insufficient_card_outcome_used_sample",
     "candidate_used_without_cut_comparator",
+    "candidate_accessed_without_used_sample",
+    "candidate_near_access_without_used_sample",
 }
 LOW_EXPOSURE_STATUSES = {
     "candidate_added_card_low_access",
@@ -358,6 +360,10 @@ def package_rows_from_prior_payload(payload: Any) -> list[dict[str, Any]]:
             "forced_access_no_lift_reject_or_rework": "forced_access_no_lift_reject_or_rework",
             "used_without_cut_comparator": "candidate_used_without_cut_comparator",
             "insufficient_card_outcome_sample": "insufficient_card_outcome_used_sample",
+            "accessed_without_use_conversion_review": "candidate_accessed_without_used_sample",
+            "near_access_without_use_access_window_review": (
+                "candidate_near_access_without_used_sample"
+            ),
             "inconclusive_low_candidate_use": "inconclusive_low_exposure",
             "missing_per_card_data": "missing_per_card_outcome_data",
         }

@@ -205,6 +205,7 @@ def card_outcome_rows(group: Mapping[str, Any]) -> list[dict[str, Any]]:
         outcome = card.get("outcome_summary") or {}
         used = outcome.get("used_games") or {}
         accessed = outcome.get("accessed_or_used_games") or {}
+        near_access = outcome.get("near_access_or_better_games") or {}
         rows.append(
             {
                 "card_name": card.get("card_name"),
@@ -212,6 +213,7 @@ def card_outcome_rows(group: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "recorded_use_count": integer(card.get("recorded_use_count")),
                 "used_games": side_record(used),
                 "accessed_or_used_games": side_record(accessed),
+                "near_access_or_better_games": side_record(near_access),
                 "sample_quality": outcome.get("sample_quality") or "missing_outcome",
                 "status_counts": outcome.get("status_counts") or {},
             }
@@ -225,6 +227,7 @@ def primary_card_outcome(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "card_name": None,
             "used_games": side_record({}),
             "accessed_or_used_games": side_record({}),
+            "near_access_or_better_games": side_record({}),
             "sample_quality": "missing_card",
         }
     return rows[0]
@@ -260,6 +263,42 @@ def classify_outcome(
     cut_used = cut_card.get("used_games") or {}
     added_used_games = integer(added_used.get("games"))
     cut_used_games = integer(cut_used.get("games"))
+    added_accessed = added_card.get("accessed_or_used_games") or {}
+    added_near_access = added_card.get("near_access_or_better_games") or {}
+    added_accessed_games = integer(added_accessed.get("games"))
+    added_near_access_games = integer(added_near_access.get("games"))
+    exposure_status = str(exposure.get("status") or "")
+    status_counts = added_card.get("status_counts") or {}
+    if added_used_games == 0 and (
+        added_accessed_games > 0
+        or exposure_status == "candidate_added_cards_accessed_not_used"
+        or integer(status_counts.get("accessed_not_used")) > 0
+    ):
+        return {
+            "decision": "candidate_accessed_without_used_sample",
+            "promotion_allowed": False,
+            "next_action": "inspect_play_heuristic_or_runtime_for_accessed_card",
+            "used_delta_pp": None,
+            "reason": "candidate card reached an actionable zone but produced no recorded use",
+            "candidate_accessed_games": added_accessed_games,
+            "candidate_near_access_games": added_near_access_games,
+            "candidate_status_counts": dict(status_counts),
+        }
+    if added_used_games == 0 and (
+        added_near_access_games > 0
+        or exposure_status == "candidate_added_cards_near_access_low_use"
+        or integer(status_counts.get("near_access_not_used")) > 0
+    ):
+        return {
+            "decision": "candidate_near_access_without_used_sample",
+            "promotion_allowed": False,
+            "next_action": "rerun_targeted_access_or_draw_window",
+            "used_delta_pp": None,
+            "reason": "candidate card was near an access window but produced no recorded use",
+            "candidate_accessed_games": added_accessed_games,
+            "candidate_near_access_games": added_near_access_games,
+            "candidate_status_counts": dict(status_counts),
+        }
     if bool(exposure.get("low_candidate_added_card_use")) or added_used_games == 0:
         return {
             "decision": "inconclusive_no_candidate_used_sample",
@@ -417,9 +456,11 @@ ROLLUP_PRIORITY = {
     "forced_access_no_lift_reject_or_rework": 3,
     "used_without_cut_comparator": 4,
     "insufficient_card_outcome_sample": 5,
-    "inconclusive_low_candidate_use": 6,
-    "missing_per_card_data": 7,
-    "manual_review": 8,
+    "accessed_without_use_conversion_review": 6,
+    "near_access_without_use_access_window_review": 7,
+    "inconclusive_low_candidate_use": 8,
+    "missing_per_card_data": 9,
+    "manual_review": 10,
 }
 
 
@@ -446,6 +487,16 @@ def rollup_decision(rows: list[dict[str, Any]]) -> tuple[str, str]:
         return "used_without_cut_comparator", "rerun_or_compare_against_a_cut_with_observed_use"
     if "insufficient_card_outcome_used_sample" in decisions:
         return "insufficient_card_outcome_sample", "increase_natural_used_sample_before_card_outcome_decision"
+    if "candidate_accessed_without_used_sample" in decisions:
+        return (
+            "accessed_without_use_conversion_review",
+            "inspect_play_heuristic_or_runtime_for_accessed_card",
+        )
+    if "candidate_near_access_without_used_sample" in decisions:
+        return (
+            "near_access_without_use_access_window_review",
+            "rerun_targeted_access_or_draw_window",
+        )
     if any(decision.startswith("inconclusive") for decision in decisions):
         return "inconclusive_low_candidate_use", "rerun_larger_or_forced_access_then_natural_confirmation"
     if "missing_per_card_outcome_data" in decisions:
@@ -544,6 +595,18 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
         if (row.get("outcome_decision") or {}).get("decision")
         == "insufficient_card_outcome_used_sample"
     ]
+    accessed_without_use = [
+        row
+        for row in packages
+        if (row.get("outcome_decision") or {}).get("decision")
+        == "candidate_accessed_without_used_sample"
+    ]
+    near_access_without_use = [
+        row
+        for row in packages
+        if (row.get("outcome_decision") or {}).get("decision")
+        == "candidate_near_access_without_used_sample"
+    ]
     return {
         "generated_at": utc_now(),
         "postgres_writes": False,
@@ -563,6 +626,8 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
             "forced_access_signal_count": len(forced_signals),
             "rejected_current_pair_count": len(rejected),
             "insufficient_card_outcome_sample_count": len(insufficient),
+            "accessed_without_used_sample_count": len(accessed_without_use),
+            "near_access_without_used_sample_count": len(near_access_without_use),
             "inconclusive_no_used_sample_count": len(inconclusive),
             "recommended_next_action": (
                 "run_best_card_outcome_supported_deeper_gate"
@@ -571,6 +636,10 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
                 if forced_signals and not rejected
                 else "increase_natural_used_sample_before_card_outcome_decision"
                 if insufficient and not rejected
+                else "inspect_play_heuristic_or_runtime_for_accessed_cards"
+                if accessed_without_use and not rejected
+                else "run_targeted_access_or_draw_window_before_more_swap_decisions"
+                if near_access_without_use and not rejected
                 else "avoid_repeating_rejected_pairs_and_generate_new_trace_targeted_package"
                 if rejected
                 else "increase_exposure_before_more_card_swap_decisions"
@@ -579,6 +648,8 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
         "decision_rules": [
             "aggregate deck record is not card-level proof by itself",
             "candidate card must have a used-game sample before a package can be promoted",
+            "candidate card accessed without recorded use is a conversion/runtime/heuristic review, not a promotion signal",
+            "candidate card near the access window without use needs targeted access or draw-window testing",
             (
                 "candidate and baseline cut must each reach at least "
                 f"{MIN_CARD_OUTCOME_USED_GAMES} used games before a card-outcome decision"
@@ -662,8 +733,8 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
             "",
             "## Package Outcomes",
             "",
-            "| Package | Source | Adds | Cuts | Aggregate | Added Used | Cut Used | Used Delta | Decision | Next Action |",
-            "| --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
+            "| Package | Source | Adds | Cuts | Aggregate | Added Used | Added Access | Cut Used | Used Delta | Decision | Next Action |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
         ]
     )
     for row in payload.get("packages") or []:
@@ -671,6 +742,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         added = (row.get("candidate_added_cards") or [{}])[0] if row.get("candidate_added_cards") else {}
         cut = (row.get("baseline_cut_cards") or [{}])[0] if row.get("baseline_cut_cards") else {}
         decision = row.get("outcome_decision") or {}
+        added_access = added.get("accessed_or_used_games") or {}
         aggregate_text = "-"
         if aggregate.get("delta_pp") is not None:
             aggregate_text = "{base} -> {cand} ({delta:+.2f})".format(
@@ -681,13 +753,14 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         used_delta = decision.get("used_delta_pp")
         used_delta_text = f"{numeric(used_delta):+.2f}" if used_delta is not None else "-"
         lines.append(
-            "| `{package}` | `{source}` | {adds} | {cuts} | {aggregate} | {added} | {cut} | {used_delta} | `{decision}` | `{next_action}` |".format(
+            "| `{package}` | `{source}` | {adds} | {cuts} | {aggregate} | {added} | {added_access} | {cut} | {used_delta} | `{decision}` | `{next_action}` |".format(
                 package=row.get("package_key"),
                 source=row.get("source_file"),
                 adds=", ".join(f"`{card}`" for card in row.get("adds") or []),
                 cuts=", ".join(f"`{card}`" for card in row.get("cuts") or []),
                 aggregate=aggregate_text,
                 added=record_text((added.get("used_games") or {})) if added else "-",
+                added_access=record_text(added_access) if added else "-",
                 cut=record_text((cut.get("used_games") or {})) if cut else "-",
                 used_delta=used_delta_text,
                 decision=decision.get("decision"),

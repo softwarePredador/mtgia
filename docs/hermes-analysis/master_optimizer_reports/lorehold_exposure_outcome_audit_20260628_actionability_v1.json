@@ -1,0 +1,5953 @@
+{
+  "decision_rules": [
+    "aggregate deck record is not card-level proof by itself",
+    "candidate card must have a used-game sample before a package can be promoted",
+    "candidate card accessed without recorded use is a conversion/runtime/heuristic review, not a promotion signal",
+    "candidate card near the access window without use needs targeted access or draw-window testing",
+    "candidate and baseline cut must each reach at least 2 used games before a card-outcome decision",
+    "used-game comparison is candidate-added card record versus baseline-cut card record",
+    "forced-access probes can diagnose access but require natural confirmation before promotion",
+    "multi-card packages require split or manual review before per-card outcome promotion",
+    "Hermes gate evidence is lab evidence; PostgreSQL state is not mutated by this report"
+  ],
+  "generated_at": "2026-06-28T11:46:55Z",
+  "missing_reports": [],
+  "package_rollups": [
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": -50.0,
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "decision_counts": {
+        "card_outcome_rejects_current_pair": 3,
+        "insufficient_card_outcome_used_sample": 1
+      },
+      "family": "fast_mana",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 4,
+      "next_action": "do_not_repeat_exact_pair_without_new_failure_target_or_cut",
+      "observation_count": 4,
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "source_files": [
+        "lorehold_exposure_by_game_gate_20260628_v1_20260628_101737.json",
+        "lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+        "lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+        "lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json"
+      ],
+      "status": "natural_reject_current_pair",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": -100.0
+    },
+    {
+      "adds": [
+        "Runaway Steam-Kin"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": -100.0,
+      "cuts": [
+        "Talisman of Conviction"
+      ],
+      "decision_counts": {
+        "card_outcome_rejects_current_pair": 1
+      },
+      "family": "spellchain_mana",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "do_not_repeat_exact_pair_without_new_failure_target_or_cut",
+      "observation_count": 1,
+      "package_key": "runaway_steamkin_cut_talisman",
+      "source_files": [
+        "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json"
+      ],
+      "status": "natural_reject_current_pair",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": -100.0
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "best_aggregate_delta_pp": -33.33,
+      "best_used_delta_pp": -50.0,
+      "cuts": [
+        "Jeska's Will"
+      ],
+      "decision_counts": {
+        "forced_access_card_outcome_no_lift_reject_or_rework": 1,
+        "insufficient_card_outcome_used_sample": 1
+      },
+      "family": "spellchain_mana",
+      "forced_access_observation_count": 1,
+      "natural_observation_count": 1,
+      "next_action": "do_not_promote_from_forced_access_probe",
+      "observation_count": 2,
+      "package_key": "birgi_spellchain_cut_jeskas_will",
+      "source_files": [
+        "lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410.json",
+        "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json"
+      ],
+      "status": "forced_access_no_lift_reject_or_rework",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": -100.0
+    },
+    {
+      "adds": [
+        "Akroma's Will"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "decision_counts": {
+        "candidate_used_without_cut_comparator": 1
+      },
+      "family": "pressure_absorber",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_or_compare_against_a_cut_with_observed_use",
+      "observation_count": 1,
+      "package_key": "akromas_will_cut_avatar_wrath",
+      "source_files": [
+        "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+      ],
+      "status": "used_without_cut_comparator",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Boros Charm"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "decision_counts": {
+        "candidate_used_without_cut_comparator": 1
+      },
+      "family": "pressure_absorber",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_or_compare_against_a_cut_with_observed_use",
+      "observation_count": 1,
+      "package_key": "boros_charm_pressure_cut_avatar_wrath",
+      "source_files": [
+        "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+      ],
+      "status": "used_without_cut_comparator",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Grand Abolisher"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Mother of Runes"
+      ],
+      "decision_counts": {
+        "candidate_used_without_cut_comparator": 1
+      },
+      "family": "spell_protection",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_or_compare_against_a_cut_with_observed_use",
+      "observation_count": 1,
+      "package_key": "grand_abolisher_cut_mother_of_runes",
+      "source_files": [
+        "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+      ],
+      "status": "used_without_cut_comparator",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Twinflame Tyrant"
+      ],
+      "best_aggregate_delta_pp": -33.34,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Thor, God of Thunder"
+      ],
+      "decision_counts": {
+        "candidate_used_without_cut_comparator": 1
+      },
+      "family": "static_damage_modifier",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_or_compare_against_a_cut_with_observed_use",
+      "observation_count": 1,
+      "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+      "source_files": [
+        "lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json"
+      ],
+      "status": "used_without_cut_comparator",
+      "worst_aggregate_delta_pp": -33.34,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Enlightened Tutor"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": -100.0,
+      "cuts": [
+        "Land Tax"
+      ],
+      "decision_counts": {
+        "insufficient_card_outcome_used_sample": 1
+      },
+      "family": "tutor_access_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+      "observation_count": 1,
+      "package_key": "enlightened_access_benchmark_cut_land_tax",
+      "source_files": [
+        "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+      ],
+      "status": "insufficient_card_outcome_sample",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": -100.0
+    },
+    {
+      "adds": [
+        "Gamble"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": 0.0,
+      "cuts": [
+        "Land Tax"
+      ],
+      "decision_counts": {
+        "insufficient_card_outcome_used_sample": 1
+      },
+      "family": "tutor_access_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+      "observation_count": 1,
+      "package_key": "gamble_access_benchmark_cut_land_tax",
+      "source_files": [
+        "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+      ],
+      "status": "insufficient_card_outcome_sample",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": 0.0
+    },
+    {
+      "adds": [
+        "Hidden Retreat"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": 0.0,
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "decision_counts": {
+        "insufficient_card_outcome_used_sample": 1
+      },
+      "family": "topdeck_protection",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+      "observation_count": 1,
+      "package_key": "hidden_retreat_stack_damage_topdeck_cut_promise",
+      "source_files": [
+        "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json"
+      ],
+      "status": "insufficient_card_outcome_sample",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": 0.0
+    },
+    {
+      "adds": [
+        "Seething Song"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": -100.0,
+      "cuts": [
+        "Fellwar Stone"
+      ],
+      "decision_counts": {
+        "insufficient_card_outcome_used_sample": 1
+      },
+      "family": "spellchain_mana",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+      "observation_count": 1,
+      "package_key": "seething_song_cut_fellwar_stone",
+      "source_files": [
+        "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json"
+      ],
+      "status": "insufficient_card_outcome_sample",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": -100.0
+    },
+    {
+      "adds": [
+        "Storm-Kiln Artist"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": -100.0,
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "decision_counts": {
+        "insufficient_card_outcome_used_sample": 1
+      },
+      "family": "spellchain_mana",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+      "observation_count": 1,
+      "package_key": "storm_kiln_artist_cut_arcane_signet",
+      "source_files": [
+        "lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json"
+      ],
+      "status": "insufficient_card_outcome_sample",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": -100.0
+    },
+    {
+      "adds": [
+        "Austere Command"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Emeria's Call // Emeria, Shattered Skyclave"
+      ],
+      "decision_counts": {
+        "inconclusive_no_candidate_used_sample": 1
+      },
+      "family": "pressure_reset_tradeoff",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+      "observation_count": 1,
+      "package_key": "austere_command_wipe_over_emeria_tradeoff",
+      "source_files": [
+        "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+      ],
+      "status": "inconclusive_low_candidate_use",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Perch Protection"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "decision_counts": {
+        "inconclusive_no_candidate_used_sample": 1
+      },
+      "family": "pressure_absorber",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+      "observation_count": 1,
+      "package_key": "perch_protection_cut_avatar_wrath",
+      "source_files": [
+        "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+      ],
+      "status": "inconclusive_low_candidate_use",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Plateau"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Radiant Summit"
+      ],
+      "decision_counts": {
+        "inconclusive_no_candidate_used_sample": 1
+      },
+      "family": "mana_base",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+      "observation_count": 1,
+      "package_key": "plateau_timing_upgrade_cut_radiant_summit",
+      "source_files": [
+        "lorehold_mana_base_plateau_gate_20260627_v1_real.json"
+      ],
+      "status": "inconclusive_low_candidate_use",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Plateau"
+      ],
+      "best_aggregate_delta_pp": -55.56,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Turbulent Steppe"
+      ],
+      "decision_counts": {
+        "inconclusive_no_candidate_used_sample": 1
+      },
+      "family": "mana_base",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+      "observation_count": 1,
+      "package_key": "plateau_timing_upgrade_cut_turbulent_steppe",
+      "source_files": [
+        "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json"
+      ],
+      "status": "inconclusive_low_candidate_use",
+      "worst_aggregate_delta_pp": -55.56,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Silence"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "decision_counts": {
+        "inconclusive_no_candidate_used_sample": 1
+      },
+      "family": "spell_protection",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+      "observation_count": 1,
+      "package_key": "silence_cut_avatar_wrath",
+      "source_files": [
+        "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+      ],
+      "status": "inconclusive_low_candidate_use",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Valakut Awakening // Valakut Stoneforge"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Big Score"
+      ],
+      "decision_counts": {
+        "inconclusive_no_candidate_used_sample": 1
+      },
+      "family": "hand_filter_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+      "observation_count": 1,
+      "package_key": "valakut_hand_filter_cut_big_score",
+      "source_files": [
+        "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json"
+      ],
+      "status": "inconclusive_low_candidate_use",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Volcanic Vision"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Pinnacle Monk // Mystic Peak"
+      ],
+      "decision_counts": {
+        "inconclusive_no_candidate_used_sample": 1
+      },
+      "family": "graveyard_recursion_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+      "observation_count": 1,
+      "package_key": "volcanic_recursion_cut_pinnacle",
+      "source_files": [
+        "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json"
+      ],
+      "status": "inconclusive_low_candidate_use",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Wheel of Fortune"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Big Score"
+      ],
+      "decision_counts": {
+        "inconclusive_no_candidate_used_sample": 1
+      },
+      "family": "hand_filter_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+      "observation_count": 1,
+      "package_key": "wheel_hand_filter_cut_big_score",
+      "source_files": [
+        "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json"
+      ],
+      "status": "inconclusive_low_candidate_use",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Arcane Bombardment"
+      ],
+      "best_aggregate_delta_pp": 0.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "spell_copy_recursion",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "arcane_bombardment_engine",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": 0.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Basalt Monolith"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "basalt_monolith_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "best_aggregate_delta_pp": 0.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "spellchain_mana",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "birgi_spellchain_cut_squelcher",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": 0.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "best_aggregate_delta_pp": 0.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "spellchain_mana",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "birgi_spellchain_cut_waterskin",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": 0.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Brainstone"
+      ],
+      "best_aggregate_delta_pp": -50.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "topdeck_setup",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "brainstone_topdeck_miracle",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -50.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Brass's Bounty"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Boros Signet"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "spellchain_mana",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "brass_bounty_cut_boros_signet",
+      "source_files": [
+        "lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Chandra, Hope's Beacon"
+      ],
+      "best_aggregate_delta_pp": -50.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "spell_copy",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "chandra_copy_engine",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -50.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Chaos Warp"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Stroke of Midnight"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "chaos_warp_interaction_benchmark_cut_stroke_of_midnight",
+      "source_files": [
+        "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Reverberate",
+        "Return the Favor",
+        "Flare of Duplication"
+      ],
+      "best_aggregate_delta_pp": 0.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Hexing Squelcher",
+        "Bender's Waterskin",
+        "Victory Chimes"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "spell_copy",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "copy_stack_package",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": 0.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Dance with Calamity"
+      ],
+      "best_aggregate_delta_pp": 0.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Storm Herd"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "payoff_challenge",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "core_challenge_dance_over_storm",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": 0.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "best_aggregate_delta_pp": -50.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Tragic Arrogance"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "payoff_challenge",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "core_challenge_past_over_tragic",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -50.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Crackle with Power"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "crackle_with_power_same_lane_benchmark_cut_winds_of_abandon",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Desperate Ritual"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "desperate_ritual_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Electro, Assaulting Battery"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "electro_assaulting_battery_same_lane_benchmark_cut_winds_of_abandon",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Erode"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "erode_same_lane_benchmark_cut_winds_of_abandon",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Galvanoth"
+      ],
+      "best_aggregate_delta_pp": 0.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "topdeck_freecast",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "galvanoth_topdeck_freecast",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": 0.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Gods Willing"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "targeted_commander_protection",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "gods_willing_commander_shield_cut_promise",
+      "source_files": [
+        "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Invoke Calamity"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Creative Technique"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "big_spell_value_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "invoke_calamity_same_lane_benchmark_cut_creative_technique",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Lightning Bolt"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "lightning_bolt_interaction_benchmark_cut_winds_of_abandon",
+      "source_files": [
+        "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Lightning Helix"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "lightning_helix_same_lane_benchmark_cut_winds_of_abandon",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Lion's Eye Diamond"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "lion_s_eye_diamond_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Locket of Yesterdays"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "locket_of_yesterdays_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Lotus Petal"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "lotus_petal_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Millikin"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "millikin_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Monologue Tax"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "monologue_tax_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Ol\u00f3rin's Searing Light"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "ol_rin_s_searing_light_interaction_benchmark_cut_winds_of_abandon",
+      "source_files": [
+        "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Overmaster"
+      ],
+      "best_aggregate_delta_pp": 0.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 2
+      },
+      "family": "spell_protection",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 2,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 2,
+      "package_key": "overmaster_protect_draw",
+      "source_files": [
+        "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "best_aggregate_delta_pp": -66.67,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "graveyard_recast",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "past_in_flames_cut_squelcher",
+      "source_files": [
+        "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "best_aggregate_delta_pp": 50.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 2
+      },
+      "family": "graveyard_recast",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 2,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 2,
+      "package_key": "past_in_flames_recast",
+      "source_files": [
+        "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -66.67,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Past in Flames",
+        "Overmaster"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin",
+        "Hexing Squelcher"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "graveyard_recast_protection",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "past_overmaster_spellchain",
+      "source_files": [
+        "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Primal Amulet // Primal Wellspring"
+      ],
+      "best_aggregate_delta_pp": 0.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "cost_reduce_copy",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "primal_amulet_spell_engine",
+      "source_files": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": 0.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Pyretic Ritual"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "pyretic_ritual_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Razorgrass Ambush // Razorgrass Field"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "razorgrass_ambush_razorgrass_field_same_lane_benchmark_cut_winds_of_abandon",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Seething Song"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Sejiri Shelter // Sejiri Glacier"
+      ],
+      "best_aggregate_delta_pp": -100.0,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "targeted_commander_protection",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "sejiri_shelter_commander_shield_cut_promise",
+      "source_files": [
+        "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": -100.0,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Surly Badgersaur"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "surly_badgersaur_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Tablet of Discovery"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "tablet_of_discovery_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Treasonous Ogre"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "ramp_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "treasonous_ogre_same_lane_benchmark_cut_bender_s_waterskin",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Velomachus Lorehold"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Creative Technique"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 1
+      },
+      "family": "big_spell_value_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 1,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 1,
+      "package_key": "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    },
+    {
+      "adds": [
+        "Witch Enchanter // Witch-Blessed Meadow"
+      ],
+      "best_aggregate_delta_pp": null,
+      "best_used_delta_pp": null,
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "decision_counts": {
+        "missing_per_card_outcome_data": 2
+      },
+      "family": "interaction_removal_benchmark",
+      "forced_access_observation_count": 0,
+      "natural_observation_count": 2,
+      "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+      "observation_count": 2,
+      "package_key": "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_winds_of_abandon",
+      "source_files": [
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json"
+      ],
+      "status": "missing_per_card_data",
+      "worst_aggregate_delta_pp": null,
+      "worst_used_delta_pp": null
+    }
+  ],
+  "packages": [
+    {
+      "adds": [
+        "Akroma's Will"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Avatar's Wrath",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Akroma's Will",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 3,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "pressure_absorber",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "candidate_used_without_cut_comparator",
+        "next_action": "rerun_or_compare_against_a_cut_with_observed_use",
+        "promotion_allowed": false,
+        "reason": "baseline cut card did not produce a used-game comparator",
+        "used_delta_pp": null
+      },
+      "package_key": "akromas_will_cut_avatar_wrath",
+      "raw_decision": null,
+      "source_file": "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+    },
+    {
+      "adds": [
+        "Arcane Bombardment"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "spell_copy_recursion",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "arcane_bombardment_engine",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Austere Command"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 2,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Austere Command",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Emeria's Call // Emeria, Shattered Skyclave"
+      ],
+      "exposure_status": "candidate_added_card_low_access",
+      "family": "pressure_reset_tradeoff",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "inconclusive_no_candidate_used_sample",
+        "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+        "promotion_allowed": false,
+        "reason": "candidate card did not produce a used-game sample",
+        "used_delta_pp": null
+      },
+      "package_key": "austere_command_wipe_over_emeria_tradeoff",
+      "raw_decision": null,
+      "source_file": "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+    },
+    {
+      "adds": [
+        "Basalt Monolith"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "basalt_monolith_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json"
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -33.33
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 3,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 33.33,
+            "wins": 1
+          },
+          "card_name": "Jeska's Will",
+          "near_access_or_better_games": {
+            "games": 3,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 33.33,
+            "wins": 1
+          },
+          "recorded_use_count": 6,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "accessed_not_used": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 3,
+            "losses": 3,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "near_access_or_better_games": {
+            "games": 3,
+            "losses": 3,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 5,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "accessed_not_used": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Jeska's Will"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "spellchain_mana",
+      "forced_access_mode": "opening_hand",
+      "outcome_decision": {
+        "decision": "forced_access_card_outcome_no_lift_reject_or_rework",
+        "next_action": "do_not_promote_from_forced_access_probe",
+        "promotion_allowed": false,
+        "reason": "forced-access probe did not produce a positive card-outcome signal",
+        "used_delta_pp": -50.0
+      },
+      "package_key": "birgi_spellchain_cut_jeskas_will",
+      "raw_decision": "forced_access_no_lift_reject_or_rework",
+      "source_file": "lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410.json"
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Jeska's Will",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 3,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 2,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Jeska's Will"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "spellchain_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "candidate_used_games": 1,
+        "cut_used_games": 1,
+        "decision": "insufficient_card_outcome_used_sample",
+        "minimum_used_games": 2,
+        "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+        "promotion_allowed": false,
+        "reason": "candidate and cut must each reach at least 2 used games before a card-outcome decision",
+        "used_delta_pp": -100.0
+      },
+      "package_key": "birgi_spellchain_cut_jeskas_will",
+      "raw_decision": null,
+      "source_file": "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json"
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "exposure_status": null,
+      "family": "spellchain_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "birgi_spellchain_cut_squelcher",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "spellchain_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "birgi_spellchain_cut_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Boros Charm"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Avatar's Wrath",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Boros Charm",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 2,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "pressure_absorber",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "candidate_used_without_cut_comparator",
+        "next_action": "rerun_or_compare_against_a_cut_with_observed_use",
+        "promotion_allowed": false,
+        "reason": "baseline cut card did not produce a used-game comparator",
+        "used_delta_pp": null
+      },
+      "package_key": "boros_charm_pressure_cut_avatar_wrath",
+      "raw_decision": null,
+      "source_file": "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+    },
+    {
+      "adds": [
+        "Brainstone"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -50.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "topdeck_setup",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "brainstone_topdeck_miracle",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Brass's Bounty"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Boros Signet"
+      ],
+      "exposure_status": null,
+      "family": "spellchain_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "brass_bounty_cut_boros_signet",
+      "raw_decision": null,
+      "source_file": "lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json"
+    },
+    {
+      "adds": [
+        "Chandra, Hope's Beacon"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -50.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "spell_copy",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "chandra_copy_engine",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Chaos Warp"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Stroke of Midnight"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "chaos_warp_interaction_benchmark_cut_stroke_of_midnight",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json"
+    },
+    {
+      "adds": [
+        "Reverberate",
+        "Return the Favor",
+        "Flare of Duplication"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Hexing Squelcher",
+        "Bender's Waterskin",
+        "Victory Chimes"
+      ],
+      "exposure_status": null,
+      "family": "spell_copy",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "copy_stack_package",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Dance with Calamity"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Storm Herd"
+      ],
+      "exposure_status": null,
+      "family": "payoff_challenge",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "core_challenge_dance_over_storm",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -50.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Tragic Arrogance"
+      ],
+      "exposure_status": null,
+      "family": "payoff_challenge",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "core_challenge_past_over_tragic",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Crackle with Power"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "crackle_with_power_same_lane_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json"
+    },
+    {
+      "adds": [
+        "Desperate Ritual"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "desperate_ritual_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json"
+    },
+    {
+      "adds": [
+        "Electro, Assaulting Battery"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "electro_assaulting_battery_same_lane_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+    },
+    {
+      "adds": [
+        "Enlightened Tutor"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          },
+          "card_name": "Land Tax",
+          "near_access_or_better_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          },
+          "recorded_use_count": 9,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "used": 3
+          },
+          "used_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Enlightened Tutor",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 2,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Land Tax"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "tutor_access_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "candidate_used_games": 1,
+        "cut_used_games": 3,
+        "decision": "insufficient_card_outcome_used_sample",
+        "minimum_used_games": 2,
+        "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+        "promotion_allowed": false,
+        "reason": "candidate and cut must each reach at least 2 used games before a card-outcome decision",
+        "used_delta_pp": -100.0
+      },
+      "package_key": "enlightened_access_benchmark_cut_land_tax",
+      "raw_decision": null,
+      "source_file": "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+    },
+    {
+      "adds": [
+        "Erode"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "erode_same_lane_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+    },
+    {
+      "adds": [
+        "Galvanoth"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "topdeck_freecast",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "galvanoth_topdeck_freecast",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Gamble"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          },
+          "card_name": "Land Tax",
+          "near_access_or_better_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          },
+          "recorded_use_count": 9,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "used": 3
+          },
+          "used_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Gamble",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "cuts": [
+        "Land Tax"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "tutor_access_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "candidate_used_games": 1,
+        "cut_used_games": 3,
+        "decision": "insufficient_card_outcome_used_sample",
+        "minimum_used_games": 2,
+        "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+        "promotion_allowed": false,
+        "reason": "candidate and cut must each reach at least 2 used games before a card-outcome decision",
+        "used_delta_pp": 0.0
+      },
+      "package_key": "gamble_access_benchmark_cut_land_tax",
+      "raw_decision": null,
+      "source_file": "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+    },
+    {
+      "adds": [
+        "Gods Willing"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "exposure_status": null,
+      "family": "targeted_commander_protection",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "gods_willing_commander_shield_cut_promise",
+      "raw_decision": null,
+      "source_file": "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json"
+    },
+    {
+      "adds": [
+        "Grand Abolisher"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Mother of Runes",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Grand Abolisher",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 5,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Mother of Runes"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "spell_protection",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "candidate_used_without_cut_comparator",
+        "next_action": "rerun_or_compare_against_a_cut_with_observed_use",
+        "promotion_allowed": false,
+        "reason": "baseline cut card did not produce a used-game comparator",
+        "used_delta_pp": null
+      },
+      "package_key": "grand_abolisher_cut_mother_of_runes",
+      "raw_decision": null,
+      "source_file": "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+    },
+    {
+      "adds": [
+        "Hidden Retreat"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Promise of Loyalty",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Hidden Retreat",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 3,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "topdeck_protection",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "candidate_used_games": 1,
+        "cut_used_games": 1,
+        "decision": "insufficient_card_outcome_used_sample",
+        "minimum_used_games": 2,
+        "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+        "promotion_allowed": false,
+        "reason": "candidate and cut must each reach at least 2 used games before a card-outcome decision",
+        "used_delta_pp": 0.0
+      },
+      "package_key": "hidden_retreat_stack_damage_topdeck_cut_promise",
+      "raw_decision": null,
+      "source_file": "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json"
+    },
+    {
+      "adds": [
+        "Invoke Calamity"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Creative Technique"
+      ],
+      "exposure_status": null,
+      "family": "big_spell_value_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "invoke_calamity_same_lane_benchmark_cut_creative_technique",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json"
+    },
+    {
+      "adds": [
+        "Lightning Bolt"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "lightning_bolt_interaction_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json"
+    },
+    {
+      "adds": [
+        "Lightning Helix"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "lightning_helix_same_lane_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json"
+    },
+    {
+      "adds": [
+        "Lion's Eye Diamond"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "lion_s_eye_diamond_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+    },
+    {
+      "adds": [
+        "Locket of Yesterdays"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "locket_of_yesterdays_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json"
+    },
+    {
+      "adds": [
+        "Lotus Petal"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "lotus_petal_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "card_name": "Arcane Signet",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "library_only_not_used": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          },
+          "card_name": "Mana Vault",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "library_only_not_used": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          }
+        }
+      ],
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "fast_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "card_outcome_rejects_current_pair",
+        "next_action": "do_not_repeat_exact_pair_without_new_failure_target_or_cut",
+        "promotion_allowed": false,
+        "reason": "compared candidate used-game record against baseline cut used-game record",
+        "used_delta_pp": -50.0
+      },
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "raw_decision": "reject_or_rework",
+      "source_file": "lorehold_exposure_by_game_gate_20260628_v1_20260628_101737.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_by_game_gate_20260628_v1_20260628_101737.json"
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "card_name": "Arcane Signet",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Mana Vault",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 2,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "fast_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "candidate_used_games": 1,
+        "cut_used_games": 2,
+        "decision": "insufficient_card_outcome_used_sample",
+        "minimum_used_games": 2,
+        "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+        "promotion_allowed": false,
+        "reason": "candidate and cut must each reach at least 2 used games before a card-outcome decision",
+        "used_delta_pp": -100.0
+      },
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "raw_decision": null,
+      "source_file": "lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json"
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "card_name": "Arcane Signet",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          },
+          "card_name": "Mana Vault",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          }
+        }
+      ],
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "fast_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "card_outcome_rejects_current_pair",
+        "next_action": "do_not_repeat_exact_pair_without_new_failure_target_or_cut",
+        "promotion_allowed": false,
+        "reason": "compared candidate used-game record against baseline cut used-game record",
+        "used_delta_pp": -50.0
+      },
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "raw_decision": null,
+      "source_file": "lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json"
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "card_name": "Arcane Signet",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "library_only_not_used": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          },
+          "card_name": "Mana Vault",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "library_only_not_used": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 50.0,
+            "wins": 1
+          }
+        }
+      ],
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "fast_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "card_outcome_rejects_current_pair",
+        "next_action": "do_not_repeat_exact_pair_without_new_failure_target_or_cut",
+        "promotion_allowed": false,
+        "reason": "compared candidate used-game record against baseline cut used-game record",
+        "used_delta_pp": -50.0
+      },
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "raw_decision": "reject_or_rework",
+      "source_file": "lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json"
+    },
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json"
+    },
+    {
+      "adds": [
+        "Millikin"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "millikin_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+    },
+    {
+      "adds": [
+        "Monologue Tax"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "monologue_tax_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json"
+    },
+    {
+      "adds": [
+        "Ol\u00f3rin's Searing Light"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "ol_rin_s_searing_light_interaction_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json"
+    },
+    {
+      "adds": [
+        "Overmaster"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "exposure_status": null,
+      "family": "spell_protection",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "overmaster_protect_draw",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
+    },
+    {
+      "adds": [
+        "Overmaster"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "exposure_status": null,
+      "family": "spell_protection",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "overmaster_protect_draw",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Hexing Squelcher"
+      ],
+      "exposure_status": null,
+      "family": "graveyard_recast",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "past_in_flames_cut_squelcher",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "graveyard_recast",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "past_in_flames_recast",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
+    },
+    {
+      "adds": [
+        "Past in Flames"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 2
+        },
+        "delta_pp": 50.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "graveyard_recast",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "past_in_flames_recast",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Past in Flames",
+        "Overmaster"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin",
+        "Hexing Squelcher"
+      ],
+      "exposure_status": null,
+      "family": "graveyard_recast_protection",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "past_overmaster_spellchain",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json"
+    },
+    {
+      "adds": [
+        "Perch Protection"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Avatar's Wrath",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Perch Protection",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "exposure_status": "candidate_added_card_low_access",
+      "family": "pressure_absorber",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "inconclusive_no_candidate_used_sample",
+        "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+        "promotion_allowed": false,
+        "reason": "candidate card did not produce a used-game sample",
+        "used_delta_pp": null
+      },
+      "package_key": "perch_protection_cut_avatar_wrath",
+      "raw_decision": null,
+      "source_file": "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+    },
+    {
+      "adds": [
+        "Twinflame Tyrant"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 9,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 77.78,
+          "wins": 7
+        },
+        "candidate": {
+          "games": 9,
+          "losses": 5,
+          "stalls": 0,
+          "win_rate": 44.44,
+          "wins": 4
+        },
+        "delta_pp": -33.34
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Thor, God of Thunder",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 9
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Twinflame Tyrant",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 3,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 8,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "cuts": [
+        "Thor, God of Thunder"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "static_damage_modifier",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "candidate_used_without_cut_comparator",
+        "next_action": "rerun_or_compare_against_a_cut_with_observed_use",
+        "promotion_allowed": false,
+        "reason": "baseline cut card did not produce a used-game comparator",
+        "used_delta_pp": null
+      },
+      "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+      "raw_decision": null,
+      "source_file": "lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json"
+    },
+    {
+      "adds": [
+        "Plateau"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 9,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 88.89,
+          "wins": 8
+        },
+        "candidate": {
+          "games": 9,
+          "losses": 7,
+          "stalls": 0,
+          "win_rate": 22.22,
+          "wins": 2
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Radiant Summit",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 9
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Plateau",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 9
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Radiant Summit"
+      ],
+      "exposure_status": "candidate_added_card_low_access",
+      "family": "mana_base",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "inconclusive_no_candidate_used_sample",
+        "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+        "promotion_allowed": false,
+        "reason": "candidate card did not produce a used-game sample",
+        "used_delta_pp": null
+      },
+      "package_key": "plateau_timing_upgrade_cut_radiant_summit",
+      "raw_decision": null,
+      "source_file": "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json"
+    },
+    {
+      "adds": [
+        "Plateau"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 9,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 88.89,
+          "wins": 8
+        },
+        "candidate": {
+          "games": 9,
+          "losses": 6,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 3
+        },
+        "delta_pp": -55.56
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Turbulent Steppe",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 9
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Plateau",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 9
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Turbulent Steppe"
+      ],
+      "exposure_status": "candidate_added_card_low_access",
+      "family": "mana_base",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "inconclusive_no_candidate_used_sample",
+        "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+        "promotion_allowed": false,
+        "reason": "candidate card did not produce a used-game sample",
+        "used_delta_pp": null
+      },
+      "package_key": "plateau_timing_upgrade_cut_turbulent_steppe",
+      "raw_decision": null,
+      "source_file": "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json"
+    },
+    {
+      "adds": [
+        "Primal Amulet // Primal Wellspring"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 2,
+          "losses": 1,
+          "stalls": 0,
+          "win_rate": 50.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "cost_reduce_copy",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "primal_amulet_spell_engine",
+      "raw_decision": null,
+      "source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+    },
+    {
+      "adds": [
+        "Pyretic Ritual"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "pyretic_ritual_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json"
+    },
+    {
+      "adds": [
+        "Razorgrass Ambush // Razorgrass Field"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "razorgrass_ambush_razorgrass_field_same_lane_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json"
+    },
+    {
+      "adds": [
+        "Runaway Steam-Kin"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          },
+          "card_name": "Talisman of Conviction",
+          "near_access_or_better_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          },
+          "recorded_use_count": 6,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "used": 3
+          },
+          "used_games": {
+            "games": 3,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 3
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Runaway Steam-Kin",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 2,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 2,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Talisman of Conviction"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "spellchain_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "card_outcome_rejects_current_pair",
+        "next_action": "do_not_repeat_exact_pair_without_new_failure_target_or_cut",
+        "promotion_allowed": false,
+        "reason": "compared candidate used-game record against baseline cut used-game record",
+        "used_delta_pp": -100.0
+      },
+      "package_key": "runaway_steamkin_cut_talisman",
+      "raw_decision": null,
+      "source_file": "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json"
+    },
+    {
+      "adds": [
+        "Seething Song"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Fellwar Stone",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 2,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Seething Song",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 2,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Fellwar Stone"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "spellchain_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "candidate_used_games": 1,
+        "cut_used_games": 1,
+        "decision": "insufficient_card_outcome_used_sample",
+        "minimum_used_games": 2,
+        "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+        "promotion_allowed": false,
+        "reason": "candidate and cut must each reach at least 2 used games before a card-outcome decision",
+        "used_delta_pp": -100.0
+      },
+      "package_key": "seething_song_cut_fellwar_stone",
+      "raw_decision": null,
+      "source_file": "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json"
+    },
+    {
+      "adds": [
+        "Seething Song"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json"
+    },
+    {
+      "adds": [
+        "Sejiri Shelter // Sejiri Glacier"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Promise of Loyalty"
+      ],
+      "exposure_status": null,
+      "family": "targeted_commander_protection",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "sejiri_shelter_commander_shield_cut_promise",
+      "raw_decision": null,
+      "source_file": "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json"
+    },
+    {
+      "adds": [
+        "Silence"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Avatar's Wrath",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Silence",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Avatar's Wrath"
+      ],
+      "exposure_status": "candidate_added_card_low_access",
+      "family": "spell_protection",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "inconclusive_no_candidate_used_sample",
+        "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+        "promotion_allowed": false,
+        "reason": "candidate card did not produce a used-game sample",
+        "used_delta_pp": null
+      },
+      "package_key": "silence_cut_avatar_wrath",
+      "raw_decision": null,
+      "source_file": "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json"
+    },
+    {
+      "adds": [
+        "Storm-Kiln Artist"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 1
+        },
+        "delta_pp": -66.67
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "card_name": "Arcane Signet",
+          "near_access_or_better_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 1,
+            "used": 2
+          },
+          "used_games": {
+            "games": 2,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 2
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Storm-Kiln Artist",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 1,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "exposure_status": "candidate_added_cards_used",
+      "family": "spellchain_mana",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "candidate_used_games": 1,
+        "cut_used_games": 2,
+        "decision": "insufficient_card_outcome_used_sample",
+        "minimum_used_games": 2,
+        "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+        "promotion_allowed": false,
+        "reason": "candidate and cut must each reach at least 2 used games before a card-outcome decision",
+        "used_delta_pp": -100.0
+      },
+      "package_key": "storm_kiln_artist_cut_arcane_signet",
+      "raw_decision": null,
+      "source_file": "lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json"
+    },
+    {
+      "adds": [
+        "Surly Badgersaur"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "surly_badgersaur_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+    },
+    {
+      "adds": [
+        "Tablet of Discovery"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "tablet_of_discovery_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+    },
+    {
+      "adds": [
+        "Treasonous Ogre"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Bender's Waterskin"
+      ],
+      "exposure_status": null,
+      "family": "ramp_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "treasonous_ogre_same_lane_benchmark_cut_bender_s_waterskin",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json"
+    },
+    {
+      "adds": [
+        "Valakut Awakening // Valakut Stoneforge"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Big Score",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Valakut Awakening // Valakut Stoneforge",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Big Score"
+      ],
+      "exposure_status": "candidate_added_card_low_access",
+      "family": "hand_filter_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "inconclusive_no_candidate_used_sample",
+        "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+        "promotion_allowed": false,
+        "reason": "candidate card did not produce a used-game sample",
+        "used_delta_pp": null
+      },
+      "package_key": "valakut_hand_filter_cut_big_score",
+      "raw_decision": null,
+      "source_file": "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json"
+    },
+    {
+      "adds": [
+        "Velomachus Lorehold"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Creative Technique"
+      ],
+      "exposure_status": null,
+      "family": "big_spell_value_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json"
+    },
+    {
+      "adds": [
+        "Volcanic Vision"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Pinnacle Monk // Mystic Peak",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 1,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Volcanic Vision",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Pinnacle Monk // Mystic Peak"
+      ],
+      "exposure_status": "candidate_added_card_low_access",
+      "family": "graveyard_recursion_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "inconclusive_no_candidate_used_sample",
+        "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+        "promotion_allowed": false,
+        "reason": "candidate card did not produce a used-game sample",
+        "used_delta_pp": null
+      },
+      "package_key": "volcanic_recursion_cut_pinnacle",
+      "raw_decision": null,
+      "source_file": "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json"
+    },
+    {
+      "adds": [
+        "Wheel of Fortune"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 3,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 100.0,
+          "wins": 3
+        },
+        "candidate": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -100.0
+      },
+      "baseline_cut_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "card_name": "Big Score",
+          "near_access_or_better_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          },
+          "recorded_use_count": 4,
+          "sample_quality": "card_used_sample",
+          "status": "used",
+          "status_counts": {
+            "not_observed": 2,
+            "used": 1
+          },
+          "used_games": {
+            "games": 1,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 100.0,
+            "wins": 1
+          }
+        }
+      ],
+      "candidate_added_cards": [
+        {
+          "accessed_or_used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "card_name": "Wheel of Fortune",
+          "near_access_or_better_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "recorded_use_count": 0,
+          "sample_quality": "no_card_exposure_sample",
+          "status": "not_observed",
+          "status_counts": {
+            "not_observed": 3
+          },
+          "used_games": {
+            "games": 0,
+            "losses": 0,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          }
+        }
+      ],
+      "cuts": [
+        "Big Score"
+      ],
+      "exposure_status": "candidate_added_card_low_access",
+      "family": "hand_filter_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "inconclusive_no_candidate_used_sample",
+        "next_action": "rerun_larger_or_forced_access_then_natural_confirmation",
+        "promotion_allowed": false,
+        "reason": "candidate card did not produce a used-game sample",
+        "used_delta_pp": null
+      },
+      "package_key": "wheel_hand_filter_cut_big_score",
+      "raw_decision": null,
+      "source_file": "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json"
+    },
+    {
+      "adds": [
+        "Witch Enchanter // Witch-Blessed Meadow"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json"
+    },
+    {
+      "adds": [
+        "Witch Enchanter // Witch-Blessed Meadow"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "candidate": {
+          "games": 0,
+          "losses": 0,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": null
+      },
+      "baseline_cut_cards": [],
+      "candidate_added_cards": [],
+      "cuts": [
+        "Winds of Abandon"
+      ],
+      "exposure_status": null,
+      "family": "interaction_removal_benchmark",
+      "forced_access_mode": "none",
+      "outcome_decision": {
+        "decision": "missing_per_card_outcome_data",
+        "next_action": "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json",
+        "promotion_allowed": false,
+        "reason": "source report does not expose candidate and cut card outcome rows",
+        "used_delta_pp": null
+      },
+      "package_key": "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_winds_of_abandon",
+      "raw_decision": null,
+      "source_file": "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json"
+    }
+  ],
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_by_game_gate_20260628_v1_20260628_101737.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410.json"
+  ],
+  "summary": {
+    "accessed_without_used_sample_count": 0,
+    "decision_counts": {
+      "candidate_used_without_cut_comparator": 4,
+      "card_outcome_rejects_current_pair": 4,
+      "forced_access_card_outcome_no_lift_reject_or_rework": 1,
+      "inconclusive_no_candidate_used_sample": 8,
+      "insufficient_card_outcome_used_sample": 7,
+      "missing_per_card_outcome_data": 44
+    },
+    "deeper_gate_candidate_count": 0,
+    "forced_access_signal_count": 0,
+    "inconclusive_no_used_sample_count": 8,
+    "insufficient_card_outcome_sample_count": 7,
+    "loaded_package_observation_count": 68,
+    "missing_report_count": 0,
+    "near_access_without_used_sample_count": 0,
+    "package_rollup_count": 61,
+    "recommended_next_action": "avoid_repeating_rejected_pairs_and_generate_new_trace_targeted_package",
+    "rejected_current_pair_count": 4,
+    "rollup_status_counts": {
+      "forced_access_no_lift_reject_or_rework": 1,
+      "inconclusive_low_candidate_use": 8,
+      "insufficient_card_outcome_sample": 5,
+      "missing_per_card_data": 41,
+      "natural_reject_current_pair": 2,
+      "used_without_cut_comparator": 4
+    },
+    "source_report_count": 28
+  }
+}

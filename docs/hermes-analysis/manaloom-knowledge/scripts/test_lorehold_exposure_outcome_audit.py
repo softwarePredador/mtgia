@@ -32,11 +32,27 @@ def package_report(
     delta_pp: float = -66.67,
     added_used: dict | None = None,
     cut_used: dict | None = None,
+    added_accessed: dict | None = None,
+    added_near_access: dict | None = None,
     low_candidate_use: bool = False,
     forced_access_mode: str = "none",
+    exposure_status: str | None = None,
+    added_status: str | None = None,
+    added_status_counts: dict | None = None,
 ) -> dict:
     added_used = added_used if added_used is not None else used_record(2, 1, 1)
     cut_used = cut_used if cut_used is not None else used_record(2, 2, 0)
+    added_accessed = added_accessed if added_accessed is not None else added_used
+    added_near_access = added_near_access if added_near_access is not None else added_accessed
+    exposure_status = exposure_status or (
+        "candidate_added_cards_used"
+        if not low_candidate_use
+        else "candidate_added_card_low_access"
+    )
+    added_status = added_status or ("used" if not low_candidate_use else "library_only_not_used")
+    added_status_counts = added_status_counts or {
+        "used": added_used["games"],
+    }
     return {
         "generated_at": "2026-06-28T00:00:00Z",
         "packages": [
@@ -63,23 +79,27 @@ def package_report(
                     "delta_pp": delta_pp,
                 },
                 "exposure_summary": {
-                    "status": "candidate_added_cards_used"
-                    if not low_candidate_use
-                    else "candidate_added_card_low_access",
+                    "status": exposure_status,
                     "low_candidate_added_card_use": low_candidate_use,
                     "candidate_added_cards": {
                         "all_cards_used": not low_candidate_use,
                         "cards": [
                             {
                                 "card_name": add,
-                                "status": "used" if not low_candidate_use else "library_only_not_used",
+                                "status": added_status,
                                 "recorded_use_count": 2 if not low_candidate_use else 0,
                                 "outcome_summary": {
                                     "used_games": added_used,
+                                    "accessed_or_used_games": added_accessed,
+                                    "near_access_or_better_games": added_near_access,
                                     "sample_quality": "card_used_sample"
                                     if added_used["games"]
+                                    else "card_accessed_not_used_sample"
+                                    if added_accessed["games"]
+                                    else "card_near_access_only_sample"
+                                    if added_near_access["games"]
                                     else "no_card_exposure_sample",
-                                    "status_counts": {"used": added_used["games"]},
+                                    "status_counts": added_status_counts,
                                 },
                             }
                         ],
@@ -93,6 +113,8 @@ def package_report(
                                 "recorded_use_count": 2,
                                 "outcome_summary": {
                                     "used_games": cut_used,
+                                    "accessed_or_used_games": cut_used,
+                                    "near_access_or_better_games": cut_used,
                                     "sample_quality": "card_used_sample",
                                     "status_counts": {"used": cut_used["games"]},
                                 },
@@ -195,6 +217,88 @@ class LoreholdExposureOutcomeAuditTest(unittest.TestCase):
             )
             self.assertFalse(row["outcome_decision"]["promotion_allowed"])
             self.assertEqual(payload["summary"]["inconclusive_no_used_sample_count"], 1)
+
+    def test_positive_aggregate_accessed_without_use_routes_to_conversion_review(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "gate.json"
+            write_json(
+                path,
+                package_report(
+                    package_key="silence_cut_avatar_wrath",
+                    add="Silence",
+                    cut="Avatar's Wrath",
+                    baseline_wins=0,
+                    baseline_losses=3,
+                    candidate_wins=3,
+                    candidate_losses=0,
+                    delta_pp=100.0,
+                    added_used=used_record(0, 0, 0),
+                    added_accessed=used_record(2, 2, 0),
+                    added_near_access=used_record(2, 2, 0),
+                    low_candidate_use=True,
+                    exposure_status="candidate_added_cards_accessed_not_used",
+                    added_status="accessed_not_used",
+                    added_status_counts={"accessed_not_used": 2},
+                ),
+            )
+
+            payload = audit.build_report([path])
+
+            row = payload["packages"][0]
+            decision = row["outcome_decision"]
+            self.assertEqual(
+                decision["decision"],
+                "candidate_accessed_without_used_sample",
+            )
+            self.assertFalse(decision["promotion_allowed"])
+            self.assertEqual(decision["candidate_accessed_games"], 2)
+            self.assertEqual(
+                decision["next_action"],
+                "inspect_play_heuristic_or_runtime_for_accessed_card",
+            )
+            self.assertEqual(payload["summary"]["accessed_without_used_sample_count"], 1)
+            self.assertEqual(
+                payload["package_rollups"][0]["status"],
+                "accessed_without_use_conversion_review",
+            )
+
+    def test_positive_aggregate_near_access_without_use_routes_to_access_window(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "gate.json"
+            write_json(
+                path,
+                package_report(
+                    package_key="wheel_hand_filter_cut_big_score",
+                    add="Wheel of Fortune",
+                    cut="Big Score",
+                    baseline_wins=0,
+                    baseline_losses=3,
+                    candidate_wins=3,
+                    candidate_losses=0,
+                    delta_pp=100.0,
+                    added_used=used_record(0, 0, 0),
+                    added_accessed=used_record(0, 0, 0),
+                    added_near_access=used_record(2, 1, 1),
+                    low_candidate_use=True,
+                    exposure_status="candidate_added_cards_near_access_low_use",
+                    added_status="near_access_not_used",
+                    added_status_counts={"near_access_not_used": 2},
+                ),
+            )
+
+            payload = audit.build_report([path])
+
+            decision = payload["packages"][0]["outcome_decision"]
+            self.assertEqual(
+                decision["decision"],
+                "candidate_near_access_without_used_sample",
+            )
+            self.assertFalse(decision["promotion_allowed"])
+            self.assertEqual(decision["candidate_near_access_games"], 2)
+            self.assertEqual(
+                payload["package_rollups"][0]["status"],
+                "near_access_without_use_access_window_review",
+            )
 
     def test_positive_aggregate_and_used_record_supports_deeper_gate(self):
         with tempfile.TemporaryDirectory() as tmpdir:
