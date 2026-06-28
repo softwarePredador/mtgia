@@ -391,9 +391,103 @@ def collect_audits(paths: Iterable[Path]) -> tuple[list[dict[str, Any]], list[st
     return rows, missing
 
 
+ROLLUP_PRIORITY = {
+    "natural_deeper_gate_candidate": 0,
+    "natural_reject_current_pair": 1,
+    "forced_access_requires_natural_confirmation": 2,
+    "used_without_cut_comparator": 3,
+    "inconclusive_low_candidate_use": 4,
+    "missing_per_card_data": 5,
+    "manual_review": 6,
+}
+
+
+def package_rollup_key(row: Mapping[str, Any]) -> tuple[str, str, str]:
+    adds = "|".join(str(card) for card in row.get("adds") or [])
+    cuts = "|".join(str(card) for card in row.get("cuts") or [])
+    return str(row.get("package_key") or ""), adds, cuts
+
+
+def rollup_decision(rows: list[dict[str, Any]]) -> tuple[str, str]:
+    decisions = [
+        str((row.get("outcome_decision") or {}).get("decision") or "")
+        for row in rows
+    ]
+    if "card_outcome_supports_deeper_gate" in decisions:
+        return "natural_deeper_gate_candidate", "confirm_with_larger_natural_gate_and_critical_matchups"
+    if "card_outcome_rejects_current_pair" in decisions:
+        return "natural_reject_current_pair", "do_not_repeat_exact_pair_without_new_failure_target_or_cut"
+    if "forced_access_card_outcome_signal_requires_natural_confirmation" in decisions:
+        return "forced_access_requires_natural_confirmation", "run_natural_gate_without_forced_access_before_promoting"
+    if "candidate_used_without_cut_comparator" in decisions:
+        return "used_without_cut_comparator", "rerun_or_compare_against_a_cut_with_observed_use"
+    if any(decision.startswith("inconclusive") for decision in decisions):
+        return "inconclusive_low_candidate_use", "rerun_larger_or_forced_access_then_natural_confirmation"
+    if "missing_per_card_outcome_data" in decisions:
+        return "missing_per_card_data", "rerun_with_current_exposure_outcome_gate_or_recover_detailed_gate_json"
+    return "manual_review", "inspect_package_observations"
+
+
+def build_package_rollups(packages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    for row in packages:
+        grouped.setdefault(package_rollup_key(row), []).append(row)
+
+    rollups: list[dict[str, Any]] = []
+    for (_package_key, _adds_key, _cuts_key), rows in grouped.items():
+        first = rows[0]
+        status, next_action = rollup_decision(rows)
+        decision_counts = Counter(
+            str((row.get("outcome_decision") or {}).get("decision") or "unknown")
+            for row in rows
+        )
+        used_deltas = [
+            numeric((row.get("outcome_decision") or {}).get("used_delta_pp"))
+            for row in rows
+            if (row.get("outcome_decision") or {}).get("used_delta_pp") is not None
+        ]
+        aggregate_deltas = [
+            numeric((row.get("aggregate") or {}).get("delta_pp"))
+            for row in rows
+            if (row.get("aggregate") or {}).get("delta_pp") is not None
+        ]
+        natural_rows = [
+            row
+            for row in rows
+            if str(row.get("forced_access_mode") or "none") == "none"
+        ]
+        rollups.append(
+            {
+                "package_key": first.get("package_key"),
+                "family": first.get("family") or "misc",
+                "adds": list(first.get("adds") or []),
+                "cuts": list(first.get("cuts") or []),
+                "status": status,
+                "next_action": next_action,
+                "observation_count": len(rows),
+                "natural_observation_count": len(natural_rows),
+                "forced_access_observation_count": len(rows) - len(natural_rows),
+                "decision_counts": dict(sorted(decision_counts.items())),
+                "best_used_delta_pp": round(max(used_deltas), 2) if used_deltas else None,
+                "worst_used_delta_pp": round(min(used_deltas), 2) if used_deltas else None,
+                "best_aggregate_delta_pp": round(max(aggregate_deltas), 2) if aggregate_deltas else None,
+                "worst_aggregate_delta_pp": round(min(aggregate_deltas), 2) if aggregate_deltas else None,
+                "source_files": sorted({str(row.get("source_file") or "") for row in rows}),
+            }
+        )
+    rollups.sort(
+        key=lambda row: (
+            ROLLUP_PRIORITY.get(str(row.get("status") or ""), 99),
+            str(row.get("package_key") or ""),
+        )
+    )
+    return rollups
+
+
 def build_report(paths: Iterable[Path]) -> dict[str, Any]:
     source_paths = list(paths)
     packages, missing = collect_audits(source_paths)
+    rollups = build_package_rollups(packages)
     decision_counts = Counter(
         str((row.get("outcome_decision") or {}).get("decision") or "unknown")
         for row in packages
@@ -428,8 +522,12 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
         "summary": {
             "source_report_count": len(source_paths),
             "loaded_package_observation_count": len(packages),
+            "package_rollup_count": len(rollups),
             "missing_report_count": len(missing),
             "decision_counts": dict(sorted(decision_counts.items())),
+            "rollup_status_counts": dict(
+                sorted(Counter(str(row.get("status") or "unknown") for row in rollups).items())
+            ),
             "deeper_gate_candidate_count": len(promoted),
             "forced_access_signal_count": len(forced_signals),
             "rejected_current_pair_count": len(rejected),
@@ -452,6 +550,7 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
             "multi-card packages require split or manual review before per-card outcome promotion",
             "Hermes gate evidence is lab evidence; PostgreSQL state is not mutated by this report",
         ],
+        "package_rollups": rollups,
         "packages": packages,
     }
 
@@ -474,14 +573,52 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "- postgres_writes: `false`",
         "- source_db_mutated: `false`",
         f"- loaded_package_observation_count: `{summary.get('loaded_package_observation_count')}`",
+        f"- package_rollup_count: `{summary.get('package_rollup_count')}`",
         f"- missing_report_count: `{summary.get('missing_report_count')}`",
         f"- decision_counts: `{json.dumps(summary.get('decision_counts') or {}, sort_keys=True)}`",
+        f"- rollup_status_counts: `{json.dumps(summary.get('rollup_status_counts') or {}, sort_keys=True)}`",
         f"- recommended_next_action: `{summary.get('recommended_next_action')}`",
         "",
         "## Decision Rules",
         "",
     ]
     lines.extend(f"- {rule}" for rule in payload.get("decision_rules") or [])
+    lines.extend(
+        [
+            "",
+            "## Package Rollups",
+            "",
+            "| Package | Adds | Cuts | Status | Obs | Natural | Forced | Used Delta Range | Aggregate Delta Range | Next Action |",
+            "| --- | --- | --- | --- | ---: | ---: | ---: | --- | --- | --- |",
+        ]
+    )
+    for row in payload.get("package_rollups") or []:
+        used_range = "-"
+        if row.get("best_used_delta_pp") is not None or row.get("worst_used_delta_pp") is not None:
+            used_range = "{worst:+.2f} to {best:+.2f}".format(
+                worst=numeric(row.get("worst_used_delta_pp")),
+                best=numeric(row.get("best_used_delta_pp")),
+            )
+        aggregate_range = "-"
+        if row.get("best_aggregate_delta_pp") is not None or row.get("worst_aggregate_delta_pp") is not None:
+            aggregate_range = "{worst:+.2f} to {best:+.2f}".format(
+                worst=numeric(row.get("worst_aggregate_delta_pp")),
+                best=numeric(row.get("best_aggregate_delta_pp")),
+            )
+        lines.append(
+            "| `{package}` | {adds} | {cuts} | `{status}` | {obs} | {natural} | {forced} | {used} | {aggregate} | `{next_action}` |".format(
+                package=row.get("package_key"),
+                adds=", ".join(f"`{card}`" for card in row.get("adds") or []),
+                cuts=", ".join(f"`{card}`" for card in row.get("cuts") or []),
+                status=row.get("status"),
+                obs=int(row.get("observation_count") or 0),
+                natural=int(row.get("natural_observation_count") or 0),
+                forced=int(row.get("forced_access_observation_count") or 0),
+                used=used_range,
+                aggregate=aggregate_range,
+                next_action=row.get("next_action"),
+            )
+        )
     lines.extend(
         [
             "",

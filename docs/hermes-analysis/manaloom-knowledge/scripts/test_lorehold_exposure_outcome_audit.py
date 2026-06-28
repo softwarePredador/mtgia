@@ -254,6 +254,38 @@ class LoreholdExposureOutcomeAuditTest(unittest.TestCase):
                 "run_natural_confirmation_for_forced_access_signal",
             )
 
+    def test_rollup_prefers_natural_reject_over_forced_access_signal(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            natural = Path(tmpdir) / "natural.json"
+            forced = Path(tmpdir) / "forced.json"
+            write_json(natural, package_report())
+            write_json(
+                forced,
+                package_report(
+                    baseline_wins=1,
+                    baseline_losses=2,
+                    candidate_wins=3,
+                    candidate_losses=0,
+                    delta_pp=66.67,
+                    added_used=used_record(2, 2, 0),
+                    cut_used=used_record(2, 1, 1),
+                    forced_access_mode="opening_hand",
+                ),
+            )
+
+            payload = audit.build_report([natural, forced])
+
+            rollup = payload["package_rollups"][0]
+            self.assertEqual(rollup["package_key"], "mana_vault_fast_mana_cut_arcane_signet")
+            self.assertEqual(rollup["status"], "natural_reject_current_pair")
+            self.assertEqual(rollup["observation_count"], 2)
+            self.assertEqual(rollup["natural_observation_count"], 1)
+            self.assertEqual(rollup["forced_access_observation_count"], 1)
+            self.assertEqual(
+                payload["summary"]["rollup_status_counts"],
+                {"natural_reject_current_pair": 1},
+            )
+
     def test_missing_card_rows_are_not_labeled_multi_card_review(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "gate.json"
