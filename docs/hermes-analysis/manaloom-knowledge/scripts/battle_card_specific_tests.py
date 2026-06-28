@@ -10913,6 +10913,82 @@ def register_tests(battle, player):
         )
         assert not any(decision.get("decision_type") == "lorehold_upkeep_rummage" for decision in decisions)
 
+    def test_lorehold_upkeep_rummage_discards_squee_to_graveyard_for_recursion():
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            if hasattr(battle, "reset_decision_trace_counter"):
+                battle.reset_decision_trace_counter()
+            lorehold = player("Lorehold")
+            lorehold.is_human = True
+            lorehold.battlefield = [
+                {
+                    "name": "Lorehold, the Historian",
+                    "effect": "creature",
+                    "type_line": "Legendary Creature",
+                    "haste": True,
+                },
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain"},
+                {"name": "Sacred Foundry", "effect": "land", "type_line": "Land"},
+            ]
+            lorehold.hand = [
+                {
+                    "name": "Squee, Goblin Nabob",
+                    "cmc": 3,
+                    "type_line": "Legendary Creature — Goblin",
+                }
+            ]
+            lorehold.library = [
+                {"name": "Filler Draw", "cmc": 2, "type_line": "Creature", "effect": "creature"}
+            ]
+            opponent = player("Opponent")
+            opponent.library = [_card("Opponent Draw", cmc=1)]
+            lorehold.refresh_mana_sources(turn=6)
+
+            triggered = battle.process_lorehold_opponent_upkeep_rummage(
+                opponent,
+                [lorehold, opponent],
+                6,
+                random.Random(220),
+                battle.Stack(),
+            )
+            returned = battle.process_graveyard_upkeep_self_return(lorehold, turn=7)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert triggered == 1
+        assert returned == 1
+        assert any(card.get("name") == "Squee, Goblin Nabob" for card in lorehold.hand)
+        assert not any(card.get("name") == "Squee, Goblin Nabob" for card in lorehold.graveyard)
+        assert any(
+            event == "lorehold_upkeep_rummage"
+            and data.get("discarded") == "Squee, Goblin Nabob"
+            and data.get("discard_destination") == "graveyard"
+            and data.get("replacement_used") is False
+            and data.get("reason") == "discard_squee_for_upkeep_recursion"
+            for event, data in events
+        )
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Squee, Goblin Nabob"
+            and data.get("effect") == "graveyard_upkeep_return_self_to_hand"
+            and data.get("destination") == "hand"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "lorehold_upkeep_rummage"
+            and decision.get("chosen_option", {}).get("card") == "Squee, Goblin Nabob"
+            and decision.get("reason") == "discard_squee_for_upkeep_recursion"
+            and "squee_recursion_engine" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
     def test_low_life_casts_approach_before_proactive_attack_tax():
         events = []
         decisions = []
@@ -19072,6 +19148,7 @@ def register_tests(battle, player):
         test_scroll_rack_sets_up_lorehold_approach_second_cast_on_opponent_upkeep,
         test_brainstone_first_draw_approach_wins_before_rummage_resolution,
         test_lorehold_upkeep_rummage_preserves_approach_without_top_replacement,
+        test_lorehold_upkeep_rummage_discards_squee_to_graveyard_for_recursion,
         test_low_life_casts_approach_before_proactive_attack_tax,
         test_grand_abolisher_casts_as_setup_for_future_approach,
         test_orims_chant_held_without_castable_second_approach_payoff,

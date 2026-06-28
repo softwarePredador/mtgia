@@ -19099,6 +19099,18 @@ def is_lorehold_protected_win_condition(card):
     return normalized_name == "approach of the second sun" or effect in {"approach", "wincon"}
 
 
+def is_squee_graveyard_recursion_card(card):
+    if not isinstance(card, dict):
+        return False
+    if normalize_card_name(card.get("name", "")) != "squee, goblin nabob":
+        return False
+    effect_data = card if card.get("battle_model_scope") else get_card_effect(card)
+    return (
+        effect_data.get("battle_model_scope") == "graveyard_upkeep_return_self_to_hand_v1"
+        and bool(effect_data.get("graveyard_upkeep_return_self_to_hand"))
+    )
+
+
 def activate_lorehold_topdeck_artifacts(
     player,
     turn,
@@ -19725,6 +19737,10 @@ def choose_lorehold_rummage_discard(player):
             score = 130 + min(cmc, 8) * 4
             reason = "redraw_spell_as_first_draw_for_miracle"
             use_top_replacement = True
+        elif is_squee_graveyard_recursion_card(card):
+            score = 122
+            reason = "discard_squee_for_upkeep_recursion"
+            risk_flags.append("squee_recursion_engine")
         elif is_land_card and lands_in_hand >= 2 and battlefield_lands >= 4:
             score = 88
             reason = "discard_excess_land_for_new_draw"
