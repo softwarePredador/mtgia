@@ -465,6 +465,13 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         return "targeted_interaction"
     if (
         str(effect_json.get("battle_model_scope") or "")
+        == "source_dealt_damage_reflect_to_any_target_v1"
+        and effect_json.get("trigger") == "source_dealt_damage"
+        and effect_json.get("trigger_effect") == "damage_any_target"
+    ):
+        return "targeted_interaction"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
         == "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
         and effect_json.get("effect") == "redirect_removal"
     ):
@@ -3216,6 +3223,27 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("trigger_effect") == "damage_creature_controller"
             and effect_json.get("damage_amount_source") == "damage_dealt_to_creature"
             and bool(effect_json.get("global_creature_damage_reflect_to_controller"))
+        )
+
+    if effect == "creature" and scope == "source_dealt_damage_reflect_to_any_target_v1":
+        return (
+            types == {"CREATURE"}
+            and {"DamageTargetEffect", "GainAbilitySourceEffect"}.issubset(effect_classes)
+            and {
+                "DealtDamageToSourceTriggeredAbility",
+                "FirstStrikeAbility",
+                "SimpleActivatedAbility",
+            }.issubset(ability_classes)
+            and target_classes == {"TargetAnyTarget"}
+            and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 3
+            and effect_json.get("trigger") == "source_dealt_damage"
+            and effect_json.get("trigger_effect") == "damage_any_target"
+            and effect_json.get("damage_amount_source") == "damage_dealt_to_source"
+            and bool(effect_json.get("source_damage_reflect_to_any_target"))
+            and effect_json.get("target") == "any_target"
+            and bool(effect_json.get("activated_gain_first_strike_until_eot"))
+            and effect_json.get("first_strike_activation_cost") == "{R/W}"
         )
 
     if effect == "artifact" and scope == "etb_exile_graveyard_card_or_sacrifice_for_mass_graveyard_exile_or_draw_v1":

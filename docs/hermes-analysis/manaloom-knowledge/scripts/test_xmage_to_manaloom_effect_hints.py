@@ -4973,6 +4973,47 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["damage_amount_source"], "damage_dealt_to_creature")
         self.assertTrue(primary["global_creature_damage_reflect_to_controller"])
 
+    def test_boros_reckoner_maps_to_source_damaged_reflect_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BorosReckoner",
+                "effect_classes": ["DamageTargetEffect", "GainAbilitySourceEffect"],
+                "ability_classes": [
+                    "DealtDamageToSourceTriggeredAbility",
+                    "FirstStrikeAbility",
+                    "SimpleActivatedAbility",
+                ],
+                "dynamic_value_classes": ["SavedDamageValue"],
+                "target_classes": ["TargetAnyTarget"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(3); this.toughness = new MageInt(3); "
+                    "Ability ability = new DealtDamageToSourceTriggeredAbility("
+                    "new DamageTargetEffect(SavedDamageValue.MUCH, \"it\"), false); "
+                    "ability.addTarget(new TargetAnyTarget()); "
+                    "this.addAbility(new SimpleActivatedAbility(new GainAbilitySourceEffect("
+                    "FirstStrikeAbility.getInstance(), Duration.EndOfTurn), new ManaCostsImpl<>(\"{R/W}\")));"
+                ),
+            },
+            (
+                "Whenever Boros Reckoner is dealt damage, it deals that much damage to any target. "
+                "{R/W}: Boros Reckoner gains first strike until end of turn."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(primary["battle_model_scope"], "source_dealt_damage_reflect_to_any_target_v1")
+        self.assertEqual(primary["power"], 3)
+        self.assertEqual(primary["toughness"], 3)
+        self.assertEqual(primary["trigger"], "source_dealt_damage")
+        self.assertEqual(primary["trigger_effect"], "damage_any_target")
+        self.assertEqual(primary["damage_amount_source"], "damage_dealt_to_source")
+        self.assertTrue(primary["source_damage_reflect_to_any_target"])
+        self.assertEqual(primary["target"], "any_target")
+        self.assertTrue(primary["activated_gain_first_strike_until_eot"])
+        self.assertEqual(primary["first_strike_activation_cost"], "{R/W}")
+
     def test_terror_of_the_peaks_maps_to_etb_power_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

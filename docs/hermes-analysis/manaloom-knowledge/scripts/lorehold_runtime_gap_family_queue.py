@@ -207,11 +207,11 @@ TARGETED_INTERACTION_SUBFAMILY_META = {
         "priority": 15,
     },
     "source_damaged_reflect_to_any_target": {
-        "status": "runtime_family_implementation_required",
+        "status": "runtime_supported_family",
         "implementation_unit": (
             "source-creature dealt-damage trigger that deals the same amount to any chosen target"
         ),
-        "next_step": "implement Boros-Reckoner style damage reflection and target choice tests",
+        "next_step": "prepare PG metadata package after PostgreSQL precheck, then gate Boros Reckoner reflection lines",
         "family_tests": [
             "test_boros_reckoner_reflects_damage_to_selected_any_target",
             "test_boros_reckoner_reflection_uses_saved_damage_amount",
@@ -261,6 +261,7 @@ def targeted_interaction_subfamily(card: dict[str, Any]) -> dict[str, Any] | Non
         "controlled_other_creature_enters_power_damage_any_target_v1",
         "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
         "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+        "source_dealt_damage_reflect_to_any_target_v1",
     }
     if effect != "direct_damage" and scope not in runtime_scopes:
         return None

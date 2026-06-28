@@ -8083,6 +8083,63 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             "creature_damage_controller_reflect",
         )
 
+    def test_classifier_and_generator_mark_boros_reckoner_exact_scope_as_batch_safe(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Boros Reckoner",
+                    "severity": "high",
+                    "oracle_hash": "boroshash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "BorosReckoner",
+                        "path": "/xmage/BorosReckoner.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": ["DamageTargetEffect", "GainAbilitySourceEffect"],
+                        "ability_classes": [
+                            "DealtDamageToSourceTriggeredAbility",
+                            "FirstStrikeAbility",
+                            "SimpleActivatedAbility",
+                        ],
+                        "target_classes": ["TargetAnyTarget"],
+                        "primary_effect": {
+                            "effect": "creature",
+                            "battle_model_scope": "source_dealt_damage_reflect_to_any_target_v1",
+                            "power": 3,
+                            "toughness": 3,
+                            "trigger": "source_dealt_damage",
+                            "trigger_effect": "damage_any_target",
+                            "damage_amount_source": "damage_dealt_to_source",
+                            "source_damage_reflect_to_any_target": True,
+                            "target": "any_target",
+                            "target_constraints": {"scope": "any_target"},
+                            "activated_gain_first_strike_until_eot": True,
+                            "first_strike_activation_cost": "{R/W}",
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "targeted_interaction")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        proposal_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = proposal_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "burn_engine")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "damage_reflection")
+        self.assertEqual(
+            proposal["deck_role_json"]["subtype"],
+            "source_damaged_reflect_any_target",
+        )
+
     def test_classifier_and_generator_mark_terror_of_the_peaks_exact_scope_as_batch_safe(self) -> None:
         batch_audit = {
             "cards": [

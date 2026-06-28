@@ -6590,6 +6590,51 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         )
 
     if (
+        xmage_class_name == "BorosReckoner"
+        and card_types == {"CREATURE"}
+        and {"DamageTargetEffect", "GainAbilitySourceEffect"}.issubset(effect_classes)
+        and {
+            "DealtDamageToSourceTriggeredAbility",
+            "FirstStrikeAbility",
+            "SimpleActivatedAbility",
+        }.issubset(ability_classes)
+        and "SavedDamageValue" in dynamic_value_classes
+        and "TargetAnyTarget" in target_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="source_dealt_damage_reflect_to_any_target_v1",
+                reason=(
+                    "XMage structure matches Boros Reckoner: whenever this source is dealt damage, "
+                    "it deals that much damage to any target, with an activated first strike annotation."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text) or 3,
+                    "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text) or 3,
+                    "trigger": "source_dealt_damage",
+                    "trigger_effect": "damage_any_target",
+                    "damage_amount_source": "damage_dealt_to_source",
+                    "source_damage_reflect_to_any_target": True,
+                    "target": "any_target",
+                    "target_constraints": {"scope": "any_target"},
+                    "activated_gain_first_strike_until_eot": True,
+                    "first_strike_activation_cost": "{R/W}",
+                },
+                matched_signals=[
+                    "DealtDamageToSourceTriggeredAbility",
+                    "DamageTargetEffect",
+                    "SavedDamageValue.MUCH",
+                    "TargetAnyTarget",
+                    "GainAbilitySourceEffect",
+                    "FirstStrikeAbility",
+                ],
+            )
+        )
+
+    if (
         xmage_class_name == "TroubleInPairs"
         and card_types == {"ENCHANTMENT"}
         and effect_classes == {"DrawCardSourceControllerEffect"}

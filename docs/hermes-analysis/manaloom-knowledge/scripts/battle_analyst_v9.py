@@ -27610,7 +27610,17 @@ def trigger_creature_damage_controller_reflect(
     if damage_amount <= 0:
         return 0
 
-    triggers = 0
+    triggers = trigger_source_damaged_reflect_to_any_target(
+        all_players,
+        damage_source_controller,
+        damaged_controller,
+        source_card,
+        damaged_creature,
+        damage_amount,
+        turn=turn,
+        phase=phase,
+        damage_event=damage_event,
+    )
     for controller, permanent, effect_data in _creature_damage_controller_reflect_permanents(all_players):
         if not getattr(damaged_controller, "is_alive", lambda: True)():
             continue
@@ -27648,6 +27658,124 @@ def trigger_creature_damage_controller_reflect(
             **replay_rule_fields(effect_data),
         )
     return triggers
+
+
+def _source_damaged_reflect_effect_data(damaged_creature):
+    if not isinstance(damaged_creature, dict):
+        return None
+    candidates = [damaged_creature]
+    try:
+        resolved = get_card_effect(damaged_creature)
+    except Exception:
+        resolved = {}
+    if isinstance(resolved, dict) and resolved is not damaged_creature:
+        candidates.append({**damaged_creature, **resolved})
+    for candidate in candidates:
+        trigger = candidate.get("trigger")
+        trigger_effect = candidate.get("trigger_effect")
+        if (
+            candidate.get("source_damage_reflect_to_any_target")
+            or candidate.get("battle_model_scope") == "source_dealt_damage_reflect_to_any_target_v1"
+            or (
+                trigger in {"source_dealt_damage", "source_damaged", "dealt_damage_to_source"}
+                and trigger_effect in {"damage_any_target", "reflect_damage_any_target"}
+                and candidate.get("damage_amount_source") == "damage_dealt_to_source"
+            )
+        ):
+            return candidate
+    return None
+
+
+def trigger_source_damaged_reflect_to_any_target(
+    all_players,
+    damage_source_controller,
+    damaged_controller,
+    source_card,
+    damaged_creature,
+    amount,
+    *,
+    turn=None,
+    phase=None,
+    damage_event="creature_damage",
+):
+    if damaged_controller is None or not is_battlefield_creature(damaged_creature):
+        return 0
+    effect_data = _source_damaged_reflect_effect_data(damaged_creature)
+    if not effect_data:
+        return 0
+    try:
+        damage_amount = max(0, int(amount or 0))
+    except Exception:
+        damage_amount = 0
+    if damage_amount <= 0:
+        return 0
+
+    alive_targets = [
+        participant
+        for participant in all_players or []
+        if participant is not None
+        and participant is not damaged_controller
+        and getattr(participant, "is_alive", lambda: True)()
+    ]
+    target_player = (
+        min(alive_targets, key=lambda participant: (participant.life, participant.name))
+        if alive_targets
+        else None
+    )
+    if target_player is None:
+        emit_replay_event(
+            "trigger_skipped",
+            player=getattr(damaged_controller, "name", None),
+            card=damaged_creature.get("name", "?"),
+            trigger=effect_data.get("trigger") or "source_dealt_damage",
+            effect="damage_any_target",
+            reason="no_legal_target",
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else source_card,
+            source_controller=getattr(damage_source_controller, "name", None),
+            damaged_creature=damaged_creature.get("name", "?"),
+            original_damage_to_source=damage_amount,
+            damage_event=damage_event,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return 0
+
+    reflect_card = {**damaged_creature, **effect_data}
+    life_before = getattr(target_player, "life", None)
+    damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+        damaged_controller,
+        target_player,
+        reflect_card,
+        damage_amount,
+        turn=turn,
+        phase=phase,
+        damage_event_type="player",
+    )
+    emit_replay_event(
+        "trigger_resolved",
+        player=getattr(damaged_controller, "name", None),
+        card=damaged_creature.get("name", "?"),
+        trigger=effect_data.get("trigger") or "source_dealt_damage",
+        effect="damage_any_target",
+        source=source_card.get("name", "?") if isinstance(source_card, dict) else source_card,
+        source_controller=getattr(damage_source_controller, "name", None),
+        damaged_creature=damaged_creature.get("name", "?"),
+        damaged_creature_controller=getattr(damaged_controller, "name", None),
+        target="player",
+        target_player=getattr(target_player, "name", None),
+        original_damage_to_source=damage_amount,
+        amount=target_amount,
+        damage_dealt=damage_dealt,
+        result="player_damage" if dealt else "prevented",
+        life_before=life_before,
+        life_after=getattr(target_player, "life", None),
+        damage_event=damage_event,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return 1
 
 
 def trigger_spell_damage_token_engines(
