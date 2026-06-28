@@ -139,6 +139,60 @@ class LoreholdLearningEvidenceLedgerTest(unittest.TestCase):
             markdown = ledger.render_markdown(payload)
             self.assertIn("galvanoth_topdeck_freecast_cut_chimes", markdown)
 
+    def test_latest_cut_safety_block_overrides_older_positive_signal(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            registry = tmp / "registry.json"
+            write_json(registry, {"current_leader": "candidate_607_squee_v1"})
+            write_json(
+                tmp / "lorehold_brainstone_gate_old.json",
+                {
+                    "generated_at": "2026-06-27T00:00:00+00:00",
+                    "packages": [
+                        {
+                            "package_key": "brainstone_topdeck_miracle_cut_squelcher",
+                            "family": "topdeck_setup",
+                            "adds": ["Brainstone"],
+                            "cuts": ["Hexing Squelcher"],
+                            "status": "gated",
+                            "gate_summary": {
+                                "baseline": {"games": 9, "wins": 0, "losses": 9, "stalls": 0, "win_rate": 0.0},
+                                "candidate": {"games": 9, "wins": 5, "losses": 4, "stalls": 0, "win_rate": 55.56},
+                                "delta_pp": 55.56,
+                            },
+                        }
+                    ],
+                },
+            )
+            write_json(
+                tmp / "lorehold_brainstone_preflight_new.json",
+                {
+                    "generated_at": "2026-06-28T00:00:00+00:00",
+                    "packages": [
+                        {
+                            "package_key": "brainstone_topdeck_miracle_cut_squelcher",
+                            "family": "topdeck_setup",
+                            "adds": ["Brainstone"],
+                            "cuts": ["Hexing Squelcher"],
+                            "status": "skipped_cut_safety",
+                            "cut_safety": {
+                                "status": "blocked_cut_safety",
+                                "reason": "proposed cuts already have blocker evidence: Hexing Squelcher",
+                            },
+                        }
+                    ],
+                },
+            )
+
+            payload = ledger.build_ledger(tmp, registry)
+
+            group = next(row for row in payload["package_groups"] if row["package_key"] == "brainstone_topdeck_miracle_cut_squelcher")
+            self.assertEqual(group["classification"], "preflight_blocked_protected_cut")
+            self.assertEqual(group["best_delta_pp"], 55.56)
+            self.assertIsNone(group["latest_delta_pp"])
+            self.assertEqual(group["latest_decision"], "preflight_blocked_protected_cut")
+            self.assertNotIn(group, payload["actionable_confirmation_queue"])
+
 
 if __name__ == "__main__":
     unittest.main()

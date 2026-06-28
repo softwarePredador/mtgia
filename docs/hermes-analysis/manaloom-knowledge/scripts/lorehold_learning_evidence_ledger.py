@@ -36,6 +36,10 @@ def numeric(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def has_numeric(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
 def integer(value: Any, default: int = 0) -> int:
     try:
         return int(value)
@@ -64,12 +68,49 @@ def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> l
         baseline = gate.get("baseline") or {}
         candidate = gate.get("candidate") or {}
         if not baseline or not candidate:
+            package_status = str(package.get("status") or "")
+            if package_status not in {
+                "skipped_cut_safety",
+                "skipped_prior_evidence",
+                "skipped_candidate_apply_error",
+                "preflight_ready",
+                "apply_ready",
+            }:
+                continue
+            observations.append(
+                {
+                    "source_path": str(path),
+                    "source_file": path.name,
+                    "source_mtime": path.stat().st_mtime,
+                    "generated_at": payload.get("generated_at"),
+                    "source_kind": "package_preflight",
+                    "package_key": str(package.get("package_key") or ""),
+                    "family": package.get("family"),
+                    "adds": list(package.get("adds") or []),
+                    "cuts": list(package.get("cuts") or []),
+                    "status": package.get("status"),
+                    "cut_safety": package.get("cut_safety") or {},
+                    "prior_evidence": package.get("prior_evidence") or {},
+                    "baseline": {},
+                    "candidate": {},
+                    "delta_pp": None,
+                    "decision": preflight_decision(package),
+                    "games_per_opponent": payload.get("games_per_opponent"),
+                    "opponent_limit": payload.get("opponent_limit"),
+                    "opponent_seed": payload.get("opponent_seed"),
+                    "simulation_seed": payload.get("simulation_seed"),
+                    "source_db": payload.get("source_db"),
+                    "runtime_package_proposal_reports": payload.get("runtime_package_proposal_reports") or [],
+                }
+            )
             continue
         delta_pp = numeric(gate.get("delta_pp"), numeric(candidate.get("win_rate")) - numeric(baseline.get("win_rate")))
         observations.append(
             {
                 "source_path": str(path),
                 "source_file": path.name,
+                "source_mtime": path.stat().st_mtime,
+                "generated_at": payload.get("generated_at"),
                 "source_kind": "package_gate",
                 "package_key": str(package.get("package_key") or ""),
                 "family": package.get("family"),
@@ -89,6 +130,21 @@ def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> l
             }
         )
     return observations
+
+
+def preflight_decision(package: Mapping[str, Any]) -> str:
+    status = str(package.get("status") or "")
+    cut_status = str((package.get("cut_safety") or {}).get("status") or "")
+    prior_status = str((package.get("prior_evidence") or {}).get("status") or "")
+    if status == "skipped_cut_safety" or cut_status == "blocked_cut_safety":
+        return "preflight_blocked_protected_cut"
+    if status == "skipped_prior_evidence" or prior_status == "blocked_prior_reject":
+        return "blocked_prior_evidence"
+    if status == "skipped_candidate_apply_error":
+        return "candidate_apply_error"
+    if status in {"preflight_ready", "apply_ready"}:
+        return status
+    return status or "preflight_observed"
 
 
 def compact_result(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -134,6 +190,8 @@ def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> li
             {
                 "source_path": str(path),
                 "source_file": path.name,
+                "source_mtime": path.stat().st_mtime,
+                "generated_at": payload.get("generated_at"),
                 "source_kind": "candidate_gate",
                 "package_key": deck_key,
                 "family": row.get("archetype"),
@@ -156,7 +214,9 @@ def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> li
 
 
 def iter_gate_reports(reports_dir: Path) -> Iterable[Path]:
-    for path in sorted(reports_dir.glob("lorehold_*gate*.json")):
+    paths = set(reports_dir.glob("lorehold_*gate*.json"))
+    paths.update(reports_dir.glob("lorehold_*preflight*.json"))
+    for path in sorted(paths):
         name = path.name
         if "_partial" in name or "_game_checkpoint" in name:
             continue
@@ -202,11 +262,19 @@ def registry_statuses(registry: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
 
 
 def summarize_group(package_key: str, observations: list[dict[str, Any]], registry: Mapping[str, Any]) -> dict[str, Any]:
-    deltas = [numeric(row.get("delta_pp")) for row in observations]
-    positive = [row for row in observations if numeric(row.get("delta_pp")) > 0]
-    negative = [row for row in observations if numeric(row.get("delta_pp")) < 0]
-    ties = [row for row in observations if numeric(row.get("delta_pp")) == 0]
-    latest = sorted(observations, key=lambda row: str(row.get("source_file") or ""))[-1]
+    delta_rows = [row for row in observations if has_numeric(row.get("delta_pp"))]
+    deltas = [numeric(row.get("delta_pp")) for row in delta_rows]
+    positive = [row for row in delta_rows if numeric(row.get("delta_pp")) > 0]
+    negative = [row for row in delta_rows if numeric(row.get("delta_pp")) < 0]
+    ties = [row for row in delta_rows if numeric(row.get("delta_pp")) == 0]
+    latest = sorted(
+        observations,
+        key=lambda row: (
+            str(row.get("generated_at") or ""),
+            numeric(row.get("source_mtime")),
+            str(row.get("source_file") or ""),
+        ),
+    )[-1]
     registry_row = registry.get(package_key) or {}
     registry_status = str(registry_row.get("status") or "")
     classification = classify_group(
@@ -215,6 +283,7 @@ def summarize_group(package_key: str, observations: list[dict[str, Any]], regist
         negative_count=len(negative),
         tie_count=len(ties),
         latest_delta=numeric(latest.get("delta_pp")),
+        latest_decision=str(latest.get("decision") or ""),
     )
     return {
         "package_key": package_key,
@@ -224,13 +293,16 @@ def summarize_group(package_key: str, observations: list[dict[str, Any]], regist
         "positive_count": len(positive),
         "negative_count": len(negative),
         "tie_count": len(ties),
-        "best_delta_pp": round(max(deltas), 2),
-        "worst_delta_pp": round(min(deltas), 2),
-        "latest_delta_pp": round(numeric(latest.get("delta_pp")), 2),
+        "best_delta_pp": round(max(deltas), 2) if deltas else None,
+        "worst_delta_pp": round(min(deltas), 2) if deltas else None,
+        "latest_delta_pp": round(numeric(latest.get("delta_pp")), 2) if has_numeric(latest.get("delta_pp")) else None,
         "latest_source_file": latest.get("source_file"),
         "latest_baseline": latest.get("baseline"),
         "latest_candidate": latest.get("candidate"),
         "latest_decision": latest.get("decision"),
+        "latest_status": latest.get("status"),
+        "latest_cut_safety": latest.get("cut_safety") or {},
+        "latest_prior_evidence": latest.get("prior_evidence") or {},
         "latest_adds": latest.get("adds") or [],
         "latest_cuts": latest.get("cuts") or [],
         "families": sorted({str(row.get("family")) for row in observations if row.get("family")}),
@@ -245,9 +317,22 @@ def classify_group(
     negative_count: int,
     tie_count: int,
     latest_delta: float,
+    latest_decision: str,
 ) -> str:
     if registry_status == "promoted_current_champion":
         return "current_champion"
+    if latest_decision == "preflight_blocked_protected_cut":
+        return "preflight_blocked_protected_cut"
+    if latest_decision == "blocked_prior_evidence":
+        return "blocked_prior_evidence"
+    if latest_decision == "candidate_apply_error":
+        return "candidate_apply_error"
+    if latest_decision in {"preflight_ready", "apply_ready"}:
+        if positive_count:
+            return "preflight_ready_needs_gate"
+        if negative_count:
+            return "preflight_ready_negative_history"
+        return "preflight_ready_needs_gate"
     if registry_status.startswith("rejected") or registry_status == "rejected":
         return "registry_rejected"
     if latest_delta < 0 and negative_count:
@@ -290,6 +375,7 @@ def build_ledger(reports_dir: Path, registry_path: Path) -> dict[str, Any]:
         if group["classification"] in {
             "positive_signal_needs_confirmation",
             "conflicting_signal_needs_champion_gate",
+            "preflight_ready_needs_gate",
         }
     ]
     actionable.sort(key=lambda row: (row["classification"] != "conflicting_signal_needs_champion_gate", -numeric(row["best_delta_pp"])))
@@ -323,8 +409,9 @@ def build_ledger(reports_dir: Path, registry_path: Path) -> dict[str, Any]:
             groups,
             key=lambda row: (
                 row["classification"] != "current_champion",
+                row["classification"] != "preflight_blocked_protected_cut",
                 row["classification"] != "latest_rejected",
-                -numeric(row["best_delta_pp"]),
+                -numeric(row["best_delta_pp"], -9999.0),
                 str(row["package_key"]),
             ),
         ),
