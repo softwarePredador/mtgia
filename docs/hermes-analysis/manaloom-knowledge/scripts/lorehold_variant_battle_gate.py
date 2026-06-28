@@ -83,6 +83,7 @@ FOCUS_TRACE_EVENTS = {
     "trigger_skipped",
     "utility_artifact_activated",
 }
+FOCUS_ACCESS_ZONES = {"hand", "battlefield", "graveyard", "exile", "stack"}
 
 
 def focus_trace_cards() -> set[str]:
@@ -97,6 +98,147 @@ def focus_trace_cards() -> set[str]:
     if isinstance(parsed, list):
         cards.update(str(item).strip() for item in parsed if str(item).strip())
     return cards
+
+
+def trace_card_names_from_snapshots(value: Any) -> set[str]:
+    names: set[str] = set()
+    if not isinstance(value, list):
+        return names
+    for item in value:
+        if isinstance(item, Mapping):
+            name = str(item.get("name") or "").strip()
+        else:
+            name = str(item or "").strip()
+        if name:
+            names.add(name)
+    return names
+
+
+def focus_card_access_by_game_from_traces(
+    traces_by_game: Mapping[str, Any],
+) -> dict[str, dict[str, dict[str, Any]]]:
+    card_names: set[str] = set()
+    for traces in traces_by_game.values():
+        if not isinstance(traces, list):
+            continue
+        for trace in traces:
+            if not isinstance(trace, Mapping):
+                continue
+            data = trace.get("data") or {}
+            zones = data.get("focus_card_zones") if isinstance(data, Mapping) else None
+            if isinstance(zones, Mapping):
+                card_names.update(str(name) for name in zones)
+
+    by_card: dict[str, dict[str, dict[str, Any]]] = {}
+    for card_name in sorted(card_names):
+        by_game: dict[str, dict[str, Any]] = {}
+        for raw_game_id, traces in traces_by_game.items():
+            if not isinstance(traces, list):
+                continue
+            game_id = str(raw_game_id)
+            profile: dict[str, Any] = {
+                "trace_count": 0,
+                "zone_counts": {},
+                "accessed": False,
+                "near_access": False,
+                "drawn": False,
+                "opening_hand": False,
+                "library_only": False,
+                "dominant_zone": None,
+            }
+            zone_counts: dict[str, int] = {}
+            observed = False
+            saw_library = False
+            for trace in traces:
+                if not isinstance(trace, Mapping):
+                    continue
+                data = trace.get("data") or {}
+                if not isinstance(data, Mapping):
+                    continue
+                zones = data.get("focus_card_zones") or {}
+                zone_info = zones.get(card_name) if isinstance(zones, Mapping) else None
+                if not isinstance(zone_info, Mapping):
+                    continue
+                zone = str(zone_info.get("zone") or "").strip()
+                if not zone:
+                    continue
+                profile["trace_count"] = int(profile["trace_count"]) + 1
+                zone_counts[zone] = zone_counts.get(zone, 0) + 1
+                if zone != "absent":
+                    observed = True
+                if zone == "library":
+                    saw_library = True
+                drawn_names = (
+                    trace_card_names_from_snapshots(data.get("drawn_for_turn"))
+                    | trace_card_names_from_snapshots(data.get("drawn"))
+                    | trace_card_names_from_snapshots(data.get("first_draw"))
+                )
+                if card_name in drawn_names:
+                    profile["drawn"] = True
+                    profile["accessed"] = True
+                if card_name in set(data.get("hand_focus") or []):
+                    profile["accessed"] = True
+                if zone in FOCUS_ACCESS_ZONES:
+                    profile["accessed"] = True
+                if (
+                    bool(zone_info.get("library_top_7"))
+                    or card_name in set(data.get("library_top_focus") or [])
+                ):
+                    profile["near_access"] = True
+                if data.get("phase") == "opening_keep" and zone == "hand":
+                    profile["opening_hand"] = True
+                    profile["accessed"] = True
+            if not observed and not int(profile["trace_count"]):
+                continue
+            profile["zone_counts"] = dict(sorted(zone_counts.items()))
+            if zone_counts:
+                profile["dominant_zone"] = max(zone_counts.items(), key=lambda item: item[1])[0]
+            profile["library_only"] = bool(
+                saw_library and not profile["accessed"] and not profile["near_access"]
+            )
+            by_game[game_id] = profile
+        if by_game:
+            by_card[card_name] = by_game
+    return by_card
+
+
+def focus_card_access_summary_from_by_game(
+    by_card: Mapping[str, Mapping[str, Mapping[str, Any]]],
+) -> dict[str, dict[str, Any]]:
+    summary: dict[str, dict[str, Any]] = {}
+    for card_name, games in by_card.items():
+        zone_counts: dict[str, int] = {}
+        accessed_games = near_access_games = drawn_games = opening_hand_games = library_only_games = 0
+        trace_count = 0
+        for profile in games.values():
+            if not isinstance(profile, Mapping):
+                continue
+            trace_count += int(profile.get("trace_count") or 0)
+            for zone, count in (profile.get("zone_counts") or {}).items():
+                zone_counts[str(zone)] = zone_counts.get(str(zone), 0) + int(count or 0)
+            if profile.get("accessed"):
+                accessed_games += 1
+            if profile.get("near_access"):
+                near_access_games += 1
+            if profile.get("drawn"):
+                drawn_games += 1
+            if profile.get("opening_hand"):
+                opening_hand_games += 1
+            if profile.get("library_only"):
+                library_only_games += 1
+        dominant_zone = max(zone_counts.items(), key=lambda item: item[1])[0] if zone_counts else None
+        summary[str(card_name)] = {
+            "trace_count": trace_count,
+            "trace_games": len(games),
+            "zone_counts": dict(sorted(zone_counts.items())),
+            "accessed_games": accessed_games,
+            "near_access_games": near_access_games,
+            "drawn_games": drawn_games,
+            "opening_hand_games": opening_hand_games,
+            "library_only_games": library_only_games,
+            "dominant_zone": dominant_zone,
+        }
+    return summary
 
 
 class GameTimeoutError(TimeoutError):
@@ -818,6 +960,8 @@ class GateTelemetry:
 
     def as_json(self, total_games: int) -> dict[str, Any]:
         games = max(1, total_games)
+        focus_access_by_game = focus_card_access_by_game_from_traces(self.focus_card_game_traces)
+        focus_access_summary = focus_card_access_summary_from_by_game(focus_access_by_game)
         return {
             "event_counts": dict(self.events),
             "strategic_event_counts": dict(self.strategic_events),
@@ -880,6 +1024,8 @@ class GateTelemetry:
                 key: dict(value)
                 for key, value in sorted(self.focus_card_trace_card_counts_by_game.items())
             },
+            "focus_card_access_summary": focus_access_summary,
+            "focus_card_access_by_game": focus_access_by_game,
         }
 
 

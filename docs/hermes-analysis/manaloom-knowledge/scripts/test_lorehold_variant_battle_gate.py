@@ -1,3 +1,4 @@
+import os
 import unittest
 from tempfile import TemporaryDirectory
 from pathlib import Path
@@ -370,6 +371,48 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(
             payload["focus_card_trace_card_counts_by_game"]["game-access"]["Sensei's Divining Top"],
             1,
+        )
+        top_access = payload["focus_card_access_summary"]["Sensei's Divining Top"]
+        self.assertEqual(top_access["accessed_games"], 1)
+        self.assertEqual(top_access["opening_hand_games"], 1)
+        self.assertEqual(top_access["dominant_zone"], "hand")
+        squee_access = payload["focus_card_access_by_game"]["Squee, Goblin Nabob"]["game-access"]
+        self.assertFalse(squee_access["accessed"])
+        self.assertTrue(squee_access["library_only"])
+
+    def test_gate_telemetry_summarizes_dynamic_focus_card_access(self):
+        previous = os.environ.get("MANALOOM_FOCUS_ACCESS_CARDS")
+        os.environ["MANALOOM_FOCUS_ACCESS_CARDS"] = '["Mana Vault"]'
+        try:
+            telemetry = gate.GateTelemetry()
+            telemetry.begin("game-mana-vault")
+            telemetry.record(
+                "focus_card_access_snapshot",
+                {
+                    "player": "Lorehold",
+                    "phase": "opening_keep",
+                    "turn": 0,
+                    "focus_card_zones": {"Mana Vault": {"zone": "hand"}},
+                    "focus_cards_seen": ["Mana Vault"],
+                    "hand_focus": ["Mana Vault"],
+                    "library_focus": [],
+                    "library_top_focus": [],
+                },
+            )
+
+            payload = telemetry.as_json(1)
+        finally:
+            if previous is None:
+                os.environ.pop("MANALOOM_FOCUS_ACCESS_CARDS", None)
+            else:
+                os.environ["MANALOOM_FOCUS_ACCESS_CARDS"] = previous
+
+        access = payload["focus_card_access_summary"]["Mana Vault"]
+        self.assertEqual(access["accessed_games"], 1)
+        self.assertEqual(access["opening_hand_games"], 1)
+        self.assertEqual(access["dominant_zone"], "hand")
+        self.assertTrue(
+            payload["focus_card_access_by_game"]["Mana Vault"]["game-mana-vault"]["accessed"]
         )
 
     def test_gate_telemetry_does_not_count_spell_target_as_squee_graveyard_entry(self):
