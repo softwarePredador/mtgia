@@ -53,6 +53,30 @@ def memory_db():
             "verified",
             {"effect": "tutor", "battle_model_scope": "any_card_to_hand_then_random_discard_v1"},
         ),
+        (
+            "Stroke of Midnight",
+            "stroke of midnight",
+            "auto",
+            "verified",
+            {"effect": "removal", "battle_model_scope": "destroy_target_nonland_permanent_v1"},
+        ),
+        (
+            "Smothering Tithe",
+            "smothering tithe",
+            "auto",
+            "verified",
+            {"effect": "ramp_engine", "battle_model_scope": "opponent_draw_tax_treasure_v1"},
+        ),
+        (
+            "Monument to Endurance",
+            "monument to endurance",
+            "auto",
+            "verified",
+            {
+                "effect": "discard_trigger_modal_draw_treasure_opponent_life_loss",
+                "battle_model_scope": "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1",
+            },
+        ),
     ]
     conn.executemany(
         "INSERT INTO battle_card_rules VALUES (?, ?, ?, ?, ?)",
@@ -205,3 +229,97 @@ def test_exposure_profiler_does_not_treat_tutor_found_target_as_tutor_source(tmp
     assert wheel["inferred_role"] == "tutor_target"
     assert "tutor_access" not in wheel["role_signals"]
     assert wheel["matched_field_counts"]["found"] == 1
+
+
+def test_exposure_profiler_labels_measured_removal(tmp_path):
+    evidence = tmp_path / "removal.jsonl"
+    evidence.write_text(
+        json.dumps(
+            {
+                "event": "removal_resolved",
+                "card": "Stroke of Midnight",
+                "effect": "removal",
+                "target": "opponent threat",
+                "player": "Lorehold",
+                "turn": 4,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with memory_db() as conn:
+        payload = profiler.build_profile(
+            evidence_paths=[evidence],
+            card_names=["Stroke of Midnight"],
+            conn=conn,
+        )
+
+    stroke = payload["card_profiles"][0]
+    assert stroke["inferred_role"] == "spot_removal"
+    assert "spot_removal" in stroke["role_signals"]
+
+
+def test_exposure_profiler_does_not_label_removed_target_as_removal_source(tmp_path):
+    evidence = tmp_path / "removed_target.jsonl"
+    evidence.write_text(
+        json.dumps(
+            {
+                "event": "removal_resolved",
+                "card": "Opponent Removal",
+                "target": "Smothering Tithe",
+                "player": "Opponent",
+                "turn": 4,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with memory_db() as conn:
+        payload = profiler.build_profile(
+            evidence_paths=[evidence],
+            card_names=["Smothering Tithe"],
+            conn=conn,
+        )
+
+    tithe = payload["card_profiles"][0]
+    assert tithe["inferred_role"] == "ramp_engine"
+    assert "spot_removal" not in tithe["role_signals"]
+    assert "ramp_engine" in tithe["role_signals"]
+    assert tithe["matched_field_counts"]["target"] == 1
+
+
+def test_exposure_profiler_prefers_ramp_rule_over_tutor_target_role(tmp_path):
+    evidence = tmp_path / "tutor_found_tithe.jsonl"
+    evidence.write_text(
+        json.dumps(
+            {
+                "event": "tutor_resolved",
+                "card": "Enlightened Tutor",
+                "found": "Smothering Tithe",
+                "player": "Lorehold",
+                "turn": 4,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with memory_db() as conn:
+        payload = profiler.build_profile(
+            evidence_paths=[evidence],
+            card_names=["Smothering Tithe", "Monument to Endurance"],
+            conn=conn,
+        )
+
+    by_card = {row["card_name"]: row for row in payload["card_profiles"]}
+    tithe = by_card["Smothering Tithe"]
+    assert tithe["inferred_role"] == "ramp_engine"
+    assert "ramp_engine" in tithe["role_signals"]
+    assert "tutor_target" in tithe["role_signals"]
+
+    monument = by_card["Monument to Endurance"]
+    assert monument["inferred_role"] == "discard_ramp_value"
+    assert "discard_payoff" in monument["role_signals"]
+    assert "ramp_engine" in monument["role_signals"]

@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from pathlib import Path
 
 import lorehold_manual_cut_review as review
 
@@ -216,6 +217,26 @@ def exposure_profile():
     }
 
 
+def high_cut_exposure_profile():
+    return {
+        "card_profiles": [
+            {
+                "card_name": "Manual Flex",
+                "unique_exposure_count": 144,
+                "direct_event_count": 80,
+                "summary_metric_count": 64,
+                "role_signals": ["paid_cast_exposure", "draw_filter_value"],
+                "inferred_role": "draw_filter_value",
+                "role_confidence": "direct_event_or_rule",
+                "decision": {
+                    "status": "not_safe_as_blind_cut",
+                    "next_action": "require_same_lane_benchmark",
+                },
+            }
+        ]
+    }
+
+
 def test_manual_cut_review_blocks_squee_and_holds_emeria_for_role_review():
     with memory_db() as conn:
         payload = review.build_review(
@@ -305,3 +326,52 @@ def test_manual_cut_review_builds_cut_evidence_expansion_from_safe_cut_report():
         "missing_cut_safety_row": 1
     }
     assert payload["summary"]["cut_evidence_expansion"]["model_cut_exposure_count"] >= 1
+
+
+def test_manual_cut_review_blocks_high_exposure_cut_slots():
+    with memory_db() as conn:
+        payload = review.build_review(
+            strategy_audit=strategy_audit(),
+            cut_model=cut_model(),
+            exposure_profile=high_cut_exposure_profile(),
+            safe_cut_report=safe_cut_report(),
+            conn=conn,
+        )
+
+    expansion = payload["cut_evidence_expansion"]
+    rows = {row["card_name"]: row for row in expansion["rows"]}
+    assert rows["Manual Flex"]["status"] == "measured_high_cut_exposure"
+    assert rows["Manual Flex"]["recommended_action"] == "blocked"
+    assert rows["Manual Flex"]["cut_exposure"]["unique_exposure_count"] == 144
+    assert rows["Manual Flex"] in expansion["top_protected_exposure_slots"]
+
+
+def test_manual_cut_review_prefers_highest_exposure_profile_for_cut_slots():
+    low_profile = {
+        "card_profiles": [
+            {
+                "card_name": "Manual Flex",
+                "unique_exposure_count": 4,
+                "inferred_role": "low_signal",
+                "decision": {"status": "low"},
+            }
+        ]
+    }
+    with memory_db() as conn:
+        payload = review.build_review(
+            strategy_audit=strategy_audit(),
+            cut_model=cut_model(),
+            exposure_profiles=[
+                (Path("old_profile.json"), low_profile),
+                (Path("new_profile.json"), high_cut_exposure_profile()),
+            ],
+            safe_cut_report=safe_cut_report(),
+            conn=conn,
+        )
+
+    row = {
+        row["card_name"]: row
+        for row in payload["cut_evidence_expansion"]["rows"]
+    }["Manual Flex"]
+    assert row["cut_exposure"]["unique_exposure_count"] == 144
+    assert row["cut_exposure"]["exposure_profile"] == "new_profile.json"

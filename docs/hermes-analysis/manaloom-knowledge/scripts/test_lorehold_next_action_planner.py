@@ -160,6 +160,59 @@ def manual_review_with_cut_evidence():
     return payload
 
 
+def manual_review_with_profiled_cut_evidence():
+    payload = manual_review()
+    payload["cut_evidence_expansion"] = {
+        "summary": {
+            "model_cut_exposure_count": 0,
+            "manual_same_lane_only_count": 2,
+            "status_counts": {
+                "measured_cut_exposure_needs_same_lane_benchmark": 2,
+                "measured_high_cut_exposure": 1,
+            },
+            "recommended_action_counts": {
+                "blocked": 1,
+                "manual_same_lane_only": 2,
+            },
+        },
+        "top_exposure_candidates": [],
+        "top_same_lane_candidates": [
+            {
+                "card_name": "Winds of Abandon",
+                "status": "measured_cut_exposure_needs_same_lane_benchmark",
+                "recommended_action": "manual_same_lane_only",
+                "cut_exposure": {
+                    "unique_exposure_count": 59,
+                    "inferred_role": "removal",
+                },
+                "reasons": ["Replay profile measured 59 deduplicated exposures."],
+            },
+            {
+                "card_name": "Stroke of Midnight",
+                "status": "measured_cut_exposure_needs_same_lane_benchmark",
+                "recommended_action": "manual_same_lane_only",
+                "cut_exposure": {
+                    "unique_exposure_count": 57,
+                    "inferred_role": "removal",
+                },
+                "reasons": ["Replay profile measured 57 deduplicated exposures."],
+            },
+        ],
+        "top_protected_exposure_slots": [
+            {
+                "card_name": "Sensei's Divining Top",
+                "status": "measured_high_cut_exposure",
+                "recommended_action": "blocked",
+                "cut_exposure": {
+                    "unique_exposure_count": 1605,
+                    "inferred_role": "draw_filter_value",
+                },
+            }
+        ],
+    }
+    return payload
+
+
 def trace_audit_report():
     return {
         "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
@@ -543,6 +596,24 @@ def test_next_action_planner_prioritizes_cut_exposure_when_safe_cut_queue_is_emp
     assert action["priority"] == -3
     assert action["status"] == "cut_safety_expansion_required"
     assert action["cut_cards"] == ["Winds of Abandon", "Stroke of Midnight"]
+
+
+def test_next_action_planner_moves_to_same_lane_benchmarks_after_cut_exposure():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review_with_profiled_cut_evidence(),
+        exposure_profiles=[exposure_profile()],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "build_same_lane_benchmarks_from_profiled_cut_slots"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "cut_exposure_profiled_requires_same_lane_package"
+    assert action["cut_cards"] == ["Winds of Abandon", "Stroke of Midnight"]
+    assert action["protected_high_exposure_cut_slots"][0]["card_name"] == (
+        "Sensei's Divining Top"
+    )
 
 
 def test_next_action_planner_moves_past_rejected_land_tax_tutor_benchmarks():

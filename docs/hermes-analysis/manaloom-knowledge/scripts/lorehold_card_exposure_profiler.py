@@ -64,7 +64,7 @@ def default_evidence_paths() -> list[Path]:
     return sorted(
         path
         for path in paths
-        if not path.name.startswith("lorehold_card_exposure_profile_")
+        if "exposure_profile" not in path.name
     )
 
 
@@ -410,10 +410,32 @@ def infer_role_signals(
         signals.add("board_development_tokens")
     if all_effects & {"draw_cards", "draw_engine", "hand_filter", "exile_value"} or "wheel_resolved" in event_counts:
         signals.add("draw_filter_value")
+    if (
+        "ramp_engine" in all_effects
+        or any("treasure" in effect for effect in all_effects)
+        or any("treasure" in scope or "mana" in scope for scope in scopes)
+    ):
+        signals.add("ramp_engine")
+    if any("discard" in effect for effect in all_effects) or any("discard" in scope for scope in scopes):
+        signals.add("discard_payoff")
     if "protection_resolved" in event_counts or any("indestructible" in scope for scope in scopes):
         signals.add("protection_window")
     if "board_wipe_resolved" in event_counts or "board_wipe" in all_effects:
         signals.add("pressure_reset_board_wipe")
+    rule_removal_effect = any(
+        effect.startswith("remove") or "removal" in effect
+        for effect in rule_effects
+    )
+    rule_removal_scope = any(
+        "destroy_target" in scope
+        or "exile_target" in scope
+        or scope.startswith("path_to_exile")
+        or scope.startswith("swords_to_plowshares")
+        or scope.startswith("winds_of_abandon")
+        for scope in scopes
+    )
+    if rule_removal_effect or rule_removal_scope:
+        signals.add("spot_removal")
     if any("tutor" in effect for effect in all_effects):
         signals.add("tutor_access")
     if "tutor_resolved" in event_counts and matched_field_counts.get("found"):
@@ -459,10 +481,16 @@ def infer_role(
         if unique_exposure_count:
             return "recursion_candidate", "summary_metric_and_rule"
         return "recursion_candidate", "rule_ready_unexposed"
+    if "spot_removal" in signal_set:
+        return "spot_removal", "direct_event_or_rule" if direct_event_count else "rule_only"
     if "tutor_access" in signal_set:
         return "tutor_access", "direct_event_or_rule" if direct_event_count else "rule_only"
     if "draw_filter_value" in signal_set:
         return "draw_filter_value", "direct_event_or_rule" if direct_event_count else "rule_only"
+    if {"discard_payoff", "ramp_engine"} <= signal_set:
+        return "discard_ramp_value", "direct_event_or_rule" if direct_event_count else "rule_only"
+    if "ramp_engine" in signal_set:
+        return "ramp_engine", "direct_event_or_rule" if direct_event_count else "rule_only"
     if "tutor_target" in signal_set:
         return "tutor_target", "direct_event"
     if int(rule.get("active_rule_count") or 0) > 0:
@@ -621,7 +649,7 @@ def package_implications(profiles: list[dict[str, Any]]) -> list[dict[str, str]]
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Card Exposure Profile - 2026-06-27",
+        "# Lorehold Card Exposure Profile - 2026-06-28",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Source DB: `{payload['source_db']}`",
@@ -682,7 +710,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--evidence", type=Path, action="append")
     parser.add_argument("--card", action="append")
-    parser.add_argument("--stem", default="lorehold_card_exposure_profile_20260627_v1")
+    parser.add_argument("--stem", default="lorehold_card_exposure_profile_20260628_v1")
     return parser.parse_args()
 
 

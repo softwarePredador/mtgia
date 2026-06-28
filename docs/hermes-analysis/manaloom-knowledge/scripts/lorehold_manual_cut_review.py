@@ -23,7 +23,11 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_CUT_MODEL = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
-DEFAULT_EXPOSURE_PROFILE = REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json"
+DEFAULT_EXPOSURE_PROFILES = [
+    REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json",
+    REPORT_DIR / "lorehold_cut_exposure_profile_20260628_v1.json",
+]
+DEFAULT_EXPOSURE_PROFILE = DEFAULT_EXPOSURE_PROFILES[0]
 DEFAULT_SAFE_CUT_REPLANNER = REPORT_DIR / "lorehold_safe_cut_replanner_20260628_v4.json"
 DEFAULT_DB = (
     REPORT_DIR
@@ -41,6 +45,8 @@ STRUCTURAL_BLOCKERS = {
     "cut_is_protection_shell",
     "never_cut_lane",
 }
+HIGH_CUT_EXPOSURE_MIN = 100
+MEASURED_CUT_EXPOSURE_MIN = 25
 
 EXTERNAL_RESEARCH_SOURCES = [
     {
@@ -100,6 +106,14 @@ def read_optional_json(path: Path | None) -> dict[str, Any]:
     return read_json(path)
 
 
+def read_existing_json(paths: Iterable[Path]) -> list[tuple[Path, dict[str, Any]]]:
+    loaded = []
+    for path in paths:
+        if path.exists():
+            loaded.append((path, read_json(path)))
+    return loaded
+
+
 def connect(path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
@@ -122,11 +136,44 @@ def cut_safety_lookup(strategy_audit: dict[str, Any]) -> dict[str, dict[str, Any
     }
 
 
-def exposure_lookup(exposure_profile: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def exposure_lookup(
+    exposure_profiles: dict[str, Any] | list[tuple[Path | None, dict[str, Any]]] | None,
+) -> dict[str, dict[str, Any]]:
+    if not exposure_profiles:
+        return {}
+    if isinstance(exposure_profiles, dict):
+        profile_rows: list[tuple[Path | None, dict[str, Any]]] = [(None, exposure_profiles)]
+    else:
+        profile_rows = exposure_profiles
+    out: dict[str, dict[str, Any]] = {}
+    for path, payload in profile_rows:
+        for row in payload.get("card_profiles") or []:
+            if not row.get("card_name"):
+                continue
+            key = normalize_key(row.get("card_name"))
+            candidate = dict(row)
+            if path:
+                candidate["exposure_profile"] = str(path)
+            current = out.get(key)
+            if current is None or int(candidate.get("unique_exposure_count") or 0) >= int(
+                current.get("unique_exposure_count") or 0
+            ):
+                out[key] = candidate
+    return out
+
+
+def cut_exposure_summary(cut_exposure: dict[str, Any]) -> dict[str, Any]:
+    decision = cut_exposure.get("decision") or {}
     return {
-        normalize_key(row.get("card_name")): row
-        for row in exposure_profile.get("card_profiles") or []
-        if row.get("card_name")
+        "unique_exposure_count": int(cut_exposure.get("unique_exposure_count") or 0),
+        "direct_event_count": int(cut_exposure.get("direct_event_count") or 0),
+        "summary_metric_count": int(cut_exposure.get("summary_metric_count") or 0),
+        "inferred_role": cut_exposure.get("inferred_role") or "unmeasured",
+        "role_confidence": cut_exposure.get("role_confidence") or "unmeasured",
+        "role_signals": list(cut_exposure.get("role_signals") or [])[:8],
+        "decision_status": decision.get("status") or "unmeasured",
+        "next_action": decision.get("next_action") or "",
+        "exposure_profile": cut_exposure.get("exposure_profile") or "",
     }
 
 
@@ -478,6 +525,7 @@ def classify_cut_slot(
     safety: dict[str, Any],
     variant_presence: dict[str, Any],
     safe_cut_evidence: dict[str, Any],
+    cut_exposure: dict[str, Any] | None = None,
 ) -> tuple[str, str, list[str]]:
     reasons: list[str] = []
     blockers = set((safe_cut_evidence.get("blocker_counts") or {}).keys())
@@ -485,6 +533,9 @@ def classify_cut_slot(
     lane = str(decision.get("package_lane") or "")
     effective_role = str(decision.get("effective_role") or card.get("functional_tag") or "")
     type_line = str(card.get("type_line") or "")
+    exposure_count = int((cut_exposure or {}).get("unique_exposure_count") or 0)
+    exposure_role = str((cut_exposure or {}).get("inferred_role") or "unmeasured")
+    exposure_signals = ", ".join(str(signal) for signal in (cut_exposure or {}).get("role_signals") or [])
     if card.get("is_commander"):
         return "never_cut", "commander", ["Commander defines the deck objective."]
     if "Land" in type_line or lane == "mana_base":
@@ -507,6 +558,22 @@ def classify_cut_slot(
     if is_miracle_core_slot(card, decision):
         reasons.append("Slot contributes to instant/sorcery density, miracle setup, wipe, or wincon plan.")
         return "structural_dependency", "blocked", reasons
+    if exposure_count >= HIGH_CUT_EXPOSURE_MIN:
+        reasons.append(
+            f"Replay profile measured {exposure_count} deduplicated exposures for this cut slot."
+        )
+        reasons.append(f"Measured role is {exposure_role}.")
+        if exposure_signals:
+            reasons.append(f"Exposure signals: {exposure_signals}.")
+        return "measured_high_cut_exposure", "blocked", reasons
+    if exposure_count >= MEASURED_CUT_EXPOSURE_MIN:
+        reasons.append(
+            f"Replay profile measured {exposure_count} deduplicated exposures, so this is not a blind low-use cut."
+        )
+        reasons.append(f"Measured role is {exposure_role}.")
+        if exposure_signals:
+            reasons.append(f"Exposure signals: {exposure_signals}.")
+        return "measured_cut_exposure_needs_same_lane_benchmark", "manual_same_lane_only", reasons
     if decision_key and decision_key not in SAFE_CUT_DECISIONS:
         reasons.append(f"Strategy decision is {decision_key}, not a flex decision.")
         if "missing_cut_safety_row" in blockers:
@@ -527,6 +594,7 @@ def build_cut_evidence_expansion(
     conn: sqlite3.Connection,
     strategy_audit: dict[str, Any],
     cut_safety: dict[str, dict[str, Any]],
+    exposures: dict[str, dict[str, Any]],
     safe_cut_report: dict[str, Any] | None,
     deck_id: int = 6,
 ) -> dict[str, Any]:
@@ -545,6 +613,7 @@ def build_cut_evidence_expansion(
             safety=cut_safety.get(key, {}),
             variant_presence=variant_presence.get(key, {}),
             safe_cut_evidence=safe_cut_by_card.get(key, {}),
+            cut_exposure=exposures.get(key, {}),
         )
         status_counts[status] += 1
         action_counts[action] += 1
@@ -562,6 +631,7 @@ def build_cut_evidence_expansion(
                 "cut_safety": cut_safety.get(key, {}),
                 "lorehold_variant_presence": variant_presence.get(key, {}),
                 "safe_cut_replanner_evidence": safe_cut_by_card.get(key, {}),
+                "cut_exposure": cut_exposure_summary(exposures.get(key, {})),
             }
         )
     rows.sort(
@@ -571,6 +641,8 @@ def build_cut_evidence_expansion(
                 "manual_same_lane_probe_candidate": 1,
                 "needs_exposure_before_cut": 2,
                 "same_lane_only": 3,
+                "measured_cut_exposure_needs_same_lane_benchmark": 4,
+                "measured_high_cut_exposure": 5,
             }.get(row["status"], 9),
             int((row.get("lorehold_variant_presence") or {}).get("deck_count") or 0),
             row["card_name"],
@@ -591,6 +663,21 @@ def build_cut_evidence_expansion(
             for row in rows
             if row["status"] in {"cut_exposure_candidate", "needs_exposure_before_cut"}
         ][:20],
+        "top_same_lane_candidates": [
+            row
+            for row in rows
+            if row["status"]
+            in {
+                "measured_cut_exposure_needs_same_lane_benchmark",
+                "manual_same_lane_probe_candidate",
+                "same_lane_only",
+            }
+        ][:20],
+        "top_protected_exposure_slots": [
+            row
+            for row in rows
+            if row["status"] == "measured_high_cut_exposure"
+        ][:20],
     }
 
 
@@ -600,16 +687,31 @@ def build_review(
     cut_model: dict[str, Any],
     conn: sqlite3.Connection,
     exposure_profile: dict[str, Any] | None = None,
+    exposure_profiles: list[tuple[Path | None, dict[str, Any]]] | None = None,
     safe_cut_report: dict[str, Any] | None = None,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
     cut_model_path: Path = DEFAULT_CUT_MODEL,
     db_path: Path = DEFAULT_DB,
     exposure_profile_path: Path | None = DEFAULT_EXPOSURE_PROFILE,
+    exposure_profile_paths: list[Path] | None = None,
     safe_cut_report_path: Path | None = DEFAULT_SAFE_CUT_REPLANNER,
 ) -> dict[str, Any]:
     card_decisions = card_decision_lookup(strategy_audit)
     cut_safety = cut_safety_lookup(strategy_audit)
-    exposures = exposure_lookup(exposure_profile or {})
+    if exposure_profiles is None:
+        exposure_profile_entries = (
+            [(exposure_profile_path, exposure_profile)] if exposure_profile else []
+        )
+    else:
+        exposure_profile_entries = exposure_profiles
+    exposures = exposure_lookup(exposure_profile_entries)
+    loaded_exposure_paths = [
+        str(path)
+        for path, payload in exposure_profile_entries
+        if path is not None and payload
+    ]
+    if exposure_profile_paths and not loaded_exposure_paths:
+        loaded_exposure_paths = [str(path) for path in exposure_profile_paths if path.exists()]
     manual_pairings = [
         row
         for row in cut_model.get("pairing_hypotheses") or []
@@ -635,6 +737,7 @@ def build_review(
         conn=conn,
         strategy_audit=strategy_audit,
         cut_safety=cut_safety,
+        exposures=exposures,
         safe_cut_report=safe_cut_report,
     )
 
@@ -738,7 +841,8 @@ def build_review(
         "generated_at": utc_now(),
         "strategy_audit": str(strategy_path),
         "cut_model": str(cut_model_path),
-        "exposure_profile": str(exposure_profile_path) if exposure_profile else "",
+        "exposure_profile": ", ".join(loaded_exposure_paths),
+        "exposure_profiles": loaded_exposure_paths,
         "safe_cut_replanner": str(safe_cut_report_path) if safe_cut_report else "",
         "source_db": str(db_path),
         "postgres_writes": False,
@@ -798,7 +902,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Generated at: `{payload['generated_at']}`",
         f"- Strategy audit: `{payload['strategy_audit']}`",
         f"- Cut model: `{payload['cut_model']}`",
-        f"- Exposure profile: `{payload['exposure_profile'] or 'none'}`",
+        f"- Exposure profiles: `{', '.join(payload.get('exposure_profiles') or []) or 'none'}`",
         f"- Safe-cut replanner: `{payload.get('safe_cut_replanner') or 'none'}`",
         f"- Source DB: `{payload['source_db']}`",
         "- PostgreSQL writes: `false`",
@@ -827,21 +931,67 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Cut Evidence Expansion",
             "",
-            "| Card | Status | Action | Lorehold Variants | Reasons |",
-            "| --- | --- | --- | ---: | --- |",
+            "| Card | Status | Action | Lorehold Variants | Exposure | Reasons |",
+            "| --- | --- | --- | ---: | ---: | --- |",
         ]
     )
     for row in (payload.get("cut_evidence_expansion") or {}).get("top_exposure_candidates") or []:
         presence = row.get("lorehold_variant_presence") or {}
+        exposure = row.get("cut_exposure") or {}
         lines.append(
-            "| {card} | `{status}` | `{action}` | {variants} | {reasons} |".format(
+            "| {card} | `{status}` | `{action}` | {variants} | {exposure_count} | {reasons} |".format(
                 card=row["card_name"],
                 status=row["status"],
                 action=row["recommended_action"],
                 variants=int(presence.get("deck_count") or 0),
+                exposure_count=int(exposure.get("unique_exposure_count") or 0),
                 reasons="; ".join(row.get("reasons") or []),
             )
         )
+    same_lane_rows = (payload.get("cut_evidence_expansion") or {}).get("top_same_lane_candidates") or []
+    if same_lane_rows:
+        lines.extend(
+            [
+                "",
+                "## Profiled Same-Lane Cut Candidates",
+                "",
+                "| Card | Status | Action | Exposure | Role | Reasons |",
+                "| --- | --- | --- | ---: | --- | --- |",
+            ]
+        )
+        for row in same_lane_rows:
+            exposure = row.get("cut_exposure") or {}
+            lines.append(
+                "| {card} | `{status}` | `{action}` | {exposure_count} | {role} | {reasons} |".format(
+                    card=row["card_name"],
+                    status=row["status"],
+                    action=row["recommended_action"],
+                    exposure_count=int(exposure.get("unique_exposure_count") or 0),
+                    role=exposure.get("inferred_role") or "unmeasured",
+                    reasons="; ".join(row.get("reasons") or []),
+                )
+            )
+    protected_rows = (payload.get("cut_evidence_expansion") or {}).get("top_protected_exposure_slots") or []
+    if protected_rows:
+        lines.extend(
+            [
+                "",
+                "## Protected By Measured Exposure",
+                "",
+                "| Card | Exposure | Role | Reasons |",
+                "| --- | ---: | --- | --- |",
+            ]
+        )
+        for row in protected_rows:
+            exposure = row.get("cut_exposure") or {}
+            lines.append(
+                "| {card} | {exposure_count} | {role} | {reasons} |".format(
+                    card=row["card_name"],
+                    exposure_count=int(exposure.get("unique_exposure_count") or 0),
+                    role=exposure.get("inferred_role") or "unmeasured",
+                    reasons="; ".join(row.get("reasons") or []),
+                )
+            )
     lines.extend(
         [
             "",
@@ -899,7 +1049,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--strategy-audit", type=Path, default=DEFAULT_STRATEGY_AUDIT)
     parser.add_argument("--cut-model", type=Path, default=DEFAULT_CUT_MODEL)
-    parser.add_argument("--exposure-profile", type=Path, default=DEFAULT_EXPOSURE_PROFILE)
+    parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--safe-cut-replanner", type=Path, default=DEFAULT_SAFE_CUT_REPLANNER)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--stem", default="lorehold_manual_cut_review_20260628_v1_safe_cut_expansion")
@@ -910,19 +1060,20 @@ def main() -> int:
     args = parse_args()
     strategy_audit = read_json(args.strategy_audit)
     cut_model = read_json(args.cut_model)
-    exposure_profile = read_optional_json(args.exposure_profile)
+    exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
+    exposure_profiles = read_existing_json(exposure_paths)
     safe_cut_report = read_optional_json(args.safe_cut_replanner)
     with connect(args.db) as conn:
         payload = build_review(
             strategy_audit=strategy_audit,
             cut_model=cut_model,
             conn=conn,
-            exposure_profile=exposure_profile,
+            exposure_profiles=exposure_profiles,
             safe_cut_report=safe_cut_report,
             strategy_path=args.strategy_audit,
             cut_model_path=args.cut_model,
             db_path=args.db,
-            exposure_profile_path=args.exposure_profile,
+            exposure_profile_paths=exposure_paths,
             safe_cut_report_path=args.safe_cut_replanner,
         )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
