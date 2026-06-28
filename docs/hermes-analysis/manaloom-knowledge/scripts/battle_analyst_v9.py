@@ -4217,6 +4217,39 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017",
         }
     ),
+    "Radiant Performer": handcrafted_runtime_rule(
+        {
+            "ability_kind": "flash_creature_etb_stack_copy_partial",
+            "cmc": 5.0,
+            "effect": "copy_spell",
+            "mana_cost": "{3}{R}{R}",
+            "colors": ["R"],
+            "type_line": "Creature - Human Wizard",
+            "power": 2,
+            "toughness": 2,
+            "subtypes": ["Human", "Wizard"],
+            "flash": True,
+            "etb_if_cast_from_hand": True,
+            "etb_copy_spell": True,
+            "copy_target_stack_object": True,
+            "copy_target_stack_object_single_permanent_or_player_target_only": True,
+            "copy_for_each_other_legal_permanent_or_player_target": True,
+            "supports_stack_spell_copy": True,
+            "supports_stack_ability_copy": False,
+            "supports_copy_for_each_other_target": False,
+            "target": "spell_or_ability_on_stack_single_permanent_or_player_target",
+            "target_constraints": {
+                "zone": "stack",
+                "target_count": 1,
+                "target_kind": "permanent_or_player",
+            },
+            "battle_model_scope": "flash_creature_etb_copy_stack_spell_partial_metadata_v1",
+            "_runtime_partial": True,
+            "_runtime_partial_reason": "ManaLoom stack executor copies a spell target, but not abilities or one-copy-per-legal-target fanout yet.",
+            "_rule_oracle_hash": "893b8d4958e842209180034ee424d134",
+            "_rule_logical_key": "battle_rule_v1:fa12ce53b0a0c4b963f4071b4fde2c9b",
+        }
+    ),
     "Rem Karolus, Stalwart Slayer": handcrafted_runtime_rule(
         {
             "ability_kind": "static_replacement",
@@ -4741,6 +4774,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Beacon of Immortality",
     "Boros Reckoner",
     "Repercussion",
+    "Radiant Performer",
     "Rem Karolus, Stalwart Slayer",
     "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence",
     "Unstable Glyphbridge // Sandswirl Wanderglyph",
@@ -4884,6 +4918,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed global creature-damage reflection to the damaged creature's controller.",
         ["manaloom_log_learning_audit_20260628_v31_runtime_waiver_drift", "Repercussion.java"],
         "2026-06-29T03:00:00Z",
+    ),
+    "Radiant Performer": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed flash creature and partial stack-spell ETB copy metadata; full ability/fanout copy remains a separate runtime family.",
+        ["manaloom_log_learning_audit_20260628_v36_after_toralf_runtime", "RadiantPerformer.java"],
+        "2026-06-29T04:50:00Z",
     ),
     "Rem Karolus, Stalwart Slayer": manual_runtime_waiver_metadata(
         "Replace no_active runtime gap with XMage-backed spell-damage prevention for self/controlled permanents and +1 spell damage to opponents/opponent permanents.",
