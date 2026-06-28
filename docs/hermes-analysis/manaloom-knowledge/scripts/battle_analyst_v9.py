@@ -4090,6 +4090,30 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:f1540009e5e8a14128cf83a2f494a0db",
         }
     ),
+    "Stuffy Doll": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static_triggered_and_activated",
+            "cmc": 5.0,
+            "effect": "creature",
+            "artifact": True,
+            "mana_cost": "{5}",
+            "type_line": "Artifact Creature - Construct",
+            "power": 0,
+            "toughness": 1,
+            "subtypes": ["Construct"],
+            "indestructible": True,
+            "as_enters_choose_player": True,
+            "trigger": "source_dealt_damage",
+            "trigger_effect": "damage_any_target",
+            "damage_amount_source": "damage_dealt_to_source",
+            "source_damage_reflect_to_chosen_player": True,
+            "activated_self_damage_to_source": 1,
+            "activation_requires_tap": True,
+            "battle_model_scope": "source_dealt_damage_reflect_to_chosen_player_self_damage_indestructible_v1",
+            "_rule_oracle_hash": "b3404d9b844875e0e427a0eda8011c83",
+            "_rule_logical_key": "battle_rule_v1:e7b60d9805dbf2701195f627c6ca1600",
+        }
+    ),
     "Ancient Copper Dragon": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4357,6 +4381,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Heroes Remembered",
     "Beacon of Immortality",
     "Boros Reckoner",
+    "Stuffy Doll",
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
     "Wild Ricochet",
@@ -4484,6 +4509,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Promote the existing source-damaged reflection executor to the real XMage-backed Boros Reckoner card lookup while PG metadata remains pending.",
         ["manaloom_log_learning_audit_20260628_v13_after_life_total_runtime", "BorosReckoner.java", "pg_boros_reckoner_runtime_20260628"],
         "2026-06-28T21:35:00Z",
+    ),
+    "Stuffy Doll": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed chosen-player damage reflection, indestructible body, and tap self-damage ability.",
+        ["manaloom_log_learning_audit_20260628_v21_after_warring_triad_runtime", "StuffyDoll.java"],
+        "2026-06-29T00:25:00Z",
     ),
     "Ancient Copper Dragon": manual_runtime_waiver_metadata(
         "Replace passive review_only evidence with XMage-backed combat-damage d20 Treasure trigger semantics.",
@@ -18829,6 +18859,171 @@ def activate_sacrifice_damage_outlets(player, opponents, all_players, turn, rng,
     return 0
 
 
+def activate_self_damage_reflect_sources(player, opponents, all_players, turn, *, phase="precombat_main"):
+    if not player.is_alive() or phase not in {"precombat_main", "postcombat_main"}:
+        return 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("activated_self_damage_to_source"):
+            continue
+        if permanent.get("utility_activation_used_this_turn"):
+            continue
+        if not is_battlefield_creature(permanent):
+            continue
+        if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="source_already_tapped",
+                activation_kind="self_damage_reflect",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if permanent.get("activation_requires_tap") and permanent.get("summoning_sick"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="summoning_sick",
+                activation_kind="self_damage_reflect",
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            continue
+
+        chosen_player_name = permanent.get("chosen_player_name")
+        if permanent.get("source_damage_reflect_to_chosen_player"):
+            chosen_player = next(
+                (
+                    participant
+                    for participant in all_players or []
+                    if participant is not None
+                    and getattr(participant, "name", None) == chosen_player_name
+                    and getattr(participant, "is_alive", lambda: True)()
+                ),
+                None,
+            )
+            if chosen_player is None or chosen_player is player:
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    reason="chosen_player_unavailable_or_not_opponent",
+                    activation_kind="self_damage_reflect",
+                    chosen_player=chosen_player_name,
+                    phase=phase,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+
+        damage = max(1, int(permanent.get("activated_self_damage_to_source") or 1))
+        damage = apply_static_damage_replacements(
+            player,
+            player,
+            permanent,
+            permanent,
+            damage,
+            damage_event_type="permanent",
+            turn=turn,
+            phase=phase,
+        )
+        if permanent.get("activation_requires_tap"):
+            permanent["tapped"] = True
+        permanent["utility_activation_used_this_turn"] = True
+        triggers = trigger_creature_damage_controller_reflect(
+            all_players,
+            player,
+            player,
+            permanent,
+            permanent,
+            damage,
+            turn=turn,
+            phase=phase,
+            damage_event="activated_self_damage",
+        )
+        destroyed = False
+        if not permanent.get("indestructible") and _damage_sweep_creature_toughness(permanent) <= damage:
+            process_taii_wakeen_noncombat_damage_to_creature(
+                player,
+                player,
+                permanent,
+                permanent,
+                damage,
+                turn=turn,
+                phase=phase,
+            )
+            move_creature_from_battlefield(
+                player,
+                permanent,
+                reason="activated_self_damage",
+                source=permanent,
+            )
+            destroyed = True
+        emit_decision_trace(
+            decision_type="activated_self_damage_reflect",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    permanent,
+                    action="tap_self_damage_reflect",
+                    effect=permanent.get("effect", "creature"),
+                    score=16 + damage * 4,
+                    target=chosen_player_name,
+                )
+            ],
+            chosen_option=decision_card_option(
+                permanent,
+                action="tap_self_damage_reflect",
+                effect=permanent.get("effect", "creature"),
+                score=16 + damage * 4,
+                target=chosen_player_name,
+            ),
+            score_components={
+                "self_damage": damage,
+                "reflected_triggers": triggers,
+                "chosen_player": chosen_player_name,
+            },
+            rule_source=permanent.get("_rule_source", "focused_battle_rule_evidence"),
+            rule_status=permanent.get("_rule_review_status", "verified"),
+            confidence="medium",
+            expected_benefit_score=16 + damage * 4,
+            actual_outcome="self_damage_reflected_to_chosen_player",
+            reason="convert safe self-damage trigger into repeated damage pressure",
+            strategic_principle="use indestructible reflection engines as inevitability",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "tapped": 1 if permanent.get("activation_requires_tap") else 0,
+                "damage": damage,
+                "destroyed_self": destroyed,
+            },
+            risk_flags=["tap_creature", "self_damage"],
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="self_damage_reflect",
+            damage_to_self=damage,
+            reflected_triggers=triggers,
+            chosen_player=chosen_player_name,
+            destroyed_self=destroyed,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        check_sbas_until_stable(all_players)
+        return 1
+    return 0
+
+
 def _has_attack_artifact_tutor_trigger(permanent):
     return bool(
         isinstance(permanent, dict)
@@ -25215,6 +25410,60 @@ def refresh_graveyard_count_creature_statics_for_player(
     return refreshed
 
 
+def choose_damage_reflection_player(controller, all_players):
+    candidates = [
+        participant
+        for participant in all_players or []
+        if participant is not None
+        and participant is not controller
+        and getattr(participant, "is_alive", lambda: True)()
+    ]
+    if not candidates and controller is not None:
+        candidates = [controller]
+    if not candidates:
+        return None
+    return min(
+        candidates,
+        key=lambda participant: (
+            int(getattr(participant, "life", 40) or 40),
+            -table_visible_threat_score(participant),
+            getattr(participant, "name", ""),
+        ),
+    )
+
+
+def apply_as_enters_choose_player_static(
+    permanent,
+    controller,
+    all_players,
+    turn=None,
+):
+    if not isinstance(permanent, dict):
+        return None
+    if not (
+        permanent.get("as_enters_choose_player")
+        or permanent.get("source_damage_reflect_to_chosen_player")
+    ):
+        return None
+    if permanent.get("chosen_player_name"):
+        return permanent.get("chosen_player_name")
+    chosen = choose_damage_reflection_player(controller, all_players)
+    if chosen is None:
+        return None
+    permanent["chosen_player_name"] = getattr(chosen, "name", None)
+    permanent["chosen_player_role"] = "controller" if chosen is controller else "opponent"
+    emit_replay_event(
+        "as_enters_choose_player",
+        player=getattr(controller, "name", "?"),
+        card=permanent.get("name", "?"),
+        chosen_player=permanent["chosen_player_name"],
+        chosen_player_role=permanent["chosen_player_role"],
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    return permanent["chosen_player_name"]
+
+
 def prepare_entering_permanent(permanent, controller=None, all_players=None, turn=None):
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
@@ -25229,6 +25478,12 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         controller,
         turn=turn,
         phase="enter_battlefield",
+    )
+    apply_as_enters_choose_player_static(
+        permanent,
+        controller,
+        all_players,
+        turn=turn,
     )
     if is_battlefield_creature(permanent):
         permanent["haste"] = has_haste(permanent)
@@ -29135,6 +29390,7 @@ def _source_damaged_reflect_effect_data(damaged_creature):
         trigger_effect = candidate.get("trigger_effect")
         if (
             candidate.get("source_damage_reflect_to_any_target")
+            or candidate.get("source_damage_reflect_to_chosen_player")
             or candidate.get("battle_model_scope") == "source_dealt_damage_reflect_to_any_target_v1"
             or (
                 trigger in {"source_dealt_damage", "source_damaged", "dealt_damage_to_source"}
@@ -29170,18 +29426,33 @@ def trigger_source_damaged_reflect_to_any_target(
     if damage_amount <= 0:
         return 0
 
-    alive_targets = [
-        participant
-        for participant in all_players or []
-        if participant is not None
-        and participant is not damaged_controller
-        and getattr(participant, "is_alive", lambda: True)()
-    ]
-    target_player = (
-        min(alive_targets, key=lambda participant: (participant.life, participant.name))
-        if alive_targets
-        else None
-    )
+    if effect_data.get("source_damage_reflect_to_chosen_player"):
+        chosen_player_name = effect_data.get("chosen_player_name")
+        target_player = next(
+            (
+                participant
+                for participant in all_players or []
+                if participant is not None
+                and getattr(participant, "name", None) == chosen_player_name
+                and getattr(participant, "is_alive", lambda: True)()
+            ),
+            None,
+        )
+        target_selection = "chosen_player"
+    else:
+        alive_targets = [
+            participant
+            for participant in all_players or []
+            if participant is not None
+            and participant is not damaged_controller
+            and getattr(participant, "is_alive", lambda: True)()
+        ]
+        target_player = (
+            min(alive_targets, key=lambda participant: (participant.life, participant.name))
+            if alive_targets
+            else None
+        )
+        target_selection = "any_target_heuristic"
     if target_player is None:
         emit_replay_event(
             "trigger_skipped",
@@ -29189,10 +29460,13 @@ def trigger_source_damaged_reflect_to_any_target(
             card=damaged_creature.get("name", "?"),
             trigger=effect_data.get("trigger") or "source_dealt_damage",
             effect="damage_any_target",
-            reason="no_legal_target",
+            reason="no_legal_target"
+            if target_selection != "chosen_player"
+            else "chosen_player_unavailable",
             source=source_card.get("name", "?") if isinstance(source_card, dict) else source_card,
             source_controller=getattr(damage_source_controller, "name", None),
             damaged_creature=damaged_creature.get("name", "?"),
+            chosen_player=effect_data.get("chosen_player_name"),
             original_damage_to_source=damage_amount,
             damage_event=damage_event,
             turn=turn,
@@ -29224,6 +29498,8 @@ def trigger_source_damaged_reflect_to_any_target(
         damaged_creature_controller=getattr(damaged_controller, "name", None),
         target="player",
         target_player=getattr(target_player, "name", None),
+        target_selection=target_selection,
+        chosen_player=effect_data.get("chosen_player_name"),
         original_damage_to_source=damage_amount,
         amount=target_amount,
         damage_dealt=damage_dealt,
@@ -38294,6 +38570,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         rng,
         phase="precombat_main",
     )
+    activate_self_damage_reflect_sources(
+        player,
+        opponents,
+        all_players,
+        turn,
+        phase="precombat_main",
+    )
     activate_taii_wakeen_noncombat_damage_bonus(
         player,
         opponents,
@@ -38367,6 +38650,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         all_players,
         turn,
         rng,
+        phase="postcombat_main",
+    )
+    activate_self_damage_reflect_sources(
+        player,
+        opponents,
+        all_players,
+        turn,
         phase="postcombat_main",
     )
     activate_taii_wakeen_noncombat_damage_bonus(
