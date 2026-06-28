@@ -33,6 +33,7 @@ STATUS_SEVERITY = {
     "postgres_precheck_blocked_connection_closed": "critical",
     "blocked": "high",
     "needs_more_evidence": "high",
+    "inconclusive_candidate_not_used": "high",
     "inconclusive_candidate_unobserved": "high",
     "warning": "medium",
     "battle_prior_warning": "medium",
@@ -212,6 +213,7 @@ def analyze_battle_prior(path: Path, payload: Mapping[str, Any], issues: list[di
     observed = payload.get("observed_summary") or {}
     comparison = payload.get("comparison") or {}
     candidates = observed.get("candidate_observations") or {}
+    scoreability = payload.get("candidate_scoreability") or {}
     if isinstance(candidates, Mapping):
         for card, row in candidates.items():
             if not isinstance(row, Mapping):
@@ -231,6 +233,34 @@ def analyze_battle_prior(path: Path, payload: Mapping[str, Any], issues: list[di
                     },
                     next_action="do_not_score_swap_until_forced_or_natural_access_sample_exists",
                 )
+    if isinstance(scoreability, Mapping):
+        scoreability_cards = scoreability.get("cards") or {}
+        unused_cards = list(scoreability.get("candidate_accessed_not_used_cards") or [])
+        unused_cards += list(scoreability.get("candidate_near_access_only_cards") or [])
+        for card in unused_cards:
+            score_row = (
+                scoreability_cards.get(card)
+                if isinstance(scoreability_cards, Mapping)
+                else {}
+            )
+            if not isinstance(score_row, Mapping):
+                score_row = {}
+            add_issue(
+                issues,
+                severity="high",
+                category="evidence_gap",
+                issue_type="candidate_not_used",
+                path=path,
+                detail=f"candidate card was accessed or near-accessed but not used: {card}",
+                evidence={
+                    "card": card,
+                    "evidence_status": score_row.get("evidence_status"),
+                    "accessed_games": score_row.get("accessed_games"),
+                    "direct_card_events": score_row.get("direct_card_events"),
+                    "near_access_games": score_row.get("near_access_games"),
+                },
+                next_action="do_not_score_swap_until_direct_card_use_sample_exists",
+            )
     flags = comparison.get("flags") or []
     if isinstance(flags, list) and flags:
         non_candidate_flags = [

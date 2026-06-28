@@ -1,0 +1,138 @@
+{
+  "action_queue": [
+    {
+      "category": "blocked_workflow",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "text log contains blocked",
+          "evidence": {
+            "snippets": [
+              "- Status: `inconclusive_candidate_unobserved`"
+            ],
+            "test_names": []
+          },
+          "severity": "high",
+          "source_mtime": 1782685763.2951522,
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_battle_prior_compare_birgi_scoreability_20260628_v1.md"
+        }
+      ],
+      "issue_type": "text_blocked",
+      "next_action": "inspect_text_log_and_convert_recurring_pattern_to_structured_gate_field",
+      "severity": "high"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "candidate card was not observed: Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "evidence": {
+            "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "evidence_level": "library_only",
+            "trace_count": 45
+          },
+          "severity": "high",
+          "source_mtime": 1782685763.2949934,
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_battle_prior_compare_birgi_scoreability_20260628_v1.json"
+        }
+      ],
+      "issue_type": "candidate_unobserved",
+      "next_action": "do_not_score_swap_until_forced_or_natural_access_sample_exists",
+      "severity": "high"
+    },
+    {
+      "category": "evidence_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "report status is inconclusive_candidate_unobserved",
+          "evidence": {
+            "status": "inconclusive_candidate_unobserved"
+          },
+          "severity": "high",
+          "source_mtime": 1782685763.2949934,
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_battle_prior_compare_birgi_scoreability_20260628_v1.json"
+        }
+      ],
+      "issue_type": "top_level_status",
+      "next_action": "rerun_with_candidate_observation_or_min_used_sample",
+      "severity": "high"
+    },
+    {
+      "category": "battle_rhythm_gap",
+      "count": 1,
+      "examples": [
+        {
+          "detail": "battle prior emitted 4 rhythm flags",
+          "evidence": {
+            "sample_flags": [
+              {
+                "metric": "spell_action_entries",
+                "observed_per_player_slot": 48.5,
+                "prior_per_player_slot": 8.9,
+                "ratio": 5.4494,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "creature_cast_entries",
+                "observed_per_player_slot": 1.0,
+                "prior_per_player_slot": 5.49,
+                "ratio": 0.1821,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "noncreature_cast_entries",
+                "observed_per_player_slot": 47.5,
+                "prior_per_player_slot": 3.41,
+                "ratio": 13.9296,
+                "scope": "whole_game"
+              },
+              {
+                "metric": "total_combat_damage",
+                "observed_per_player_slot": 0.0,
+                "prior_per_player_slot": 13.2575,
+                "ratio": 0.0,
+                "scope": "whole_game"
+              }
+            ]
+          },
+          "severity": "medium",
+          "source_mtime": 1782685763.2949934,
+          "source_path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_battle_prior_compare_birgi_scoreability_20260628_v1.json"
+        }
+      ],
+      "issue_type": "prior_rhythm_flags",
+      "next_action": "calibrate_or_quarantine_gate_metrics_before_treating_winrate_as_strategy_signal",
+      "severity": "medium"
+    }
+  ],
+  "category_counts": {
+    "battle_rhythm_gap": 1,
+    "blocked_workflow": 1,
+    "evidence_gap": 2
+  },
+  "files_scanned": 2,
+  "generated_at": "2026-06-28T22:33:23Z",
+  "include_patterns": [
+    "seventeenlands_battle_prior_compare_birgi_scoreability_20260628_v1"
+  ],
+  "issue_count": 4,
+  "parse_warnings": {},
+  "postgres_writes": false,
+  "reports_dir": "docs/hermes-analysis/master_optimizer_reports",
+  "severity_counts": {
+    "high": 3,
+    "medium": 1
+  },
+  "source_db_mutated": false,
+  "status_counts": {
+    "inconclusive_candidate_unobserved": 1
+  },
+  "suffix_counts": {
+    ".json": 1,
+    ".md": 1
+  },
+  "superseded_issue_count": 0,
+  "superseded_issue_samples": []
+}
