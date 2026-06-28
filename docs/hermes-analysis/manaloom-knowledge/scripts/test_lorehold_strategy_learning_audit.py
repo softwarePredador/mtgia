@@ -376,6 +376,81 @@ class LoreholdStrategyLearningAuditTest(unittest.TestCase):
             -13,
         )
 
+    def test_runtime_package_readiness_keeps_pg_blocked_cards_in_hypothesis_pool(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            proposal_path = tmp_path / "proposals.json"
+            manifest_path = tmp_path / "manifest.json"
+            blocker_path = tmp_path / "blocked.json"
+            proposal_path.write_text(
+                json.dumps(
+                    {
+                        "proposals": [
+                            {
+                                "card_name": "Twinflame Tyrant",
+                                "family_id": "static_damage_modifier",
+                                "effect": "damage_modifier",
+                                "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+                                "proposal_status": "batch_pg_candidate_after_precheck",
+                                "safe_for_batch_pg_package": True,
+                                "oracle_hash": "hash",
+                                "logical_rule_key": "battle_rule_v1:hash",
+                                "deck_role_json": {"category": "wincon"},
+                                "effect_json": {"effect": "damage_modifier"},
+                            },
+                            {
+                                "card_name": "Manual Card",
+                                "family_id": "manual_model",
+                                "safe_for_batch_pg_package": False,
+                            },
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "deploy_id": "PG245",
+                        "slug": "lorehold_topdeck_damage_runtime",
+                        "status": "prepared_read_only_pending_apply_approval",
+                        "selected_count": 1,
+                        "selected_card_names": ["Twinflame Tyrant"],
+                        "family_counts": {"static_damage_modifier": 1},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            blocker_path.write_text(
+                json.dumps(
+                    {
+                        "deploy_id": "PG245",
+                        "slug": "lorehold_topdeck_damage_runtime",
+                        "status": "postgres_precheck_blocked_connection_closed",
+                        "blocked_step": "precheck",
+                        "sanitized_error": "server closed the connection unexpectedly before precheck execution",
+                        "selected_cards": ["Twinflame Tyrant"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = audit.aggregate_runtime_package_readiness(
+                proposal_paths=[proposal_path],
+                manifest_paths=[manifest_path],
+                blocker_paths=[blocker_path],
+            )
+
+        self.assertEqual(result["summary"]["card_count"], 1)
+        self.assertEqual(result["summary"]["blocked_card_count"], 1)
+        self.assertEqual(result["summary"]["readiness_counts"]["runtime_ready_pg_precheck_blocked"], 1)
+        card = result["cards"][0]
+        self.assertEqual(card["card_name"], "Twinflame Tyrant")
+        self.assertEqual(card["family_id"], "static_damage_modifier")
+        self.assertEqual(card["readiness"], "runtime_ready_pg_precheck_blocked")
+        self.assertEqual(card["package_manifests"][0]["deploy_id"], "PG245")
+        self.assertEqual(card["blockers"][0]["blocked_step"], "precheck")
+
     def test_strategy_dependency_map_turns_gates_into_next_hypothesis_contract(self):
         result = audit.build_strategy_dependency_map(
             squee_gates={
