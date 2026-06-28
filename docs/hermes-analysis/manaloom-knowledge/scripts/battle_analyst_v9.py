@@ -3028,6 +3028,8 @@ def is_battlefield_creature(card):
     """Permanent-level creature check; effects can add extra roles."""
     if not isinstance(card, dict):
         return False
+    if card.get("creature_type_suppressed"):
+        return False
     return (
         card.get("effect") == "creature"
         or bool(card.get("is_creature_permanent"))
@@ -3489,6 +3491,56 @@ def mana_source_production_for_state(player, source):
     if source.get("mana_produced_from_colors_among_permanents"):
         return len(_controlled_permanent_mana_colors(player))
     return int(source.get("mana_produced", 1) or 0)
+
+
+def pay_mana_source_activation_costs(player, source, turn=None):
+    if not isinstance(source, dict):
+        return True
+    mill_count = int(source.get("mana_activation_mill_count") or 0)
+    if mill_count > 0:
+        library = getattr(player, "library", []) or []
+        if len(library) < mill_count:
+            emit_replay_event(
+                "mana_source_activation_skipped",
+                player=getattr(player, "name", "?"),
+                card=source.get("name", "?"),
+                reason="insufficient_library_for_mill_cost",
+                required_mill_count=mill_count,
+                library_count=len(library),
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+            return False
+        milled = []
+        for _ in range(mill_count):
+            milled_card = player.library.pop(0)
+            player.graveyard.append(milled_card)
+            milled.append(milled_card)
+        resolve_land_cards_enter_graveyard_triggers(
+            player,
+            milled,
+            turn=turn,
+            source_event="mana_source_mill_cost",
+        )
+        refresh_graveyard_count_creature_statics_for_player(
+            player,
+            turn=turn,
+            phase="mana_source_activation",
+            emit_events=True,
+        )
+        emit_replay_event(
+            "mana_source_mill_cost_paid",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            milled=[card.get("name", "?") for card in milled if isinstance(card, dict)],
+            mill_count=len(milled),
+            graveyard_count=len(getattr(player, "graveyard", []) or []),
+            turn=turn,
+            **replay_rule_fields(source),
+        )
+    if source.get("mana_activation_requires_tap"):
+        source["tapped"] = True
+    return True
 
 
 def numeric_stat(value):
@@ -4159,6 +4211,37 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:9e2c7c96d5b2a117731924d511bb0e2a",
         }
     ),
+    "The Warring Triad": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static_and_mana_activated",
+            "cmc": 3.0,
+            "effect": "ramp_permanent",
+            "artifact": True,
+            "mana_cost": "{3}",
+            "type_line": "Legendary Artifact Creature - God",
+            "legendary": True,
+            "subtypes": ["God"],
+            "power": 5,
+            "toughness": 5,
+            "base_power": 5,
+            "base_toughness": 5,
+            "flying": True,
+            "trample": True,
+            "haste": True,
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "mana_activation_mill_count": 1,
+            "mana_ability_target": "target_player_self_model",
+            "creature_if_graveyard_count_at_least": 8,
+            "creature_type_suppressed_when_graveyard_count_below": 8,
+            "battle_model_scope": "legendary_artifact_creature_graveyard_threshold_self_mill_any_color_mana_v1",
+            "_rule_oracle_hash": "4b71a0484cf31247d62e92ca0bf27efd",
+            "_rule_logical_key": "battle_rule_v1:1b92340f98d8dd60da33dbd03e915d23",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4280,6 +4363,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Whispersilk Cloak",
     "Wand of Vertebrae",
     "Vedalken Orrery",
+    "The Warring Triad",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4430,6 +4514,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace generated ramp_permanent review_only evidence with XMage-backed static nonland-spells-as-flash timing permission.",
         ["manaloom_log_learning_audit_20260628_v19_after_wand_runtime", "VedalkenOrrery.java"],
         "2026-06-28T23:45:00Z",
+    ),
+    "The Warring Triad": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed graveyard-count creature static and self-mill any-color mana ability.",
+        ["manaloom_log_learning_audit_20260628_v20_after_vedalken_orrery_runtime", "TheWarringTriad.java"],
+        "2026-06-29T00:05:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -6174,6 +6263,12 @@ class Player:
         """Untap mana sources once for this player's turn."""
         self.mana_pool.empty()
         self.restricted_mana = {}
+        refresh_graveyard_count_creature_statics_for_player(
+            self,
+            turn=turn,
+            phase="mana_refresh",
+            emit_events=True,
+        )
         sources = [
             source
             for source in self.battlefield
@@ -6189,6 +6284,8 @@ class Player:
         for source in sources:
             produced = mana_source_production_for_state(self, source)
             if produced <= 0:
+                continue
+            if not pay_mana_source_activation_costs(self, source, turn=turn):
                 continue
             colors = mana_source_colors_for_state(self, source)
             # A source with multiple options is treated as flexible generic unless
@@ -25034,6 +25131,90 @@ def apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=
     return True
 
 
+def apply_graveyard_count_creature_static(
+    permanent,
+    controller,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    if not isinstance(permanent, dict):
+        return False
+    threshold = permanent.get("creature_if_graveyard_count_at_least")
+    if threshold in (None, "", False):
+        return False
+    try:
+        required_count = max(0, int(threshold or 0))
+    except (TypeError, ValueError):
+        required_count = 0
+    graveyard_count = len(getattr(controller, "graveyard", []) or [])
+    active = graveyard_count >= required_count
+    was_active = bool(permanent.get("graveyard_count_creature_active"))
+
+    permanent["graveyard_count_creature_active"] = active
+    permanent["graveyard_count_creature_required"] = required_count
+    permanent["graveyard_count_current"] = graveyard_count
+    if active:
+        permanent.pop("creature_type_suppressed", None)
+        permanent["is_creature_permanent"] = True
+        permanent["haste"] = has_haste(permanent)
+        if "summoning_sick" not in permanent:
+            permanent["summoning_sick"] = not permanent["haste"]
+        if permanent.get("power") in (None, ""):
+            permanent["power"] = int(permanent.get("base_power") or 1)
+        if permanent.get("toughness") in (None, ""):
+            permanent["toughness"] = int(permanent.get("base_toughness") or permanent.get("power") or 1)
+    else:
+        permanent["creature_type_suppressed"] = True
+        permanent["is_creature_permanent"] = False
+        permanent.pop("summoning_sick", None)
+
+    if emit_event and active != was_active:
+        emit_replay_event(
+            "static_graveyard_count_creature_state_changed",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            active=active,
+            graveyard_count=graveyard_count,
+            required_graveyard_count=required_count,
+            creature_type_suppressed=bool(permanent.get("creature_type_suppressed")),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+    return active
+
+
+def refresh_graveyard_count_creature_statics_for_player(
+    player,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    refreshed = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("creature_if_graveyard_count_at_least") in (None, "", False):
+            continue
+        active = apply_graveyard_count_creature_static(
+            permanent,
+            player,
+            turn=turn,
+            phase=phase,
+            emit_event=emit_events,
+        )
+        refreshed.append(
+            {
+                "card": permanent.get("name", "?"),
+                "graveyard_count_creature_active": active,
+                "graveyard_count": permanent.get("graveyard_count_current"),
+                "creature_type_suppressed": bool(permanent.get("creature_type_suppressed")),
+            }
+        )
+    return refreshed
+
+
 def prepare_entering_permanent(permanent, controller=None, all_players=None, turn=None):
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
@@ -25043,6 +25224,12 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
     enters_tapped = bool(permanent.get("enters_tapped"))
     if apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=turn):
         enters_tapped = True
+    apply_graveyard_count_creature_static(
+        permanent,
+        controller,
+        turn=turn,
+        phase="enter_battlefield",
+    )
     if is_battlefield_creature(permanent):
         permanent["haste"] = has_haste(permanent)
         permanent["summoning_sick"] = not permanent["haste"]
