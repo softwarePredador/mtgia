@@ -27914,6 +27914,118 @@ def trigger_spell_cast_engines(
         spell_is_creature = is_creature_card(spell) or "creature" in str(spell.get("type_line") or "").lower()
         if trigger_kind == "noncreature_spell_cast" and spell_is_creature:
             continue
+        if permanent.get("trigger_effect") == "spell_color_damage_life":
+            red_damage = int(permanent.get("red_spell_trigger_damage") or 0)
+            if red_damage > 0 and _spell_has_color(spell, "R"):
+                amount = apply_controller_noncombat_damage_modifiers(
+                    player,
+                    red_damage,
+                    permanent,
+                    turn=turn,
+                    phase=phase,
+                )
+
+                def resolve_red_spell_damage_trigger(
+                    permanent=permanent,
+                    amount=amount,
+                    trigger_kind=trigger_kind,
+                ):
+                    alive_opponents = [opponent for opponent in opponents if opponent.is_alive()]
+                    target_player = (
+                        min(alive_opponents, key=lambda opponent: (opponent.life, opponent.name))
+                        if alive_opponents
+                        else None
+                    )
+                    life_before = target_player.life if target_player is not None else None
+                    damage_dealt, target_amount, dealt = (
+                        deal_damage_to_player_with_static_replacements(
+                            player,
+                            target_player,
+                            permanent,
+                            amount,
+                            turn=turn,
+                            phase=phase,
+                            damage_event_type="player",
+                        )
+                        if target_player is not None and amount > 0
+                        else (0, amount, False)
+                    )
+                    emit_replay_event(
+                        "trigger_resolved",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger=trigger_kind,
+                        trigger_spell=spell.get("name", "?"),
+                        trigger_spell_color="R",
+                        effect="damage_player_or_planeswalker",
+                        amount=target_amount,
+                        original_amount=amount,
+                        damage_dealt=damage_dealt,
+                        target_player=target_player.name if target_player is not None else None,
+                        result="player_damage" if dealt else "no_legal_target_or_zero_damage",
+                        life_before=life_before,
+                        life_after=target_player.life if target_player is not None else None,
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+
+                resolve_or_enqueue_trigger(
+                    player,
+                    permanent,
+                    trigger_kind,
+                    resolve_red_spell_damage_trigger,
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
+                    data={
+                        "trigger_spell": spell.get("name", "?"),
+                        "trigger_spell_color": "R",
+                    },
+                )
+
+            white_life_gain = int(permanent.get("white_spell_trigger_gain_life") or 0)
+            if white_life_gain > 0 and _spell_has_color(spell, "W"):
+
+                def resolve_white_spell_lifegain_trigger(
+                    permanent=permanent,
+                    white_life_gain=white_life_gain,
+                    trigger_kind=trigger_kind,
+                ):
+                    life_before = player.life
+                    gain_life(player, white_life_gain, cap=999)
+                    life_gained = player.life - life_before
+                    emit_replay_event(
+                        "trigger_resolved",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger=trigger_kind,
+                        trigger_spell=spell.get("name", "?"),
+                        trigger_spell_color="W",
+                        effect="gain_life",
+                        life_gain_requested=white_life_gain,
+                        life_gained=life_gained,
+                        life_before=life_before,
+                        life_after=player.life,
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+
+                resolve_or_enqueue_trigger(
+                    player,
+                    permanent,
+                    trigger_kind,
+                    resolve_white_spell_lifegain_trigger,
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
+                    data={
+                        "trigger_spell": spell.get("name", "?"),
+                        "trigger_spell_color": "W",
+                    },
+                )
+            continue
         if permanent.get("trigger_effect") == "rummage":
             discard_card, discard_reason, risk_flags, use_top_replacement, scored_options = (
                 choose_lorehold_rummage_discard(player)

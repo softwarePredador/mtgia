@@ -8207,6 +8207,71 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             "red_spell_lifelink_white_spell_lifegain_damage",
         )
 
+    def test_classifier_and_generator_mark_balefire_liege_exact_scope_as_batch_safe(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Balefire Liege",
+                    "severity": "high",
+                    "oracle_hash": "balefirehash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "BalefireLiege",
+                        "path": "/xmage/BalefireLiege.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": [
+                            "BoostControlledEffect",
+                            "DamageTargetEffect",
+                            "GainLifeEffect",
+                        ],
+                        "ability_classes": [
+                            "SimpleStaticAbility",
+                            "SpellCastControllerTriggeredAbility",
+                        ],
+                        "target_classes": ["TargetPlayerOrPlaneswalker"],
+                        "primary_effect": {
+                            "effect": "creature",
+                            "battle_model_scope": "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+                            "power": 2,
+                            "toughness": 4,
+                            "trigger": "spell_cast",
+                            "trigger_effect": "spell_color_damage_life",
+                            "red_spell_trigger_damage": 3,
+                            "red_spell_trigger_damage_target": "player_or_planeswalker",
+                            "white_spell_trigger_gain_life": 3,
+                            "static_boost_other_red_creatures_you_control": {
+                                "power": 1,
+                                "toughness": 1,
+                            },
+                            "static_boost_other_white_creatures_you_control": {
+                                "power": 1,
+                                "toughness": 1,
+                            },
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "targeted_interaction")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        proposal_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = proposal_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "burn_lifegain_engine")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "spell_color_damage_life")
+        self.assertEqual(
+            proposal["deck_role_json"]["subtype"],
+            "red_spell_damage_white_spell_lifegain",
+        )
+
     def test_classifier_marks_tinder_wall_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

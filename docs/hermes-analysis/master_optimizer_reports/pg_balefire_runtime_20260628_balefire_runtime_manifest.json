@@ -1,0 +1,24 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg_balefire_runtime_20260628_balefire_runtime_20260628_1",
+  "deploy_id": "pg_balefire_runtime_20260628",
+  "family_counts": {
+    "targeted_interaction": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg_balefire_runtime_20260628_balefire_runtime_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg_balefire_runtime_20260628_balefire_runtime_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg_balefire_runtime_20260628_balefire_runtime_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg_balefire_runtime_20260628_balefire_runtime_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg_balefire_runtime_20260628_balefire_runtime_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg_balefire_runtime_20260628_balefire_runtime_rollback.sql"
+  },
+  "generated_at": "2026-06-28T11:37:42+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Balefire Liege"
+  ],
+  "selected_count": 1,
+  "slug": "balefire_runtime",
+  "status": "prepared_read_only_pending_apply_approval"
+}

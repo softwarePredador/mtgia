@@ -180,15 +180,16 @@ TARGETED_INTERACTION_SUBFAMILY_META = {
         "priority": 20,
     },
     "spell_color_trigger_damage_life_engine": {
-        "status": "runtime_family_implementation_required",
+        "status": "runtime_supported_family",
         "implementation_unit": (
             "red/white spell-cast triggers that separately deal targeted damage, "
             "gain life, and annotate static creature boosts"
         ),
-        "next_step": "split Balefire Liege red and white spell triggers before PG metadata promotion",
+        "next_step": "prepare PG metadata package after PostgreSQL precheck, then gate Balefire spell-color lines",
         "family_tests": [
             "test_balefire_liege_red_spell_deals_three_to_target_player_or_planeswalker",
             "test_balefire_liege_white_spell_gains_three_life",
+            "test_balefire_liege_red_white_spell_fires_both_triggers",
         ],
         "priority": 15,
     },
@@ -259,6 +260,7 @@ def targeted_interaction_subfamily(card: dict[str, Any]) -> dict[str, Any] | Non
     runtime_scopes = {
         "controlled_other_creature_enters_power_damage_any_target_v1",
         "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+        "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
     }
     if effect != "direct_damage" and scope not in runtime_scopes:
         return None

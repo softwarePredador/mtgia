@@ -458,6 +458,13 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         return "targeted_interaction"
     if (
         str(effect_json.get("battle_model_scope") or "")
+        == "red_spell_damage_white_spell_lifegain_static_creature_boost_v1"
+        and effect_json.get("trigger") == "spell_cast"
+        and effect_json.get("trigger_effect") == "spell_color_damage_life"
+    ):
+        return "targeted_interaction"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
         == "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
         and effect_json.get("effect") == "redirect_removal"
     ):
@@ -1380,6 +1387,28 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("trigger_effect") == "damage_any_target"
             and int(effect_json.get("white_instant_sorcery_lifegain_trigger_damage") or 0) == 3
             and effect_json.get("target") == "any_target"
+        )
+
+    if effect == "creature" and scope == "red_spell_damage_white_spell_lifegain_static_creature_boost_v1":
+        target_classes = xmage_target_classes(card)
+        red_boost = effect_json.get("static_boost_other_red_creatures_you_control") or {}
+        white_boost = effect_json.get("static_boost_other_white_creatures_you_control") or {}
+        return (
+            types == {"CREATURE"}
+            and {"BoostControlledEffect", "DamageTargetEffect", "GainLifeEffect"}.issubset(effect_classes)
+            and {"SimpleStaticAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+            and target_classes == {"TargetPlayerOrPlaneswalker"}
+            and int(effect_json.get("power") or 0) == 2
+            and int(effect_json.get("toughness") or 0) == 4
+            and effect_json.get("trigger") == "spell_cast"
+            and effect_json.get("trigger_effect") == "spell_color_damage_life"
+            and int(effect_json.get("red_spell_trigger_damage") or 0) == 3
+            and effect_json.get("red_spell_trigger_damage_target") == "player_or_planeswalker"
+            and int(effect_json.get("white_spell_trigger_gain_life") or 0) == 3
+            and int(red_boost.get("power") or 0) == 1
+            and int(red_boost.get("toughness") or 0) == 1
+            and int(white_boost.get("power") or 0) == 1
+            and int(white_boost.get("toughness") or 0) == 1
         )
 
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":

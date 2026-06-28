@@ -5063,6 +5063,63 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["white_instant_sorcery_lifegain_trigger_damage"], 3)
         self.assertEqual(primary["target"], "any_target")
 
+    def test_balefire_liege_maps_to_spell_color_damage_life_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "BalefireLiege",
+                "effect_classes": [
+                    "BoostControlledEffect",
+                    "DamageTargetEffect",
+                    "GainLifeEffect",
+                ],
+                "ability_classes": [
+                    "SimpleStaticAbility",
+                    "SpellCastControllerTriggeredAbility",
+                ],
+                "target_classes": ["TargetPlayerOrPlaneswalker"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(2); this.toughness = new MageInt(4); "
+                    "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect(1, 1, "
+                    "Duration.WhileOnBattlefield, filterRed, true))); "
+                    "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect(1, 1, "
+                    "Duration.WhileOnBattlefield, filterWhite, true))); "
+                    "this.addAbility(new SpellCastControllerTriggeredAbility("
+                    "new DamageTargetEffect(3), filterRedSpell, false)); "
+                    "this.addTarget(new TargetPlayerOrPlaneswalker()); "
+                    "this.addAbility(new SpellCastControllerTriggeredAbility("
+                    "new GainLifeEffect(3), filterWhiteSpell, false));"
+                ),
+            },
+            (
+                "Other red creatures you control get +1/+1. Other white creatures you control get +1/+1. "
+                "Whenever you cast a red spell, Balefire Liege deals 3 damage to target player or planeswalker. "
+                "Whenever you cast a white spell, you gain 3 life."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+        )
+        self.assertEqual(primary["power"], 2)
+        self.assertEqual(primary["toughness"], 4)
+        self.assertEqual(primary["trigger"], "spell_cast")
+        self.assertEqual(primary["trigger_effect"], "spell_color_damage_life")
+        self.assertEqual(primary["red_spell_trigger_damage"], 3)
+        self.assertEqual(primary["red_spell_trigger_damage_target"], "player_or_planeswalker")
+        self.assertEqual(primary["white_spell_trigger_gain_life"], 3)
+        self.assertEqual(
+            primary["static_boost_other_red_creatures_you_control"],
+            {"power": 1, "toughness": 1},
+        )
+        self.assertEqual(
+            primary["static_boost_other_white_creatures_you_control"],
+            {"power": 1, "toughness": 1},
+        )
+
     def test_caldera_pyremaw_maps_to_counter_then_power_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -213,6 +213,13 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
             "subtype": "red_spell_lifelink_white_spell_lifegain_damage",
             "timing": "static_and_triggered",
         }
+    if effect_json.get("battle_model_scope") == "red_spell_damage_white_spell_lifegain_static_creature_boost_v1":
+        return {
+            "category": "burn_lifegain_engine",
+            "effect": "spell_color_damage_life",
+            "subtype": "red_spell_damage_white_spell_lifegain",
+            "timing": "static_and_triggered",
+        }
     if effect == "creature" and (
         int(effect_json.get("etb_draw_count") or 0) > 0
         or int(effect_json.get("etb_discard_hand_then_draw_count") or 0) > 0

@@ -3488,6 +3488,41 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "BalefireLiege"
+        and card_types == {"CREATURE"}
+        and {"BoostControlledEffect", "DamageTargetEffect", "GainLifeEffect"}.issubset(effect_classes)
+        and {"SimpleStaticAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+        and "TargetPlayerOrPlaneswalker" in target_classes
+    ):
+        return {
+            "effect": "creature",
+            "scope": "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+            "fields": {
+                "trigger": "spell_cast",
+                "trigger_effect": "spell_color_damage_life",
+                "red_spell_trigger_damage": 3,
+                "red_spell_trigger_damage_target": "player_or_planeswalker",
+                "white_spell_trigger_gain_life": 3,
+                "static_boost_other_red_creatures_you_control": {"power": 1, "toughness": 1},
+                "static_boost_other_white_creatures_you_control": {"power": 1, "toughness": 1},
+                "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text) or 2,
+                "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text) or 4,
+            },
+            "reason": (
+                "XMage structure matches Balefire Liege: red spells trigger 3 damage to "
+                "a player or planeswalker, white spells trigger 3 life, and static boosts "
+                "annotate other red/white creatures you control."
+            ),
+            "signals": [
+                "BoostControlledEffect",
+                "SpellCastControllerTriggeredAbility",
+                "DamageTargetEffect",
+                "GainLifeEffect",
+                "TargetPlayerOrPlaneswalker",
+            ],
+        }
+
+    if (
         card_types == {"ENCHANTMENT"}
         and effect_classes == {"DamageTargetEffect"}
         and ability_classes == {"SimpleActivatedAbility"}
