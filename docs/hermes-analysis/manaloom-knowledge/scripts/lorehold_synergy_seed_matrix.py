@@ -10,6 +10,7 @@ for every requested simulation seed and writes one aggregate decision report.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -56,6 +57,15 @@ def parse_package_keys(
     if unknown:
         raise argparse.ArgumentTypeError(f"unknown package(s): {', '.join(unknown)}")
     return raw
+
+
+def short_package_token(package_key: str, *, max_slug_length: int = 44) -> str:
+    slug = "".join(ch if ch.isalnum() else "_" for ch in package_key.lower()).strip("_")
+    slug = "_".join(part for part in slug.split("_") if part)
+    digest = hashlib.sha1(package_key.encode("utf-8")).hexdigest()[:8]
+    if len(slug) > max_slug_length:
+        slug = slug[:max_slug_length].rstrip("_")
+    return f"{slug}_{digest}"
 
 
 def preflight_packages(
@@ -173,7 +183,7 @@ def run_package_seed(
     ignore_prior_results: bool,
     no_game_checkpoint: bool,
 ) -> dict[str, Any]:
-    run_stem = f"{stem}_seed{seed}"
+    run_stem = f"{stem}_seed{seed}_{short_package_token(package_key)}"
     report_json = package_gate.REPORT_DIR / f"{run_stem}_{stamp}.json"
     cmd = [
         sys.executable,
@@ -457,7 +467,7 @@ def main() -> int:
                 deck_process_timeout_seconds=args.deck_process_timeout_seconds,
                 gate_timeout_seconds=args.gate_timeout_seconds,
                 stem=args.stem,
-                stamp=f"{stamp}_{row['package_key']}",
+                stamp=stamp,
                 cut_safety_report=cut_safety_report,
                 prior_package_reports=prior_package_reports,
                 package_files=package_files,

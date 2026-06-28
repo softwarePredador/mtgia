@@ -59,9 +59,19 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_brass_bounty_recurring_seed_window_20260628_v1_run.json",
+    REPORT_DIR / "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
     REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+    REPORT_DIR
+    / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
     DEFAULT_STRATEGY_AUDIT,
+    REPORT_DIR / "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json",
 ]
+INCONCLUSIVE_EXPOSURE_DECISIONS = {
+    "inconclusive_low_exposure",
+    "forced_access_inconclusive_low_exposure",
+}
 
 
 def utc_now() -> str:
@@ -192,12 +202,23 @@ def summarize_cut_options(pairings: list[dict[str, Any]], limit: int = 5) -> lis
 
 
 def infer_package_decision(result: dict[str, Any]) -> str:
+    exposure = result.get("exposure_summary") or {}
+    low_candidate_use = bool(exposure.get("low_candidate_added_card_use"))
+    forced_access_mode = str(result.get("forced_access_mode") or "none")
     if result.get("decision"):
         decision = str(result["decision"])
+        if decision in INCONCLUSIVE_EXPOSURE_DECISIONS:
+            return decision
+        if low_candidate_use:
+            if forced_access_mode and forced_access_mode != "none":
+                return "forced_access_inconclusive_low_exposure"
+            return "inconclusive_low_exposure"
         return "reject_or_rework" if decision.startswith("reject") else decision
     aggregate = result.get("aggregate") or {}
     aggregate_decision = str(aggregate.get("decision") or "")
     if aggregate_decision:
+        if low_candidate_use:
+            return "inconclusive_low_exposure"
         return "reject_or_rework" if aggregate_decision.startswith("reject") else aggregate_decision
     gate = result.get("gate_summary") or {}
     baseline = gate.get("baseline") or {}
@@ -206,6 +227,8 @@ def infer_package_decision(result: dict[str, Any]) -> str:
     candidate_wins = int(candidate.get("wins") or 0)
     delta = float(gate.get("delta_pp") or 0.0)
     if delta < 0 or candidate_wins < baseline_wins:
+        if low_candidate_use:
+            return "inconclusive_low_exposure"
         return "reject_or_rework"
     if delta > 0 or candidate_wins > baseline_wins:
         return "promote_to_deeper_gate"
@@ -336,6 +359,68 @@ def rejected_package_evidence(
                 "aggregate": aggregate,
             }
     return rejected
+
+
+def inconclusive_package_evidence(
+    prior_package_reports: list[tuple[Path, dict[str, Any]]],
+) -> dict[str, dict[str, Any]]:
+    inconclusive: dict[str, dict[str, Any]] = {}
+    for path, payload in prior_package_reports:
+        payload_has_cut_safety = bool(payload.get("cut_safety_report"))
+        payload_has_prior_reports = bool(payload.get("prior_package_reports"))
+        evidence_scope = (
+            "strategy_gate"
+            if payload_has_cut_safety and payload_has_prior_reports
+            else "diagnostic_or_contract"
+        )
+        for result in package_rows_from_prior_payload(payload):
+            if not isinstance(result, dict):
+                continue
+            key = str(result.get("package_key") or "")
+            if not key:
+                continue
+            if "gate_summary" not in result:
+                flat_gate = gate_summary_from_flat_result(result)
+                if flat_gate:
+                    result = {**result, "gate_summary": flat_gate}
+            decision = infer_package_decision(result)
+            if decision not in INCONCLUSIVE_EXPOSURE_DECISIONS:
+                continue
+            gate = result.get("gate_summary") or {}
+            aggregate = result.get("aggregate") or {}
+            exposure = result.get("exposure_summary") or {}
+            candidate_added = exposure.get("candidate_added_cards") or {}
+            cards = candidate_added.get("cards") or []
+            inconclusive[key] = {
+                "package_key": key,
+                "source_report": str(path),
+                "source_section": result.get("source_section"),
+                "evidence_scope": evidence_scope,
+                "adds": result.get("adds") or [],
+                "cuts": result.get("cuts") or [],
+                "decision": decision,
+                "delta_pp": gate.get(
+                    "delta_pp",
+                    aggregate.get("delta_pp_total", result.get("delta_pp")),
+                ),
+                "baseline": gate.get("baseline") or {},
+                "candidate": gate.get("candidate") or {},
+                "exposure_status": exposure.get("status"),
+                "exposure_next_step": exposure.get("next_step"),
+                "candidate_added_card_statuses": [
+                    {
+                        "card_name": row.get("card_name"),
+                        "status": row.get("status"),
+                        "recorded_use_count": row.get("recorded_use_count"),
+                        "accessed_games": (row.get("access_profile") or {}).get("accessed_games"),
+                        "near_access_games": (row.get("access_profile") or {}).get("near_access_games"),
+                        "library_only_games": (row.get("access_profile") or {}).get("library_only_games"),
+                    }
+                    for row in cards
+                    if isinstance(row, dict)
+                ],
+            }
+    return inconclusive
 
 
 def latest_tutor_cut_model(
@@ -908,6 +993,66 @@ def build_cut_exposure_action(manual_review: dict[str, Any]) -> dict[str, Any] |
     return None
 
 
+def build_inconclusive_exposure_action(
+    inconclusive_packages: dict[str, dict[str, Any]],
+) -> dict[str, Any] | None:
+    if not inconclusive_packages:
+        return None
+    rows = sorted(
+        inconclusive_packages.values(),
+        key=lambda row: (
+            row.get("evidence_scope") != "strategy_gate",
+            row.get("package_key") or "",
+        ),
+    )
+    strategy_rows = [row for row in rows if row.get("evidence_scope") == "strategy_gate"]
+    diagnostic_rows = [row for row in rows if row.get("evidence_scope") != "strategy_gate"]
+    priority = -4 if strategy_rows else 6
+    status = (
+        "resolve_strategy_gate_low_exposure_before_next_swap"
+        if strategy_rows
+        else "diagnostic_low_exposure_recorded_no_strategy_block"
+    )
+    return {
+        "priority": priority,
+        "action_key": "resolve_inconclusive_package_exposures",
+        "status": status,
+        "lane": "battle_gate_evidence_quality",
+        "candidate_cards": sorted(
+            {
+                str(card)
+                for row in rows
+                for card in (row.get("adds") or [])
+                if str(card).strip()
+            }
+        ),
+        "cut_cards": sorted(
+            {
+                str(card)
+                for row in rows
+                for card in (row.get("cuts") or [])
+                if str(card).strip()
+            }
+        ),
+        "why_now": (
+            "Some package gates reached deck-level results without proving that the added card "
+            "was actually drawn, accessed, cast, activated, or otherwise used."
+        ),
+        "blockers": [
+            "deck-level win rate is not card-level proof when the added card has low exposure",
+            "inconclusive packages must not be promoted or treated as rejected exact packages",
+        ],
+        "next_steps": [
+            "For strategy-gate rows, rerun with a larger natural sample or a forced-access diagnostic followed by natural confirmation.",
+            "For diagnostic/contract rows, keep them as evidence-quality examples and do not let them outrank current strategy actions.",
+            "Only count a future result as card evidence when recorded_use_count or accessed_games confirms exposure.",
+        ],
+        "strategy_gate_inconclusive_count": len(strategy_rows),
+        "diagnostic_or_contract_inconclusive_count": len(diagnostic_rows),
+        "packages": rows[:12],
+    }
+
+
 def deck_contains(strategy_audit: dict[str, Any], card_name: str) -> bool:
     wanted = normalize_key(card_name)
     for summary in (strategy_audit.get("deck_summaries") or {}).values():
@@ -1074,6 +1219,7 @@ def build_guardrails(
     manual_review: dict[str, Any],
     hypothesis_queue: dict[str, Any] | None = None,
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    inconclusive_packages: dict[str, dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     negative = miner_report.get("negative_exact_packages") or []
     prior_rejections = rejected_package_evidence(prior_package_reports or [])
@@ -1100,6 +1246,18 @@ def build_guardrails(
                 "reason": (
                     "Loaded prior package reports include explicit rejected package evidence; "
                     "the planner must not recommend those exact add/cut packages as fresh gates."
+                ),
+            }
+        )
+    if inconclusive_packages:
+        guardrails.append(
+            {
+                "guardrail_key": "inconclusive_low_exposure_is_not_card_proof",
+                "inconclusive_package_count": len(inconclusive_packages),
+                "inconclusive_package_keys": sorted(inconclusive_packages),
+                "reason": (
+                    "A package with low added-card exposure cannot be promoted or rejected "
+                    "as card-level evidence until the added card is actually accessed or used."
                 ),
             }
         )
@@ -1157,9 +1315,14 @@ def build_plan(
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
     actions = []
+    prior_rejections = rejected_package_evidence(prior_package_reports or [])
+    inconclusive_packages = inconclusive_package_evidence(prior_package_reports or [])
     cut_exposure_action = build_cut_exposure_action(manual_review)
     if cut_exposure_action:
         actions.append(cut_exposure_action)
+    inconclusive_action = build_inconclusive_exposure_action(inconclusive_packages)
+    if inconclusive_action:
+        actions.append(inconclusive_action)
     trace_action = build_focus_access_trace_action(trace_audit)
     if trace_action:
         actions.append(trace_action)
@@ -1218,7 +1381,6 @@ def build_plan(
     actions.sort(key=lambda row: (int(row.get("priority") or 0), row.get("action_key") or ""))
     status_counts = Counter(str(row.get("status") or "") for row in actions)
     recommended = actions[0]["action_key"] if actions else "rerun_variant_gap_miner"
-    prior_rejections = rejected_package_evidence(prior_package_reports or [])
     return {
         "generated_at": utc_now(),
         "miner_report": str(miner_path),
@@ -1249,6 +1411,8 @@ def build_plan(
             "recommended_next_action": recommended,
             "prior_rejected_package_count": len(prior_rejections),
             "prior_rejected_package_keys": sorted(prior_rejections),
+            "prior_inconclusive_low_exposure_count": len(inconclusive_packages),
+            "prior_inconclusive_low_exposure_keys": sorted(inconclusive_packages),
             "miner_candidate_status_counts": (miner_report.get("summary") or {}).get(
                 "candidate_status_counts",
                 {},
@@ -1270,6 +1434,7 @@ def build_plan(
             manual_review,
             hypothesis_queue,
             prior_package_reports,
+            inconclusive_packages,
         ),
         "method_notes": [
             "This planner is a decision layer, not a promotion engine.",
@@ -1309,6 +1474,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Recommended next action: `{payload['summary']['recommended_next_action']}`",
         f"- Prior rejected packages loaded: `{payload['summary']['prior_rejected_package_count']}`",
         f"- Prior rejected package keys: `{', '.join(payload['summary']['prior_rejected_package_keys']) or '-'}`",
+        f"- Prior inconclusive low-exposure packages loaded: `{payload['summary']['prior_inconclusive_low_exposure_count']}`",
+        f"- Prior inconclusive low-exposure package keys: `{', '.join(payload['summary']['prior_inconclusive_low_exposure_keys']) or '-'}`",
         f"- Miner candidate statuses: `{json.dumps(payload['summary']['miner_candidate_status_counts'], sort_keys=True)}`",
         f"- Miner pairing statuses: `{json.dumps(payload['summary']['miner_pairing_status_counts'], sort_keys=True)}`",
         "",

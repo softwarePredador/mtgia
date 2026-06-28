@@ -794,6 +794,18 @@ def test_next_action_planner_default_prior_reports_include_strategy_audit():
     assert planner.DEFAULT_STRATEGY_AUDIT in planner.DEFAULT_PRIOR_PACKAGE_REPORTS
 
 
+def test_next_action_planner_default_prior_reports_include_profiled_history():
+    expected = {
+        "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+    }
+    default_names = {path.name for path in planner.DEFAULT_PRIOR_PACKAGE_REPORTS}
+    assert expected.issubset(default_names)
+
+
 def test_next_action_planner_prioritizes_focus_access_trace_review():
     payload = planner.build_plan(
         miner_report=miner_report(),

@@ -76,6 +76,37 @@ def test_run_package_seed_forwards_external_package_file():
     assert "/tmp/packages.json" in cmd
 
 
+def test_run_package_seed_uses_short_package_token_for_long_names():
+    package_key = "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_winds_of_abandon"
+    with patch("lorehold_synergy_seed_matrix.subprocess.run") as run:
+        run.return_value = SimpleNamespace(returncode=0, stdout="", stderr="")
+        matrix.run_package_seed(
+            package_key=package_key,
+            seed=42,
+            source_db=Path("/tmp/source.db"),
+            games=1,
+            opponent_limit=1,
+            opponent_seed=20260626,
+            game_timeout_seconds=1.0,
+            deck_process_timeout_seconds=1.0,
+            gate_timeout_seconds=1.0,
+            stem="test_matrix",
+            stamp="20260628_091040",
+            cut_safety_report=None,
+            prior_package_reports=[],
+            package_files=[],
+            ignore_prior_results=True,
+            no_game_checkpoint=True,
+        )
+
+    cmd = run.call_args.args[0]
+    stem_value = cmd[cmd.index("--stem") + 1]
+    stamp_value = cmd[cmd.index("--stamp") + 1]
+    assert package_key not in stem_value
+    assert len(stem_value) < 90
+    assert stamp_value == "20260628_091040"
+
+
 def test_aggregate_rejects_if_strong_seed_regresses():
     rows = [
         {

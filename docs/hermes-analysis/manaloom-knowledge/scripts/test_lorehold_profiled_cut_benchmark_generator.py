@@ -40,6 +40,7 @@ def build_conn() -> sqlite3.Connection:
         (610, "Untimely Malfunction", "removal", '["removal"]', 2, "Instant", "Destroy target artifact."),
         (611, "Red Elemental Blast", "removal", '["removal"]', 1, "Instant", "Counter target blue spell or destroy target blue permanent."),
         (612, "Mana Vault", "ramp", '["ramp"]', 1, "Artifact", "Tap to add three colorless mana."),
+        (612, "Chrome Mox", "ramp", '["ramp"]', 0, "Artifact", "Imprint. Tap: Add one mana of any of the exiled card's colors."),
         (613, "Storm-Kiln Artist", "ramp", '["ramp","creature"]', 4, "Creature — Dwarf Shaman", "Magecraft creates Treasure."),
         (614, "Galvanoth", "draw", '["draw"]', 5, "Creature — Beast", "May cast the top instant or sorcery without paying its mana cost."),
         (615, "Apex of Power", "draw", '["draw","payoff"]', 10, "Sorcery", "Exile seven cards and cast them this turn."),
@@ -57,6 +58,7 @@ def build_conn() -> sqlite3.Connection:
         ("Bender's Waterskin", "bender s waterskin", "auto", "verified", {"effect": "ramp_permanent", "battle_model_scope": "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1", "mana_produced": 1}),
         ("Creative Technique", "creative technique", "auto", "verified", {"effect": "exile_top_nonland_free_cast", "battle_model_scope": "shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1"}),
         ("Mana Vault", "mana vault", "auto", "active", {"effect": "ramp_permanent", "battle_model_scope": "fast_mana_artifact_partial_v1", "mana_produced": 3}),
+        ("Chrome Mox", "chrome mox", "auto", "active", {"effect": "ramp_permanent", "battle_model_scope": "fast_mana_artifact_partial_v1", "mana_produced": 1}),
         ("Storm-Kiln Artist", "storm kiln artist", "auto", "verified", {"effect": "creature", "battle_model_scope": "creature_body_artifact_power_magecraft_treasure_annotation_v1", "magecraft_treasure_status": "annotation_only"}),
         ("Galvanoth", "galvanoth", "auto", "verified", {"effect": "creature", "battle_model_scope": "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1", "upkeep_may_cast_top_instant_or_sorcery_without_paying_mana": True}),
         ("Apex of Power", "apex of power", "auto", "active", {"effect": "passive", "battle_model_scope": "impulse_top_seven_plus_hand_cast_mana_annotation_v1", "impulse_top_seven_until_eot": True}),
@@ -177,6 +179,8 @@ def test_generator_uses_cut_safety_roles_for_ramp_and_big_spell_packages():
     }
     assert package_by_cut["Creative Technique"]["allow_miracle_core_cuts"] is True
     assert "allow_miracle_core_cuts" not in package_by_cut["Bender's Waterskin"]
+    chrome_rows = [row for row in payload["top_pair_evaluations"] if row["candidate"] == "Chrome Mox"]
+    assert any("candidate_policy_blocked_no_premium_mox" in row["blockers"] for row in chrome_rows)
     storm_rows = [row for row in payload["top_pair_evaluations"] if row["candidate"] == "Storm-Kiln Artist"]
     assert any("candidate_runtime_annotation_only" in row["blockers"] or "candidate_role_mismatch:unknown" in row["blockers"] for row in storm_rows)
     grinding_rows = [row for row in payload["top_pair_evaluations"] if row["candidate"] == "Grinding Station"]

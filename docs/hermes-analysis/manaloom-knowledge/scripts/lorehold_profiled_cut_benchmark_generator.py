@@ -63,6 +63,13 @@ def normalize_key(value: object) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
 
 
+PREMIUM_MOX_POLICY_BLOCKLIST = {
+    normalize_key("Chrome Mox"),
+    normalize_key("Mox Diamond"),
+    normalize_key("Mox Opal"),
+}
+
+
 def slug(value: object) -> str:
     return normalize_key(value).replace(" ", "_")
 
@@ -526,6 +533,10 @@ def is_narrow_color_hate(candidate: dict[str, Any], candidate_rule: dict[str, An
     return any(pattern in text for pattern in COLOR_HATE_PATTERNS)
 
 
+def is_policy_blocked_candidate(candidate_name: str) -> bool:
+    return normalize_key(candidate_name) in PREMIUM_MOX_POLICY_BLOCKLIST
+
+
 def effective_cut_role(cut: dict[str, Any]) -> str:
     cut_safety = cut.get("cut_safety") or {}
     return (
@@ -567,6 +578,8 @@ def score_candidate(
         score += 20
     if (normalize_key(candidate_name), normalize_key(cut_name)) in prior_rejects:
         blockers.append("prior_exact_reject")
+    if is_policy_blocked_candidate(candidate_name):
+        blockers.append("candidate_policy_blocked_no_premium_mox")
     if cut_role == "spot_removal" and is_narrow_color_hate(candidate, candidate_rule):
         blockers.append("candidate_narrow_color_hate")
     deck_count = int(candidate.get("deck_count") or 0)
