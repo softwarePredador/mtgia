@@ -1,0 +1,3453 @@
+{
+  "blocked_cut_rows": [
+    {
+      "card_name": "Creative Technique",
+      "cut_exposure": {
+        "decision_status": "unmeasured",
+        "direct_event_count": 0,
+        "exposure_profile": "",
+        "inferred_role": "unmeasured",
+        "next_action": "",
+        "role_confidence": "unmeasured",
+        "role_signals": [],
+        "summary_metric_count": 0,
+        "unique_exposure_count": 0
+      },
+      "reason": "no supported generator for this cut role yet",
+      "recommended_action": "requires_same_lane_gate",
+      "status": "same_lane_only"
+    },
+    {
+      "card_name": "Bender's Waterskin",
+      "cut_exposure": {
+        "decision_status": "unmeasured",
+        "direct_event_count": 0,
+        "exposure_profile": "",
+        "inferred_role": "unmeasured",
+        "next_action": "",
+        "role_confidence": "unmeasured",
+        "role_signals": [],
+        "summary_metric_count": 0,
+        "unique_exposure_count": 0
+      },
+      "reason": "no supported generator for this cut role yet",
+      "recommended_action": "requires_same_lane_gate",
+      "status": "same_lane_only"
+    }
+  ],
+  "generated_at": "2026-06-28T08:36:05Z",
+  "manifest": {
+    "generated_at": "2026-06-28T08:36:05Z",
+    "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json",
+    "packages": [
+      {
+        "adds": [
+          "Chaos Warp"
+        ],
+        "cut_safety_override_reason": "same-lane interaction benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut has measured exposure and is not a blind flex slot",
+        "cuts": [
+          "Stroke of Midnight"
+        ],
+        "family": "interaction_removal_benchmark",
+        "hypothesis": "Chaos Warp is an active-rule Lorehold variant interaction card. This benchmarks it as a same-lane replacement for measured moderate-exposure Stroke of Midnight before any deck promotion; high-exposure interaction slots remain protected.",
+        "package_key": "chaos_warp_interaction_benchmark_cut_stroke_of_midnight"
+      },
+      {
+        "adds": [
+          "Lightning Bolt"
+        ],
+        "cut_safety_override_reason": "same-lane interaction benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut has measured exposure and is not a blind flex slot",
+        "cuts": [
+          "Winds of Abandon"
+        ],
+        "family": "interaction_removal_benchmark",
+        "hypothesis": "Lightning Bolt is an active-rule Lorehold variant interaction card. This benchmarks it as a same-lane replacement for measured moderate-exposure Winds of Abandon before any deck promotion; high-exposure interaction slots remain protected.",
+        "package_key": "lightning_bolt_interaction_benchmark_cut_winds_of_abandon"
+      },
+      {
+        "adds": [
+          "Ol\u00f3rin's Searing Light"
+        ],
+        "cut_safety_override_reason": "same-lane interaction benchmark required by lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json; cut has measured exposure and is not a blind flex slot",
+        "cuts": [
+          "Winds of Abandon"
+        ],
+        "family": "interaction_removal_benchmark",
+        "hypothesis": "Ol\u00f3rin's Searing Light is an active-rule Lorehold variant interaction card. This benchmarks it as a same-lane replacement for measured moderate-exposure Winds of Abandon before any deck promotion; high-exposure interaction slots remain protected.",
+        "package_key": "ol_rin_s_searing_light_interaction_benchmark_cut_winds_of_abandon"
+      }
+    ],
+    "postgres_writes": false,
+    "source": "lorehold_profiled_cut_benchmark_generator",
+    "source_db_mutated": false
+  },
+  "manifest_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260628_v1_package_manifest.json",
+  "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json",
+  "postgres_writes": false,
+  "selected_pairs": [
+    {
+      "blockers": [],
+      "candidate": "Chaos Warp",
+      "candidate_metadata": {
+        "card_name": "Chaos Warp",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          611,
+          615,
+          616
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "removal",
+          "interaction"
+        ],
+        "oracle_text": "The owner of target permanent shuffles it into their library, then reveals the top card of their library. If it's a permanent card, they put it onto the battlefield.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1": 1
+        },
+        "card_name": "Chaos Warp",
+        "effects": {
+          "draw_cards": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "chaos_warp_interaction_benchmark_cut_stroke_of_midnight",
+      "score": 117,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Lightning Bolt",
+      "candidate_metadata": {
+        "card_name": "Lightning Bolt",
+        "cmc": 1.0,
+        "deck_count": 2,
+        "deck_ids": [
+          615,
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal",
+          "direct_damage",
+          "interaction"
+        ],
+        "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "targeted_damage_variant_v1": 1
+        },
+        "card_name": "Lightning Bolt",
+        "effects": {
+          "direct_damage": 1,
+          "remove_creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "lightning_bolt_interaction_benchmark_cut_winds_of_abandon",
+      "score": 109,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Ol\u00f3rin's Searing Light",
+      "candidate_metadata": {
+        "card_name": "Ol\u00f3rin's Searing Light",
+        "cmc": 4.0,
+        "deck_count": 4,
+        "deck_ids": [
+          609,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "removal"
+        ],
+        "oracle_text": "Each opponent exiles a creature with the greatest power among creatures that player controls.\nSpell mastery \u2014 If there are two or more instant and/or sorcery cards in your graveyard, Ol\u00f3rin's Searing Light deals damage to each opponent equal to the power of the creature they exiled.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "each_opponent_greatest_power_edict_single_target_baseline_v1": 1
+        },
+        "card_name": "Ol\u00f3rin's Searing Light",
+        "effects": {
+          "draw_cards": 2,
+          "remove_creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "ol_rin_s_searing_light_interaction_benchmark_cut_winds_of_abandon",
+      "score": 109,
+      "status": "preflight_ready"
+    }
+  ],
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "summary": {
+    "candidate_pool_count": 270,
+    "pair_evaluation_count": 1080,
+    "preflight_ready_pair_count": 9,
+    "profiled_cut_count": 4,
+    "recommended_next_action": "run_profiled_cut_benchmark_preflight",
+    "selected_package_count": 3,
+    "status_counts": {
+      "blocked": 1071,
+      "preflight_ready": 9
+    },
+    "supported_cut_count": 2
+  },
+  "top_pair_evaluations": [
+    {
+      "blockers": [],
+      "candidate": "Chaos Warp",
+      "candidate_metadata": {
+        "card_name": "Chaos Warp",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          611,
+          615,
+          616
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "removal",
+          "interaction"
+        ],
+        "oracle_text": "The owner of target permanent shuffles it into their library, then reveals the top card of their library. If it's a permanent card, they put it onto the battlefield.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1": 1
+        },
+        "card_name": "Chaos Warp",
+        "effects": {
+          "draw_cards": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "chaos_warp_interaction_benchmark_cut_stroke_of_midnight",
+      "score": 117,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Lightning Bolt",
+      "candidate_metadata": {
+        "card_name": "Lightning Bolt",
+        "cmc": 1.0,
+        "deck_count": 2,
+        "deck_ids": [
+          615,
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal",
+          "direct_damage",
+          "interaction"
+        ],
+        "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "targeted_damage_variant_v1": 1
+        },
+        "card_name": "Lightning Bolt",
+        "effects": {
+          "direct_damage": 1,
+          "remove_creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "lightning_bolt_interaction_benchmark_cut_winds_of_abandon",
+      "score": 109,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Ol\u00f3rin's Searing Light",
+      "candidate_metadata": {
+        "card_name": "Ol\u00f3rin's Searing Light",
+        "cmc": 4.0,
+        "deck_count": 4,
+        "deck_ids": [
+          609,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "removal"
+        ],
+        "oracle_text": "Each opponent exiles a creature with the greatest power among creatures that player controls.\nSpell mastery \u2014 If there are two or more instant and/or sorcery cards in your graveyard, Ol\u00f3rin's Searing Light deals damage to each opponent equal to the power of the creature they exiled.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "each_opponent_greatest_power_edict_single_target_baseline_v1": 1
+        },
+        "card_name": "Ol\u00f3rin's Searing Light",
+        "effects": {
+          "draw_cards": 2,
+          "remove_creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "ol_rin_s_searing_light_interaction_benchmark_cut_winds_of_abandon",
+      "score": 109,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Crackle with Power",
+      "candidate_metadata": {
+        "card_name": "Crackle with Power",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          611
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw"
+        ],
+        "oracle_text": "Crackle with Power deals five times X damage to each of up to X targets.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "targeted_damage_variant_v1": 1
+        },
+        "card_name": "Crackle with Power",
+        "effects": {
+          "direct_damage": 1,
+          "draw_cards": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 2,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "crackle_with_power_interaction_benchmark_cut_winds_of_abandon",
+      "score": 101,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Lightning Helix",
+      "candidate_metadata": {
+        "card_name": "Lightning Helix",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Lightning Helix deals 3 damage to any target and you gain 3 life.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "damage_any_target_and_gain_life_v1": 1
+        },
+        "card_name": "Lightning Helix",
+        "effects": {
+          "direct_damage": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "lightning_helix_interaction_benchmark_cut_winds_of_abandon",
+      "score": 101,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Razorgrass Ambush // Razorgrass Field",
+      "candidate_metadata": {
+        "card_name": "Razorgrass Ambush // Razorgrass Field",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          608
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Razorgrass Ambush deals 3 damage to target attacking or blocking creature.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1": 1
+        },
+        "card_name": "Razorgrass Ambush // Razorgrass Field",
+        "effects": {
+          "direct_damage": 1,
+          "remove_creature": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 2,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "razorgrass_ambush_razorgrass_field_interaction_benchmark_cut_winds_of_abandon",
+      "score": 101,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Witch Enchanter // Witch-Blessed Meadow",
+      "candidate_metadata": {
+        "card_name": "Witch Enchanter // Witch-Blessed Meadow",
+        "cmc": 4.0,
+        "deck_count": 2,
+        "deck_ids": [
+          608,
+          609
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "When this creature enters, destroy target artifact or enchantment an opponent controls.",
+        "type_line": "Creature \u2014 Human Warlock"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "creature_etb_destroy_opponent_artifact_or_enchantment_v1": 1
+        },
+        "card_name": "Witch Enchanter // Witch-Blessed Meadow",
+        "effects": {
+          "creature": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "witch_enchanter_witch_blessed_meadow_interaction_benchmark_cut_winds_of_abandon",
+      "score": 96,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Erode",
+      "candidate_metadata": {
+        "card_name": "Erode",
+        "cmc": 0.0,
+        "deck_count": 1,
+        "deck_ids": [
+          615
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_annotation_v1": 1
+        },
+        "card_name": "Erode",
+        "effects": {
+          "remove_creature": 2,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 2,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "erode_interaction_benchmark_cut_winds_of_abandon",
+      "score": 93,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [],
+      "candidate": "Electro, Assaulting Battery",
+      "candidate_metadata": {
+        "card_name": "Electro, Assaulting Battery",
+        "cmc": 3.0,
+        "deck_count": 1,
+        "deck_ids": [
+          611
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal",
+          "creature",
+          "unknown"
+        ],
+        "oracle_text": "Flying\nYou don't lose unspent red mana as steps and phases end.\nWhenever you cast an instant or sorcery spell, add {R}.\nWhen Electro leaves the battlefield, you may pay {X}. When you do, he deals X damage to target player.",
+        "type_line": "Legendary Creature \u2014 Human Villain"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {},
+        "card_name": "Electro, Assaulting Battery",
+        "effects": {
+          "creature": 1,
+          "remove_creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Winds of Abandon",
+      "cut_metadata": {
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you don't control. For each creature exiled this way, its controller searches their library for a basic land card. Those players put those cards onto the battlefield tapped, then shuffle.\nOverload {4}{W}{W} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1": 1
+        },
+        "card_name": "Winds of Abandon",
+        "effects": {
+          "remove_creature": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "package_key": "electro_assaulting_battery_interaction_benchmark_cut_winds_of_abandon",
+      "score": 88,
+      "status": "preflight_ready"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Enlightened Tutor",
+      "candidate_metadata": {
+        "card_name": "Enlightened Tutor",
+        "cmc": 1.0,
+        "deck_count": 6,
+        "deck_ids": [
+          608,
+          611,
+          612,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "tutor",
+        "functional_tags": [
+          "tutor"
+        ],
+        "oracle_text": "Search your library for an artifact or enchantment card, reveal it, then shuffle and put that card on top.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_enchantment_tutor_to_library_top_v1": 1
+        },
+        "card_name": "Enlightened Tutor",
+        "effects": {
+          "tutor": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "enlightened_tutor_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 82,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Goblin Engineer",
+      "candidate_metadata": {
+        "card_name": "Goblin Engineer",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          608,
+          610,
+          611
+        ],
+        "functional_tag": "tutor",
+        "functional_tags": [
+          "tutor",
+          "creature",
+          "unknown"
+        ],
+        "oracle_text": "When this creature enters, you may search your library for an artifact card, put it into your graveyard, then shuffle.\n{R}, {T}, Sacrifice an artifact: Return target artifact card with mana value 3 or less from your graveyard to the battlefield.",
+        "type_line": "Creature \u2014 Goblin Artificer"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "goblin_engineer_etb_artifact_to_graveyard_v1": 1
+        },
+        "card_name": "Goblin Engineer",
+        "effects": {
+          "creature": 1,
+          "tutor": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "goblin_engineer_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 77,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Mana Vault",
+      "candidate_metadata": {
+        "card_name": "Mana Vault",
+        "cmc": 1.0,
+        "deck_count": 3,
+        "deck_ids": [
+          612,
+          613,
+          615
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "This artifact doesn't untap during your untap step.\nAt the beginning of your upkeep, you may pay {4}. If you do, untap this artifact.\nAt the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.\n{T}: Add {C}{C}{C}.",
+        "type_line": "Artifact"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "fast_mana_artifact_partial_v1": 1
+        },
+        "card_name": "Mana Vault",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "mana_vault_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 77,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:spot_removal"
+      ],
+      "candidate": "Untimely Malfunction",
+      "candidate_metadata": {
+        "card_name": "Untimely Malfunction",
+        "cmc": 2.0,
+        "deck_count": 2,
+        "deck_ids": [
+          608,
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Choose one \u2014\n\u2022 Destroy target artifact.\n\u2022 Change the target of target spell or ability with a single target.\n\u2022 One or two target creatures can't block this turn.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "modal_destroy_artifact_redirect_or_cant_block_annotation_v1": 1
+        },
+        "card_name": "Untimely Malfunction",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "untimely_malfunction_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 74,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:spot_removal"
+      ],
+      "candidate": "Vandalblast",
+      "candidate_metadata": {
+        "card_name": "Vandalblast",
+        "cmc": 1.0,
+        "deck_count": 2,
+        "deck_ids": [
+          609,
+          615
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target artifact you don't control.\nOverload {4}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1": 1
+        },
+        "card_name": "Vandalblast",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "vandalblast_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 74,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:spot_removal"
+      ],
+      "candidate": "Wear // Tear",
+      "candidate_metadata": {
+        "card_name": "Wear // Tear",
+        "cmc": 2.0,
+        "deck_count": 2,
+        "deck_ids": [
+          609,
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target artifact.\nFuse (You may cast one or both halves of this card from your hand.)",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "split_artifact_or_enchantment_removal_v1": 1
+        },
+        "card_name": "Wear // Tear",
+        "effects": {
+          "remove_permanent": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "wear_tear_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 74,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Storm-Kiln Artist",
+      "candidate_metadata": {
+        "card_name": "Storm-Kiln Artist",
+        "cmc": 4.0,
+        "deck_count": 5,
+        "deck_ids": [
+          608,
+          611,
+          612,
+          613,
+          614
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp",
+          "creature",
+          "unknown"
+        ],
+        "oracle_text": "This creature gets +1/+0 for each artifact you control.\nMagecraft \u2014 Whenever you cast or copy an instant or sorcery spell, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+        "type_line": "Creature \u2014 Dwarf Shaman"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "creature_body_artifact_power_magecraft_treasure_annotation_v1": 1
+        },
+        "card_name": "Storm-Kiln Artist",
+        "effects": {
+          "creature": 1,
+          "ramp_engine": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "storm_kiln_artist_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 69,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:spot_removal"
+      ],
+      "candidate": "Abrade",
+      "candidate_metadata": {
+        "card_name": "Abrade",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal",
+          "remove_artifact_or_3dmg"
+        ],
+        "oracle_text": "Choose one \u2014\n\u2022 Abrade deals 3 damage to target creature.\n\u2022 Destroy target artifact.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {},
+        "card_name": "Abrade",
+        "effects": {
+          "remove_artifact_or_3dmg": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "abrade_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 66,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Molten Duplication",
+      "candidate_metadata": {
+        "card_name": "Molten Duplication",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          612
+        ],
+        "functional_tag": "wincon",
+        "functional_tags": [
+          "wincon",
+          "combo",
+          "copy_creature_token",
+          "token_maker"
+        ],
+        "oracle_text": "Create a token that's a copy of target artifact or creature you control, except it's an artifact in addition to its other types. It gains haste until end of turn. Sacrifice it at the beginning of the next end step.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "own_artifact_or_creature_copy_artifact_haste_sacrifice_eot_v1": 1
+        },
+        "card_name": "Molten Duplication",
+        "effects": {
+          "copy_creature_token": 1,
+          "token_maker": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "molten_duplication_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 66,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Ultima",
+      "candidate_metadata": {
+        "card_name": "Ultima",
+        "cmc": 5.0,
+        "deck_count": 2,
+        "deck_ids": [
+          612,
+          614
+        ],
+        "functional_tag": "board_wipe",
+        "functional_tags": [
+          "board_wipe",
+          "wipe"
+        ],
+        "oracle_text": "Destroy all artifacts and creatures. End the turn. (Exile all spells and abilities from the stack, including this card. The player whose turn it is discards down to their maximum hand size. Damage wears off, and \"this turn\" and \"until end of turn\" effects end.)",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_all_artifacts_and_creatures_end_turn_v1": 1
+        },
+        "card_name": "Ultima",
+        "effects": {
+          "board_wipe": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "ultima_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 66,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Boros Charm",
+      "candidate_metadata": {
+        "card_name": "Boros Charm",
+        "cmc": 2.0,
+        "deck_count": 5,
+        "deck_ids": [
+          609,
+          612,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection",
+          "modal_boros_charm"
+        ],
+        "oracle_text": "Choose one \u2014\n\u2022 Boros Charm deals 4 damage to target player or planeswalker.\n\u2022 Permanents you control gain indestructible until end of turn.\n\u2022 Target creature gains double strike until end of turn.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "boros_charm_choose_one_damage_indestructible_double_strike_v1": 1
+        },
+        "card_name": "Boros Charm",
+        "effects": {
+          "indestructible": 1,
+          "modal_boros_charm": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "boros_charm_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:spot_removal",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Chaos Warp",
+      "candidate_metadata": {
+        "card_name": "Chaos Warp",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          611,
+          615,
+          616
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "removal",
+          "interaction"
+        ],
+        "oracle_text": "The owner of target permanent shuffles it into their library, then reveals the top card of their library. If it's a permanent card, they put it onto the battlefield.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1": 1
+        },
+        "card_name": "Chaos Warp",
+        "effects": {
+          "draw_cards": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "chaos_warp_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Deflecting Palm",
+      "candidate_metadata": {
+        "card_name": "Deflecting Palm",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          614,
+          615,
+          616
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection"
+        ],
+        "oracle_text": "The next time a source of your choice would deal damage to you this turn, prevent that damage. If damage is prevented this way, Deflecting Palm deals that much damage to that source's controller.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1": 1
+        },
+        "card_name": "Deflecting Palm",
+        "effects": {
+          "damage_prevention_reflect": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "deflecting_palm_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Gamble",
+      "candidate_metadata": {
+        "card_name": "Gamble",
+        "cmc": 1.0,
+        "deck_count": 5,
+        "deck_ids": [
+          609,
+          612,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "tutor",
+        "functional_tags": [
+          "tutor"
+        ],
+        "oracle_text": "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "any_card_to_hand_then_random_discard_v1": 1
+        },
+        "card_name": "Gamble",
+        "effects": {
+          "tutor": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "gamble_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:spot_removal",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Red Elemental Blast",
+      "candidate_metadata": {
+        "card_name": "Red Elemental Blast",
+        "cmc": 1.0,
+        "deck_count": 3,
+        "deck_ids": [
+          612,
+          613,
+          615
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection",
+          "manual_review",
+          "modal_spell"
+        ],
+        "oracle_text": "Choose one \u2014\n\u2022 Counter target blue spell.\n\u2022 Destroy target blue permanent.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "counter_target_blue_spell_or_destroy_target_blue_permanent_v1": 1
+        },
+        "card_name": "Red Elemental Blast",
+        "effects": {
+          "counter": 1,
+          "modal_spell": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "red_elemental_blast_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Reprieve",
+      "candidate_metadata": {
+        "card_name": "Reprieve",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          612,
+          613,
+          615
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection"
+        ],
+        "oracle_text": "Return target spell to its owner's hand.\nDraw a card.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {},
+        "card_name": "Reprieve",
+        "effects": {
+          "counter": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "reprieve_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Seething Song",
+      "candidate_metadata": {
+        "card_name": "Seething Song",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          612,
+          614,
+          615
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Add {R}{R}{R}{R}{R}.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "single_shot_red_ritual_v1": 1
+        },
+        "card_name": "Seething Song",
+        "effects": {
+          "ramp_ritual": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "seething_song_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Silence",
+      "candidate_metadata": {
+        "card_name": "Silence",
+        "cmc": 1.0,
+        "deck_count": 5,
+        "deck_ids": [
+          612,
+          613,
+          614,
+          615,
+          616
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection",
+          "interaction",
+          "silence_spell"
+        ],
+        "oracle_text": "Your opponents can't cast spells this turn.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "silence_until_eot_v1": 1
+        },
+        "card_name": "Silence",
+        "effects": {
+          "silence_opponents": 1,
+          "silence_spell": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "silence_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Twinflame",
+      "candidate_metadata": {
+        "card_name": "Twinflame",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          611,
+          612,
+          613
+        ],
+        "functional_tag": "wincon",
+        "functional_tags": [
+          "wincon",
+          "combo",
+          "copy_creature_token",
+          "token_maker"
+        ],
+        "oracle_text": "Strive \u2014 This spell costs {2}{R} more to cast for each target beyond the first.\nChoose any number of target creatures you control. For each of them, create a token that's a copy of that creature, except it has haste. Exile those tokens at the beginning of the next end step.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "own_creature_single_copy_haste_exile_eot_v1": 1
+        },
+        "card_name": "Twinflame",
+        "effects": {
+          "copy_creature_token": 1,
+          "token_maker": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "twinflame_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Valakut Awakening // Valakut Stoneforge",
+      "candidate_metadata": {
+        "card_name": "Valakut Awakening // Valakut Stoneforge",
+        "cmc": 3.0,
+        "deck_count": 4,
+        "deck_ids": [
+          608,
+          609,
+          610,
+          611
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "hand_filter"
+        ],
+        "oracle_text": "Put any number of cards from your hand on the bottom of your library, then draw that many cards plus one.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "bottom_then_draw_plus_one_mdfc_land_v1": 1
+        },
+        "card_name": "Valakut Awakening // Valakut Stoneforge",
+        "effects": {
+          "draw_cards": 1,
+          "hand_filter": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "valakut_awakening_valakut_stoneforge_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Wheel of Fortune",
+      "candidate_metadata": {
+        "card_name": "Wheel of Fortune",
+        "cmc": 3.0,
+        "deck_count": 4,
+        "deck_ids": [
+          608,
+          609,
+          612,
+          616
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw"
+        ],
+        "oracle_text": "Each player discards their hand, then draws seven cards.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "multiplayer_discard_draw_v1": 1
+        },
+        "card_name": "Wheel of Fortune",
+        "effects": {
+          "draw_cards": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "wheel_of_fortune_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Ancient Den",
+      "candidate_metadata": {
+        "card_name": "Ancient Den",
+        "cmc": 0.0,
+        "deck_count": 2,
+        "deck_ids": [
+          610,
+          614
+        ],
+        "functional_tag": "land",
+        "functional_tags": [
+          "land"
+        ],
+        "oracle_text": "{T}: Add {W}.",
+        "type_line": "Artifact Land"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 2,
+        "battle_model_scopes": {
+          "artifact_land_colored_source_v1": 1
+        },
+        "card_name": "Ancient Den",
+        "effects": {
+          "land": 3
+        },
+        "execution_statuses": {
+          "auto": 2,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 2
+        },
+        "rule_count": 3
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "ancient_den_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Great Furnace",
+      "candidate_metadata": {
+        "card_name": "Great Furnace",
+        "cmc": 0.0,
+        "deck_count": 2,
+        "deck_ids": [
+          610,
+          614
+        ],
+        "functional_tag": "land",
+        "functional_tags": [
+          "land"
+        ],
+        "oracle_text": "{T}: Add {R}.",
+        "type_line": "Artifact Land"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 2,
+        "battle_model_scopes": {
+          "artifact_land_colored_source_v1": 1
+        },
+        "card_name": "Great Furnace",
+        "effects": {
+          "land": 3
+        },
+        "execution_statuses": {
+          "auto": 2,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 2
+        },
+        "rule_count": 3
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "great_furnace_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Lotus Petal",
+      "candidate_metadata": {
+        "card_name": "Lotus Petal",
+        "cmc": 0.0,
+        "deck_count": 2,
+        "deck_ids": [
+          608,
+          613
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "{T}, Sacrifice this artifact: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "zero_mana_artifact_sacrifice_one_mana_one_shot_runtime_v1": 1
+        },
+        "card_name": "Lotus Petal",
+        "effects": {
+          "ramp_ritual": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "lotus_petal_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Primal Amulet // Primal Wellspring",
+      "candidate_metadata": {
+        "card_name": "Primal Amulet // Primal Wellspring",
+        "cmc": 4.0,
+        "deck_count": 2,
+        "deck_ids": [
+          610,
+          615
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Instant and sorcery spells you cast cost {1} less to cast.\nWhenever you cast an instant or sorcery spell, put a charge counter on this artifact. Then if there are four or more charge counters on it, you may remove those counters and transform it.",
+        "type_line": "Artifact"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_instant_sorcery_cost_reduction_charge_transform_to_any_color_spell_copy_land_v1": 1
+        },
+        "card_name": "Primal Amulet // Primal Wellspring",
+        "effects": {
+          "ramp_permanent": 2,
+          "static_cost_reduction": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 2,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "primal_amulet_primal_wellspring_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Soul-Guide Lantern",
+      "candidate_metadata": {
+        "card_name": "Soul-Guide Lantern",
+        "cmc": 1.0,
+        "deck_count": 1,
+        "deck_ids": [
+          609
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "hate_artifact",
+          "interaction"
+        ],
+        "oracle_text": "When this artifact enters, exile target card from a graveyard.\n{T}, Sacrifice this artifact: Exile each opponent's graveyard.\n{1}, {T}, Sacrifice this artifact: Draw a card.",
+        "type_line": "Artifact"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "graveyard_hate_cantrip_artifact_v1": 1
+        },
+        "card_name": "Soul-Guide Lantern",
+        "effects": {
+          "draw_cards": 1,
+          "hate_artifact": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "soul_guide_lantern_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Tablet of Discovery",
+      "candidate_metadata": {
+        "card_name": "Tablet of Discovery",
+        "cmc": 3.0,
+        "deck_count": 1,
+        "deck_ids": [
+          608
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "When this artifact enters, mill a card. You may play that card this turn. (To mill a card, put the top card of your library into your graveyard.)\n{T}: Add {R}.\n{T}: Add {R}{R}. Spend this mana only to cast instant and sorcery spells.",
+        "type_line": "Artifact"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_etb_mill_one_play_milled_card_this_turn_red_spell_mana_v1": 1
+        },
+        "card_name": "Tablet of Discovery",
+        "effects": {
+          "ramp_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "tablet_of_discovery_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:spot_removal"
+      ],
+      "candidate": "Witch Enchanter // Witch-Blessed Meadow",
+      "candidate_metadata": {
+        "card_name": "Witch Enchanter // Witch-Blessed Meadow",
+        "cmc": 4.0,
+        "deck_count": 2,
+        "deck_ids": [
+          608,
+          609
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "When this creature enters, destroy target artifact or enchantment an opponent controls.",
+        "type_line": "Creature \u2014 Human Warlock"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "creature_etb_destroy_opponent_artifact_or_enchantment_v1": 1
+        },
+        "card_name": "Witch Enchanter // Witch-Blessed Meadow",
+        "effects": {
+          "creature": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "witch_enchanter_witch_blessed_meadow_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane",
+        "prior_exact_reject"
+      ],
+      "candidate": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "candidate_metadata": {
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          608,
+          612,
+          615
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.\nCreatures you control can boast twice during each of your turns rather than once.",
+        "type_line": "Legendary Creature \u2014 God"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "spell_cast_red_mana_trigger_v1": 1
+        },
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "effects": {
+          "creature": 1,
+          "ramp_ritual": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "birgi_god_of_storytelling_harnfel_horn_of_bounty_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 57,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Dragon's Rage Channeler",
+      "candidate_metadata": {
+        "card_name": "Dragon's Rage Channeler",
+        "cmc": 1.0,
+        "deck_count": 3,
+        "deck_ids": [
+          609,
+          613,
+          614
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "creature",
+          "unknown"
+        ],
+        "oracle_text": "Whenever you cast a noncreature spell, surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDelirium \u2014 As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.",
+        "type_line": "Creature \u2014 Human Shaman"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {},
+        "card_name": "Dragon's Rage Channeler",
+        "effects": {
+          "creature": 1,
+          "topdeck_manipulation": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "dragon_s_rage_channeler_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 57,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "unsupported_cut_role:unmeasured",
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Dualcaster Mage",
+      "candidate_metadata": {
+        "card_name": "Dualcaster Mage",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          611,
+          612,
+          613
+        ],
+        "functional_tag": "engine",
+        "functional_tags": [
+          "engine",
+          "copy_spell",
+          "interaction"
+        ],
+        "oracle_text": "Flash\nWhen this creature enters, copy target instant or sorcery spell. You may choose new targets for the copy.",
+        "type_line": "Creature \u2014 Human Wizard"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "creature_etb_copy_stack_instant_or_sorcery_v1": 1
+        },
+        "card_name": "Dualcaster Mage",
+        "effects": {
+          "copy_spell": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Bender's Waterskin",
+      "cut_metadata": {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color.",
+        "type_line": "Artifact"
+      },
+      "cut_role": "unmeasured",
+      "cut_rule": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1": 1
+        },
+        "card_name": "Bender's Waterskin",
+        "effects": {
+          "ramp_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "package_key": "dualcaster_mage_interaction_benchmark_cut_bender_s_waterskin",
+      "score": 57,
+      "status": "blocked"
+    }
+  ],
+  "variant_deck_ids": [
+    608,
+    609,
+    610,
+    611,
+    612,
+    613,
+    614,
+    615,
+    616
+  ]
+}

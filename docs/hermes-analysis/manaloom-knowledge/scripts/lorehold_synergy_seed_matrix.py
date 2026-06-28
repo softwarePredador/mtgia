@@ -44,11 +44,15 @@ def parse_int_csv(value: str) -> list[int]:
     return parsed
 
 
-def parse_package_keys(value: str) -> list[str]:
+def parse_package_keys(
+    value: str,
+    package_definitions: dict[str, dict[str, Any]] | None = None,
+) -> list[str]:
+    definitions = package_definitions or package_gate.PACKAGE_DEFINITIONS
     raw = [item.strip() for item in str(value or "").split(",") if item.strip()]
     if not raw or raw == ["all"]:
-        return list(package_gate.PACKAGE_DEFINITIONS)
-    unknown = [key for key in raw if key not in package_gate.PACKAGE_DEFINITIONS]
+        return list(definitions)
+    unknown = [key for key in raw if key not in definitions]
     if unknown:
         raise argparse.ArgumentTypeError(f"unknown package(s): {', '.join(unknown)}")
     return raw
@@ -57,12 +61,13 @@ def parse_package_keys(value: str) -> list[str]:
 def preflight_packages(
     package_keys: list[str],
     *,
+    package_definitions: dict[str, dict[str, Any]],
     cut_safety: dict[str, Any],
     prior_results: dict[str, Any],
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for package_key in package_keys:
-        definition = package_gate.PACKAGE_DEFINITIONS[package_key]
+        definition = package_definitions[package_key]
         cut_safety_result = package_gate.classify_package_cut_safety(definition, cut_safety)
         prior_result = package_gate.classify_package_prior_evidence(
             package_key,
@@ -164,6 +169,7 @@ def run_package_seed(
     stamp: str,
     cut_safety_report: Path | None,
     prior_package_reports: list[Path],
+    package_files: list[Path],
     ignore_prior_results: bool,
     no_game_checkpoint: bool,
 ) -> dict[str, Any]:
@@ -197,6 +203,8 @@ def run_package_seed(
     ]
     if cut_safety_report is not None:
         cmd.extend(["--cut-safety-report", str(cut_safety_report)])
+    for path in package_files:
+        cmd.extend(["--package-file", str(path)])
     if ignore_prior_results:
         cmd.append("--ignore-prior-results")
     else:
@@ -394,12 +402,24 @@ def main() -> int:
     parser.add_argument("--cut-safety-report", type=Path, default=package_gate.DEFAULT_CUT_SAFETY_REPORT)
     parser.add_argument("--no-cut-safety", action="store_true")
     parser.add_argument("--prior-package-report", type=Path, action="append")
+    parser.add_argument(
+        "--package-file",
+        type=Path,
+        action="append",
+        default=[],
+        help=(
+            "External JSON package manifest with a packages list. "
+            "Forwarded to lorehold_synergy_package_gate.py for each seed run."
+        ),
+    )
     parser.add_argument("--ignore-prior-results", action="store_true")
     parser.add_argument("--no-game-checkpoint", action="store_true")
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
 
-    package_keys = parse_package_keys(args.packages)
+    package_files = [path.resolve() for path in args.package_file]
+    package_definitions, loaded_package_files = package_gate.merge_package_definitions(package_files)
+    package_keys = parse_package_keys(args.packages, package_definitions=package_definitions)
     seeds = parse_int_csv(args.seeds)
     strong_seeds = set(parse_int_csv(args.strong_seeds))
     if args.max_packages > 0:
@@ -415,6 +435,7 @@ def main() -> int:
     prior_results = package_gate.load_prior_package_results(prior_package_reports)
     preflight_rows = preflight_packages(
         package_keys,
+        package_definitions=package_definitions,
         cut_safety=cut_safety,
         prior_results=prior_results,
     )
@@ -439,6 +460,7 @@ def main() -> int:
                 stamp=f"{stamp}_{row['package_key']}",
                 cut_safety_report=cut_safety_report,
                 prior_package_reports=prior_package_reports,
+                package_files=package_files,
                 ignore_prior_results=args.ignore_prior_results,
                 no_game_checkpoint=args.no_game_checkpoint,
             )
@@ -473,6 +495,7 @@ def main() -> int:
         "preflight_only": bool(args.preflight_only),
         "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,
         "prior_package_reports": [str(path) for path in prior_package_reports],
+        "loaded_package_files": loaded_package_files,
         "package_status_counts": dict(sorted(status_counts.items())),
         "packages": results,
     }

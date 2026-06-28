@@ -1,4 +1,7 @@
 import argparse
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 import lorehold_synergy_seed_matrix as matrix
 
@@ -30,6 +33,47 @@ def test_parse_int_csv_requires_at_least_one_value():
         pass
     else:
         raise AssertionError("empty seed CSV should fail")
+
+
+def test_parse_package_keys_accepts_external_package_definition():
+    definitions = {
+        "external_profiled_cut": {
+            "hypothesis": "benchmark",
+            "adds": ["Lightning Bolt"],
+            "cuts": ["Winds of Abandon"],
+        }
+    }
+
+    assert matrix.parse_package_keys("external_profiled_cut", package_definitions=definitions) == [
+        "external_profiled_cut"
+    ]
+
+
+def test_run_package_seed_forwards_external_package_file():
+    with patch("lorehold_synergy_seed_matrix.subprocess.run") as run:
+        run.return_value = SimpleNamespace(returncode=0, stdout="", stderr="")
+        matrix.run_package_seed(
+            package_key="external_profiled_cut",
+            seed=7,
+            source_db=Path("/tmp/source.db"),
+            games=1,
+            opponent_limit=1,
+            opponent_seed=20260626,
+            game_timeout_seconds=1.0,
+            deck_process_timeout_seconds=1.0,
+            gate_timeout_seconds=1.0,
+            stem="test_matrix",
+            stamp="stamp",
+            cut_safety_report=None,
+            prior_package_reports=[],
+            package_files=[Path("/tmp/packages.json")],
+            ignore_prior_results=True,
+            no_game_checkpoint=True,
+        )
+
+    cmd = run.call_args.args[0]
+    assert "--package-file" in cmd
+    assert "/tmp/packages.json" in cmd
 
 
 def test_aggregate_rejects_if_strong_seed_regresses():
