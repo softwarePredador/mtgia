@@ -345,6 +345,76 @@ def mana_base_validator_report():
     )
 
 
+def strategy_audit():
+    return {
+        "current_champion_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+        "deck_summaries": {
+            "607": {
+                "cards": [
+                    {"card_name": "Urza's Saga"},
+                    {"card_name": "Library of Leng"},
+                    {"card_name": "Sensei's Divining Top"},
+                    {"card_name": "Scroll Rack"},
+                    {"card_name": "Squee, Goblin Nabob"},
+                    {"card_name": "The Mind Stone"},
+                    {"card_name": "Land Tax"},
+                ]
+            }
+        },
+        "external_method_sources": [
+            {
+                "name": "EDHREC Lorehold commander page",
+                "url": "https://edhrec.com/commanders/lorehold-the-historian",
+                "use": "commander-specific package comparison lane",
+            }
+        ],
+        "runtime_package_readiness": {
+            "summary": {
+                "card_count": 2,
+                "readiness_counts": {"runtime_ready_pg_precheck_blocked": 2},
+            }
+        },
+        "strategy_dependency_map": {
+            "current_benchmark": {
+                "champion": {
+                    "record": "24-66-0",
+                    "games": 90,
+                    "win_rate": 26.67,
+                    "wins": 24,
+                    "losses": 66,
+                }
+            },
+            "next_hypothesis_contract": {
+                "must_target": [
+                    "seed 7: missing early topdeck/Library/Squee engine",
+                    "seed 20260625: engine appears but fails to convert",
+                ],
+                "required_telemetry": [
+                    "miracle_cast and topdeck_manipulation_activated must not fall",
+                ],
+            },
+            "dependency_pillars": [
+                {
+                    "pillar": "topdeck_miracle_setup",
+                    "risk": "seed 7 shows the deck can miss the engine entirely",
+                    "next_requirement": "improve early access or topdeck quality",
+                    "depends_on": ["Library of Leng", "Scroll Rack", "Sensei's Divining Top"],
+                }
+            ],
+        },
+    }
+
+
+def exhausted_hypothesis_queue():
+    return {
+        "summary": {
+            "gate_ready_count": 0,
+            "tested_negative_count": 13,
+            "status_counts": {"tested_negative_do_not_promote": 13},
+        }
+    }
+
+
 def test_next_action_planner_prioritizes_cut_models_before_gates():
     payload = planner.build_plan(
         miner_report=miner_report(),
@@ -476,3 +546,26 @@ def test_next_action_planner_uses_validated_mana_preflight_report():
     assert mana_action["candidate_cards"] == ["Plateau"]
     assert mana_action["cut_cards"] == ["Turbulent Steppe"]
     assert mana_action["top_ready_swaps"][0]["deltas"]["etb_score_delta"] == 2
+
+
+def test_next_action_planner_routes_exhausted_queue_to_strategy_synthesis():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        strategy_audit=strategy_audit(),
+        hypothesis_queue=exhausted_hypothesis_queue(),
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "build_failure_targeted_synergy_hypotheses"
+    )
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    action = actions["build_failure_targeted_synergy_hypotheses"]
+    assert action["priority"] == -1
+    assert action["status"] == "hypothesis_queue_exhausted_requires_new_synthesis"
+    assert "Urza's Saga" in action["candidate_cards"]
+    assert action["evidence"]["queue_summary"]["tested_negative_count"] == 13
+    assert action["evidence"]["must_target"][0].startswith("seed 7")
+    guardrails = {row["guardrail_key"] for row in payload["guardrails"]}
+    assert "current_hypothesis_queue_exhausted" in guardrails

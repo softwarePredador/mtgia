@@ -23,10 +23,16 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_MINER_REPORT = (
-    REPORT_DIR / "lorehold_variant_gap_miner_20260627_v3_post_austere_tradeoff.json"
+    REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
-DEFAULT_MANUAL_REVIEW = REPORT_DIR / "lorehold_manual_cut_review_20260627_v2.json"
-DEFAULT_EXPOSURE_PROFILES = [REPORT_DIR / "lorehold_card_exposure_profile_20260627_v1.json"]
+DEFAULT_MANUAL_REVIEW = REPORT_DIR / "lorehold_manual_cut_review_20260627_v3_role_fix.json"
+DEFAULT_EXPOSURE_PROFILES = [REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json"]
+DEFAULT_STRATEGY_AUDIT = (
+    REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
+)
+DEFAULT_HYPOTHESIS_QUEUE = (
+    REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
+)
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260627_v1.json"]
 DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_hand_filter_cut_model_20260627_v3_big_score_rejected.json"
@@ -728,9 +734,105 @@ def build_runtime_action(miner_report: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+def deck_contains(strategy_audit: dict[str, Any], card_name: str) -> bool:
+    wanted = normalize_key(card_name)
+    for summary in (strategy_audit.get("deck_summaries") or {}).values():
+        for row in summary.get("cards") or []:
+            if normalize_key(row.get("card_name")) == wanted:
+                return True
+    return False
+
+
+def current_engine_audit_targets(strategy_audit: dict[str, Any]) -> list[str]:
+    target_names = [
+        "Urza's Saga",
+        "Library of Leng",
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Squee, Goblin Nabob",
+        "The Mind Stone",
+        "Land Tax",
+    ]
+    return [name for name in target_names if deck_contains(strategy_audit, name)]
+
+
+def build_strategy_synthesis_action(
+    strategy_audit: dict[str, Any] | None,
+    hypothesis_queue: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not strategy_audit or not hypothesis_queue:
+        return None
+    queue_summary = hypothesis_queue.get("summary") or {}
+    if int(queue_summary.get("gate_ready_count") or 0) > 0:
+        return None
+    tested_negative = int(queue_summary.get("tested_negative_count") or 0)
+    if tested_negative <= 0:
+        return None
+
+    dependency_map = strategy_audit.get("strategy_dependency_map") or {}
+    contract = dependency_map.get("next_hypothesis_contract") or {}
+    benchmark = (dependency_map.get("current_benchmark") or {}).get("champion") or {}
+    pillars = dependency_map.get("dependency_pillars") or []
+    runtime_summary = (strategy_audit.get("runtime_package_readiness") or {}).get("summary") or {}
+    focus_cards = current_engine_audit_targets(strategy_audit)
+    external_sources = [
+        {"name": row.get("name"), "url": row.get("url"), "use": row.get("use")}
+        for row in strategy_audit.get("external_method_sources") or []
+        if row.get("name") and row.get("url")
+    ]
+    return {
+        "priority": -1,
+        "action_key": "build_failure_targeted_synergy_hypotheses",
+        "status": "hypothesis_queue_exhausted_requires_new_synthesis",
+        "lane": "strategy_learning",
+        "candidate_cards": focus_cards,
+        "cut_cards": [],
+        "why_now": (
+            f"The current hypothesis queue has 0 gate-ready packages and {tested_negative} tested negatives. "
+            "The next move must explain the failed seeds and existing-engine sequencing before another card swap."
+        ),
+        "blockers": [
+            "all current package hypotheses are prior-negative",
+            "protected cuts cannot be repeated without same-lane proof",
+            "seed 7 and seed 20260625 still show missing-engine or conversion failures",
+        ],
+        "next_steps": [
+            "Mine seed 7 and seed 20260625 traces for missing-engine versus engine-failed-to-convert patterns.",
+            "Audit utilization of existing engine pieces before adding cards: Urza's Saga, Library of Leng, Top, Rack, Squee, The Mind Stone, and Land Tax when present.",
+            "Generate a fresh candidate package queue that suppresses exact prior negatives and rejects locked cuts before battle.",
+            "Only register a new package when it targets a named failure mode and preserves seed-42 miracle/topdeck telemetry.",
+        ],
+        "evidence": {
+            "queue_summary": queue_summary,
+            "current_champion_key": strategy_audit.get("current_champion_key"),
+            "champion_record": {
+                "record": benchmark.get("record"),
+                "games": benchmark.get("games"),
+                "win_rate": benchmark.get("win_rate"),
+                "wins": benchmark.get("wins"),
+                "losses": benchmark.get("losses"),
+            },
+            "must_target": contract.get("must_target") or [],
+            "required_telemetry": contract.get("required_telemetry") or [],
+            "focus_pillars": [
+                {
+                    "pillar": row.get("pillar"),
+                    "risk": row.get("risk"),
+                    "next_requirement": row.get("next_requirement"),
+                    "depends_on": row.get("depends_on") or [],
+                }
+                for row in pillars
+            ],
+            "runtime_package_readiness": runtime_summary,
+            "external_method_sources": external_sources,
+        },
+    }
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
+    hypothesis_queue: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     negative = miner_report.get("negative_exact_packages") or []
     guardrails = [
@@ -761,6 +863,21 @@ def build_guardrails(
                 "reason": "Manual review confirms the current unresolved candidates require modeling before battle.",
             }
         )
+    if hypothesis_queue:
+        queue_summary = hypothesis_queue.get("summary") or {}
+        if (
+            int(queue_summary.get("gate_ready_count") or 0) == 0
+            and int(queue_summary.get("tested_negative_count") or 0) > 0
+        ):
+            guardrails.append(
+                {
+                    "guardrail_key": "current_hypothesis_queue_exhausted",
+                    "reason": (
+                        "The latest hypothesis queue has no gate-ready package; generate new failure-targeted "
+                        "hypotheses instead of rerunning prior-negative swaps."
+                    ),
+                }
+            )
     return guardrails
 
 
@@ -774,12 +891,19 @@ def build_plan(
     recursion_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     mana_base_validator_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    strategy_audit: dict[str, Any] | None = None,
+    hypothesis_queue: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
+    strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
+    hypothesis_queue_path: Path = DEFAULT_HYPOTHESIS_QUEUE,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
     actions = []
+    strategy_action = build_strategy_synthesis_action(strategy_audit, hypothesis_queue)
+    if strategy_action:
+        actions.append(strategy_action)
     if gate_ready:
         actions.append(
             {
@@ -836,6 +960,8 @@ def build_plan(
         "generated_at": utc_now(),
         "miner_report": str(miner_path),
         "manual_review": str(manual_path),
+        "strategy_audit": str(strategy_path) if strategy_audit else "",
+        "hypothesis_queue": str(hypothesis_queue_path) if hypothesis_queue else "",
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
         "tutor_cut_model_reports": [
             str(path) for path, _payload in (tutor_cut_model_reports or [])
@@ -865,13 +991,17 @@ def build_plan(
                 "pairing_status_counts",
                 {},
             ),
+            "hypothesis_queue_status_counts": (
+                (hypothesis_queue or {}).get("summary") or {}
+            ).get("status_counts", {}),
         },
         "action_queue": actions,
-        "guardrails": build_guardrails(miner_report, manual_review),
+        "guardrails": build_guardrails(miner_report, manual_review, hypothesis_queue),
         "method_notes": [
             "This planner is a decision layer, not a promotion engine.",
             "A runtime-ready card is not gate-ready unless a safe cut model exists.",
             "Exposure evidence is used to protect proven roles and to decide which lane needs profiling next.",
+            "An exhausted hypothesis queue routes back to failure-targeted strategy synthesis before any new gate.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -879,11 +1009,13 @@ def build_plan(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Next Action Planner - 2026-06-27",
+        "# Lorehold Next Action Planner - 2026-06-28",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Miner report: `{payload['miner_report']}`",
         f"- Manual review: `{payload['manual_review']}`",
+        f"- Strategy audit: `{payload.get('strategy_audit') or '-'}`",
+        f"- Hypothesis queue: `{payload.get('hypothesis_queue') or '-'}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
         f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
         f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
@@ -959,13 +1091,15 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--manual-review", type=Path, default=DEFAULT_MANUAL_REVIEW)
+    parser.add_argument("--strategy-audit", type=Path, default=DEFAULT_STRATEGY_AUDIT)
+    parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
     parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
     parser.add_argument("--recursion-cut-model-report", type=Path, action="append")
     parser.add_argument("--mana-base-validator-report", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
-    parser.add_argument("--stem", default="lorehold_next_action_planner_20260627_v1")
+    parser.add_argument("--stem", default="lorehold_next_action_planner_20260628_v1")
     return parser.parse_args()
 
 
@@ -973,6 +1107,8 @@ def main() -> int:
     args = parse_args()
     miner_report = read_json(args.miner_report)
     manual_review = read_json(args.manual_review)
+    strategy_audit = read_json(args.strategy_audit) if args.strategy_audit.exists() else None
+    hypothesis_queue = read_json(args.hypothesis_queue) if args.hypothesis_queue.exists() else None
     exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
     exposure_profiles = read_existing_json(exposure_paths)
     tutor_cut_model_reports = read_existing_json(
@@ -999,8 +1135,12 @@ def main() -> int:
         recursion_cut_model_reports=recursion_cut_model_reports,
         mana_base_validator_reports=mana_base_validator_reports,
         prior_package_reports=prior_package_reports,
+        strategy_audit=strategy_audit,
+        hypothesis_queue=hypothesis_queue,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
+        strategy_path=args.strategy_audit,
+        hypothesis_queue_path=args.hypothesis_queue,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"
