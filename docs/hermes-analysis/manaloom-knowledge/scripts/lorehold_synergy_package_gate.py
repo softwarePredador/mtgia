@@ -65,6 +65,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
     REPORT_DIR / "lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
     REPORT_DIR / "lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+    REPORT_DIR / "lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
     REPORT_DIR / "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
 )
 

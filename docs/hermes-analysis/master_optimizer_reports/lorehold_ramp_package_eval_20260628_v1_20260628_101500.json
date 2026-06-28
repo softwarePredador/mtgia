@@ -1,0 +1,97 @@
+{
+  "generated_at": "2026-06-28T07:48:19.010541+00:00",
+  "packages": [
+    {
+      "add_summary": {
+        "cards": [
+          "Mana Vault"
+        ],
+        "fast_mana_count": 1,
+        "lorehold_colored_fixing": 0,
+        "mana_produced": 3,
+        "nonstandard_untap_count": 1,
+        "recurring_source_count": 0,
+        "risk_flags": [
+          "colorless_only",
+          "nonstandard_untap",
+          "untap_tax",
+          "upkeep_damage"
+        ],
+        "same_turn_net_mana": 2.0
+      },
+      "adds": [
+        {
+          "battle_model_scope": "fast_mana_artifact_partial_v1",
+          "card_name": "Mana Vault",
+          "cmc": 1.0,
+          "colorless_only": true,
+          "effect": "ramp_permanent",
+          "fast_mana": true,
+          "lorehold_colored_fixing": 0,
+          "mana_produced": 3,
+          "missing": false,
+          "nonstandard_untap": true,
+          "produces": "C",
+          "recurring_source": false,
+          "risk_flags": [
+            "colorless_only",
+            "nonstandard_untap",
+            "untap_tax",
+            "upkeep_damage"
+          ],
+          "rule_execution_status": "auto",
+          "rule_review_status": "active",
+          "rule_source": "curated",
+          "same_turn_net_mana": 2.0
+        }
+      ],
+      "battle_interpretation_guardrail": "A battle loss for this package rejects the exact add/cut signature, not the added ramp card globally.",
+      "cut_summary": {
+        "cards": [
+          "Arcane Signet"
+        ],
+        "fast_mana_count": 0,
+        "lorehold_colored_fixing": 2,
+        "mana_produced": 1,
+        "nonstandard_untap_count": 0,
+        "recurring_source_count": 1,
+        "risk_flags": [],
+        "same_turn_net_mana": -1.0
+      },
+      "cuts": [
+        {
+          "battle_model_scope": "commander_identity_mana_rock_deck_scoped_v1",
+          "card_name": "Arcane Signet",
+          "cmc": 2.0,
+          "colorless_only": false,
+          "effect": "ramp_permanent",
+          "fast_mana": false,
+          "lorehold_colored_fixing": 2,
+          "mana_produced": 1,
+          "missing": false,
+          "nonstandard_untap": false,
+          "produces": "RW",
+          "recurring_source": true,
+          "risk_flags": [],
+          "rule_execution_status": "auto",
+          "rule_review_status": "verified",
+          "rule_source": "curated",
+          "same_turn_net_mana": -1.0
+        }
+      ],
+      "delta": {
+        "fast_mana_count": 1,
+        "lorehold_colored_fixing": -2,
+        "mana_produced": 2,
+        "nonstandard_untap_count": 1,
+        "recurring_source_count": -1,
+        "same_turn_net_mana": 3.0
+      },
+      "family": "fast_mana",
+      "hypothesis": "Mana Vault is legal, battle-ready fast mana and appears in multiple Lorehold variants. This tests whether one-mana colorless burst accelerates commander and expensive spell windows more than Arcane Signet's colored fixing, without cutting protected medallions, Bender's Waterskin, Victory Chimes, or Jeska's Will.",
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "ramp_static_classification": "burst_vs_fixing_or_recurring_tradeoff"
+    }
+  ],
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db"
+}

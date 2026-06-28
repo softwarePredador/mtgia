@@ -826,6 +826,10 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             default_names,
         )
         self.assertIn(
+            "lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+            default_names,
+        )
+        self.assertIn(
             "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
             default_names,
         )

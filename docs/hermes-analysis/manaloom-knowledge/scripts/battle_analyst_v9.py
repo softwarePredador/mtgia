@@ -2892,6 +2892,20 @@ def is_mana_source_permanent(source):
     return source.get("effect") == "ramp_engine" and source.get("mana_produced") is not None
 
 
+def does_not_untap_in_untap_step(permanent):
+    if not isinstance(permanent, dict):
+        return False
+    return bool(
+        permanent.get("does_not_untap_in_untap_step")
+        or permanent.get("does_not_untap_normally")
+    )
+
+
+def mark_mana_source_used_if_nonstandard_untap(source):
+    if does_not_untap_in_untap_step(source):
+        source["tapped"] = True
+
+
 def _controls_creature_token_any_color_mana_passive(player):
     if player is None:
         return False
@@ -5588,6 +5602,7 @@ class Player:
             source
             for source in self.battlefield
             if player_mana_source_permanent(self, source)
+            and not (isinstance(source, dict) and source.get("tapped"))
             and not (
                 is_battlefield_creature(source)
                 and player_mana_source_permanent(self, source)
@@ -5604,6 +5619,7 @@ class Player:
             # the imported data specifies one concrete produced color.
             color = colors[0] if len(colors) == 1 else "generic"
             self.mana_pool.add(color, produced)
+            mark_mana_source_used_if_nonstandard_untap(source)
             active_sources += 1
         emit_replay_event(
             "mana_refreshed",
@@ -22989,6 +23005,8 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
         return permanent
+    if permanent.get("does_not_untap_normally"):
+        permanent["does_not_untap_in_untap_step"] = True
     enters_tapped = bool(permanent.get("enters_tapped"))
     if apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=turn):
         enters_tapped = True
@@ -30052,6 +30070,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                         produced = mana_source_production_for_state(player, permanent)
                         if produced > 0:
                             player.mana_pool.add(colors[0], produced)
+                            mark_mana_source_used_if_nonstandard_untap(permanent)
                 mana = player.available_mana()
                 if note_action():
                     return True
@@ -35067,7 +35086,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     # ── UNTAP ──
     for c in player.battlefield:
         if isinstance(c, dict):
-            if not c.get("does_not_untap_in_untap_step"):
+            if not does_not_untap_in_untap_step(c):
                 c["tapped"] = False
             c["utility_land_used_this_turn"] = False
             c["utility_artifact_used_this_turn"] = False

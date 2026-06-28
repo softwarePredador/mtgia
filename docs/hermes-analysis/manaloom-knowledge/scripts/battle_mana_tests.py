@@ -120,7 +120,7 @@ def register_tests(battle, player):
                 "type_line": "Artifact",
                 "produces": "C",
                 "mana_produced": 3,
-                "normal_untap_status": "annotation_only",
+                "does_not_untap_normally": True,
                 "draw_step_damage_status": "annotation_only",
                 "battle_model_scope": "fast_mana_artifact_partial_v1",
             },
@@ -139,6 +139,8 @@ def register_tests(battle, player):
         assert active.available_mana() == 7
         assert active.mana_pool.wildcard == 2
         assert active.mana_pool.colorless == 5
+        mana_vault = next(card for card in active.battlefield if card["name"] == "Mana Vault")
+        assert mana_vault["tapped"] is True
 
         active.battlefield.append(
             {
@@ -150,8 +152,9 @@ def register_tests(battle, player):
             }
         )
         active.refresh_mana_sources(turn=2)
-        assert active.available_mana() == 8
+        assert active.available_mana() == 5
         assert active.mana_pool.wildcard == 3
+        assert active.mana_pool.colorless == 2
 
     def test_pain_mana_source_shapes_refresh_without_new_runtime_executor():
         active = player("Active")
