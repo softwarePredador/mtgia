@@ -33,6 +33,9 @@ DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_2026062
 DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST = (
     REPORT_DIR / "pg244_hidden_retreat_runtime_scope_20260628_v1_manifest.json"
 )
+DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS = (
+    REPORT_DIR / "xmage_hidden_retreat_runtime_scope_20260628_v3_proposals.json",
+)
 DEFAULT_CANDIDATES = [
     "Brainstone",
     "Penance",
@@ -255,6 +258,94 @@ def rule_summary(conn: sqlite3.Connection, card_names: Iterable[str]) -> dict[st
         for key in ("execution_statuses", "review_statuses", "effects", "battle_model_scopes"):
             summary[key] = dict(sorted(summary[key].items()))
     return summaries
+
+
+def runtime_package_rule_summary(
+    proposal_paths: Iterable[Path],
+    card_names: Iterable[str],
+) -> dict[str, dict[str, Any]]:
+    wanted = {normalize_key(name): str(name) for name in card_names if str(name).strip()}
+    summaries: dict[str, dict[str, Any]] = {}
+    if not wanted:
+        return summaries
+
+    for path in proposal_paths:
+        if not path.exists():
+            continue
+        try:
+            payload = read_json(path)
+        except (OSError, json.JSONDecodeError):
+            continue
+        proposals = payload.get("proposals") if isinstance(payload, dict) else []
+        if not isinstance(proposals, list):
+            continue
+        for proposal in proposals:
+            if not isinstance(proposal, dict):
+                continue
+            card_name = str(proposal.get("card_name") or "").strip()
+            key = normalize_key(card_name)
+            if key not in wanted:
+                continue
+            effect_json = proposal.get("effect_json") or {}
+            if not isinstance(effect_json, dict) or not effect_json:
+                continue
+            review_status = str(proposal.get("review_status") or "")
+            execution_status = str(proposal.get("execution_status") or "")
+            summary = summaries.setdefault(
+                key,
+                {
+                    "card_name": card_name or wanted[key],
+                    "rule_count": 0,
+                    "active_rule_count": 0,
+                    "review_only_rule_count": 0,
+                    "execution_statuses": Counter(),
+                    "review_statuses": Counter(),
+                    "effects": Counter(),
+                    "battle_model_scopes": Counter(),
+                    "runtime_package_proposal_reports": [],
+                },
+            )
+            summary["rule_count"] += 1
+            summary["execution_statuses"][execution_status] += 1
+            summary["review_statuses"][review_status] += 1
+            if execution_status == "review_only":
+                summary["review_only_rule_count"] += 1
+            if execution_status in ACTIVE_EXECUTION_STATUSES and review_status in ACTIVE_REVIEW_STATUSES:
+                summary["active_rule_count"] += 1
+            if effect_json.get("effect"):
+                summary["effects"][str(effect_json["effect"])] += 1
+            if effect_json.get("battle_model_scope"):
+                summary["battle_model_scopes"][str(effect_json["battle_model_scope"])] += 1
+            summary["runtime_package_proposal_reports"].append(str(path))
+
+    for summary in summaries.values():
+        for key in ("execution_statuses", "review_statuses", "effects", "battle_model_scopes"):
+            summary[key] = dict(sorted(summary[key].items()))
+        summary["runtime_package_proposal_reports"] = sorted(
+            set(summary.get("runtime_package_proposal_reports") or [])
+        )
+    return summaries
+
+
+def merge_rule_summaries(
+    base: dict[str, dict[str, Any]],
+    overlay: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    merged = {key: dict(value) for key, value in base.items()}
+    for key, overlay_row in overlay.items():
+        row = merged.setdefault(key, {"card_name": overlay_row.get("card_name")})
+        for count_key in ("rule_count", "active_rule_count", "review_only_rule_count"):
+            row[count_key] = int(row.get(count_key) or 0) + int(overlay_row.get(count_key) or 0)
+        for counter_key in ("execution_statuses", "review_statuses", "effects", "battle_model_scopes"):
+            counts = Counter(row.get(counter_key) or {})
+            counts.update(overlay_row.get(counter_key) or {})
+            row[counter_key] = dict(sorted(counts.items()))
+        reports = set(row.get("runtime_package_proposal_reports") or [])
+        reports.update(overlay_row.get("runtime_package_proposal_reports") or [])
+        if reports:
+            row["runtime_package_proposal_reports"] = sorted(reports)
+            row["runtime_package_overlay_count"] = len(reports)
+    return merged
 
 
 def variant_usage(
@@ -516,11 +607,16 @@ def build_model(
     strategy_path: Path = DEFAULT_STRATEGY_REPORT,
     seed_matrix_path: Path = DEFAULT_SEED_MATRIX,
     squee_probe_path: Path = DEFAULT_SQUEE_PROBE,
+    runtime_package_proposal_reports: Iterable[Path] | None = None,
 ) -> dict[str, Any]:
     deck_cards = load_deck_cards(conn, deck_id)
     deck_cards_by_name = {normalize_key(row["card_name"]): row for row in deck_cards}
     all_names = sorted({*candidates, *(row["card_name"] for row in deck_cards)})
-    rules = rule_summary(conn, all_names)
+    proposal_paths = list(runtime_package_proposal_reports or [])
+    rules = merge_rule_summaries(
+        rule_summary(conn, all_names),
+        runtime_package_rule_summary(proposal_paths, all_names),
+    )
     usage = variant_usage(conn, all_names, variant_deck_ids)
     cut_safety = load_cut_safety(strategy_report)
     seed_matrix = load_seed_matrix(seed_matrix_report)
@@ -573,12 +669,20 @@ def build_model(
         if DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST.exists()
         else "not_prepared"
     )
+    hidden_retreat_rule = rules.get(normalize_key("Hidden Retreat")) or {}
+    hidden_retreat_runtime_model_status = (
+        "runtime_proposal_overlay_active"
+        if hidden_retreat_rule.get("runtime_package_proposal_reports")
+        and int(hidden_retreat_rule.get("active_rule_count") or 0) > 0
+        else "local_db_runtime_only"
+    )
     return {
         "generated_at": utc_now(),
         "source_db": str(db_path),
         "strategy_report": str(strategy_path),
         "seed_matrix_report": str(seed_matrix_path),
         "squee_probe_report": str(squee_probe_path) if squee_probe_report else "",
+        "runtime_package_proposal_reports": [str(path) for path in proposal_paths],
         "deck_id": deck_id,
         "variant_deck_ids": list(variant_deck_ids),
         "postgres_writes": False,
@@ -608,10 +712,14 @@ def build_model(
                 )
             ),
             "hidden_retreat_package_status": hidden_retreat_package_status,
+            "hidden_retreat_runtime_model_status": hidden_retreat_runtime_model_status,
             "hidden_retreat_package_manifest": (
                 str(DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST)
                 if hidden_retreat_package_status == "prepared_read_only_pending_apply_approval"
                 else ""
+            ),
+            "runtime_package_overlay_card_count": sum(
+                1 for row in rules.values() if row.get("runtime_package_proposal_reports")
             ),
         },
         "access_density_context": {
@@ -637,10 +745,10 @@ def build_model(
                 "reason": "Promise of Loyalty, Avatar's Wrath, Tibalt's Trickery, Prismari Pianist, and similar slots need a new rationale after repeated matrix regressions.",
             },
             {
-                "guardrail_key": "hidden_retreat_runtime_first",
+                "guardrail_key": "runtime_package_overlay_is_read_only",
                 "reason": (
-                    "Hidden Retreat now has a focused battle runtime path and a prepared PG package, "
-                    "but the local candidate DB still exposes only review_only rules until apply/sync."
+                    "Runtime proposal overlays make candidate modeling possible in copied DB gates, "
+                    "but PostgreSQL/product truth still requires explicit approved apply/sync."
                 ),
             },
         ],
@@ -656,6 +764,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- strategy_report: `{payload['strategy_report']}`",
         f"- seed_matrix_report: `{payload['seed_matrix_report']}`",
         f"- squee_probe_report: `{payload.get('squee_probe_report') or '-'}`",
+        f"- runtime_package_proposal_reports: `{', '.join(payload.get('runtime_package_proposal_reports') or []) or '-'}`",
         "- postgres_writes: `false`",
         "- source_db_mutated: `false`",
         "",
@@ -671,7 +780,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- target_access_cards: `{', '.join(payload['summary']['target_access_cards'])}`",
         f"- recommended_next_action: `{payload['summary']['recommended_next_action']}`",
         f"- hidden_retreat_package_status: `{payload['summary'].get('hidden_retreat_package_status') or '-'}`",
+        f"- hidden_retreat_runtime_model_status: `{payload['summary'].get('hidden_retreat_runtime_model_status') or '-'}`",
         f"- hidden_retreat_package_manifest: `{payload['summary'].get('hidden_retreat_package_manifest') or '-'}`",
+        f"- runtime_package_overlay_card_count: `{payload['summary'].get('runtime_package_overlay_card_count') or 0}`",
         "",
         "## Access Candidates",
         "",
@@ -751,6 +862,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--strategy-report", type=Path, default=DEFAULT_STRATEGY_REPORT)
     parser.add_argument("--seed-matrix-report", type=Path, default=DEFAULT_SEED_MATRIX)
     parser.add_argument("--squee-probe", type=Path, default=DEFAULT_SQUEE_PROBE)
+    parser.add_argument(
+        "--runtime-package-proposals",
+        type=Path,
+        action="append",
+        help="Read-only runtime proposal reports to overlay while scoring candidates.",
+    )
     parser.add_argument("--candidate", action="append")
     parser.add_argument("--deck-id", type=int, default=6)
     parser.add_argument("--stem", default="lorehold_access_cut_model_20260628_v2")
@@ -760,6 +877,11 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     with connect(args.db) as conn:
+        runtime_package_proposals = (
+            args.runtime_package_proposals
+            if args.runtime_package_proposals is not None
+            else list(DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS)
+        )
         payload = build_model(
             conn=conn,
             strategy_report=read_json(args.strategy_report),
@@ -771,6 +893,7 @@ def main() -> int:
             strategy_path=args.strategy_report,
             seed_matrix_path=args.seed_matrix_report,
             squee_probe_path=args.squee_probe,
+            runtime_package_proposal_reports=runtime_package_proposals,
         )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

@@ -5,6 +5,10 @@ def test_default_planner_uses_current_rejection_integrated_report():
     assert gen.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260628_v16_current_default_chain.json"
 
 
+def test_default_access_model_uses_runtime_overlay_report():
+    assert gen.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260628_v3_runtime_overlay.json"
+
+
 def planner_payload(prior_keys=None):
     return {
         "summary": {
@@ -187,6 +191,8 @@ def test_completed_squee_probe_routes_to_access_density_model():
             "summary": {
                 "access_density_status": "squee_route_modeled_access_density_needed",
                 "preflight_access_candidate_ready_count": 0,
+                "hidden_retreat_runtime_model_status": "runtime_proposal_overlay_active",
+                "hidden_retreat_package_status": "prepared_read_only_pending_apply_approval",
             }
         },
     )
@@ -197,4 +203,6 @@ def test_completed_squee_probe_routes_to_access_density_model():
     assert report["summary"]["squee_probe_status"] == "squee_route_modeled_but_access_gap_remains"
     assert report["summary"]["access_model_status"] == "squee_route_modeled_access_density_needed"
     assert required[0]["preflight_access_candidate_ready_count"] == 0
+    assert "read-only runtime proposal" in required[0]["reason"]
+    assert "approved PG apply/sync" in required[0]["reason"]
     assert "squee_graveyard_entry_probe" not in {row["work_key"] for row in required}

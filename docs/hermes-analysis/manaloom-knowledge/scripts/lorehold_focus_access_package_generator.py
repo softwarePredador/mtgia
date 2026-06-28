@@ -29,7 +29,7 @@ DEFAULT_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_202606
 DEFAULT_MINER_REPORT = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260628_v1.md"
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
-DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260628_v2.json"
+DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260628_v3_runtime_overlay.json"
 
 PROTECTED_CARDS = {
     "Urza's Saga",
@@ -422,11 +422,26 @@ def squee_work_item(
         access_summary = (access_model or {}).get("summary") or {}
         weak_seeds = summary.get("weak_material_missing_squee_seeds") or []
         if access_summary:
-            reason = (
-                "Squee discard/return is modeled when accessed; access model found "
-                f"{int(access_summary.get('preflight_access_candidate_ready_count') or 0)} "
-                "preflight-ready access swaps and requires a new seed-safe cut or runtime upgrade."
+            ready_count = int(access_summary.get("preflight_access_candidate_ready_count") or 0)
+            hidden_runtime_status = str(
+                access_summary.get("hidden_retreat_runtime_model_status") or ""
             )
+            hidden_package_status = str(access_summary.get("hidden_retreat_package_status") or "")
+            if hidden_runtime_status == "runtime_proposal_overlay_active" and ready_count == 0:
+                reason = (
+                    "Squee discard/return is modeled when accessed; Hidden Retreat is modeled "
+                    "through a read-only runtime proposal, but access model found 0 preflight-ready "
+                    "access swaps. Remaining blockers are approved PG apply/sync for product truth "
+                    "and a seed-safe cut model."
+                )
+                if hidden_package_status:
+                    reason += f" Hidden Retreat package status: {hidden_package_status}."
+            else:
+                reason = (
+                    "Squee discard/return is modeled when accessed; access model found "
+                    f"{ready_count} preflight-ready access swaps and requires a new seed-safe "
+                    "cut or runtime upgrade."
+                )
         else:
             reason = (
                 "Squee discard/return is modeled when accessed; the remaining blocker is access "

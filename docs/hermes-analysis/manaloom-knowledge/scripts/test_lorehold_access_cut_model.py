@@ -1,3 +1,4 @@
+import json
 import sqlite3
 
 import lorehold_access_cut_model as model
@@ -157,6 +158,49 @@ def test_hidden_retreat_is_blocked_until_runtime_is_executable():
     assert hidden["status"] == "blocked"
     assert "candidate_runtime_review_only" in hidden["blockers"]
     assert payload["summary"]["preflight_access_candidate_ready_count"] == 0
+
+
+def test_hidden_retreat_runtime_proposal_overlay_makes_candidate_model_ready(tmp_path):
+    proposals = tmp_path / "hidden_retreat_proposals.json"
+    proposals.write_text(
+        json.dumps(
+            {
+                "proposals": [
+                    {
+                        "card_name": "Hidden Retreat",
+                        "review_status": "verified",
+                        "execution_status": "auto",
+                        "effect_json": {
+                            "effect": "damage_prevention_shield",
+                            "battle_model_scope": (
+                                "activated_put_card_from_hand_on_top_library_"
+                                "prevent_damage_from_target_instant_or_sorcery_spell_v1"
+                            ),
+                        },
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with memory_db() as conn:
+        payload = model.build_model(
+            conn=conn,
+            strategy_report=strategy_report(),
+            seed_matrix_report=seed_matrix_report(),
+            candidates=["Hidden Retreat"],
+            runtime_package_proposal_reports=[proposals],
+        )
+
+    hidden = payload["candidates"][0]
+    assert hidden["status"] == "ready"
+    assert hidden["rule_summary"]["active_rule_count"] == 1
+    assert hidden["rule_summary"]["runtime_package_proposal_reports"] == [str(proposals)]
+    assert payload["summary"]["runtime_package_overlay_card_count"] == 1
+    assert payload["summary"]["hidden_retreat_runtime_model_status"] == (
+        "runtime_proposal_overlay_active"
+    )
 
 
 def test_access_model_blocks_exact_and_repeated_rejected_cuts():
