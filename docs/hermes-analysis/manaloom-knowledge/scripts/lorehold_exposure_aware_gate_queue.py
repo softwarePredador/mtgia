@@ -28,7 +28,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_READINESS = REPORT_DIR / "lorehold_runtime_candidate_readiness_20260628_v1.json"
 DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
-DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260628_v16_current_default_chain.json"
+DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260628_min_used_sample_v2.json"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v3_runtime_readiness.json"
 

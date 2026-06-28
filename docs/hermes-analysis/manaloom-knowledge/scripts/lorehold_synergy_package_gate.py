@@ -2768,6 +2768,7 @@ LOW_EXPOSURE_STATUSES = {
     "candidate_added_cards_accessed_not_used",
     "candidate_added_cards_near_access_low_use",
 }
+MIN_CARD_OUTCOME_USED_GAMES = 2
 
 
 def exposure_requires_inconclusive(exposure: dict[str, Any] | None) -> bool:
@@ -2784,12 +2785,57 @@ def exposure_requires_inconclusive(exposure: dict[str, Any] | None) -> bool:
     return False
 
 
+def card_outcome_used_game_count(card: dict[str, Any]) -> int | None:
+    outcome = card.get("outcome_summary") or {}
+    if not isinstance(outcome, dict):
+        return None
+    used = outcome.get("used_games") or {}
+    if not isinstance(used, dict) or "games" not in used:
+        return None
+    return int(used.get("games") or 0)
+
+
+def card_outcome_sample_decision(
+    exposure: dict[str, Any] | None,
+    forced_access_mode: str = "none",
+    *,
+    minimum_used_games: int = MIN_CARD_OUTCOME_USED_GAMES,
+) -> str | None:
+    if not exposure:
+        return None
+    under_minimum: list[dict[str, Any]] = []
+    for group_key in ("candidate_added_cards", "baseline_cut_cards"):
+        group = exposure.get(group_key) or {}
+        cards = group.get("cards") or []
+        if not isinstance(cards, list):
+            continue
+        for card in cards:
+            if not isinstance(card, dict):
+                continue
+            used_games = card_outcome_used_game_count(card)
+            if used_games is None:
+                continue
+            if used_games < minimum_used_games:
+                under_minimum.append(
+                    {
+                        "group": group_key,
+                        "card_name": card.get("card_name"),
+                        "used_games": used_games,
+                    }
+                )
+    if not under_minimum:
+        return None
+    if forced_access_mode and forced_access_mode != "none":
+        return "forced_access_insufficient_card_outcome_sample"
+    return "insufficient_card_outcome_sample"
+
+
 def exposure_inconclusive_decision(
     exposure: dict[str, Any] | None,
     forced_access_mode: str = "none",
 ) -> str | None:
     if not exposure_requires_inconclusive(exposure):
-        return None
+        return card_outcome_sample_decision(exposure, forced_access_mode)
     if forced_access_mode and forced_access_mode != "none":
         return "forced_access_inconclusive_low_exposure"
     return "inconclusive_low_exposure"

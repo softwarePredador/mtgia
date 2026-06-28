@@ -72,10 +72,15 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
     DEFAULT_STRATEGY_AUDIT,
     REPORT_DIR / "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json",
+    REPORT_DIR / "lorehold_exposure_outcome_audit_20260628_min_used_sample_v2.json",
 ]
 INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "inconclusive_low_exposure",
     "forced_access_inconclusive_low_exposure",
+    "insufficient_card_outcome_sample",
+    "forced_access_insufficient_card_outcome_sample",
+    "insufficient_card_outcome_used_sample",
+    "candidate_used_without_cut_comparator",
 }
 LOW_EXPOSURE_STATUSES = {
     "candidate_added_card_low_access",
@@ -342,6 +347,35 @@ def package_rows_from_prior_payload(payload: Any) -> list[dict[str, Any]]:
     if not isinstance(payload, dict):
         return []
     rows: list[dict[str, Any]] = []
+    rollups = payload.get("package_rollups")
+    if isinstance(rollups, list):
+        decision_by_status = {
+            "natural_deeper_gate_candidate": "promote_to_deeper_gate",
+            "natural_reject_current_pair": "reject_or_rework",
+            "forced_access_requires_natural_confirmation": (
+                "forced_access_signal_requires_natural_confirmation"
+            ),
+            "forced_access_no_lift_reject_or_rework": "forced_access_no_lift_reject_or_rework",
+            "used_without_cut_comparator": "candidate_used_without_cut_comparator",
+            "insufficient_card_outcome_sample": "insufficient_card_outcome_used_sample",
+            "inconclusive_low_candidate_use": "inconclusive_low_exposure",
+            "missing_per_card_data": "missing_per_card_outcome_data",
+        }
+        for row in rollups:
+            if not isinstance(row, dict):
+                continue
+            copied = dict(row)
+            copied.setdefault("source_section", "package_rollups")
+            copied["decision"] = decision_by_status.get(
+                str(row.get("status") or ""),
+                str(row.get("status") or "unknown"),
+            )
+            if "gate_summary" not in copied:
+                copied["gate_summary"] = {
+                    "delta_pp": row.get("worst_aggregate_delta_pp")
+                }
+            rows.append(copied)
+        return rows
     packages = payload.get("packages")
     if isinstance(packages, list):
         rows.extend(row for row in packages if isinstance(row, dict))
@@ -394,6 +428,8 @@ def rejected_package_evidence(
                     result = {**result, "gate_summary": flat_gate}
             decision = infer_package_decision(result)
             if decision != "reject_or_rework":
+                if decision in INCONCLUSIVE_EXPOSURE_DECISIONS:
+                    rejected.pop(key, None)
                 continue
             gate = result.get("gate_summary") or {}
             aggregate = result.get("aggregate") or {}
@@ -439,6 +475,8 @@ def inconclusive_package_evidence(
                     result = {**result, "gate_summary": flat_gate}
             decision = infer_package_decision(result)
             if decision not in INCONCLUSIVE_EXPOSURE_DECISIONS:
+                if decision == "reject_or_rework":
+                    inconclusive.pop(key, None)
                 continue
             gate = result.get("gate_summary") or {}
             aggregate = result.get("aggregate") or {}
@@ -466,6 +504,7 @@ def inconclusive_package_evidence(
                         "card_name": row.get("card_name"),
                         "status": row.get("status"),
                         "recorded_use_count": row.get("recorded_use_count"),
+                        "used_games": ((row.get("outcome_summary") or {}).get("used_games") or {}).get("games"),
                         "accessed_games": (row.get("access_profile") or {}).get("accessed_games"),
                         "near_access_games": (row.get("access_profile") or {}).get("near_access_games"),
                         "library_only_games": (row.get("access_profile") or {}).get("library_only_games"),
@@ -1343,8 +1382,8 @@ def build_guardrails(
                 "inconclusive_package_count": len(inconclusive_packages),
                 "inconclusive_package_keys": sorted(inconclusive_packages),
                 "reason": (
-                    "A package with low added-card exposure cannot be promoted or rejected "
-                    "as card-level evidence until the added card is actually accessed or used."
+                    "A package with low added-card exposure or too few used-card games cannot "
+                    "be promoted or rejected as card-level evidence until the card sample is real."
                 ),
             }
         )

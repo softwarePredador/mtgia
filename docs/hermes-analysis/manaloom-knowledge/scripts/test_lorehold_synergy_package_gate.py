@@ -1359,6 +1359,76 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "forced_access_signal_requires_natural_confirmation",
         )
 
+    def test_gate_decision_requires_minimum_card_used_game_sample(self):
+        gate_summary = {
+            "baseline": {"wins": 0, "losses": 3, "win_rate": 0.0, "telemetry": {}},
+            "candidate": {"wins": 3, "losses": 0, "win_rate": 100.0, "telemetry": {}},
+            "delta_pp": 100.0,
+        }
+        exposure = {
+            "low_candidate_added_card_use": False,
+            "candidate_added_cards": {
+                "all_cards_used": True,
+                "cards": [
+                    {
+                        "card_name": "Mana Vault",
+                        "outcome_summary": {"used_games": {"games": 1}},
+                    }
+                ],
+            },
+            "baseline_cut_cards": {
+                "all_cards_used": True,
+                "cards": [
+                    {
+                        "card_name": "Arcane Signet",
+                        "outcome_summary": {"used_games": {"games": 2}},
+                    }
+                ],
+            },
+        }
+
+        self.assertEqual(
+            gate.gate_decision(gate_summary, exposure),
+            "insufficient_card_outcome_sample",
+        )
+
+    def test_forced_access_requires_minimum_card_used_game_sample(self):
+        gate_summary = {
+            "baseline": {"wins": 0, "losses": 3, "win_rate": 0.0, "telemetry": {}},
+            "candidate": {"wins": 3, "losses": 0, "win_rate": 100.0, "telemetry": {}},
+            "delta_pp": 100.0,
+        }
+        exposure = {
+            "low_candidate_added_card_use": False,
+            "candidate_added_cards": {
+                "all_cards_used": True,
+                "cards": [
+                    {
+                        "card_name": "Mana Vault",
+                        "outcome_summary": {"used_games": {"games": 1}},
+                    }
+                ],
+            },
+            "baseline_cut_cards": {
+                "all_cards_used": True,
+                "cards": [
+                    {
+                        "card_name": "Arcane Signet",
+                        "outcome_summary": {"used_games": {"games": 2}},
+                    }
+                ],
+            },
+        }
+
+        self.assertEqual(
+            gate.gate_decision(
+                gate_summary,
+                exposure,
+                forced_access_mode="opening_hand",
+            ),
+            "forced_access_insufficient_card_outcome_sample",
+        )
+
     def test_forced_access_signal_adds_natural_confirmation_queue_item(self):
         payload = {
             "games_per_opponent": 1,

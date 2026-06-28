@@ -495,6 +495,83 @@ def prior_low_exposure_report(*, with_strategy_scope=False):
     )
 
 
+def prior_insufficient_used_sample_report(*, with_strategy_scope=False):
+    return (
+        planner.REPORT_DIR / "insufficient_used_sample_package_report.json",
+        {
+            "cut_safety_report": "/tmp/cut.json" if with_strategy_scope else None,
+            "prior_package_reports": ["/tmp/prior.json"] if with_strategy_scope else [],
+            "packages": [
+                {
+                    "package_key": "birgi_spellchain_cut_jeskas_will",
+                    "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+                    "cuts": ["Jeska's Will"],
+                    "decision": "insufficient_card_outcome_used_sample",
+                    "gate_summary": {
+                        "baseline": {"wins": 0, "losses": 1, "win_rate": 0.0},
+                        "candidate": {"wins": 1, "losses": 0, "win_rate": 100.0},
+                        "delta_pp": 100.0,
+                    },
+                    "exposure_summary": {
+                        "low_candidate_added_card_use": False,
+                        "status": "candidate_added_cards_used",
+                        "candidate_added_cards": {
+                            "cards": [
+                                {
+                                    "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                                    "status": "used",
+                                    "recorded_use_count": 1,
+                                    "outcome_summary": {
+                                        "used_games": {"games": 1, "wins": 1, "losses": 0}
+                                    },
+                                }
+                            ]
+                        },
+                    },
+                }
+            ],
+        },
+    )
+
+
+def prior_birgi_reject_report():
+    return (
+        planner.REPORT_DIR / "birgi_old_reject_report.json",
+        {
+            "packages": [
+                {
+                    "package_key": "birgi_spellchain_cut_jeskas_will",
+                    "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+                    "cuts": ["Jeska's Will"],
+                    "decision": "reject_or_rework",
+                    "gate_summary": {
+                        "baseline": {"wins": 1, "losses": 0, "win_rate": 100.0},
+                        "candidate": {"wins": 0, "losses": 1, "win_rate": 0.0},
+                        "delta_pp": -100.0,
+                    },
+                }
+            ]
+        },
+    )
+
+
+def prior_mana_vault_reject_rollup_report():
+    return (
+        planner.REPORT_DIR / "mana_vault_rollup_reject_report.json",
+        {
+            "package_rollups": [
+                {
+                    "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+                    "status": "natural_reject_current_pair",
+                    "adds": ["Mana Vault"],
+                    "cuts": ["Arcane Signet"],
+                    "worst_aggregate_delta_pp": -66.67,
+                }
+            ]
+        },
+    )
+
+
 def hand_filter_cut_model_report():
     return (
         planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0],
@@ -882,6 +959,7 @@ def test_next_action_planner_defaults_include_exposure_contract_report():
     default_names = {path.name for path in planner.DEFAULT_PRIOR_PACKAGE_REPORTS}
 
     assert "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json" in default_names
+    assert "lorehold_exposure_outcome_audit_20260628_min_used_sample_v2.json" in default_names
 
 
 def test_next_action_planner_default_prior_reports_include_profiled_history():
@@ -935,6 +1013,80 @@ def test_next_action_planner_infers_low_exposure_from_status_without_boolean():
     }
 
     assert planner.infer_package_decision(result) == "inconclusive_low_exposure"
+
+
+def test_next_action_planner_downgrades_insufficient_used_sample_to_inconclusive():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        prior_package_reports=[prior_insufficient_used_sample_report(with_strategy_scope=True)],
+    )
+
+    assert payload["summary"]["prior_rejected_package_count"] == 0
+    assert payload["summary"]["prior_inconclusive_low_exposure_count"] == 1
+    assert payload["summary"]["prior_inconclusive_low_exposure_keys"] == [
+        "birgi_spellchain_cut_jeskas_will"
+    ]
+    assert payload["summary"]["recommended_next_action"] == (
+        "resolve_inconclusive_package_exposures"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "resolve_strategy_gate_low_exposure_before_next_swap"
+    assert action["packages"][0]["decision"] == "insufficient_card_outcome_used_sample"
+    assert action["packages"][0]["candidate_added_card_statuses"][0]["used_games"] == 1
+
+
+def test_next_action_planner_prefers_package_rollups_over_raw_observations():
+    payload = {
+        "package_rollups": [
+            {
+                "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+                "status": "natural_reject_current_pair",
+                "adds": ["Mana Vault"],
+                "cuts": ["Arcane Signet"],
+                "worst_aggregate_delta_pp": -66.67,
+            }
+        ],
+        "packages": [
+            {
+                "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+                "decision": "insufficient_card_outcome_used_sample",
+            }
+        ],
+    }
+
+    rows = planner.package_rows_from_prior_payload(payload)
+
+    assert len(rows) == 1
+    assert rows[0]["source_section"] == "package_rollups"
+    assert rows[0]["decision"] == "reject_or_rework"
+
+
+def test_next_action_planner_later_insufficient_sample_overrides_old_reject():
+    reports = [
+        prior_birgi_reject_report(),
+        prior_insufficient_used_sample_report(with_strategy_scope=True),
+    ]
+
+    rejected = planner.rejected_package_evidence(reports)
+    inconclusive = planner.inconclusive_package_evidence(reports)
+
+    assert "birgi_spellchain_cut_jeskas_will" not in rejected
+    assert "birgi_spellchain_cut_jeskas_will" in inconclusive
+
+
+def test_next_action_planner_later_rollup_reject_overrides_old_inconclusive():
+    reports = [
+        prior_low_exposure_report(with_strategy_scope=True),
+        prior_mana_vault_reject_rollup_report(),
+    ]
+
+    rejected = planner.rejected_package_evidence(reports)
+    inconclusive = planner.inconclusive_package_evidence(reports)
+
+    assert "mana_vault_fast_mana_cut_arcane_signet" in rejected
+    assert "mana_vault_fast_mana_cut_arcane_signet" not in inconclusive
 
 
 def test_next_action_planner_keeps_diagnostic_low_exposure_below_strategy_actions():

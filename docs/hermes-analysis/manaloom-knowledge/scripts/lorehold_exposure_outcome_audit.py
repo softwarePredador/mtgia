@@ -24,7 +24,9 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_EXTRA_REPORTS = [
     REPORT_DIR / "lorehold_exposure_by_game_gate_20260628_v1_20260628_101737.json",
+    REPORT_DIR / "lorehold_birgi_min_sample_forced_probe_20260628_v1_20260628_113410.json",
 ]
+MIN_CARD_OUTCOME_USED_GAMES = 2
 
 
 def utc_now() -> str:
@@ -276,6 +278,23 @@ def classify_outcome(
         }
 
     used_delta = round(numeric(added_used.get("win_rate")) - numeric(cut_used.get("win_rate")), 2)
+    if (
+        added_used_games < MIN_CARD_OUTCOME_USED_GAMES
+        or cut_used_games < MIN_CARD_OUTCOME_USED_GAMES
+    ):
+        return {
+            "decision": "insufficient_card_outcome_used_sample",
+            "promotion_allowed": False,
+            "next_action": "increase_natural_used_sample_before_card_outcome_decision",
+            "used_delta_pp": used_delta,
+            "reason": (
+                "candidate and cut must each reach at least "
+                f"{MIN_CARD_OUTCOME_USED_GAMES} used games before a card-outcome decision"
+            ),
+            "minimum_used_games": MIN_CARD_OUTCOME_USED_GAMES,
+            "candidate_used_games": added_used_games,
+            "cut_used_games": cut_used_games,
+        }
     aggregate_delta = numeric(aggregate_delta_pp) if aggregate_delta_pp is not None else 0.0
     if forced_access_mode and forced_access_mode != "none":
         if aggregate_delta > 0 and used_delta > 0:
@@ -395,10 +414,12 @@ ROLLUP_PRIORITY = {
     "natural_deeper_gate_candidate": 0,
     "natural_reject_current_pair": 1,
     "forced_access_requires_natural_confirmation": 2,
-    "used_without_cut_comparator": 3,
-    "inconclusive_low_candidate_use": 4,
-    "missing_per_card_data": 5,
-    "manual_review": 6,
+    "forced_access_no_lift_reject_or_rework": 3,
+    "used_without_cut_comparator": 4,
+    "insufficient_card_outcome_sample": 5,
+    "inconclusive_low_candidate_use": 6,
+    "missing_per_card_data": 7,
+    "manual_review": 8,
 }
 
 
@@ -419,8 +440,12 @@ def rollup_decision(rows: list[dict[str, Any]]) -> tuple[str, str]:
         return "natural_reject_current_pair", "do_not_repeat_exact_pair_without_new_failure_target_or_cut"
     if "forced_access_card_outcome_signal_requires_natural_confirmation" in decisions:
         return "forced_access_requires_natural_confirmation", "run_natural_gate_without_forced_access_before_promoting"
+    if "forced_access_card_outcome_no_lift_reject_or_rework" in decisions:
+        return "forced_access_no_lift_reject_or_rework", "do_not_promote_from_forced_access_probe"
     if "candidate_used_without_cut_comparator" in decisions:
         return "used_without_cut_comparator", "rerun_or_compare_against_a_cut_with_observed_use"
+    if "insufficient_card_outcome_used_sample" in decisions:
+        return "insufficient_card_outcome_sample", "increase_natural_used_sample_before_card_outcome_decision"
     if any(decision.startswith("inconclusive") for decision in decisions):
         return "inconclusive_low_candidate_use", "rerun_larger_or_forced_access_then_natural_confirmation"
     if "missing_per_card_outcome_data" in decisions:
@@ -513,6 +538,12 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
         if (row.get("outcome_decision") or {}).get("decision")
         == "forced_access_card_outcome_signal_requires_natural_confirmation"
     ]
+    insufficient = [
+        row
+        for row in packages
+        if (row.get("outcome_decision") or {}).get("decision")
+        == "insufficient_card_outcome_used_sample"
+    ]
     return {
         "generated_at": utc_now(),
         "postgres_writes": False,
@@ -531,12 +562,15 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
             "deeper_gate_candidate_count": len(promoted),
             "forced_access_signal_count": len(forced_signals),
             "rejected_current_pair_count": len(rejected),
+            "insufficient_card_outcome_sample_count": len(insufficient),
             "inconclusive_no_used_sample_count": len(inconclusive),
             "recommended_next_action": (
                 "run_best_card_outcome_supported_deeper_gate"
                 if promoted
                 else "run_natural_confirmation_for_forced_access_signal"
                 if forced_signals and not rejected
+                else "increase_natural_used_sample_before_card_outcome_decision"
+                if insufficient and not rejected
                 else "avoid_repeating_rejected_pairs_and_generate_new_trace_targeted_package"
                 if rejected
                 else "increase_exposure_before_more_card_swap_decisions"
@@ -545,6 +579,10 @@ def build_report(paths: Iterable[Path]) -> dict[str, Any]:
         "decision_rules": [
             "aggregate deck record is not card-level proof by itself",
             "candidate card must have a used-game sample before a package can be promoted",
+            (
+                "candidate and baseline cut must each reach at least "
+                f"{MIN_CARD_OUTCOME_USED_GAMES} used games before a card-outcome decision"
+            ),
             "used-game comparison is candidate-added card record versus baseline-cut card record",
             "forced-access probes can diagnose access but require natural confirmation before promotion",
             "multi-card packages require split or manual review before per-card outcome promotion",

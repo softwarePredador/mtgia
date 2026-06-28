@@ -222,6 +222,34 @@ class LoreholdExposureOutcomeAuditTest(unittest.TestCase):
             self.assertTrue(row["outcome_decision"]["promotion_allowed"])
             self.assertEqual(payload["summary"]["deeper_gate_candidate_count"], 1)
 
+    def test_single_used_game_sample_is_not_card_outcome_decision(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "gate.json"
+            write_json(
+                path,
+                package_report(
+                    baseline_wins=1,
+                    baseline_losses=2,
+                    candidate_wins=3,
+                    candidate_losses=0,
+                    delta_pp=66.67,
+                    added_used=used_record(1, 1, 0),
+                    cut_used=used_record(1, 0, 1),
+                ),
+            )
+
+            payload = audit.build_report([path])
+
+            decision = payload["packages"][0]["outcome_decision"]
+            self.assertEqual(
+                decision["decision"],
+                "insufficient_card_outcome_used_sample",
+            )
+            self.assertFalse(decision["promotion_allowed"])
+            self.assertEqual(decision["minimum_used_games"], 2)
+            self.assertEqual(payload["summary"]["deeper_gate_candidate_count"], 0)
+            self.assertEqual(payload["summary"]["insufficient_card_outcome_sample_count"], 1)
+
     def test_forced_access_positive_sample_requires_natural_confirmation(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "gate.json"
@@ -253,6 +281,34 @@ class LoreholdExposureOutcomeAuditTest(unittest.TestCase):
                 payload["summary"]["recommended_next_action"],
                 "run_natural_confirmation_for_forced_access_signal",
             )
+
+    def test_forced_access_negative_sample_is_no_lift_reject_or_rework(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "gate.json"
+            write_json(
+                path,
+                package_report(
+                    baseline_wins=1,
+                    baseline_losses=2,
+                    candidate_wins=0,
+                    candidate_losses=3,
+                    delta_pp=-33.33,
+                    added_used=used_record(2, 0, 2),
+                    cut_used=used_record(2, 1, 1),
+                    forced_access_mode="opening_hand",
+                ),
+            )
+
+            payload = audit.build_report([path])
+
+            decision = payload["packages"][0]["outcome_decision"]
+            self.assertEqual(
+                decision["decision"],
+                "forced_access_card_outcome_no_lift_reject_or_rework",
+            )
+            rollup = payload["package_rollups"][0]
+            self.assertEqual(rollup["status"], "forced_access_no_lift_reject_or_rework")
+            self.assertEqual(rollup["next_action"], "do_not_promote_from_forced_access_probe")
 
     def test_rollup_prefers_natural_reject_over_forced_access_signal(self):
         with tempfile.TemporaryDirectory() as tmpdir:

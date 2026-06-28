@@ -255,3 +255,7 @@ irrelevant package output
     status = queue.extract_child_status(stdout)
     assert status["json"] == "/tmp/report.json"
     assert status["markdown"] == "/tmp/report.md"
+
+
+def test_default_planner_uses_minimum_used_sample_contract():
+    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260628_min_used_sample_v2.json"
