@@ -44,6 +44,9 @@ def build_conn() -> sqlite3.Connection:
         (613, "Storm-Kiln Artist", "ramp", '["ramp","creature"]', 4, "Creature — Dwarf Shaman", "Magecraft creates Treasure."),
         (614, "Galvanoth", "draw", '["draw"]', 5, "Creature — Beast", "May cast the top instant or sorcery without paying its mana cost."),
         (615, "Apex of Power", "draw", '["draw","payoff"]', 10, "Sorcery", "Exile seven cards and cast them this turn."),
+        (616, "Lion's Eye Diamond", "ramp", '["ramp"]', 0, "Artifact", "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant."),
+        (616, "Treasonous Ogre", "ramp", '["ramp","creature"]', 4, "Creature — Ogre Shaman", "Dethrone\nPay 3 life: Add {R}."),
+        (616, "Surly Badgersaur", "ramp", '["ramp","creature"]', 4, "Creature — Dinosaur", "Whenever you discard a land card, create a Treasure token."),
         (616, "Grinding Station", "ramp", '["ramp"]', 2, "Artifact", "Tap, sacrifice an artifact: target player mills three cards."),
         (616, "Thrumming Stone", "engine", '["engine","ripple_engine"]', 5, "Legendary Artifact", "Spells you cast have ripple 4."),
     ]
@@ -62,6 +65,9 @@ def build_conn() -> sqlite3.Connection:
         ("Storm-Kiln Artist", "storm kiln artist", "auto", "verified", {"effect": "creature", "battle_model_scope": "creature_body_artifact_power_magecraft_treasure_annotation_v1", "magecraft_treasure_status": "annotation_only"}),
         ("Galvanoth", "galvanoth", "auto", "verified", {"effect": "creature", "battle_model_scope": "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1", "upkeep_may_cast_top_instant_or_sorcery_without_paying_mana": True}),
         ("Apex of Power", "apex of power", "auto", "active", {"effect": "passive", "battle_model_scope": "impulse_top_seven_plus_hand_cast_mana_annotation_v1", "impulse_top_seven_until_eot": True}),
+        ("Lion's Eye Diamond", "lion s eye diamond", "auto", "verified", {"effect": "ramp_ritual", "mana_produced": 3, "produces": "WUBRGC"}),
+        ("Treasonous Ogre", "treasonous ogre", "auto", "verified", {"effect": "creature", "is_mana_source": True, "mana_produced": 1, "produces": "R", "power": 2, "toughness": 3}),
+        ("Surly Badgersaur", "surly badgersaur", "auto", "verified", {"effect": "creature", "battle_model_scope": "surly_badgersaur_discard_card_type_triggers_v1", "trigger": "controller_discard", "controller_discard_land_create_treasure": True}),
         ("Grinding Station", "grinding station", "auto", "verified", {"effect": "ramp_permanent", "mana_produced": 1}),
         ("Thrumming Stone", "thrumming stone", "auto", "verified", {"effect": "ripple_engine", "battle_model_scope": "static_spell_ripple_4_same_name_runtime_v1"}),
     ]
@@ -187,6 +193,34 @@ def test_generator_uses_cut_safety_roles_for_ramp_and_big_spell_packages():
     assert any("candidate_scope_not_same_lane" in row["blockers"] for row in grinding_rows)
     thrumming_rows = [row for row in payload["top_pair_evaluations"] if row["candidate"] == "Thrumming Stone"]
     assert any("candidate_scope_not_same_lane" in row["blockers"] for row in thrumming_rows)
+
+
+def test_generator_blocks_under_modeled_costs_and_conditional_ramp_payoffs():
+    with build_conn() as conn:
+        payload = generator.build_report(
+            conn=conn,
+            manual_review=manual_review(),
+            prior_results={"by_signature": {}},
+            cut_safety=cut_safety(),
+            db_path=Path("memory.db"),
+            manual_review_path=Path("manual_review.json"),
+            variant_deck_ids=[616],
+            max_per_cut=4,
+        )
+
+    rows_by_candidate = {
+        row["candidate"]: row
+        for row in payload["top_pair_evaluations"]
+        if row["cut"] == "Bender's Waterskin"
+    }
+    assert "candidate_unmodeled_discard_hand_cost" in rows_by_candidate["Lion's Eye Diamond"]["blockers"]
+    assert "candidate_unmodeled_life_payment_mana_cost" in rows_by_candidate["Treasonous Ogre"]["blockers"]
+    assert (
+        "candidate_conditional_discard_payoff_not_early_mana_replacement"
+        in rows_by_candidate["Surly Badgersaur"]["blockers"]
+    )
+    assert payload["summary"]["blocker_counts"]["candidate_unmodeled_discard_hand_cost"] >= 1
+    assert payload["summary"]["blocker_counts"]["candidate_unmodeled_life_payment_mana_cost"] >= 1
 
 
 def test_generator_excludes_prior_exact_rejects():

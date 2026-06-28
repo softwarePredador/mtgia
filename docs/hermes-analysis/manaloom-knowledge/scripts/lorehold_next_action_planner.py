@@ -51,6 +51,9 @@ DEFAULT_RECURSION_CUT_MODEL_REPORTS = [
 DEFAULT_MANA_BASE_VALIDATOR_REPORTS = [
     REPORT_DIR / "lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json"
 ]
+DEFAULT_PROFILED_CUT_BENCHMARK_REPORTS = [
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json"
+]
 DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
@@ -65,6 +68,8 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
     REPORT_DIR
     / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
     DEFAULT_STRATEGY_AUDIT,
     REPORT_DIR / "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json",
 ]
@@ -92,6 +97,26 @@ def read_existing_json(paths: Iterable[Path]) -> list[tuple[Path, dict[str, Any]
         if path.exists():
             loaded.append((path, read_json(path)))
     return loaded
+
+
+def latest_profiled_cut_benchmark(
+    reports: list[tuple[Path, dict[str, Any]]] | None,
+) -> tuple[Path, dict[str, Any]] | None:
+    if not reports:
+        return None
+    return reports[-1]
+
+
+def is_profiled_cut_benchmark_exhausted(payload: dict[str, Any]) -> bool:
+    summary = payload.get("summary") or {}
+    return (
+        summary.get("recommended_next_action") == "no_profiled_cut_benchmark_package_ready"
+        or (
+            int(summary.get("profiled_cut_count") or 0) > 0
+            and int(summary.get("preflight_ready_pair_count") or 0) == 0
+            and int(summary.get("selected_package_count") or 0) == 0
+        )
+    )
 
 
 def exposure_lookup(exposure_profiles: list[tuple[Path, dict[str, Any]]]) -> dict[str, dict[str, Any]]:
@@ -930,7 +955,10 @@ def build_runtime_action(miner_report: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
-def build_cut_exposure_action(manual_review: dict[str, Any]) -> dict[str, Any] | None:
+def build_cut_exposure_action(
+    manual_review: dict[str, Any],
+    profiled_cut_benchmark_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+) -> dict[str, Any] | None:
     expansion = manual_review.get("cut_evidence_expansion") or {}
     summary = expansion.get("summary") or {}
     top_rows = list(expansion.get("top_exposure_candidates") or [])
@@ -965,6 +993,35 @@ def build_cut_exposure_action(manual_review: dict[str, Any]) -> dict[str, Any] |
     if int(summary.get("manual_same_lane_only_count") or 0) > 0 and same_lane_rows:
         top = same_lane_rows[:8]
         protected = list(expansion.get("top_protected_exposure_slots") or [])[:8]
+        latest_benchmark = latest_profiled_cut_benchmark(profiled_cut_benchmark_reports)
+        if latest_benchmark and is_profiled_cut_benchmark_exhausted(latest_benchmark[1]):
+            benchmark_summary = latest_benchmark[1].get("summary") or {}
+            return {
+                "priority": 3,
+                "action_key": "record_profiled_same_lane_benchmarks_exhausted",
+                "status": "profiled_same_lane_benchmark_queue_exhausted",
+                "lane": "cut_modeling",
+                "candidate_cards": [],
+                "cut_cards": [str(row.get("card_name") or "") for row in top],
+                "why_now": (
+                    "The profiled same-lane benchmark generator found no remaining preflight-ready "
+                    "packages after loading prior negative evidence."
+                ),
+                "blockers": [
+                    "same-lane candidate queue is exhausted for the currently profiled cuts",
+                    "all evaluated same-lane packages either regressed strong seed 42 or are blocked by prior evidence",
+                ],
+                "next_steps": [
+                    "Do not keep rerunning the profiled cut benchmark generator until the shell, corpus, or runtime rules change.",
+                    "Move to focus-access trace review and failure-targeted package synthesis.",
+                    "Reopen these cuts only if new variant cards become runtime-ready or the cut model changes.",
+                ],
+                "cut_evidence_summary": summary,
+                "top_same_lane_cut_candidates": top,
+                "protected_high_exposure_cut_slots": protected,
+                "profiled_cut_benchmark_report": str(latest_benchmark[0]),
+                "profiled_cut_benchmark_summary": benchmark_summary,
+            }
         return {
             "priority": -3,
             "action_key": "build_same_lane_benchmarks_from_profiled_cut_slots",
@@ -1220,6 +1277,7 @@ def build_guardrails(
     hypothesis_queue: dict[str, Any] | None = None,
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     inconclusive_packages: dict[str, dict[str, Any]] | None = None,
+    profiled_cut_benchmark_reports: list[tuple[Path, dict[str, Any]]] | None = None,
 ) -> list[dict[str, Any]]:
     negative = miner_report.get("negative_exact_packages") or []
     prior_rejections = rejected_package_evidence(prior_package_reports or [])
@@ -1258,6 +1316,18 @@ def build_guardrails(
                 "reason": (
                     "A package with low added-card exposure cannot be promoted or rejected "
                     "as card-level evidence until the added card is actually accessed or used."
+                ),
+            }
+        )
+    latest_benchmark = latest_profiled_cut_benchmark(profiled_cut_benchmark_reports)
+    if latest_benchmark and is_profiled_cut_benchmark_exhausted(latest_benchmark[1]):
+        guardrails.append(
+            {
+                "guardrail_key": "profiled_same_lane_benchmark_queue_exhausted",
+                "source_report": str(latest_benchmark[0]),
+                "reason": (
+                    "The latest profiled cut benchmark generator has no remaining preflight-ready "
+                    "same-lane package, so the planner must advance to trace or runtime work."
                 ),
             }
         )
@@ -1302,6 +1372,7 @@ def build_plan(
     hand_filter_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     recursion_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     mana_base_validator_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    profiled_cut_benchmark_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     strategy_audit: dict[str, Any] | None = None,
     hypothesis_queue: dict[str, Any] | None = None,
@@ -1317,7 +1388,10 @@ def build_plan(
     actions = []
     prior_rejections = rejected_package_evidence(prior_package_reports or [])
     inconclusive_packages = inconclusive_package_evidence(prior_package_reports or [])
-    cut_exposure_action = build_cut_exposure_action(manual_review)
+    cut_exposure_action = build_cut_exposure_action(
+        manual_review,
+        profiled_cut_benchmark_reports=profiled_cut_benchmark_reports,
+    )
     if cut_exposure_action:
         actions.append(cut_exposure_action)
     inconclusive_action = build_inconclusive_exposure_action(inconclusive_packages)
@@ -1401,6 +1475,9 @@ def build_plan(
         "mana_base_validator_reports": [
             str(path) for path, _payload in (mana_base_validator_reports or [])
         ],
+        "profiled_cut_benchmark_reports": [
+            str(path) for path, _payload in (profiled_cut_benchmark_reports or [])
+        ],
         "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
         "postgres_writes": False,
         "source_db_mutated": False,
@@ -1435,6 +1512,7 @@ def build_plan(
             hypothesis_queue,
             prior_package_reports,
             inconclusive_packages,
+            profiled_cut_benchmark_reports,
         ),
         "method_notes": [
             "This planner is a decision layer, not a promotion engine.",
@@ -1442,6 +1520,7 @@ def build_plan(
             "Exposure evidence is used to protect proven roles and to decide which lane needs profiling next.",
             "An exhausted hypothesis queue routes back to failure-targeted strategy synthesis before any new gate.",
             "A completed focus-access trace routes to package design; do not regenerate the same payload unless the deck list changes.",
+            "An exhausted profiled cut benchmark queue routes to trace/runtime synthesis instead of repeated same-lane generators.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -1462,6 +1541,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
         f"- Recursion cut model reports: `{', '.join(payload.get('recursion_cut_model_reports') or []) or '-'}`",
         f"- Mana-base validator reports: `{', '.join(payload.get('mana_base_validator_reports') or []) or '-'}`",
+        f"- Profiled cut benchmark reports: `{', '.join(payload.get('profiled_cut_benchmark_reports') or []) or '-'}`",
         f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
@@ -1544,6 +1624,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
     parser.add_argument("--recursion-cut-model-report", type=Path, action="append")
     parser.add_argument("--mana-base-validator-report", type=Path, action="append")
+    parser.add_argument("--profiled-cut-benchmark-report", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260628_v1")
     return parser.parse_args()
@@ -1570,6 +1651,9 @@ def main() -> int:
     mana_base_validator_reports = read_existing_json(
         args.mana_base_validator_report or DEFAULT_MANA_BASE_VALIDATOR_REPORTS
     )
+    profiled_cut_benchmark_reports = read_existing_json(
+        args.profiled_cut_benchmark_report or DEFAULT_PROFILED_CUT_BENCHMARK_REPORTS
+    )
     prior_package_reports = read_existing_json(
         args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
     )
@@ -1581,6 +1665,7 @@ def main() -> int:
         hand_filter_cut_model_reports=hand_filter_cut_model_reports,
         recursion_cut_model_reports=recursion_cut_model_reports,
         mana_base_validator_reports=mana_base_validator_reports,
+        profiled_cut_benchmark_reports=profiled_cut_benchmark_reports,
         prior_package_reports=prior_package_reports,
         strategy_audit=strategy_audit,
         hypothesis_queue=hypothesis_queue,

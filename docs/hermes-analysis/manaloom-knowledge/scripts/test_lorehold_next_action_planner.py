@@ -390,6 +390,22 @@ def prior_profiled_family_seed_matrix_report():
     )
 
 
+def profiled_cut_benchmark_exhausted_report():
+    return (
+        planner.REPORT_DIR
+        / "lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json",
+        {
+            "summary": {
+                "recommended_next_action": "no_profiled_cut_benchmark_package_ready",
+                "profiled_cut_count": 4,
+                "preflight_ready_pair_count": 0,
+                "selected_package_count": 0,
+                "status_counts": {"blocked": 1080},
+            }
+        },
+    )
+
+
 def prior_strategy_audit_report():
     return (
         planner.DEFAULT_STRATEGY_AUDIT,
@@ -745,6 +761,27 @@ def test_next_action_planner_moves_to_same_lane_benchmarks_after_cut_exposure():
     )
 
 
+def test_next_action_planner_moves_past_exhausted_profiled_same_lane_benchmarks():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review_with_profiled_cut_evidence(),
+        exposure_profiles=[exposure_profile()],
+        trace_audit=trace_audit_report(),
+        profiled_cut_benchmark_reports=[profiled_cut_benchmark_exhausted_report()],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "review_focus_access_trace_then_define_next_deck_or_runtime_package"
+    )
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    exhausted = actions["record_profiled_same_lane_benchmarks_exhausted"]
+    assert exhausted["priority"] == 3
+    assert exhausted["status"] == "profiled_same_lane_benchmark_queue_exhausted"
+    assert exhausted["profiled_cut_benchmark_summary"]["preflight_ready_pair_count"] == 0
+    guardrails = {row["guardrail_key"]: row for row in payload["guardrails"]}
+    assert "profiled_same_lane_benchmark_queue_exhausted" in guardrails
+
+
 def test_next_action_planner_moves_past_rejected_land_tax_tutor_benchmarks():
     payload = planner.build_plan(
         miner_report=miner_report(),
@@ -849,6 +886,8 @@ def test_next_action_planner_default_prior_reports_include_profiled_history():
         "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
         "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
         "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+        "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
     }
     default_names = {path.name for path in planner.DEFAULT_PRIOR_PACKAGE_REPORTS}
     assert expected.issubset(default_names)

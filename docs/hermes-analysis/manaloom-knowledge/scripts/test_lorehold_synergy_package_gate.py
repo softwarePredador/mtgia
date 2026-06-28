@@ -974,6 +974,16 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
             default_names,
         )
+        expected_profiled_history = {
+            "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+            "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+            "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+            "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+            "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+            "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+            "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+        }
+        self.assertTrue(expected_profiled_history.issubset(default_names))
 
     def test_prior_evidence_blocks_aggregate_matrix_reject(self):
         with tempfile.TemporaryDirectory() as tmp:

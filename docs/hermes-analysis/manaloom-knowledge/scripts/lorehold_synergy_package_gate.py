@@ -68,6 +68,14 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
     REPORT_DIR / "lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
     REPORT_DIR / "lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+    REPORT_DIR / "lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+    REPORT_DIR
+    / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
 )
 
 

@@ -537,6 +537,33 @@ def is_policy_blocked_candidate(candidate_name: str) -> bool:
     return normalize_key(candidate_name) in PREMIUM_MOX_POLICY_BLOCKLIST
 
 
+def candidate_runtime_model_blockers(
+    cut: dict[str, Any],
+    candidate: dict[str, Any],
+    candidate_rule: dict[str, Any],
+) -> list[str]:
+    """Block benchmarks where the active rule misses the cost that defines the card."""
+
+    blockers: list[str] = []
+    oracle = str(candidate.get("oracle_text") or "").lower()
+    active_text = active_rule_text(candidate_rule)
+    cut_safety = cut.get("cut_safety") or {}
+    if "discard your hand" in oracle and "discard" not in active_text:
+        blockers.append("candidate_unmodeled_discard_hand_cost")
+    if re.search(r"\bpay \d+ life:\s*add\b", oracle) and "life" not in active_text:
+        blockers.append("candidate_unmodeled_life_payment_mana_cost")
+    if (
+        cut_safety.get("current_lane") == "early_mana"
+        and "whenever you discard" in oracle
+        and "add {" not in oracle
+        and "add one mana" not in oracle
+        and "add two mana" not in oracle
+        and "add three" not in oracle
+    ):
+        blockers.append("candidate_conditional_discard_payoff_not_early_mana_replacement")
+    return blockers
+
+
 def effective_cut_role(cut: dict[str, Any]) -> str:
     cut_safety = cut.get("cut_safety") or {}
     return (
@@ -580,6 +607,7 @@ def score_candidate(
         blockers.append("prior_exact_reject")
     if is_policy_blocked_candidate(candidate_name):
         blockers.append("candidate_policy_blocked_no_premium_mox")
+    blockers.extend(candidate_runtime_model_blockers(cut, candidate, candidate_rule))
     if cut_role == "spot_removal" and is_narrow_color_hate(candidate, candidate_rule):
         blockers.append("candidate_narrow_color_hate")
     deck_count = int(candidate.get("deck_count") or 0)
@@ -720,6 +748,11 @@ def build_report(
     ]
     packages = [build_manifest_package(row, manual_review_path) for row in selected]
     status_counts = Counter(row["status"] for row in pair_rows)
+    blocker_counts = Counter(
+        blocker
+        for row in pair_rows
+        for blocker in row.get("blockers", [])
+    )
     blocked_cut_rows = [
         {
             "card_name": row.get("card_name"),
@@ -750,6 +783,7 @@ def build_report(
             "preflight_ready_pair_count": len([row for row in pair_rows if row["status"] == "preflight_ready"]),
             "selected_package_count": len(packages),
             "status_counts": dict(sorted(status_counts.items())),
+            "blocker_counts": dict(sorted(blocker_counts.items())),
             "recommended_next_action": (
                 "run_profiled_cut_benchmark_preflight"
                 if packages
