@@ -33,6 +33,9 @@ DEFAULT_STRATEGY_AUDIT = (
 DEFAULT_HYPOTHESIS_QUEUE = (
     REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
 )
+DEFAULT_TRACE_AUDIT = (
+    REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
+)
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260627_v1.json"]
 DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_hand_filter_cut_model_20260627_v3_big_score_rejected.json"
@@ -829,6 +832,72 @@ def build_strategy_synthesis_action(
     }
 
 
+def build_focus_access_trace_action(trace_audit: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not trace_audit:
+        return None
+    summary = trace_audit.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    status_counts = summary.get("trace_status_counts") or {}
+    if recommended != "review_focus_access_trace_then_define_next_deck_or_runtime_package":
+        return None
+    if not (
+        status_counts.get("focus_access_trace_available_review_sequence")
+        or status_counts.get("focus_access_trace_available_review_conversion")
+    ):
+        return None
+    assessments = []
+    focus_cards = set()
+    for row in trace_audit.get("hypothesis_assessments") or []:
+        status = str(row.get("trace_status") or "")
+        if status not in {
+            "focus_access_trace_available_review_sequence",
+            "focus_access_trace_available_review_conversion",
+            "trace_evidence_supports_sequencing_gap",
+            "runtime_trace_payload_available_review_model_scope",
+        }:
+            continue
+        cards = [str(card) for card in row.get("focus_cards") or []]
+        focus_cards.update(cards)
+        assessments.append(
+            {
+                "hypothesis_key": row.get("hypothesis_key"),
+                "trace_status": status,
+                "target_seeds": row.get("target_seeds") or [],
+                "focus_cards": cards,
+                "next_action": row.get("next_action"),
+                "current_limitations": (row.get("current_limitations") or [])[:3],
+            }
+        )
+    return {
+        "priority": -2,
+        "action_key": "review_focus_access_trace_then_define_next_deck_or_runtime_package",
+        "status": "focus_access_trace_ready_for_package_design",
+        "lane": "strategy_learning",
+        "candidate_cards": sorted(focus_cards),
+        "cut_cards": [],
+        "why_now": (
+            "The latest failure-targeted audit has per-game access snapshots for the weak seeds. "
+            "The blocker moved from missing telemetry to deciding whether access density, conversion timing, "
+            "or runtime sequencing should be tested next."
+        ),
+        "blockers": [
+            "seed 7 and seed 20260625 still lose 0-9 in the candidate-only access diagnostics",
+            "Squee and Land Tax are not naturally accessible in the weak seeds even though seed 42 wins when access appears early",
+            "prior exact tutor-over-Land-Tax benchmarks are negative, so the next package must preserve protected engine pieces unless a same-lane cut model proves otherwise",
+        ],
+        "next_steps": [
+            "Build a small access package that increases early Top/Rack/Library/Squee reach without repeating rejected Land Tax cuts.",
+            "Prefer cards already in local oracle/rule scope, then gate only the package that preserves seed-42 miracle/topdeck telemetry.",
+            "If the package cannot be evaluated because a card lacks runtime behavior, route that card to XMage/runtime implementation before battle.",
+        ],
+        "evidence": {
+            "trace_summary": summary,
+            "candidate_key": trace_audit.get("candidate_key"),
+            "hypothesis_assessments": assessments,
+        },
+    }
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -893,14 +962,19 @@ def build_plan(
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     strategy_audit: dict[str, Any] | None = None,
     hypothesis_queue: dict[str, Any] | None = None,
+    trace_audit: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
     hypothesis_queue_path: Path = DEFAULT_HYPOTHESIS_QUEUE,
+    trace_audit_path: Path = DEFAULT_TRACE_AUDIT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
     actions = []
+    trace_action = build_focus_access_trace_action(trace_audit)
+    if trace_action:
+        actions.append(trace_action)
     strategy_action = build_strategy_synthesis_action(strategy_audit, hypothesis_queue)
     if strategy_action:
         actions.append(strategy_action)
@@ -962,6 +1036,7 @@ def build_plan(
         "manual_review": str(manual_path),
         "strategy_audit": str(strategy_path) if strategy_audit else "",
         "hypothesis_queue": str(hypothesis_queue_path) if hypothesis_queue else "",
+        "trace_audit": str(trace_audit_path) if trace_audit else "",
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
         "tutor_cut_model_reports": [
             str(path) for path, _payload in (tutor_cut_model_reports or [])
@@ -994,6 +1069,9 @@ def build_plan(
             "hypothesis_queue_status_counts": (
                 (hypothesis_queue or {}).get("summary") or {}
             ).get("status_counts", {}),
+            "trace_audit_status_counts": (
+                (trace_audit or {}).get("summary") or {}
+            ).get("trace_status_counts", {}),
         },
         "action_queue": actions,
         "guardrails": build_guardrails(miner_report, manual_review, hypothesis_queue),
@@ -1002,6 +1080,7 @@ def build_plan(
             "A runtime-ready card is not gate-ready unless a safe cut model exists.",
             "Exposure evidence is used to protect proven roles and to decide which lane needs profiling next.",
             "An exhausted hypothesis queue routes back to failure-targeted strategy synthesis before any new gate.",
+            "A completed focus-access trace routes to package design; do not regenerate the same payload unless the deck list changes.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -1016,6 +1095,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Manual review: `{payload['manual_review']}`",
         f"- Strategy audit: `{payload.get('strategy_audit') or '-'}`",
         f"- Hypothesis queue: `{payload.get('hypothesis_queue') or '-'}`",
+        f"- Trace audit: `{payload.get('trace_audit') or '-'}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
         f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
         f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
@@ -1093,6 +1173,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--manual-review", type=Path, default=DEFAULT_MANUAL_REVIEW)
     parser.add_argument("--strategy-audit", type=Path, default=DEFAULT_STRATEGY_AUDIT)
     parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
+    parser.add_argument("--trace-audit", type=Path, default=DEFAULT_TRACE_AUDIT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
     parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
@@ -1109,6 +1190,7 @@ def main() -> int:
     manual_review = read_json(args.manual_review)
     strategy_audit = read_json(args.strategy_audit) if args.strategy_audit.exists() else None
     hypothesis_queue = read_json(args.hypothesis_queue) if args.hypothesis_queue.exists() else None
+    trace_audit = read_json(args.trace_audit) if args.trace_audit.exists() else None
     exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
     exposure_profiles = read_existing_json(exposure_paths)
     tutor_cut_model_reports = read_existing_json(
@@ -1137,10 +1219,12 @@ def main() -> int:
         prior_package_reports=prior_package_reports,
         strategy_audit=strategy_audit,
         hypothesis_queue=hypothesis_queue,
+        trace_audit=trace_audit,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,
         hypothesis_queue_path=args.hypothesis_queue,
+        trace_audit_path=args.trace_audit,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

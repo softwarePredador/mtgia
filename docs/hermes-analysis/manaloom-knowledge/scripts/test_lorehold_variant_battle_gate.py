@@ -331,6 +331,47 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
             1,
         )
 
+    def test_gate_telemetry_records_focus_card_access_snapshot(self):
+        telemetry = gate.GateTelemetry()
+        telemetry.begin("game-access")
+        telemetry.record(
+            "focus_card_access_snapshot",
+            {
+                "player": "Lorehold",
+                "phase": "opening_keep",
+                "turn": 0,
+                "hand_size": 7,
+                "library_size": 92,
+                "focus_card_zones": {
+                    "Squee, Goblin Nabob": {
+                        "zone": "library",
+                        "library_position": 18,
+                    },
+                    "Sensei's Divining Top": {"zone": "hand"},
+                    "Library of Leng": {"zone": "absent"},
+                },
+                "focus_cards_seen": ["Squee, Goblin Nabob", "Sensei's Divining Top"],
+                "hand_focus": ["Sensei's Divining Top"],
+                "library_focus": ["Squee, Goblin Nabob"],
+                "library_top_focus": [],
+                "top_library": [{"name": "Mountain"}],
+                "opening_reason": "early_card_flow:Sensei's Divining Top:1",
+            },
+        )
+
+        payload = telemetry.as_json(1)
+        trace = payload["focus_card_game_traces"]["game-access"][0]
+        self.assertEqual(trace["event"], "focus_card_access_snapshot")
+        self.assertIn("Squee, Goblin Nabob", trace["cards"])
+        self.assertEqual(
+            trace["data"]["focus_card_zones"]["Squee, Goblin Nabob"]["library_position"],
+            18,
+        )
+        self.assertEqual(
+            payload["focus_card_trace_card_counts_by_game"]["game-access"]["Sensei's Divining Top"],
+            1,
+        )
+
     def test_gate_telemetry_does_not_count_spell_target_as_squee_graveyard_entry(self):
         telemetry = gate.GateTelemetry()
         telemetry.begin("game-target")

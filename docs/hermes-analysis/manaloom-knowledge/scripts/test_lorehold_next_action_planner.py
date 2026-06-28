@@ -132,6 +132,39 @@ def manual_review():
     }
 
 
+def trace_audit_report():
+    return {
+        "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+        "summary": {
+            "recommended_next_action": "review_focus_access_trace_then_define_next_deck_or_runtime_package",
+            "trace_status_counts": {
+                "focus_access_trace_available_review_sequence": 1,
+                "focus_access_trace_available_review_conversion": 1,
+                "runtime_trace_payload_available_review_model_scope": 1,
+                "trace_evidence_supports_sequencing_gap": 1,
+            },
+        },
+        "hypothesis_assessments": [
+            {
+                "hypothesis_key": "trace_seed7_engine_access_sequence",
+                "trace_status": "focus_access_trace_available_review_sequence",
+                "target_seeds": ["7"],
+                "focus_cards": ["Squee, Goblin Nabob", "Sensei's Divining Top"],
+                "next_action": "review weak-seed access sequence",
+                "current_limitations": ["Squee stayed in library in seed 7"],
+            },
+            {
+                "hypothesis_key": "trace_seed20260625_conversion_window",
+                "trace_status": "focus_access_trace_available_review_conversion",
+                "target_seeds": ["20260625"],
+                "focus_cards": ["The Mind Stone", "Land Tax"],
+                "next_action": "review conversion-window access trace",
+                "current_limitations": ["Land Tax stayed in library in seed 20260625"],
+            },
+        ],
+    }
+
+
 def exposure_profile():
     return (
         planner.DEFAULT_EXPOSURE_PROFILES[0],
@@ -466,6 +499,24 @@ def test_next_action_planner_moves_past_rejected_land_tax_tutor_benchmarks():
         "gamble_access_benchmark_cut_land_tax",
         "enlightened_access_benchmark_cut_land_tax",
     }
+
+
+def test_next_action_planner_prioritizes_focus_access_trace_review():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        trace_audit=trace_audit_report(),
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "review_focus_access_trace_then_define_next_deck_or_runtime_package"
+    )
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    action = actions["review_focus_access_trace_then_define_next_deck_or_runtime_package"]
+    assert action["status"] == "focus_access_trace_ready_for_package_design"
+    assert "Squee, Goblin Nabob" in action["candidate_cards"]
+    assert "The Mind Stone" in action["candidate_cards"]
 
 
 def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():

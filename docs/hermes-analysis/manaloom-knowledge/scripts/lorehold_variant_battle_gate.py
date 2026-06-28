@@ -63,6 +63,7 @@ FOCUS_TRACE_CARDS = {
 FOCUS_TRACE_EVENTS = {
     "activated_ability",
     "cost_paid",
+    "focus_card_access_snapshot",
     "land_tax_trigger_resolved",
     "land_tax_trigger_skipped",
     "lorehold_upkeep_rummage",
@@ -470,6 +471,14 @@ class GateTelemetry:
         self.squee_trace_samples.append(trace)
 
     def _focus_card_matches(self, event: str, data: Mapping[str, Any]) -> list[str]:
+        if event == "focus_card_access_snapshot":
+            zones = data.get("focus_card_zones") or {}
+            if isinstance(zones, Mapping):
+                return sorted(
+                    card
+                    for card in FOCUS_TRACE_CARDS
+                    if card in zones and (zones.get(card) or {}).get("zone") != "absent"
+                )
         raw = json.dumps(data, sort_keys=True, default=str)
         matches = {
             card
@@ -532,6 +541,29 @@ class GateTelemetry:
             "top_after",
             "hand_to_top",
             "hand_gained",
+            "hand_size",
+            "battlefield_size",
+            "graveyard_size",
+            "exile_size",
+            "library_size",
+            "available_mana",
+            "lands_played_this_turn",
+            "focus_cards_seen",
+            "focus_card_zones",
+            "hand_focus",
+            "battlefield_focus",
+            "graveyard_focus",
+            "exile_focus",
+            "command_zone_focus",
+            "library_focus",
+            "library_top_focus",
+            "top_library",
+            "drawn_for_turn",
+            "mulligan_count",
+            "opening_reason",
+            "opening_keep",
+            "opening_risk_flags",
+            "cleanup_discarded",
             "first_draw",
             "drawn",
             "putback",

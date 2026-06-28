@@ -32,9 +32,9 @@ DEFAULT_GATE_PATHS = [
 ]
 
 DEFAULT_DIAGNOSTIC_GATE_PATHS = [
-    REPORT_DIR / "lorehold_focus_trace_diag_seed7_20260628_v1.json",
-    REPORT_DIR / "lorehold_focus_trace_diag_seed20260625_20260628_v1.json",
-    REPORT_DIR / "lorehold_focus_trace_diag_seed42_candidate_only_20260628_v1.json",
+    REPORT_DIR / "lorehold_focus_access_diag_seed7_candidate_only_20260628_v1.json",
+    REPORT_DIR / "lorehold_focus_access_diag_seed20260625_candidate_only_20260628_v1.json",
+    REPORT_DIR / "lorehold_focus_access_diag_seed42_candidate_only_20260628_v1.json",
 ]
 
 DEFAULT_FOCUS_CARDS = [
@@ -402,6 +402,102 @@ def summarize_focus_traces(result: Mapping[str, Any], focus_cards: Iterable[str]
     }
 
 
+def summarize_focus_access(result: Mapping[str, Any], focus_cards: Iterable[str]) -> dict[str, Any]:
+    telemetry = result.get("telemetry") or {}
+    traces = telemetry.get("focus_card_game_traces") or {}
+    focus = [str(card) for card in focus_cards]
+    zone_counts: dict[str, Counter[str]] = defaultdict(Counter)
+    phase_counts: dict[str, Counter[str]] = defaultdict(Counter)
+    games_by_card_zone: dict[str, dict[str, set[str]]] = {
+        card: defaultdict(set) for card in focus
+    }
+    first_seen: dict[str, dict[str, Any]] = {}
+    first_hand_or_battlefield: dict[str, dict[str, Any]] = {}
+    opening_zones: dict[str, Counter[str]] = defaultdict(Counter)
+    early_zones: dict[str, Counter[str]] = defaultdict(Counter)
+    min_library_position: dict[str, int] = {}
+    snapshot_count = 0
+    game_count = 0
+
+    for game_id, rows in traces.items():
+        game_has_snapshot = False
+        for row in rows or []:
+            if row.get("event") != "focus_card_access_snapshot":
+                continue
+            data = row.get("data") or {}
+            if not isinstance(data, Mapping):
+                continue
+            zones = data.get("focus_card_zones") or {}
+            if not isinstance(zones, Mapping):
+                continue
+            snapshot_count += 1
+            game_has_snapshot = True
+            phase = str(data.get("phase") or "")
+            try:
+                turn = int(data.get("turn") or 0)
+            except (TypeError, ValueError):
+                turn = 0
+            for card in focus:
+                entry = zones.get(card) or {}
+                if not isinstance(entry, Mapping):
+                    entry = {}
+                zone = str(entry.get("zone") or "absent")
+                zone_counts[card][zone] += 1
+                phase_counts[card][phase] += 1
+                games_by_card_zone[card][zone].add(str(game_id))
+                if card not in first_seen and zone != "absent":
+                    first_seen[card] = {
+                        "game_id": game_id,
+                        "turn": turn,
+                        "phase": phase,
+                        "zone": zone,
+                        "library_position": entry.get("library_position"),
+                    }
+                if zone in {"hand", "battlefield"} and card not in first_hand_or_battlefield:
+                    first_hand_or_battlefield[card] = {
+                        "game_id": game_id,
+                        "turn": turn,
+                        "phase": phase,
+                        "zone": zone,
+                    }
+                if phase == "opening_keep":
+                    opening_zones[card][zone] += 1
+                if turn <= 3:
+                    early_zones[card][zone] += 1
+                if zone == "library" and entry.get("library_position") is not None:
+                    try:
+                        position = int(entry.get("library_position"))
+                    except (TypeError, ValueError):
+                        position = 0
+                    if position > 0:
+                        previous = min_library_position.get(card)
+                        if previous is None or position < previous:
+                            min_library_position[card] = position
+        if game_has_snapshot:
+            game_count += 1
+
+    by_card = {}
+    for card in focus:
+        by_card[card] = {
+            "zone_counts": dict(sorted(zone_counts.get(card, {}).items())),
+            "phase_counts": dict(sorted(phase_counts.get(card, {}).items())),
+            "opening_zones": dict(sorted(opening_zones.get(card, {}).items())),
+            "early_zones": dict(sorted(early_zones.get(card, {}).items())),
+            "games_by_zone": {
+                zone: len(games)
+                for zone, games in sorted(games_by_card_zone.get(card, {}).items())
+            },
+            "first_seen": first_seen.get(card),
+            "first_hand_or_battlefield": first_hand_or_battlefield.get(card),
+            "min_library_position": min_library_position.get(card),
+        }
+    return {
+        "snapshot_count": snapshot_count,
+        "snapshot_game_count": game_count,
+        "by_card": by_card,
+    }
+
+
 def card_observation(
     *,
     card: str,
@@ -412,6 +508,7 @@ def card_observation(
     per_game: Mapping[str, Any],
     squee_trace: Mapping[str, Any],
     focus_trace: Mapping[str, Any],
+    focus_access: Mapping[str, Any],
 ) -> dict[str, Any]:
     card_events = CARD_EVENT_KEYS.get(card, [])
     aggregate_event_counts: dict[str, int] = {}
@@ -428,11 +525,14 @@ def card_observation(
 
     trace_matches = (squee_trace.get("matched_cards") or {}).get(card) or {}
     focus_trace_matches = (focus_trace.get("matched_cards") or {}).get(card) or {}
+    access_summary = (focus_access.get("by_card") or {}).get(card) or {}
     metrics = list(top_metrics.get(card) or [])
     has_game_results = int(per_game.get("game_count") or 0) > 0
     has_squee_trace = int(squee_trace.get("trace_game_count") or 0) > 0
 
-    if focus_trace_matches:
+    if access_summary and int(focus_access.get("snapshot_count") or 0) > 0:
+        evidence_level = "focus_access_trace_available"
+    elif focus_trace_matches:
         evidence_level = "focus_card_trace_available"
     elif trace_matches:
         evidence_level = "partial_game_trace_available"
@@ -460,6 +560,7 @@ def card_observation(
         "focus_trace_payload_fields": dict(
             sorted(((focus_trace.get("payload_field_counts") or {}).get(card) or {}).items())
         ),
+        "focus_access": access_summary,
     }
 
 
@@ -480,6 +581,7 @@ def compact_seed_source(
     top_metrics = top_card_metrics_by_card(result, focus_cards)
     squee_trace = summarize_squee_traces(result, focus_cards)
     focus_trace = summarize_focus_traces(result, focus_cards)
+    focus_access = summarize_focus_access(result, focus_cards)
 
     if per_game["game_count"]:
         trace_data_level = "per_game_event_counts"
@@ -500,6 +602,7 @@ def compact_seed_source(
             per_game=per_game,
             squee_trace=squee_trace,
             focus_trace=focus_trace,
+            focus_access=focus_access,
         )
         for card in focus_cards
     ]
@@ -529,6 +632,7 @@ def compact_seed_source(
         "per_game_samples": per_game["games"][:9],
         "squee_trace_summary": squee_trace,
         "focus_trace_summary": focus_trace,
+        "focus_access_summary": focus_access,
         "card_observations": observations,
     }
 
@@ -685,6 +789,14 @@ def hypothesis_status(
             reasons.append("missing required payload fields: " + "; ".join(required))
         return "runtime_trace_partial_missing_tutor_payload", reasons
 
+    if key == "trace_seed7_engine_access_sequence" and focus_access_available(seed_records, seeds):
+        reasons.extend(focus_access_brief(seed_records, seeds, focus_cards))
+        return "focus_access_trace_available_review_sequence", reasons
+
+    if key == "trace_seed20260625_conversion_window" and focus_access_available(seed_records, seeds):
+        reasons.extend(focus_access_brief(seed_records, seeds, focus_cards))
+        return "focus_access_trace_available_review_conversion", reasons
+
     required = CARD_TRACE_REQUIRED_FIELDS.get(key) or []
     if required:
         reasons.append("missing required payload fields: " + "; ".join(required))
@@ -711,6 +823,46 @@ def focus_payload_available(
         if required_fields <= fields:
             return True
     return False
+
+
+def focus_access_available(
+    seed_records: Mapping[str, dict[str, Any]],
+    seeds: Iterable[str],
+) -> bool:
+    for seed in seeds:
+        summary = seed_records.get(str(seed), {}).get("focus_access_summary") or {}
+        if int(summary.get("snapshot_count") or 0) <= 0:
+            return False
+    return True
+
+
+def focus_access_brief(
+    seed_records: Mapping[str, dict[str, Any]],
+    seeds: Iterable[str],
+    focus_cards: Iterable[str],
+) -> list[str]:
+    reasons = []
+    for seed in seeds:
+        summary = seed_records.get(str(seed), {}).get("focus_access_summary") or {}
+        by_card = summary.get("by_card") or {}
+        details = []
+        for card in focus_cards:
+            row = by_card.get(card) or {}
+            opening = row.get("opening_zones") or {}
+            early = row.get("early_zones") or {}
+            first_hand = row.get("first_hand_or_battlefield") or {}
+            min_library = row.get("min_library_position")
+            detail = (
+                f"{card}:opening={opening or '-'};"
+                f"early={early or '-'};"
+                f"first_hand_or_battlefield={first_hand or '-'}"
+            )
+            if min_library is not None:
+                detail += f";min_library_position={min_library}"
+            details.append(detail)
+        if details:
+            reasons.append(f"focus access seed {seed}: " + " | ".join(details[:5]))
+    return reasons
 
 
 def build_hypothesis_assessments(
@@ -756,6 +908,10 @@ def build_hypothesis_assessments(
 
 
 def next_action_for_status(status: str) -> str:
+    if status == "focus_access_trace_available_review_sequence":
+        return "review weak-seed access sequence and decide whether tutor/draw density or runtime sequencing is the blocker"
+    if status == "focus_access_trace_available_review_conversion":
+        return "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package"
     if status == "trace_evidence_supports_sequencing_gap":
         return "add sequencing/runtime probe for Squee graveyard entry before testing another card swap"
     if status == "runtime_trace_payload_available_review_model_scope":
@@ -816,6 +972,10 @@ def build_report(
 
 
 def recommended_next_action(status_counts: Mapping[str, int]) -> str:
+    if status_counts.get("focus_access_trace_available_review_sequence") or status_counts.get(
+        "focus_access_trace_available_review_conversion"
+    ):
+        return "review_focus_access_trace_then_define_next_deck_or_runtime_package"
     if status_counts.get("runtime_trace_partial_missing_tutor_payload"):
         return "extend_focus_card_trace_payload_then_rerun_seed_diagnostics"
     if status_counts.get("runtime_trace_payload_available_review_model_scope"):
@@ -899,8 +1059,18 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
                 for key, value in (obs.get("focus_trace_matches") or {}).items()
             ]
             field_bits = sorted((obs.get("focus_trace_payload_fields") or {}).keys())
+            access = obs.get("focus_access") or {}
+            access_bits = []
+            if access:
+                access_bits.append(f"opening={access.get('opening_zones') or '-'}")
+                access_bits.append(f"early={access.get('early_zones') or '-'}")
+                access_bits.append(
+                    f"first_hand_or_battlefield={access.get('first_hand_or_battlefield') or '-'}"
+                )
+                if access.get("min_library_position") is not None:
+                    access_bits.append(f"min_library_position={access.get('min_library_position')}")
             lines.append(
-                "- `{card}`: level=`{level}`, metrics=`{metrics}`, events=`{events}`, games_with=`{games}`, trace=`{trace}`, focus_trace=`{focus}`, focus_fields=`{fields}`".format(
+                "- `{card}`: level=`{level}`, metrics=`{metrics}`, events=`{events}`, games_with=`{games}`, trace=`{trace}`, focus_trace=`{focus}`, focus_fields=`{fields}`, access=`{access}`".format(
                     card=obs["card_name"],
                     level=obs["evidence_level"],
                     metrics=", ".join(metric_bits) or "-",
@@ -909,6 +1079,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
                     trace=", ".join(trace_bits) or "-",
                     focus=", ".join(focus_bits) or "-",
                     fields=", ".join(field_bits) or "-",
+                    access="; ".join(access_bits) or "-",
                 )
             )
         lines.append("")

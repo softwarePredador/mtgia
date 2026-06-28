@@ -6319,6 +6319,15 @@ def play_mulligan(player, rng):
             bottomed_cards=bottomed_cards,
             forced_keep=forced_keep,
         )
+    emit_focus_card_access_snapshot(
+        player,
+        turn=0,
+        phase="opening_keep",
+        mulligan_count=mulligan_count,
+        opening_reason=evaluation.get("reason"),
+        opening_keep=bool(evaluation.get("keep")),
+        opening_risk_flags=list(evaluation.get("risk_flags") or []),
+    )
     return mulligan_count
 
 
@@ -6368,6 +6377,107 @@ def _opening_hand_summary(hand):
         }
         for card in hand
     ]
+
+
+FOCUS_ACCESS_CARD_NAMES = (
+    "Urza's Saga",
+    "Library of Leng",
+    "Sensei's Divining Top",
+    "Scroll Rack",
+    "Squee, Goblin Nabob",
+    "The Mind Stone",
+    "Land Tax",
+    "Lorehold, the Historian",
+)
+
+
+def _zone_card_name(card):
+    if isinstance(card, dict):
+        return str(card.get("name") or card.get("card_name") or "?")
+    return str(card)
+
+
+def _focus_zone_names(cards):
+    focus = set(FOCUS_ACCESS_CARD_NAMES)
+    return [
+        _zone_card_name(card)
+        for card in cards or []
+        if _zone_card_name(card) in focus
+    ]
+
+
+def focus_card_zone_snapshot(player):
+    """Trace-only location summary for Lorehold engine cards."""
+    focus = set(FOCUS_ACCESS_CARD_NAMES)
+    zones = {
+        card_name: {"zone": "absent"}
+        for card_name in FOCUS_ACCESS_CARD_NAMES
+    }
+    zone_sources = (
+        ("hand", getattr(player, "hand", []) or []),
+        ("battlefield", getattr(player, "battlefield", []) or []),
+        ("graveyard", getattr(player, "graveyard", []) or []),
+        ("exile", getattr(player, "exile", []) or []),
+        ("command_zone", getattr(player, "command_zone", []) or []),
+        ("library", getattr(player, "library", []) or []),
+    )
+    for zone_name, cards in zone_sources:
+        for index, card in enumerate(cards):
+            name = _zone_card_name(card)
+            if name not in focus:
+                continue
+            entry = {"zone": zone_name}
+            if zone_name == "library":
+                entry["library_index"] = index
+                entry["library_position"] = index + 1
+                entry["library_top_7"] = index < 7
+            zones[name] = entry
+    return zones
+
+
+def emit_focus_card_access_snapshot(player, *, turn, phase, **context):
+    """Emit bounded card-access evidence without changing simulation behavior."""
+    if getattr(player, "name", None) != "Lorehold":
+        return
+    zones = focus_card_zone_snapshot(player)
+    top_library = [
+        replay_card_snapshot(card)
+        for card in (getattr(player, "library", []) or [])[:5]
+    ]
+    emit_replay_event(
+        "focus_card_access_snapshot",
+        player=player.name,
+        phase=phase,
+        turn=turn,
+        hand_size=len(getattr(player, "hand", []) or []),
+        battlefield_size=len(getattr(player, "battlefield", []) or []),
+        graveyard_size=len(getattr(player, "graveyard", []) or []),
+        exile_size=len(getattr(player, "exile", []) or []),
+        library_size=len(getattr(player, "library", []) or []),
+        available_mana=player.available_mana() if hasattr(player, "available_mana") else None,
+        lands_played_this_turn=getattr(player, "lands_played_this_turn", 0),
+        focus_cards_seen=[
+            name for name, entry in zones.items() if entry.get("zone") != "absent"
+        ],
+        focus_card_zones=zones,
+        hand_focus=_focus_zone_names(getattr(player, "hand", []) or []),
+        battlefield_focus=_focus_zone_names(getattr(player, "battlefield", []) or []),
+        graveyard_focus=_focus_zone_names(getattr(player, "graveyard", []) or []),
+        exile_focus=_focus_zone_names(getattr(player, "exile", []) or []),
+        command_zone_focus=_focus_zone_names(getattr(player, "command_zone", []) or []),
+        library_focus=[
+            name
+            for name, entry in zones.items()
+            if entry.get("zone") == "library"
+        ],
+        library_top_focus=[
+            name
+            for name, entry in zones.items()
+            if entry.get("zone") == "library" and entry.get("library_top_7")
+        ],
+        top_library=top_library,
+        **context,
+    )
 
 
 def _opening_hand_land_options(hand):
@@ -34266,6 +34376,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         hand_snapshot=[replay_card_snapshot(card) for card in player.hand],
         board=len(player.battlefield),
     )
+    emit_focus_card_access_snapshot(player, turn=turn, phase="turn_start")
     clear_expired_non_hand_cast_locks(player, all_players, turn)
     decay_table_intent_memory(player)
     player.lands_played_this_turn = 0
@@ -34335,6 +34446,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         all_players=all_players,
         stack=stack,
     )
+    emit_focus_card_access_snapshot(player, turn=turn, phase="after_upkeep_engines")
 
     # ── DRAW ──
     drawn_for_turn = player.draw(1, rng)
@@ -34372,6 +34484,12 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         priority_round(player, all_players, stack, turn, rng, phase="draw_step")
         if turn_ended_by_effect(player):
             return
+    emit_focus_card_access_snapshot(
+        player,
+        turn=turn,
+        phase="after_draw_step",
+        drawn_for_turn=[replay_card_snapshot(card) for card in drawn_for_turn],
+    )
 
     # ── PRECOMBAT MAIN ──
     process_precombat_main_phase_engines(
@@ -34455,6 +34573,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     run_priority_loop(player, all_players, stack, turn, "precombat_main", rng)
     if turn_ended_by_effect(player):
         return
+    emit_focus_card_access_snapshot(player, turn=turn, phase="after_precombat_main")
     if game_winner(all_players):
         return
     if check_sbas(all_players): return
@@ -34634,6 +34753,13 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
         player.graveyard.append(worst)
         discarded_cards.append(worst.get("name", "?"))
         discarded += 1
+
+    emit_focus_card_access_snapshot(
+        player,
+        turn=turn,
+        phase="cleanup",
+        cleanup_discarded=discarded_cards,
+    )
 
     emit_replay_event(
         "turn_end",

@@ -42,7 +42,7 @@ def synthesis_payload():
     }
 
 
-def result(seed, wins, losses, *, game_results=False, squee_trace=False, focus_trace=False):
+def result(seed, wins, losses, *, game_results=False, squee_trace=False, focus_trace=False, focus_access=False):
     telemetry = {
         "event_counts": {
             "saga_chapter_progressed": 2,
@@ -120,6 +120,40 @@ def result(seed, wins, losses, *, game_results=False, squee_trace=False, focus_t
                 }
             ]
         }
+    if focus_access:
+        rows = telemetry["focus_card_game_traces"].setdefault("candidate:opponent:0", [])
+        rows.append(
+            {
+                "seq": 2,
+                "game_id": "candidate:opponent:0",
+                "event": "focus_card_access_snapshot",
+                "cards": [
+                    "Urza's Saga",
+                    "Sensei's Divining Top",
+                    "Scroll Rack",
+                    "Squee, Goblin Nabob",
+                ],
+                "data": {
+                    "player": "Lorehold",
+                    "phase": "opening_keep",
+                    "turn": 0,
+                    "hand_size": 7,
+                    "library_size": 92,
+                    "focus_card_zones": {
+                        "Urza's Saga": {"zone": "hand"},
+                        "Library of Leng": {"zone": "library", "library_position": 12},
+                        "Sensei's Divining Top": {"zone": "hand"},
+                        "Scroll Rack": {"zone": "library", "library_position": 4},
+                        "Squee, Goblin Nabob": {"zone": "library", "library_position": 18},
+                    },
+                    "hand_focus": ["Urza's Saga", "Sensei's Divining Top"],
+                    "library_focus": ["Library of Leng", "Scroll Rack", "Squee, Goblin Nabob"],
+                    "library_top_focus": ["Scroll Rack"],
+                    "top_library": [{"name": "Scroll Rack"}],
+                    "opening_reason": "early_engine:Sensei's Divining Top:1",
+                },
+            }
+        )
 
     payload = {
         "deck_key": audit.CANDIDATE_KEY,
@@ -157,7 +191,7 @@ def result(seed, wins, losses, *, game_results=False, squee_trace=False, focus_t
     return payload
 
 
-def gate(seed, wins, losses, *, game_results=False, squee_trace=False, focus_trace=False):
+def gate(seed, wins, losses, *, game_results=False, squee_trace=False, focus_trace=False, focus_access=False):
     return {
         "simulation_seed": seed,
         "status": "ready",
@@ -169,6 +203,7 @@ def gate(seed, wins, losses, *, game_results=False, squee_trace=False, focus_tra
                 game_results=game_results,
                 squee_trace=squee_trace,
                 focus_trace=focus_trace,
+                focus_access=focus_access,
             )
         ],
     }
@@ -255,3 +290,33 @@ def test_urza_scope_uses_focus_trace_payload_when_available(tmp_path):
     urza_obs = next(row for row in seed7["card_observations"] if row["card_name"] == "Urza's Saga")
     assert urza_obs["evidence_level"] == "focus_card_trace_available"
     assert "candidate_names" in urza_obs["focus_trace_payload_fields"]
+
+
+def test_seed7_access_snapshot_changes_missing_payload_status(tmp_path):
+    diagnostic7 = write_json(
+        tmp_path / "seed7_diag.json",
+        gate(7, 0, 3, game_results=True, focus_access=True),
+    )
+    diagnostic42 = write_json(
+        tmp_path / "seed42_diag.json",
+        gate(42, 2, 1, game_results=True, squee_trace=True, focus_trace=True),
+    )
+
+    report = audit.build_report(
+        synthesis=synthesis_payload(),
+        gate_paths=[],
+        diagnostic_gate_paths=[diagnostic7, diagnostic42],
+    )
+
+    by_key = {row["hypothesis_key"]: row for row in report["hypothesis_assessments"]}
+    seed7 = by_key["trace_seed7_engine_access_sequence"]
+    assert seed7["trace_status"] == "focus_access_trace_available_review_sequence"
+    assert "focus access seed 7" in " ".join(seed7["current_limitations"])
+
+    seed7_record = report["primary_seed_records"]["7"]
+    squee_obs = next(
+        row for row in seed7_record["card_observations"]
+        if row["card_name"] == "Squee, Goblin Nabob"
+    )
+    assert squee_obs["evidence_level"] == "focus_access_trace_available"
+    assert squee_obs["focus_access"]["min_library_position"] == 18
