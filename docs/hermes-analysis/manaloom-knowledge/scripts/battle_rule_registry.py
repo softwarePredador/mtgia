@@ -96,6 +96,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "damage_player_and_creatures": "removal",
     "deal_damage": "removal",
     "damage_modifier": "wincon",
+    "goad_opponents_creatures_cant_block": "wincon",
     "copy_spell": "engine",
     "exile_top_nonland_free_cast": "engine",
     "recursion": "engine",

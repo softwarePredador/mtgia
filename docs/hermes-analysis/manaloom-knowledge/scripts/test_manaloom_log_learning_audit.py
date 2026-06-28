@@ -124,6 +124,21 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
                             "trusted_executable_rule_count": 0,
                         },
                         {
+                            "card_name": "Semblance Anvil",
+                            "deck_count": 2,
+                            "deck_ids": [612, 615],
+                            "findings": [
+                                {
+                                    "code": "no_trusted_executable_rule",
+                                    "severity": "high",
+                                }
+                            ],
+                            "priority_score": 7101,
+                            "severity": "high",
+                            "total_quantity": 2,
+                            "trusted_executable_rule_count": 0,
+                        },
+                        {
                             "active_rule_count": 2,
                             "card_name": "Verge Rangers",
                             "deck_count": 3,
@@ -182,10 +197,10 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             )
             top_codes = {row["code"]: row["count"] for row in evidence["top_finding_codes"]}
             self.assertEqual(top_codes["generic_effect_without_model_scope"], 1)
-            self.assertEqual(top_codes["no_trusted_executable_rule"], 4)
+            self.assertEqual(top_codes["no_trusted_executable_rule"], 5)
             self.assertEqual(
                 evidence["top_lorehold_runtime_missing_cards"][0]["card_name"],
-                "Taunt from the Rampart",
+                "Semblance Anvil",
             )
             self.assertEqual(
                 evidence["top_lorehold_runtime_missing_cards"][0]["gap_kind"],
@@ -201,6 +216,10 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             )
             self.assertEqual(
                 waived_cards["Goliath Daydreamer"],
+                "runtime_waived_pending_pg_promotion",
+            )
+            self.assertEqual(
+                waived_cards["Taunt from the Rampart"],
                 "runtime_waived_pending_pg_promotion",
             )
 

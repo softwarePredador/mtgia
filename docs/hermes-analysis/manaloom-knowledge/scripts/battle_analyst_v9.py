@@ -2183,28 +2183,35 @@ def set_until_next_turn(card, key, value, *, source_player, turn):
     card[key] = value
 
 
-def clear_until_next_turn_effects(active_player, turn):
+def clear_until_next_turn_effects(active_player, turn, all_players=None):
     source_name = getattr(active_player, "name", None)
-    for zone in (active_player.battlefield, active_player.phased_out, active_player.graveyard):
-        for card in zone:
-            if not isinstance(card, dict):
-                continue
-            if card.get("_until_next_turn_source_player") != source_name:
-                continue
-            try:
-                granted_turn = int(card.get("_until_next_turn_granted_turn") or 0)
-            except (TypeError, ValueError):
-                granted_turn = 0
-            if int(turn) <= granted_turn:
-                continue
-            originals = card.pop("_until_next_turn_originals", {})
-            for key, original in originals.items():
-                if original is None:
-                    card.pop(key, None)
-                else:
-                    card[key] = original
-            card.pop("_until_next_turn_source_player", None)
-            card.pop("_until_next_turn_granted_turn", None)
+    participants = list(all_players or [active_player])
+    for participant in participants:
+        for zone in (participant.battlefield, participant.phased_out, participant.graveyard):
+            for card in zone:
+                if not isinstance(card, dict):
+                    continue
+                if card.get("_until_next_turn_source_player") != source_name:
+                    continue
+                try:
+                    granted_turn = int(card.get("_until_next_turn_granted_turn") or 0)
+                except (TypeError, ValueError):
+                    granted_turn = 0
+                if int(turn) <= granted_turn:
+                    continue
+                originals = card.pop("_until_next_turn_originals", {})
+                for key, original in originals.items():
+                    if original is None:
+                        card.pop(key, None)
+                    else:
+                        card[key] = original
+                card.pop("_until_next_turn_source_player", None)
+                card.pop("_until_next_turn_granted_turn", None)
+
+
+def apply_until_next_turn_to_card(card, updates, *, source_player, turn):
+    for key, value in updates.items():
+        set_until_next_turn(card, key, value, source_player=source_player, turn=turn)
 
 
 def cast_warp_card_from_exile(player, card, turn, phase):
@@ -3913,6 +3920,23 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:b495892461d2521bc633d7e9ab5cd443",
         }
     ),
+    "Taunt from the Rampart": handcrafted_runtime_rule(
+        {
+            "ability_kind": "one_shot",
+            "cmc": 5.0,
+            "effect": "goad_opponents_creatures_cant_block",
+            "goad_all_opponents_creatures": True,
+            "affected_creatures_cant_block_until_your_next_turn": True,
+            "duration": "until_your_next_turn",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "controller_scope": "opponent",
+            },
+            "battle_model_scope": "goad_all_opponents_creatures_cant_block_until_your_next_turn_v1",
+            "_rule_oracle_hash": "8edc08d877978569fe4b5bc7120bb771",
+            "_rule_logical_key": "battle_rule_v1:16e15ea414a18410acd151d43276651c",
+        }
+    ),
     "Verge Rangers": handcrafted_runtime_rule(
         {
             "cmc": 3.0,
@@ -3954,6 +3978,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
+    "Taunt from the Rampart",
     "Verge Rangers",
 }
 
@@ -4055,6 +4080,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace review_only passive evidence with XMage-backed another-creature ETB power damage semantics.",
         ["manaloom_log_learning_audit_20260628_v5", "TerrorOfThePeaks.java", "pg_terror_runtime_20260628_terror_runtime"],
         "2026-06-28T19:10:00Z",
+    ),
+    "Taunt from the Rampart": manual_runtime_waiver_metadata(
+        "Replace generated draw_cards review_only evidence with XMage-backed goad-all and can't-block-until-next-turn combat semantics.",
+        ["manaloom_log_learning_audit_20260628_v9_after_goliath_waiver", "TauntFromTheRampart.java"],
+        "2026-06-28T20:05:00Z",
     ),
     "Verge Rangers": manual_runtime_waiver_metadata(
         "Replace generated review_only topdeck_manipulation evidence with XMage-backed top-library land play semantics.",
@@ -6072,7 +6102,8 @@ class Player:
 
     def creatures_for_blocking(self):
         return [c for c in self.battlefield if is_battlefield_creature(c)
-                and not c.get("tapped", False)]
+                and not c.get("tapped", False)
+                and not creature_cannot_block(c)]
 
     def has_counterspell(self):
         """Return whether a real counterspell in hand can currently be paid for."""
@@ -32491,6 +32522,42 @@ def apply_effect_immediate(
             summoning_sick=permanent.get("summoning_sick"),
             turn=turn,
         )
+    elif effect == "goad_opponents_creatures_cant_block":
+        affected = []
+        source_player = getattr(player, "name", None)
+        for opponent in opponents or []:
+            for permanent in getattr(opponent, "battlefield", []) or []:
+                if not is_battlefield_creature(permanent):
+                    continue
+                apply_until_next_turn_to_card(
+                    permanent,
+                    {
+                        "goaded": True,
+                        "goaded_by": card.get("name", "?"),
+                        "must_attack_each_combat_if_able": True,
+                        "cant_block": True,
+                        "cant_block_source": card.get("name", "?"),
+                    },
+                    source_player=source_player,
+                    turn=turn,
+                )
+                affected.append(
+                    {
+                        "controller": getattr(opponent, "name", "?"),
+                        "card": permanent.get("name", "?"),
+                    }
+                )
+        emit_replay_event(
+            "goad_opponents_creatures_cant_block_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            affected_count=len(affected),
+            affected=affected,
+            duration="until_your_next_turn",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "copy_permanent_etb":
         permanent = enrich_card({**card, **effect_data})
         permanent = resolve_copy_permanent_etb(player, opponents, permanent, effect_data, turn)
@@ -34630,6 +34697,15 @@ def must_attack_if_able(creature):
         or creature.get("must_attack_if_able")
         or creature.get("must_attack_each_combat_if_able")
         or creature.get("attacks_each_combat_if_able")
+        or creature.get("goaded")
+    )
+
+
+def creature_cannot_block(creature):
+    return bool(
+        creature.get("cant_block")
+        or creature.get("cannot_block")
+        or creature.get("can't_block")
     )
 
 
@@ -36629,7 +36705,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.cards_drawn_this_turn = 0
     player.surge_to_victory_delayed_triggers = []
     clear_until_eot(player)
-    clear_until_next_turn_effects(player, turn)
+    clear_until_next_turn_effects(player, turn, all_players=all_players)
     player.indestructible = False
 
     # ── UNTAP ──
