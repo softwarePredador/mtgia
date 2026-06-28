@@ -3451,6 +3451,43 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "FiresongAndSunspeaker"
+        and card_types == {"CREATURE"}
+        and {"DamageTargetEffect", "GainAbilityControlledSpellsEffect"}.issubset(effect_classes)
+        and {
+            "FiresongAndSunspeakerTriggeredAbility",
+            "SimpleStaticAbility",
+        }.issubset(ability_classes)
+        and "TargetCreatureOrPlayer" in target_classes
+    ):
+        return {
+            "effect": "creature",
+            "scope": "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+            "fields": {
+                "instant_sorcery_spells_you_control_have_lifelink": True,
+                "instant_sorcery_lifelink_colors": ["R"],
+                "trigger": "white_instant_sorcery_lifegain",
+                "trigger_effect": "damage_any_target",
+                "white_instant_sorcery_lifegain_trigger_damage": 3,
+                "target": "any_target",
+                "target_constraints": {"scope": "any_target"},
+                "power": _first_int(r"power\s*=\s*new MageInt\((\d+)\)", rules_text) or 4,
+                "toughness": _first_int(r"toughness\s*=\s*new MageInt\((\d+)\)", rules_text) or 6,
+            },
+            "reason": (
+                "XMage structure matches Firesong and Sunspeaker: red instant/sorcery spells "
+                "you control gain lifelink and white instant/sorcery lifegain triggers 3 damage."
+            ),
+            "signals": [
+                "GainAbilityControlledSpellsEffect",
+                "LifelinkAbility",
+                "FiresongAndSunspeakerTriggeredAbility",
+                "DamageTargetEffect",
+                "TargetCreatureOrPlayer",
+            ],
+        }
+
+    if (
         card_types == {"ENCHANTMENT"}
         and effect_classes == {"DamageTargetEffect"}
         and ability_classes == {"SimpleActivatedAbility"}

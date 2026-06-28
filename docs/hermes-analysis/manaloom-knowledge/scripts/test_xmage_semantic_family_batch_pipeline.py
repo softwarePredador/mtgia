@@ -8145,6 +8145,68 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             "controlled_creature_enters_power_damage_any_target",
         )
 
+    def test_classifier_and_generator_mark_firesong_exact_scope_as_batch_safe(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Firesong and Sunspeaker",
+                    "severity": "high",
+                    "oracle_hash": "firesonghash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "FiresongAndSunspeaker",
+                        "path": "/xmage/FiresongAndSunspeaker.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": [
+                            "DamageTargetEffect",
+                            "GainAbilityControlledSpellsEffect",
+                        ],
+                        "ability_classes": [
+                            "FiresongAndSunspeakerTriggeredAbility",
+                            "LifelinkAbility",
+                            "SimpleStaticAbility",
+                        ],
+                        "target_classes": ["TargetCreatureOrPlayer"],
+                        "primary_effect": {
+                            "effect": "creature",
+                            "battle_model_scope": "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+                            "power": 4,
+                            "toughness": 6,
+                            "instant_sorcery_spells_you_control_have_lifelink": True,
+                            "instant_sorcery_lifelink_colors": ["R"],
+                            "trigger": "white_instant_sorcery_lifegain",
+                            "trigger_effect": "damage_any_target",
+                            "white_instant_sorcery_lifegain_trigger_damage": 3,
+                            "target": "any_target",
+                            "target_constraints": {"scope": "any_target"},
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "targeted_interaction")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        proposal_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = proposal_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "burn_lifegain_engine")
+        self.assertEqual(
+            proposal["deck_role_json"]["effect"],
+            "instant_sorcery_lifelink_lifegain_damage",
+        )
+        self.assertEqual(
+            proposal["deck_role_json"]["subtype"],
+            "red_spell_lifelink_white_spell_lifegain_damage",
+        )
+
     def test_classifier_marks_tinder_wall_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

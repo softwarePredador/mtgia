@@ -218,8 +218,8 @@ def test_targeted_interaction_queue_splits_direct_damage_subfamilies() -> None:
 
     family = family_queue[0]
     assert family["targeted_interaction_subfamily_status_counts"] == {
-        "runtime_family_implementation_required": 4,
-        "runtime_supported_family": 2,
+        "runtime_family_implementation_required": 3,
+        "runtime_supported_family": 3,
     }
     assert family["targeted_interaction_subfamily_counts"] == {
         "creature_damage_controller_reflect_global": 1,
@@ -238,6 +238,7 @@ def test_targeted_interaction_queue_splits_direct_damage_subfamilies() -> None:
     assert by_card["Toralf, God of Fury // Toralf's Hammer"]["requires_condition_model"] is True
     assert by_card["Terror of the Peaks"]["subfamily_id"] == "targeted_damage_etb_power_to_any_target"
     assert by_card["Terror of the Peaks"]["status"] == "runtime_supported_family"
+    assert by_card["Firesong and Sunspeaker"]["status"] == "runtime_supported_family"
     assert by_card["Balefire Liege"]["family_tests"] == [
         "test_balefire_liege_red_spell_deals_three_to_target_player_or_planeswalker",
         "test_balefire_liege_white_spell_gains_three_life",

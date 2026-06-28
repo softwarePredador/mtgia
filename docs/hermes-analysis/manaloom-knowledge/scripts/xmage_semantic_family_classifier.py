@@ -451,6 +451,13 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         return "targeted_interaction"
     if (
         str(effect_json.get("battle_model_scope") or "")
+        == "red_instant_sorcery_lifelink_white_lifegain_damage_v1"
+        and effect_json.get("trigger") == "white_instant_sorcery_lifegain"
+        and effect_json.get("trigger_effect") == "damage_any_target"
+    ):
+        return "targeted_interaction"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
         == "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1"
         and effect_json.get("effect") == "redirect_removal"
     ):
@@ -1353,6 +1360,26 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("trigger_another_creature_you_control_enters"))
             and effect_json.get("target") == "any_target"
             and int(effect_json.get("opponent_spells_targeting_this_additional_life_cost") or 0) == 3
+        )
+
+    if effect == "creature" and scope == "red_instant_sorcery_lifelink_white_lifegain_damage_v1":
+        target_classes = xmage_target_classes(card)
+        return (
+            types == {"CREATURE"}
+            and {"DamageTargetEffect", "GainAbilityControlledSpellsEffect"}.issubset(effect_classes)
+            and {
+                "FiresongAndSunspeakerTriggeredAbility",
+                "SimpleStaticAbility",
+            }.issubset(ability_classes)
+            and target_classes == {"TargetCreatureOrPlayer"}
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 6
+            and bool(effect_json.get("instant_sorcery_spells_you_control_have_lifelink"))
+            and set(effect_json.get("instant_sorcery_lifelink_colors") or []) == {"R"}
+            and effect_json.get("trigger") == "white_instant_sorcery_lifegain"
+            and effect_json.get("trigger_effect") == "damage_any_target"
+            and int(effect_json.get("white_instant_sorcery_lifegain_trigger_damage") or 0) == 3
+            and effect_json.get("target") == "any_target"
         )
 
     if effect == "creature" and scope == "glint_horn_buccaneer_discard_damage_attack_loot_v1":

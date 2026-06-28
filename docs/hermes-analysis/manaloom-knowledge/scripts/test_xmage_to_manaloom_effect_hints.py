@@ -5019,6 +5019,50 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target"], "any_target")
         self.assertEqual(primary["opponent_spells_targeting_this_additional_life_cost"], 3)
 
+    def test_firesong_and_sunspeaker_maps_to_lifelink_lifegain_damage_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "FiresongAndSunspeaker",
+                "effect_classes": ["DamageTargetEffect", "GainAbilityControlledSpellsEffect"],
+                "ability_classes": [
+                    "FiresongAndSunspeakerTriggeredAbility",
+                    "LifelinkAbility",
+                    "SimpleStaticAbility",
+                ],
+                "target_classes": ["TargetCreatureOrPlayer"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "this.power = new MageInt(4); this.toughness = new MageInt(6); "
+                    "Effect effect = new GainAbilityControlledSpellsEffect("
+                    "LifelinkAbility.getInstance(), filter); "
+                    "this.addAbility(new SimpleStaticAbility(effect)); "
+                    "this.addAbility(new FiresongAndSunspeakerTriggeredAbility()); "
+                    "super(Zone.BATTLEFIELD, new DamageTargetEffect(3), false); "
+                    "this.addTarget(new TargetCreatureOrPlayer());"
+                ),
+            },
+            (
+                "Red instant and sorcery spells you control have lifelink. "
+                "Whenever a white instant or sorcery spell causes you to gain life, "
+                "Firesong and Sunspeaker deals 3 damage to any target."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+        )
+        self.assertEqual(primary["power"], 4)
+        self.assertEqual(primary["toughness"], 6)
+        self.assertTrue(primary["instant_sorcery_spells_you_control_have_lifelink"])
+        self.assertEqual(primary["instant_sorcery_lifelink_colors"], ["R"])
+        self.assertEqual(primary["trigger"], "white_instant_sorcery_lifegain")
+        self.assertEqual(primary["trigger_effect"], "damage_any_target")
+        self.assertEqual(primary["white_instant_sorcery_lifegain_trigger_damage"], 3)
+        self.assertEqual(primary["target"], "any_target")
+
     def test_caldera_pyremaw_maps_to_counter_then_power_damage_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -26003,6 +26003,12 @@ def spell_lifelink_sources(player, spell):
         effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
         if not effect_data.get("instant_sorcery_spells_you_control_have_lifelink"):
             continue
+        lifelink_colors = _as_list(
+            effect_data.get("instant_sorcery_lifelink_colors")
+            or effect_data.get("lifelink_spell_colors")
+        )
+        if lifelink_colors and not any(_spell_has_color(spell, color) for color in lifelink_colors):
+            continue
         sources.append(
             {
                 "card": permanent.get("name", "?"),
@@ -26011,6 +26017,72 @@ def spell_lifelink_sources(player, spell):
             }
         )
     return sources
+
+
+def trigger_white_instant_sorcery_lifegain_damage(
+    player,
+    opponents,
+    source_spell,
+    life_gained,
+    turn,
+    *,
+    phase="resolution",
+):
+    if (
+        life_gained <= 0
+        or not isinstance(source_spell, dict)
+        or not is_instant_or_sorcery_spell(source_spell)
+        or not _spell_has_color(source_spell, "W")
+    ):
+        return 0
+    resolved = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+        if not (
+            effect_data.get("white_instant_sorcery_lifegain_trigger_damage")
+            or effect_data.get("trigger") == "white_instant_sorcery_lifegain"
+        ):
+            continue
+        amount = int(
+            effect_data.get("white_instant_sorcery_lifegain_trigger_damage")
+            or effect_data.get("trigger_damage")
+            or 0
+        )
+        if amount <= 0:
+            continue
+        result = resolve_damage_any_target(
+            player,
+            opponents,
+            permanent,
+            amount,
+            turn=turn,
+            phase=phase,
+        )
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="white_instant_sorcery_lifegain",
+            trigger_spell=source_spell.get("name", "?"),
+            source_spell_type_line=source_spell.get("type_line", ""),
+            effect="damage_any_target",
+            life_gained=life_gained,
+            amount=result["amount"],
+            original_amount=amount,
+            target_player=result["target_player"],
+            target=result["target"],
+            result=result["result"],
+            destination=result["destination"],
+            life_before=result["life_before"],
+            life_after=result["life_after"],
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        resolved += 1
+    return resolved
 
 
 def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
@@ -26036,7 +26108,8 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             return 0, player.life, player.life, spell_lifelink_gain
         controller_life_before = player.life
         gain_life(player, total_life_gain)
-        return player.life - controller_life_before, controller_life_before, player.life, spell_lifelink_gain
+        life_gained = player.life - controller_life_before
+        return life_gained, controller_life_before, player.life, spell_lifelink_gain
 
     for opp in opponents:
         target_options = []
@@ -26120,6 +26193,14 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 turn=turn,
                 **replay_rule_fields(effect_data),
             )
+            trigger_white_instant_sorcery_lifegain_damage(
+                player,
+                opponents,
+                card,
+                life_gained,
+                turn,
+                phase="resolution",
+            )
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
             return
     alive_opponents = [opp for opp in opponents if opp.is_alive()]
@@ -26169,6 +26250,14 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             controller_life_after=controller_life_after,
             turn=turn,
             **replay_rule_fields(effect_data),
+        )
+        trigger_white_instant_sorcery_lifegain_damage(
+            player,
+            opponents,
+            card,
+            life_gained,
+            turn,
+            phase="resolution",
         )
     finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
 

@@ -193,12 +193,12 @@ TARGETED_INTERACTION_SUBFAMILY_META = {
         "priority": 15,
     },
     "instant_sorcery_lifelink_lifegain_damage_engine": {
-        "status": "runtime_family_implementation_required",
+        "status": "runtime_supported_family",
         "implementation_unit": (
             "instant/sorcery lifelink grant plus white instant/sorcery lifegain trigger "
             "that deals three damage to a target"
         ),
-        "next_step": "implement Firesong and Sunspeaker lifelink/lifegain trigger as a standalone battle family",
+        "next_step": "prepare PG metadata package after PostgreSQL precheck, then gate Firesong burn/lifegain lines",
         "family_tests": [
             "test_firesong_grants_lifelink_to_red_instant_and_sorcery_spells",
             "test_firesong_white_instant_lifegain_triggers_three_damage",
@@ -256,7 +256,11 @@ def targeted_interaction_subfamily(card: dict[str, Any]) -> dict[str, Any] | Non
         return None
     effect = str(card.get("effect") or "")
     scope = str(card.get("battle_model_scope") or "")
-    if effect != "direct_damage" and scope != "controlled_other_creature_enters_power_damage_any_target_v1":
+    runtime_scopes = {
+        "controlled_other_creature_enters_power_damage_any_target_v1",
+        "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+    }
+    if effect != "direct_damage" and scope not in runtime_scopes:
         return None
 
     abilities = set(card.get("xmage_ability_classes") or [])
