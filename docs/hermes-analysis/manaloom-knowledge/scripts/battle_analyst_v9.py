@@ -1072,6 +1072,7 @@ MTG_SHARED_CARD_TYPES = {
     "sorcery",
     "tribal",
 }
+PLANETARIUM_TOP_FREE_CAST_SCOPE = "scry_or_surveil_once_turn_top_library_free_cast_v1"
 MEDALLION_COLOR_RESTRICTIONS = {
     "pearl medallion": "W",
     "sapphire medallion": "U",
@@ -3933,6 +3934,24 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
         }
     ),
+    "Planetarium of Wan Shi Tong": handcrafted_runtime_rule(
+        {
+            "ability_kind": "activated_and_triggered",
+            "cmc": 6.0,
+            "effect": "topdeck_manipulation",
+            "legendary": True,
+            "activation_cost_generic": 1,
+            "activation_requires_tap": True,
+            "activated_scry_count": 2,
+            "trigger": "scry_or_surveil",
+            "trigger_once_each_turn": True,
+            "scry_or_surveil_top_library_free_cast_once_each_turn": True,
+            "cast_top_card_without_paying_mana": True,
+            "battle_model_scope": PLANETARIUM_TOP_FREE_CAST_SCOPE,
+            "_rule_oracle_hash": "67433ff9a3bb75652404373a2949a53a",
+            "_rule_logical_key": "battle_rule_v1:a2082ebdf6e7e169b97eccecbb22b36a",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4043,6 +4062,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Faeburrow Elder",
     "Neoform",
     "Semblance Anvil",
+    "Planetarium of Wan Shi Tong",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4138,6 +4158,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace generated ramp_permanent review_only evidence with XMage-backed imprint and shared-card-type cost reduction semantics.",
         ["manaloom_log_learning_audit_20260628_v10_after_taunt_runtime", "SemblanceAnvil.java"],
         "2026-06-28T20:25:00Z",
+    ),
+    "Planetarium of Wan Shi Tong": manual_runtime_waiver_metadata(
+        "Replace generated topdeck_manipulation review_only evidence with XMage-backed scry activation and once-per-turn top-library free-cast trigger.",
+        ["manaloom_log_learning_audit_20260628_v11_after_semblance_runtime", "PlanetariumOfWanShiTong.java"],
+        "2026-06-28T20:45:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -20408,6 +20433,190 @@ def scry_library_for_controller(player, count):
     }
 
 
+def planetarium_top_card_free_castable(card, effect_data):
+    if not isinstance(card, dict):
+        return False
+    if is_effective_land(card):
+        return False
+    return str((effect_data or {}).get("effect") or "").lower() not in {
+        "unknown",
+        "land",
+        "counter",
+    }
+
+
+def resolve_planetarium_scry_or_surveil_trigger(
+    player,
+    permanent,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="resolution",
+    stack=None,
+    trigger_event="scry",
+):
+    effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+    if (
+        effect_data.get("battle_model_scope") != PLANETARIUM_TOP_FREE_CAST_SCOPE
+        or not effect_data.get("scry_or_surveil_top_library_free_cast_once_each_turn")
+    ):
+        return False
+    if permanent.get("planetarium_top_free_cast_last_turn") == turn:
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger=trigger_event,
+            effect="top_library_may_cast_without_paying_mana",
+            result="once_each_turn_already_used",
+            chosen=False,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return False
+
+    permanent["planetarium_top_free_cast_last_turn"] = turn
+    top_card = player.library[0] if getattr(player, "library", None) else None
+    if not isinstance(top_card, dict):
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger=trigger_event,
+            effect="top_library_may_cast_without_paying_mana",
+            result="no_card_to_look_at",
+            chosen=False,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return False
+
+    top_effect = get_card_effect(top_card)
+    top_name = top_card.get("name", "?")
+    if not planetarium_top_card_free_castable(top_card, top_effect):
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger=trigger_event,
+            effect="top_library_may_cast_without_paying_mana",
+            looked_card=top_name,
+            looked_type_line=top_card.get("type_line", ""),
+            looked_effect=top_effect.get("effect", "unknown"),
+            result="look_only_no_cast",
+            chosen=False,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return False
+
+    cast_ctx = begin_cast_context(
+        player,
+        top_card,
+        phase,
+        effect_data=top_effect,
+        role="planetarium_top_library_free_cast",
+        modes=["cast_without_paying_mana", "planetarium", "top_library"],
+        alternative_cost="{0}",
+        source_zone="library",
+        alternative_cost_kind="cast_without_paying_mana",
+    )
+    cast_ctx.is_legal = True
+    cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+    store_cast_context_fields(
+        top_effect,
+        {
+            "phase": phase,
+            **cast_ctx.to_replay_fields(),
+        },
+    )
+    if not commit_cast_payment(cast_ctx):
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger=trigger_event,
+            effect="top_library_may_cast_without_paying_mana",
+            looked_card=top_name,
+            looked_type_line=top_card.get("type_line", ""),
+            looked_effect=top_effect.get("effect", "unknown"),
+            result="cast_failed",
+            chosen=False,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return False
+
+    player.library.pop(0)
+    emit_replay_event(
+        "trigger_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        trigger=trigger_event,
+        effect="top_library_may_cast_without_paying_mana",
+        looked_card=top_name,
+        looked_type_line=top_card.get("type_line", ""),
+        looked_effect=top_effect.get("effect", "unknown"),
+        result="cast_without_paying_mana",
+        chosen=True,
+        cast_without_paying_mana_cost=True,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    emit_replay_event(
+        "spell_cast",
+        player=player.name,
+        card=top_name,
+        effect=top_effect.get("effect", "unknown"),
+        type_line=top_card.get("type_line", ""),
+        cmc=top_card.get("cmc", 0),
+        turn=turn,
+        phase=phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(top_effect),
+    )
+    mark_cast_ledger_emitted(top_effect)
+    players = all_players or [player, *(opponents or [])]
+    trigger_spell_cast_engines(
+        player,
+        players,
+        top_card,
+        turn,
+        phase,
+        stack=stack,
+        active_player=player,
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        top_card,
+        turn,
+        phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=players,
+    )
+    apply_effect_immediate(
+        player,
+        opponents,
+        top_card,
+        turn,
+        rng,
+        effect_data_override=top_effect,
+        stack=stack,
+        phase=phase,
+    )
+    return True
+
+
 def is_lorehold_protected_win_condition(card):
     if not isinstance(card, dict):
         return False
@@ -20448,6 +20657,146 @@ def activate_lorehold_topdeck_artifacts(
 ):
     if not player.is_alive() or not player_has_lorehold_miracle_engine(player):
         return 0
+
+    planetarium_artifacts = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("effect") == "topdeck_manipulation"
+        and permanent.get("battle_model_scope") == PLANETARIUM_TOP_FREE_CAST_SCOPE
+        and permanent.get("activated_scry_count")
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase in {"upkeep", "opponent_upkeep"} and planetarium_artifacts and player.library:
+        for permanent in planetarium_artifacts:
+            if permanent.get("tapped"):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "planetarium_already_tapped",
+                    phase=phase,
+                )
+                continue
+            scry_count = max(1, int(permanent.get("activated_scry_count") or 2))
+            visible = [card for card in player.library[:scry_count] if isinstance(card, dict)]
+            visible_castable = [
+                card
+                for card in visible
+                if planetarium_top_card_free_castable(card, get_card_effect(card))
+            ]
+            if not visible_castable:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "planetarium_no_castable_card_in_scry_window",
+                    phase=phase,
+                )
+                continue
+            activation_cost = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(permanent.get("activation_cost_generic") or 1),
+            )
+            activation_cost_text = "{%d}" % activation_cost if activation_cost > 0 else "{0}"
+            if player.available_mana() < activation_cost:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "insufficient_mana_for_planetarium_scry",
+                    phase=phase,
+                )
+                continue
+            if not player.spend_mana(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_planetarium_scry_cost",
+                    phase=phase,
+                )
+                continue
+
+            scry_result = scry_library_for_controller(player, scry_count)
+            permanent["utility_artifact_used_this_turn"] = True
+            if permanent.get("activation_requires_tap"):
+                permanent["tapped"] = True
+
+            top_after = player.library[0].get("name", "?") if player.library else None
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        card,
+                        score=lorehold_draw_priority(card, player),
+                        action="scry_keep_for_planetarium_free_cast",
+                        effect="topdeck_manipulation",
+                    )
+                    for card in visible_castable
+                ],
+                chosen_option={
+                    "card": top_after,
+                    "action": "activate_planetarium_scry_then_free_cast",
+                    "effect": "topdeck_manipulation",
+                },
+                score_components={
+                    "activation_cost_generic": activation_cost,
+                    "scry_count": scry_count,
+                    "looked_at": scry_result["looked_at"],
+                    "kept_on_top": scry_result["kept_on_top"],
+                    "bottomed": scry_result["bottomed"],
+                    "top_after": top_after,
+                },
+                rule_source="xmage_planetarium_runtime_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=max(
+                    [lorehold_draw_priority(card, player) for card in visible_castable] or [0]
+                ),
+                actual_outcome="scry_resolved_and_planetarium_trigger_checked",
+                reason="use_planetarium_when_scry_window_contains_castable_top_card",
+                strategic_principle="convert topdeck selection into immediate free cast when available",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "mana": -activation_cost,
+                    "tapped": 1 if permanent.get("activation_requires_tap") else 0,
+                    "top_after": top_after,
+                },
+                risk_flags=["upkeep_mana_spend", "engine_piece_tapped"],
+                rejected_reason="not_in_scry_window_or_lower_priority",
+            )
+            emit_replay_event(
+                "topdeck_manipulation_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="planetarium_scry_then_top_free_cast",
+                activation_cost=activation_cost_text,
+                scry_count=scry_count,
+                scry_looked_at=scry_result["looked_at"],
+                scry_kept_on_top=scry_result["kept_on_top"],
+                scry_bottomed=scry_result["bottomed"],
+                scry_top_after=scry_result["top_after"],
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            resolve_planetarium_scry_or_surveil_trigger(
+                player,
+                permanent,
+                opponents=[participant for participant in (all_players or []) if participant is not player],
+                all_players=all_players,
+                turn=turn,
+                rng=rng,
+                phase=phase,
+                stack=stack,
+                trigger_event="scry",
+            )
+            return 1
 
     hand_to_top_permanents = [
         permanent
