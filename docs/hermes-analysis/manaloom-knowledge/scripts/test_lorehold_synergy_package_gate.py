@@ -1,5 +1,7 @@
 import unittest
 import json
+import sqlite3
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -25,9 +27,28 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         args, kwargs = run.call_args
         cmd = args[0]
         self.assertIn("--isolate-deck-process", cmd)
-        self.assertIn("--no-game-checkpoint", cmd)
+        self.assertNotIn("--no-game-checkpoint", cmd)
         self.assertEqual(kwargs["env"]["PYTHONHASHSEED"], "0")
         self.assertEqual(kwargs["cwd"], str(gate.SCRIPT_DIR))
+
+    def test_run_gate_can_disable_checkpoint_explicitly_for_smoke_runs(self):
+        with patch("lorehold_synergy_package_gate.subprocess.run") as run:
+            run.return_value.returncode = 0
+            gate.run_gate(
+                source_db=Path("/tmp/source.db"),
+                candidate_db=Path("/tmp/candidate.db"),
+                package_key="brainstone_topdeck_miracle",
+                games=1,
+                opponent_limit=1,
+                opponent_seed=20260626,
+                simulation_seed=42,
+                game_timeout_seconds=20.0,
+                stem="test_stem",
+                no_game_checkpoint=True,
+            )
+
+        cmd = run.call_args.args[0]
+        self.assertIn("--no-game-checkpoint", cmd)
 
     def test_runtime_rule_priority_prefers_land_scaled_treasure_model(self):
         generic = {
@@ -93,6 +114,18 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         )
         self.assertTrue(
             gate.PACKAGE_DEFINITIONS["galvanoth_topdeck_freecast_cut_thor"]["allow_miracle_core_cuts"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["pg245_verge_rangers_topdeck_land_cut_waterskin"]["family"],
+            "topdeck_play",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["pg245_verge_rangers_topdeck_land_cut_waterskin"]["adds"],
+            ["Verge Rangers"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["pg245_verge_rangers_topdeck_land_cut_waterskin"]["cuts"],
+            ["Bender's Waterskin"],
         )
         self.assertEqual(
             gate.PACKAGE_DEFINITIONS["boseiju_spell_protection_land"]["family"],
@@ -385,6 +418,18 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(
             gate.PACKAGE_DEFINITIONS["young_pyromancer_spell_tokens_cut_prismari"]["adds"],
             ["Young Pyromancer"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["pg245_twinflame_damage_payoff_cut_thor"]["family"],
+            "static_damage_modifier",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["pg245_twinflame_damage_payoff_cut_thor"]["adds"],
+            ["Twinflame Tyrant"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["pg245_twinflame_damage_payoff_cut_thor"]["cuts"],
+            ["Thor, God of Thunder"],
         )
 
     def test_new_cut_safety_aware_packages_do_not_touch_protected_slots(self):
@@ -683,6 +728,85 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertIn("discard-to-top +4", gate.strategic_delta_text(payload))
         self.assertIn("rummage-to-top +3", gate.strategic_delta_text(payload))
         self.assertIn("spell-rummage-to-top +3", gate.strategic_delta_text(payload))
+
+    def test_runtime_package_rules_deprecate_review_only_shadows(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proposals = Path(tmp) / "proposals.json"
+            proposals.write_text(
+                json.dumps(
+                    {
+                        "proposals": [
+                            {
+                                "card_name": "Twinflame Tyrant",
+                                "effect_json": {
+                                    "effect": "damage_modifier",
+                                    "battle_model_scope": (
+                                        "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
+                                    ),
+                                    "damage_modifier_applies_to": "sources_you_control",
+                                    "damage_modifier_targets": ["opponents", "opponent_permanents"],
+                                    "damage_modifier_duration": "while_on_battlefield",
+                                    "damage_multiplier": 2,
+                                },
+                                "deck_role_json": {
+                                    "category": "wincon",
+                                    "effect": "damage_modifier",
+                                },
+                                "logical_rule_key": "battle_rule_v1:pg245_twinflame",
+                                "source": "curated",
+                                "confidence": 0.94,
+                                "review_status": "verified",
+                                "execution_status": "auto",
+                                "oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6",
+                                "shadow_handling": "deprecate_nonmatching_rows",
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            conn = sqlite3.connect(":memory:")
+            conn.row_factory = sqlite3.Row
+            gate.battle_rule_registry.ensure_battle_card_rules(conn)
+            gate.battle_rule_registry.upsert_battle_card_rule(
+                conn,
+                "Twinflame Tyrant",
+                {"effect": "finisher", "cmc": 5},
+                source="generated",
+                confidence=0.3,
+                review_status="needs_review",
+                execution_status="review_only",
+                deck_role_json={"category": "wincon", "effect": "finisher"},
+                logical_rule_key_value="battle_rule_v1:old_generated",
+            )
+
+            counts = gate.upsert_runtime_package_rules_for_cards(
+                conn,
+                ["Twinflame Tyrant"],
+                proposals_path=proposals,
+            )
+
+            self.assertEqual(counts["Twinflame Tyrant"]["upserted"], 1)
+            self.assertEqual(counts["Twinflame Tyrant"]["shadow_deprecated"], 1)
+            rows = conn.execute(
+                """
+                SELECT logical_rule_key, review_status, execution_status, oracle_hash
+                FROM battle_card_rules
+                WHERE normalized_name='twinflame tyrant'
+                ORDER BY logical_rule_key
+                """
+            ).fetchall()
+            by_key = {row["logical_rule_key"]: dict(row) for row in rows}
+            self.assertEqual(by_key["battle_rule_v1:old_generated"]["review_status"], "deprecated")
+            self.assertEqual(by_key["battle_rule_v1:old_generated"]["execution_status"], "disabled")
+            self.assertEqual(by_key["battle_rule_v1:pg245_twinflame"]["review_status"], "verified")
+            self.assertEqual(by_key["battle_rule_v1:pg245_twinflame"]["execution_status"], "auto")
+            self.assertEqual(
+                by_key["battle_rule_v1:pg245_twinflame"]["oracle_hash"],
+                "e4ca0585f743b1c34c36649bfbb1fff6",
+            )
+            active_rules = gate.active_rules_for_card(conn, "Twinflame Tyrant")
+            self.assertEqual([rule["logical_rule_key"] for rule in active_rules], ["battle_rule_v1:pg245_twinflame"])
 
 
 if __name__ == "__main__":

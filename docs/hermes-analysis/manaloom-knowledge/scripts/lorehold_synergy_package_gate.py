@@ -34,7 +34,10 @@ DEFAULT_SOURCE_DB = (
     / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
     / "knowledge_candidate.db"
 )
-DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260627_v1.json"
+DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
+DEFAULT_RUNTIME_PACKAGE_PROPOSALS = (
+    REPORT_DIR / "lorehold_runtime_gap_family_queue_20260628_v5_topdeck_damage_proposals.json"
+)
 DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
     REPORT_DIR / "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
@@ -265,6 +268,20 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Galvanoth"],
         "cuts": ["Thor, God of Thunder"],
         "allow_miracle_core_cuts": True,
+    },
+    "pg245_verge_rangers_topdeck_land_cut_waterskin": {
+        "family": "topdeck_play",
+        "hypothesis": (
+            "PG245 gives Verge Rangers an executable XMage-backed topdeck land "
+            "play model. This same-lane diagnostic challenges Bender's Waterskin "
+            "only because both occupy the three-mana early-mana/topdeck support "
+            "slot, while preserving the expensive miracle spell package."
+        ),
+        "adds": ["Verge Rangers"],
+        "cuts": ["Bender's Waterskin"],
+        "cut_safety_override_reason": (
+            "PG245 same-lane topdeck_play/ramp benchmark; isolated candidate only"
+        ),
     },
     "brainstone_topdeck_miracle": {
         "family": "topdeck_setup",
@@ -600,6 +617,21 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Guttersnipe"],
         "cuts": ["Prismari Pianist"],
         "allow_miracle_core_cuts": True,
+    },
+    "pg245_twinflame_damage_payoff_cut_thor": {
+        "family": "static_damage_modifier",
+        "hypothesis": (
+            "PG245 gives Twinflame Tyrant an executable XMage-backed static "
+            "damage-doubling model. This is a same-mana-value damage payoff "
+            "diagnostic over Thor, not a promotion, because prior Thor cuts failed "
+            "when the replacement was not a direct damage payoff."
+        ),
+        "adds": ["Twinflame Tyrant"],
+        "cuts": ["Thor, God of Thunder"],
+        "allow_miracle_core_cuts": True,
+        "cut_safety_override_reason": (
+            "PG245 same-slot damage payoff benchmark; isolated candidate only"
+        ),
     },
     "monastery_mentor_spell_tokens_cut_prismari": {
         "family": "spellcast_payoff",
@@ -1206,6 +1238,102 @@ def upsert_reviewed_rules_for_cards(
     return counts
 
 
+def load_runtime_package_rule_rows(
+    path: Path,
+    card_names: list[str],
+) -> list[dict[str, Any]]:
+    wanted = {normalize_name(name) for name in card_names}
+    if not wanted or not path.exists():
+        return []
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    proposals = payload.get("proposals") if isinstance(payload, dict) else None
+    if not isinstance(proposals, list):
+        return []
+
+    rows: list[dict[str, Any]] = []
+    for proposal in proposals:
+        if not isinstance(proposal, dict):
+            continue
+        card_name = str(proposal.get("card_name") or "").strip()
+        if not card_name or normalize_name(card_name) not in wanted:
+            continue
+        effect_json = proposal.get("effect_json")
+        deck_role_json = proposal.get("deck_role_json")
+        if not isinstance(effect_json, dict) or not effect_json:
+            continue
+        rows.append(
+            {
+                "card_name": card_name,
+                "effect_json": effect_json,
+                "deck_role_json": deck_role_json if isinstance(deck_role_json, dict) else None,
+                "logical_rule_key": proposal.get("logical_rule_key"),
+                "source": str(proposal.get("source") or "curated"),
+                "confidence": float(proposal.get("confidence") or 1.0),
+                "review_status": str(proposal.get("review_status") or "verified"),
+                "execution_status": str(proposal.get("execution_status") or "auto"),
+                "notes": str(proposal.get("notes") or "").strip(),
+                "oracle_hash": proposal.get("oracle_hash"),
+                "shadow_handling": proposal.get("shadow_handling"),
+            }
+        )
+    return rows
+
+
+def upsert_runtime_package_rules_for_cards(
+    conn: sqlite3.Connection,
+    card_names: list[str],
+    *,
+    proposals_path: Path = DEFAULT_RUNTIME_PACKAGE_PROPOSALS,
+) -> dict[str, dict[str, int]]:
+    rows = load_runtime_package_rule_rows(proposals_path, card_names)
+    if not rows:
+        return {}
+    battle_rule_registry.ensure_battle_card_rules(conn)
+    counts: dict[str, dict[str, int]] = {}
+    for row in rows:
+        card_name = row["card_name"]
+        logical_key = str(row.get("logical_rule_key") or "")
+        upserted = battle_rule_registry.upsert_battle_card_rule(
+            conn,
+            card_name,
+            row["effect_json"],
+            source=row["source"],
+            confidence=row["confidence"],
+            review_status=row["review_status"],
+            execution_status=row["execution_status"],
+            deck_role_json=row.get("deck_role_json"),
+            notes=row.get("notes", ""),
+            oracle_hash=row.get("oracle_hash"),
+            logical_rule_key_value=logical_key or None,
+        )
+        summary = counts.setdefault(card_name, {"upserted": 0, "shadow_deprecated": 0})
+        if upserted:
+            summary["upserted"] += 1
+        if row.get("shadow_handling") == "deprecate_nonmatching_rows" and logical_key:
+            before = conn.total_changes
+            conn.execute(
+                """
+                UPDATE battle_card_rules
+                SET review_status='deprecated',
+                    execution_status='disabled',
+                    updated_at=?,
+                    last_seen_at=COALESCE(last_seen_at, ?)
+                WHERE normalized_name=?
+                  AND logical_rule_key<>?
+                  AND execution_status!='disabled'
+                """,
+                (
+                    battle_rule_registry.utc_now(),
+                    battle_rule_registry.utc_now(),
+                    normalize_name(card_name),
+                    logical_key,
+                ),
+            )
+            summary["shadow_deprecated"] += max(0, conn.total_changes - before)
+    conn.commit()
+    return counts
+
+
 def is_miracle_core_cut(row: sqlite3.Row) -> bool:
     name = str(row["card_name"] or "")
     type_line = str(row["type_line"] or "")
@@ -1264,6 +1392,7 @@ def apply_package(
         )
 
     reviewed_rule_upserts = upsert_reviewed_rules_for_cards(conn, adds)
+    runtime_package_rule_upserts = upsert_runtime_package_rules_for_cards(conn, adds)
     columns = [row[1] for row in conn.execute("PRAGMA table_info(deck_cards)") if row[1] != "id"]
     candidate_rows: list[dict[str, Any]] = []
     for row in rows:
@@ -1317,6 +1446,7 @@ def apply_package(
         "row_count": len(candidate_rows),
         "total_cards": sum(int(row.get("quantity") or 1) for row in candidate_rows),
         "reviewed_rule_upserts": reviewed_rule_upserts,
+        "runtime_package_rule_upserts": runtime_package_rule_upserts,
         "added_rule_counts": {
             name: len(active_rules_for_card(conn, name))
             for name in adds
@@ -1335,6 +1465,7 @@ def run_gate(
     simulation_seed: int,
     game_timeout_seconds: float,
     stem: str,
+    no_game_checkpoint: bool = False,
 ) -> subprocess.CompletedProcess[str]:
     cmd = [
         sys.executable,
@@ -1362,10 +1493,11 @@ def run_gate(
         "--game-timeout-seconds",
         str(game_timeout_seconds),
         "--isolate-deck-process",
-        "--no-game-checkpoint",
         "--stem",
         stem,
     ]
+    if no_game_checkpoint:
+        cmd.append("--no-game-checkpoint")
     env = dict(os.environ)
     env["PYTHONHASHSEED"] = "0"
     return subprocess.run(
@@ -1495,6 +1627,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- simulation_seed: `{payload['simulation_seed']}`",
         f"- preflight_only: `{payload.get('preflight_only')}`",
         f"- apply_only: `{payload.get('apply_only')}`",
+        f"- no_game_checkpoint: `{payload.get('no_game_checkpoint')}`",
         f"- cut_safety_report: `{payload.get('cut_safety_report') or '-'}`",
         f"- prior_package_reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         f"- package_status_counts: `{json.dumps(payload.get('package_status_counts') or {}, sort_keys=True)}`",
@@ -1589,6 +1722,7 @@ def main() -> int:
     parser.add_argument("--no-cut-safety", action="store_true")
     parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--apply-only", action="store_true")
+    parser.add_argument("--no-game-checkpoint", action="store_true")
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--ignore-prior-results", action="store_true")
     args = parser.parse_args()
@@ -1747,6 +1881,7 @@ def main() -> int:
             simulation_seed=args.simulation_seed,
             game_timeout_seconds=max(0.0, args.game_timeout_seconds),
             stem=gate_stem,
+            no_game_checkpoint=bool(args.no_game_checkpoint),
         )
         gate_json = REPORT_DIR / f"{gate_stem}.json"
         gate_md = REPORT_DIR / f"{gate_stem}.md"
@@ -1792,6 +1927,7 @@ def main() -> int:
         "simulation_seed": args.simulation_seed,
         "preflight_only": bool(args.preflight_only),
         "apply_only": bool(args.apply_only),
+        "no_game_checkpoint": bool(args.no_game_checkpoint),
         "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,
         "cut_safety_summary": cut_safety.get("summary") or {},
         "prior_package_reports": [str(path) for path in prior_package_reports],
