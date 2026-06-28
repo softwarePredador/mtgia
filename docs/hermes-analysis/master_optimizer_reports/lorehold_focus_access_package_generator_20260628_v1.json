@@ -1,0 +1,2446 @@
+{
+  "design_contract": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_design_20260628_v1.md",
+  "focus_failure_modes": [
+    {
+      "current_limitations": [
+        "per-game event counts available for seeds: 7",
+        "focus access seed 7: Urza's Saga:opening={'hand': 2, 'library': 7};early={'battlefield': 9, 'hand': 23, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | Library of Leng:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=6 | Sensei's Divining Top:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=27 | Scroll Rack:opening={'library': 9};early={'library': 144};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Squee, Goblin Nabob:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=4"
+      ],
+      "failure_mode": "seed7_missing_engine_access",
+      "focus_cards": [
+        "Urza's Saga",
+        "Library of Leng",
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Squee, Goblin Nabob"
+      ],
+      "hypothesis_key": "trace_seed7_engine_access_sequence",
+      "next_action": "review weak-seed access sequence and decide whether tutor/draw density or runtime sequencing is the blocker",
+      "target_seeds": [
+        "7"
+      ],
+      "trace_status": "focus_access_trace_available_review_sequence"
+    },
+    {
+      "current_limitations": [
+        "per-game event counts available for seeds: 20260625",
+        "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+      ],
+      "failure_mode": "seed20260625_conversion_under_pressure",
+      "focus_cards": [
+        "Library of Leng",
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "The Mind Stone",
+        "Land Tax"
+      ],
+      "hypothesis_key": "trace_seed20260625_conversion_window",
+      "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+      "target_seeds": [
+        "20260625"
+      ],
+      "trace_status": "focus_access_trace_available_review_conversion"
+    },
+    {
+      "current_limitations": [
+        "per-game event counts available for seeds: 7, 20260625, 42",
+        "Saga focus trace includes target_type, candidate_names, legal_target_names, and selected_reason"
+      ],
+      "failure_mode": "saga_runtime_scope_review",
+      "focus_cards": [
+        "Urza's Saga",
+        "Sensei's Divining Top",
+        "Library of Leng"
+      ],
+      "hypothesis_key": "audit_urzas_saga_artifact_tutor_scope",
+      "next_action": "review Saga target scope against trace payload before changing cards",
+      "target_seeds": [
+        "7",
+        "20260625",
+        "42"
+      ],
+      "trace_status": "runtime_trace_payload_available_review_model_scope"
+    },
+    {
+      "current_limitations": [
+        "per-game event counts available for seeds: 7, 20260625, 42"
+      ],
+      "failure_mode": "squee_graveyard_entry_route",
+      "focus_cards": [
+        "Squee, Goblin Nabob",
+        "Library of Leng",
+        "Lorehold, the Historian"
+      ],
+      "hypothesis_key": "audit_squee_graveyard_entry_route",
+      "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+      "target_seeds": [
+        "7",
+        "20260625",
+        "42"
+      ],
+      "trace_status": "trace_evidence_supports_sequencing_gap"
+    }
+  ],
+  "gate_ready_packages": [],
+  "generated_at": "2026-06-28T06:25:15Z",
+  "guardrail_contract": {
+    "prior_negative_exact_match_must_be_false": true,
+    "protected_cards": [
+      "Boros Signet",
+      "Land Tax",
+      "Library of Leng",
+      "Scroll Rack",
+      "Sensei's Divining Top",
+      "Squee, Goblin Nabob",
+      "The Mind Stone",
+      "Urza's Saga"
+    ],
+    "runtime_status_required": "active_or_materialized",
+    "seed_42_anchor_requirement": {
+      "required": true,
+      "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
+    },
+    "target_failure_mode_required": true
+  },
+  "instrumentation_route": {
+    "next_action": "do_not_create_blind_swap; run focused trace/runtime/cut-model work first",
+    "required_work": [
+      {
+        "failure_mode": "squee_graveyard_entry_route",
+        "reason": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "work_key": "squee_graveyard_entry_probe"
+      },
+      {
+        "failure_mode": "seed7_missing_engine_access",
+        "reason": "Enlightened Tutor and Gamble have runtime support but no safe cut option.",
+        "target_seeds": [
+          "7"
+        ],
+        "work_key": "contextual_tutor_cut_model"
+      },
+      {
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "reason": "Hand-filter candidates only pair with protected same-lane support cuts.",
+        "target_seeds": [
+          "20260625"
+        ],
+        "work_key": "hand_filter_non_core_cut_search"
+      },
+      {
+        "failure_mode": "blocked_runtime_rule_gap",
+        "reason": "61 variant-only cards still cannot be trusted in battle because the local runtime does not have an active rule for them.",
+        "target_seeds": [],
+        "work_key": "runtime_rule_gap_batch"
+      }
+    ],
+    "status": "trace_or_runtime_probe_required"
+  },
+  "miner_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json",
+  "package_candidates": [
+    {
+      "add_card": "Apex of Power",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 92,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Artist's Talent",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "apex_of_power_cut_artist_s_talent",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Apex of Power",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 92,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Big Score",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "apex_of_power_cut_big_score",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Apex of Power",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 92,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Esper Sentinel",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "apex_of_power_cut_esper_sentinel",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Apex of Power",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 92,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Monument to Endurance",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "apex_of_power_cut_monument_to_endurance",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Apex of Power",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 92,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Rise of the Eldrazi",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "apex_of_power_cut_rise_of_the_eldrazi",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Volcanic Vision",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 72,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Farewell",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "graveyard_recursion",
+      "package_key": "volcanic_vision_cut_farewell",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Volcanic Vision",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 72,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Furygale Flocking",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "graveyard_recursion",
+      "package_key": "volcanic_vision_cut_furygale_flocking",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Volcanic Vision",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 72,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Mizzix's Mastery",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "graveyard_recursion",
+      "package_key": "volcanic_vision_cut_mizzix_s_mastery",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Ol\u00f3rin's Searing Light",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Artist's Talent",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "olorin_s_searing_light_cut_artist_s_talent",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Ol\u00f3rin's Searing Light",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Big Score",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "olorin_s_searing_light_cut_big_score",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Ol\u00f3rin's Searing Light",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Esper Sentinel",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "olorin_s_searing_light_cut_esper_sentinel",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Ol\u00f3rin's Searing Light",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Monument to Endurance",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "olorin_s_searing_light_cut_monument_to_endurance",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Ol\u00f3rin's Searing Light",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Rise of the Eldrazi",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "olorin_s_searing_light_cut_rise_of_the_eldrazi",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Restoration Seminar",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Farewell",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "graveyard_recursion",
+      "package_key": "restoration_seminar_cut_farewell",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Restoration Seminar",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Furygale Flocking",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "graveyard_recursion",
+      "package_key": "restoration_seminar_cut_furygale_flocking",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Restoration Seminar",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Mizzix's Mastery",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "graveyard_recursion",
+      "package_key": "restoration_seminar_cut_mizzix_s_mastery",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Restoration Seminar",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Pinnacle Monk // Mystic Peak",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "graveyard_recursion",
+      "package_key": "restoration_seminar_cut_pinnacle_monk_mystic_peak",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Artist's Talent",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "valakut_awakening_valakut_stoneforge_cut_artist_s_talent",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Esper Sentinel",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "valakut_awakening_valakut_stoneforge_cut_esper_sentinel",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Monument to Endurance",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "valakut_awakening_valakut_stoneforge_cut_monument_to_endurance",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Rise of the Eldrazi",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "valakut_awakening_valakut_stoneforge_cut_rise_of_the_eldrazi",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Artist's Talent",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "wheel_of_fortune_cut_artist_s_talent",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Esper Sentinel",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "wheel_of_fortune_cut_esper_sentinel",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Monument to Endurance",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "wheel_of_fortune_cut_monument_to_endurance",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Rise of the Eldrazi",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "wheel_of_fortune_cut_rise_of_the_eldrazi",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Dance with Calamity",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Artist's Talent",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "dance_with_calamity_cut_artist_s_talent",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Dance with Calamity",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Big Score",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "dance_with_calamity_cut_big_score",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Dance with Calamity",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Esper Sentinel",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "dance_with_calamity_cut_esper_sentinel",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Dance with Calamity",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Monument to Endurance",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "dance_with_calamity_cut_monument_to_endurance",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Dance with Calamity",
+      "blockers": [
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Rise of the Eldrazi",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "dance_with_calamity_cut_rise_of_the_eldrazi",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_safe_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Plateau",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 94,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Ancient Tomb",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "plateau_cut_ancient_tomb",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Plateau",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 94,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Arid Mesa",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "plateau_cut_arid_mesa",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Plateau",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 94,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Battlefield Forge",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "plateau_cut_battlefield_forge",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Plateau",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 94,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Bloodstained Mire",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "plateau_cut_bloodstained_mire",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Plateau",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 94,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Command Beacon",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "plateau_cut_command_beacon",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 84,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Ancient Tomb",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "clifftop_retreat_cut_ancient_tomb",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 84,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Arid Mesa",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "clifftop_retreat_cut_arid_mesa",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 84,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Battlefield Forge",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "clifftop_retreat_cut_battlefield_forge",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 84,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Bloodstained Mire",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "clifftop_retreat_cut_bloodstained_mire",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 84,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Command Beacon",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "clifftop_retreat_cut_command_beacon",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Ancient Tomb",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "boseiju_who_shelters_all_cut_ancient_tomb",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Arid Mesa",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "boseiju_who_shelters_all_cut_arid_mesa",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Battlefield Forge",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "boseiju_who_shelters_all_cut_battlefield_forge",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Bloodstained Mire",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "boseiju_who_shelters_all_cut_bloodstained_mire",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "blockers": [
+        "missing_target_failure_mode",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 64,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Command Beacon",
+      "cut_gate_readiness": "blocked_cut_contract",
+      "cut_readiness_reason": "cut is blocked by core/lock contract",
+      "cut_status": "blocked_core_cut",
+      "lane": "mana_base",
+      "package_key": "boseiju_who_shelters_all_cut_command_beacon",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_no_target_failure_mode",
+      "target_failure_evidence": {},
+      "target_failure_mode": null
+    },
+    {
+      "add_card": "Volcanic Vision",
+      "blockers": [
+        "prior_negative_exact_match",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 72,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Pinnacle Monk // Mystic Peak",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "graveyard_recursion",
+      "package_key": "volcanic_vision_cut_pinnacle_monk_mystic_peak",
+      "prior_negative_evidence": {
+        "delta_pp": null,
+        "package_key": "volcanic_recursion_cut_pinnacle",
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+        "status": "gated"
+      },
+      "prior_negative_exact_match": true,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_prior_negative_exact",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "blockers": [
+        "prior_negative_exact_match",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Big Score",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "valakut_awakening_valakut_stoneforge_cut_big_score",
+      "prior_negative_evidence": {
+        "delta_pp": null,
+        "package_key": "valakut_hand_filter_cut_big_score",
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+        "status": "gated"
+      },
+      "prior_negative_exact_match": true,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_prior_negative_exact",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "blockers": [
+        "prior_negative_exact_match",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Big Score",
+      "cut_gate_readiness": "protected_same_lane_benchmark_required",
+      "cut_readiness_reason": "cut is core/support and needs a stronger same-lane benchmark",
+      "cut_status": "requires_same_lane_gate",
+      "lane": "hand_filter",
+      "package_key": "wheel_of_fortune_cut_big_score",
+      "prior_negative_evidence": {
+        "delta_pp": null,
+        "package_key": "wheel_hand_filter_cut_big_score",
+        "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+        "status": "gated"
+      },
+      "prior_negative_exact_match": true,
+      "protected_cards_avoided": true,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_prior_negative_exact",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 20260625",
+          "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+        ],
+        "failure_mode": "seed20260625_conversion_under_pressure",
+        "focus_cards": [
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "The Mind Stone",
+          "Land Tax"
+        ],
+        "hypothesis_key": "trace_seed20260625_conversion_window",
+        "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
+        "target_seeds": [
+          "20260625"
+        ],
+        "trace_status": "focus_access_trace_available_review_conversion"
+      },
+      "target_failure_mode": "seed20260625_conversion_under_pressure"
+    },
+    {
+      "add_card": "Volcanic Vision",
+      "blockers": [
+        "protected_cut",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 72,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Squee, Goblin Nabob",
+      "cut_gate_readiness": "manual_cut_review_required",
+      "cut_readiness_reason": "cut needs role/runtime review before gate",
+      "cut_status": "manual_review_needed",
+      "lane": "graveyard_recursion",
+      "package_key": "volcanic_vision_cut_squee_goblin_nabob",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": false,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_protected_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Restoration Seminar",
+      "blockers": [
+        "protected_cut",
+        "cut_not_gate_ready"
+      ],
+      "candidate_score": 68,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "Squee, Goblin Nabob",
+      "cut_gate_readiness": "manual_cut_review_required",
+      "cut_readiness_reason": "cut needs role/runtime review before gate",
+      "cut_status": "manual_review_needed",
+      "lane": "graveyard_recursion",
+      "package_key": "restoration_seminar_cut_squee_goblin_nabob",
+      "prior_negative_evidence": null,
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": false,
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band",
+          "any strong-seed regression rejects the package before broader gates"
+        ],
+        "required": true
+      },
+      "status": "blocked_protected_cut",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7, 20260625, 42"
+        ],
+        "failure_mode": "squee_graveyard_entry_route",
+        "focus_cards": [
+          "Squee, Goblin Nabob",
+          "Library of Leng",
+          "Lorehold, the Historian"
+        ],
+        "hypothesis_key": "audit_squee_graveyard_entry_route",
+        "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+        "target_seeds": [
+          "7",
+          "20260625",
+          "42"
+        ],
+        "trace_status": "trace_evidence_supports_sequencing_gap"
+      },
+      "target_failure_mode": "squee_graveyard_entry_route"
+    },
+    {
+      "add_card": "Enlightened Tutor",
+      "blockers": [
+        "no_cut_option_from_miner"
+      ],
+      "candidate_score": 84,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "",
+      "lane": "contextual",
+      "package_key": "",
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "recommended_action": "define contextual lane and candidate-specific cut model before gate",
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band"
+        ],
+        "required": true
+      },
+      "status": "trace_or_runtime_probe_required",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7",
+          "focus access seed 7: Urza's Saga:opening={'hand': 2, 'library': 7};early={'battlefield': 9, 'hand': 23, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | Library of Leng:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=6 | Sensei's Divining Top:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=27 | Scroll Rack:opening={'library': 9};early={'library': 144};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Squee, Goblin Nabob:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=4"
+        ],
+        "failure_mode": "seed7_missing_engine_access",
+        "focus_cards": [
+          "Urza's Saga",
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "Squee, Goblin Nabob"
+        ],
+        "hypothesis_key": "trace_seed7_engine_access_sequence",
+        "next_action": "review weak-seed access sequence and decide whether tutor/draw density or runtime sequencing is the blocker",
+        "target_seeds": [
+          "7"
+        ],
+        "trace_status": "focus_access_trace_available_review_sequence"
+      },
+      "target_failure_mode": "seed7_missing_engine_access"
+    },
+    {
+      "add_card": "Gamble",
+      "blockers": [
+        "no_cut_option_from_miner"
+      ],
+      "candidate_score": 74,
+      "candidate_status": "high_frequency_runtime_ready_unexplored",
+      "cut_card": "",
+      "lane": "contextual",
+      "package_key": "",
+      "prior_negative_exact_match": false,
+      "protected_cards_avoided": true,
+      "recommended_action": "define contextual lane and candidate-specific cut model before gate",
+      "runtime_status": "active_or_materialized",
+      "seed_42_anchor_requirement": {
+        "available": true,
+        "pass_conditions": [
+          "candidate must not regress the seed-42 record versus baseline",
+          "miracle/topdeck telemetry must stay within the current seed-42 engine band"
+        ],
+        "required": true
+      },
+      "status": "trace_or_runtime_probe_required",
+      "target_failure_evidence": {
+        "current_limitations": [
+          "per-game event counts available for seeds: 7",
+          "focus access seed 7: Urza's Saga:opening={'hand': 2, 'library': 7};early={'battlefield': 9, 'hand': 23, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | Library of Leng:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=6 | Sensei's Divining Top:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=27 | Scroll Rack:opening={'library': 9};early={'library': 144};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Squee, Goblin Nabob:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=4"
+        ],
+        "failure_mode": "seed7_missing_engine_access",
+        "focus_cards": [
+          "Urza's Saga",
+          "Library of Leng",
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "Squee, Goblin Nabob"
+        ],
+        "hypothesis_key": "trace_seed7_engine_access_sequence",
+        "next_action": "review weak-seed access sequence and decide whether tutor/draw density or runtime sequencing is the blocker",
+        "target_seeds": [
+          "7"
+        ],
+        "trace_status": "focus_access_trace_available_review_sequence"
+      },
+      "target_failure_mode": "seed7_missing_engine_access"
+    }
+  ],
+  "planner": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260628_v13_brass_rejection_integrated.json",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "summary": {
+    "focus_failure_mode_count": 4,
+    "gate_ready_package_count": 0,
+    "package_candidate_count": 52,
+    "package_status_counts": {
+      "blocked_no_safe_cut": 30,
+      "blocked_no_target_failure_mode": 15,
+      "blocked_prior_negative_exact": 3,
+      "blocked_protected_cut": 2,
+      "trace_or_runtime_probe_required": 2
+    },
+    "prior_rejected_package_count": 8,
+    "protected_card_count": 8,
+    "recommended_next_action": "do_not_create_blind_swap; run focused trace/runtime/cut-model work first",
+    "seed_42_anchor_available": true
+  },
+  "trace_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
+}
