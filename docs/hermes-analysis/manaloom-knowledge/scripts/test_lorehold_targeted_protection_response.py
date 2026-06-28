@@ -1,0 +1,139 @@
+import random
+
+import battle_analyst_v9 as battle
+
+
+def player(name, *, commander=None, is_human=False):
+    return battle.Player(name, commander, [], is_human=is_human)
+
+
+def lorehold_commander():
+    return {
+        "name": "Lorehold, the Historian",
+        "effect": "commander",
+        "type_line": "Legendary Creature — Elder Dragon",
+        "cmc": 4,
+        "power": 4,
+        "toughness": 4,
+        "is_commander": True,
+    }
+
+
+def flood_maw_stack_item(controller, target_controller, target):
+    card = {
+        "name": "Into the Flood Maw",
+        "cmc": 1,
+        "type_line": "Instant",
+        "colors": ["U"],
+    }
+    effect = {
+        "effect": "remove_creature",
+        "target": "creature",
+        "declared_targets": [
+            {
+                "target": target,
+                "controller": target_controller,
+                "target_type": "creature",
+                "declared_by": controller,
+            }
+        ],
+    }
+    return card, effect
+
+
+def resolve_targeted_removal_after_response(active, players, stack):
+    battle.priority_round(active, players, stack, turn=4, rng=random.Random(2), phase="precombat_main")
+
+
+def test_lorehold_uses_gods_willing_response_for_targeted_commander_removal():
+    commander = lorehold_commander()
+    lorehold = player("Lorehold", commander=commander, is_human=True)
+    opponent = player("Opponent")
+    lorehold.battlefield = [commander]
+    lorehold.mana_pool.add("white", 1)
+    gods_willing = {
+        "name": "Gods Willing",
+        "cmc": 1,
+        "mana_cost": "{W}",
+        "type_line": "Instant",
+        "colors": ["W"],
+    }
+    lorehold.hand = [gods_willing]
+    card, effect = flood_maw_stack_item(opponent, lorehold, commander)
+    stack = battle.Stack()
+    stack.push(card, opponent, effect)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        responded = battle.priority_round(
+            opponent,
+            [opponent, lorehold],
+            stack,
+            turn=4,
+            rng=random.Random(1),
+            phase="precombat_main",
+        )
+        resolve_targeted_removal_after_response(opponent, [opponent, lorehold], stack)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert responded is True
+    assert gods_willing not in lorehold.hand
+    assert commander in lorehold.battlefield
+    assert commander["protection_from"] == ["blue"]
+    assert any(
+        event == "targeted_protection_granted"
+        and data.get("card") == "Gods Willing"
+        and data.get("target") == "Lorehold, the Historian"
+        and data.get("protection_from") == ["blue"]
+        for event, data in events
+    )
+    assert any(
+        event == "removal_resolved"
+        and data.get("card") == "Into the Flood Maw"
+        and data.get("result") == "no_legal_target"
+        for event, data in events
+    )
+
+
+def test_lorehold_uses_mother_of_runes_tap_response_for_targeted_commander_removal():
+    commander = lorehold_commander()
+    lorehold = player("Lorehold", commander=commander, is_human=True)
+    opponent = player("Opponent")
+    mother = {
+        "name": "Mother of Runes",
+        "cmc": 1,
+        "type_line": "Creature — Human Cleric",
+        "colors": ["W"],
+    }
+    lorehold.battlefield = [commander, mother]
+    card, effect = flood_maw_stack_item(opponent, lorehold, commander)
+    stack = battle.Stack()
+    stack.push(card, opponent, effect)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        responded = battle.priority_round(
+            opponent,
+            [opponent, lorehold],
+            stack,
+            turn=4,
+            rng=random.Random(3),
+            phase="precombat_main",
+        )
+        resolve_targeted_removal_after_response(opponent, [opponent, lorehold], stack)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert responded is True
+    assert mother["tapped"] is True
+    assert commander in lorehold.battlefield
+    assert commander["protection_from"] == ["blue"]
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Mother of Runes"
+        and data.get("activation_kind") == "targeted_protection_response"
+        for event, data in events
+    )

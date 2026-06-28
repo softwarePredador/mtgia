@@ -7096,6 +7096,8 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     if isinstance(source_colors, str):
         source_colors = read_json_list(source_colors) or [source_colors]
     source_colors = {_normalize_color_symbol(color) for color in source_colors}
+    if not source_colors and isinstance(spell, dict):
+        source_colors = set(protection_colors_for_source(spell))
     if any(c in protections for c in source_colors):
         return False
     constraints = _target_constraints_dict(spell)
@@ -8377,6 +8379,112 @@ def emit_priority_pass_sequence(active_player, all_players, turn, phase=None, re
     return order
 
 
+def protection_colors_for_source(source):
+    if not isinstance(source, dict):
+        return []
+    colors = source.get("colors") or source.get("color_identity") or []
+    if isinstance(colors, str):
+        colors = read_json_list(colors) or [colors]
+    normalized = sorted({_normalize_color_symbol(color) for color in colors if color})
+    if normalized:
+        return normalized
+    type_line = str(source.get("type_line") or "").lower()
+    mana_cost = str(source.get("mana_cost") or "")
+    if "artifact" in type_line or (not re.search(r"\{[WUBRG]", mana_cost.upper())):
+        return ["colorless"]
+    return []
+
+
+def targeted_stack_protection_context(player, stack_item):
+    if stack_item is None or getattr(stack_item, "controller", None) is player:
+        return None
+    effect_data = getattr(stack_item, "effect_data", {}) or {}
+    if effect_data.get("effect") not in TARGETED_REMOVAL_EFFECTS:
+        return None
+    source_colors = protection_colors_for_source(getattr(stack_item, "card", None))
+    if not source_colors:
+        return None
+    for entry in effect_data.get("declared_targets") or []:
+        if not isinstance(entry, dict):
+            continue
+        target = entry.get("target")
+        controller = entry.get("controller")
+        if controller is not player and getattr(controller, "name", None) != player.name:
+            continue
+        if target not in getattr(player, "battlefield", []):
+            continue
+        if not is_battlefield_creature(target):
+            continue
+        return {
+            "target": target,
+            "target_name": target.get("name", "?"),
+            "source_card": (getattr(stack_item, "card", None) or {}).get("name", "?"),
+            "source_colors": source_colors,
+            "target_is_commander": bool(target.get("is_commander")),
+        }
+    return None
+
+
+def protection_card_can_cover_stack_context(card, effect_data, context):
+    if not context:
+        return False
+    effect = (effect_data or {}).get("effect")
+    if effect == "grant_protection_from_chosen_color":
+        return any(color != "colorless" for color in context.get("source_colors") or [])
+    choices = {
+        str(choice or "").strip().lower()
+        for choice in (effect_data or {}).get("protection_choices") or []
+    }
+    source_colors = set(context.get("source_colors") or [])
+    return (
+        "chosen_color" in choices
+        and any(color != "colorless" for color in source_colors)
+    ) or ("colorless" in choices and "colorless" in source_colors)
+
+
+def activate_permanent_targeted_protection_response(player, permanent, context, turn, phase=None):
+    effect_data = get_card_effect(permanent)
+    if not effect_data.get("tap_activation") or not protection_card_can_cover_stack_context(permanent, effect_data, context):
+        return False
+    target = context.get("target")
+    if effect_data.get("protection_target") == "another_creature_you_control" and target is permanent:
+        return False
+    if permanent.get("tapped") or permanent.get("summoning_sick"):
+        return False
+    colors = list(context.get("source_colors") or [])
+    existing = target.get("protection_from") or []
+    if isinstance(existing, str):
+        existing = [existing]
+    merged = sorted({_normalize_color_symbol(color) for color in existing if color} | set(colors))
+    set_until_eot(target, "protection_from", merged)
+    permanent["tapped"] = True
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="targeted_protection_response",
+        target=context.get("target_name"),
+        protection_from=colors,
+        response_to=context.get("source_card"),
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    emit_replay_event(
+        "targeted_protection_granted",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        target=context.get("target_name"),
+        protection_from=colors,
+        target_found=True,
+        activation_kind="targeted_protection_response",
+        response_to=context.get("source_card"),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return True
+
+
 def _is_reactive_interaction_card(card, effect_data):
     effect = str(effect_data.get("effect") or card.get("effect") or "").lower()
     if effect in (
@@ -8898,17 +9006,89 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells
             top_effect = top_item.effect_data.get("effect", "")
+            targeted_protection_context = targeted_stack_protection_context(player, top_item)
             own_stack_protection_targets = {
                 "board_wipe",
                 "damage_wipe",
                 "damage_player_and_creatures",
                 "worldfire_reset",
             }
-            should_consider_protection = score >= 40 and (
-                player != top_item.controller
-                or top_effect in own_stack_protection_targets
+            should_consider_protection = (
+                score >= 40
+                and (
+                    player != top_item.controller
+                    or top_effect in own_stack_protection_targets
+                )
+            ) or bool(
+                targeted_protection_context
+                and targeted_protection_context.get("target_is_commander")
             )
             if should_consider_protection:
+                if targeted_protection_context:
+                    protection_permanents = [
+                        permanent
+                        for permanent in player.battlefield
+                        if isinstance(permanent, dict)
+                        and get_card_effect(permanent).get("tap_activation")
+                        and protection_card_can_cover_stack_context(
+                            permanent,
+                            get_card_effect(permanent),
+                            targeted_protection_context,
+                        )
+                    ]
+                    for permanent in protection_permanents:
+                        if activate_permanent_targeted_protection_response(
+                            player,
+                            permanent,
+                            targeted_protection_context,
+                            turn,
+                            phase=phase,
+                        ):
+                            permanent_fields = replay_rule_fields(get_card_effect(permanent))
+                            emit_decision_trace(
+                                decision_type="response",
+                                player=player,
+                                turn=turn,
+                                phase=phase,
+                                available_options=[
+                                    decision_card_option(
+                                        option,
+                                        get_card_effect(option),
+                                        action="activate_protection",
+                                        target=targeted_protection_context.get("target_name"),
+                                    )
+                                    for option in protection_permanents[:8]
+                                ],
+                                chosen_option=decision_card_option(
+                                    permanent,
+                                    get_card_effect(permanent),
+                                    action="activate_protection",
+                                    target=targeted_protection_context.get("target_name"),
+                                ),
+                                rejected_options=[
+                                    decision_card_option(
+                                        option,
+                                        get_card_effect(option),
+                                        action="reject_protection_activation",
+                                    )
+                                    for option in protection_permanents
+                                    if option is not permanent
+                                ][:8],
+                                score_components={
+                                    "stack_threat_score": score,
+                                    "targeted_protection_available": len(protection_permanents),
+                                    "target_is_commander": int(
+                                        bool(targeted_protection_context.get("target_is_commander"))
+                                    ),
+                                },
+                                rule_source=permanent_fields.get("rule_source", "battle_heuristic"),
+                                rule_status=permanent_fields.get("rule_review_status", "heuristic"),
+                                confidence="high",
+                                expected_benefit_score=max(score, 45),
+                                actual_outcome="targeted_protection_activation",
+                                reason="protect_targeted_creature_from_stack_removal",
+                            )
+                            return True
                 instants = [c for c in player.hand if is_instant(c)]
                 for c in instants:
                     eff = get_card_effect(c)
@@ -8923,18 +9103,29 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                         "gift_hexproof_indestructible",
                         "indestructible",
                         "modal_boros_charm",
+                        "grant_protection_from_chosen_color",
                     ):
                         continue
+                    targeted_spell_context = None
+                    if protection_effect == "grant_protection_from_chosen_color":
+                        targeted_spell_context = targeted_protection_context
+                        if not protection_card_can_cover_stack_context(c, eff, targeted_spell_context):
+                            continue
                     if protection_effect in (
                         "phase_out",
                         "gift_hexproof_indestructible",
                         "indestructible",
                         "modal_boros_charm",
                         "cannot_lose_turn",
+                        "grant_protection_from_chosen_color",
                     ):
                         if can_pay_card_for_effect(player, c, eff):
                             alternative_cost, alternative_cost_kind = alternative_cost_for_effect(player, c, eff)
                             locked_cost = card_cost_for_effect(player, c, eff)
+                            response_effect = dict(eff)
+                            if targeted_spell_context:
+                                response_effect["_response_protect_target"] = targeted_spell_context.get("target")
+                                response_effect["protection_colors"] = targeted_spell_context.get("source_colors")
                             fields = replay_rule_fields(eff)
                             score_components = {
                                 "stack_threat_score": score,
@@ -8942,6 +9133,15 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                             }
                             if cannot_lose_context:
                                 score_components.update(cannot_lose_context)
+                            if targeted_spell_context:
+                                score_components.update(
+                                    {
+                                        "targeted_protection_response": 1,
+                                        "target_is_commander": int(
+                                            bool(targeted_spell_context.get("target_is_commander"))
+                                        ),
+                                    }
+                                )
                             emit_decision_trace(
                                 decision_type="response",
                                 player=player,
@@ -8977,7 +9177,11 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                 ),
                                 reason=(
                                     (cannot_lose_context or {}).get("reason")
-                                    or "high_threat_stack_response"
+                                    or (
+                                        "protect_targeted_creature_from_stack_removal"
+                                        if targeted_spell_context
+                                        else "high_threat_stack_response"
+                                    )
                                 ),
                             )
                             if not player.spend_mana(locked_cost):
@@ -9015,7 +9219,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                 c,
                                 turn,
                                 rng,
-                                effect_data_override=eff,
+                                effect_data_override=response_effect,
                             )
                             return True
         else:
@@ -31395,7 +31599,13 @@ def apply_effect_immediate(
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "grant_protection_from_chosen_color":
         candidates = [permanent for permanent in player.battlefield if is_battlefield_creature(permanent)]
-        target = choose_best_creature_target(candidates) if candidates else None
+        response_target = effect_data.get("_response_protect_target")
+        live_response_target = battlefield_object_for_target(player, response_target) if response_target else None
+        target = (
+            live_response_target
+            if live_response_target in candidates
+            else choose_best_creature_target(candidates) if candidates else None
+        )
         colors = effect_data.get("protection_colors") or ["W", "U", "B", "R", "G"]
         if isinstance(colors, str):
             colors = read_json_list(colors) or [colors]
