@@ -4200,6 +4200,23 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:f1540009e5e8a14128cf83a2f494a0db",
         }
     ),
+    "Repercussion": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered_static_enchantment",
+            "cmc": 3.0,
+            "effect": "passive",
+            "mana_cost": "{1}{R}{R}",
+            "colors": ["R"],
+            "type_line": "Enchantment",
+            "global_creature_damage_reflect_to_controller": True,
+            "trigger": "creature_dealt_damage",
+            "trigger_effect": "damage_creature_controller",
+            "damage_amount_source": "damage_dealt_to_creature",
+            "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+            "_rule_oracle_hash": "8e1ed4f8063ab89dd8906878a6232862",
+            "_rule_logical_key": "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017",
+        }
+    ),
     "Stuffy Doll": handcrafted_runtime_rule(
         {
             "ability_kind": "static_triggered_and_activated",
@@ -4620,6 +4637,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Heroes Remembered",
     "Beacon of Immortality",
     "Boros Reckoner",
+    "Repercussion",
     "Stuffy Doll",
     "Slickshot Show-Off",
     "Serra Ascendant",
@@ -4754,6 +4772,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Promote the existing source-damaged reflection executor to the real XMage-backed Boros Reckoner card lookup while PG metadata remains pending.",
         ["manaloom_log_learning_audit_20260628_v13_after_life_total_runtime", "BorosReckoner.java", "pg_boros_reckoner_runtime_20260628"],
         "2026-06-28T21:35:00Z",
+    ),
+    "Repercussion": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed global creature-damage reflection to the damaged creature's controller.",
+        ["manaloom_log_learning_audit_20260628_v31_runtime_waiver_drift", "Repercussion.java"],
+        "2026-06-29T03:00:00Z",
     ),
     "Stuffy Doll": manual_runtime_waiver_metadata(
         "Replace no_active runtime gap with XMage-backed chosen-player damage reflection, indestructible body, and tap self-damage ability.",

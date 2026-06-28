@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import importlib.util
+import random
 from pathlib import Path
 
 
@@ -32,18 +33,82 @@ def creature(name, toughness=4):
     }
 
 
-def repercussion():
+def repercussion_card():
     return {
         "name": "Repercussion",
-        "effect": "direct_damage",
-        "battle_model_scope": "creature_damage_controller_reflect_global_v1",
-        "trigger": "creature_dealt_damage",
-        "trigger_effect": "damage_creature_controller",
-        "damage_amount_source": "damage_dealt_to_creature",
         "type_line": "Enchantment",
-        "_rule_logical_key": "battle_rule_v1:repercussion_runtime_test",
-        "_rule_oracle_hash": "repercussion-runtime-test-hash",
+        "cmc": 3,
+        "mana_cost": "{1}{R}{R}",
     }
+
+
+def repercussion(battle):
+    card = repercussion_card()
+    effect = battle.get_card_effect(card)
+    return {**card, **effect}
+
+
+def test_repercussion_uses_xmage_backed_manual_runtime_waiver():
+    battle = load_battle()
+    effect = battle.get_card_effect(repercussion_card())
+
+    assert "Repercussion" in battle.MANUAL_RULE_RUNTIME_WAIVERS
+    assert effect["effect"] == "passive"
+    assert effect["global_creature_damage_reflect_to_controller"] is True
+    assert effect["trigger"] == "creature_dealt_damage"
+    assert effect["trigger_effect"] == "damage_creature_controller"
+    assert effect["damage_amount_source"] == "damage_dealt_to_creature"
+    assert effect["battle_model_scope"] == "creature_damage_controller_reflect_global_v1"
+    assert effect["_rule_oracle_hash"] == "8e1ed4f8063ab89dd8906878a6232862"
+    assert effect["_rule_logical_key"] == "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017"
+    waiver = next(
+        row
+        for row in battle.manual_runtime_waiver_inventory()
+        if row["card"] == "Repercussion"
+    )
+    assert waiver["effect"] == "passive"
+    assert waiver["promotion_target"] == "card_battle_rules"
+    assert "Repercussion.java" in waiver["source_runs"]
+
+
+def test_repercussion_cast_enters_battlefield_and_triggers():
+    battle = load_battle()
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player(battle, "Lorehold")
+        opponent = player(battle, "Opponent")
+        opponent.battlefield = [creature("Four Toughness Creature", toughness=4)]
+        card = repercussion_card()
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=3,
+            rng=random.Random(607),
+            effect_data_override=battle.get_card_effect(card),
+        )
+        assert any(permanent.get("name") == "Repercussion" for permanent in active.battlefield)
+
+        battle.apply_damage_wipe(
+            active,
+            [opponent],
+            {"name": "Three Damage Wipe", "type_line": "Sorcery", "cmc": 4},
+            {"effect": "damage_wipe", "damage": 3, "damage_scope": "each_creature"},
+            turn=4,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = None
+
+    assert opponent.life == 37
+    assert any(
+        event == "trigger_resolved"
+        and data.get("card") == "Repercussion"
+        and data.get("target_player") == "Opponent"
+        and data.get("original_damage_to_creature") == 3
+        for event, data in events
+    )
 
 
 def test_repercussion_damages_creature_controller_after_survived_creature_damage():
@@ -54,7 +119,7 @@ def test_repercussion_damages_creature_controller_after_survived_creature_damage
         active = player(battle, "Lorehold")
         opponent = player(battle, "Opponent")
         opponent.battlefield = [creature("Four Toughness Creature", toughness=4)]
-        active.battlefield = [repercussion()]
+        active.battlefield = [repercussion(battle)]
 
         battle.apply_damage_wipe(
             active,
@@ -90,7 +155,7 @@ def test_repercussion_stacks_with_blasphemous_act_board_damage():
         active = player(battle, "Lorehold")
         opponent = player(battle, "Opponent")
         active.battlefield = [
-            repercussion(),
+            repercussion(battle),
             creature("Own Token", toughness=1),
         ]
         opponent.battlefield = [
@@ -121,3 +186,15 @@ def test_repercussion_stacks_with_blasphemous_act_board_damage():
     assert [data["target_player"] for data in trigger_events].count("Opponent") == 2
     assert [data["target_player"] for data in trigger_events].count("Lorehold") == 1
     assert all(data.get("amount") == 13 for data in trigger_events)
+
+
+if __name__ == "__main__":
+    tests = [
+        test_repercussion_uses_xmage_backed_manual_runtime_waiver,
+        test_repercussion_cast_enters_battlefield_and_triggers,
+        test_repercussion_damages_creature_controller_after_survived_creature_damage,
+        test_repercussion_stacks_with_blasphemous_act_board_damage,
+    ]
+    for test in tests:
+        test()
+        print(f"PASS {test.__name__}")
