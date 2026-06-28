@@ -1500,6 +1500,7 @@ def activated_ability_cost_reductions_for_permanent(
     base_generic_cost,
     *,
     activation_colors=None,
+    is_mana_ability=False,
 ):
     if base_generic_cost <= 0 or not isinstance(permanent, dict):
         return []
@@ -1512,6 +1513,8 @@ def activated_ability_cost_reductions_for_permanent(
         if not effect_data:
             continue
         if _static_cost_reduction_scope(effect_data) != "static_activated_ability_cost_reduction_variant_v1":
+            continue
+        if is_mana_ability and effect_data.get("cost_reduction_excludes_mana_abilities"):
             continue
         applies_to = str(effect_data.get("cost_reduction_applies_to") or "")
         if applies_to == "activated_abilities_of_creatures_you_control":
@@ -1546,6 +1549,7 @@ def adjusted_activated_ability_generic_cost(
     base_generic_cost,
     *,
     activation_colors=None,
+    is_mana_ability=False,
 ):
     try:
         remaining_generic = max(0, int(base_generic_cost or 0))
@@ -1556,6 +1560,7 @@ def adjusted_activated_ability_generic_cost(
         permanent,
         remaining_generic,
         activation_colors=activation_colors,
+        is_mana_ability=is_mana_ability,
     )
     for reduction in reductions:
         amount = max(0, int(reduction.get("amount", 0) or 0))
@@ -4039,6 +4044,32 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:e2ac43c9f6e03e11e9fab994a5c15258",
         }
     ),
+    "Zirda, the Dawnwaker": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static_and_activated",
+            "cmc": 3.0,
+            "effect": "static_cost_reduction",
+            "mana_cost": "{1}{R/W}{R/W}",
+            "colors": ["R", "W"],
+            "type_line": "Legendary Creature - Elemental Fox",
+            "is_creature_permanent": True,
+            "legendary": True,
+            "power": 3,
+            "toughness": 3,
+            "subtypes": ["Elemental", "Fox"],
+            "cost_reduction_applies_to": "activated_abilities_you_activate",
+            "cost_reduction_generic": 2,
+            "cost_reduction_minimum_total_mana": 1,
+            "cost_reduction_excludes_mana_abilities": True,
+            "activated_ability_cost": "{1}, {T}",
+            "activated_ability_effect": "cant_block_target_creature_until_eot",
+            "activated_ability_target": "target_creature",
+            "companion_condition": "each_permanent_card_in_starting_deck_has_activated_ability",
+            "battle_model_scope": "static_activated_ability_cost_reduction_variant_v1",
+            "_rule_oracle_hash": "23860bc4072cc27137ba346b82b9f548",
+            "_rule_logical_key": "battle_rule_v1:45c3e1db1be4f2f97a3337ce3de8f767",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4155,6 +4186,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Beacon of Immortality",
     "Boros Reckoner",
     "Ancient Copper Dragon",
+    "Zirda, the Dawnwaker",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4280,6 +4312,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace passive review_only evidence with XMage-backed combat-damage d20 Treasure trigger semantics.",
         ["manaloom_log_learning_audit_20260628_v14_after_boros_reckoner_runtime", "AncientCopperDragon.java"],
         "2026-06-28T21:55:00Z",
+    ),
+    "Zirda, the Dawnwaker": manual_runtime_waiver_metadata(
+        "Replace no_active battle-rule gap with XMage-backed activated-ability cost reduction and activated can't-block metadata.",
+        ["manaloom_log_learning_audit_20260628_v15_after_ancient_copper_runtime", "ZirdaTheDawnwaker.java"],
+        "2026-06-28T22:20:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
