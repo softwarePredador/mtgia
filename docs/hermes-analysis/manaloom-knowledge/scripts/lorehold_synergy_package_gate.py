@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import signal
 import shutil
 import sqlite3
 import subprocess
@@ -392,6 +393,35 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         ),
         "adds": ["Silence"],
         "cuts": ["Avatar's Wrath"],
+        "allow_miracle_core_cuts": True,
+    },
+    "gods_willing_commander_shield_cut_promise": {
+        "family": "targeted_commander_protection",
+        "hypothesis": (
+            "After the runtime learned targeted protection responses, Gods "
+            "Willing tests the cheapest 616 commander shield against the seed-7 "
+            "failure mode where Lorehold died to targeted removal with one mana "
+            "available. Promise of Loyalty is the pressure-lane comparison slot: "
+            "it is a five-mana sorcery cleanup spell already challenged by the "
+            "Ghostly Prison pressure test, while this keeps Mother/Giver, Dawn's "
+            "Truce, High Noon, topdeck engines, ramp, and the expensive win "
+            "package intact."
+        ),
+        "adds": ["Gods Willing"],
+        "cuts": ["Promise of Loyalty"],
+        "allow_miracle_core_cuts": True,
+    },
+    "sejiri_shelter_commander_shield_cut_promise": {
+        "family": "targeted_commander_protection",
+        "hypothesis": (
+            "Sejiri Shelter carries the same targeted protection rule as Gods "
+            "Willing, but costs two mana and is currently evaluated by the local "
+            "runtime as the spell face rather than as a flexible MDFC land. This "
+            "benchmark checks whether the extra shield density is still useful "
+            "when compared against the same five-mana pressure cleanup slot."
+        ),
+        "adds": ["Sejiri Shelter // Sejiri Glacier"],
+        "cuts": ["Promise of Loyalty"],
         "allow_miracle_core_cuts": True,
     },
     "dragon_rage_channeler_cut_scarlet_witch": {
@@ -1464,6 +1494,8 @@ def run_gate(
     opponent_seed: int,
     simulation_seed: int,
     game_timeout_seconds: float,
+    deck_process_timeout_seconds: float,
+    gate_timeout_seconds: float,
     stem: str,
     no_game_checkpoint: bool = False,
 ) -> subprocess.CompletedProcess[str]:
@@ -1492,6 +1524,8 @@ def run_gate(
         str(simulation_seed),
         "--game-timeout-seconds",
         str(game_timeout_seconds),
+        "--deck-process-timeout-seconds",
+        str(deck_process_timeout_seconds),
         "--isolate-deck-process",
         "--stem",
         stem,
@@ -1500,18 +1534,80 @@ def run_gate(
         cmd.append("--no-game-checkpoint")
     env = dict(os.environ)
     env["PYTHONHASHSEED"] = "0"
-    return subprocess.run(
+    timeout = float(gate_timeout_seconds or 0.0)
+    if timeout <= 0:
+        total_games = max(1, games) * max(1, opponent_limit)
+        per_deck_timeout = float(deck_process_timeout_seconds or 0.0)
+        if per_deck_timeout <= 0:
+            per_deck_timeout = max(
+                120.0,
+                total_games * max(5.0, float(game_timeout_seconds or 0.0)) + 120.0,
+            )
+        timeout = max(60.0, (per_deck_timeout * 2.0) + 60.0)
+
+    process = subprocess.Popen(
         cmd,
         cwd=str(SCRIPT_DIR),
-        check=False,
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
         env=env,
+        start_new_session=True,
     )
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+        return subprocess.CompletedProcess(cmd, process.returncode, stdout, stderr)
+    except subprocess.TimeoutExpired as exc:
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except Exception:
+            process.terminate()
+        try:
+            stdout, stderr = process.communicate(timeout=10)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except Exception:
+                process.kill()
+            stdout, stderr = process.communicate()
+        timeout_message = f"\npackage gate subprocess timed out after {timeout:.1f}s"
+        return subprocess.CompletedProcess(
+            cmd,
+            124,
+            (exc.stdout or "") + (stdout or ""),
+            (exc.stderr or "") + (stderr or "") + timeout_message,
+        )
 
 
 def load_gate_result(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def compact_gate_telemetry(telemetry: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "strategic_event_counts": telemetry.get("strategic_event_counts") or {},
+        "strategic_games": telemetry.get("strategic_games") or {},
+        "event_counts": telemetry.get("event_counts") or {},
+        "top_cards": telemetry.get("top_cards") or [],
+        "lorehold_attack_restrictions": telemetry.get("lorehold_attack_restrictions") or {},
+        "lorehold_attack_restriction_source_events": (
+            telemetry.get("lorehold_attack_restriction_source_events") or {}
+        ),
+    }
+
+
+def compact_gate_row(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "status": row.get("status"),
+        "error": row.get("error"),
+        "games": row.get("games"),
+        "wins": row.get("wins"),
+        "losses": row.get("losses"),
+        "stalls": row.get("stalls"),
+        "win_rate": row.get("win_rate"),
+        "avg_win_turn": row.get("avg_win_turn"),
+        "telemetry": compact_gate_telemetry(row.get("telemetry") or {}),
+    }
 
 
 def summarize_gate(report: dict[str, Any], candidate_key: str) -> dict[str, Any]:
@@ -1520,23 +1616,9 @@ def summarize_gate(report: dict[str, Any], candidate_key: str) -> dict[str, Any]
     for row in rows:
         key = str(row.get("deck_key") or "")
         if key == "deck_6":
-            summary["baseline"] = {
-                "wins": row.get("wins"),
-                "losses": row.get("losses"),
-                "stalls": row.get("stalls"),
-                "win_rate": row.get("win_rate"),
-                "avg_win_turn": row.get("avg_win_turn"),
-                "telemetry": row.get("telemetry") or {},
-            }
+            summary["baseline"] = compact_gate_row(row)
         elif key == candidate_key:
-            summary["candidate"] = {
-                "wins": row.get("wins"),
-                "losses": row.get("losses"),
-                "stalls": row.get("stalls"),
-                "win_rate": row.get("win_rate"),
-                "avg_win_turn": row.get("avg_win_turn"),
-                "telemetry": row.get("telemetry") or {},
-            }
+            summary["candidate"] = compact_gate_row(row)
     baseline_wr = float((summary.get("baseline") or {}).get("win_rate") or 0.0)
     candidate_wr = float((summary.get("candidate") or {}).get("win_rate") or 0.0)
     summary["delta_pp"] = round(candidate_wr - baseline_wr, 2)
@@ -1716,6 +1798,8 @@ def main() -> int:
     parser.add_argument("--opponent-seed", type=int, default=20260626)
     parser.add_argument("--simulation-seed", type=int, default=42)
     parser.add_argument("--game-timeout-seconds", type=float, default=90.0)
+    parser.add_argument("--deck-process-timeout-seconds", type=float, default=0.0)
+    parser.add_argument("--gate-timeout-seconds", type=float, default=0.0)
     parser.add_argument("--stem", default="lorehold_synergy_package_gate")
     parser.add_argument("--stamp", default=None)
     parser.add_argument("--cut-safety-report", type=Path, default=DEFAULT_CUT_SAFETY_REPORT)
@@ -1880,6 +1964,8 @@ def main() -> int:
             opponent_seed=args.opponent_seed,
             simulation_seed=args.simulation_seed,
             game_timeout_seconds=max(0.0, args.game_timeout_seconds),
+            deck_process_timeout_seconds=max(0.0, args.deck_process_timeout_seconds),
+            gate_timeout_seconds=max(0.0, args.gate_timeout_seconds),
             stem=gate_stem,
             no_game_checkpoint=bool(args.no_game_checkpoint),
         )

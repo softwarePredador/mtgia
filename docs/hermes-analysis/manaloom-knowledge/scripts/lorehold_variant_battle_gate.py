@@ -13,9 +13,12 @@ import copy
 import json
 import multiprocessing as mp
 import os
+import queue as queue_module
 import random
 import signal
 import sqlite3
+import tempfile
+import time
 import traceback
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -1005,11 +1008,26 @@ def run_deck_gate(
 
 def _run_deck_gate_process_entry(queue: Any, kwargs: dict[str, Any]) -> None:
     try:
+        queue_progress = bool(kwargs.pop("_queue_progress", False))
+        result_path = kwargs.pop("_result_path", None)
+        if queue_progress:
+            def child_progress_callback(event: dict[str, Any]) -> None:
+                queue.put({"type": "progress", "event": dict(event)})
+
+            kwargs["progress_callback"] = child_progress_callback
         result = run_deck_gate(**kwargs)
-        queue.put({"ok": True, "result": result})
+        if result_path:
+            Path(str(result_path)).write_text(
+                json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            queue.put({"type": "result", "ok": True, "result_path": str(result_path)})
+        else:
+            queue.put({"type": "result", "ok": True, "result": result})
     except Exception as exc:
         queue.put(
             {
+                "type": "result",
                 "ok": False,
                 "error": str(exc),
                 "traceback": traceback.format_exc(limit=8),
@@ -1024,9 +1042,18 @@ def run_deck_gate_in_process(
     games_per_opponent: int,
     simulation_seed: int,
     game_timeout_seconds: float,
+    progress_callback: Callable[[dict[str, Any]], None] | None = None,
+    process_timeout_seconds: float = 0,
 ) -> dict[str, Any]:
     ctx = mp.get_context("spawn")
     queue: Any = ctx.Queue()
+    result_fd, result_path_raw = tempfile.mkstemp(
+        prefix="lorehold_deck_gate_",
+        suffix=".json",
+        dir=str(REPORT_DIR),
+    )
+    os.close(result_fd)
+    result_path = Path(result_path_raw)
     kwargs = {
         "spec": dict(spec),
         "opponents": opponents,
@@ -1034,22 +1061,69 @@ def run_deck_gate_in_process(
         "simulation_seed": simulation_seed,
         "game_timeout_seconds": game_timeout_seconds,
         "progress_callback": None,
+        "_queue_progress": progress_callback is not None,
+        "_result_path": str(result_path),
     }
     process = ctx.Process(target=_run_deck_gate_process_entry, args=(queue, kwargs))
     process.start()
     total_games = max(1, games_per_opponent) * max(1, len(opponents))
-    timeout = max(120.0, total_games * max(5.0, float(game_timeout_seconds or 0.0)) + 120.0)
-    process.join(timeout)
+    default_timeout = max(120.0, total_games * max(5.0, float(game_timeout_seconds or 0.0)) + 120.0)
+    timeout = float(process_timeout_seconds or 0.0) or default_timeout
+    deadline = time.monotonic() + timeout
+    payload: dict[str, Any] | None = None
+    while payload is None:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        if result_path.exists() and result_path.stat().st_size > 0:
+            payload = {"type": "result", "ok": True, "result_path": str(result_path)}
+            break
+        try:
+            item = queue.get(timeout=min(1.0, max(0.05, remaining)))
+        except queue_module.Empty:
+            if not process.is_alive():
+                break
+            continue
+        if item.get("type") == "progress":
+            if progress_callback is not None:
+                progress_callback(dict(item.get("event") or {}))
+            continue
+        payload = item
+
+    process.join(0 if payload is not None else max(0.0, deadline - time.monotonic()))
     if process.is_alive():
         process.terminate()
         process.join(10)
-        raise RuntimeError(f"isolated deck process timed out after {timeout:.1f}s")
-    if process.exitcode != 0 and queue.empty():
+        if process.is_alive() and hasattr(process, "kill"):
+            process.kill()
+            process.join(5)
+        if payload is None:
+            raise RuntimeError(f"isolated deck process timed out after {timeout:.1f}s")
+    while payload is None:
+        try:
+            item = queue.get_nowait()
+        except queue_module.Empty:
+            break
+        if item.get("type") == "progress":
+            if progress_callback is not None:
+                progress_callback(dict(item.get("event") or {}))
+            continue
+        payload = item
+
+    if process.exitcode != 0 and payload is None:
         raise RuntimeError(f"isolated deck process exited with code {process.exitcode}")
-    payload = queue.get()
+    if payload is None:
+        raise RuntimeError("isolated deck process exited without result payload")
     if not payload.get("ok"):
         raise RuntimeError(payload.get("error") or payload.get("traceback") or "isolated deck process failed")
-    result = payload["result"]
+    if payload.get("result_path"):
+        result = json.loads(Path(str(payload["result_path"])).read_text(encoding="utf-8"))
+        try:
+            Path(str(payload["result_path"])).unlink()
+        except FileNotFoundError:
+            pass
+    else:
+        result = payload["result"]
     result["process_isolated"] = True
     return result
 
@@ -1277,6 +1351,12 @@ def main() -> int:
     parser.add_argument("--opponent-seed", type=int, default=20260626)
     parser.add_argument("--simulation-seed", type=int, default=42)
     parser.add_argument("--game-timeout-seconds", type=float, default=0.0)
+    parser.add_argument(
+        "--deck-process-timeout-seconds",
+        type=float,
+        default=0.0,
+        help="Optional wall-clock cap for each isolated deck process. Defaults to a game-count based budget.",
+    )
     parser.add_argument("--checkpoint-stem", default=None)
     parser.add_argument("--checkpoint-history-limit", type=int, default=200)
     parser.add_argument("--no-game-checkpoint", action="store_true")
@@ -1347,6 +1427,8 @@ def main() -> int:
                     games_per_opponent=max(1, args.games),
                     simulation_seed=args.simulation_seed,
                     game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
+                    progress_callback=progress_callback,
+                    process_timeout_seconds=max(0.0, float(args.deck_process_timeout_seconds or 0)),
                 )
             else:
                 result = run_deck_gate(
