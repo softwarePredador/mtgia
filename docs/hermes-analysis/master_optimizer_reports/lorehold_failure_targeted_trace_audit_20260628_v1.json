@@ -1,0 +1,5433 @@
+{
+  "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+  "focus_cards": [
+    "Urza's Saga",
+    "Library of Leng",
+    "Sensei's Divining Top",
+    "Scroll Rack",
+    "Squee, Goblin Nabob",
+    "The Mind Stone",
+    "Land Tax",
+    "Lorehold, the Historian"
+  ],
+  "generated_at": "2026-06-28T02:44:27Z",
+  "guardrails": [
+    "Do not count aggregate event presence as proof of the intended card sequence.",
+    "Do not test another blind swap until weak seeds have per-game focus-card payload.",
+    "Treat Urza's Saga target choice and The Mind Stone blink target as runtime trace requirements.",
+    "Keep seed 42 as the regression anchor for miracle/topdeck conversion."
+  ],
+  "hypothesis_assessments": [
+    {
+      "current_limitations": [
+        "per-game event counts available for seeds: 7",
+        "not observed in current artifact: Squee, Goblin Nabob@seed7",
+        "missing required payload fields: opening/early-turn hand or battlefield presence; card-specific topdeck activation source per game; Squee hand to graveyard route"
+      ],
+      "focus_cards": [
+        "Urza's Saga",
+        "Library of Leng",
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Squee, Goblin Nabob"
+      ],
+      "hypothesis_key": "trace_seed7_engine_access_sequence",
+      "next_action": "rerun targeted diagnostic gate with per-turn hand/battlefield/card-source payload",
+      "seed_summaries": [
+        {
+          "card_observations": {
+            "Library of Leng": {
+              "aggregate_event_counts": {
+                "replacement_applied": 9
+              },
+              "card_name": "Library of Leng",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "replacement_applied": 4
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Scroll Rack": {
+              "aggregate_event_counts": {
+                "topdeck_manipulation_activated": 2
+              },
+              "card_name": "Scroll Rack",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "topdeck_manipulation_activated": 1
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 2,
+                  "metric": "topdeck:Scroll Rack",
+                  "metric_type": "topdeck"
+                }
+              ]
+            },
+            "Sensei's Divining Top": {
+              "aggregate_event_counts": {
+                "topdeck_manipulation_activated": 2
+              },
+              "card_name": "Sensei's Divining Top",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "topdeck_manipulation_activated": 1
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Squee, Goblin Nabob": {
+              "aggregate_event_counts": {},
+              "card_name": "Squee, Goblin Nabob",
+              "evidence_level": "not_observed",
+              "games_with": {},
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Urza's Saga": {
+              "aggregate_event_counts": {
+                "saga_chapter_progressed": 4,
+                "saga_chapter_resolved": 2,
+                "saga_sacrificed_by_sba": 2,
+                "tutor_resolved": 7
+              },
+              "card_name": "Urza's Saga",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 2,
+                "saga_sacrificed_by_sba": 2,
+                "tutor_resolved": 6
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            }
+          },
+          "record": {
+            "games": 9,
+            "losses": 9,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "seed": "7",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
+          "trace_data_level": "per_game_event_counts"
+        }
+      ],
+      "source_status": "trace_audit_required",
+      "target_failure": "seed 7 missing or low engine access",
+      "target_seeds": [
+        "7"
+      ],
+      "trace_status": "trace_partial_missing_payload"
+    },
+    {
+      "current_limitations": [
+        "per-game event counts available for seeds: 20260625",
+        "not observed in current artifact: Land Tax@seed20260625",
+        "missing required payload fields: discard-to-top target identity; The Mind Stone blink target identity; Land Tax trigger payload and resulting hand quality"
+      ],
+      "focus_cards": [
+        "Library of Leng",
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "The Mind Stone",
+        "Land Tax"
+      ],
+      "hypothesis_key": "trace_seed20260625_conversion_window",
+      "next_action": "rerun targeted diagnostic gate with per-turn hand/battlefield/card-source payload",
+      "seed_summaries": [
+        {
+          "card_observations": {
+            "Land Tax": {
+              "aggregate_event_counts": {},
+              "card_name": "Land Tax",
+              "evidence_level": "not_observed",
+              "games_with": {},
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Library of Leng": {
+              "aggregate_event_counts": {
+                "replacement_applied": 19
+              },
+              "card_name": "Library of Leng",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "replacement_applied": 7
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 4,
+                  "metric": "cost_paid:Library of Leng",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "Scroll Rack": {
+              "aggregate_event_counts": {
+                "topdeck_manipulation_activated": 3
+              },
+              "card_name": "Scroll Rack",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "topdeck_manipulation_activated": 1
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 3,
+                  "metric": "topdeck:Scroll Rack",
+                  "metric_type": "topdeck"
+                }
+              ]
+            },
+            "Sensei's Divining Top": {
+              "aggregate_event_counts": {
+                "topdeck_manipulation_activated": 3
+              },
+              "card_name": "Sensei's Divining Top",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "topdeck_manipulation_activated": 1
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 2,
+                  "metric": "cost_paid:Sensei's Divining Top",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "The Mind Stone": {
+              "aggregate_event_counts": {},
+              "card_name": "The Mind Stone",
+              "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+              "games_with": {},
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 2,
+                  "metric": "cost_paid:The Mind Stone",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            }
+          },
+          "record": {
+            "games": 9,
+            "losses": 9,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "seed": "20260625",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json",
+          "trace_data_level": "per_game_event_counts"
+        }
+      ],
+      "source_status": "trace_audit_required",
+      "target_failure": "engine appears but fails to convert",
+      "target_seeds": [
+        "20260625"
+      ],
+      "trace_status": "trace_partial_missing_payload"
+    },
+    {
+      "current_limitations": [
+        "per-game event counts available for seeds: 7, 20260625, 42",
+        "missing required payload fields: Saga chapter payload; artifact tutor target identity; whether Top or Library are legal/reachable Saga targets"
+      ],
+      "focus_cards": [
+        "Urza's Saga",
+        "Sensei's Divining Top",
+        "Library of Leng"
+      ],
+      "hypothesis_key": "audit_urzas_saga_artifact_tutor_scope",
+      "next_action": "extend Urza's Saga trace payload with chapter, tutor target, and legal target set",
+      "seed_summaries": [
+        {
+          "card_observations": {
+            "Library of Leng": {
+              "aggregate_event_counts": {
+                "replacement_applied": 9
+              },
+              "card_name": "Library of Leng",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "replacement_applied": 4
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Sensei's Divining Top": {
+              "aggregate_event_counts": {
+                "topdeck_manipulation_activated": 2
+              },
+              "card_name": "Sensei's Divining Top",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "topdeck_manipulation_activated": 1
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Urza's Saga": {
+              "aggregate_event_counts": {
+                "saga_chapter_progressed": 4,
+                "saga_chapter_resolved": 2,
+                "saga_sacrificed_by_sba": 2,
+                "tutor_resolved": 7
+              },
+              "card_name": "Urza's Saga",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 2,
+                "saga_sacrificed_by_sba": 2,
+                "tutor_resolved": 6
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            }
+          },
+          "record": {
+            "games": 9,
+            "losses": 9,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "seed": "7",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
+          "trace_data_level": "per_game_event_counts"
+        },
+        {
+          "card_observations": {
+            "Library of Leng": {
+              "aggregate_event_counts": {
+                "replacement_applied": 19
+              },
+              "card_name": "Library of Leng",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "replacement_applied": 7
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 4,
+                  "metric": "cost_paid:Library of Leng",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "Sensei's Divining Top": {
+              "aggregate_event_counts": {
+                "topdeck_manipulation_activated": 3
+              },
+              "card_name": "Sensei's Divining Top",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "topdeck_manipulation_activated": 1
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 2,
+                  "metric": "cost_paid:Sensei's Divining Top",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "Urza's Saga": {
+              "aggregate_event_counts": {
+                "saga_chapter_progressed": 4,
+                "saga_chapter_resolved": 2,
+                "saga_sacrificed_by_sba": 2,
+                "tutor_resolved": 9
+              },
+              "card_name": "Urza's Saga",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "saga_chapter_progressed": 2,
+                "saga_chapter_resolved": 2,
+                "saga_sacrificed_by_sba": 2,
+                "tutor_resolved": 6
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            }
+          },
+          "record": {
+            "games": 9,
+            "losses": 9,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "seed": "20260625",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json",
+          "trace_data_level": "per_game_event_counts"
+        },
+        {
+          "card_observations": {
+            "Library of Leng": {
+              "aggregate_event_counts": {
+                "replacement_applied": 50
+              },
+              "card_name": "Library of Leng",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "replacement_applied": 7
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Sensei's Divining Top": {
+              "aggregate_event_counts": {
+                "topdeck_manipulation_activated": 30
+              },
+              "card_name": "Sensei's Divining Top",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "topdeck_manipulation_activated": 5
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 17,
+                  "metric": "topdeck:Sensei's Divining Top",
+                  "metric_type": "topdeck"
+                },
+                {
+                  "count": 5,
+                  "metric": "cost_paid:Sensei's Divining Top",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "Urza's Saga": {
+              "aggregate_event_counts": {
+                "saga_chapter_progressed": 7,
+                "saga_chapter_resolved": 3,
+                "saga_sacrificed_by_sba": 3,
+                "tutor_resolved": 10
+              },
+              "card_name": "Urza's Saga",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "saga_chapter_progressed": 4,
+                "saga_chapter_resolved": 3,
+                "saga_sacrificed_by_sba": 3,
+                "tutor_resolved": 7
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            }
+          },
+          "record": {
+            "games": 9,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 88.89,
+            "wins": 8
+          },
+          "seed": "42",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed42_20260627_v1.json",
+          "trace_data_level": "per_game_event_counts"
+        }
+      ],
+      "source_status": "runtime_utilization_audit_required",
+      "target_failure": "existing engine may be under-modeled",
+      "target_seeds": [
+        "7",
+        "20260625",
+        "42"
+      ],
+      "trace_status": "runtime_trace_partial_missing_tutor_payload"
+    },
+    {
+      "current_limitations": [
+        "per-game event counts available for seeds: 7, 20260625, 42",
+        "not observed in current artifact: Squee, Goblin Nabob@seed7, Squee, Goblin Nabob@seed20260625",
+        "missing required payload fields: Squee zone move reason; whether Lorehold rummage discards Squee; whether Library replacement conflicts with graveyard entry"
+      ],
+      "focus_cards": [
+        "Squee, Goblin Nabob",
+        "Library of Leng",
+        "Lorehold, the Historian"
+      ],
+      "hypothesis_key": "audit_squee_graveyard_entry_route",
+      "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
+      "seed_summaries": [
+        {
+          "card_observations": {
+            "Library of Leng": {
+              "aggregate_event_counts": {
+                "replacement_applied": 9
+              },
+              "card_name": "Library of Leng",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "replacement_applied": 4
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Lorehold, the Historian": {
+              "aggregate_event_counts": {},
+              "card_name": "Lorehold, the Historian",
+              "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+              "games_with": {},
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 10,
+                  "metric": "cost_paid:Lorehold, the Historian",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "Squee, Goblin Nabob": {
+              "aggregate_event_counts": {},
+              "card_name": "Squee, Goblin Nabob",
+              "evidence_level": "not_observed",
+              "games_with": {},
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            }
+          },
+          "record": {
+            "games": 9,
+            "losses": 9,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "seed": "7",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
+          "trace_data_level": "per_game_event_counts"
+        },
+        {
+          "card_observations": {
+            "Library of Leng": {
+              "aggregate_event_counts": {
+                "replacement_applied": 19
+              },
+              "card_name": "Library of Leng",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "replacement_applied": 7
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 4,
+                  "metric": "cost_paid:Library of Leng",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "Lorehold, the Historian": {
+              "aggregate_event_counts": {},
+              "card_name": "Lorehold, the Historian",
+              "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+              "games_with": {},
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 13,
+                  "metric": "cost_paid:Lorehold, the Historian",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "Squee, Goblin Nabob": {
+              "aggregate_event_counts": {},
+              "card_name": "Squee, Goblin Nabob",
+              "evidence_level": "not_observed",
+              "games_with": {},
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            }
+          },
+          "record": {
+            "games": 9,
+            "losses": 9,
+            "stalls": 0,
+            "win_rate": 0.0,
+            "wins": 0
+          },
+          "seed": "20260625",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json",
+          "trace_data_level": "per_game_event_counts"
+        },
+        {
+          "card_observations": {
+            "Library of Leng": {
+              "aggregate_event_counts": {
+                "replacement_applied": 50
+              },
+              "card_name": "Library of Leng",
+              "evidence_level": "per_game_event_counts_indirect",
+              "games_with": {
+                "replacement_applied": 7
+              },
+              "squee_trace_matches": {},
+              "top_card_metrics": []
+            },
+            "Lorehold, the Historian": {
+              "aggregate_event_counts": {},
+              "card_name": "Lorehold, the Historian",
+              "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+              "games_with": {},
+              "squee_trace_matches": {},
+              "top_card_metrics": [
+                {
+                  "count": 15,
+                  "metric": "cost_paid:Lorehold, the Historian",
+                  "metric_type": "cost_paid"
+                }
+              ]
+            },
+            "Squee, Goblin Nabob": {
+              "aggregate_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 5,
+                "squee_return_after_known_graveyard_entry": 5,
+                "squee_to_graveyard": 7,
+                "squee_upkeep_return": 5
+              },
+              "card_name": "Squee, Goblin Nabob",
+              "evidence_level": "partial_game_trace_available",
+              "games_with": {
+                "graveyard_upkeep_return_self_to_hand": 2,
+                "squee_return_after_known_graveyard_entry": 2,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 2
+              },
+              "squee_trace_matches": {
+                "airbend_creature_cast_from_exile": 1,
+                "cast_announced": 10,
+                "cost_paid": 10,
+                "creature_cast": 9,
+                "permanent_moved_from_battlefield": 6,
+                "trigger_resolved": 5
+              },
+              "top_card_metrics": [
+                {
+                  "count": 10,
+                  "metric": "cost_paid:Squee, Goblin Nabob",
+                  "metric_type": "cost_paid"
+                },
+                {
+                  "count": 5,
+                  "metric": "graveyard_return:Squee, Goblin Nabob",
+                  "metric_type": "graveyard_return"
+                }
+              ]
+            }
+          },
+          "record": {
+            "games": 9,
+            "losses": 1,
+            "stalls": 0,
+            "win_rate": 88.89,
+            "wins": 8
+          },
+          "seed": "42",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed42_20260627_v1.json",
+          "trace_data_level": "per_game_event_counts"
+        }
+      ],
+      "source_status": "trace_audit_required",
+      "target_failure": "Squee value exists but not through Lorehold discard",
+      "target_seeds": [
+        "7",
+        "20260625",
+        "42"
+      ],
+      "trace_status": "trace_evidence_supports_sequencing_gap"
+    }
+  ],
+  "postgres_writes": false,
+  "primary_seed_records": {
+    "20260625": {
+      "aggregate_event_counts": {
+        "lorehold_upkeep_rummage": 38,
+        "miracle_cast": 4,
+        "replacement_applied": 19,
+        "saga_chapter_progressed": 4,
+        "saga_chapter_resolved": 2,
+        "saga_sacrificed_by_sba": 2,
+        "topdeck_manipulation_activated": 3,
+        "tutor_resolved": 9,
+        "utility_land_activated": 15
+      },
+      "available_sources": [
+        {
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json",
+          "source_type": "diagnostic_gate",
+          "trace_data_level": "per_game_event_counts"
+        },
+        {
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+          "source_type": "gate",
+          "trace_data_level": "aggregate_only"
+        }
+      ],
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 4,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 9
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 6
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 19
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "replacement_applied": 7
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 4,
+              "metric": "cost_paid:Library of Leng",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 3
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "cost_paid:Sensei's Divining Top",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 3
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 3,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "The Mind Stone",
+          "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "cost_paid:The Mind Stone",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Land Tax",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 13,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 8,
+            "replacement_applied": 4,
+            "tutor_resolved": 3,
+            "utility_land_activated": 6
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "game_index": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 12,
+            "lorehold_spell_cast": 9,
+            "lorehold_upkeep_rummage": 8
+          },
+          "turns": 10
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 1,
+            "replacement_applied": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "game_index": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "replacement_applied": 1,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "game_index": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 6,
+            "lorehold_spell_cast": 6
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 3,
+            "replacement_applied": 3,
+            "topdeck_manipulation_activated": 3,
+            "tutor_resolved": 1,
+            "utility_land_activated": 6
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "game_index": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 6,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 3,
+            "topdeck_manipulation_activated": 3
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 2,
+            "replacement_applied": 4,
+            "tutor_resolved": 2,
+            "utility_land_activated": 2
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "game_index": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 10,
+            "lorehold_spell_cast": 8,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 2
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 8
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "game_index": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 8
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "replacement_applied": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "game_index": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 5
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 6,
+            "miracle_cast": 1,
+            "replacement_applied": 5,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "game_index": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 6,
+            "miracle_cast": 1
+          },
+          "turns": 8
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 1,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "game_index": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 4,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 1
+          },
+          "turns": 7
+        }
+      ],
+      "per_game_summary": {
+        "event_totals": {
+          "lorehold_upkeep_rummage": 38,
+          "miracle_cast": 4,
+          "replacement_applied": 19,
+          "saga_chapter_progressed": 4,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "topdeck_manipulation_activated": 3,
+          "tutor_resolved": 9,
+          "utility_land_activated": 15
+        },
+        "game_count": 9,
+        "games_with": {
+          "lorehold_cost_paid": 9,
+          "lorehold_spell_cast": 9,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 16,
+          "miracle_cast": 4,
+          "replacement_applied": 7,
+          "saga_chapter_progressed": 2,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "topdeck_manipulation_activated": 2,
+          "tutor_resolved": 6,
+          "utility_land_activated": 4
+        },
+        "outcome_counts": {
+          "loss": 9
+        },
+        "strategic_event_totals": {
+          "lorehold_cost_paid": 64,
+          "lorehold_spell_cast": 48,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 38,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 3
+        }
+      },
+      "record": {
+        "games": 9,
+        "losses": 9,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "20260625",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json",
+      "source_type": "diagnostic_gate",
+      "squee_trace_summary": {
+        "event_counts": {},
+        "game_event_counts": {},
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {},
+        "samples": [],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "trace_game_count": 0,
+        "trace_row_count": 0
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "lorehold_cost_paid": 64,
+        "lorehold_spell_cast": 48,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 38,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 3
+      },
+      "strategic_games": {
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 8,
+          "rate": 0.8889
+        },
+        "miracle_cast": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "topdeck_manipulation_activated": {
+          "games": 1,
+          "rate": 0.1111
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Library of Leng": [
+          {
+            "count": 4,
+            "metric": "cost_paid:Library of Leng",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Lorehold, the Historian": [
+          {
+            "count": 13,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 3,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ],
+        "Sensei's Divining Top": [
+          {
+            "count": 2,
+            "metric": "cost_paid:Sensei's Divining Top",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "The Mind Stone": [
+          {
+            "count": 2,
+            "metric": "cost_paid:The Mind Stone",
+            "metric_type": "cost_paid"
+          }
+        ]
+      },
+      "trace_data_level": "per_game_event_counts"
+    },
+    "42": {
+      "aggregate_event_counts": {
+        "land_tax_trigger_resolved": 2,
+        "land_tax_trigger_skipped": 47,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 33,
+        "replacement_applied": 50,
+        "saga_chapter_progressed": 7,
+        "saga_chapter_resolved": 3,
+        "saga_sacrificed_by_sba": 3,
+        "topdeck_manipulation_activated": 30,
+        "tutor_resolved": 10,
+        "utility_artifact_activated": 4,
+        "utility_land_activated": 12
+      },
+      "available_sources": [
+        {
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed42_20260627_v1.json",
+          "source_type": "diagnostic_gate",
+          "trace_data_level": "per_game_event_counts"
+        },
+        {
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed42_20260627_v1.json",
+          "source_type": "gate",
+          "trace_data_level": "squee_window_trace"
+        }
+      ],
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 7,
+            "saga_chapter_resolved": 3,
+            "saga_sacrificed_by_sba": 3,
+            "tutor_resolved": 10
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "saga_chapter_progressed": 4,
+            "saga_chapter_resolved": 3,
+            "saga_sacrificed_by_sba": 3,
+            "tutor_resolved": 7
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 50
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "replacement_applied": 7
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 30
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 5
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 17,
+              "metric": "topdeck:Sensei's Divining Top",
+              "metric_type": "topdeck"
+            },
+            {
+              "count": 5,
+              "metric": "cost_paid:Sensei's Divining Top",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 30
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "partial_game_trace_available",
+          "games_with": {
+            "topdeck_manipulation_activated": 5
+          },
+          "squee_trace_matches": {
+            "topdeck_manipulation_activated": 2
+          },
+          "top_card_metrics": [
+            {
+              "count": 13,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "graveyard_upkeep_return_self_to_hand": 5,
+            "squee_return_after_known_graveyard_entry": 5,
+            "squee_to_graveyard": 7,
+            "squee_upkeep_return": 5
+          },
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "partial_game_trace_available",
+          "games_with": {
+            "graveyard_upkeep_return_self_to_hand": 2,
+            "squee_return_after_known_graveyard_entry": 2,
+            "squee_to_graveyard": 4,
+            "squee_upkeep_return": 2
+          },
+          "squee_trace_matches": {
+            "airbend_creature_cast_from_exile": 1,
+            "cast_announced": 10,
+            "cost_paid": 10,
+            "creature_cast": 9,
+            "permanent_moved_from_battlefield": 6,
+            "trigger_resolved": 5
+          },
+          "top_card_metrics": [
+            {
+              "count": 10,
+              "metric": "cost_paid:Squee, Goblin Nabob",
+              "metric_type": "cost_paid"
+            },
+            {
+              "count": 5,
+              "metric": "graveyard_return:Squee, Goblin Nabob",
+              "metric_type": "graveyard_return"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "utility_artifact_activated": 4
+          },
+          "card_name": "The Mind Stone",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "utility_artifact_activated": 3
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "land_tax_trigger_resolved": 2,
+            "land_tax_trigger_skipped": 47
+          },
+          "card_name": "Land Tax",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 4
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 15,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [
+        {
+          "event_counts": {
+            "land_tax_trigger_skipped": 6,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 5,
+            "replacement_applied": 5,
+            "topdeck_manipulation_activated": 9,
+            "tutor_resolved": 2,
+            "utility_land_activated": 4
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "game_index": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "elimination",
+          "result": "win",
+          "squee_known_graveyard_balance": 1,
+          "squee_trace_count": 21,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 35,
+            "lorehold_spell_cast": 32,
+            "lorehold_spell_rummage": 12,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 5,
+            "squee_to_graveyard": 1,
+            "topdeck_manipulation_activated": 9
+          },
+          "turns": 17
+        },
+        {
+          "event_counts": {
+            "land_tax_trigger_resolved": 2,
+            "land_tax_trigger_skipped": 17,
+            "lorehold_upkeep_rummage": 12,
+            "miracle_cast": 7,
+            "replacement_applied": 9,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "topdeck_manipulation_activated": 1,
+            "utility_artifact_activated": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "game_index": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "elimination",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 22,
+            "lorehold_spell_cast": 19,
+            "lorehold_spell_rummage": 5,
+            "lorehold_upkeep_rummage": 12,
+            "miracle_cast": 7,
+            "topdeck_manipulation_activated": 1
+          },
+          "turns": 22
+        },
+        {
+          "event_counts": {
+            "land_tax_trigger_skipped": 18,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 2,
+            "replacement_applied": 6,
+            "saga_chapter_progressed": 1,
+            "topdeck_manipulation_activated": 8,
+            "tutor_resolved": 2,
+            "utility_land_activated": 3
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "game_index": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "elimination",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 8,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 19,
+            "lorehold_spell_cast": 14,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 2,
+            "topdeck_manipulation_activated": 8
+          },
+          "turns": 20
+        },
+        {
+          "event_counts": {
+            "miracle_cast": 3,
+            "replacement_applied": 4,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "topdeck_manipulation_activated": 1,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "game_index": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "approach",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 12,
+            "lorehold_spell_cast": 9,
+            "miracle_cast": 3,
+            "topdeck_manipulation_activated": 1
+          },
+          "turns": 13
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 5,
+            "tutor_resolved": 2,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "game_index": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 1,
+          "squee_trace_count": 16,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 5,
+            "lorehold_upkeep_rummage": 5,
+            "squee_to_graveyard": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "land_tax_trigger_skipped": 6,
+            "lorehold_upkeep_rummage": 1,
+            "miracle_cast": 2
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "game_index": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "approach",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 6,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 1,
+            "miracle_cast": 2
+          },
+          "turns": 8
+        },
+        {
+          "event_counts": {
+            "miracle_cast": 6,
+            "replacement_applied": 23,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "topdeck_manipulation_activated": 11,
+            "tutor_resolved": 1,
+            "utility_artifact_activated": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "game_index": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "approach",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 75,
+          "strategic_event_counts": {
+            "graveyard_upkeep_return_self_to_hand": 3,
+            "lorehold_cost_paid": 18,
+            "lorehold_spell_cast": 11,
+            "miracle_cast": 6,
+            "squee_return_after_known_graveyard_entry": 3,
+            "squee_to_graveyard": 3,
+            "squee_upkeep_return": 3,
+            "topdeck_manipulation_activated": 11
+          },
+          "turns": 21
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 7,
+            "replacement_applied": 1,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "game_index": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "elimination",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 28,
+          "strategic_event_counts": {
+            "graveyard_upkeep_return_self_to_hand": 2,
+            "lorehold_cost_paid": 16,
+            "lorehold_spell_cast": 13,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 7,
+            "squee_return_after_known_graveyard_entry": 2,
+            "squee_to_graveyard": 2,
+            "squee_upkeep_return": 2
+          },
+          "turns": 12
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "replacement_applied": 2,
+            "tutor_resolved": 1,
+            "utility_artifact_activated": 2
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "game_index": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "approach",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 10,
+            "lorehold_spell_cast": 9,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1
+          },
+          "turns": 8
+        }
+      ],
+      "per_game_summary": {
+        "event_totals": {
+          "land_tax_trigger_resolved": 2,
+          "land_tax_trigger_skipped": 47,
+          "lorehold_upkeep_rummage": 41,
+          "miracle_cast": 33,
+          "replacement_applied": 50,
+          "saga_chapter_progressed": 7,
+          "saga_chapter_resolved": 3,
+          "saga_sacrificed_by_sba": 3,
+          "topdeck_manipulation_activated": 30,
+          "tutor_resolved": 10,
+          "utility_artifact_activated": 4,
+          "utility_land_activated": 12
+        },
+        "game_count": 9,
+        "games_with": {
+          "graveyard_upkeep_return_self_to_hand": 2,
+          "land_tax_trigger_resolved": 1,
+          "land_tax_trigger_skipped": 4,
+          "lorehold_cost_paid": 9,
+          "lorehold_spell_cast": 9,
+          "lorehold_spell_rummage": 4,
+          "lorehold_upkeep_rummage": 14,
+          "miracle_cast": 16,
+          "replacement_applied": 7,
+          "saga_chapter_progressed": 4,
+          "saga_chapter_resolved": 3,
+          "saga_sacrificed_by_sba": 3,
+          "squee_return_after_known_graveyard_entry": 2,
+          "squee_to_graveyard": 4,
+          "squee_upkeep_return": 2,
+          "topdeck_manipulation_activated": 10,
+          "tutor_resolved": 7,
+          "utility_artifact_activated": 3,
+          "utility_land_activated": 7
+        },
+        "outcome_counts": {
+          "loss": 1,
+          "win": 8
+        },
+        "strategic_event_totals": {
+          "graveyard_upkeep_return_self_to_hand": 5,
+          "lorehold_cost_paid": 148,
+          "lorehold_spell_cast": 118,
+          "lorehold_spell_rummage": 19,
+          "lorehold_upkeep_rummage": 41,
+          "miracle_cast": 33,
+          "squee_return_after_known_graveyard_entry": 5,
+          "squee_to_graveyard": 7,
+          "squee_upkeep_return": 5,
+          "topdeck_manipulation_activated": 30
+        }
+      },
+      "record": {
+        "games": 9,
+        "losses": 1,
+        "stalls": 0,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "seed": "42",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed42_20260627_v1.json",
+      "source_type": "diagnostic_gate",
+      "squee_trace_summary": {
+        "event_counts": {
+          "airbend_creature_cast_from_exile": 1,
+          "airbend_other_creatures_resolved": 1,
+          "board_wipe_resolved": 5,
+          "cast_announced": 10,
+          "combat": 18,
+          "combat_step": 17,
+          "cost_paid": 10,
+          "creature_cast": 9,
+          "land_played": 14,
+          "mill_resolved": 1,
+          "multi_defender_attack": 7,
+          "permanent_moved_from_battlefield": 6,
+          "protection_resolved": 1,
+          "replacement_applied": 7,
+          "spell_resolved": 1,
+          "tokens_created": 1,
+          "topdeck_manipulation_activated": 2,
+          "trigger_resolved": 5,
+          "turn_end": 27,
+          "turn_start": 5
+        },
+        "game_event_counts": {
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1": {
+            "cast_announced": 1,
+            "combat": 1,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "permanent_moved_from_battlefield": 1,
+            "turn_end": 6,
+            "turn_start": 5
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0": {
+            "board_wipe_resolved": 2,
+            "cast_announced": 1,
+            "combat": 3,
+            "combat_step": 3,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "land_played": 3,
+            "permanent_moved_from_battlefield": 1,
+            "spell_resolved": 1,
+            "topdeck_manipulation_activated": 1,
+            "turn_end": 4
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2": {
+            "cast_announced": 1,
+            "combat": 1,
+            "combat_step": 1,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "land_played": 1,
+            "topdeck_manipulation_activated": 1,
+            "turn_end": 1
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0": {
+            "airbend_creature_cast_from_exile": 1,
+            "airbend_other_creatures_resolved": 1,
+            "board_wipe_resolved": 2,
+            "cast_announced": 5,
+            "combat": 9,
+            "combat_step": 9,
+            "cost_paid": 5,
+            "creature_cast": 4,
+            "land_played": 5,
+            "multi_defender_attack": 6,
+            "permanent_moved_from_battlefield": 3,
+            "protection_resolved": 1,
+            "replacement_applied": 7,
+            "tokens_created": 1,
+            "trigger_resolved": 3,
+            "turn_end": 13
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1": {
+            "board_wipe_resolved": 1,
+            "cast_announced": 2,
+            "combat": 4,
+            "combat_step": 4,
+            "cost_paid": 2,
+            "creature_cast": 2,
+            "land_played": 5,
+            "mill_resolved": 1,
+            "multi_defender_attack": 1,
+            "permanent_moved_from_battlefield": 1,
+            "trigger_resolved": 2,
+            "turn_end": 3
+          }
+        },
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {
+          "Scroll Rack": {
+            "topdeck_manipulation_activated": 2
+          },
+          "Squee, Goblin Nabob": {
+            "airbend_creature_cast_from_exile": 1,
+            "cast_announced": 10,
+            "cost_paid": 10,
+            "creature_cast": 9,
+            "permanent_moved_from_battlefield": 6,
+            "trigger_resolved": 5
+          }
+        },
+        "samples": [
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4202,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4203,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4204,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "combat_damage",
+            "seq": 4270,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Scroll Rack",
+            "event": "topdeck_manipulation_activated",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 900,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 909,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 910,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 911,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "starfall_invocation",
+            "seq": 984,
+            "source": "Starfall Invocation",
+            "turn": 15
+          },
+          {
+            "card": "Scroll Rack",
+            "event": "topdeck_manipulation_activated",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3077,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3079,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3080,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3081,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5073,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5074,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5075,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "fated_clash",
+            "seq": 5300,
+            "source": "Fated Clash",
+            "turn": 10
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "trigger_resolved",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "upkeep_return"
+            ],
+            "reason": null,
+            "seq": 5335,
+            "source": null,
+            "turn": 11
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5346,
+            "source": null,
+            "turn": 11
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5347,
+            "source": null,
+            "turn": 11
+          }
+        ],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {
+          "combat_damage": 2,
+          "fated_clash": 2,
+          "starfall_invocation": 1,
+          "tragic_arrogance": 1
+        },
+        "squee_known_graveyard_balance_by_game": {
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1": 1,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0": 1,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0": 0,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1": 0
+        },
+        "trace_game_count": 5,
+        "trace_row_count": 148
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "graveyard_upkeep_return_self_to_hand": 5,
+        "lorehold_cost_paid": 148,
+        "lorehold_spell_cast": 118,
+        "lorehold_spell_rummage": 19,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 33,
+        "squee_return_after_known_graveyard_entry": 5,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "topdeck_manipulation_activated": 30
+      },
+      "strategic_games": {
+        "graveyard_upkeep_return_self_to_hand": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 7,
+          "rate": 0.7778
+        },
+        "miracle_cast": {
+          "games": 8,
+          "rate": 0.8889
+        },
+        "squee_return_after_known_graveyard_entry": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "squee_to_graveyard": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "squee_upkeep_return": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "topdeck_manipulation_activated": {
+          "games": 5,
+          "rate": 0.5556
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Lorehold, the Historian": [
+          {
+            "count": 15,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 13,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ],
+        "Sensei's Divining Top": [
+          {
+            "count": 17,
+            "metric": "topdeck:Sensei's Divining Top",
+            "metric_type": "topdeck"
+          },
+          {
+            "count": 5,
+            "metric": "cost_paid:Sensei's Divining Top",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Squee, Goblin Nabob": [
+          {
+            "count": 10,
+            "metric": "cost_paid:Squee, Goblin Nabob",
+            "metric_type": "cost_paid"
+          },
+          {
+            "count": 5,
+            "metric": "graveyard_return:Squee, Goblin Nabob",
+            "metric_type": "graveyard_return"
+          }
+        ]
+      },
+      "trace_data_level": "per_game_event_counts"
+    },
+    "7": {
+      "aggregate_event_counts": {
+        "land_tax_trigger_resolved": 1,
+        "land_tax_trigger_skipped": 3,
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 4,
+        "random_discard_after_tutor": 3,
+        "replacement_applied": 9,
+        "saga_chapter_progressed": 4,
+        "saga_chapter_resolved": 2,
+        "saga_sacrificed_by_sba": 2,
+        "topdeck_manipulation_activated": 2,
+        "tutor_resolved": 7,
+        "utility_land_activated": 2
+      },
+      "available_sources": [
+        {
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
+          "source_type": "diagnostic_gate",
+          "trace_data_level": "per_game_event_counts"
+        },
+        {
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",
+          "source_type": "gate",
+          "trace_data_level": "aggregate_only"
+        }
+      ],
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 4,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 7
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 6
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 9
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "replacement_applied": 4
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 2
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 2
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "The Mind Stone",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 3
+          },
+          "card_name": "Land Tax",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 10,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "game_index": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "random_discard_after_tutor": 1,
+            "replacement_applied": 2,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "topdeck_manipulation_activated": 2,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "game_index": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "topdeck_manipulation_activated": 2
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1,
+            "random_discard_after_tutor": 1,
+            "replacement_applied": 1,
+            "tutor_resolved": 2
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "game_index": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 5,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "game_index": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 4,
+            "replacement_applied": 3,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "game_index": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 7,
+            "lorehold_upkeep_rummage": 4
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "random_discard_after_tutor": 1,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "game_index": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 3,
+            "lorehold_spell_cast": 1,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 5
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "replacement_applied": 3,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "game_index": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1
+          },
+          "turns": 8
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "game_index": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 3,
+            "lorehold_upkeep_rummage": 4
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "game_index": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 9,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 4
+          },
+          "turns": 6
+        }
+      ],
+      "per_game_summary": {
+        "event_totals": {
+          "land_tax_trigger_resolved": 1,
+          "land_tax_trigger_skipped": 3,
+          "lorehold_upkeep_rummage": 27,
+          "miracle_cast": 4,
+          "random_discard_after_tutor": 3,
+          "replacement_applied": 9,
+          "saga_chapter_progressed": 4,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "topdeck_manipulation_activated": 2,
+          "tutor_resolved": 7,
+          "utility_land_activated": 2
+        },
+        "game_count": 9,
+        "games_with": {
+          "land_tax_trigger_resolved": 1,
+          "land_tax_trigger_skipped": 1,
+          "lorehold_cost_paid": 9,
+          "lorehold_spell_cast": 9,
+          "lorehold_spell_rummage": 1,
+          "lorehold_upkeep_rummage": 18,
+          "miracle_cast": 8,
+          "random_discard_after_tutor": 3,
+          "replacement_applied": 4,
+          "saga_chapter_progressed": 2,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "topdeck_manipulation_activated": 2,
+          "tutor_resolved": 6,
+          "utility_land_activated": 2
+        },
+        "outcome_counts": {
+          "loss": 9
+        },
+        "strategic_event_totals": {
+          "lorehold_cost_paid": 53,
+          "lorehold_spell_cast": 42,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 27,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 2
+        }
+      },
+      "record": {
+        "games": 9,
+        "losses": 9,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "7",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
+      "source_type": "diagnostic_gate",
+      "squee_trace_summary": {
+        "event_counts": {},
+        "game_event_counts": {},
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {},
+        "samples": [],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "trace_game_count": 0,
+        "trace_row_count": 0
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "lorehold_cost_paid": 53,
+        "lorehold_spell_cast": 42,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 2
+      },
+      "strategic_games": {
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 1,
+          "rate": 0.1111
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "miracle_cast": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "topdeck_manipulation_activated": {
+          "games": 1,
+          "rate": 0.1111
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Lorehold, the Historian": [
+          {
+            "count": 10,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 2,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ]
+      },
+      "trace_data_level": "per_game_event_counts"
+    }
+  },
+  "seed_sources": [
+    {
+      "aggregate_event_counts": {
+        "land_tax_trigger_resolved": 1,
+        "land_tax_trigger_skipped": 3,
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 4,
+        "random_discard_after_tutor": 3,
+        "replacement_applied": 9,
+        "saga_chapter_progressed": 4,
+        "saga_chapter_resolved": 2,
+        "saga_sacrificed_by_sba": 2,
+        "topdeck_manipulation_activated": 2,
+        "tutor_resolved": 7,
+        "utility_land_activated": 2
+      },
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 4,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 7
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 6
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 9
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "replacement_applied": 4
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 2
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 2
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "The Mind Stone",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 3
+          },
+          "card_name": "Land Tax",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 10,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "game_index": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "random_discard_after_tutor": 1,
+            "replacement_applied": 2,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "topdeck_manipulation_activated": 2,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "game_index": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "topdeck_manipulation_activated": 2
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1,
+            "random_discard_after_tutor": 1,
+            "replacement_applied": 1,
+            "tutor_resolved": 2
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "game_index": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 5,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "game_index": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 4,
+            "replacement_applied": 3,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "game_index": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 7,
+            "lorehold_upkeep_rummage": 4
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "random_discard_after_tutor": 1,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "game_index": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 3,
+            "lorehold_spell_cast": 1,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 5
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "replacement_applied": 3,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "game_index": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1
+          },
+          "turns": 8
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "game_index": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 3,
+            "lorehold_upkeep_rummage": 4
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "game_index": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 9,
+            "lorehold_spell_rummage": 2,
+            "lorehold_upkeep_rummage": 4
+          },
+          "turns": 6
+        }
+      ],
+      "per_game_summary": {
+        "event_totals": {
+          "land_tax_trigger_resolved": 1,
+          "land_tax_trigger_skipped": 3,
+          "lorehold_upkeep_rummage": 27,
+          "miracle_cast": 4,
+          "random_discard_after_tutor": 3,
+          "replacement_applied": 9,
+          "saga_chapter_progressed": 4,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "topdeck_manipulation_activated": 2,
+          "tutor_resolved": 7,
+          "utility_land_activated": 2
+        },
+        "game_count": 9,
+        "games_with": {
+          "land_tax_trigger_resolved": 1,
+          "land_tax_trigger_skipped": 1,
+          "lorehold_cost_paid": 9,
+          "lorehold_spell_cast": 9,
+          "lorehold_spell_rummage": 1,
+          "lorehold_upkeep_rummage": 18,
+          "miracle_cast": 8,
+          "random_discard_after_tutor": 3,
+          "replacement_applied": 4,
+          "saga_chapter_progressed": 2,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "topdeck_manipulation_activated": 2,
+          "tutor_resolved": 6,
+          "utility_land_activated": 2
+        },
+        "outcome_counts": {
+          "loss": 9
+        },
+        "strategic_event_totals": {
+          "lorehold_cost_paid": 53,
+          "lorehold_spell_cast": 42,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 27,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 2
+        }
+      },
+      "record": {
+        "games": 9,
+        "losses": 9,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "7",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed7_20260627_v1.json",
+      "source_type": "diagnostic_gate",
+      "squee_trace_summary": {
+        "event_counts": {},
+        "game_event_counts": {},
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {},
+        "samples": [],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "trace_game_count": 0,
+        "trace_row_count": 0
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "lorehold_cost_paid": 53,
+        "lorehold_spell_cast": 42,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 2
+      },
+      "strategic_games": {
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 1,
+          "rate": 0.1111
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "miracle_cast": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "topdeck_manipulation_activated": {
+          "games": 1,
+          "rate": 0.1111
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Lorehold, the Historian": [
+          {
+            "count": 10,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 2,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ]
+      },
+      "trace_data_level": "per_game_event_counts"
+    },
+    {
+      "aggregate_event_counts": {
+        "land_tax_trigger_resolved": 1,
+        "land_tax_trigger_skipped": 3,
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 4,
+        "random_discard_after_tutor": 3,
+        "replacement_applied": 9,
+        "saga_chapter_progressed": 4,
+        "saga_chapter_resolved": 2,
+        "saga_sacrificed_by_sba": 2,
+        "topdeck_manipulation_activated": 2,
+        "tutor_resolved": 7,
+        "utility_land_activated": 2
+      },
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 4,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 7
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 9
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 2
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 2
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "The Mind Stone",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 3
+          },
+          "card_name": "Land Tax",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 10,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [],
+      "per_game_summary": {
+        "event_totals": {},
+        "game_count": 0,
+        "games_with": {},
+        "outcome_counts": {},
+        "strategic_event_totals": {}
+      },
+      "record": {
+        "games": 9,
+        "losses": 9,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "7",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",
+      "source_type": "gate",
+      "squee_trace_summary": {
+        "event_counts": {},
+        "game_event_counts": {},
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {},
+        "samples": [],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "trace_game_count": 0,
+        "trace_row_count": 0
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "lorehold_cost_paid": 53,
+        "lorehold_spell_cast": 42,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 27,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 2
+      },
+      "strategic_games": {
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 1,
+          "rate": 0.1111
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "miracle_cast": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "topdeck_manipulation_activated": {
+          "games": 1,
+          "rate": 0.1111
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Lorehold, the Historian": [
+          {
+            "count": 10,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 2,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ]
+      },
+      "trace_data_level": "aggregate_only"
+    },
+    {
+      "aggregate_event_counts": {
+        "land_tax_trigger_resolved": 2,
+        "land_tax_trigger_skipped": 47,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 33,
+        "replacement_applied": 50,
+        "saga_chapter_progressed": 7,
+        "saga_chapter_resolved": 3,
+        "saga_sacrificed_by_sba": 3,
+        "topdeck_manipulation_activated": 30,
+        "tutor_resolved": 10,
+        "utility_artifact_activated": 4,
+        "utility_land_activated": 12
+      },
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 7,
+            "saga_chapter_resolved": 3,
+            "saga_sacrificed_by_sba": 3,
+            "tutor_resolved": 10
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "saga_chapter_progressed": 4,
+            "saga_chapter_resolved": 3,
+            "saga_sacrificed_by_sba": 3,
+            "tutor_resolved": 7
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 50
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "replacement_applied": 7
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 30
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 5
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 17,
+              "metric": "topdeck:Sensei's Divining Top",
+              "metric_type": "topdeck"
+            },
+            {
+              "count": 5,
+              "metric": "cost_paid:Sensei's Divining Top",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 30
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "partial_game_trace_available",
+          "games_with": {
+            "topdeck_manipulation_activated": 5
+          },
+          "squee_trace_matches": {
+            "topdeck_manipulation_activated": 2
+          },
+          "top_card_metrics": [
+            {
+              "count": 13,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "graveyard_upkeep_return_self_to_hand": 5,
+            "squee_return_after_known_graveyard_entry": 5,
+            "squee_to_graveyard": 7,
+            "squee_upkeep_return": 5
+          },
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "partial_game_trace_available",
+          "games_with": {
+            "graveyard_upkeep_return_self_to_hand": 2,
+            "squee_return_after_known_graveyard_entry": 2,
+            "squee_to_graveyard": 4,
+            "squee_upkeep_return": 2
+          },
+          "squee_trace_matches": {
+            "airbend_creature_cast_from_exile": 1,
+            "cast_announced": 10,
+            "cost_paid": 10,
+            "creature_cast": 9,
+            "permanent_moved_from_battlefield": 6,
+            "trigger_resolved": 5
+          },
+          "top_card_metrics": [
+            {
+              "count": 10,
+              "metric": "cost_paid:Squee, Goblin Nabob",
+              "metric_type": "cost_paid"
+            },
+            {
+              "count": 5,
+              "metric": "graveyard_return:Squee, Goblin Nabob",
+              "metric_type": "graveyard_return"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "utility_artifact_activated": 4
+          },
+          "card_name": "The Mind Stone",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "utility_artifact_activated": 3
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "land_tax_trigger_resolved": 2,
+            "land_tax_trigger_skipped": 47
+          },
+          "card_name": "Land Tax",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "land_tax_trigger_resolved": 1,
+            "land_tax_trigger_skipped": 4
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 15,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [
+        {
+          "event_counts": {
+            "land_tax_trigger_skipped": 6,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 5,
+            "replacement_applied": 5,
+            "topdeck_manipulation_activated": 9,
+            "tutor_resolved": 2,
+            "utility_land_activated": 4
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "game_index": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "elimination",
+          "result": "win",
+          "squee_known_graveyard_balance": 1,
+          "squee_trace_count": 21,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 35,
+            "lorehold_spell_cast": 32,
+            "lorehold_spell_rummage": 12,
+            "lorehold_upkeep_rummage": 3,
+            "miracle_cast": 5,
+            "squee_to_graveyard": 1,
+            "topdeck_manipulation_activated": 9
+          },
+          "turns": 17
+        },
+        {
+          "event_counts": {
+            "land_tax_trigger_resolved": 2,
+            "land_tax_trigger_skipped": 17,
+            "lorehold_upkeep_rummage": 12,
+            "miracle_cast": 7,
+            "replacement_applied": 9,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "topdeck_manipulation_activated": 1,
+            "utility_artifact_activated": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "game_index": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "elimination",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 22,
+            "lorehold_spell_cast": 19,
+            "lorehold_spell_rummage": 5,
+            "lorehold_upkeep_rummage": 12,
+            "miracle_cast": 7,
+            "topdeck_manipulation_activated": 1
+          },
+          "turns": 22
+        },
+        {
+          "event_counts": {
+            "land_tax_trigger_skipped": 18,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 2,
+            "replacement_applied": 6,
+            "saga_chapter_progressed": 1,
+            "topdeck_manipulation_activated": 8,
+            "tutor_resolved": 2,
+            "utility_land_activated": 3
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "game_index": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "elimination",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 8,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 19,
+            "lorehold_spell_cast": 14,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 2,
+            "topdeck_manipulation_activated": 8
+          },
+          "turns": 20
+        },
+        {
+          "event_counts": {
+            "miracle_cast": 3,
+            "replacement_applied": 4,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "topdeck_manipulation_activated": 1,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "game_index": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "approach",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 12,
+            "lorehold_spell_cast": 9,
+            "miracle_cast": 3,
+            "topdeck_manipulation_activated": 1
+          },
+          "turns": 13
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 5,
+            "tutor_resolved": 2,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "game_index": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 1,
+          "squee_trace_count": 16,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 5,
+            "lorehold_upkeep_rummage": 5,
+            "squee_to_graveyard": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "land_tax_trigger_skipped": 6,
+            "lorehold_upkeep_rummage": 1,
+            "miracle_cast": 2
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "game_index": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "approach",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 9,
+            "lorehold_spell_cast": 6,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 1,
+            "miracle_cast": 2
+          },
+          "turns": 8
+        },
+        {
+          "event_counts": {
+            "miracle_cast": 6,
+            "replacement_applied": 23,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "topdeck_manipulation_activated": 11,
+            "tutor_resolved": 1,
+            "utility_artifact_activated": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "game_index": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "approach",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 75,
+          "strategic_event_counts": {
+            "graveyard_upkeep_return_self_to_hand": 3,
+            "lorehold_cost_paid": 18,
+            "lorehold_spell_cast": 11,
+            "miracle_cast": 6,
+            "squee_return_after_known_graveyard_entry": 3,
+            "squee_to_graveyard": 3,
+            "squee_upkeep_return": 3,
+            "topdeck_manipulation_activated": 11
+          },
+          "turns": 21
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 7,
+            "replacement_applied": 1,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "game_index": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "elimination",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 28,
+          "strategic_event_counts": {
+            "graveyard_upkeep_return_self_to_hand": 2,
+            "lorehold_cost_paid": 16,
+            "lorehold_spell_cast": 13,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 7,
+            "squee_return_after_known_graveyard_entry": 2,
+            "squee_to_graveyard": 2,
+            "squee_upkeep_return": 2
+          },
+          "turns": 12
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1,
+            "replacement_applied": 2,
+            "tutor_resolved": 1,
+            "utility_artifact_activated": 2
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "game_index": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "approach",
+          "result": "win",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 10,
+            "lorehold_spell_cast": 9,
+            "lorehold_upkeep_rummage": 2,
+            "miracle_cast": 1
+          },
+          "turns": 8
+        }
+      ],
+      "per_game_summary": {
+        "event_totals": {
+          "land_tax_trigger_resolved": 2,
+          "land_tax_trigger_skipped": 47,
+          "lorehold_upkeep_rummage": 41,
+          "miracle_cast": 33,
+          "replacement_applied": 50,
+          "saga_chapter_progressed": 7,
+          "saga_chapter_resolved": 3,
+          "saga_sacrificed_by_sba": 3,
+          "topdeck_manipulation_activated": 30,
+          "tutor_resolved": 10,
+          "utility_artifact_activated": 4,
+          "utility_land_activated": 12
+        },
+        "game_count": 9,
+        "games_with": {
+          "graveyard_upkeep_return_self_to_hand": 2,
+          "land_tax_trigger_resolved": 1,
+          "land_tax_trigger_skipped": 4,
+          "lorehold_cost_paid": 9,
+          "lorehold_spell_cast": 9,
+          "lorehold_spell_rummage": 4,
+          "lorehold_upkeep_rummage": 14,
+          "miracle_cast": 16,
+          "replacement_applied": 7,
+          "saga_chapter_progressed": 4,
+          "saga_chapter_resolved": 3,
+          "saga_sacrificed_by_sba": 3,
+          "squee_return_after_known_graveyard_entry": 2,
+          "squee_to_graveyard": 4,
+          "squee_upkeep_return": 2,
+          "topdeck_manipulation_activated": 10,
+          "tutor_resolved": 7,
+          "utility_artifact_activated": 3,
+          "utility_land_activated": 7
+        },
+        "outcome_counts": {
+          "loss": 1,
+          "win": 8
+        },
+        "strategic_event_totals": {
+          "graveyard_upkeep_return_self_to_hand": 5,
+          "lorehold_cost_paid": 148,
+          "lorehold_spell_cast": 118,
+          "lorehold_spell_rummage": 19,
+          "lorehold_upkeep_rummage": 41,
+          "miracle_cast": 33,
+          "squee_return_after_known_graveyard_entry": 5,
+          "squee_to_graveyard": 7,
+          "squee_upkeep_return": 5,
+          "topdeck_manipulation_activated": 30
+        }
+      },
+      "record": {
+        "games": 9,
+        "losses": 1,
+        "stalls": 0,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "seed": "42",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed42_20260627_v1.json",
+      "source_type": "diagnostic_gate",
+      "squee_trace_summary": {
+        "event_counts": {
+          "airbend_creature_cast_from_exile": 1,
+          "airbend_other_creatures_resolved": 1,
+          "board_wipe_resolved": 5,
+          "cast_announced": 10,
+          "combat": 18,
+          "combat_step": 17,
+          "cost_paid": 10,
+          "creature_cast": 9,
+          "land_played": 14,
+          "mill_resolved": 1,
+          "multi_defender_attack": 7,
+          "permanent_moved_from_battlefield": 6,
+          "protection_resolved": 1,
+          "replacement_applied": 7,
+          "spell_resolved": 1,
+          "tokens_created": 1,
+          "topdeck_manipulation_activated": 2,
+          "trigger_resolved": 5,
+          "turn_end": 27,
+          "turn_start": 5
+        },
+        "game_event_counts": {
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1": {
+            "cast_announced": 1,
+            "combat": 1,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "permanent_moved_from_battlefield": 1,
+            "turn_end": 6,
+            "turn_start": 5
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0": {
+            "board_wipe_resolved": 2,
+            "cast_announced": 1,
+            "combat": 3,
+            "combat_step": 3,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "land_played": 3,
+            "permanent_moved_from_battlefield": 1,
+            "spell_resolved": 1,
+            "topdeck_manipulation_activated": 1,
+            "turn_end": 4
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2": {
+            "cast_announced": 1,
+            "combat": 1,
+            "combat_step": 1,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "land_played": 1,
+            "topdeck_manipulation_activated": 1,
+            "turn_end": 1
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0": {
+            "airbend_creature_cast_from_exile": 1,
+            "airbend_other_creatures_resolved": 1,
+            "board_wipe_resolved": 2,
+            "cast_announced": 5,
+            "combat": 9,
+            "combat_step": 9,
+            "cost_paid": 5,
+            "creature_cast": 4,
+            "land_played": 5,
+            "multi_defender_attack": 6,
+            "permanent_moved_from_battlefield": 3,
+            "protection_resolved": 1,
+            "replacement_applied": 7,
+            "tokens_created": 1,
+            "trigger_resolved": 3,
+            "turn_end": 13
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1": {
+            "board_wipe_resolved": 1,
+            "cast_announced": 2,
+            "combat": 4,
+            "combat_step": 4,
+            "cost_paid": 2,
+            "creature_cast": 2,
+            "land_played": 5,
+            "mill_resolved": 1,
+            "multi_defender_attack": 1,
+            "permanent_moved_from_battlefield": 1,
+            "trigger_resolved": 2,
+            "turn_end": 3
+          }
+        },
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {
+          "Scroll Rack": {
+            "topdeck_manipulation_activated": 2
+          },
+          "Squee, Goblin Nabob": {
+            "airbend_creature_cast_from_exile": 1,
+            "cast_announced": 10,
+            "cost_paid": 10,
+            "creature_cast": 9,
+            "permanent_moved_from_battlefield": 6,
+            "trigger_resolved": 5
+          }
+        },
+        "samples": [
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4202,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4203,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4204,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "combat_damage",
+            "seq": 4270,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Scroll Rack",
+            "event": "topdeck_manipulation_activated",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 900,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 909,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 910,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 911,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "starfall_invocation",
+            "seq": 984,
+            "source": "Starfall Invocation",
+            "turn": 15
+          },
+          {
+            "card": "Scroll Rack",
+            "event": "topdeck_manipulation_activated",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3077,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3079,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3080,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3081,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5073,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5074,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5075,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "fated_clash",
+            "seq": 5300,
+            "source": "Fated Clash",
+            "turn": 10
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "trigger_resolved",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "upkeep_return"
+            ],
+            "reason": null,
+            "seq": 5335,
+            "source": null,
+            "turn": 11
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5346,
+            "source": null,
+            "turn": 11
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5347,
+            "source": null,
+            "turn": 11
+          }
+        ],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {
+          "combat_damage": 2,
+          "fated_clash": 2,
+          "starfall_invocation": 1,
+          "tragic_arrogance": 1
+        },
+        "squee_known_graveyard_balance_by_game": {
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1": 1,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0": 1,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0": 0,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1": 0
+        },
+        "trace_game_count": 5,
+        "trace_row_count": 148
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "graveyard_upkeep_return_self_to_hand": 5,
+        "lorehold_cost_paid": 148,
+        "lorehold_spell_cast": 118,
+        "lorehold_spell_rummage": 19,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 33,
+        "squee_return_after_known_graveyard_entry": 5,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "topdeck_manipulation_activated": 30
+      },
+      "strategic_games": {
+        "graveyard_upkeep_return_self_to_hand": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 7,
+          "rate": 0.7778
+        },
+        "miracle_cast": {
+          "games": 8,
+          "rate": 0.8889
+        },
+        "squee_return_after_known_graveyard_entry": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "squee_to_graveyard": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "squee_upkeep_return": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "topdeck_manipulation_activated": {
+          "games": 5,
+          "rate": 0.5556
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Lorehold, the Historian": [
+          {
+            "count": 15,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 13,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ],
+        "Sensei's Divining Top": [
+          {
+            "count": 17,
+            "metric": "topdeck:Sensei's Divining Top",
+            "metric_type": "topdeck"
+          },
+          {
+            "count": 5,
+            "metric": "cost_paid:Sensei's Divining Top",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Squee, Goblin Nabob": [
+          {
+            "count": 10,
+            "metric": "cost_paid:Squee, Goblin Nabob",
+            "metric_type": "cost_paid"
+          },
+          {
+            "count": 5,
+            "metric": "graveyard_return:Squee, Goblin Nabob",
+            "metric_type": "graveyard_return"
+          }
+        ]
+      },
+      "trace_data_level": "per_game_event_counts"
+    },
+    {
+      "aggregate_event_counts": {
+        "land_tax_trigger_resolved": 2,
+        "land_tax_trigger_skipped": 47,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 33,
+        "replacement_applied": 50,
+        "saga_chapter_progressed": 7,
+        "saga_chapter_resolved": 3,
+        "saga_sacrificed_by_sba": 3,
+        "topdeck_manipulation_activated": 30,
+        "tutor_resolved": 10,
+        "utility_artifact_activated": 4,
+        "utility_land_activated": 12
+      },
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 7,
+            "saga_chapter_resolved": 3,
+            "saga_sacrificed_by_sba": 3,
+            "tutor_resolved": 10
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 50
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 30
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {
+            "topdeck_manipulation_activated": 5
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 17,
+              "metric": "topdeck:Sensei's Divining Top",
+              "metric_type": "topdeck"
+            },
+            {
+              "count": 5,
+              "metric": "cost_paid:Sensei's Divining Top",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 30
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "partial_game_trace_available",
+          "games_with": {
+            "topdeck_manipulation_activated": 5
+          },
+          "squee_trace_matches": {
+            "topdeck_manipulation_activated": 2
+          },
+          "top_card_metrics": [
+            {
+              "count": 13,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "graveyard_upkeep_return_self_to_hand": 5,
+            "squee_return_after_known_graveyard_entry": 5,
+            "squee_to_graveyard": 7,
+            "squee_upkeep_return": 5
+          },
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "partial_game_trace_available",
+          "games_with": {
+            "graveyard_upkeep_return_self_to_hand": 2,
+            "squee_return_after_known_graveyard_entry": 2,
+            "squee_to_graveyard": 4,
+            "squee_upkeep_return": 2
+          },
+          "squee_trace_matches": {
+            "airbend_creature_cast_from_exile": 1,
+            "cast_announced": 10,
+            "cost_paid": 10,
+            "creature_cast": 9,
+            "permanent_moved_from_battlefield": 6,
+            "trigger_resolved": 5
+          },
+          "top_card_metrics": [
+            {
+              "count": 10,
+              "metric": "cost_paid:Squee, Goblin Nabob",
+              "metric_type": "cost_paid"
+            },
+            {
+              "count": 5,
+              "metric": "graveyard_return:Squee, Goblin Nabob",
+              "metric_type": "graveyard_return"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "utility_artifact_activated": 4
+          },
+          "card_name": "The Mind Stone",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "land_tax_trigger_resolved": 2,
+            "land_tax_trigger_skipped": 47
+          },
+          "card_name": "Land Tax",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 15,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [],
+      "per_game_summary": {
+        "event_totals": {},
+        "game_count": 0,
+        "games_with": {},
+        "outcome_counts": {},
+        "strategic_event_totals": {}
+      },
+      "record": {
+        "games": 9,
+        "losses": 1,
+        "stalls": 0,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "seed": "42",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed42_20260627_v1.json",
+      "source_type": "gate",
+      "squee_trace_summary": {
+        "event_counts": {
+          "airbend_creature_cast_from_exile": 1,
+          "airbend_other_creatures_resolved": 1,
+          "board_wipe_resolved": 5,
+          "cast_announced": 10,
+          "combat": 18,
+          "combat_step": 17,
+          "cost_paid": 10,
+          "creature_cast": 9,
+          "land_played": 14,
+          "mill_resolved": 1,
+          "multi_defender_attack": 7,
+          "permanent_moved_from_battlefield": 6,
+          "protection_resolved": 1,
+          "replacement_applied": 7,
+          "spell_resolved": 1,
+          "tokens_created": 1,
+          "topdeck_manipulation_activated": 2,
+          "trigger_resolved": 5,
+          "turn_end": 27,
+          "turn_start": 5
+        },
+        "game_event_counts": {
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1": {
+            "cast_announced": 1,
+            "combat": 1,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "permanent_moved_from_battlefield": 1,
+            "turn_end": 6,
+            "turn_start": 5
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0": {
+            "board_wipe_resolved": 2,
+            "cast_announced": 1,
+            "combat": 3,
+            "combat_step": 3,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "land_played": 3,
+            "permanent_moved_from_battlefield": 1,
+            "spell_resolved": 1,
+            "topdeck_manipulation_activated": 1,
+            "turn_end": 4
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2": {
+            "cast_announced": 1,
+            "combat": 1,
+            "combat_step": 1,
+            "cost_paid": 1,
+            "creature_cast": 1,
+            "land_played": 1,
+            "topdeck_manipulation_activated": 1,
+            "turn_end": 1
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0": {
+            "airbend_creature_cast_from_exile": 1,
+            "airbend_other_creatures_resolved": 1,
+            "board_wipe_resolved": 2,
+            "cast_announced": 5,
+            "combat": 9,
+            "combat_step": 9,
+            "cost_paid": 5,
+            "creature_cast": 4,
+            "land_played": 5,
+            "multi_defender_attack": 6,
+            "permanent_moved_from_battlefield": 3,
+            "protection_resolved": 1,
+            "replacement_applied": 7,
+            "tokens_created": 1,
+            "trigger_resolved": 3,
+            "turn_end": 13
+          },
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1": {
+            "board_wipe_resolved": 1,
+            "cast_announced": 2,
+            "combat": 4,
+            "combat_step": 4,
+            "cost_paid": 2,
+            "creature_cast": 2,
+            "land_played": 5,
+            "mill_resolved": 1,
+            "multi_defender_attack": 1,
+            "permanent_moved_from_battlefield": 1,
+            "trigger_resolved": 2,
+            "turn_end": 3
+          }
+        },
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {
+          "Scroll Rack": {
+            "topdeck_manipulation_activated": 2
+          },
+          "Squee, Goblin Nabob": {
+            "airbend_creature_cast_from_exile": 1,
+            "cast_announced": 10,
+            "cost_paid": 10,
+            "creature_cast": 9,
+            "permanent_moved_from_battlefield": 6,
+            "trigger_resolved": 5
+          }
+        },
+        "samples": [
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4202,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4203,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 4204,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "combat_damage",
+            "seq": 4270,
+            "source": null,
+            "turn": 6
+          },
+          {
+            "card": "Scroll Rack",
+            "event": "topdeck_manipulation_activated",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 900,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 909,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 910,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 911,
+            "source": null,
+            "turn": 12
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "starfall_invocation",
+            "seq": 984,
+            "source": "Starfall Invocation",
+            "turn": 15
+          },
+          {
+            "card": "Scroll Rack",
+            "event": "topdeck_manipulation_activated",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3077,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3079,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3080,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 3081,
+            "source": null,
+            "turn": 18
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5073,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5074,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "creature_cast",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5075,
+            "source": null,
+            "turn": 5
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "permanent_moved_from_battlefield",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "graveyard_entry"
+            ],
+            "reason": "fated_clash",
+            "seq": 5300,
+            "source": "Fated Clash",
+            "turn": 10
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "trigger_resolved",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "upkeep_return"
+            ],
+            "reason": null,
+            "seq": 5335,
+            "source": null,
+            "turn": 11
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cast_announced",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5346,
+            "source": null,
+            "turn": 11
+          },
+          {
+            "card": "Squee, Goblin Nabob",
+            "event": "cost_paid",
+            "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+            "markers": [
+              "mentions_squee"
+            ],
+            "reason": null,
+            "seq": 5347,
+            "source": null,
+            "turn": 11
+          }
+        ],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {
+          "combat_damage": 2,
+          "fated_clash": 2,
+          "starfall_invocation": 1,
+          "tragic_arrogance": 1
+        },
+        "squee_known_graveyard_balance_by_game": {
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1": 1,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0": 1,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0": 0,
+          "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1": 0
+        },
+        "trace_game_count": 5,
+        "trace_row_count": 148
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "graveyard_upkeep_return_self_to_hand": 5,
+        "lorehold_cost_paid": 148,
+        "lorehold_spell_cast": 118,
+        "lorehold_spell_rummage": 19,
+        "lorehold_upkeep_rummage": 41,
+        "miracle_cast": 33,
+        "squee_return_after_known_graveyard_entry": 5,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "topdeck_manipulation_activated": 30
+      },
+      "strategic_games": {
+        "graveyard_upkeep_return_self_to_hand": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 7,
+          "rate": 0.7778
+        },
+        "miracle_cast": {
+          "games": 8,
+          "rate": 0.8889
+        },
+        "squee_return_after_known_graveyard_entry": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "squee_to_graveyard": {
+          "games": 4,
+          "rate": 0.4444
+        },
+        "squee_upkeep_return": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "topdeck_manipulation_activated": {
+          "games": 5,
+          "rate": 0.5556
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Lorehold, the Historian": [
+          {
+            "count": 15,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 13,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ],
+        "Sensei's Divining Top": [
+          {
+            "count": 17,
+            "metric": "topdeck:Sensei's Divining Top",
+            "metric_type": "topdeck"
+          },
+          {
+            "count": 5,
+            "metric": "cost_paid:Sensei's Divining Top",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Squee, Goblin Nabob": [
+          {
+            "count": 10,
+            "metric": "cost_paid:Squee, Goblin Nabob",
+            "metric_type": "cost_paid"
+          },
+          {
+            "count": 5,
+            "metric": "graveyard_return:Squee, Goblin Nabob",
+            "metric_type": "graveyard_return"
+          }
+        ]
+      },
+      "trace_data_level": "squee_window_trace"
+    },
+    {
+      "aggregate_event_counts": {
+        "lorehold_upkeep_rummage": 38,
+        "miracle_cast": 4,
+        "replacement_applied": 19,
+        "saga_chapter_progressed": 4,
+        "saga_chapter_resolved": 2,
+        "saga_sacrificed_by_sba": 2,
+        "topdeck_manipulation_activated": 3,
+        "tutor_resolved": 9,
+        "utility_land_activated": 15
+      },
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 4,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 9
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 6
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 19
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "replacement_applied": 7
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 4,
+              "metric": "cost_paid:Library of Leng",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 3
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "cost_paid:Sensei's Divining Top",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 3
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "per_game_event_counts_indirect",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 3,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "The Mind Stone",
+          "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "cost_paid:The Mind Stone",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Land Tax",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_plus_per_game_family_counts",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 13,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 8,
+            "replacement_applied": 4,
+            "tutor_resolved": 3,
+            "utility_land_activated": 6
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0",
+          "game_index": 0,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 12,
+            "lorehold_spell_cast": 9,
+            "lorehold_upkeep_rummage": 8
+          },
+          "turns": 10
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 1,
+            "replacement_applied": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1",
+          "game_index": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 4,
+            "lorehold_upkeep_rummage": 1
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "replacement_applied": 1,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):2",
+          "game_index": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 6,
+            "lorehold_spell_cast": 6
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 3,
+            "replacement_applied": 3,
+            "topdeck_manipulation_activated": 3,
+            "tutor_resolved": 1,
+            "utility_land_activated": 6
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0",
+          "game_index": 0,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 6,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 9,
+            "miracle_cast": 3,
+            "topdeck_manipulation_activated": 3
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 2,
+            "replacement_applied": 4,
+            "tutor_resolved": 2,
+            "utility_land_activated": 2
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1",
+          "game_index": 1,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 10,
+            "lorehold_spell_cast": 8,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 2
+          },
+          "turns": 7
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 8
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):2",
+          "game_index": 2,
+          "opponent": "Sisay, Weatherlight Captain #61 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 6,
+            "lorehold_upkeep_rummage": 8
+          },
+          "turns": 6
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 3,
+            "replacement_applied": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):0",
+          "game_index": 0,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 5,
+            "lorehold_spell_cast": 3,
+            "lorehold_spell_rummage": 1,
+            "lorehold_upkeep_rummage": 3
+          },
+          "turns": 5
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 6,
+            "miracle_cast": 1,
+            "replacement_applied": 5,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "tutor_resolved": 1,
+            "utility_land_activated": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):1",
+          "game_index": 1,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 7,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 6,
+            "miracle_cast": 1
+          },
+          "turns": 8
+        },
+        {
+          "event_counts": {
+            "lorehold_upkeep_rummage": 1,
+            "saga_chapter_progressed": 2,
+            "saga_chapter_resolved": 1,
+            "saga_sacrificed_by_sba": 1,
+            "tutor_resolved": 1
+          },
+          "game_id": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Winota, Joiner of Forces #39 (real):2",
+          "game_index": 2,
+          "opponent": "Winota, Joiner of Forces #39 (real)",
+          "reason": "life_zero|found=False|countered=0",
+          "result": "loss",
+          "squee_known_graveyard_balance": 0,
+          "squee_trace_count": 0,
+          "strategic_event_counts": {
+            "lorehold_cost_paid": 4,
+            "lorehold_spell_cast": 3,
+            "lorehold_upkeep_rummage": 1
+          },
+          "turns": 7
+        }
+      ],
+      "per_game_summary": {
+        "event_totals": {
+          "lorehold_upkeep_rummage": 38,
+          "miracle_cast": 4,
+          "replacement_applied": 19,
+          "saga_chapter_progressed": 4,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "topdeck_manipulation_activated": 3,
+          "tutor_resolved": 9,
+          "utility_land_activated": 15
+        },
+        "game_count": 9,
+        "games_with": {
+          "lorehold_cost_paid": 9,
+          "lorehold_spell_cast": 9,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 16,
+          "miracle_cast": 4,
+          "replacement_applied": 7,
+          "saga_chapter_progressed": 2,
+          "saga_chapter_resolved": 2,
+          "saga_sacrificed_by_sba": 2,
+          "topdeck_manipulation_activated": 2,
+          "tutor_resolved": 6,
+          "utility_land_activated": 4
+        },
+        "outcome_counts": {
+          "loss": 9
+        },
+        "strategic_event_totals": {
+          "lorehold_cost_paid": 64,
+          "lorehold_spell_cast": 48,
+          "lorehold_spell_rummage": 2,
+          "lorehold_upkeep_rummage": 38,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 3
+        }
+      },
+      "record": {
+        "games": 9,
+        "losses": 9,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "20260625",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_diag_seed20260625_20260627_v1.json",
+      "source_type": "diagnostic_gate",
+      "squee_trace_summary": {
+        "event_counts": {},
+        "game_event_counts": {},
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {},
+        "samples": [],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "trace_game_count": 0,
+        "trace_row_count": 0
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "lorehold_cost_paid": 64,
+        "lorehold_spell_cast": 48,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 38,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 3
+      },
+      "strategic_games": {
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 8,
+          "rate": 0.8889
+        },
+        "miracle_cast": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "topdeck_manipulation_activated": {
+          "games": 1,
+          "rate": 0.1111
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Library of Leng": [
+          {
+            "count": 4,
+            "metric": "cost_paid:Library of Leng",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Lorehold, the Historian": [
+          {
+            "count": 13,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 3,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ],
+        "Sensei's Divining Top": [
+          {
+            "count": 2,
+            "metric": "cost_paid:Sensei's Divining Top",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "The Mind Stone": [
+          {
+            "count": 2,
+            "metric": "cost_paid:The Mind Stone",
+            "metric_type": "cost_paid"
+          }
+        ]
+      },
+      "trace_data_level": "per_game_event_counts"
+    },
+    {
+      "aggregate_event_counts": {
+        "lorehold_upkeep_rummage": 38,
+        "miracle_cast": 4,
+        "replacement_applied": 19,
+        "saga_chapter_progressed": 4,
+        "saga_chapter_resolved": 2,
+        "saga_sacrificed_by_sba": 2,
+        "topdeck_manipulation_activated": 3,
+        "tutor_resolved": 9,
+        "utility_land_activated": 15
+      },
+      "candidate_found": true,
+      "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
+      "card_observations": [
+        {
+          "aggregate_event_counts": {
+            "saga_chapter_progressed": 4,
+            "saga_chapter_resolved": 2,
+            "saga_sacrificed_by_sba": 2,
+            "tutor_resolved": 9
+          },
+          "card_name": "Urza's Saga",
+          "evidence_level": "aggregate_event_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {
+            "replacement_applied": 19
+          },
+          "card_name": "Library of Leng",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 4,
+              "metric": "cost_paid:Library of Leng",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 3
+          },
+          "card_name": "Sensei's Divining Top",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "cost_paid:Sensei's Divining Top",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {
+            "topdeck_manipulation_activated": 3
+          },
+          "card_name": "Scroll Rack",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {
+            "topdeck_manipulation_activated": 1
+          },
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 3,
+              "metric": "topdeck:Scroll Rack",
+              "metric_type": "topdeck"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Squee, Goblin Nabob",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "The Mind Stone",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 2,
+              "metric": "cost_paid:The Mind Stone",
+              "metric_type": "cost_paid"
+            }
+          ]
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Land Tax",
+          "evidence_level": "not_observed",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": []
+        },
+        {
+          "aggregate_event_counts": {},
+          "card_name": "Lorehold, the Historian",
+          "evidence_level": "aggregate_card_metric_only",
+          "games_with": {},
+          "squee_trace_matches": {},
+          "top_card_metrics": [
+            {
+              "count": 13,
+              "metric": "cost_paid:Lorehold, the Historian",
+              "metric_type": "cost_paid"
+            }
+          ]
+        }
+      ],
+      "per_game_samples": [],
+      "per_game_summary": {
+        "event_totals": {},
+        "game_count": 0,
+        "games_with": {},
+        "outcome_counts": {},
+        "strategic_event_totals": {}
+      },
+      "record": {
+        "games": 9,
+        "losses": 9,
+        "stalls": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "seed": "20260625",
+      "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+      "source_type": "gate",
+      "squee_trace_summary": {
+        "event_counts": {},
+        "game_event_counts": {},
+        "lorehold_squee_discard_count": 0,
+        "matched_cards": {},
+        "samples": [],
+        "squee_anomaly_count": 0,
+        "squee_graveyard_reason_counts": {},
+        "squee_known_graveyard_balance_by_game": {},
+        "trace_game_count": 0,
+        "trace_row_count": 0
+      },
+      "status": "ready",
+      "strategic_event_counts": {
+        "lorehold_cost_paid": 64,
+        "lorehold_spell_cast": 48,
+        "lorehold_spell_rummage": 2,
+        "lorehold_upkeep_rummage": 38,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 3
+      },
+      "strategic_games": {
+        "lorehold_cost_paid": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_cast": {
+          "games": 9,
+          "rate": 1.0
+        },
+        "lorehold_spell_rummage": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "lorehold_upkeep_rummage": {
+          "games": 8,
+          "rate": 0.8889
+        },
+        "miracle_cast": {
+          "games": 2,
+          "rate": 0.2222
+        },
+        "topdeck_manipulation_activated": {
+          "games": 1,
+          "rate": 0.1111
+        }
+      },
+      "top_card_metrics_by_card": {
+        "Library of Leng": [
+          {
+            "count": 4,
+            "metric": "cost_paid:Library of Leng",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Lorehold, the Historian": [
+          {
+            "count": 13,
+            "metric": "cost_paid:Lorehold, the Historian",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "Scroll Rack": [
+          {
+            "count": 3,
+            "metric": "topdeck:Scroll Rack",
+            "metric_type": "topdeck"
+          }
+        ],
+        "Sensei's Divining Top": [
+          {
+            "count": 2,
+            "metric": "cost_paid:Sensei's Divining Top",
+            "metric_type": "cost_paid"
+          }
+        ],
+        "The Mind Stone": [
+          {
+            "count": 2,
+            "metric": "cost_paid:The Mind Stone",
+            "metric_type": "cost_paid"
+          }
+        ]
+      },
+      "trace_data_level": "aggregate_only"
+    }
+  ],
+  "source_db_mutated": false,
+  "summary": {
+    "focus_card_count": 8,
+    "hypothesis_count": 4,
+    "primary_trace_level_counts": {
+      "per_game_event_counts": 3
+    },
+    "recommended_next_action": "extend_focus_card_trace_payload_then_rerun_seed_diagnostics",
+    "seed_count": 3,
+    "seed_source_count": 6,
+    "trace_status_counts": {
+      "runtime_trace_partial_missing_tutor_payload": 1,
+      "trace_evidence_supports_sequencing_gap": 1,
+      "trace_partial_missing_payload": 2
+    }
+  },
+  "synthesis_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_synergy_hypotheses_20260628_v1.json"
+}
