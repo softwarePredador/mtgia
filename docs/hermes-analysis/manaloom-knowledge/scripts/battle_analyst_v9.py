@@ -995,11 +995,25 @@ def attach_direct_resolution_context(
     return effect_data
 
 
-def can_cast_in_phase(card, effect_data, phase):
+def controller_casts_nonland_as_flash(controller, card):
+    if controller is None or is_effective_land(card):
+        return False
+    for permanent in getattr(controller, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("cast_nonland_spells_as_flash"):
+            continue
+        return True
+    return False
+
+
+def can_cast_in_phase(card, effect_data, phase, controller=None):
     if is_effective_land(card):
         return False
     if str(effect_data.get("effect") or "").lower() in COUNTERLIKE_EFFECTS:
         return False
+    if phase not in MAIN_PHASES and controller_casts_nonland_as_flash(controller, card):
+        return True
     if effect_data.get("effect") == "creature" and phase not in MAIN_PHASES:
         return False
     if is_sorcery(card) and phase not in MAIN_PHASES:
@@ -1811,7 +1825,7 @@ def begin_cast_context(
         alternative_cost_kind=alternative_cost_kind,
     )
     ctx.effect_data = effect_data or get_card_effect(card)
-    ctx.is_legal = can_cast_in_phase(card, ctx.effect_data, phase)
+    ctx.is_legal = can_cast_in_phase(card, ctx.effect_data, phase, controller=player)
     ctx.locked_cost = (
         copy.deepcopy(locked_cost_override)
         if locked_cost_override is not None
@@ -4131,6 +4145,20 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:ab583f78c19a22031bb99e0ac2d0d131",
         }
     ),
+    "Vedalken Orrery": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 4.0,
+            "effect": "flash_permission",
+            "artifact": True,
+            "mana_cost": "{4}",
+            "cast_nonland_spells_as_flash": True,
+            "flash_permission_filter": "nonland_spells",
+            "battle_model_scope": "nonland_spells_as_though_flash_static_v1",
+            "_rule_oracle_hash": "1fa2fc4b26db2e2d0691f8170d03b4db",
+            "_rule_logical_key": "battle_rule_v1:9e2c7c96d5b2a117731924d511bb0e2a",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4251,6 +4279,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Wild Ricochet",
     "Whispersilk Cloak",
     "Wand of Vertebrae",
+    "Vedalken Orrery",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4396,6 +4425,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed tap self-mill and self-exile graveyard shuffle artifact semantics.",
         ["manaloom_log_learning_audit_20260628_v18_after_whispersilk_cloak_runtime", "WandOfVertebrae.java"],
         "2026-06-28T23:25:00Z",
+    ),
+    "Vedalken Orrery": manual_runtime_waiver_metadata(
+        "Replace generated ramp_permanent review_only evidence with XMage-backed static nonland-spells-as-flash timing permission.",
+        ["manaloom_log_learning_audit_20260628_v19_after_wand_runtime", "VedalkenOrrery.java"],
+        "2026-06-28T23:45:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -8825,7 +8859,7 @@ def silence_payoff_plan(player, phase, silence_card=None):
         ):
             continue
         effect_data = get_card_effect(candidate)
-        if not can_cast_in_phase(candidate, effect_data, phase):
+        if not can_cast_in_phase(candidate, effect_data, phase, controller=player):
             continue
         if should_hold_squee_for_lorehold_recursion(player, candidate, phase):
             continue
@@ -8978,7 +9012,7 @@ def proactive_combat_defense_cards_in_hand(player, phase):
             and not grants_protection_from_everything_on_enter(candidate, candidate_effect)
         ):
             continue
-        if not can_cast_in_phase(candidate, candidate_effect, phase):
+        if not can_cast_in_phase(candidate, candidate_effect, phase, controller=player):
             continue
         if not player.can_pay_card(candidate):
             continue
@@ -9571,7 +9605,7 @@ def describe_pass_no_action(player, phase):
         effect_data = get_card_effect(card)
         cmc = int(float(card.get("cmc") or 0))
         payable = bool(player.can_pay_card(card))
-        phase_legal = bool(can_cast_in_phase(card, effect_data, phase))
+        phase_legal = bool(can_cast_in_phase(card, effect_data, phase, controller=player))
         if minimum_cmc is None or cmc < minimum_cmc:
             minimum_cmc = cmc
         option_score = _pass_option_trace_score(
@@ -19556,7 +19590,7 @@ def cantrip_mana_filter_unlock_options(player, permanent, turn, *, phase="precom
     def maybe_add_option(card, effect_data, *, role, additional_generic=0, reason):
         if card is None:
             return
-        if not can_cast_in_phase(card, effect_data, phase):
+        if not can_cast_in_phase(card, effect_data, phase, controller=player):
             return
         if player.can_pay_card(card, additional_generic):
             return
@@ -31767,7 +31801,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
         has_free_castable = any(
             not is_effective_land(candidate)
             and player.can_pay_card(candidate)
-            and can_cast_in_phase(candidate, get_card_effect(candidate), phase)
+            and can_cast_in_phase(candidate, get_card_effect(candidate), phase, controller=player)
             and str(get_card_effect(candidate).get("effect") or "").lower()
             not in COUNTERLIKE_EFFECTS.union({"unknown"})
             and not should_hold_for_response_window(
@@ -31820,7 +31854,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 candidate_effect = get_card_effect(candidate)
                 if str(candidate_effect.get("effect") or "").lower() in COUNTERLIKE_EFFECTS.union({"unknown", "ramp_ritual"}):
                     continue
-                if not can_cast_in_phase(candidate, candidate_effect, phase):
+                if not can_cast_in_phase(candidate, candidate_effect, phase, controller=player):
                     continue
                 if should_hold_squee_for_lorehold_recursion(player, candidate, phase):
                     continue
@@ -31890,7 +31924,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 continue
             if effect_name not in HIGH_IMPACT_PAYOFF_EFFECTS:
                 continue
-            if not can_cast_in_phase(candidate, candidate_effect, phase):
+            if not can_cast_in_phase(candidate, candidate_effect, phase, controller=player):
                 continue
             candidates.append((candidate, 0, "high_impact_spell"))
         return candidates
@@ -33799,6 +33833,19 @@ def apply_effect_immediate(
                 == SHARED_CARD_TYPE_COST_REDUCTION_APPLIES_TO
             ):
                 resolve_semblance_anvil_imprint(player, permanent, card, turn=turn)
+    elif effect == "flash_permission":
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "flash_permission"
+        player.battlefield.append(permanent)
+        emit_replay_event(
+            "static_permission_entered",
+            player=player.name,
+            card=card.get("name", "?"),
+            permission="cast_nonland_spells_as_flash",
+            filter=permanent.get("flash_permission_filter", "nonland_spells"),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
     elif effect == "discard_trigger_modal_draw_treasure_opponent_life_loss":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = effect
