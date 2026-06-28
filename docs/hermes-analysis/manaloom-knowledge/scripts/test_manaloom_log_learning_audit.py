@@ -56,6 +56,66 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
                 {
                     "deck_id": 607,
                     "finding_counts": {"no_active_battle_rule": 2},
+                    "cards": [
+                        {
+                            "active_rule_count": 2,
+                            "card_name": "Reprieve",
+                            "deck_count": 3,
+                            "deck_ids": [612, 613, 615],
+                            "effects": ["counter", "draw_cards"],
+                            "findings": [
+                                {
+                                    "code": "generic_effect_without_model_scope",
+                                    "severity": "high",
+                                },
+                                {
+                                    "code": "trusted_rule_without_oracle_hash",
+                                    "severity": "medium",
+                                },
+                            ],
+                            "impact_tier": "battle_critical",
+                            "priority_score": 7153,
+                            "severity": "high",
+                            "total_quantity": 3,
+                            "trusted_executable_rule_count": 1,
+                        },
+                        {
+                            "card_name": "Sheoldred, the Apocalypse",
+                            "deck_count": 4,
+                            "deck_ids": [617, 618],
+                            "findings": [
+                                {
+                                    "code": "no_trusted_executable_rule",
+                                    "severity": "high",
+                                }
+                            ],
+                            "priority_score": 7204,
+                            "severity": "high",
+                            "total_quantity": 4,
+                        },
+                        {
+                            "active_rule_count": 2,
+                            "card_name": "Verge Rangers",
+                            "deck_count": 3,
+                            "deck_ids": [609, 611, 613],
+                            "effects": ["topdeck_manipulation"],
+                            "findings": [
+                                {
+                                    "code": "no_trusted_executable_rule",
+                                    "severity": "high",
+                                },
+                                {
+                                    "code": "review_only_or_needs_review_rule",
+                                    "severity": "high",
+                                },
+                            ],
+                            "impact_tier": "battle_critical",
+                            "priority_score": 7153,
+                            "severity": "high",
+                            "total_quantity": 3,
+                            "trusted_executable_rule_count": 0,
+                        },
+                    ],
                     "severity_counts": {"critical": 1, "high": 2},
                 },
             )
@@ -76,6 +136,31 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             self.assertIn("coherence_critical_high_findings", issue_types)
             self.assertIn("missing_xmage_source_or_class", issue_types)
             self.assertIn("manual_or_blocked_rules", issue_types)
+            coherence_issue = next(
+                row
+                for row in report["action_queue"]
+                if row["issue_type"] == "coherence_critical_high_findings"
+            )
+            evidence = coherence_issue["examples"][0]["evidence"]
+            self.assertIn(
+                "Reprieve",
+                {row["card_name"] for row in evidence["top_lorehold_cards"]},
+            )
+            self.assertNotIn(
+                "Sheoldred, the Apocalypse",
+                {row["card_name"] for row in evidence["top_lorehold_cards"]},
+            )
+            top_codes = {row["code"]: row["count"] for row in evidence["top_finding_codes"]}
+            self.assertEqual(top_codes["generic_effect_without_model_scope"], 1)
+            self.assertEqual(top_codes["no_trusted_executable_rule"], 2)
+            self.assertEqual(
+                evidence["top_lorehold_runtime_missing_cards"][0]["card_name"],
+                "Verge Rangers",
+            )
+            self.assertEqual(
+                evidence["top_lorehold_runtime_missing_cards"][0]["gap_kind"],
+                "runtime_rule_missing",
+            )
 
     def test_build_audit_finds_text_failures(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_name:
@@ -98,6 +183,24 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
                 row for row in report["action_queue"] if row["issue_type"] == "text_test_failure"
             ]
             self.assertEqual(test_failures[0]["count"], 1)
+
+    def test_markdown_blocks_without_active_marker_do_not_create_blocked_noise(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_name:
+            tmp = Path(tmp_name)
+            (tmp / "historical_notes.md").write_text(
+                "Old package was blocked in a previous discussion, but this is narrative history.\n",
+                encoding="utf-8",
+            )
+            (tmp / "current_gate.md").write_text(
+                "- status: `needs_more_evidence`\n",
+                encoding="utf-8",
+            )
+
+            report = audit.build_audit(tmp, max_files=None, include_patterns=[])
+
+            blocked = [row for row in report["action_queue"] if row["issue_type"] == "text_blocked"]
+            self.assertEqual(len(blocked), 1)
+            self.assertEqual(blocked[0]["count"], 1)
 
     def test_later_pass_supersedes_old_text_failure(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_name:

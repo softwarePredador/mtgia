@@ -23,6 +23,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_STEM = "manaloom_log_learning_audit_20260628"
 SUPPORTED_SUFFIXES = {".json", ".jsonl", ".out", ".md", ".txt"}
 SEVERITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+LOREHOLD_DECK_IDS = set(range(607, 617))
 STATUS_SEVERITY = {
     "fail": "critical",
     "failed": "critical",
@@ -314,10 +315,132 @@ def analyze_coherence(path: Path, payload: Mapping[str, Any], issues: list[dict[
                 evidence={
                     "deck_id": payload.get("deck_id"),
                     "finding_counts": dict(finding_counts) if isinstance(finding_counts, Mapping) else {},
+                    "lorehold_deck_ids": sorted(LOREHOLD_DECK_IDS),
                     "severity_counts": dict(severity_counts),
+                    "top_finding_codes": coherence_top_finding_codes(payload),
+                    "top_lorehold_cards": coherence_top_cards(payload, only_lorehold=True),
+                    "top_lorehold_runtime_missing_cards": coherence_top_cards(
+                        payload,
+                        only_lorehold=True,
+                        gap_kind="runtime_rule_missing",
+                    ),
+                    "top_overall_cards": coherence_top_cards(payload, only_lorehold=False),
                 },
                 next_action="prioritize_cards_with_no_active_or_no_trusted_rules_in_current_deck_scope",
             )
+
+
+def finding_code(row: Mapping[str, Any]) -> str:
+    return str(row.get("code") or row.get("finding") or row)
+
+
+def finding_severity(row: Mapping[str, Any]) -> str:
+    return str(row.get("severity") or "").lower()
+
+
+def high_finding_codes(card: Mapping[str, Any]) -> list[str]:
+    codes: list[str] = []
+    for raw in card.get("findings") or []:
+        if not isinstance(raw, Mapping):
+            code = str(raw)
+            severity = str(card.get("severity") or "")
+        else:
+            code = finding_code(raw)
+            severity = finding_severity(raw)
+        if severity in {"critical", "high"} and code not in codes:
+            codes.append(code)
+    return codes
+
+
+def card_deck_ids(card: Mapping[str, Any]) -> list[int]:
+    deck_ids: list[int] = []
+    for value in card.get("deck_ids") or []:
+        parsed = integer(value, -1)
+        if parsed >= 0:
+            deck_ids.append(parsed)
+    return deck_ids
+
+
+def is_high_coherence_card(card: Mapping[str, Any]) -> bool:
+    if str(card.get("severity") or "").lower() in {"critical", "high"}:
+        return True
+    return bool(high_finding_codes(card))
+
+
+def coherence_gap_kind(card: Mapping[str, Any]) -> str:
+    codes = set(high_finding_codes(card))
+    if codes & {"no_active_battle_rule", "no_trusted_executable_rule"}:
+        return "runtime_rule_missing"
+    if "generic_effect_without_model_scope" in codes:
+        return "battle_model_scope_missing"
+    if "review_only_or_needs_review_rule" in codes and integer(card.get("trusted_executable_rule_count")):
+        return "trusted_rule_with_review_shadow_cleanup"
+    if "missing_oracle_text" in codes or "missing_oracle_identity" in codes:
+        return "oracle_identity_missing"
+    return "metadata_or_review_gap"
+
+
+def compact_coherence_card(card: Mapping[str, Any]) -> dict[str, Any]:
+    deck_ids = card_deck_ids(card)
+    codes = high_finding_codes(card)
+    return {
+        "active_rule_count": integer(card.get("active_rule_count")),
+        "card_name": card.get("card_name") or card.get("name"),
+        "deck_count": integer(card.get("deck_count")),
+        "deck_ids": deck_ids[:12],
+        "effects": list(card.get("effects") or [])[:8],
+        "finding_codes": codes,
+        "gap_kind": coherence_gap_kind(card),
+        "impact_tier": card.get("impact_tier"),
+        "lorehold_deck_ids": [deck_id for deck_id in deck_ids if deck_id in LOREHOLD_DECK_IDS],
+        "priority_score": integer(card.get("priority_score")),
+        "severity": card.get("severity"),
+        "total_quantity": integer(card.get("total_quantity")),
+        "trusted_executable_rule_count": integer(card.get("trusted_executable_rule_count")),
+    }
+
+
+def coherence_top_cards(
+    payload: Mapping[str, Any],
+    *,
+    only_lorehold: bool,
+    gap_kind: str | None = None,
+    limit: int = 12,
+) -> list[dict[str, Any]]:
+    cards = payload.get("cards") or []
+    if not isinstance(cards, list):
+        return []
+    selected: list[Mapping[str, Any]] = []
+    for card in cards:
+        if not isinstance(card, Mapping) or not is_high_coherence_card(card):
+            continue
+        if only_lorehold and not (set(card_deck_ids(card)) & LOREHOLD_DECK_IDS):
+            continue
+        if gap_kind and coherence_gap_kind(card) != gap_kind:
+            continue
+        selected.append(card)
+    selected.sort(
+        key=lambda card: (
+            integer(card.get("priority_score")),
+            integer(card.get("total_quantity")),
+            integer(card.get("deck_count")),
+            str(card.get("card_name") or ""),
+        ),
+        reverse=True,
+    )
+    return [compact_coherence_card(card) for card in selected[:limit]]
+
+
+def coherence_top_finding_codes(payload: Mapping[str, Any], limit: int = 12) -> list[dict[str, Any]]:
+    cards = payload.get("cards") or []
+    counter: Counter[str] = Counter()
+    if isinstance(cards, list):
+        for card in cards:
+            if isinstance(card, Mapping) and is_high_coherence_card(card):
+                counter.update(high_finding_codes(card))
+    if not counter and isinstance(payload.get("finding_counts"), Mapping):
+        counter.update({str(key): integer(value) for key, value in payload["finding_counts"].items()})
+    return [{"code": code, "count": count} for code, count in counter.most_common(limit)]
 
 
 def find_numeric_field(payload: Any, target_key: str) -> int:
@@ -403,6 +526,8 @@ def analyze_text(path: Path, text: str, issues: list[dict[str, Any]]) -> None:
         if not compact:
             continue
         for severity, issue_type, pattern in TEXT_PATTERNS:
+            if issue_type == "blocked" and path.suffix.lower() == ".md" and not is_active_blocked_line(compact):
+                continue
             if pattern.search(compact) and len(snippets_by_type[issue_type]) < 3:
                 snippets_by_type[issue_type].append(compact[:300])
     for severity, issue_type, _ in TEXT_PATTERNS:
@@ -422,6 +547,23 @@ def analyze_text(path: Path, text: str, issues: list[dict[str, Any]]) -> None:
             evidence={"snippets": snippets, "test_names": test_names},
             next_action="inspect_text_log_and_convert_recurring_pattern_to_structured_gate_field",
         )
+
+
+def is_active_blocked_line(line: str) -> bool:
+    lowered = line.lower()
+    active_markers = (
+        "status:",
+        "status is",
+        "| `",
+        "next=`",
+        "issue_type",
+        "blocked_workflow",
+        "blocked_missing",
+        "manual_or_blocked",
+        "needs_more_evidence",
+        "inconclusive",
+    )
+    return any(marker in lowered for marker in active_markers)
 
 
 def filter_superseded_issues(
@@ -527,18 +669,59 @@ def aggregate_issues(issues: list[dict[str, Any]], *, max_examples: int = 5) -> 
         row["count"] += 1
         if SEVERITY_RANK[issue["severity"]] < SEVERITY_RANK[row["severity"]]:
             row["severity"] = issue["severity"]
-        if len(row["examples"]) < max_examples:
-            row["examples"].append(
-                {
-                    "detail": issue["detail"],
-                    "evidence": issue.get("evidence") or {},
-                    "source_path": issue["source_path"],
-                }
-            )
+        row["examples"].append(
+            {
+                "detail": issue["detail"],
+                "evidence": issue.get("evidence") or {},
+                "severity": issue["severity"],
+                "source_mtime": issue["source_mtime"],
+                "source_path": issue["source_path"],
+            }
+        )
+    for row in grouped.values():
+        row["examples"] = sorted(
+            row["examples"],
+            key=lambda example: (
+                SEVERITY_RANK[example["severity"]],
+                -numeric(example.get("source_mtime")),
+                str(example["source_path"]),
+            ),
+        )[:max_examples]
     return sorted(
         grouped.values(),
         key=lambda row: (SEVERITY_RANK[row["severity"]], -row["count"], row["category"], row["issue_type"]),
     )
+
+
+def render_example_evidence(example: Mapping[str, Any]) -> list[str]:
+    evidence = example.get("evidence") or {}
+    lines: list[str] = []
+    cards = evidence.get("top_lorehold_cards") or []
+    if isinstance(cards, list) and cards:
+        card_names = [str(card.get("card_name")) for card in cards[:5] if isinstance(card, Mapping)]
+        if card_names:
+            lines.append(f"     top_lorehold_cards: `{', '.join(card_names)}`")
+    runtime_missing = evidence.get("top_lorehold_runtime_missing_cards") or []
+    if isinstance(runtime_missing, list) and runtime_missing:
+        runtime_missing_names = [
+            str(card.get("card_name"))
+            for card in runtime_missing[:5]
+            if isinstance(card, Mapping)
+        ]
+        if runtime_missing_names:
+            lines.append(
+                f"     top_lorehold_runtime_missing: `{', '.join(runtime_missing_names)}`"
+            )
+    codes = evidence.get("top_finding_codes") or []
+    if isinstance(codes, list) and codes:
+        rendered_codes = [
+            f"{row.get('code')}={row.get('count')}"
+            for row in codes[:5]
+            if isinstance(row, Mapping)
+        ]
+        if rendered_codes:
+            lines.append(f"     top_finding_codes: `{', '.join(rendered_codes)}`")
+    return lines
 
 
 def build_audit(
@@ -612,6 +795,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         )
         for example in issue.get("examples", [])[:2]:
             lines.append(f"   - {example['detail']} [{example['source_path']}]")
+            lines.extend(render_example_evidence(example))
     lines.append("")
     return "\n".join(lines)
 
