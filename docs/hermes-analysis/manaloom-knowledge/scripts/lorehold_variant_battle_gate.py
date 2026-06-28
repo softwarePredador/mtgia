@@ -70,6 +70,7 @@ FOCUS_TRACE_EVENTS = {
     "activated_ability",
     "cost_paid",
     "focus_card_access_snapshot",
+    "forced_focus_access_applied",
     "land_tax_trigger_resolved",
     "land_tax_trigger_skipped",
     "lorehold_upkeep_rummage",
@@ -609,6 +610,12 @@ class GateTelemetry:
             "rule_oracle_hash",
             "rule_review_status",
             "battle_model_scope",
+            "forced_access_mode",
+            "mode",
+            "source_zone",
+            "destination_zone",
+            "replaced_card",
+            "test_only",
         )
         return {
             "seq": self.event_sequence,
@@ -883,6 +890,7 @@ def run_deck_gate(
     games_per_opponent: int,
     simulation_seed: int,
     game_timeout_seconds: float = 0,
+    forced_access_mode: str = "none",
     progress_callback: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     source_db = Path(str(spec["source_db"]))
@@ -904,6 +912,11 @@ def run_deck_gate(
     completed_games = 0
 
     previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_forced_access_mode = os.environ.get("MANALOOM_FORCE_FOCUS_ACCESS_MODE")
+    if forced_access_mode and forced_access_mode != "none":
+        os.environ["MANALOOM_FORCE_FOCUS_ACCESS_MODE"] = forced_access_mode
+    else:
+        os.environ.pop("MANALOOM_FORCE_FOCUS_ACCESS_MODE", None)
 
     def event_handler(event: str, data: Mapping[str, Any]) -> None:
         telemetry.record(event, data)
@@ -980,6 +993,7 @@ def run_deck_gate(
                             "losses": losses,
                             "stalls": stalls,
                             "game_timeout_seconds": float(game_timeout_seconds or 0),
+                            "forced_access_mode": forced_access_mode,
                         }
                     )
             opponent_rows.append(
@@ -998,6 +1012,10 @@ def run_deck_gate(
             )
     finally:
         battle.REPLAY_EVENT_HANDLER = previous_handler
+        if previous_forced_access_mode is None:
+            os.environ.pop("MANALOOM_FORCE_FOCUS_ACCESS_MODE", None)
+        else:
+            os.environ["MANALOOM_FORCE_FOCUS_ACCESS_MODE"] = previous_forced_access_mode
 
     lands = sum(1 for card in deck if battle.card_has_functional_tag(card, "land") or "Land" in card.get("type_line", ""))
     ramp = sum(1 for card in deck if battle.card_has_functional_tag(card, "ramp", "ritual"))
@@ -1020,6 +1038,7 @@ def run_deck_gate(
         "win_reasons": dict(win_reasons),
         "opponents": opponent_rows,
         "game_results": game_rows,
+        "forced_access_mode": forced_access_mode,
         "telemetry": telemetry.as_json(total_games),
     }
 
@@ -1060,6 +1079,7 @@ def run_deck_gate_in_process(
     games_per_opponent: int,
     simulation_seed: int,
     game_timeout_seconds: float,
+    forced_access_mode: str = "none",
     progress_callback: Callable[[dict[str, Any]], None] | None = None,
     process_timeout_seconds: float = 0,
 ) -> dict[str, Any]:
@@ -1078,6 +1098,7 @@ def run_deck_gate_in_process(
         "games_per_opponent": games_per_opponent,
         "simulation_seed": simulation_seed,
         "game_timeout_seconds": game_timeout_seconds,
+        "forced_access_mode": forced_access_mode,
         "progress_callback": None,
         "_queue_progress": progress_callback is not None,
         "_result_path": str(result_path),
@@ -1199,6 +1220,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- python_hash_seed: `{report.get('python_hash_seed', 'unset')}`",
         f"- deck_process_isolation: `{report.get('deck_process_isolation', False)}`",
         f"- game_timeout_seconds: `{report.get('game_timeout_seconds', 0)}`",
+        f"- forced_access_mode: `{report.get('forced_access_mode', 'none')}`",
         f"- game_checkpoint_json: `{report.get('game_checkpoint_json')}`",
         f"- opponents: `{', '.join(report.get('opponents') or [])}`",
         "- postgres_writes: `false`",
@@ -1305,6 +1327,7 @@ def render_checkpoint_markdown(payload: Mapping[str, Any]) -> str:
         f"- completed_games: `{payload.get('completed_games')}`",
         f"- total_games: `{payload.get('total_games')}`",
         f"- game_timeout_seconds: `{payload.get('game_timeout_seconds')}`",
+        f"- forced_access_mode: `{payload.get('forced_access_mode', 'none')}`",
         "",
         "## Latest Game",
         "",
@@ -1379,6 +1402,16 @@ def main() -> int:
     parser.add_argument("--checkpoint-history-limit", type=int, default=200)
     parser.add_argument("--no-game-checkpoint", action="store_true")
     parser.add_argument(
+        "--force-focus-access",
+        choices=("none", "opening_hand", "library_top"),
+        default="none",
+        help=(
+            "Test-only exposure mode for MANALOOM_FOCUS_ACCESS_CARDS. "
+            "opening_hand replaces one non-focus opening card with the focus card; "
+            "library_top moves it to the top of the opening library."
+        ),
+    )
+    parser.add_argument(
         "--isolate-deck-process",
         action="store_true",
         help="Run each deck/candidate in a fresh Python process to avoid battle runtime global-state bleed.",
@@ -1428,6 +1461,7 @@ def main() -> int:
             "simulation_seed": args.simulation_seed,
             "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
             "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+            "forced_access_mode": args.force_focus_access,
             "completed_games": latest.get("completed_games", 0),
             "total_games": latest.get("total_games", 0),
             "latest": latest,
@@ -1445,6 +1479,7 @@ def main() -> int:
                     games_per_opponent=max(1, args.games),
                     simulation_seed=args.simulation_seed,
                     game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
+                    forced_access_mode=args.force_focus_access,
                     progress_callback=progress_callback,
                     process_timeout_seconds=max(0.0, float(args.deck_process_timeout_seconds or 0)),
                 )
@@ -1455,6 +1490,7 @@ def main() -> int:
                     games_per_opponent=max(1, args.games),
                     simulation_seed=args.simulation_seed,
                     game_timeout_seconds=max(0.0, float(args.game_timeout_seconds or 0)),
+                    forced_access_mode=args.force_focus_access,
                     progress_callback=progress_callback,
                 )
         except Exception as exc:
@@ -1485,6 +1521,7 @@ def main() -> int:
             "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
             "deck_process_isolation": bool(args.isolate_deck_process),
             "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+            "forced_access_mode": args.force_focus_access,
             "game_checkpoint_json": None if args.no_game_checkpoint else str(checkpoint_json),
             "game_checkpoint_markdown": None if args.no_game_checkpoint else str(checkpoint_md),
             "opponents": [opponent.get("name", "?") for opponent in opponents],
@@ -1505,6 +1542,7 @@ def main() -> int:
         "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
         "deck_process_isolation": bool(args.isolate_deck_process),
         "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+        "forced_access_mode": args.force_focus_access,
         "game_checkpoint_json": None if args.no_game_checkpoint else str(checkpoint_json),
         "game_checkpoint_markdown": None if args.no_game_checkpoint else str(checkpoint_md),
         "opponents": [opponent.get("name", "?") for opponent in opponents],
@@ -1527,6 +1565,7 @@ def main() -> int:
                 "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
                 "deck_process_isolation": bool(args.isolate_deck_process),
                 "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+                "forced_access_mode": args.force_focus_access,
                 "completed_games": (recent_events[-1].get("completed_games", 0) if recent_events else 0),
                 "total_games": (recent_events[-1].get("total_games", 0) if recent_events else 0),
                 "latest": recent_events[-1] if recent_events else {},

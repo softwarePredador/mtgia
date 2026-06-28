@@ -4167,6 +4167,51 @@ def register_tests(battle, player):
         assert casts[:2] == ["Silence", "Approach of the Second Sun"]
         assert active.has_won() is True
 
+    def test_forced_focus_access_opening_hand_replaces_non_focus_card():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        active = player("Lorehold")
+        active.hand = [_card(f"Filler {index}", cmc=index % 3) for index in range(7)]
+        active.library = [
+            {"name": "The One Ring", "cmc": 4, "type_line": "Legendary Artifact"},
+            _card("Library Filler"),
+        ]
+
+        try:
+            applied = battle.apply_forced_focus_access_to_opening_keep(
+                active,
+                mode="opening_hand",
+                focus_cards=["The One Ring"],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert len(active.hand) == 7
+        assert any(card.get("name") == "The One Ring" for card in active.hand)
+        assert not any(card.get("name") == "The One Ring" for card in active.library)
+        assert applied[0]["status"] == "moved"
+        assert any(event == "forced_focus_access_applied" for event, _ in events)
+
+    def test_forced_focus_access_library_top_preserves_hand_size():
+        active = player("Lorehold")
+        active.hand = [_card(f"Filler {index}", cmc=index % 3) for index in range(7)]
+        active.library = [
+            _card("Library Filler A"),
+            {"name": "The One Ring", "cmc": 4, "type_line": "Legendary Artifact"},
+            _card("Library Filler B"),
+        ]
+
+        applied = battle.apply_forced_focus_access_to_opening_keep(
+            active,
+            mode="library_top",
+            focus_cards=["The One Ring"],
+        )
+
+        assert len(active.hand) == 7
+        assert active.library[0]["name"] == "The One Ring"
+        assert applied[0]["destination_zone"] == "library_top"
+
     def test_pg054_silence_lock_family_rule_provenance():
         cases = [
             (
@@ -19149,6 +19194,8 @@ def register_tests(battle, player):
         test_silence_spell_blocks_responses_until_cleanup_only,
         test_proactive_silence_requires_payoff_after_paying_silence,
         test_proactive_silence_casts_before_second_approach,
+        test_forced_focus_access_opening_hand_replaces_non_focus_card,
+        test_forced_focus_access_library_top_preserves_hand_size,
         test_pg054_silence_lock_family_rule_provenance,
         test_pg055_artifact_mana_rock_family_rule_provenance,
         test_pg058_simple_red_ritual_family_rule_provenance,

@@ -1265,7 +1265,11 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
                     except Exception:
                         exposure = {}
             raw_decision = str(result.get("decision") or aggregate.get("decision") or "")
-            exposure_decision = gate_decision(gate, exposure)
+            exposure_decision = gate_decision(
+                gate,
+                exposure,
+                forced_access_mode=str(result.get("forced_access_mode") or "none"),
+            )
             if exposure.get("low_candidate_added_card_use"):
                 decision = exposure_decision
             else:
@@ -1289,6 +1293,7 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
                 "gate_json": result.get("gate_json"),
                 "gate_markdown": result.get("gate_markdown"),
                 "gate_returncode": result.get("gate_returncode"),
+                "forced_access_mode": result.get("forced_access_mode") or "none",
             }
             by_package_key.setdefault(str(result.get("package_key")), []).append(package_result)
             by_signature.setdefault(
@@ -1883,6 +1888,7 @@ def run_gate(
     gate_timeout_seconds: float = 0.0,
     stem: str = "lorehold_synergy_package_gate",
     no_game_checkpoint: bool = False,
+    forced_access_mode: str = "none",
 ) -> subprocess.CompletedProcess[str]:
     cmd = [
         sys.executable,
@@ -1915,6 +1921,8 @@ def run_gate(
         "--stem",
         stem,
     ]
+    if forced_access_mode and forced_access_mode != "none":
+        cmd.extend(["--force-focus-access", forced_access_mode])
     if no_game_checkpoint:
         cmd.append("--no-game-checkpoint")
     env = dict(os.environ)
@@ -2383,12 +2391,18 @@ def exposure_summary_text(exposure: dict[str, Any]) -> str:
     return f"{status}: " + ", ".join(parts)
 
 
-def gate_decision(gate: dict[str, Any], exposure: dict[str, Any] | None = None) -> str:
+def gate_decision(
+    gate: dict[str, Any],
+    exposure: dict[str, Any] | None = None,
+    forced_access_mode: str = "none",
+) -> str:
     baseline = gate.get("baseline") or {}
     candidate = gate.get("candidate") or {}
     if not baseline or not candidate:
         return "invalid_or_incomplete"
     if exposure and exposure.get("low_candidate_added_card_use"):
+        if forced_access_mode and forced_access_mode != "none":
+            return "forced_access_inconclusive_low_exposure"
         return "inconclusive_low_exposure"
 
     baseline_wins = int(baseline.get("wins") or 0)
@@ -2397,6 +2411,15 @@ def gate_decision(gate: dict[str, Any], exposure: dict[str, Any] | None = None) 
     candidate_losses = int(candidate.get("losses") or 0)
     delta = float(gate.get("delta_pp") or 0.0)
     strategic = strategic_delta(gate)
+
+    if forced_access_mode and forced_access_mode != "none":
+        if delta > 0 or candidate_wins > baseline_wins or (
+            candidate_wins == baseline_wins and candidate_losses < baseline_losses
+        ):
+            return "forced_access_signal_requires_natural_confirmation"
+        if delta == 0 and candidate_wins == baseline_wins:
+            return "forced_access_tie_requires_natural_confirmation"
+        return "forced_access_no_lift_reject_or_rework"
 
     if delta > 0:
         return "promote_to_deeper_gate"
@@ -2425,6 +2448,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- preflight_only: `{payload.get('preflight_only')}`",
         f"- apply_only: `{payload.get('apply_only')}`",
         f"- no_game_checkpoint: `{payload.get('no_game_checkpoint')}`",
+        f"- forced_access_mode: `{payload.get('forced_access_mode', 'none')}`",
         f"- runtime_package_proposal_reports: `{', '.join(payload.get('runtime_package_proposal_reports') or []) or '-'}`",
         f"- package_definition_files: `{', '.join(payload.get('package_definition_files') or []) or '-'}`",
         f"- cut_safety_report: `{payload.get('cut_safety_report') or '-'}`",
@@ -2462,7 +2486,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         candidate = gate.get("candidate") or {}
         delta = float(gate.get("delta_pp") or 0.0)
         exposure = result.get("exposure_summary") or {}
-        decision = gate_decision(gate, exposure)
+        decision = gate_decision(
+            gate,
+            exposure,
+            forced_access_mode=str(result.get("forced_access_mode") or payload.get("forced_access_mode") or "none"),
+        )
         lines.append(
             "| {key} | {family} | {adds} | {cuts} | `{preflight}` | {bw}/{bl}/{bs} `{bwr:.2f}%` | "
             "{cw}/{cl}/{cs} `{cwr:.2f}%` | {delta:+.2f} | {strategic} | {exposure} | {decision} |".format(
@@ -2494,6 +2522,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- family: {result.get('family') or '-'}",
                 f"- hypothesis: {result['hypothesis']}",
                 f"- status: `{result.get('status') or 'gated'}`",
+                f"- forced_access_mode: `{result.get('forced_access_mode') or payload.get('forced_access_mode', 'none')}`",
                 f"- cut_safety: `{json.dumps(result.get('cut_safety') or {}, sort_keys=True)}`",
                 f"- prior_evidence: `{json.dumps(result.get('prior_evidence') or {}, sort_keys=True)}`",
                 f"- allow_miracle_core_cuts: `{result.get('candidate_meta', {}).get('allow_miracle_core_cuts')}`",
@@ -2539,6 +2568,15 @@ def main() -> int:
     parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--apply-only", action="store_true")
     parser.add_argument("--no-game-checkpoint", action="store_true")
+    parser.add_argument(
+        "--forced-access-mode",
+        choices=("none", "opening_hand", "library_top"),
+        default="none",
+        help=(
+            "Run the variant gate in a test-only forced exposure mode for added "
+            "focus cards. Use none for natural games."
+        ),
+    )
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--ignore-prior-results", action="store_true")
     parser.add_argument(
@@ -2700,6 +2738,7 @@ def main() -> int:
                 "prior_evidence": package_prior_evidence,
                 "candidate_db": str(candidate_db),
                 "candidate_meta": candidate_meta,
+                "forced_access_mode": args.forced_access_mode,
                 "gate_json": None,
                 "gate_markdown": None,
                 "gate_returncode": None,
@@ -2726,6 +2765,7 @@ def main() -> int:
             gate_timeout_seconds=max(0.0, args.gate_timeout_seconds),
             stem=gate_stem,
             no_game_checkpoint=bool(args.no_game_checkpoint),
+            forced_access_mode=args.forced_access_mode,
         )
         gate_json = REPORT_DIR / f"{gate_stem}.json"
         gate_md = REPORT_DIR / f"{gate_stem}.md"
@@ -2755,6 +2795,7 @@ def main() -> int:
             "prior_evidence": package_prior_evidence,
             "candidate_db": str(candidate_db),
             "candidate_meta": candidate_meta,
+            "forced_access_mode": args.forced_access_mode,
             "gate_json": str(gate_json) if gate_json.exists() else None,
             "gate_markdown": str(gate_md) if gate_md.exists() else None,
             "gate_returncode": completed.returncode,
@@ -2782,6 +2823,7 @@ def main() -> int:
         "preflight_only": bool(args.preflight_only),
         "apply_only": bool(args.apply_only),
         "no_game_checkpoint": bool(args.no_game_checkpoint),
+        "forced_access_mode": args.forced_access_mode,
         "runtime_package_proposal_reports": [str(path) for path in runtime_package_proposal_reports],
         "package_definition_files": loaded_package_files,
         "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,

@@ -58,6 +58,30 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         cmd = popen.call_args.args[0]
         self.assertIn("--no-game-checkpoint", cmd)
 
+    def test_run_gate_can_force_focus_access_for_targeted_exposure_runs(self):
+        with patch("lorehold_synergy_package_gate.subprocess.Popen") as popen:
+            process = MagicMock()
+            process.pid = 123
+            process.returncode = 0
+            process.communicate.return_value = ("", "")
+            popen.return_value = process
+            gate.run_gate(
+                source_db=Path("/tmp/source.db"),
+                candidate_db=Path("/tmp/candidate.db"),
+                package_key="mana_vault_fast_mana_cut_arcane_signet",
+                games=1,
+                opponent_limit=1,
+                opponent_seed=20260626,
+                simulation_seed=42,
+                game_timeout_seconds=20.0,
+                stem="test_stem",
+                forced_access_mode="opening_hand",
+            )
+
+        cmd = popen.call_args.args[0]
+        self.assertIn("--force-focus-access", cmd)
+        self.assertIn("opening_hand", cmd)
+
     def test_runtime_rule_priority_prefers_land_scaled_treasure_model(self):
         generic = {
             "logical_rule_key": "battle_rule_v1:generic",
@@ -1051,6 +1075,23 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         )
 
         self.assertEqual(gate.gate_decision(gate_summary, exposure), "inconclusive_low_exposure")
+
+    def test_gate_decision_marks_forced_access_positive_as_confirmation_signal(self):
+        gate_summary = {
+            "baseline": {"wins": 0, "losses": 3, "win_rate": 0.0, "telemetry": {}},
+            "candidate": {"wins": 1, "losses": 2, "win_rate": 33.33, "telemetry": {}},
+            "delta_pp": 33.33,
+        }
+        exposure = {"low_candidate_added_card_use": False}
+
+        self.assertEqual(
+            gate.gate_decision(
+                gate_summary,
+                exposure,
+                forced_access_mode="opening_hand",
+            ),
+            "forced_access_signal_requires_natural_confirmation",
+        )
 
     def test_side_card_exposure_distinguishes_library_only_low_access(self):
         row = {

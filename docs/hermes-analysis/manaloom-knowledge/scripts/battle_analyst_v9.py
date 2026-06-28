@@ -287,6 +287,7 @@ OPENING_HAND_RAMP_EFFECTS = {
     "ramp_permanent",
 }
 ENGINE_METRICS = None
+FORCED_FOCUS_ACCESS_MODES = {"none", "opening_hand", "library_top"}
 
 
 def emit_replay_event(event, **data):
@@ -304,6 +305,35 @@ def emit_replay_event(event, **data):
         REPLAY_EVENT_HANDLER(event, data)
     except Exception:
         pass
+
+
+def explicit_focus_access_card_names():
+    raw = os.environ.get("MANALOOM_FOCUS_ACCESS_CARDS", "")
+    if not raw:
+        return tuple()
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        parsed = [part.strip() for part in raw.split("|") if part.strip()]
+    if not isinstance(parsed, list):
+        return tuple()
+    names = []
+    for item in parsed:
+        name = str(item).strip()
+        if name and name not in names:
+            names.append(name)
+    return tuple(names)
+
+
+def forced_focus_access_mode():
+    mode = str(os.environ.get("MANALOOM_FORCE_FOCUS_ACCESS_MODE") or "none").strip().lower()
+    if mode in {"top", "library-top", "library_top"}:
+        return "library_top"
+    if mode in {"hand", "opening-hand", "opening_hand"}:
+        return "opening_hand"
+    if mode not in FORCED_FOCUS_ACCESS_MODES:
+        return "none"
+    return mode
 
 
 def reset_decision_trace_counter():
@@ -6335,6 +6365,11 @@ def play_mulligan(player, rng):
             bottomed_cards=bottomed_cards,
             forced_keep=forced_keep,
         )
+    forced_access = apply_forced_focus_access_to_opening_keep(
+        player,
+        mode=forced_focus_access_mode(),
+        focus_cards=explicit_focus_access_card_names(),
+    )
     emit_focus_card_access_snapshot(
         player,
         turn=0,
@@ -6343,8 +6378,142 @@ def play_mulligan(player, rng):
         opening_reason=evaluation.get("reason"),
         opening_keep=bool(evaluation.get("keep")),
         opening_risk_flags=list(evaluation.get("risk_flags") or []),
+        forced_access_mode=forced_focus_access_mode(),
+        forced_access_applied=forced_access,
     )
     return mulligan_count
+
+
+def _card_name_matches(card, wanted_name):
+    return normalize_card_name(_zone_card_name(card)) == normalize_card_name(wanted_name)
+
+
+def _remove_named_card(cards, wanted_name):
+    for index, card in enumerate(list(cards or [])):
+        if _card_name_matches(card, wanted_name):
+            return cards.pop(index)
+    return None
+
+
+def _choose_forced_access_replacement(hand, focus_names):
+    focus = {normalize_card_name(name) for name in focus_names}
+    candidates = [
+        card
+        for card in hand or []
+        if normalize_card_name(_zone_card_name(card)) not in focus
+    ]
+    if not candidates:
+        return None
+    return min(
+        candidates,
+        key=lambda card: (
+            _mulligan_bottom_priority(card, hand, sum(1 for c in hand if is_effective_land(c))),
+            -_opening_hand_card_cmc(card),
+            _zone_card_name(card),
+        ),
+    )
+
+
+def apply_forced_focus_access_to_opening_keep(player, *, mode=None, focus_cards=None):
+    """Traceable test hook: force explicit focus cards into early access windows."""
+    if getattr(player, "name", None) != "Lorehold":
+        return []
+    mode = str(mode or "none").strip().lower()
+    if mode not in FORCED_FOCUS_ACCESS_MODES or mode == "none":
+        return []
+    focus_names = [str(name).strip() for name in (focus_cards or []) if str(name).strip()]
+    if not focus_names:
+        return []
+
+    applied = []
+    if mode == "library_top":
+        moved_cards = []
+        for card_name in focus_names:
+            if any(_card_name_matches(card, card_name) for card in getattr(player, "hand", []) or []):
+                applied.append({"card": card_name, "mode": mode, "status": "already_in_hand"})
+                continue
+            card = _remove_named_card(player.library, card_name)
+            if card is None:
+                applied.append({"card": card_name, "mode": mode, "status": "not_found"})
+                continue
+            moved_cards.append(card)
+            applied.append(
+                {
+                    "card": _zone_card_name(card),
+                    "mode": mode,
+                    "status": "moved",
+                    "source_zone": "library",
+                    "destination_zone": "library_top",
+                }
+            )
+        for card in reversed(moved_cards):
+            player.library.insert(0, card)
+        for row in applied:
+            emit_replay_event(
+                "forced_focus_access_applied",
+                player=player.name,
+                phase="opening_keep",
+                turn=0,
+                test_only=True,
+                forced_access_mode=mode,
+                **row,
+            )
+        return applied
+
+    for card_name in focus_names:
+        if any(_card_name_matches(card, card_name) for card in getattr(player, "hand", []) or []):
+            row = {"card": card_name, "mode": mode, "status": "already_in_hand"}
+            applied.append(row)
+            emit_replay_event(
+                "forced_focus_access_applied",
+                player=player.name,
+                phase="opening_keep",
+                turn=0,
+                test_only=True,
+                forced_access_mode=mode,
+                **row,
+            )
+            continue
+        card = _remove_named_card(player.library, card_name)
+        if card is None:
+            row = {"card": card_name, "mode": mode, "status": "not_found"}
+            applied.append(row)
+            emit_replay_event(
+                "forced_focus_access_applied",
+                player=player.name,
+                phase="opening_keep",
+                turn=0,
+                test_only=True,
+                forced_access_mode=mode,
+                **row,
+            )
+            continue
+        replacement = _choose_forced_access_replacement(player.hand, focus_names)
+        replacement_name = None
+        if replacement is not None and replacement in player.hand:
+            player.hand.remove(replacement)
+            player.library.append(replacement)
+            replacement_name = _zone_card_name(replacement)
+        player.hand.append(card)
+        row = {
+            "card": _zone_card_name(card),
+            "mode": mode,
+            "status": "moved",
+            "source_zone": "library",
+            "destination_zone": "hand",
+            "replaced_card": replacement_name,
+        }
+        applied.append(row)
+        emit_replay_event(
+            "forced_focus_access_applied",
+            player=player.name,
+            phase="opening_keep",
+            turn=0,
+            test_only=True,
+            forced_access_mode=mode,
+            **row,
+        )
+    return applied
 
 
 def _opening_hand_card_cmc(card):
