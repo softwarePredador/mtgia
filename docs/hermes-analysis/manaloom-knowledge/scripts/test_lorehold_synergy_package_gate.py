@@ -728,6 +728,89 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(classification["status"], "blocked_prior_reject")
         self.assertEqual(classification["matches"][0]["package_key"], "old_mana_vault_probe")
 
+    def test_prior_evidence_loads_cut_safety_observation_rejects(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            prior = Path(tmp) / "strategy_audit.json"
+            prior.write_text(
+                json.dumps(
+                    {
+                        "cut_safety_manifest": {
+                            "cuts": [
+                                {
+                                    "card_name": "Hexing Squelcher",
+                                    "observations": [
+                                        {
+                                            "package_key": "faithless_looting_squee_enabler",
+                                            "family": "discard_rummage_recursion",
+                                            "adds": ["Faithless Looting"],
+                                            "baseline": "8-19",
+                                            "candidate": "4-23",
+                                            "decision": "reject_or_rework",
+                                            "delta_pp": -14.82,
+                                            "strong_seed_delta_pp": -66.67,
+                                        }
+                                    ],
+                                }
+                            ]
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            prior_results = gate.load_prior_package_results([prior])
+            classification = gate.classify_package_prior_evidence(
+                "faithless_looting_squee_enabler",
+                gate.PACKAGE_DEFINITIONS["faithless_looting_squee_enabler"],
+                prior_results,
+            )
+
+        self.assertEqual(classification["status"], "blocked_prior_reject")
+        self.assertEqual(classification["matches"][0]["cuts"], ["Hexing Squelcher"])
+        self.assertEqual(classification["matches"][0]["source_section"], "cut_safety_manifest")
+        self.assertEqual(classification["matches"][0]["delta_pp"], -14.82)
+        self.assertEqual(classification["matches"][0]["baseline"]["wins"], 8)
+        self.assertEqual(classification["matches"][0]["candidate"]["losses"], 23)
+
+    def test_prior_evidence_loads_strategy_audit_package_rows(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            prior = Path(tmp) / "strategy_audit.json"
+            prior.write_text(
+                json.dumps(
+                    {
+                        "post_squee_package_gates": {
+                            "rows": [
+                                {
+                                    "package_key": "faithless_looting_squee_enabler",
+                                    "family": "discard_rummage_recursion",
+                                    "adds": ["Faithless Looting"],
+                                    "cuts": ["Hexing Squelcher"],
+                                    "baseline_wins": 8,
+                                    "baseline_losses": 19,
+                                    "candidate_wins": 4,
+                                    "candidate_losses": 23,
+                                    "decision": "reject_or_rework",
+                                    "delta_pp": -14.82,
+                                }
+                            ]
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            prior_results = gate.load_prior_package_results([prior])
+            classification = gate.classify_package_prior_evidence(
+                "faithless_looting_squee_enabler",
+                gate.PACKAGE_DEFINITIONS["faithless_looting_squee_enabler"],
+                prior_results,
+            )
+
+        self.assertEqual(classification["status"], "blocked_prior_reject")
+        self.assertEqual(classification["matches"][0]["source_section"], "post_squee_package_gates")
+        self.assertEqual(classification["matches"][0]["baseline"]["wins"], 8)
+        self.assertEqual(classification["matches"][0]["candidate"]["wins"], 4)
+
     def test_external_package_definition_file_loads_new_package(self):
         with tempfile.TemporaryDirectory() as tmp:
             package_file = Path(tmp) / "packages.json"
@@ -835,6 +918,10 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
     def test_default_prior_reports_include_rejected_benchmark_gates(self):
         default_names = {path.name for path in gate.DEFAULT_PRIOR_PACKAGE_REPORTS}
 
+        self.assertIn(
+            "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+            default_names,
+        )
         self.assertIn(
             "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
             default_names,

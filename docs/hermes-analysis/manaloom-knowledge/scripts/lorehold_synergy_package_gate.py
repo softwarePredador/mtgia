@@ -50,6 +50,7 @@ DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS = (
     DEFAULT_HIDDEN_RETREAT_RUNTIME_PACKAGE_PROPOSALS,
 )
 DEFAULT_PRIOR_PACKAGE_REPORTS = (
+    DEFAULT_CUT_SAFETY_REPORT,
     REPORT_DIR / "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
     REPORT_DIR / "lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
@@ -1228,6 +1229,94 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
             "strategic_event_counts": telemetry.get("strategic_event_counts") or {},
         }
 
+    def side_from_record_string(raw: Any) -> dict[str, Any]:
+        if not isinstance(raw, str):
+            return {}
+        match = re.match(r"^\s*(\d+)-(\d+)(?:-(\d+))?\s*$", raw)
+        if not match:
+            return {}
+        wins = int(match.group(1))
+        losses = int(match.group(2))
+        stalls = int(match.group(3) or 0)
+        games = max(1, wins + losses + stalls)
+        return {
+            "wins": wins,
+            "losses": losses,
+            "stalls": stalls,
+            "win_rate": round(wins / games * 100, 2),
+        }
+
+    def side_from_observation(result: dict[str, Any], prefix: str) -> dict[str, Any]:
+        side = side_from_record_string(result.get(prefix))
+        wins_key = f"{prefix}_wins"
+        losses_key = f"{prefix}_losses"
+        if result.get(wins_key) is not None and result.get(losses_key) is not None:
+            wins = int(result.get(wins_key) or 0)
+            losses = int(result.get(losses_key) or 0)
+            games = max(1, wins + losses)
+            side.update(
+                {
+                    "wins": wins,
+                    "losses": losses,
+                    "stalls": side.get("stalls", 0),
+                    "win_rate": round(wins / games * 100, 2),
+                }
+            )
+        return side
+
+    def gate_summary_from_flat_result(result: dict[str, Any]) -> dict[str, Any]:
+        baseline = side_from_observation(result, "baseline")
+        candidate = side_from_observation(result, "candidate")
+        if not baseline and not candidate and result.get("delta_pp") is None:
+            return {}
+        return {
+            "baseline": baseline,
+            "candidate": candidate,
+            "delta_pp": result.get("delta_pp"),
+        }
+
+    def package_rows_from_payload(payload: Any) -> list[dict[str, Any]]:
+        if not isinstance(payload, dict):
+            return []
+        rows: list[dict[str, Any]] = []
+        packages = payload.get("packages")
+        if isinstance(packages, list):
+            rows.extend(row for row in packages if isinstance(row, dict))
+        for section_name in ("post_squee_package_gates", "safe_package_gates"):
+            section = payload.get(section_name)
+            section_rows = section.get("rows") if isinstance(section, dict) else None
+            if isinstance(section_rows, list):
+                for row in section_rows:
+                    if isinstance(row, dict):
+                        copied = dict(row)
+                        copied.setdefault("source_section", section_name)
+                        rows.append(copied)
+        manifest = payload.get("cut_safety_manifest")
+        cuts = manifest.get("cuts") if isinstance(manifest, dict) else None
+        if isinstance(cuts, list):
+            for cut in cuts:
+                if not isinstance(cut, dict):
+                    continue
+                cut_card = str(cut.get("card_name") or "").strip()
+                observations = cut.get("observations")
+                if not isinstance(observations, list):
+                    continue
+                for observation in observations:
+                    if not isinstance(observation, dict):
+                        continue
+                    row = dict(observation)
+                    if cut_card and not row.get("cuts"):
+                        row["cuts"] = [cut_card]
+                    row.setdefault("source_section", "cut_safety_manifest")
+                    if "gate_summary" not in row:
+                        row["gate_summary"] = {
+                            "baseline": side_from_observation(row, "baseline"),
+                            "candidate": side_from_observation(row, "candidate"),
+                            "delta_pp": row.get("delta_pp"),
+                        }
+                    rows.append(row)
+        return rows
+
     by_package_key: dict[str, list[dict[str, Any]]] = {}
     by_signature: dict[str, list[dict[str, Any]]] = {}
     loaded_paths: list[str] = []
@@ -1237,13 +1326,18 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
             missing_paths.append(str(path))
             continue
         payload = json.loads(path.read_text(encoding="utf-8"))
-        packages = payload.get("packages") if isinstance(payload, dict) else None
-        if not isinstance(packages, list):
+        packages = package_rows_from_payload(payload)
+        if not packages:
             continue
         loaded_paths.append(str(path))
         for result in packages:
             if not isinstance(result, dict) or not result.get("package_key"):
                 continue
+            if "gate_summary" not in result:
+                flat_gate = gate_summary_from_flat_result(result)
+                if flat_gate:
+                    result = dict(result)
+                    result["gate_summary"] = flat_gate
             gate = result.get("gate_summary") or {}
             aggregate = result.get("aggregate") or {}
             exposure = result.get("exposure_summary") or {}
@@ -1276,19 +1370,26 @@ def load_prior_package_results(paths: list[Path]) -> dict[str, Any]:
                 decision = raw_decision or exposure_decision
             baseline = gate.get("baseline") or {}
             candidate = gate.get("candidate") or {}
+            delta_pp = gate.get("delta_pp", aggregate.get("delta_pp_total", result.get("delta_pp")))
+            has_gate_telemetry = bool(
+                (baseline.get("telemetry") or candidate.get("telemetry"))
+                if isinstance(baseline, dict) and isinstance(candidate, dict)
+                else False
+            )
             package_result = {
                 "package_key": result.get("package_key"),
                 "source_report": str(path),
+                "source_section": result.get("source_section"),
                 "family": result.get("family"),
                 "adds": result.get("adds") or [],
                 "cuts": result.get("cuts") or [],
                 "adds_signature": card_signature(result.get("adds") or []),
                 "cuts_signature": card_signature(result.get("cuts") or []),
                 "decision": decision,
-                "delta_pp": gate.get("delta_pp", aggregate.get("delta_pp_total")),
+                "delta_pp": delta_pp,
                 "baseline": compact_side(baseline),
                 "candidate": compact_side(candidate),
-                "strategic_delta": strategic_delta(gate) if gate else {},
+                "strategic_delta": strategic_delta(gate) if gate and has_gate_telemetry else {},
                 "exposure_summary": exposure,
                 "gate_json": result.get("gate_json"),
                 "gate_markdown": result.get("gate_markdown"),
