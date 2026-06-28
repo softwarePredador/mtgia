@@ -17,6 +17,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -38,6 +39,13 @@ DEFAULT_SOURCE_DB = (
 DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_RUNTIME_PACKAGE_PROPOSALS = (
     REPORT_DIR / "lorehold_runtime_gap_family_queue_20260628_v5_topdeck_damage_proposals.json"
+)
+DEFAULT_HIDDEN_RETREAT_RUNTIME_PACKAGE_PROPOSALS = (
+    REPORT_DIR / "xmage_hidden_retreat_runtime_scope_20260628_v3_proposals.json"
+)
+DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS = (
+    DEFAULT_RUNTIME_PACKAGE_PROPOSALS,
+    DEFAULT_HIDDEN_RETREAT_RUNTIME_PACKAGE_PROPOSALS,
 )
 DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
@@ -335,6 +343,21 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
             "known topdeck engine."
         ),
         "adds": ["Penance"],
+        "cuts": ["Promise of Loyalty"],
+        "allow_miracle_core_cuts": True,
+    },
+    "hidden_retreat_stack_damage_topdeck_cut_promise": {
+        "family": "topdeck_protection",
+        "hypothesis": (
+            "Hidden Retreat now has a local XMage-backed runtime proposal and "
+            "responds to damaging instant/sorcery spells by putting a hand card "
+            "on top of the library and preventing that spell's damage. This "
+            "isolated overlay test measures whether the stack-damage shield plus "
+            "miracle-topdeck setup beats the five-mana Promise of Loyalty pressure "
+            "slot without cutting ramp, medallions, Squee, topdeck engines, or the "
+            "known protection shell."
+        ),
+        "adds": ["Hidden Retreat"],
         "cuts": ["Promise of Loyalty"],
         "allow_miracle_core_cuts": True,
     },
@@ -861,6 +884,7 @@ STRATEGIC_METRICS = (
     "tutor_resolved",
     "random_discard_after_tutor",
     "topdeck_manipulation_activated",
+    "damage_prevention_shield_created",
     "discard_to_top_replacement",
     "lorehold_rummage_discard_to_top",
     "lorehold_spell_rummage_discard_to_top",
@@ -1323,13 +1347,25 @@ def load_runtime_package_rule_rows(
     return rows
 
 
+def runtime_package_proposal_paths(
+    proposals_path: Path | Iterable[Path] | None = None,
+) -> list[Path]:
+    if proposals_path is None:
+        return [path for path in DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS]
+    if isinstance(proposals_path, (str, Path)):
+        return [Path(proposals_path)]
+    return [Path(path) for path in proposals_path]
+
+
 def upsert_runtime_package_rules_for_cards(
     conn: sqlite3.Connection,
     card_names: list[str],
     *,
-    proposals_path: Path = DEFAULT_RUNTIME_PACKAGE_PROPOSALS,
+    proposals_path: Path | Iterable[Path] | None = None,
 ) -> dict[str, dict[str, int]]:
-    rows = load_runtime_package_rule_rows(proposals_path, card_names)
+    rows: list[dict[str, Any]] = []
+    for path in runtime_package_proposal_paths(proposals_path):
+        rows.extend(load_runtime_package_rule_rows(path, card_names))
     if not rows:
         return {}
     battle_rule_registry.ensure_battle_card_rules(conn)
@@ -1404,6 +1440,7 @@ def apply_package(
     adds: list[str],
     cuts: list[str],
     allow_miracle_core_cuts: bool = False,
+    runtime_package_proposals_path: Path | Iterable[Path] | None = None,
 ) -> dict[str, Any]:
     if len(adds) != len(cuts):
         raise RuntimeError("package adds and cuts must have the same length")
@@ -1436,7 +1473,11 @@ def apply_package(
         )
 
     reviewed_rule_upserts = upsert_reviewed_rules_for_cards(conn, adds)
-    runtime_package_rule_upserts = upsert_runtime_package_rules_for_cards(conn, adds)
+    runtime_package_rule_upserts = upsert_runtime_package_rules_for_cards(
+        conn,
+        adds,
+        proposals_path=runtime_package_proposals_path,
+    )
     columns = [row[1] for row in conn.execute("PRAGMA table_info(deck_cards)") if row[1] != "id"]
     candidate_rows: list[dict[str, Any]] = []
     for row in rows:
@@ -1672,6 +1713,7 @@ def strategic_delta_text(gate: dict[str, Any]) -> str:
         "tutor_resolved": "tutor",
         "random_discard_after_tutor": "random discard",
         "topdeck_manipulation_activated": "topdeck",
+        "damage_prevention_shield_created": "shield",
         "discard_to_top_replacement": "discard-to-top",
         "lorehold_rummage_discard_to_top": "rummage-to-top",
         "lorehold_spell_rummage_discard_to_top": "spell-rummage-to-top",
@@ -1724,6 +1766,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- preflight_only: `{payload.get('preflight_only')}`",
         f"- apply_only: `{payload.get('apply_only')}`",
         f"- no_game_checkpoint: `{payload.get('no_game_checkpoint')}`",
+        f"- runtime_package_proposal_reports: `{', '.join(payload.get('runtime_package_proposal_reports') or []) or '-'}`",
         f"- cut_safety_report: `{payload.get('cut_safety_report') or '-'}`",
         f"- prior_package_reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         f"- package_status_counts: `{json.dumps(payload.get('package_status_counts') or {}, sort_keys=True)}`",
@@ -1823,6 +1866,15 @@ def main() -> int:
     parser.add_argument("--no-game-checkpoint", action="store_true")
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--ignore-prior-results", action="store_true")
+    parser.add_argument(
+        "--runtime-package-proposals",
+        type=Path,
+        action="append",
+        help=(
+            "Runtime proposal report to overlay into the copied candidate DB. "
+            "May be passed multiple times; defaults include current local package reports."
+        ),
+    )
     args = parser.parse_args()
 
     source_db = args.source_db.resolve()
@@ -1831,6 +1883,14 @@ def main() -> int:
     cut_safety = load_cut_safety_manifest(cut_safety_report)
     prior_package_reports = [] if args.ignore_prior_results else [
         path.resolve() for path in (args.prior_package_report or list(DEFAULT_PRIOR_PACKAGE_REPORTS))
+    ]
+    runtime_package_proposal_reports = [
+        path.resolve()
+        for path in (
+            args.runtime_package_proposals
+            if args.runtime_package_proposals
+            else list(DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS)
+        )
     ]
     prior_results = load_prior_package_results(prior_package_reports)
     package_keys = [key.strip() for key in args.packages.split(",") if key.strip()]
@@ -1921,6 +1981,7 @@ def main() -> int:
                     adds=list(definition["adds"]),
                     cuts=list(definition["cuts"]),
                     allow_miracle_core_cuts=bool(definition.get("allow_miracle_core_cuts")),
+                    runtime_package_proposals_path=runtime_package_proposal_reports,
                 )
         except Exception as exc:
             result = {
@@ -2028,6 +2089,7 @@ def main() -> int:
         "preflight_only": bool(args.preflight_only),
         "apply_only": bool(args.apply_only),
         "no_game_checkpoint": bool(args.no_game_checkpoint),
+        "runtime_package_proposal_reports": [str(path) for path in runtime_package_proposal_reports],
         "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,
         "cut_safety_summary": cut_safety.get("summary") or {},
         "prior_package_reports": [str(path) for path in prior_package_reports],

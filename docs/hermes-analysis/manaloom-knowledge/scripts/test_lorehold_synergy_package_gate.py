@@ -152,6 +152,23 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "topdeck_protection",
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["hidden_retreat_stack_damage_topdeck_cut_promise"]["family"],
+            "topdeck_protection",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["hidden_retreat_stack_damage_topdeck_cut_promise"]["adds"],
+            ["Hidden Retreat"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["hidden_retreat_stack_damage_topdeck_cut_promise"]["cuts"],
+            ["Promise of Loyalty"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["hidden_retreat_stack_damage_topdeck_cut_promise"][
+                "allow_miracle_core_cuts"
+            ],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["brainstone_topdeck_miracle_cut_squelcher"]["cuts"],
             ["Hexing Squelcher"],
         )
@@ -680,6 +697,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 "telemetry": {
                     "event_counts": {
                         "ritual_mana_added": 1,
+                        "damage_prevention_shield_created": 0,
                     },
                     "strategic_event_counts": {
                         "topdeck_manipulation_activated": 2,
@@ -699,6 +717,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 "telemetry": {
                     "event_counts": {
                         "ritual_mana_added": 4,
+                        "damage_prevention_shield_created": 2,
                     },
                     "strategic_event_counts": {
                         "topdeck_manipulation_activated": 5,
@@ -718,6 +737,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         delta = gate.strategic_delta(payload)
 
         self.assertEqual(delta["topdeck_manipulation_activated"], 3)
+        self.assertEqual(delta["damage_prevention_shield_created"], 2)
         self.assertEqual(delta["hand_to_topdeck_activation"], 3)
         self.assertEqual(delta["birgi_spell_cast_mana"], 2)
         self.assertEqual(delta["ritual_mana_added"], 3)
@@ -729,6 +749,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(delta["squee_to_graveyard"], 3)
         self.assertEqual(delta["squee_upkeep_return"], 3)
         self.assertIn("squee gy +3", gate.strategic_delta_text(payload))
+        self.assertIn("shield +2", gate.strategic_delta_text(payload))
         self.assertIn("ritual +3", gate.strategic_delta_text(payload))
         self.assertIn("tutor +3", gate.strategic_delta_text(payload))
         self.assertIn("random discard +2", gate.strategic_delta_text(payload))
@@ -815,6 +836,68 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             )
             active_rules = gate.active_rules_for_card(conn, "Twinflame Tyrant")
             self.assertEqual([rule["logical_rule_key"] for rule in active_rules], ["battle_rule_v1:pg245_twinflame"])
+
+    def test_runtime_package_upsert_accepts_multiple_proposal_reports(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            unrelated = tmp / "unrelated.json"
+            hidden = tmp / "hidden.json"
+            unrelated.write_text(
+                json.dumps(
+                    {
+                        "proposals": [
+                            {
+                                "card_name": "Brainstone",
+                                "effect_json": {"effect": "topdeck_manipulation"},
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            hidden.write_text(
+                json.dumps(
+                    {
+                        "proposals": [
+                            {
+                                "card_name": "Hidden Retreat",
+                                "effect_json": {
+                                    "effect": "damage_prevention_shield",
+                                    "battle_model_scope": (
+                                        "activated_put_card_from_hand_on_top_library_"
+                                        "prevent_damage_from_target_instant_or_sorcery_spell_v1"
+                                    ),
+                                },
+                                "deck_role_json": {
+                                    "category": "protection",
+                                    "effect": "damage_prevention_shield",
+                                },
+                                "logical_rule_key": "battle_rule_v1:hidden_retreat_test",
+                                "source": "curated",
+                                "confidence": 0.94,
+                                "review_status": "verified",
+                                "execution_status": "auto",
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            conn = sqlite3.connect(":memory:")
+            conn.row_factory = sqlite3.Row
+
+            counts = gate.upsert_runtime_package_rules_for_cards(
+                conn,
+                ["Hidden Retreat"],
+                proposals_path=[unrelated, hidden],
+            )
+
+            self.assertEqual(counts["Hidden Retreat"]["upserted"], 1)
+            active_rules = gate.active_rules_for_card(conn, "Hidden Retreat")
+            self.assertEqual(
+                [rule["logical_rule_key"] for rule in active_rules],
+                ["battle_rule_v1:hidden_retreat_test"],
+            )
 
 
 if __name__ == "__main__":
