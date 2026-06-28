@@ -265,6 +265,27 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
                         },
                         {
                             "active_rule_count": 2,
+                            "card_name": "Whispersilk Cloak",
+                            "deck_count": 1,
+                            "deck_ids": [616],
+                            "effects": ["indestructible"],
+                            "findings": [
+                                {
+                                    "code": "no_trusted_executable_rule",
+                                    "severity": "high",
+                                },
+                                {
+                                    "code": "review_only_or_needs_review_rule",
+                                    "severity": "high",
+                                },
+                            ],
+                            "priority_score": 7092,
+                            "severity": "high",
+                            "total_quantity": 1,
+                            "trusted_executable_rule_count": 0,
+                        },
+                        {
+                            "active_rule_count": 2,
                             "card_name": "Verge Rangers",
                             "deck_count": 3,
                             "deck_ids": [609, 611, 613],
@@ -323,8 +344,8 @@ class ManaLoomLogLearningAuditTest(unittest.TestCase):
             top_codes = {row["code"]: row["count"] for row in evidence["top_finding_codes"]}
             self.assertEqual(top_codes["generic_effect_without_model_scope"], 1)
             self.assertEqual(top_codes["no_active_battle_rule"], 3)
-            self.assertEqual(top_codes["no_trusted_executable_rule"], 10)
-            self.assertEqual(top_codes["review_only_or_needs_review_rule"], 2)
+            self.assertEqual(top_codes["no_trusted_executable_rule"], 11)
+            self.assertEqual(top_codes["review_only_or_needs_review_rule"], 3)
             self.assertEqual(evidence["top_lorehold_runtime_missing_cards"], [])
             waived_cards = {
                 row["card_name"]: row["gap_kind"]

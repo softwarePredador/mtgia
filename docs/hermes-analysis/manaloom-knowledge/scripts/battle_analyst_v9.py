@@ -4091,6 +4091,23 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:bb9ee6595d8b30aa87f1a15879e2703a",
         }
     ),
+    "Whispersilk Cloak": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static_equipment",
+            "cmc": 3.0,
+            "effect": "equipment_static_attachment",
+            "artifact": True,
+            "equipment": True,
+            "mana_cost": "{3}",
+            "equip_cost": "{2}",
+            "grants_shroud": True,
+            "grants_unblockable": True,
+            "attached_creature_cant_be_blocked": True,
+            "battle_model_scope": "equipment_auto_attach_unblockable_shroud_v1",
+            "_rule_oracle_hash": "5384a7231f4c91ab45b4007b0ac7f8dc",
+            "_rule_logical_key": "battle_rule_v1:776e69f786c18a8398012554b8e22907",
+        }
+    ),
     "Goliath Daydreamer": handcrafted_runtime_rule(
         {
             "ability_kind": "triggered",
@@ -4209,6 +4226,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Ancient Copper Dragon",
     "Zirda, the Dawnwaker",
     "Wild Ricochet",
+    "Whispersilk Cloak",
     "Goliath Daydreamer",
     "Twinflame Tyrant",
     "Terror of the Peaks",
@@ -4344,6 +4362,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active battle-rule gap with XMage-backed target instant/sorcery retarget annotation plus executable stack-copy semantics.",
         ["manaloom_log_learning_audit_20260628_v16_after_zirda_runtime", "WildRicochet.java"],
         "2026-06-28T22:45:00Z",
+    ),
+    "Whispersilk Cloak": manual_runtime_waiver_metadata(
+        "Replace review_only indestructible metadata with XMage-backed Equipment shroud and can't-be-blocked attachment semantics.",
+        ["manaloom_log_learning_audit_20260628_v17_after_wild_ricochet_runtime", "WhispersilkCloak.java"],
+        "2026-06-28T23:05:00Z",
     ),
     "Goliath Daydreamer": manual_runtime_waiver_metadata(
         "Replace review_only passive evidence with XMage-backed dream-counter exile and attack free-cast semantics.",
@@ -25956,6 +25979,10 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
             grants.append(keyword)
     if effect_data.get("grants_haste"):
         target["summoning_sick"] = False
+    if effect_data.get("grants_unblockable") or effect_data.get("attached_creature_cant_be_blocked"):
+        target["unblockable"] = True
+        target["cant_be_blocked"] = True
+        grants.append("unblockable")
     if effect_data.get("protection_from_non_commander_identity_colors"):
         target["protection_from_non_commander_identity_colors"] = True
         grants.append("protection_from_non_commander_identity_colors")
@@ -35537,6 +35564,15 @@ def creature_cannot_block(creature):
     )
 
 
+def attacker_cannot_be_blocked(creature):
+    return bool(
+        creature.get("unblockable")
+        or creature.get("cant_be_blocked")
+        or creature.get("cannot_be_blocked")
+        or creature.get("can't_be_blocked")
+    )
+
+
 def cant_attack_alone(creature):
     return bool(
         creature.get("cant_attack_alone")
@@ -36582,6 +36618,9 @@ def declare_blockers_step(target, attackers, turn, rng):
     block_assignments = []
     assigned_blockers = []
     for a in sorted(attackers, key=lambda creature: creature.get("power", 2), reverse=True):
+        if attacker_cannot_be_blocked(a):
+            block_assignments.append((a, []))
+            continue
         available = [
             blocker
             for blocker in target.creatures_for_blocking()
