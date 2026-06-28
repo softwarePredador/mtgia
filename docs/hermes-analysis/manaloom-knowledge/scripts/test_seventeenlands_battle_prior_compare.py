@@ -46,6 +46,41 @@ def fixture_events() -> list[dict[str, object]]:
     ]
 
 
+def fixture_gate_report(*, accessed: bool) -> dict[str, object]:
+    focus_summary = {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+            "accessed_games": 1 if accessed else 0,
+            "dominant_zone": "hand" if accessed else "library",
+            "drawn_games": 1 if accessed else 0,
+            "library_only_games": 0 if accessed else 2,
+            "near_access_games": 0,
+            "opening_hand_games": 0,
+            "trace_count": 4,
+            "trace_games": 2,
+            "zone_counts": {"hand": 2} if accessed else {"library": 4},
+        }
+    }
+    return {
+        "results": [
+            {"deck_key": "current_607", "games": 2, "telemetry": {}},
+            {
+                "deck_key": "candidate_607_birgi_v1",
+                "games": 2,
+                "telemetry": {
+                    "card_event_counts": {},
+                    "card_strategy_counts": {},
+                    "event_counts": {
+                        "land_played": 4,
+                        "spell_cast": 3,
+                        "miracle_cast": 1,
+                    },
+                    "focus_card_access_summary": focus_summary,
+                },
+            },
+        ]
+    }
+
+
 def test_summarize_events_counts_turn_metrics_and_candidate_observations() -> None:
     observed = compare.summarize_events(
         fixture_events(),
@@ -98,8 +133,51 @@ def test_run_reads_json_and_jsonl() -> None:
         assert report["observed_summary"]["game_count"] == 2
 
 
+def test_run_gate_report_marks_accessed_candidate_as_observed() -> None:
+    with tempfile.TemporaryDirectory() as tmp_name:
+        tmp = Path(tmp_name)
+        prior = tmp / "prior.json"
+        gate = tmp / "gate.json"
+        prior.write_text(json.dumps(fixture_prior()) + "\n", encoding="utf-8")
+        gate.write_text(json.dumps(fixture_gate_report(accessed=True)) + "\n", encoding="utf-8")
+        report = compare.run_gate_report(
+            prior_path=prior,
+            gate_report_path=gate,
+            candidate_key="candidate_607_birgi_v1",
+            candidate_cards=["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+            player_slots=2,
+        )
+        observations = report["observed_summary"]["candidate_observations"]
+        assert observations["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]["observed"] is True
+        assert report["status"] in {"battle_prior_passed", "battle_prior_warning"}
+        assert report["postgres_writes"] is False
+
+
+def test_run_gate_report_marks_library_only_candidate_inconclusive() -> None:
+    with tempfile.TemporaryDirectory() as tmp_name:
+        tmp = Path(tmp_name)
+        prior = tmp / "prior.json"
+        gate = tmp / "gate.json"
+        prior.write_text(json.dumps(fixture_prior()) + "\n", encoding="utf-8")
+        gate.write_text(json.dumps(fixture_gate_report(accessed=False)) + "\n", encoding="utf-8")
+        report = compare.run_gate_report(
+            prior_path=prior,
+            gate_report_path=gate,
+            candidate_key="candidate_607_birgi_v1",
+            candidate_cards=["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+            player_slots=2,
+        )
+        observations = report["observed_summary"]["candidate_observations"]
+        observed = observations["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]
+        assert observed["observed"] is False
+        assert observed["evidence_level"] == "library_only"
+        assert report["status"] == "inconclusive_candidate_unobserved"
+
+
 if __name__ == "__main__":
     test_summarize_events_counts_turn_metrics_and_candidate_observations()
     test_compare_to_prior_flags_missing_candidate()
     test_run_reads_json_and_jsonl()
-    print("3 tests passed")
+    test_run_gate_report_marks_accessed_candidate_as_observed()
+    test_run_gate_report_marks_library_only_candidate_inconclusive()
+    print("5 tests passed")

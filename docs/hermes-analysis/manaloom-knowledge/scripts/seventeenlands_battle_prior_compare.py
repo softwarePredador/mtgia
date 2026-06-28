@@ -14,7 +14,7 @@ import argparse
 import json
 from collections import Counter
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 
 DEFAULT_PRIOR_JSON = Path(
@@ -310,12 +310,279 @@ def compare_to_prior(prior: dict[str, Any], observed: dict[str, Any]) -> dict[st
     }
 
 
+def numeric_count(value: Any) -> float:
+    parsed = parse_float(value)
+    return float(parsed or 0.0)
+
+
+def classify_gate_event(kind: str) -> str | None:
+    normalized = normalize_text(kind).replace(" ", "_")
+    if normalized in {"play_land", "land_play", "land_played"}:
+        return "land_play_entries"
+    if "combat_damage" in normalized:
+        return "total_combat_damage"
+    if "creature" in normalized and "cast" in normalized and "noncreature" not in normalized:
+        return "creature_cast_entries"
+    if "cast" in normalized or normalized in {"spell_resolved", "miracle_cast"}:
+        return "noncreature_cast_entries"
+    return None
+
+
+def gate_whole_game_metrics(telemetry: Mapping[str, Any]) -> dict[str, Any]:
+    counts = telemetry.get("event_counts") or {}
+    metrics = Counter()
+    if isinstance(counts, Mapping):
+        for raw_kind, count in counts.items():
+            metric = classify_gate_event(str(raw_kind))
+            if metric is None:
+                continue
+            metrics[metric] += numeric_count(count)
+            if metric in {"creature_cast_entries", "noncreature_cast_entries"}:
+                metrics["spell_action_entries"] += numeric_count(count)
+    return {
+        "active_mana_spent_avg_positive": None,
+        "creature_cast_entries": int(metrics["creature_cast_entries"]),
+        "land_play_entries": int(metrics["land_play_entries"]),
+        "noncreature_cast_entries": int(metrics["noncreature_cast_entries"]),
+        "spell_action_entries": int(metrics["spell_action_entries"]),
+        "total_combat_damage": float(metrics["total_combat_damage"]),
+    }
+
+
+def direct_card_event_count(telemetry: Mapping[str, Any], card_name: str) -> int:
+    normalized = normalize_text(card_name)
+    total = 0
+    for field in ("card_strategy_counts", "card_event_counts"):
+        counts = telemetry.get(field) or {}
+        if not isinstance(counts, Mapping):
+            continue
+        for key, count in counts.items():
+            if normalized and normalized in normalize_text(key):
+                total += int(numeric_count(count))
+    return total
+
+
+def focus_payload_for_card(
+    focus_summary: Mapping[str, Any],
+    card_name: str,
+) -> tuple[str | None, Mapping[str, Any]]:
+    normalized = normalize_text(card_name)
+    for key, payload in focus_summary.items():
+        if normalize_text(key) == normalized and isinstance(payload, Mapping):
+            return str(key), payload
+    return None, {}
+
+
+def summarize_gate_candidate_observations(
+    telemetry: Mapping[str, Any],
+    candidate_cards: list[str],
+) -> dict[str, dict[str, Any]]:
+    focus_summary = telemetry.get("focus_card_access_summary") or {}
+    if not isinstance(focus_summary, Mapping):
+        focus_summary = {}
+    observations: dict[str, dict[str, Any]] = {}
+    for card in candidate_cards:
+        matched_focus_name, focus = focus_payload_for_card(focus_summary, card)
+        direct_events = direct_card_event_count(telemetry, card)
+        trace_count = int(numeric_count(focus.get("trace_count") if focus else 0))
+        accessed_games = int(numeric_count(focus.get("accessed_games") if focus else 0))
+        near_access_games = int(numeric_count(focus.get("near_access_games") if focus else 0))
+        drawn_games = int(numeric_count(focus.get("drawn_games") if focus else 0))
+        opening_hand_games = int(numeric_count(focus.get("opening_hand_games") if focus else 0))
+        library_only_games = int(numeric_count(focus.get("library_only_games") if focus else 0))
+        observed = any(
+            value > 0
+            for value in (
+                accessed_games,
+                near_access_games,
+                drawn_games,
+                opening_hand_games,
+                direct_events,
+            )
+        )
+        if accessed_games or drawn_games or opening_hand_games:
+            evidence_level = "accessed"
+        elif near_access_games:
+            evidence_level = "near_access"
+        elif direct_events:
+            evidence_level = "direct_event"
+        elif library_only_games:
+            evidence_level = "library_only"
+        elif trace_count:
+            evidence_level = "trace_only"
+        else:
+            evidence_level = "not_observed"
+        observations[card] = {
+            "accessed_games": accessed_games,
+            "direct_card_events": direct_events,
+            "drawn_games": drawn_games,
+            "evidence_level": evidence_level,
+            "first_turn": None,
+            "focus_summary_card_name": matched_focus_name,
+            "library_only_games": library_only_games,
+            "near_access_games": near_access_games,
+            "observed": observed,
+            "opening_hand_games": opening_hand_games,
+            "total_events": direct_events + trace_count,
+            "trace_count": trace_count,
+        }
+    return observations
+
+
+def find_gate_result(
+    gate_report: Mapping[str, Any],
+    candidate_key: str | None,
+) -> dict[str, Any]:
+    results = gate_report.get("results") or []
+    if not isinstance(results, list):
+        return {}
+    rows = [row for row in results if isinstance(row, dict)]
+    if candidate_key:
+        for row in rows:
+            if str(row.get("deck_key") or row.get("key") or "") == candidate_key:
+                return dict(row)
+    for row in rows:
+        deck_key = str(row.get("deck_key") or row.get("key") or "")
+        if deck_key.startswith("candidate"):
+            return dict(row)
+    return dict(rows[-1]) if rows else {}
+
+
+def summarize_gate_result(
+    gate_result: Mapping[str, Any],
+    *,
+    candidate_cards: list[str],
+    player_slots: int | None,
+) -> dict[str, Any]:
+    telemetry = gate_result.get("telemetry") or {}
+    if not isinstance(telemetry, Mapping):
+        telemetry = {}
+    game_count = max(1, int(gate_result.get("games") or 1))
+    inferred_player_slots = max(1, int(player_slots or 2))
+    event_counts = telemetry.get("event_counts") or {}
+    event_count = int(sum(numeric_count(value) for value in event_counts.values())) if isinstance(event_counts, Mapping) else 0
+    return {
+        "candidate_observations": summarize_gate_candidate_observations(
+            telemetry,
+            candidate_cards,
+        ),
+        "event_count": event_count,
+        "game_count": game_count,
+        "gate_deck_key": gate_result.get("deck_key"),
+        "player_slots": inferred_player_slots,
+        "turn_behavior_metrics": {},
+        "whole_game_behavior_metrics": gate_whole_game_metrics(telemetry),
+    }
+
+
+def summed_prior_metrics(prior: Mapping[str, Any]) -> dict[str, Any]:
+    prior_metrics = (
+        prior.get("sample_summary", {}).get("turn_behavior_metrics", {})
+        if isinstance(prior.get("sample_summary"), Mapping)
+        else {}
+    )
+    totals = Counter()
+    for payload in prior_metrics.values():
+        if not isinstance(payload, Mapping):
+            continue
+        for key in (
+            "creature_cast_entries",
+            "land_play_entries",
+            "noncreature_cast_entries",
+            "spell_action_entries",
+            "total_combat_damage",
+        ):
+            totals[key] += numeric_count(payload.get(key))
+    return {
+        "active_mana_spent_avg_positive": None,
+        "creature_cast_entries": int(totals["creature_cast_entries"]),
+        "land_play_entries": int(totals["land_play_entries"]),
+        "noncreature_cast_entries": int(totals["noncreature_cast_entries"]),
+        "spell_action_entries": int(totals["spell_action_entries"]),
+        "total_combat_damage": float(totals["total_combat_damage"]),
+    }
+
+
+def compare_gate_to_prior(prior: dict[str, Any], observed: dict[str, Any]) -> dict[str, Any]:
+    prior_rows = int(prior.get("rows_sampled") or 1)
+    observed_games = int(observed["game_count"] or 1)
+    prior_player_slots = 2
+    observed_player_slots = int(observed.get("player_slots") or 1)
+    prior_denominator = prior_rows * prior_player_slots
+    observed_denominator = observed_games * observed_player_slots
+    prior_totals = summed_prior_metrics(prior)
+    observed_totals = observed["whole_game_behavior_metrics"]
+    keys = [
+        "land_play_entries",
+        "spell_action_entries",
+        "creature_cast_entries",
+        "noncreature_cast_entries",
+        "total_combat_damage",
+    ]
+    comparison: dict[str, Any] = {}
+    flags: list[dict[str, Any]] = []
+    for key in keys:
+        prior_per_slot = per_player_slot(prior_totals.get(key), prior_denominator)
+        observed_per_slot = per_player_slot(observed_totals.get(key), observed_denominator)
+        metric_ratio = ratio(observed_per_slot, prior_per_slot)
+        comparison[key] = {
+            "observed_per_player_slot": observed_per_slot,
+            "prior_per_player_slot": prior_per_slot,
+            "ratio": metric_ratio,
+        }
+        if metric_ratio is not None and (metric_ratio >= 2.0 or metric_ratio <= 0.5):
+            flags.append(
+                {
+                    "metric": key,
+                    "observed_per_player_slot": observed_per_slot,
+                    "prior_per_player_slot": prior_per_slot,
+                    "ratio": metric_ratio,
+                    "scope": "whole_game",
+                }
+            )
+
+    for card, card_report in observed["candidate_observations"].items():
+        if not card_report["observed"]:
+            flags.append(
+                {
+                    "card": card,
+                    "evidence_level": card_report.get("evidence_level"),
+                    "metric": "candidate_observation",
+                    "reason": "candidate_card_never_accessed_or_near_accessed",
+                }
+            )
+
+    return {
+        "comparison_whole_game": comparison,
+        "flags": flags,
+        "prior_rows_sampled": prior_rows,
+        "prior_player_slots": prior_player_slots,
+        "observed_game_count": observed_games,
+        "observed_player_slots": observed_player_slots,
+    }
+
+
+def battle_prior_status(comparison: Mapping[str, Any]) -> str:
+    flags = comparison.get("flags") or []
+    if any(isinstance(flag, Mapping) and flag.get("metric") == "candidate_observation" for flag in flags):
+        return "inconclusive_candidate_unobserved"
+    if flags:
+        return "battle_prior_warning"
+    return "battle_prior_passed"
+
+
 def render_markdown(report: dict[str, Any]) -> str:
+    source_label = "Events"
+    source_value = report.get("events_path")
+    if report.get("gate_report_path"):
+        source_label = "Gate report"
+        source_value = report.get("gate_report_path")
     lines = [
         "# 17Lands Battle Prior Comparison",
         "",
         f"- Prior: `{report['prior_path']}`",
-        f"- Events: `{report['events_path']}`",
+        f"- {source_label}: `{source_value}`",
+        f"- Status: `{report.get('status')}`",
         f"- Event count: `{report['observed_summary']['event_count']}`",
         f"- Game count: `{report['observed_summary']['game_count']}`",
         f"- Player slots: `{report['observed_summary']['player_slots']}`",
@@ -333,8 +600,11 @@ def render_markdown(report: dict[str, Any]) -> str:
     for card, payload in report["observed_summary"]["candidate_observations"].items():
         lines.append(f"- {card}: `{payload}`")
     lines.extend(["", "## Turn Comparison", ""])
-    for turn, payload in list(report["comparison"]["comparison_by_turn"].items())[:12]:
-        lines.append(f"- Turn {turn}: `{payload}`")
+    if report["comparison"].get("comparison_by_turn"):
+        for turn, payload in list(report["comparison"]["comparison_by_turn"].items())[:12]:
+            lines.append(f"- Turn {turn}: `{payload}`")
+    if report["comparison"].get("comparison_whole_game"):
+        lines.append(f"- Whole game: `{report['comparison']['comparison_whole_game']}`")
     lines.append("")
     return "\n".join(lines)
 
@@ -364,6 +634,36 @@ def run(
         "observed_summary": observed,
         "postgres_writes": False,
         "prior_path": str(prior_path),
+        "status": battle_prior_status(comparison),
+        "source_db_mutated": False,
+    }
+
+
+def run_gate_report(
+    *,
+    prior_path: Path,
+    gate_report_path: Path,
+    candidate_key: str | None,
+    candidate_cards: list[str],
+    player_slots: int | None,
+) -> dict[str, Any]:
+    prior = load_json(prior_path)
+    gate_report = load_json(gate_report_path)
+    gate_result = find_gate_result(gate_report, candidate_key)
+    observed = summarize_gate_result(
+        gate_result,
+        candidate_cards=candidate_cards,
+        player_slots=player_slots,
+    )
+    comparison = compare_gate_to_prior(prior, observed)
+    return {
+        "candidate_key": candidate_key,
+        "comparison": comparison,
+        "gate_report_path": str(gate_report_path),
+        "observed_summary": observed,
+        "postgres_writes": False,
+        "prior_path": str(prior_path),
+        "status": battle_prior_status(comparison),
         "source_db_mutated": False,
     }
 
@@ -371,7 +671,9 @@ def run(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prior-json", type=Path, default=DEFAULT_PRIOR_JSON)
-    parser.add_argument("--events-jsonl", type=Path, required=True)
+    parser.add_argument("--events-jsonl", type=Path)
+    parser.add_argument("--gate-report-json", type=Path)
+    parser.add_argument("--candidate-key")
     parser.add_argument("--candidate-card", action="append", default=[])
     parser.add_argument("--game-count", type=int)
     parser.add_argument("--player-slots", type=int)
@@ -382,13 +684,24 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    report = run(
-        prior_path=args.prior_json,
-        events_path=args.events_jsonl,
-        candidate_cards=args.candidate_card,
-        game_count=args.game_count,
-        player_slots=args.player_slots,
-    )
+    if bool(args.events_jsonl) == bool(args.gate_report_json):
+        raise SystemExit("provide exactly one of --events-jsonl or --gate-report-json")
+    if args.events_jsonl:
+        report = run(
+            prior_path=args.prior_json,
+            events_path=args.events_jsonl,
+            candidate_cards=args.candidate_card,
+            game_count=args.game_count,
+            player_slots=args.player_slots,
+        )
+    else:
+        report = run_gate_report(
+            prior_path=args.prior_json,
+            gate_report_path=args.gate_report_json,
+            candidate_key=args.candidate_key,
+            candidate_cards=args.candidate_card,
+            player_slots=args.player_slots,
+        )
     if args.output_json:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
         args.output_json.write_text(stable_json(report) + "\n", encoding="utf-8")

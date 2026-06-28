@@ -34,6 +34,44 @@ class LoreholdRegistryCandidateRunnerTest(unittest.TestCase):
             "birgi_v1",
         )
 
+    def test_added_cards_for_plan_reads_research_plan(self):
+        self.assertEqual(
+            runner.added_cards_for_plan("birgi_v1"),
+            ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+        )
+
+    def test_extract_child_status_from_noisy_stdout(self):
+        payload = runner.extract_child_status(
+            "running candidate\n"
+            '{\n  "status": "ready",\n  "json": "/tmp/gate.json"\n}\n'
+        )
+
+        self.assertEqual(payload["status"], "ready")
+        self.assertEqual(payload["json"], "/tmp/gate.json")
+
+    def test_command_payloads_include_focus_and_battle_prior(self):
+        commands = runner.command_payloads(
+            plan="birgi_v1",
+            python="python3",
+            source_db=runner.DEFAULT_SOURCE_DB,
+            battle_prior_json=runner.DEFAULT_BATTLE_PRIOR_JSON,
+            battle_prior_player_slots=2,
+            candidate_cards=runner.added_cards_for_plan("birgi_v1"),
+            games=1,
+            opponent_limit=1,
+            opponent_seed=7,
+            simulation_seed=11,
+            game_timeout_seconds=3.0,
+            force_focus_access="opening_hand",
+            stem="unit",
+        )
+
+        self.assertEqual(commands["candidate_key"], "candidate_607_birgi_v1")
+        self.assertIn("Birgi, God of Storytelling", commands["focus_access_env"])
+        self.assertIn("opening_hand", commands["gate_command"])
+        self.assertIn("--gate-report-json", commands["battle_prior_command"])
+        self.assertIn("--candidate-card", commands["battle_prior_command"])
+
 
 if __name__ == "__main__":
     unittest.main()
