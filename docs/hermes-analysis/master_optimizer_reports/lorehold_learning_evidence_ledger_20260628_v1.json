@@ -1,0 +1,5028 @@
+{
+  "actionable_confirmation_queue": [
+    {
+      "best_delta_pp": 55.56,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_setup"
+      ],
+      "latest_adds": [
+        "Brainstone"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 9,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 7,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "brainstone_topdeck_miracle_cut_squelcher",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -77.78
+    },
+    {
+      "best_delta_pp": 44.44,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "payoff_challenge"
+      ],
+      "latest_adds": [
+        "Dance with Calamity"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Storm Herd"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "core_challenge_dance_over_storm",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -88.89
+    },
+    {
+      "best_delta_pp": 44.44,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_freecast"
+      ],
+      "latest_adds": [
+        "Galvanoth"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "galvanoth_topdeck_freecast",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "life_floor_protection"
+      ],
+      "latest_adds": [
+        "Angel's Grace"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 2,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Dawn's Truce"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_life_floor_conversion_gate_20260627_seed7_v1_life_floor_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "angel_grace_life_floor_cut_dawn",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_life_floor_conversion_gate_20260627_seed20260625_v1_life_floor_v1.json",
+        "lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1.json",
+        "lorehold_life_floor_conversion_gate_20260627_seed7_v1_life_floor_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -88.89
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Seething Song"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 15,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 14,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Pearl Medallion",
+        "Ruby Medallion"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_spellchain_conversion_gate_20260627_seed7_v1_spellchain_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "birgi_seething_chain_cut_medallions",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1.json",
+        "lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1.json",
+        "lorehold_spellchain_conversion_gate_20260627_seed7_v1_spellchain_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_freecast"
+      ],
+      "latest_adds": [
+        "Galvanoth"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 12,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Victory Chimes"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_squee_refinement_package_gate_20260627_v2_seed20260625_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+        "lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+        "lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "tutor_access"
+      ],
+      "latest_adds": [
+        "Gamble"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 16,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 13,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Creative Technique"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_tutor_access_conversion_gate_20260627_seed7_v1_tutor_access_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "gamble_approach_access_cut_creative",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_tutor_access_conversion_gate_20260627_seed20260625_v1_tutor_access_v1.json",
+        "lorehold_tutor_access_conversion_gate_20260627_seed42_v1_tutor_access_v1.json",
+        "lorehold_tutor_access_conversion_gate_20260627_seed7_v1_tutor_access_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "targeted_commander_protection"
+      ],
+      "latest_adds": [
+        "Gods Willing"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 7,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Promise of Loyalty"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 33.33,
+      "latest_source_file": "lorehold_targeted_shield_package_gate_20260628_seed7_targeted_shield_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "gods_willing_commander_shield_cut_promise",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_targeted_shield_package_gate_20260628_seed20260625_targeted_shield_v3.json",
+        "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+        "lorehold_targeted_shield_package_gate_20260628_seed7_targeted_shield_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "draw_protection"
+      ],
+      "latest_adds": [
+        "The One Ring"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 11,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "one_ring_protection_draw_cut_squelcher",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -77.78
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 9,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "birgi_spellchain_cut_squelcher",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "payoff_challenge"
+      ],
+      "latest_adds": [
+        "Aetherflux Reservoir"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 12,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Storm Herd"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "core_challenge_aetherflux_over_storm",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_freecast"
+      ],
+      "latest_adds": [
+        "Galvanoth"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 16,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "pressure_absorber"
+      ],
+      "latest_adds": [
+        "Ghostly Prison"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 16,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 4,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "ghostly_prison_pressure_cut_squelcher",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_protection"
+      ],
+      "latest_adds": [
+        "Penance"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 10,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 7,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "penance_topdeck_protection_cut_squelcher",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "cost_reduce_copy"
+      ],
+      "latest_adds": [
+        "Primal Amulet // Primal Wellspring"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 1,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_topfreecast_conversion_gate_20260627_seed7_v1_topfreecast_v1.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "primal_amulet_spell_engine",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_topfreecast_conversion_gate_20260627_seed20260625_v1_topfreecast_v1.json",
+        "lorehold_topfreecast_conversion_gate_20260627_seed42_v1_topfreecast_v1.json",
+        "lorehold_topfreecast_conversion_gate_20260627_seed7_v1_topfreecast_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": 11.11,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_setup"
+      ],
+      "latest_adds": [
+        "Brainstone"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 2,
+      "observation_count": 4,
+      "package_key": "brainstone_topdeck_miracle",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -50.0
+    },
+    {
+      "best_delta_pp": 11.11,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "discard_rummage_recursion"
+      ],
+      "latest_adds": [
+        "Faithless Looting"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 6,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "faithless_looting_squee_enabler",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 8.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Brass's Bounty"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 12,
+        "miracle_cast": 30,
+        "squee_to_graveyard": 5,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 24,
+        "win_rate": 25.0,
+        "wins": 4
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 12,
+        "miracle_cast": 30,
+        "squee_to_graveyard": 5,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 25,
+        "win_rate": 25.0,
+        "wins": 4
+      },
+      "latest_cuts": [
+        "Boros Signet"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "brass_bounty_cut_boros_signet",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_brass_bounty_gate_20260627_v2_20260627_211959.json",
+        "lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+        "lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725.json",
+        "lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848.json"
+      ],
+      "tie_count": 2,
+      "worst_delta_pp": -12.5
+    },
+    {
+      "best_delta_pp": 50.0,
+      "classification": "positive_signal_needs_confirmation",
+      "families": [
+        "graveyard_recast"
+      ],
+      "latest_adds": [
+        "Past in Flames"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 100.0,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 50.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 0,
+      "observation_count": 1,
+      "package_key": "past_in_flames_recast",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": 50.0
+    }
+  ],
+  "generated_at": "2026-06-28T07:15:14.335996+00:00",
+  "hidden_retreat": {
+    "best_delta_pp": -66.67,
+    "classification": "latest_rejected",
+    "families": [
+      "topdeck_protection"
+    ],
+    "latest_adds": [
+      "Hidden Retreat"
+    ],
+    "latest_baseline": {
+      "damage_prevention_shield_created": 0,
+      "games": 3,
+      "hand_to_topdeck_activation": 0,
+      "losses": 0,
+      "miracle_cast": 13,
+      "squee_to_graveyard": 4,
+      "squee_upkeep_return": 3,
+      "stalls": 0,
+      "status": "pass",
+      "topdeck_manipulation_activated": 12,
+      "win_rate": 100.0,
+      "wins": 3
+    },
+    "latest_candidate": {
+      "damage_prevention_shield_created": 0,
+      "games": 3,
+      "hand_to_topdeck_activation": 0,
+      "losses": 2,
+      "miracle_cast": 3,
+      "squee_to_graveyard": 0,
+      "squee_upkeep_return": 0,
+      "stalls": 0,
+      "status": "pass",
+      "topdeck_manipulation_activated": 0,
+      "win_rate": 33.33,
+      "wins": 1
+    },
+    "latest_cuts": [
+      "Promise of Loyalty"
+    ],
+    "latest_decision": "reject_or_rework",
+    "latest_delta_pp": -66.67,
+    "latest_source_file": "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+    "negative_count": 1,
+    "observation_count": 1,
+    "package_key": "hidden_retreat_stack_damage_topdeck_cut_promise",
+    "positive_count": 0,
+    "registry": {},
+    "sources": [
+      "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json"
+    ],
+    "tie_count": 0,
+    "worst_delta_pp": -66.67
+  },
+  "package_groups": [
+    {
+      "best_delta_pp": 88.89,
+      "classification": "current_champion",
+      "families": [
+        "strategy-first-squee-cached-timeout"
+      ],
+      "latest_adds": [],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 9,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 13,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 14,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 9,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 13,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json",
+      "negative_count": 2,
+      "observation_count": 10,
+      "package_key": "candidate_607_squee_v1",
+      "positive_count": 4,
+      "registry": {
+        "learning": "Squee cleared the relevant-opponent probe and then beat deck_607 in two completed equal gates. The seed42 rerun preserved the baseline at 55.56% while Squee climbed to 77.78%, and the harsher seed99 gate still left Squee ahead while doubling miracle and topdeck event frequency over the baseline. This is the first tested swap that has actually dethroned deck_607 on repeated real-opponent evidence.",
+        "result": "scoped probe 3W/0L/0S; equal gate rerun seed42 7W/1L/1S vs deck_607 5W/4L/0S; equal gate seed99 2W/7L/0S vs deck_607 1W/8L/0S",
+        "section": "tested",
+        "status": "promoted_current_champion",
+        "swap_or_scope": "+Squee, Goblin Nabob; -Insurrection"
+      },
+      "sources": [
+        "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260624_v1.json",
+        "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+        "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260626_v1.json",
+        "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260627_v1.json",
+        "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed21_20260627_v1.json",
+        "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed42_20260627_v1.json",
+        "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",
+        "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json"
+      ],
+      "tie_count": 4,
+      "worst_delta_pp": -33.33
+    },
+    {
+      "best_delta_pp": 37.5,
+      "classification": "latest_rejected",
+      "families": [
+        "pressure_absorber"
+      ],
+      "latest_adds": [
+        "Ghostly Prison"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 1,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Promise of Loyalty"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+      "negative_count": 1,
+      "observation_count": 5,
+      "package_key": "ghostly_prison_pressure_cut_promise",
+      "positive_count": 4,
+      "registry": {},
+      "sources": [
+        "lorehold_ghostly_promise_gate_20260627_v1_games2_opp8_20260627_221429.json",
+        "lorehold_ghostly_promise_gate_20260627_v2_seed7_smoke_opp8_20260627_221507.json",
+        "lorehold_ghostly_promise_gate_20260627_v3_seed99_games3_opp8_20260627_221640.json",
+        "lorehold_ghostly_promise_integration_gate_20260627_v2_seed314_games3_opp8_20260627_223721.json",
+        "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": 25.0,
+      "classification": "latest_rejected",
+      "families": [
+        "spell_protection"
+      ],
+      "latest_adds": [
+        "Overmaster"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 66.67,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Tibalt's Trickery"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -33.33,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+      "negative_count": 2,
+      "observation_count": 4,
+      "package_key": "overmaster_protect_draw_cut_tibalts_trickery",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_overmaster_tibalt_gate_20260627_v2_smoke_opp8_20260627_215233.json",
+        "lorehold_overmaster_tibalt_gate_20260627_v3_seed7_smoke_opp8_20260627_215341.json",
+        "lorehold_overmaster_tibalt_gate_20260627_v4_games2_opp8_20260627_215440.json",
+        "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -33.33
+    },
+    {
+      "best_delta_pp": 12.5,
+      "classification": "latest_rejected",
+      "families": [
+        "payoff_challenge"
+      ],
+      "latest_adds": [
+        "Past in Flames"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 12,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 12.5,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 17,
+        "squee_to_graveyard": 2,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Tragic Arrogance"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -12.5,
+      "latest_source_file": "lorehold_past_tragic_gate_20260627_v4_seed123_smoke_opp8_20260627_220625.json",
+      "negative_count": 3,
+      "observation_count": 5,
+      "package_key": "core_challenge_past_over_tragic",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_past_tragic_gate_20260627_v1_games2_opp8_20260627_215724.json",
+        "lorehold_past_tragic_gate_20260627_v2_seed7_smoke_opp8_20260627_215812.json",
+        "lorehold_past_tragic_gate_20260627_v3_seed99_smoke_opp8_20260627_220604.json",
+        "lorehold_past_tragic_gate_20260627_v4_seed123_smoke_opp8_20260627_220625.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -50.0
+    },
+    {
+      "best_delta_pp": 0.0,
+      "classification": "latest_rejected",
+      "families": [
+        "static_damage_modifier"
+      ],
+      "latest_adds": [
+        "Twinflame Tyrant"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 32,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 77.78,
+        "wins": 7
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 5,
+        "miracle_cast": 16,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 20,
+        "win_rate": 44.44,
+        "wins": 4
+      },
+      "latest_cuts": [
+        "Thor, God of Thunder"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -33.34,
+      "latest_source_file": "lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+      "negative_count": 1,
+      "observation_count": 2,
+      "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_pg245_runtime_smoke_gate_20260628_pg245_smoke_v1.json",
+        "lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -33.34
+    },
+    {
+      "best_delta_pp": -22.22,
+      "classification": "latest_rejected",
+      "families": [
+        "optimizer-equal-gate"
+      ],
+      "latest_adds": [],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 9,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 33,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 9,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 30,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 28,
+        "win_rate": 66.67,
+        "wins": 6
+      },
+      "latest_cuts": [],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -22.22,
+      "latest_source_file": "lorehold_infernal_plunge_equal_gate_20260627_020045_infernal_plunge.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "candidate_6_infernal_plunge_equal_gate",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_infernal_plunge_equal_gate_20260627_020045_infernal_plunge.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -22.22
+    },
+    {
+      "best_delta_pp": -44.45,
+      "classification": "latest_rejected",
+      "families": [
+        "tutor_access"
+      ],
+      "latest_adds": [
+        "Enlightened Tutor"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 33,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 5,
+        "miracle_cast": 18,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 9,
+        "win_rate": 44.44,
+        "wins": 4
+      },
+      "latest_cuts": [
+        "Thor, God of Thunder"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -44.45,
+      "latest_source_file": "lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "enlightened_engine_access_cut_thor",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_tutor_access_conversion_gate_20260627_seed42_v2_tutor_access_v2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": -50.0,
+      "classification": "latest_rejected",
+      "families": [
+        "spell_copy"
+      ],
+      "latest_adds": [
+        "Chandra, Hope's Beacon"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -50.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "chandra_copy_engine",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -50.0
+    },
+    {
+      "best_delta_pp": -55.56,
+      "classification": "latest_rejected",
+      "families": [
+        "spell_protection_land"
+      ],
+      "latest_adds": [
+        "Boseiju, Who Shelters All"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 33,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 6,
+        "miracle_cast": 12,
+        "squee_to_graveyard": 2,
+        "squee_upkeep_return": 2,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 8,
+        "win_rate": 33.33,
+        "wins": 3
+      },
+      "latest_cuts": [
+        "Reliquary Tower"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -55.56,
+      "latest_source_file": "lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "boseiju_spell_protection_land",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": -55.56,
+      "classification": "latest_rejected",
+      "families": [
+        "topdeck_freecast"
+      ],
+      "latest_adds": [
+        "Galvanoth"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 33,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 6,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 5,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 6,
+        "win_rate": 33.33,
+        "wins": 3
+      },
+      "latest_cuts": [
+        "Thor, God of Thunder"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -55.56,
+      "latest_source_file": "lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "galvanoth_topdeck_freecast_cut_thor",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": -55.56,
+      "classification": "latest_rejected",
+      "families": [
+        "tutor_access"
+      ],
+      "latest_adds": [
+        "Gamble"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 33,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 6,
+        "miracle_cast": 17,
+        "squee_to_graveyard": 6,
+        "squee_upkeep_return": 4,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 9,
+        "win_rate": 33.33,
+        "wins": 3
+      },
+      "latest_cuts": [
+        "Thor, God of Thunder"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -55.56,
+      "latest_source_file": "lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "gamble_access_cut_thor",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": -55.56,
+      "classification": "latest_rejected",
+      "families": [
+        "mana_base"
+      ],
+      "latest_adds": [
+        "Plateau"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 33,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 6,
+        "miracle_cast": 21,
+        "squee_to_graveyard": 3,
+        "squee_upkeep_return": 3,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 10,
+        "win_rate": 33.33,
+        "wins": 3
+      },
+      "latest_cuts": [
+        "Turbulent Steppe"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -55.56,
+      "latest_source_file": "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "plateau_timing_upgrade_cut_turbulent_steppe",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "tutor_access_benchmark"
+      ],
+      "latest_adds": [
+        "Enlightened Tutor"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 9,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Land Tax"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "enlightened_access_benchmark_cut_land_tax",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "tutor_access_benchmark"
+      ],
+      "latest_adds": [
+        "Gamble"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Land Tax"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "gamble_access_benchmark_cut_land_tax",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "topdeck_protection"
+      ],
+      "latest_adds": [
+        "Hidden Retreat"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 13,
+        "squee_to_graveyard": 4,
+        "squee_upkeep_return": 3,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 3,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Promise of Loyalty"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "hidden_retreat_stack_damage_topdeck_cut_promise",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "approach_topdeck_combo"
+      ],
+      "latest_adds": [
+        "Lapse of Certainty"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 6,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Tibalt's Trickery"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_lapse_approach_gate_20260627_v1_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "lapse_approach_topdeck_cut_tibalts_trickery",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_lapse_approach_gate_20260627_v1_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "spellcast_payoff"
+      ],
+      "latest_adds": [
+        "Monastery Mentor"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Prismari Pianist"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "monastery_mentor_spell_tokens_cut_prismari",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_spell_payoff_gate_20260627_v1_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "pressure_absorber"
+      ],
+      "latest_adds": [
+        "Perch Protection"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 4,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Avatar's Wrath"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "perch_protection_cut_avatar_wrath",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "mana_base"
+      ],
+      "latest_adds": [
+        "Plateau"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 33,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 5,
+        "squee_upkeep_return": 3,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Radiant Summit"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "plateau_timing_upgrade_cut_radiant_summit",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_mana_base_plateau_gate_20260627_v1_real.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "graveyard_recursion"
+      ],
+      "latest_adds": [
+        "Radiant Scrollwielder"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 2,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "The Scarlet Witch"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "radiant_scrollwielder_cut_scarlet_witch",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_radiant_scrollwielder_gate_20260627_v1_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "spell_protection"
+      ],
+      "latest_adds": [
+        "Silence"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 11,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Avatar's Wrath"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_silence_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "silence_cut_avatar_wrath",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_silence_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Storm-Kiln Artist"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 8,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Arcane Signet"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "storm_kiln_artist_cut_arcane_signet",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [],
+      "latest_adds": [
+        "Sun Titan"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 8,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Victory Chimes"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_sun_titan_noncore_v1_20260627_120928.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "sun_titan_cut_chimes",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_sun_titan_noncore_v1_20260627_120928.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -66.67,
+      "classification": "latest_rejected",
+      "families": [
+        "spellcast_payoff"
+      ],
+      "latest_adds": [
+        "Young Pyromancer"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 4,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Prismari Pianist"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -66.67,
+      "latest_source_file": "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "young_pyromancer_spell_tokens_cut_prismari",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_spell_payoff_gate_20260627_v1_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": -88.89,
+      "classification": "latest_rejected",
+      "families": [
+        "pressure_absorber"
+      ],
+      "latest_adds": [
+        "Boros Charm"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 33,
+        "squee_to_graveyard": 7,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 30,
+        "win_rate": 88.89,
+        "wins": 8
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 9,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 6,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Fated Clash"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -88.89,
+      "latest_source_file": "lorehold_pressure_conversion_gate_20260627_seed42_v2_pressure_v2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "boros_charm_pressure_cut_fated",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_pressure_conversion_gate_20260627_seed42_v2_pressure_v2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -88.89
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "pressure_absorber"
+      ],
+      "latest_adds": [
+        "Akroma's Will"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Avatar's Wrath"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "akromas_will_cut_avatar_wrath",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [],
+      "latest_adds": [
+        "Archaeomancer's Map",
+        "Soul-Guide Lantern",
+        "The One Ring"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Bender's Waterskin",
+        "Artist's Talent",
+        "Tempt with Bunnies"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v1_20260627_114609.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "artifact_etb_value",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_v1_20260627_114609.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "pressure_reset_tradeoff"
+      ],
+      "latest_adds": [
+        "Austere Command"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 3,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Emeria's Call // Emeria, Shattered Skyclave"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_austere_emeria_tradeoff_gate_20260627_v1_20260627_232955.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "austere_command_wipe_over_emeria_tradeoff",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_austere_emeria_tradeoff_gate_20260627_v1_20260627_232955.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Jeska's Will"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "birgi_spellchain_cut_jeskas_will",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "pressure_absorber"
+      ],
+      "latest_adds": [
+        "Boros Charm"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 6,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Avatar's Wrath"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "boros_charm_pressure_cut_avatar_wrath",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "topdeck_filter"
+      ],
+      "latest_adds": [
+        "Dragon's Rage Channeler"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 2,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "The Scarlet Witch"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "dragon_rage_channeler_cut_scarlet_witch",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [],
+      "latest_adds": [
+        "Imperial Recruiter",
+        "Recruiter of the Guard",
+        "Ranger-Captain of Eos"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Prismari Pianist",
+        "Furygale Flocking",
+        "Tempt with Bunnies"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v1_20260627_114609.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "etb_tutor_blink",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_v1_20260627_114609.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "spell_protection"
+      ],
+      "latest_adds": [
+        "Grand Abolisher"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Mother of Runes"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "grand_abolisher_cut_mother_of_runes",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "spellcast_payoff"
+      ],
+      "latest_adds": [
+        "Guttersnipe"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Prismari Pianist"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "guttersnipe_spell_payoff_cut_prismari",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_spell_payoff_gate_20260627_v1_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [],
+      "latest_adds": [
+        "The One Ring"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 4,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Artist's Talent"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v1_20260627_114609.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "one_ring_burden_reset",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_v1_20260627_114609.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "topdeck_play"
+      ],
+      "latest_adds": [
+        "Verge Rangers"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_pg245_runtime_smoke_gate_20260628_pg245_smoke_v1.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "pg245_verge_rangers_topdeck_land_cut_waterskin",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_pg245_runtime_smoke_gate_20260628_pg245_smoke_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "spell_protection"
+      ],
+      "latest_adds": [
+        "Reprieve"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 2,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 6,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Avatar's Wrath"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "reprieve_cut_avatar_wrath",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Runaway Steam-Kin"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 1,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Talisman of Conviction"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "runaway_steamkin_cut_talisman",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Seething Song"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 4,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Fellwar Stone"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "seething_song_cut_fellwar_stone",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [],
+      "latest_adds": [
+        "Sun Titan"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_sun_titan_noncore_v1_20260627_120928.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "sun_titan_cut_squelcher",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_sun_titan_noncore_v1_20260627_120928.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "hand_filter_benchmark"
+      ],
+      "latest_adds": [
+        "Valakut Awakening // Valakut Stoneforge"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Big Score"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "valakut_hand_filter_cut_big_score",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "graveyard_recursion_benchmark"
+      ],
+      "latest_adds": [
+        "Volcanic Vision"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Pinnacle Monk // Mystic Peak"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "volcanic_recursion_cut_pinnacle",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": -100.0,
+      "classification": "latest_rejected",
+      "families": [
+        "hand_filter_benchmark"
+      ],
+      "latest_adds": [
+        "Wheel of Fortune"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Big Score"
+      ],
+      "latest_decision": "reject_or_rework",
+      "latest_delta_pp": -100.0,
+      "latest_source_file": "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+      "negative_count": 1,
+      "observation_count": 1,
+      "package_key": "wheel_hand_filter_cut_big_score",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": 55.56,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_setup"
+      ],
+      "latest_adds": [
+        "Brainstone"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 9,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 7,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "brainstone_topdeck_miracle_cut_squelcher",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -77.78
+    },
+    {
+      "best_delta_pp": 50.0,
+      "classification": "positive_signal_needs_confirmation",
+      "families": [
+        "graveyard_recast"
+      ],
+      "latest_adds": [
+        "Past in Flames"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 100.0,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 50.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 0,
+      "observation_count": 1,
+      "package_key": "past_in_flames_recast",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": 50.0
+    },
+    {
+      "best_delta_pp": 44.44,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "payoff_challenge"
+      ],
+      "latest_adds": [
+        "Dance with Calamity"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Storm Herd"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "core_challenge_dance_over_storm",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -88.89
+    },
+    {
+      "best_delta_pp": 44.44,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_freecast"
+      ],
+      "latest_adds": [
+        "Galvanoth"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "galvanoth_topdeck_freecast",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "life_floor_protection"
+      ],
+      "latest_adds": [
+        "Angel's Grace"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 2,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Dawn's Truce"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_life_floor_conversion_gate_20260627_seed7_v1_life_floor_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "angel_grace_life_floor_cut_dawn",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_life_floor_conversion_gate_20260627_seed20260625_v1_life_floor_v1.json",
+        "lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1.json",
+        "lorehold_life_floor_conversion_gate_20260627_seed7_v1_life_floor_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -88.89
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Seething Song"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 15,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 14,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Pearl Medallion",
+        "Ruby Medallion"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_spellchain_conversion_gate_20260627_seed7_v1_spellchain_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "birgi_seething_chain_cut_medallions",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1.json",
+        "lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1.json",
+        "lorehold_spellchain_conversion_gate_20260627_seed7_v1_spellchain_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "registry_rejected",
+      "families": [
+        "strategy-first-candidate"
+      ],
+      "latest_adds": [],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 9,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 9,
+        "hand_to_topdeck_activation": 0,
+        "losses": 5,
+        "miracle_cast": 24,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 1,
+        "status": "pass",
+        "topdeck_manipulation_activated": 21,
+        "win_rate": 33.33,
+        "wins": 3
+      },
+      "latest_cuts": [],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 33.33,
+      "latest_source_file": "lorehold_variant_battle_gate_finalists_20260626_v1.json",
+      "negative_count": 1,
+      "observation_count": 2,
+      "package_key": "candidate_v7",
+      "positive_count": 1,
+      "registry": {
+        "learning": "High structural score does not beat deck_607 if the shell overfills engine/ramp and loses pressure response.",
+        "result": "3W/5L/1S, WR 33.33%, Winota 0W/3L",
+        "section": "tested",
+        "status": "rejected",
+        "swap_or_scope": "full strategy-first candidate package"
+      },
+      "sources": [
+        "lorehold_variant_battle_gate_20260626_v1.json",
+        "lorehold_variant_battle_gate_finalists_20260626_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -33.33
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_freecast"
+      ],
+      "latest_adds": [
+        "Galvanoth"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 12,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Victory Chimes"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_squee_refinement_package_gate_20260627_v2_seed20260625_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+        "lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+        "lorehold_squee_refinement_package_gate_20260627_v2_seed7_hash0_isolated_timeout_galvanoth_cut_chimes.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "tutor_access"
+      ],
+      "latest_adds": [
+        "Gamble"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 16,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 13,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Creative Technique"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_tutor_access_conversion_gate_20260627_seed7_v1_tutor_access_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "gamble_approach_access_cut_creative",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_tutor_access_conversion_gate_20260627_seed20260625_v1_tutor_access_v1.json",
+        "lorehold_tutor_access_conversion_gate_20260627_seed42_v1_tutor_access_v1.json",
+        "lorehold_tutor_access_conversion_gate_20260627_seed7_v1_tutor_access_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "targeted_commander_protection"
+      ],
+      "latest_adds": [
+        "Gods Willing"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 2,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 7,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Promise of Loyalty"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 33.33,
+      "latest_source_file": "lorehold_targeted_shield_package_gate_20260628_seed7_targeted_shield_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "gods_willing_commander_shield_cut_promise",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_targeted_shield_package_gate_20260628_seed20260625_targeted_shield_v3.json",
+        "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+        "lorehold_targeted_shield_package_gate_20260628_seed7_targeted_shield_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 33.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "draw_protection"
+      ],
+      "latest_adds": [
+        "The One Ring"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 11,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "one_ring_protection_draw_cut_squelcher",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -77.78
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 9,
+        "squee_to_graveyard": 1,
+        "squee_upkeep_return": 1,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "birgi_spellchain_cut_squelcher",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "payoff_challenge"
+      ],
+      "latest_adds": [
+        "Aetherflux Reservoir"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 12,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 5,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Storm Herd"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "core_challenge_aetherflux_over_storm",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed42_hash0_isolated_timeout_storm_challenge.json",
+        "lorehold_finalizer_benchmark_gate_20260627_v1_seed7_hash0_isolated_timeout_storm_challenge.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_freecast"
+      ],
+      "latest_adds": [
+        "Galvanoth"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 16,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "pressure_absorber"
+      ],
+      "latest_adds": [
+        "Ghostly Prison"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 16,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 4,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "ghostly_prison_pressure_cut_squelcher",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_library_pressure_conversion_gate_20260627_seed20260625_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+        "lorehold_library_pressure_conversion_gate_20260627_seed7_v1_library_pressure_v1.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -55.56
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_protection"
+      ],
+      "latest_adds": [
+        "Penance"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 10,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 7,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "penance_topdeck_protection_cut_squelcher",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_squee_refinement_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": 22.22,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "cost_reduce_copy"
+      ],
+      "latest_adds": [
+        "Primal Amulet // Primal Wellspring"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 7,
+        "miracle_cast": 7,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 1,
+        "win_rate": 22.22,
+        "wins": 2
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 22.22,
+      "latest_source_file": "lorehold_topfreecast_conversion_gate_20260627_seed7_v1_topfreecast_v1.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "primal_amulet_spell_engine",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_topfreecast_conversion_gate_20260627_seed20260625_v1_topfreecast_v1.json",
+        "lorehold_topfreecast_conversion_gate_20260627_seed42_v1_topfreecast_v1.json",
+        "lorehold_topfreecast_conversion_gate_20260627_seed7_v1_topfreecast_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -44.45
+    },
+    {
+      "best_delta_pp": 11.11,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "topdeck_setup"
+      ],
+      "latest_adds": [
+        "Brainstone"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 2,
+      "observation_count": 4,
+      "package_key": "brainstone_topdeck_miracle",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -50.0
+    },
+    {
+      "best_delta_pp": 11.11,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "discard_rummage_recursion"
+      ],
+      "latest_adds": [
+        "Faithless Looting"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 9,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 8,
+        "miracle_cast": 6,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 6,
+        "win_rate": 11.11,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "positive_needs_scope_check",
+      "latest_delta_pp": 11.11,
+      "latest_source_file": "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "faithless_looting_squee_enabler",
+      "positive_count": 2,
+      "registry": {},
+      "sources": [
+        "lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+        "lorehold_post_squee_package_gate_20260627_v1_seed7_hash0_isolated_timeout.json"
+      ],
+      "tie_count": 0,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 8.33,
+      "classification": "conflicting_signal_needs_champion_gate",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Brass's Bounty"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 12,
+        "miracle_cast": 30,
+        "squee_to_graveyard": 5,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 24,
+        "win_rate": 25.0,
+        "wins": 4
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 12,
+        "miracle_cast": 30,
+        "squee_to_graveyard": 5,
+        "squee_upkeep_return": 5,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 25,
+        "win_rate": 25.0,
+        "wins": 4
+      },
+      "latest_cuts": [
+        "Boros Signet"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848.json",
+      "negative_count": 1,
+      "observation_count": 4,
+      "package_key": "brass_bounty_cut_boros_signet",
+      "positive_count": 1,
+      "registry": {},
+      "sources": [
+        "lorehold_brass_bounty_gate_20260627_v2_20260627_211959.json",
+        "lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+        "lorehold_brass_bounty_gate_20260627_v5_exposure_smoke_20260627_213725.json",
+        "lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848.json"
+      ],
+      "tie_count": 2,
+      "worst_delta_pp": -12.5
+    },
+    {
+      "best_delta_pp": 0.0,
+      "classification": "tie_signal_watch",
+      "families": [
+        "spell_copy_recursion"
+      ],
+      "latest_adds": [
+        "Arcane Bombardment"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 3,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 0,
+      "observation_count": 1,
+      "package_key": "arcane_bombardment_engine",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": 0.0
+    },
+    {
+      "best_delta_pp": 0.0,
+      "classification": "tie_signal_watch",
+      "families": [
+        "spellchain_mana"
+      ],
+      "latest_adds": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 4,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 2,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Bender's Waterskin"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 0,
+      "observation_count": 1,
+      "package_key": "birgi_spellchain_cut_waterskin",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": 0.0
+    },
+    {
+      "best_delta_pp": 0.0,
+      "classification": "tie_signal_watch",
+      "families": [
+        "spell_copy"
+      ],
+      "latest_adds": [
+        "Reverberate",
+        "Return the Favor",
+        "Flare of Duplication"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 1,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Hexing Squelcher",
+        "Bender's Waterskin",
+        "Victory Chimes"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 0,
+      "observation_count": 1,
+      "package_key": "copy_stack_package",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": 0.0
+    },
+    {
+      "best_delta_pp": 0.0,
+      "classification": "tie_signal_watch",
+      "families": [
+        "spell_protection"
+      ],
+      "latest_adds": [
+        "Overmaster"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 5,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 3,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 1,
+        "miracle_cast": 9,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 8,
+        "win_rate": 50.0,
+        "wins": 1
+      },
+      "latest_cuts": [
+        "Hexing Squelcher"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "negative_count": 0,
+      "observation_count": 1,
+      "package_key": "overmaster_protect_draw",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": 0.0
+    },
+    {
+      "best_delta_pp": 0.0,
+      "classification": "tie_signal_watch",
+      "families": [
+        "topdeck_protection"
+      ],
+      "latest_adds": [
+        "Penance"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Promise of Loyalty"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_failure_access_package_gate_20260628_seed7_penance_runtime_v1.json",
+      "negative_count": 1,
+      "observation_count": 3,
+      "package_key": "penance_runtime_topdeck_cut_promise",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_failure_access_package_gate_20260628_seed20260625_penance_runtime_v1.json",
+        "lorehold_failure_access_package_gate_20260628_seed42_penance_runtime_v1.json",
+        "lorehold_failure_access_package_gate_20260628_seed7_penance_runtime_v1.json"
+      ],
+      "tie_count": 2,
+      "worst_delta_pp": -66.67
+    },
+    {
+      "best_delta_pp": 0.0,
+      "classification": "tie_signal_watch",
+      "families": [
+        "targeted_commander_protection"
+      ],
+      "latest_adds": [
+        "Sejiri Shelter // Sejiri Glacier"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 3,
+        "hand_to_topdeck_activation": 0,
+        "losses": 3,
+        "miracle_cast": 0,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": "pass",
+        "topdeck_manipulation_activated": 0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "latest_cuts": [
+        "Promise of Loyalty"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_targeted_shield_package_gate_20260628_seed7_targeted_shield_v1.json",
+      "negative_count": 2,
+      "observation_count": 3,
+      "package_key": "sejiri_shelter_commander_shield_cut_promise",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_targeted_shield_package_gate_20260628_seed20260625_targeted_shield_v3.json",
+        "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+        "lorehold_targeted_shield_package_gate_20260628_seed7_targeted_shield_v1.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -100.0
+    },
+    {
+      "best_delta_pp": 0.0,
+      "classification": "tie_signal_watch",
+      "families": [],
+      "latest_adds": [
+        "Sun Titan"
+      ],
+      "latest_baseline": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 14,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 12,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_candidate": {
+        "damage_prevention_shield_created": 0,
+        "games": 0,
+        "hand_to_topdeck_activation": 0,
+        "losses": 0,
+        "miracle_cast": 12,
+        "squee_to_graveyard": 0,
+        "squee_upkeep_return": 0,
+        "stalls": 0,
+        "status": null,
+        "topdeck_manipulation_activated": 6,
+        "win_rate": 100.0,
+        "wins": 3
+      },
+      "latest_cuts": [
+        "Storm Herd"
+      ],
+      "latest_decision": "tie_watch_strategy",
+      "latest_delta_pp": 0.0,
+      "latest_source_file": "lorehold_synergy_package_gate_20260627_v1_20260627_114609.json",
+      "negative_count": 2,
+      "observation_count": 3,
+      "package_key": "sun_titan_blink_value",
+      "positive_count": 0,
+      "registry": {},
+      "sources": [
+        "lorehold_synergy_package_gate_20260627_sun_titan_confirm_20260627_115507.json",
+        "lorehold_synergy_package_gate_20260627_sun_titan_noncore_v1_20260627_120928.json",
+        "lorehold_synergy_package_gate_20260627_v1_20260627_114609.json"
+      ],
+      "tie_count": 1,
+      "worst_delta_pp": -66.67
+    }
+  ],
+  "postgres_writes": false,
+  "registry_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json",
+  "registry_summary": {
+    "acceptance_rule": [
+      "candidate must tie or beat deck_607 on same real-opponent gate",
+      "candidate must not regress the Winota matchup",
+      "candidate must preserve or improve miracle/topdeck game frequency",
+      "candidate must not cut pressure absorption unless replacing same function"
+    ],
+    "current_leader": "candidate_607_squee_v1",
+    "current_leader_priority_residual": "exhausted_no_upgrade_20260627",
+    "protected_baseline": "deck_607",
+    "protected_cards_until_same_function_replacement_wins": [
+      "Molecule Man",
+      "The Scarlet Witch",
+      "Promise of Loyalty",
+      "Tragic Arrogance",
+      "Hexing Squelcher",
+      "Sensei's Divining Top",
+      "Scroll Rack",
+      "Bender's Waterskin",
+      "Tibalt's Trickery",
+      "Creative Technique",
+      "High Noon",
+      "Prismari Pianist",
+      "Reforge the Soul",
+      "Storm Herd"
+    ],
+    "untested_queue_count": 0
+  },
+  "reports_dir": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports",
+  "source_db_mutated": false,
+  "summary": {
+    "actionable_confirmation_count": 19,
+    "classification_counts": {
+      "conflicting_signal_needs_champion_gate": 18,
+      "current_champion": 1,
+      "latest_rejected": 42,
+      "positive_signal_needs_confirmation": 1,
+      "registry_rejected": 1,
+      "tie_signal_watch": 7
+    },
+    "current_leader": "candidate_607_squee_v1",
+    "hidden_retreat_classification": "latest_rejected",
+    "observation_count": 140,
+    "package_group_count": 70
+  }
+}
