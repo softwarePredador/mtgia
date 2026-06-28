@@ -1,0 +1,1085 @@
+{
+  "apply_only": false,
+  "cut_safety_report": null,
+  "cut_safety_summary": {},
+  "forced_access_confirmation_queue": [],
+  "forced_access_mode": "none",
+  "games_per_opponent": 1,
+  "generated_at": "2026-06-28T09:15:29.466594+00:00",
+  "no_game_checkpoint": false,
+  "opponent_limit": 1,
+  "opponent_seed": 20260626,
+  "package_decision_counts": {
+    "inconclusive_low_exposure": 1
+  },
+  "package_definition_files": [],
+  "package_status_counts": {
+    "gated": 1
+  },
+  "packages": [
+    {
+      "adds": [
+        "Mana Vault"
+      ],
+      "candidate_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_decision_contract_20260628_v1_20260628_190000_mana_vault_fast_mana_cut_arcane_signet/knowledge_candidate.db",
+      "candidate_meta": {
+        "added_rule_counts": {
+          "Mana Vault": 1
+        },
+        "adds": [
+          "Mana Vault"
+        ],
+        "allow_miracle_core_cuts": false,
+        "cuts": [
+          "Arcane Signet"
+        ],
+        "deck_id": 6,
+        "miracle_core_cuts": [],
+        "reviewed_rule_upserts": {
+          "Mana Vault": 1
+        },
+        "row_count": 94,
+        "runtime_package_rule_upserts": {},
+        "total_cards": 100
+      },
+      "cut_safety": {
+        "cuts": [],
+        "reason": "cut-safety preflight disabled",
+        "status": "not_checked"
+      },
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "decision": "inconclusive_low_exposure",
+      "exposure_summary": {
+        "baseline_cut_cards": {
+          "all_cards_accessed": false,
+          "all_cards_near_access": false,
+          "all_cards_used": false,
+          "card_count": 1,
+          "cards": [
+            {
+              "access_profile": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 47
+                }
+              },
+              "card_name": "Arcane Signet",
+              "event_breakdown": {},
+              "location_trace_count": 47,
+              "location_trace_games": 1,
+              "recorded_use_count": 0,
+              "status": "library_only_not_used"
+            }
+          ],
+          "cards_with_access": 0,
+          "cards_with_near_access": 0,
+          "cards_with_recorded_use": 0,
+          "total_recorded_use_count": 0
+        },
+        "candidate_added_cards": {
+          "all_cards_accessed": false,
+          "all_cards_near_access": false,
+          "all_cards_used": false,
+          "card_count": 1,
+          "cards": [
+            {
+              "access_profile": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 52
+                }
+              },
+              "card_name": "Mana Vault",
+              "event_breakdown": {},
+              "location_trace_count": 52,
+              "location_trace_games": 1,
+              "recorded_use_count": 0,
+              "status": "library_only_not_used"
+            }
+          ],
+          "cards_with_access": 0,
+          "cards_with_near_access": 0,
+          "cards_with_recorded_use": 0,
+          "total_recorded_use_count": 0
+        },
+        "low_candidate_added_card_access": true,
+        "low_candidate_added_card_use": true,
+        "next_step": "increase_sample_or_run_forced_access_gate",
+        "status": "candidate_added_card_low_access"
+      },
+      "family": "fast_mana",
+      "forced_access_mode": "none",
+      "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_decision_contract_20260628_v1_20260628_190000_mana_vault_fast_mana_cut_arcane_signet.json",
+      "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_decision_contract_20260628_v1_20260628_190000_mana_vault_fast_mana_cut_arcane_signet.md",
+      "gate_returncode": 0,
+      "gate_stderr_tail": "",
+      "gate_stdout_tail": "Loaded 1 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_6 games=1 opponents=1\nrunning synergy_mana_vault_fast_mana_cut_arcane_signet games=1 opponents=1\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_decision_contract_20260628_v1_20260628_190000_mana_vault_fast_mana_cut_arcane_signet.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_decision_contract_20260628_v1_20260628_190000_mana_vault_fast_mana_cut_arcane_signet.md\"\n}\n",
+      "gate_summary": {
+        "baseline": {
+          "avg_win_turn": 11.0,
+          "error": null,
+          "games": 1,
+          "losses": 0,
+          "stalls": 0,
+          "status": "pass",
+          "telemetry": {
+            "card_event_counts": {
+              "cost_paid:Artist's Talent": 1,
+              "cost_paid:Esper Sentinel": 1,
+              "cost_paid:Fellwar Stone": 1,
+              "cost_paid:Giver of Runes": 1,
+              "cost_paid:Hexing Squelcher": 1,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Land Tax": 1,
+              "cost_paid:Lorehold, the Historian": 3,
+              "cost_paid:Mother of Runes": 1,
+              "cost_paid:Prismari Pianist": 1,
+              "cost_paid:Smothering Tithe": 1,
+              "cost_paid:Swords to Plowshares": 1,
+              "cost_paid:Tempt with Bunnies": 1,
+              "land_played:Arid Mesa": 1,
+              "land_played:Eiganjo, Seat of the Empire": 1,
+              "land_played:Plains // Plains": 1,
+              "land_played:Prismatic Vista": 1,
+              "land_played:Radiant Summit": 1,
+              "land_played:Scalding Tarn": 1,
+              "land_played:Turbulent Steppe": 1,
+              "land_played:Urza's Saga": 1,
+              "land_played:War Room": 1,
+              "miracle_cast:Stroke of Midnight": 1,
+              "removal_resolved:Stroke of Midnight": 1,
+              "removal_resolved:Swords to Plowshares": 1,
+              "spell_cast:Artist's Talent": 1,
+              "spell_cast:Esper Sentinel": 1,
+              "spell_cast:Fellwar Stone": 1,
+              "spell_cast:High Noon": 1,
+              "spell_cast:Land Tax": 1,
+              "spell_cast:Prismari Pianist": 1,
+              "spell_cast:Smothering Tithe": 1,
+              "spell_cast:Swords to Plowshares": 1,
+              "spell_cast:Tempt with Bunnies": 1,
+              "spell_resolved:Artist's Talent": 1,
+              "spell_resolved:Esper Sentinel": 1,
+              "spell_resolved:High Noon": 1,
+              "spell_resolved:Land Tax": 1,
+              "spell_resolved:Prismari Pianist": 1,
+              "spell_resolved:Stroke of Midnight": 1,
+              "spell_resolved:Swords to Plowshares": 1,
+              "spell_resolved:Tempt with Bunnies": 1,
+              "topdeck_manipulation_activated:Sensei's Divining Top": 4,
+              "trigger_resolved:Esper Sentinel": 7,
+              "trigger_resolved:Smothering Tithe": 5
+            },
+            "card_strategy_counts": {
+              "cost_paid:Artist's Talent": 1,
+              "cost_paid:Esper Sentinel": 1,
+              "cost_paid:Fellwar Stone": 1,
+              "cost_paid:Giver of Runes": 1,
+              "cost_paid:Hexing Squelcher": 1,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Land Tax": 1,
+              "cost_paid:Lorehold, the Historian": 3,
+              "cost_paid:Mother of Runes": 1,
+              "cost_paid:Prismari Pianist": 1,
+              "cost_paid:Smothering Tithe": 1,
+              "cost_paid:Swords to Plowshares": 1,
+              "cost_paid:Tempt with Bunnies": 1,
+              "miracle:Stroke of Midnight": 1,
+              "topdeck:Sensei's Divining Top": 4
+            },
+            "event_counts": {
+              "activated_ability_skipped": 9,
+              "cast_announced": 27,
+              "combat": 10,
+              "combat_result": 10,
+              "combat_step": 56,
+              "commander_cast": 5,
+              "compensation_tokens_created": 1,
+              "composite_rule_component_resolved": 2,
+              "composite_rule_resolved": 1,
+              "cost_paid": 27,
+              "creature_cast": 4,
+              "draw_cards_resolved": 1,
+              "focus_card_access_snapshot": 47,
+              "land_played": 11,
+              "land_tax_trigger_skipped": 5,
+              "lorehold_upkeep_rummage": 4,
+              "mana_refreshed": 19,
+              "miracle_cast": 1,
+              "permanent_moved_from_battlefield": 2,
+              "player_eliminated": 1,
+              "priority_pass": 120,
+              "redirect_removal_resolved": 1,
+              "removal_resolved": 3,
+              "replacement_applied": 3,
+              "saga_chapter_progressed": 2,
+              "saga_chapter_resolved": 1,
+              "saga_sacrificed_by_sba": 1,
+              "spell_cast": 19,
+              "spell_resolved": 14,
+              "topdeck_manipulation_activated": 4,
+              "treasure_created": 1,
+              "trigger_put_on_stack": 12,
+              "trigger_resolved": 12,
+              "turn_end": 17,
+              "turn_start": 19
+            },
+            "focus_card_access_summary": {
+              "Arcane Signet": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 47
+                }
+              },
+              "Land Tax": {
+                "accessed_games": 1,
+                "accessed_trace_count": 32,
+                "dominant_zone": "battlefield",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 12,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "battlefield": 23,
+                  "hand": 9,
+                  "library": 15
+                }
+              },
+              "Library of Leng": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 47
+                }
+              },
+              "Lorehold, the Historian": {
+                "accessed_games": 1,
+                "accessed_trace_count": 14,
+                "dominant_zone": "command_zone",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "battlefield": 14,
+                  "command_zone": 33
+                }
+              },
+              "Mana Vault": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "absent",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 0,
+                "zone_counts": {
+                  "absent": 47
+                }
+              },
+              "Scroll Rack": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 47
+                }
+              },
+              "Sensei's Divining Top": {
+                "accessed_games": 1,
+                "accessed_trace_count": 15,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "battlefield": 15,
+                  "library": 32
+                }
+              },
+              "Squee, Goblin Nabob": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 47
+                }
+              },
+              "The Mind Stone": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 1,
+                "near_access_trace_count": 2,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 47
+                }
+              },
+              "Urza's Saga": {
+                "accessed_games": 1,
+                "accessed_trace_count": 27,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 14,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 47,
+                "trace_games": 1,
+                "zone_counts": {
+                  "battlefield": 9,
+                  "graveyard": 14,
+                  "hand": 4,
+                  "library": 20
+                }
+              }
+            },
+            "focus_card_trace_card_counts_by_game": {
+              "deck_6:Vivi Ornitier #99 (real):0": {
+                "Arcane Signet": 47,
+                "Land Tax": 53,
+                "Library of Leng": 48,
+                "Lorehold, the Historian": 57,
+                "Scroll Rack": 47,
+                "Sensei's Divining Top": 52,
+                "Squee, Goblin Nabob": 47,
+                "The Mind Stone": 47,
+                "Urza's Saga": 51
+              }
+            },
+            "lorehold_attack_restriction_source_events": {},
+            "lorehold_attack_restrictions": {},
+            "strategic_event_counts": {
+              "lorehold_cost_paid": 15,
+              "lorehold_spell_cast": 9,
+              "lorehold_upkeep_rummage": 4,
+              "miracle_cast": 1,
+              "topdeck_manipulation_activated": 4
+            },
+            "strategic_games": {
+              "birgi_spell_cast_mana": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "discard_to_top_replacement": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "hand_to_topdeck_activation": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_cost_paid": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_cast": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "lorehold_spell_rummage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_upkeep_rummage": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "spell_cast_mana_trigger": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_after_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_without_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_to_graveyard": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_upkeep_return": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_cost_paid": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage_amount": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_spell_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 1,
+                "rate": 1.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 4,
+                "key": "topdeck:Sensei's Divining Top"
+              },
+              {
+                "count": 3,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Esper Sentinel"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Fellwar Stone"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Giver of Runes"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Hexing Squelcher"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Smothering Tithe"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Land Tax"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Stroke of Midnight"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:High Noon"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Tempt with Bunnies"
+              }
+            ]
+          },
+          "win_rate": 100.0,
+          "wins": 1
+        },
+        "candidate": {
+          "avg_win_turn": 12.0,
+          "error": null,
+          "games": 1,
+          "losses": 0,
+          "stalls": 0,
+          "status": "pass",
+          "telemetry": {
+            "card_event_counts": {
+              "board_wipe_resolved:Farewell": 1,
+              "board_wipe_resolved:Promise of Loyalty": 1,
+              "board_wipe_resolved:Tragic Arrogance": 1,
+              "cost_paid:High Noon": 1,
+              "cost_paid:Library of Leng": 1,
+              "cost_paid:Lorehold, the Historian": 2,
+              "cost_paid:Mother of Runes": 1,
+              "cost_paid:Promise of Loyalty": 1,
+              "cost_paid:Smothering Tithe": 1,
+              "cost_paid:Tempt with Bunnies": 1,
+              "cost_paid:Tragic Arrogance": 1,
+              "land_played:Bloodstained Mire": 1,
+              "land_played:Command Beacon": 1,
+              "land_played:Glittering Massif": 1,
+              "land_played:Plains // Plains": 1,
+              "land_played:Prismatic Vista": 1,
+              "land_played:Radiant Summit": 1,
+              "land_played:Scalding Tarn": 1,
+              "land_played:Urza's Saga": 1,
+              "land_played:War Room": 1,
+              "miracle_cast:Farewell": 1,
+              "miracle_cast:Hit the Mother Lode": 1,
+              "miracle_cast:Reforge the Soul": 1,
+              "miracle_cast:Storm Herd": 1,
+              "spell_cast:Flawless Maneuver": 1,
+              "spell_cast:High Noon": 1,
+              "spell_cast:Library of Leng": 1,
+              "spell_cast:Promise of Loyalty": 1,
+              "spell_cast:Smothering Tithe": 1,
+              "spell_cast:Tempt with Bunnies": 1,
+              "spell_cast:Tragic Arrogance": 1,
+              "spell_resolved:Farewell": 1,
+              "spell_resolved:Flawless Maneuver": 1,
+              "spell_resolved:High Noon": 1,
+              "spell_resolved:Hit the Mother Lode": 1,
+              "spell_resolved:Library of Leng": 1,
+              "spell_resolved:Promise of Loyalty": 1,
+              "spell_resolved:Reforge the Soul": 1,
+              "spell_resolved:Storm Herd": 1,
+              "spell_resolved:Tempt with Bunnies": 1,
+              "spell_resolved:Tragic Arrogance": 1,
+              "trigger_resolved:Smothering Tithe": 5,
+              "utility_land_activated:Urza's Saga": 1
+            },
+            "card_strategy_counts": {
+              "cost_paid:High Noon": 1,
+              "cost_paid:Library of Leng": 1,
+              "cost_paid:Lorehold, the Historian": 2,
+              "cost_paid:Mother of Runes": 1,
+              "cost_paid:Promise of Loyalty": 1,
+              "cost_paid:Smothering Tithe": 1,
+              "cost_paid:Tempt with Bunnies": 1,
+              "cost_paid:Tragic Arrogance": 1,
+              "discard_to_top:Hit the Mother Lode": 1,
+              "discard_to_top:Reforge the Soul": 2,
+              "discard_to_top:Tibalt's Trickery": 1,
+              "lorehold_rummage_to_top:Hit the Mother Lode": 1,
+              "lorehold_rummage_to_top:Reforge the Soul": 2,
+              "lorehold_rummage_to_top:Tibalt's Trickery": 1,
+              "miracle:Farewell": 1,
+              "miracle:Hit the Mother Lode": 1,
+              "miracle:Reforge the Soul": 1,
+              "miracle:Storm Herd": 1
+            },
+            "event_counts": {
+              "activated_ability_skipped": 7,
+              "attachment_sba": 1,
+              "board_wipe_resolved": 3,
+              "cast_announced": 27,
+              "combat": 11,
+              "combat_result": 11,
+              "combat_step": 62,
+              "commander_cast": 4,
+              "composite_rule_component_resolved": 4,
+              "composite_rule_resolved": 2,
+              "cost_paid": 27,
+              "creature_cast": 3,
+              "draw_cards_resolved": 1,
+              "focus_card_access_snapshot": 52,
+              "land_played": 14,
+              "lorehold_upkeep_rummage": 5,
+              "mana_refreshed": 21,
+              "miracle_cast": 4,
+              "permanent_moved_from_battlefield": 13,
+              "player_eliminated": 1,
+              "priority_pass": 122,
+              "protection_resolved": 1,
+              "random_discard_after_tutor": 1,
+              "removal_resolved": 2,
+              "replacement_applied": 2,
+              "saga_chapter_progressed": 2,
+              "saga_chapter_resolved": 1,
+              "saga_sacrificed_by_sba": 1,
+              "spell_cast": 21,
+              "spell_resolved": 19,
+              "tokens_created": 1,
+              "trigger_put_on_stack": 6,
+              "trigger_resolved": 7,
+              "turn_end": 19,
+              "turn_start": 21,
+              "tutor_resolved": 1,
+              "utility_land_activated": 1,
+              "wheel_resolved": 1
+            },
+            "focus_card_access_summary": {
+              "Arcane Signet": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "absent",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 0,
+                "zone_counts": {
+                  "absent": 52
+                }
+              },
+              "Land Tax": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 52
+                }
+              },
+              "Library of Leng": {
+                "accessed_games": 1,
+                "accessed_trace_count": 24,
+                "dominant_zone": "library",
+                "drawn_games": 1,
+                "drawn_trace_count": 1,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 25,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "battlefield": 23,
+                  "hand": 1,
+                  "library": 28
+                }
+              },
+              "Lorehold, the Historian": {
+                "accessed_games": 1,
+                "accessed_trace_count": 23,
+                "dominant_zone": "command_zone",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "battlefield": 23,
+                  "command_zone": 29
+                }
+              },
+              "Mana Vault": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 52
+                }
+              },
+              "Scroll Rack": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 52
+                }
+              },
+              "Sensei's Divining Top": {
+                "accessed_games": 1,
+                "accessed_trace_count": 5,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "battlefield": 5,
+                  "library": 47
+                }
+              },
+              "Squee, Goblin Nabob": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 52
+                }
+              },
+              "The Mind Stone": {
+                "accessed_games": 0,
+                "accessed_trace_count": 0,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 1,
+                "near_access_games": 0,
+                "near_access_trace_count": 0,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "library": 52
+                }
+              },
+              "Urza's Saga": {
+                "accessed_games": 1,
+                "accessed_trace_count": 16,
+                "dominant_zone": "library",
+                "drawn_games": 0,
+                "drawn_trace_count": 0,
+                "library_only_games": 0,
+                "near_access_games": 0,
+                "near_access_trace_count": 18,
+                "opening_hand_games": 0,
+                "opening_hand_trace_count": 0,
+                "trace_count": 52,
+                "trace_games": 1,
+                "zone_counts": {
+                  "battlefield": 9,
+                  "graveyard": 4,
+                  "hand": 3,
+                  "library": 36
+                }
+              }
+            },
+            "focus_card_trace_card_counts_by_game": {
+              "synergy_mana_vault_fast_mana_cut_arcane_signet:Vivi Ornitier #99 (real):0": {
+                "Land Tax": 52,
+                "Library of Leng": 57,
+                "Lorehold, the Historian": 61,
+                "Mana Vault": 53,
+                "Scroll Rack": 52,
+                "Sensei's Divining Top": 53,
+                "Squee, Goblin Nabob": 52,
+                "The Mind Stone": 52,
+                "Urza's Saga": 56
+              }
+            },
+            "lorehold_attack_restriction_source_events": {},
+            "lorehold_attack_restrictions": {},
+            "strategic_event_counts": {
+              "discard_to_top_replacement": 4,
+              "lorehold_cost_paid": 9,
+              "lorehold_rummage_discard_to_top": 4,
+              "lorehold_spell_cast": 7,
+              "lorehold_upkeep_rummage": 5,
+              "miracle_cast": 4
+            },
+            "strategic_games": {
+              "birgi_spell_cast_mana": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "discard_to_top_replacement": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "hand_to_topdeck_activation": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_cost_paid": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discard_to_top": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "lorehold_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_cast": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "lorehold_spell_rummage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discard_to_top": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_spell_rummage_discards_squee": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "lorehold_upkeep_rummage": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "miracle_cast": {
+                "games": 1,
+                "rate": 1.0
+              },
+              "spell_cast_mana_trigger": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_after_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_return_without_known_graveyard_entry": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_to_graveyard": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "squee_upkeep_return": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_cost_paid": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_noncreature_damage_amount": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "thor_spell_cast": {
+                "games": 0,
+                "rate": 0.0
+              },
+              "topdeck_manipulation_activated": {
+                "games": 0,
+                "rate": 0.0
+              }
+            },
+            "top_cards": [
+              {
+                "count": 2,
+                "key": "cost_paid:Lorehold, the Historian"
+              },
+              {
+                "count": 2,
+                "key": "lorehold_rummage_to_top:Reforge the Soul"
+              },
+              {
+                "count": 2,
+                "key": "discard_to_top:Reforge the Soul"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Mother of Runes"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:High Noon"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Tempt with Bunnies"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Library of Leng"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Smothering Tithe"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Reforge the Soul"
+              },
+              {
+                "count": 1,
+                "key": "miracle:Farewell"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Tragic Arrogance"
+              },
+              {
+                "count": 1,
+                "key": "cost_paid:Promise of Loyalty"
+              }
+            ]
+          },
+          "win_rate": 100.0,
+          "wins": 1
+        },
+        "delta_pp": 0.0
+      },
+      "hypothesis": "Mana Vault is legal, battle-ready fast mana and appears in multiple Lorehold variants. This tests whether one-mana colorless burst accelerates commander and expensive spell windows more than Arcane Signet's colored fixing, without cutting protected medallions, Bender's Waterskin, Victory Chimes, or Jeska's Will.",
+      "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+      "prior_evidence": {
+        "matches": [],
+        "reason": "prior package evidence disabled",
+        "status": "not_checked"
+      },
+      "status": "gated"
+    }
+  ],
+  "preflight_only": false,
+  "prior_package_reports": [],
+  "prior_package_summary": {
+    "loaded_report_count": 0,
+    "missing_report_count": 0,
+    "package_key_count": 0,
+    "signature_count": 0
+  },
+  "protected_cut_registry": null,
+  "protected_cut_registry_summary": {},
+  "registry_prior_summary": {},
+  "runtime_package_proposal_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260628_v5_topdeck_damage_proposals.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/xmage_hidden_retreat_runtime_scope_20260628_v3_proposals.json"
+  ],
+  "simulation_seed": 42,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false
+}

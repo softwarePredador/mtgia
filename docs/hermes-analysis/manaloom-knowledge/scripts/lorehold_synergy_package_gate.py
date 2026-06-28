@@ -2559,6 +2559,17 @@ def package_result_decision(result: dict[str, Any], payload: dict[str, Any] | No
     )
 
 
+def package_decision_counts(
+    results: Iterable[dict[str, Any]],
+    payload: dict[str, Any] | None = None,
+) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for result in results:
+        decision = package_result_decision(result, payload)
+        counts[decision] = counts.get(decision, 0) + 1
+    return dict(sorted(counts.items()))
+
+
 def forced_access_confirmation_queue(payload: dict[str, Any]) -> list[dict[str, Any]]:
     queue: list[dict[str, Any]] = []
     for result in payload.get("packages") or []:
@@ -2619,6 +2630,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- protected_cut_registry: `{payload.get('protected_cut_registry') or '-'}`",
         f"- prior_package_reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         f"- package_status_counts: `{json.dumps(payload.get('package_status_counts') or {}, sort_keys=True)}`",
+        f"- package_decision_counts: `{json.dumps(payload.get('package_decision_counts') or {}, sort_keys=True)}`",
         "",
         "| Package | Family | Adds | Cuts | Preflight | Baseline | Candidate | Delta | Strategic Delta | Exposure | Decision |",
         "| --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- |",
@@ -2821,6 +2833,7 @@ def main() -> int:
                 "adds": definition["adds"],
                 "cuts": definition["cuts"],
                 "status": "skipped_cut_safety",
+                "decision": "not_run_cut_safety_blocked",
                 "cut_safety": package_cut_safety,
                 "prior_evidence": package_prior_evidence,
                 "candidate_db": None,
@@ -2843,6 +2856,7 @@ def main() -> int:
                 "adds": definition["adds"],
                 "cuts": definition["cuts"],
                 "status": "skipped_prior_evidence",
+                "decision": "not_run_prior_reject_blocked",
                 "cut_safety": package_cut_safety,
                 "prior_evidence": package_prior_evidence,
                 "candidate_db": None,
@@ -2865,6 +2879,7 @@ def main() -> int:
                 "adds": definition["adds"],
                 "cuts": definition["cuts"],
                 "status": "preflight_ready",
+                "decision": "preflight_ready_no_battle_evidence",
                 "cut_safety": package_cut_safety,
                 "prior_evidence": package_prior_evidence,
                 "candidate_db": None,
@@ -2901,6 +2916,7 @@ def main() -> int:
                 "adds": definition["adds"],
                 "cuts": definition["cuts"],
                 "status": "skipped_candidate_apply_error",
+                "decision": "invalid_or_incomplete",
                 "cut_safety": package_cut_safety,
                 "prior_evidence": package_prior_evidence,
                 "candidate_db": str(candidate_db) if candidate_db.exists() else None,
@@ -2924,6 +2940,7 @@ def main() -> int:
                 "adds": definition["adds"],
                 "cuts": definition["cuts"],
                 "status": "apply_ready",
+                "decision": "apply_ready_no_battle_evidence",
                 "cut_safety": package_cut_safety,
                 "prior_evidence": package_prior_evidence,
                 "candidate_db": str(candidate_db),
@@ -2974,6 +2991,15 @@ def main() -> int:
             if gate_summary
             else {}
         )
+        decision = (
+            gate_decision(
+                gate_summary,
+                exposure_summary,
+                forced_access_mode=args.forced_access_mode,
+            )
+            if gate_summary
+            else "invalid_or_incomplete"
+        )
         result = {
             "package_key": package_key,
             "family": definition.get("family") or "misc",
@@ -2981,6 +3007,7 @@ def main() -> int:
             "adds": definition["adds"],
             "cuts": definition["cuts"],
             "status": "gated",
+            "decision": decision,
             "cut_safety": package_cut_safety,
             "prior_evidence": package_prior_evidence,
             "candidate_db": str(candidate_db),
@@ -3001,6 +3028,10 @@ def main() -> int:
     for row in results:
         status_key = str(row.get("status") or "unknown")
         status_counts[status_key] = status_counts.get(status_key, 0) + 1
+    decision_counts = package_decision_counts(
+        results,
+        {"forced_access_mode": args.forced_access_mode},
+    )
 
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -3024,6 +3055,7 @@ def main() -> int:
         "prior_package_reports": [str(path) for path in prior_package_reports],
         "prior_package_summary": prior_results.get("summary") or {},
         "package_status_counts": dict(sorted(status_counts.items())),
+        "package_decision_counts": decision_counts,
         "packages": results,
     }
     payload["forced_access_confirmation_queue"] = forced_access_confirmation_queue(payload)

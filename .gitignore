@@ -51,6 +51,7 @@ server/test/artifacts/ai_optimize/source_deck_optimize_*.json
 docs/hermes-analysis/manaloom-knowledge/knowledge.db
 docs/hermes-analysis/manaloom-knowledge/backups/*.bak
 docs/hermes-analysis/master_optimizer_replays/
+docs/hermes-analysis/master_optimizer_reports/**/knowledge_candidate.db
 *.sqlite
 *.pyc
 __pycache__/

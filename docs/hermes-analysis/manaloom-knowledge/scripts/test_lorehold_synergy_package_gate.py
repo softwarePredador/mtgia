@@ -1021,6 +1021,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 "preflight_only": True,
                 "cut_safety_report": "/tmp/cut.json",
                 "prior_package_reports": ["/tmp/prior.json"],
+                "package_decision_counts": {"not_run_prior_reject_blocked": 1},
                 "packages": [
                     {
                         "package_key": "core_challenge_past_over_tragic",
@@ -1029,6 +1030,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                         "adds": ["Past in Flames"],
                         "cuts": ["Tragic Arrogance"],
                         "status": "skipped_prior_evidence",
+                        "decision": "not_run_prior_reject_blocked",
                         "cut_safety": {"status": "clear"},
                         "prior_evidence": {"status": "blocked_prior_reject"},
                         "candidate_meta": {},
@@ -1039,6 +1041,8 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
 
         self.assertIn("skipped_prior_evidence", markdown)
         self.assertIn("blocked_prior_reject", markdown)
+        self.assertIn("package_decision_counts", markdown)
+        self.assertIn("not_run_prior_reject_blocked", markdown)
 
     def test_render_markdown_handles_apply_error_rows_without_gate(self):
         markdown = gate.render_markdown(
@@ -1192,6 +1196,25 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         )
 
         self.assertEqual(gate.gate_decision(gate_summary, exposure), "inconclusive_low_exposure")
+
+    def test_package_decision_counts_are_exposure_aware(self):
+        package = {
+            "package_key": "mana_vault_fast_mana_cut_arcane_signet",
+            "status": "gated",
+            "gate_summary": {
+                "baseline": {"wins": 0, "losses": 3, "win_rate": 0.0, "telemetry": {}},
+                "candidate": {"wins": 3, "losses": 0, "win_rate": 100.0, "telemetry": {}},
+                "delta_pp": 100.0,
+            },
+            "exposure_summary": {
+                "low_candidate_added_card_use": True,
+                "status": "candidate_added_card_low_access",
+            },
+        }
+
+        counts = gate.package_decision_counts([package])
+
+        self.assertEqual(counts, {"inconclusive_low_exposure": 1})
 
     def test_gate_decision_marks_forced_access_positive_as_confirmation_signal(self):
         gate_summary = {
