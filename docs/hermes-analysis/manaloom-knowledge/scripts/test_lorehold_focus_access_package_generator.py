@@ -9,6 +9,10 @@ def test_default_access_model_uses_runtime_overlay_report():
     assert gen.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260628_v3_runtime_overlay.json"
 
 
+def test_default_runtime_gap_queue_uses_current_miner_report():
+    assert gen.DEFAULT_RUNTIME_GAP_QUEUE.name == "lorehold_runtime_gap_family_queue_20260628_v6_current_miner.json"
+
+
 def planner_payload(prior_keys=None):
     return {
         "summary": {
@@ -206,3 +210,88 @@ def test_completed_squee_probe_routes_to_access_density_model():
     assert "read-only runtime proposal" in required[0]["reason"]
     assert "approved PG apply/sync" in required[0]["reason"]
     assert "squee_graveyard_entry_probe" not in {row["work_key"] for row in required}
+
+
+def test_operational_work_queue_counts_blockers_and_prioritizes_runtime_gap_batch():
+    miner = {
+        "pairing_hypotheses": [
+            {
+                "candidate": "Apex of Power",
+                "candidate_status": "high_frequency_runtime_ready_unexplored",
+                "candidate_score": 92,
+                "lane": "hand_filter",
+                "cut_options": [
+                    {
+                        "card_name": "Loose Spell",
+                        "status": "manual_review_needed",
+                        "gate_readiness": "manual_review_needed",
+                    }
+                ],
+            },
+            {
+                "candidate": "Gamble",
+                "candidate_status": "high_frequency_runtime_ready_unexplored",
+                "candidate_score": 74,
+                "lane": "contextual",
+                "cut_options": [],
+            },
+        ],
+    }
+    runtime_gap_queue = {
+        "summary": {
+            "blocked_runtime_rule_gap_count": 61,
+            "family_count": 2,
+            "validity_summary": {
+                "ready_for_structured_pull_count": 9,
+                "exact_xmage_found_count": 61,
+            },
+            "promotion_lane_counts": {"mapper_metadata_or_test_scenario_required": 52},
+        },
+        "family_queue": [
+            {
+                "family_id": "manual_model",
+                "card_count": 52,
+                "support_status": "manual_model_required",
+                "batch_strategy": "not_batch_safe",
+                "candidate_lane_counts": {"contextual": 30},
+                "promotion_lane_counts": {"mapper_metadata_or_test_scenario_required": 52},
+                "cards": [{"card_name": "Ancient Copper Dragon"}],
+            }
+        ],
+    }
+
+    report = gen.build_report(
+        planner_payload=planner_payload(),
+        trace_audit=trace_audit(),
+        miner_report=miner,
+        squee_probe={
+            "summary": {
+                "status": "squee_route_modeled_but_access_gap_remains",
+                "modeled_when_accessed": True,
+                "weak_material_missing_squee_seeds": ["7", "20260625"],
+            }
+        },
+        access_model={
+            "summary": {
+                "access_density_status": "squee_route_modeled_access_density_needed",
+                "preflight_access_candidate_ready_count": 0,
+                "hidden_retreat_runtime_model_status": "runtime_proposal_overlay_active",
+                "hidden_retreat_package_status": "prepared_read_only_pending_apply_approval",
+            }
+        },
+        runtime_gap_queue=runtime_gap_queue,
+    )
+
+    queue = report["operational_work_queue"]
+    assert report["summary"]["operational_work_count"] == 4
+    assert report["summary"]["top_operational_work_key"] == "runtime_rule_gap_batch"
+    assert queue[0]["work_key"] == "runtime_rule_gap_batch"
+    assert queue[0]["blocked_runtime_rule_gap_count"] == 61
+    assert queue[0]["runtime_ready_for_structured_pull_count"] == 9
+    assert queue[0]["runtime_gap_context"]["top_families"][0]["family_id"] == "manual_model"
+    assert "lorehold_runtime_gap_family_queue.py" in queue[0]["next_command"]
+
+    by_work = {row["work_key"]: row for row in queue}
+    assert by_work["hand_filter_non_core_cut_search"]["blocked_package_count"] == 1
+    assert by_work["contextual_tutor_cut_model"]["blocked_package_count"] == 1
+    assert by_work["squee_access_density_model"]["postgres_write_required_to_run"] is False

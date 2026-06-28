@@ -30,6 +30,7 @@ DEFAULT_MINER_REPORT = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_
 DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260628_v1.md"
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260628_v3_runtime_overlay.json"
+DEFAULT_RUNTIME_GAP_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260628_v6_current_miner.json"
 
 PROTECTED_CARDS = {
     "Urza's Saga",
@@ -522,6 +523,220 @@ def instrumentation_route(
     }
 
 
+def runtime_gap_context(runtime_gap_queue: dict[str, Any] | None) -> dict[str, Any]:
+    if not runtime_gap_queue:
+        return {}
+    summary = runtime_gap_queue.get("summary") or {}
+    validity = summary.get("validity_summary") or {}
+    top_families = []
+    for family in (runtime_gap_queue.get("family_queue") or [])[:5]:
+        top_families.append(
+            {
+                "family_id": family.get("family_id"),
+                "card_count": int(family.get("card_count") or 0),
+                "support_status": family.get("support_status"),
+                "batch_strategy": family.get("batch_strategy"),
+                "candidate_lane_counts": family.get("candidate_lane_counts") or {},
+                "promotion_lane_counts": family.get("promotion_lane_counts") or {},
+                "sample_cards": [
+                    card.get("card_name")
+                    for card in (family.get("cards") or [])[:6]
+                    if card.get("card_name")
+                ],
+            }
+        )
+    return {
+        "blocked_runtime_rule_gap_count": int(summary.get("blocked_runtime_rule_gap_count") or 0),
+        "ready_for_structured_pull_count": int(validity.get("ready_for_structured_pull_count") or 0),
+        "exact_xmage_found_count": int(validity.get("exact_xmage_found_count") or 0),
+        "family_count": int(summary.get("family_count") or 0),
+        "promotion_lane_counts": summary.get("promotion_lane_counts") or {},
+        "top_families": top_families,
+    }
+
+
+def blocked_rows_for_work(work_key: str, package_candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if work_key == "hand_filter_non_core_cut_search":
+        return [
+            row
+            for row in package_candidates
+            if row.get("target_failure_mode") == "seed20260625_conversion_under_pressure"
+            and row.get("status") == "blocked_no_safe_cut"
+            and "cut_not_gate_ready" in (row.get("blockers") or [])
+        ]
+    if work_key == "contextual_tutor_cut_model":
+        return [
+            row
+            for row in package_candidates
+            if row.get("target_failure_mode") == "seed7_missing_engine_access"
+            and row.get("status") == "trace_or_runtime_probe_required"
+        ]
+    if work_key == "squee_access_density_model":
+        return [
+            row
+            for row in package_candidates
+            if row.get("target_failure_mode") == "squee_graveyard_entry_route"
+            and row.get("status") in {"blocked_no_safe_cut", "blocked_protected_cut"}
+        ]
+    return []
+
+
+def next_command_for_work(work_key: str) -> str:
+    commands = {
+        "squee_access_density_model": (
+            "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_access_cut_model.py "
+            "--stem lorehold_access_cut_model_20260628_v4_operational_queue"
+        ),
+        "contextual_tutor_cut_model": (
+            "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_tutor_cut_model.py "
+            "--stem lorehold_tutor_cut_model_20260628_v3_operational_queue"
+        ),
+        "hand_filter_non_core_cut_search": (
+            "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_hand_filter_cut_model.py "
+            "--stem lorehold_hand_filter_cut_model_20260628_v5_operational_queue"
+        ),
+        "runtime_rule_gap_batch": (
+            "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py "
+            "--output-prefix docs/hermes-analysis/master_optimizer_reports/"
+            "lorehold_runtime_gap_family_queue_20260628_v7_operational_queue"
+        ),
+    }
+    return commands.get(work_key, "")
+
+
+def promotion_criteria_for_work(work_key: str) -> list[str]:
+    criteria = {
+        "squee_access_density_model": [
+            "Find a non-protected access package that improves Squee/Top/Rack/Library reach.",
+            "Preserve seed-42 Squee, miracle, and topdeck telemetry before broader gates.",
+            "If Hidden Retreat is used, promote only after approved PostgreSQL apply/sync.",
+        ],
+        "contextual_tutor_cut_model": [
+            "Find a tutor package that does not cut Land Tax, Thor, Creative Technique, or protected topdeck engines.",
+            "Pass seed-7 access sequence review before any broader battle gate.",
+            "Reject exact pairs with prior strong-seed regression.",
+        ],
+        "hand_filter_non_core_cut_search": [
+            "Find a non-core hand-filter cut outside protected support slots.",
+            "Reject Big Score, Esper Sentinel, Monument, Rise, and Artist's Talent cuts unless a same-lane benchmark proves safety.",
+            "Target the seed-20260625 conversion-under-pressure failure explicitly.",
+        ],
+        "runtime_rule_gap_batch": [
+            "Group blocked cards by XMage semantic family.",
+            "Promote only cards with valid XMage source and a ManaLoom mapper/test scenario.",
+            "Rerun the variant gap miner before using newly modeled cards in deck gates.",
+        ],
+    }
+    return criteria.get(work_key, [])
+
+
+def evidence_inputs_for_work(
+    *,
+    work_item: dict[str, Any],
+    runtime_gap_path: Path | None,
+    runtime_gap_summary: dict[str, Any],
+) -> list[str]:
+    inputs = [
+        str(value)
+        for value in (
+            work_item.get("evidence_report"),
+            work_item.get("access_model_report"),
+        )
+        if value
+    ]
+    work_key = str(work_item.get("work_key") or "")
+    if work_key == "runtime_rule_gap_batch" and runtime_gap_summary and runtime_gap_path:
+        inputs.append(str(runtime_gap_path))
+    return sorted(set(inputs))
+
+
+def build_operational_work_queue(
+    *,
+    instrumentation: dict[str, Any],
+    package_candidates: list[dict[str, Any]],
+    planner_payload: dict[str, Any],
+    runtime_gap_queue: dict[str, Any] | None = None,
+    runtime_gap_path: Path | None = DEFAULT_RUNTIME_GAP_QUEUE,
+) -> list[dict[str, Any]]:
+    runtime_action = planner_runtime_action(planner_payload) or {}
+    runtime_context = runtime_gap_context(runtime_gap_queue)
+    rows: list[dict[str, Any]] = []
+    for work_item in instrumentation.get("required_work") or []:
+        work_key = str(work_item.get("work_key") or "")
+        blocked_rows = blocked_rows_for_work(work_key, package_candidates)
+        status_counts = Counter(row.get("status") for row in blocked_rows)
+        runtime_card_count = 0
+        runtime_ready_count = 0
+        if work_key == "runtime_rule_gap_batch":
+            runtime_card_count = int(
+                runtime_context.get("blocked_runtime_rule_gap_count")
+                or runtime_action.get("candidate_count")
+                or 0
+            )
+            runtime_ready_count = int(runtime_context.get("ready_for_structured_pull_count") or 0)
+        requires_pg_to_promote = (
+            work_key == "squee_access_density_model"
+            and "approved PG apply/sync" in str(work_item.get("reason") or "")
+        )
+        impact_score = len(blocked_rows) * 2
+        if work_key == "runtime_rule_gap_batch":
+            impact_score += runtime_card_count + runtime_ready_count * 5
+        elif work_key == "hand_filter_non_core_cut_search":
+            impact_score += 20
+        elif work_key == "contextual_tutor_cut_model":
+            impact_score += 35
+        elif work_key == "squee_access_density_model":
+            impact_score += 25
+        if requires_pg_to_promote:
+            impact_score -= 8
+        rows.append(
+            {
+                "work_key": work_key,
+                "failure_mode": work_item.get("failure_mode"),
+                "target_seeds": work_item.get("target_seeds") or [],
+                "reason": work_item.get("reason") or "",
+                "blocked_package_count": len(blocked_rows),
+                "blocked_package_status_counts": dict(sorted(status_counts.items())),
+                "blocked_package_samples": [
+                    {
+                        "package_key": row.get("package_key"),
+                        "add_card": row.get("add_card"),
+                        "cut_card": row.get("cut_card"),
+                        "status": row.get("status"),
+                    }
+                    for row in blocked_rows[:5]
+                ],
+                "blocked_runtime_rule_gap_count": runtime_card_count,
+                "runtime_ready_for_structured_pull_count": runtime_ready_count,
+                "runtime_gap_context": runtime_context if work_key == "runtime_rule_gap_batch" else {},
+                "postgres_write_required_to_run": False,
+                "postgres_write_required_to_promote": requires_pg_to_promote,
+                "next_command": next_command_for_work(work_key),
+                "evidence_inputs": evidence_inputs_for_work(
+                    work_item=work_item,
+                    runtime_gap_path=runtime_gap_path,
+                    runtime_gap_summary=runtime_context,
+                ),
+                "promotion_criteria": promotion_criteria_for_work(work_key),
+                "impact_score": impact_score,
+                "status": (
+                    "read_only_modeling_ready_pg_promotion_blocked"
+                    if requires_pg_to_promote
+                    else "actionable_modeling_required"
+                ),
+            }
+        )
+    rows.sort(
+        key=lambda row: (
+            -int(row.get("impact_score") or 0),
+            str(row.get("work_key") or ""),
+        )
+    )
+    for index, row in enumerate(rows, start=1):
+        row["priority_rank"] = index
+    return rows
+
+
 def build_report(
     *,
     planner_payload: dict[str, Any],
@@ -529,12 +744,14 @@ def build_report(
     miner_report: dict[str, Any],
     squee_probe: dict[str, Any] | None = None,
     access_model: dict[str, Any] | None = None,
+    runtime_gap_queue: dict[str, Any] | None = None,
     planner_path: Path = DEFAULT_PLANNER,
     trace_path: Path = DEFAULT_TRACE_AUDIT,
     miner_path: Path = DEFAULT_MINER_REPORT,
     design_path: Path = DEFAULT_DESIGN_REPORT,
     squee_probe_path: Path = DEFAULT_SQUEE_PROBE,
     access_model_path: Path = DEFAULT_ACCESS_MODEL,
+    runtime_gap_path: Path = DEFAULT_RUNTIME_GAP_QUEUE,
 ) -> dict[str, Any]:
     modes = focus_failure_modes(trace_audit)
     package_candidates = evaluate_pairings(
@@ -546,6 +763,22 @@ def build_report(
     gate_ready = [
         row for row in package_candidates if row["status"] == "gate_ready_focus_access_package"
     ]
+    instrumentation = instrumentation_route(
+        package_candidates=package_candidates,
+        planner_payload=planner_payload,
+        trace_audit=trace_audit,
+        squee_probe=squee_probe,
+        access_model=access_model,
+        squee_probe_path=squee_probe_path,
+        access_model_path=access_model_path,
+    )
+    operational_queue = build_operational_work_queue(
+        instrumentation=instrumentation,
+        package_candidates=package_candidates,
+        planner_payload=planner_payload,
+        runtime_gap_queue=runtime_gap_queue,
+        runtime_gap_path=runtime_gap_path,
+    )
     return {
         "generated_at": utc_now(),
         "planner": str(planner_path),
@@ -554,6 +787,7 @@ def build_report(
         "design_contract": str(design_path),
         "squee_probe": str(squee_probe_path) if squee_probe else "",
         "access_model": str(access_model_path) if access_model else "",
+        "runtime_gap_queue": str(runtime_gap_path) if runtime_gap_queue else "",
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -569,6 +803,10 @@ def build_report(
             "squee_probe_status": ((squee_probe or {}).get("summary") or {}).get("status", ""),
             "access_model_status": ((access_model or {}).get("summary") or {}).get(
                 "access_density_status", ""
+            ),
+            "operational_work_count": len(operational_queue),
+            "top_operational_work_key": (
+                operational_queue[0]["work_key"] if operational_queue else ""
             ),
             "recommended_next_action": (
                 "run_package_preflight_then_seed42_anchor_gate"
@@ -589,15 +827,8 @@ def build_report(
         "focus_failure_modes": list(modes.values()),
         "package_candidates": package_candidates,
         "gate_ready_packages": gate_ready,
-        "instrumentation_route": instrumentation_route(
-            package_candidates=package_candidates,
-            planner_payload=planner_payload,
-            trace_audit=trace_audit,
-            squee_probe=squee_probe,
-            access_model=access_model,
-            squee_probe_path=squee_probe_path,
-            access_model_path=access_model_path,
-        ),
+        "instrumentation_route": instrumentation,
+        "operational_work_queue": operational_queue,
     }
 
 
@@ -613,6 +844,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Design contract: `{payload['design_contract']}`",
         f"- Squee probe: `{payload['squee_probe'] or '-'}`",
         f"- Access model: `{payload['access_model'] or '-'}`",
+        f"- Runtime gap queue: `{payload['runtime_gap_queue'] or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -625,6 +857,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Seed-42 anchor available: `{str(summary['seed_42_anchor_available']).lower()}`",
         f"- Squee probe status: `{summary.get('squee_probe_status') or '-'}`",
         f"- Access model status: `{summary.get('access_model_status') or '-'}`",
+        f"- Operational work items: `{summary.get('operational_work_count') or 0}`",
+        f"- Top operational work: `{summary.get('top_operational_work_key') or '-'}`",
         "",
         "## Gate-Ready Packages",
         "",
@@ -668,6 +902,53 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append(
             f"- `{row['work_key']}`: failure `{row['failure_mode']}`, seeds `{', '.join(row.get('target_seeds') or []) or '-'}`; {row.get('reason') or ''}"
         )
+    lines.extend(
+        [
+            "",
+            "## Operational Work Queue",
+            "",
+            "| Rank | Work | Impact | Blocks | Runtime Gaps | PG To Promote | Next Command |",
+            "| ---: | --- | ---: | ---: | ---: | --- | --- |",
+        ]
+    )
+    for row in payload.get("operational_work_queue") or []:
+        lines.append(
+            "| {rank} | `{work}` | {impact} | {blocks} | {runtime} | `{pg}` | `{command}` |".format(
+                rank=row.get("priority_rank"),
+                work=row.get("work_key"),
+                impact=row.get("impact_score"),
+                blocks=row.get("blocked_package_count"),
+                runtime=row.get("blocked_runtime_rule_gap_count"),
+                pg=str(bool(row.get("postgres_write_required_to_promote"))).lower(),
+                command=row.get("next_command") or "",
+            )
+        )
+    for row in payload.get("operational_work_queue") or []:
+        lines.extend(
+            [
+                "",
+                f"### {row.get('priority_rank')}. {row.get('work_key')}",
+                "",
+                f"- Failure mode: `{row.get('failure_mode')}`",
+                f"- Target seeds: `{', '.join(row.get('target_seeds') or []) or '-'}`",
+                f"- Reason: {row.get('reason') or '-'}",
+                f"- Evidence inputs: `{', '.join(row.get('evidence_inputs') or []) or '-'}`",
+                f"- Blocked package statuses: `{json.dumps(row.get('blocked_package_status_counts'), sort_keys=True)}`",
+                f"- Promotion criteria: {'; '.join(row.get('promotion_criteria') or []) or '-'}",
+            ]
+        )
+        runtime_context = row.get("runtime_gap_context") or {}
+        if runtime_context.get("top_families"):
+            lines.append("- Runtime families:")
+            for family in runtime_context["top_families"]:
+                lines.append(
+                    "  - `{family}`: {count} cards, support `{support}`, samples `{samples}`".format(
+                        family=family.get("family_id"),
+                        count=family.get("card_count"),
+                        support=family.get("support_status"),
+                        samples=", ".join(str(card) for card in family.get("sample_cards") or []),
+                    )
+                )
     lines.extend(["", "## Guardrails", ""])
     guardrails = payload["guardrail_contract"]
     lines.append("- Target failure mode required before any package.")
@@ -687,6 +968,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--design-report", type=Path, default=DEFAULT_DESIGN_REPORT)
     parser.add_argument("--squee-probe", type=Path, default=DEFAULT_SQUEE_PROBE)
     parser.add_argument("--access-model", type=Path, default=DEFAULT_ACCESS_MODEL)
+    parser.add_argument("--runtime-gap-queue", type=Path, default=DEFAULT_RUNTIME_GAP_QUEUE)
     parser.add_argument("--stem", default="lorehold_focus_access_package_generator_20260628_v3")
     return parser.parse_args()
 
@@ -699,12 +981,14 @@ def main() -> int:
         miner_report=read_json(args.miner_report),
         squee_probe=read_json(args.squee_probe) if args.squee_probe.exists() else None,
         access_model=read_json(args.access_model) if args.access_model.exists() else None,
+        runtime_gap_queue=read_json(args.runtime_gap_queue) if args.runtime_gap_queue.exists() else None,
         planner_path=args.planner,
         trace_path=args.trace_audit,
         miner_path=args.miner_report,
         design_path=args.design_report,
         squee_probe_path=args.squee_probe,
         access_model_path=args.access_model,
+        runtime_gap_path=args.runtime_gap_queue,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"
