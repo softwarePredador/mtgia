@@ -165,6 +165,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             payload["Seething Song"]["pg058_l3b_simple_red_ritual_family"],
             "deck6_simple_red_rituals",
         )
+        self.assertEqual(payload["Seething Song"]["battle_rule_oracle_hash"], "ritual-hash")
 
     def test_filter_rows_for_current_reviewed_curated_drops_superseded_pg_curated_row(self) -> None:
         rows = [

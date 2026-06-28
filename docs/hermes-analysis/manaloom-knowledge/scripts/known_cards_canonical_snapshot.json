@@ -26821,7 +26821,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
     "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7"
+    "battle_rule_logical_key": "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7",
+    "battle_rule_oracle_hash": "ccd492289c6f1c14c8fb7a248d7bbf32"
   },
   "Seize the Day": {
     "cmc": 4.0,
