@@ -1,0 +1,2093 @@
+{
+  "card_profiles": [
+    {
+      "card_name": "Squee, Goblin Nabob",
+      "decision": {
+        "next_action": "do_not_cut_for_volcanic_or_restoration_without_non_squee_package",
+        "reason": "Squee has direct graveyard-return exposure and active rule support.",
+        "status": "protect_current_engine"
+      },
+      "direct_event_count": 6568,
+      "effect_counts": {
+        "creature": 4583,
+        "graveyard_upkeep_return_self_to_hand": 617
+      },
+      "event_counts": {
+        "airbend_creature_cast_from_exile": 82,
+        "cast_announced": 1562,
+        "cast_illegal": 4,
+        "cost_paid": 1550,
+        "creature_cast": 1459,
+        "creature_to_battlefield": 4,
+        "miracle_cast": 4,
+        "permanent_moved_from_battlefield": 878,
+        "replacement_applied": 392,
+        "spell_cast": 4,
+        "spell_resolved": 4,
+        "trigger_resolved": 617,
+        "turn_end": 8
+      },
+      "inferred_role": "recursion_engine",
+      "matched_field_counts": {
+        "card": 6168,
+        "discarded_cards": 8,
+        "metric_card": 184,
+        "source": 392
+      },
+      "metric_counts": {
+        "cost_paid:Squee, Goblin Nabob": 992,
+        "graveyard_return:Squee, Goblin Nabob": 269
+      },
+      "raw_record_count": 7442,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "discard_or_rummage_context",
+        "graveyard_recursion",
+        "paid_cast_exposure"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "graveyard_upkeep_return_self_to_hand_v1": 1
+        },
+        "card_name": "Squee, Goblin Nabob",
+        "effects": {
+          "creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "samples": [
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",
+          "turn": 12
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_trace_samples[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[0]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[4]",
+          "player": "Lorehold",
+          "reason": "fated_clash",
+          "source": "Fated Clash",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 16
+        },
+        {
+          "effect": "graveyard_upkeep_return_self_to_hand",
+          "event": "trigger_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_perch_protection_cut_avatar_wrath:Winota, Joiner of Forces #39 (real):0[6]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 17
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[0]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 15
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[4]",
+          "player": "Lorehold",
+          "reason": "fated_clash",
+          "source": "Fated Clash",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 16
+        },
+        {
+          "effect": "graveyard_upkeep_return_self_to_hand",
+          "event": "trigger_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[6]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
+          "turn": 17
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[14]",
+          "player": "Lorehold",
+          "reason": "starfall_invocation",
+          "source": "Starfall Invocation",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 15
+        },
+        {
+          "effect": "creature",
+          "event": "cast_announced",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[1]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[2]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 12
+        },
+        {
+          "effect": "creature",
+          "event": "creature_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Vivi Ornitier #99 (real):0[3]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_614_615_hypothesis_gate_20260627_v1_seed42_remaining_fixed.json",
+          "turn": 12
+        }
+      ],
+      "source_file_count": 203,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+          "unique_exposure_count": 125
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+          "unique_exposure_count": 123
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "unique_exposure_count": 122
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "unique_exposure_count": 122
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848.json",
+          "unique_exposure_count": 102
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v6_seed7_games2_opp8_20260627_213848_brass_bounty_cut_boros_signet.json",
+          "unique_exposure_count": 102
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2.json",
+          "unique_exposure_count": 91
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2_galvanoth_topdeck_freecast_cut_thor.json",
+          "unique_exposure_count": 91
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_topfreecast_conversion_gate_20260627_seed42_v2_topfreecast_v2_galvanoth_topdeck_freecast_cut_thor_partial.json",
+          "unique_exposure_count": 91
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2.json",
+          "unique_exposure_count": 90
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor.json",
+          "unique_exposure_count": 90
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_access_conversion_gate_20260627_seed42_v2_gamble_tutor_access_v2_gamble_access_cut_thor_partial.json",
+          "unique_exposure_count": 90
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed42_hash0_isolated_timeout.json",
+          "unique_exposure_count": 87
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout_birgi_spellchain_cut_squelcher.json",
+          "unique_exposure_count": 87
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_squee_package_gate_20260627_v1_seed20260625_hash0_isolated_timeout.json",
+          "unique_exposure_count": 86
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1_brainstone_topdeck_miracle_cut_squelcher.json",
+          "unique_exposure_count": 84
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes.json",
+          "unique_exposure_count": 84
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes_galvanoth_topdeck_freecast_cut_chimes.json",
+          "unique_exposure_count": 84
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v2_seed42_hash0_isolated_timeout_galvanoth_cut_chimes_galvanoth_topdeck_freecast_cut_chimes_partial.json",
+          "unique_exposure_count": 84
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_refinement_package_gate_20260627_v1_seed42_hash0_isolated_timeout_galvanoth_topdeck_freecast_cut_squelcher.json",
+          "unique_exposure_count": 83
+        }
+      ],
+      "summary_metric_count": 184,
+      "unique_exposure_count": 6752
+    },
+    {
+      "card_name": "Volcanic Vision",
+      "decision": {
+        "next_action": "find recursion cut that is not the protected Squee engine",
+        "reason": "Runtime-ready recursion candidate, but current safe-cut model points at Squee.",
+        "status": "needs_non_squee_cut"
+      },
+      "direct_event_count": 0,
+      "effect_counts": {},
+      "event_counts": {},
+      "inferred_role": "recursion_candidate",
+      "matched_field_counts": {
+        "metric_card": 2
+      },
+      "metric_counts": {
+        "miracle:Volcanic Vision": 2
+      },
+      "raw_record_count": 2,
+      "role_confidence": "summary_metric_and_rule",
+      "role_signals": [
+        "miracle_hit",
+        "spell_or_permanent_recursion"
+      ],
+      "rule_summary": {
+        "active_rule_count": 2,
+        "battle_model_scopes": {
+          "instant_sorcery_recursion_with_opponent_creature_damage_annotation_v1": 1
+        },
+        "card_name": "Volcanic Vision",
+        "effects": {
+          "recursion": 3
+        },
+        "execution_statuses": {
+          "auto": 2,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 2
+        },
+        "rule_count": 3
+      },
+      "samples": [
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Volcanic Vision",
+          "path": "results[8].telemetry.top_cards[4]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Volcanic Vision",
+          "path": "results[8].telemetry.top_cards[4]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json"
+        }
+      ],
+      "source_file_count": 2,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json",
+          "unique_exposure_count": 1
+        }
+      ],
+      "summary_metric_count": 2,
+      "unique_exposure_count": 2
+    },
+    {
+      "card_name": "Restoration Seminar",
+      "decision": {
+        "next_action": "find recursion cut that is not the protected Squee engine",
+        "reason": "Runtime-ready recursion candidate, but current safe-cut model points at Squee.",
+        "status": "needs_non_squee_cut"
+      },
+      "direct_event_count": 0,
+      "effect_counts": {},
+      "event_counts": {},
+      "inferred_role": "recursion_candidate",
+      "matched_field_counts": {
+        "metric_card": 2
+      },
+      "metric_counts": {
+        "cost_paid:Restoration Seminar": 2
+      },
+      "raw_record_count": 2,
+      "role_confidence": "summary_metric_and_rule",
+      "role_signals": [
+        "paid_cast_exposure",
+        "spell_or_permanent_recursion"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "nonland_permanent_graveyard_to_battlefield_paradigm_v1": 1
+        },
+        "card_name": "Restoration Seminar",
+        "effects": {
+          "recursion": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "samples": [
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Restoration Seminar",
+          "path": "results[6].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Restoration Seminar",
+          "path": "results[6].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json"
+        }
+      ],
+      "source_file_count": 2,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json",
+          "unique_exposure_count": 1
+        }
+      ],
+      "summary_metric_count": 2,
+      "unique_exposure_count": 2
+    },
+    {
+      "card_name": "Farewell",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 24,
+      "effect_counts": {},
+      "event_counts": {
+        "permanent_moved_from_battlefield": 18,
+        "turn_end": 6
+      },
+      "inferred_role": "board_wipe_pressure_reset",
+      "matched_field_counts": {
+        "discarded_cards": 6,
+        "metric_card": 5,
+        "source": 18
+      },
+      "metric_counts": {
+        "miracle:Farewell": 8
+      },
+      "raw_record_count": 29,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "discard_or_rummage_context",
+        "miracle_hit",
+        "pressure_reset_board_wipe"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "modal_exile_wipe_creature_runtime_baseline_v1": 1
+        },
+        "card_name": "Farewell",
+        "effects": {
+          "board_wipe": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "samples": [
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "packages[0].gate_summary.baseline.telemetry.squee_game_traces.deck_6:Aang, at the Crossroads #106 (real):2[23]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 14
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0[12]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "turn": 13
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[0].telemetry.squee_game_traces.deck_6:Aang, at the Crossroads #106 (real):2[23]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 14
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[1].telemetry.squee_game_traces.synergy_brass_bounty_cut_boros_signet:Winota, Joiner of Forces #39 (real):0[12]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "turn": 13
+        },
+        {
+          "event": "turn_end",
+          "evidence_type": "event",
+          "matched_field": "discarded_cards",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_ghostly_prison_pressure_cut_promise:Sisay, Weatherlight Captain #61 (real):0[5]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v1_games2_opp8_20260627_221429.json",
+          "turn": 6
+        },
+        {
+          "event": "turn_end",
+          "evidence_type": "event",
+          "matched_field": "discarded_cards",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[5]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v1_games2_opp8_20260627_221429.json",
+          "turn": 6
+        },
+        {
+          "event": "turn_end",
+          "evidence_type": "event",
+          "matched_field": "discarded_cards",
+          "path": "results[1].telemetry.squee_game_traces.synergy_ghostly_prison_pressure_cut_promise:Sisay, Weatherlight Captain #61 (real):0[5]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v1_games2_opp8_20260627_221429_ghostly_prison_pressure_cut_promise.json",
+          "turn": 6
+        },
+        {
+          "event": "turn_end",
+          "evidence_type": "event",
+          "matched_field": "discarded_cards",
+          "path": "results[1].telemetry.squee_trace_samples[5]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v1_games2_opp8_20260627_221429_ghostly_prison_pressure_cut_promise.json",
+          "turn": 6
+        },
+        {
+          "event": "turn_end",
+          "evidence_type": "event",
+          "matched_field": "discarded_cards",
+          "path": "packages[1].gate_summary.candidate.telemetry.squee_game_traces.synergy_ghostly_prison_pressure_cut_squelcher:Sisay, Weatherlight Captain #61 (real):0[0]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+          "turn": 3
+        },
+        {
+          "event": "turn_end",
+          "evidence_type": "event",
+          "matched_field": "discarded_cards",
+          "path": "results[1].telemetry.squee_game_traces.synergy_ghostly_prison_pressure_cut_squelcher:Sisay, Weatherlight Captain #61 (real):0[0]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1_ghostly_prison_pressure_cut_squelcher.json",
+          "turn": 3
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_angel_grace_life_floor_cut_dawn:Sisay, Weatherlight Captain #61 (real):0[9]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1.json",
+          "turn": 5
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_trace_samples[9]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1.json",
+          "turn": 5
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[1].telemetry.squee_game_traces.synergy_angel_grace_life_floor_cut_dawn:Sisay, Weatherlight Captain #61 (real):0[9]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1_angel_grace_life_floor_cut_dawn.json",
+          "turn": 5
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[1].telemetry.squee_trace_samples[9]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1_angel_grace_life_floor_cut_dawn.json",
+          "turn": 5
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0[5]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v2_smoke_opp8_20260627_215233.json",
+          "turn": 15
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[1].telemetry.squee_game_traces.synergy_overmaster_protect_draw_cut_tibalts_trickery:Tannuk, Memorial Ensign #40 (real):0[5]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v2_smoke_opp8_20260627_215233_overmaster_protect_draw_cut_tibalts_trickery.json",
+          "turn": 15
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_core_challenge_past_over_tragic:Kenrith, the Returned King #113 (real):0[63]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v2_seed7_smoke_opp8_20260627_215812.json",
+          "turn": 21
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[1].telemetry.squee_game_traces.synergy_core_challenge_past_over_tragic:Kenrith, the Returned King #113 (real):0[63]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v2_seed7_smoke_opp8_20260627_215812_core_challenge_past_over_tragic.json",
+          "turn": 21
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Farewell",
+          "path": "packages[1].gate_summary.candidate.telemetry.top_cards[7]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Farewell",
+          "path": "results[1].telemetry.top_cards[7]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed_monastery_mentor_spell_tokens_cut_prismari.json"
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_boseiju_spell_protection_land:Sisay, Weatherlight Captain #61 (real):2[45]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json",
+          "turn": 11
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[1].telemetry.squee_game_traces.synergy_boseiju_spell_protection_land:Sisay, Weatherlight Captain #61 (real):2[45]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+          "turn": 11
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[1].telemetry.squee_game_traces.synergy_boseiju_spell_protection_land:Sisay, Weatherlight Captain #61 (real):2[45]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land_partial.json",
+          "turn": 11
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "packages[0].gate_summary.candidate.telemetry.squee_game_traces.synergy_birgi_seething_chain_cut_medallions:Winota, Joiner of Forces #39 (real):2[13]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1.json",
+          "turn": 13
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[1].telemetry.squee_game_traces.synergy_birgi_seething_chain_cut_medallions:Winota, Joiner of Forces #39 (real):2[13]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json",
+          "turn": 13
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 2,
+          "metric_key": "miracle:Farewell",
+          "path": "results[0].telemetry.top_cards[10]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_seed99_20260627_010934_squee_goblin_nabob.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 2,
+          "metric_key": "miracle:Farewell",
+          "path": "results[0].telemetry.top_cards[10]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_seed99_20260627_010934_squee_goblin_nabob_partial.json"
+        },
+        {
+          "event": "permanent_moved_from_battlefield",
+          "evidence_type": "event",
+          "matched_field": "source",
+          "path": "results[2].telemetry.squee_game_traces.candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1[7]",
+          "player": "Lorehold",
+          "reason": "board_wipe",
+          "source": "Farewell",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260624_v1.json",
+          "turn": 10
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 2,
+          "metric_key": "miracle:Farewell",
+          "path": "results[1].telemetry.top_cards[11]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json"
+        }
+      ],
+      "source_file_count": 23,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_gate_20260627_v3_games3_opp8_20260627_212849_brass_bounty_cut_boros_signet.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v1_games2_opp8_20260627_221429.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v1_games2_opp8_20260627_221429_ghostly_prison_pressure_cut_promise.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_life_floor_conversion_gate_20260627_seed42_v1_life_floor_v1_angel_grace_life_floor_cut_dawn.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_library_pressure_conversion_gate_20260627_seed42_v1_library_pressure_v1_ghostly_prison_pressure_cut_squelcher.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v2_smoke_opp8_20260627_215233.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v2_smoke_opp8_20260627_215233_overmaster_protect_draw_cut_tibalts_trickery.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v2_seed7_smoke_opp8_20260627_215812.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v2_seed7_smoke_opp8_20260627_215812_core_challenge_past_over_tragic.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_payoff_gate_20260627_v1_fixed_monastery_mentor_spell_tokens_cut_prismari.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_protection_land_gate_20260627_seed42_v1_spell_protection_land_v1_boseiju_spell_protection_land_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed42_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_seed99_20260627_010934_squee_goblin_nabob.json",
+          "unique_exposure_count": 1
+        }
+      ],
+      "summary_metric_count": 5,
+      "unique_exposure_count": 29
+    },
+    {
+      "card_name": "Furygale Flocking",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 2,
+      "effect_counts": {
+        "token_maker": 2
+      },
+      "event_counts": {
+        "spell_resolved": 1,
+        "tokens_created": 1
+      },
+      "inferred_role": "runtime_ready_unexposed",
+      "matched_field_counts": {
+        "card": 2,
+        "metric_card": 20
+      },
+      "metric_counts": {
+        "cost_paid:Furygale Flocking": 13,
+        "discard_to_top:Furygale Flocking": 8,
+        "lorehold_rummage_to_top:Furygale Flocking": 8,
+        "miracle:Furygale Flocking": 9
+      },
+      "raw_record_count": 24,
+      "role_confidence": "rule_only",
+      "role_signals": [
+        "board_development_tokens",
+        "miracle_hit",
+        "paid_cast_exposure"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "per_opponent_two_3_3_flying_hasty_elemental_tokens_v1": 1
+        },
+        "card_name": "Furygale Flocking",
+        "effects": {
+          "token_maker": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "samples": [
+        {
+          "effect": "token_maker",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:2",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl",
+          "turn": 9
+        },
+        {
+          "effect": "token_maker",
+          "event": "tokens_created",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:3",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl",
+          "turn": 9
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Furygale Flocking",
+          "path": "packages[10].gate_summary.candidate.telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "packages[4].gate_summary.candidate.telemetry.top_cards[6]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[11]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[11]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine_partial.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm_partial.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[7]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[7]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast_partial.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[6]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[6]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine_partial.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[9]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_v1_20260627_122613_birgi_spellchain_cut_squelcher.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[9]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_v1_20260627_122613_birgi_spellchain_cut_squelcher_partial.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 4,
+          "metric_key": "cost_paid:Furygale Flocking",
+          "path": "packages[0].gate_summary.baseline.telemetry.top_cards[5]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v3_seed99_smoke_opp8_20260627_220604.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 4,
+          "metric_key": "cost_paid:Furygale Flocking",
+          "path": "results[0].telemetry.top_cards[5]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v3_seed99_smoke_opp8_20260627_220604_core_challenge_past_over_tragic.json"
+        },
+        {
+          "event": "lorehold_rummage_to_top",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 4,
+          "metric_key": "lorehold_rummage_to_top:Furygale Flocking",
+          "path": "packages[0].gate_summary.candidate.telemetry.top_cards[6]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1.json"
+        },
+        {
+          "event": "discard_to_top",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 4,
+          "metric_key": "discard_to_top:Furygale Flocking",
+          "path": "packages[0].gate_summary.candidate.telemetry.top_cards[7]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1.json"
+        },
+        {
+          "event": "lorehold_rummage_to_top",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 4,
+          "metric_key": "lorehold_rummage_to_top:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[6]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json"
+        },
+        {
+          "event": "discard_to_top",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 4,
+          "metric_key": "discard_to_top:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[7]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "packages[0].gate_summary.candidate.telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json"
+        },
+        {
+          "event": "miracle",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "miracle:Furygale Flocking",
+          "path": "results[1].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_gamble_access_benchmark_cut_land_tax.json"
+        }
+      ],
+      "source_file_count": 18,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck607_pg091_token_maker_family_focused_events_20260623_093259.jsonl",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_conversion_gate_20260627_seed20260625_v1_spellchain_v1_birgi_seething_chain_cut_medallions.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_arcane_bombardment_engine_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_core_challenge_dance_over_storm_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_past_in_flames_recast_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013_primal_amulet_spell_engine_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_v1_20260627_122613_birgi_spellchain_cut_squelcher.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_v1_20260627_122613_birgi_spellchain_cut_squelcher_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v3_seed99_smoke_opp8_20260627_220604.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v3_seed99_smoke_opp8_20260627_220604_core_challenge_past_over_tragic.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_gamble_access_benchmark_cut_land_tax.json",
+          "unique_exposure_count": 1
+        }
+      ],
+      "summary_metric_count": 20,
+      "unique_exposure_count": 22
+    },
+    {
+      "card_name": "Mizzix's Mastery",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 112,
+      "effect_counts": {
+        "overload_recursion": 73
+      },
+      "event_counts": {
+        "cast_announced": 4,
+        "cost_paid": 4,
+        "miracle_cast": 10,
+        "mizzix_mastery_copy_cast": 2,
+        "mizzix_mastery_resolved": 2,
+        "priority_pass": 27,
+        "self_exiled_on_resolution": 1,
+        "spell_cast": 22,
+        "spell_countered": 1,
+        "spell_resolved": 33,
+        "turn_end": 6
+      },
+      "inferred_role": "runtime_ready_unexposed",
+      "matched_field_counts": {
+        "card": 78,
+        "discarded_cards": 6,
+        "metric_card": 84,
+        "stack_top": 27,
+        "target": 1
+      },
+      "metric_counts": {
+        "cost_paid:Mizzix's Mastery": 126,
+        "discard_to_top:Mizzix's Mastery": 36,
+        "lorehold_rummage_to_top:Mizzix's Mastery": 18,
+        "miracle:Mizzix's Mastery": 6,
+        "spell_rummage_to_top:Mizzix's Mastery": 18
+      },
+      "raw_record_count": 227,
+      "role_confidence": "rule_only",
+      "role_signals": [
+        "discard_or_rummage_context",
+        "miracle_hit",
+        "paid_cast_exposure"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "target_or_overload_graveyard_instant_sorcery_copy_cast_runtime_v1": 1
+        },
+        "card_name": "Mizzix's Mastery",
+        "effects": {
+          "overload_recursion": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "samples": [
+        {
+          "event": "mizzix_mastery_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:11",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl",
+          "turn": 6
+        },
+        {
+          "event": "self_exiled_on_resolution",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:12",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl",
+          "turn": 6
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:6",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl",
+          "turn": 6
+        },
+        {
+          "event": "mizzix_mastery_copy_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:7",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl",
+          "turn": 6
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:3",
+          "player": "Active",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl",
+          "turn": 6
+        },
+        {
+          "event": "mizzix_mastery_copy_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:4",
+          "player": "Active",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl",
+          "turn": 6
+        },
+        {
+          "event": "mizzix_mastery_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:5",
+          "player": "Active",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl",
+          "turn": 6
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "miracle_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:183",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1002.jsonl",
+          "turn": 9
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:184",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1002.jsonl",
+          "turn": 9
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:212",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1007.jsonl",
+          "turn": 10
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:213",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1007.jsonl",
+          "turn": 10
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:77",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1008.jsonl",
+          "turn": 5
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:78",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1008.jsonl",
+          "turn": 5
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:204",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1011.jsonl",
+          "turn": 11
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:205",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1011.jsonl",
+          "turn": 11
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:140",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "turn": 8
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:142",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1016.jsonl",
+          "turn": 8
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:431",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_104.jsonl",
+          "turn": 23
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:432",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_104.jsonl",
+          "turn": 23
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:426",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_201.jsonl",
+          "turn": 18
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:428",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_201.jsonl",
+          "turn": 18
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:41",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_202.jsonl",
+          "turn": 3
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:42",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_202.jsonl",
+          "turn": 3
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:136",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_203.jsonl",
+          "turn": 8
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:137",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_203.jsonl",
+          "turn": 8
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:353",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_204.jsonl",
+          "turn": 18
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:354",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_204.jsonl",
+          "turn": 18
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:88",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_42.jsonl",
+          "turn": 5
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:89",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_42.jsonl",
+          "turn": 5
+        },
+        {
+          "effect": "overload_recursion",
+          "event": "miracle_cast",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:192",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_902.jsonl",
+          "turn": 9
+        }
+      ],
+      "source_file_count": 106,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_replay_20260620_153647.events.jsonl",
+          "unique_exposure_count": 13
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_battle_forensic_readonly_20260619_seed42/battle_forensic_seed_42.jsonl",
+          "unique_exposure_count": 8
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_battle_forensic_readonly_20260619_seeds42_44/battle_forensic_seed_42.jsonl",
+          "unique_exposure_count": 8
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_single_battle_replay_20260620_1810.events.jsonl",
+          "unique_exposure_count": 8
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_target_pressure_seed63212004_replay_20260620_1556.events.jsonl",
+          "unique_exposure_count": 8
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_battle_forensic_readonly_20260619_seeds42_44/battle_forensic_seed_44.jsonl",
+          "unique_exposure_count": 6
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_l4_battle_support_focused_events_20260623_062422.jsonl",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge.json",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_finalizer_benchmark_gate_20260627_v1_seed20260625_hash0_isolated_timeout_storm_challenge_core_challenge_dance_over_storm.json",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v2_seed7_smoke_opp8_20260627_221507.json",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ghostly_promise_gate_20260627_v2_seed7_smoke_opp8_20260627_221507_ghostly_prison_pressure_cut_promise.json",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v3_seed7_smoke_opp8_20260627_215341.json",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_overmaster_tibalt_gate_20260627_v3_seed7_smoke_opp8_20260627_215341_overmaster_protect_draw_cut_tibalts_trickery.json",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v2_seed7_smoke_opp8_20260627_215812.json",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_past_tragic_gate_20260627_v2_seed7_smoke_opp8_20260627_215812_core_challenge_past_over_tragic.json",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1002.jsonl",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1007.jsonl",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1008.jsonl",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_1011.jsonl",
+          "unique_exposure_count": 2
+        }
+      ],
+      "summary_metric_count": 84,
+      "unique_exposure_count": 196
+    },
+    {
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 2,
+      "effect_counts": {
+        "creature": 1
+      },
+      "event_counts": {
+        "etb_recursion_resolved": 1,
+        "spell_resolved": 1
+      },
+      "inferred_role": "recursion_engine",
+      "matched_field_counts": {
+        "card": 2,
+        "metric_card": 12
+      },
+      "metric_counts": {
+        "cost_paid:Pinnacle Monk // Mystic Peak": 30
+      },
+      "raw_record_count": 16,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "graveyard_recursion",
+        "paid_cast_exposure",
+        "spell_or_permanent_recursion"
+      ],
+      "rule_summary": {
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "front_creature_prowess_etb_return_instant_or_sorcery_graveyard_to_hand_back_land_annotation_v1": 1
+        },
+        "card_name": "Pinnacle Monk // Mystic Peak",
+        "effects": {
+          "creature": 1,
+          "recursion": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "samples": [
+        {
+          "effect": "creature",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:5",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck606_607_608_pg080_pg081_focused_events_20260623_082229.jsonl",
+          "turn": 5
+        },
+        {
+          "event": "etb_recursion_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:6",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck606_607_608_pg080_pg081_focused_events_20260623_082229.jsonl",
+          "turn": 5
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[1].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ashling_equal_gate_rerun_20260626_221622_ashling_flame_dancer.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[1].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ashling_equal_gate_rerun_20260626_221622_ashling_flame_dancer_partial.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[1].telemetry.top_cards[10]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_galvanoth_v1_galvanoth_v1_gate.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[1].telemetry.top_cards[10]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_galvanoth_v1_galvanoth_v1_gate_partial.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[1].telemetry.top_cards[10]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[0].telemetry.top_cards[10]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162145_squee_goblin_nabob_partial.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[0].telemetry.top_cards[10]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162346_squee_goblin_nabob.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[0].telemetry.top_cards[10]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162346_squee_goblin_nabob_partial.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 2,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[0].telemetry.top_cards[5]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_thor_synced_rule_gate_20260627_seed321_v1.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 2,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[0].telemetry.top_cards[5]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_thor_synced_rule_gate_20260627_seed321_v1_partial.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[5].telemetry.top_cards[11]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json"
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 1,
+          "metric_key": "cost_paid:Pinnacle Monk // Mystic Peak",
+          "path": "results[5].telemetry.top_cards[11]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json"
+        }
+      ],
+      "source_file_count": 13,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck606_607_608_pg080_pg081_focused_events_20260623_082229.jsonl",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ashling_equal_gate_rerun_20260626_221622_ashling_flame_dancer.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_ashling_equal_gate_rerun_20260626_221622_ashling_flame_dancer_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_galvanoth_v1_galvanoth_v1_gate.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_registry_candidate_runner_20260626_galvanoth_v1_galvanoth_v1_gate_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed20260625_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162145_squee_goblin_nabob_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162346_squee_goblin_nabob.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_rule_materialized_equal_gate_20260627_v1_20260627_162346_squee_goblin_nabob_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_thor_synced_rule_gate_20260627_seed321_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_thor_synced_rule_gate_20260627_seed321_v1_partial.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1.json",
+          "unique_exposure_count": 1
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_battle_gate_20260626_v1_partial.json",
+          "unique_exposure_count": 1
+        }
+      ],
+      "summary_metric_count": 12,
+      "unique_exposure_count": 14
+    }
+  ],
+  "generated_at": "2026-06-28T00:31:45Z",
+  "package_implications": [
+    {
+      "decision": "blocked_until_non_squee_cut",
+      "package": "volcanic_or_restoration_over_squee",
+      "reason": "Squee has measured graveyard-return exposure and should remain protected."
+    }
+  ],
+  "parse_errors": [],
+  "postgres_writes": false,
+  "scan_summary": {
+    "evidence_path_count": 633,
+    "json_files_scanned": 397,
+    "jsonl_files_scanned": 236,
+    "parse_error_count": 0,
+    "scanned_bytes": 64509799
+  },
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "target_cards": [
+    "Squee, Goblin Nabob",
+    "Volcanic Vision",
+    "Restoration Seminar",
+    "Farewell",
+    "Furygale Flocking",
+    "Mizzix's Mastery",
+    "Pinnacle Monk // Mystic Peak"
+  ]
+}

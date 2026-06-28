@@ -31,10 +31,14 @@ DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_202606
 DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_hand_filter_cut_model_20260627_v3_big_score_rejected.json"
 ]
+DEFAULT_RECURSION_CUT_MODEL_REPORTS = [
+    REPORT_DIR / "lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json"
+]
 DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
 ]
 
 
@@ -226,6 +230,14 @@ def latest_hand_filter_cut_model(
     if not hand_filter_cut_model_reports:
         return None
     return hand_filter_cut_model_reports[-1]
+
+
+def latest_recursion_cut_model(
+    recursion_cut_model_reports: list[tuple[Path, dict[str, Any]]],
+) -> tuple[Path, dict[str, Any]] | None:
+    if not recursion_cut_model_reports:
+        return None
+    return recursion_cut_model_reports[-1]
 
 
 def build_tutor_action(
@@ -477,6 +489,7 @@ def build_recursion_action(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
     exposures: dict[str, dict[str, Any]],
+    recursion_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
 ) -> dict[str, Any] | None:
     pairings = pairing_rows(miner_report, lane="graveyard_recursion")
     manual = manual_cut_by_candidate(manual_review)
@@ -487,6 +500,62 @@ def build_recursion_action(
             protected.append(row)
     if not pairings:
         return None
+    recursion_model = latest_recursion_cut_model(recursion_cut_model_reports or [])
+    if recursion_model:
+        model_path, model_payload = recursion_model
+        preflight_rows = [
+            row
+            for row in model_payload.get("preflight_benchmark_candidates") or []
+            if row.get("status") == "preflight_benchmark_ready"
+        ]
+        blocked_prior = [
+            row
+            for row in model_payload.get("pair_evaluations") or []
+            if row.get("status") in {"blocked_prior_reject", "blocked_cut_prior_reject"}
+        ]
+        if preflight_rows:
+            top = preflight_rows[0]
+            return {
+                "priority": 3,
+                "action_key": "run_recursion_benchmark_gate",
+                "status": "same_lane_benchmark_ready",
+                "lane": "graveyard_recursion",
+                "candidate_cards": [str(top.get("candidate") or "")],
+                "cut_cards": [str(top.get("cut") or "")],
+                "why_now": (
+                    "The recursion cut model has protected Squee and found a non-Squee same-lane benchmark."
+                ),
+                "blockers": [
+                    "the proposed cut is a benchmark, not a promotion",
+                    "the gate must prove that added recursion beats the lost current engine slot",
+                ],
+                "next_steps": [
+                    "Run package preflight for prior-negative evidence.",
+                    "Run the smallest equal gate only if preflight is clear.",
+                    "If rejected, add the exact report to prior package defaults and rerun this model.",
+                ],
+                "recursion_cut_model_report": str(model_path),
+                "preflight_benchmark_candidates": preflight_rows[:5],
+                "blocked_prior_rejections": blocked_prior[:5],
+            }
+        return {
+            "priority": 90,
+            "action_key": "avoid_recursion_without_non_squee_cut",
+            "status": "no_recursion_benchmark_ready",
+            "lane": "graveyard_recursion",
+            "candidate_cards": [],
+            "cut_cards": [],
+            "why_now": (
+                "The recursion cut model found no safe non-Squee benchmark after protected cuts and prior rejects."
+            ),
+            "blockers": ["no preflight_benchmark_ready recursion pair remains"],
+            "next_steps": [
+                "Do not cut Squee, Farewell, Furygale Flocking, Mizzix's Mastery, or Pinnacle Monk for current recursion candidates.",
+                "Return to this lane only with a different cut or a multi-card package that preserves the current engine.",
+            ],
+            "recursion_cut_model_report": str(model_path),
+            "blocked_prior_rejections": blocked_prior[:5],
+        }
     candidates = [str(row["candidate"]) for row in pairings[:5]]
     cuts = summarize_cut_options(pairings, limit=5)
     cut_names = [str(row["card_name"]) for row in cuts if row.get("card_name")]
@@ -629,6 +698,7 @@ def build_plan(
     exposure_profiles: list[tuple[Path, dict[str, Any]]],
     tutor_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     hand_filter_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    recursion_cut_model_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
@@ -671,7 +741,12 @@ def build_plan(
             exposures,
             hand_filter_cut_model_reports=hand_filter_cut_model_reports,
         ),
-        build_recursion_action(miner_report, manual_review, exposures),
+        build_recursion_action(
+            miner_report,
+            manual_review,
+            exposures,
+            recursion_cut_model_reports=recursion_cut_model_reports,
+        ),
         build_mana_action(miner_report),
         build_runtime_action(miner_report),
     ):
@@ -690,6 +765,9 @@ def build_plan(
         ],
         "hand_filter_cut_model_reports": [
             str(path) for path, _payload in (hand_filter_cut_model_reports or [])
+        ],
+        "recursion_cut_model_reports": [
+            str(path) for path, _payload in (recursion_cut_model_reports or [])
         ],
         "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
         "postgres_writes": False,
@@ -729,6 +807,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
         f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
         f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
+        f"- Recursion cut model reports: `{', '.join(payload.get('recursion_cut_model_reports') or []) or '-'}`",
         f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
@@ -802,6 +881,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
     parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
+    parser.add_argument("--recursion-cut-model-report", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260627_v1")
     return parser.parse_args()
@@ -819,6 +899,9 @@ def main() -> int:
     hand_filter_cut_model_reports = read_existing_json(
         args.hand_filter_cut_model_report or DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS
     )
+    recursion_cut_model_reports = read_existing_json(
+        args.recursion_cut_model_report or DEFAULT_RECURSION_CUT_MODEL_REPORTS
+    )
     prior_package_reports = read_existing_json(
         args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
     )
@@ -828,6 +911,7 @@ def main() -> int:
         exposure_profiles=exposure_profiles,
         tutor_cut_model_reports=tutor_cut_model_reports,
         hand_filter_cut_model_reports=hand_filter_cut_model_reports,
+        recursion_cut_model_reports=recursion_cut_model_reports,
         prior_package_reports=prior_package_reports,
         miner_path=args.miner_report,
         manual_path=args.manual_review,

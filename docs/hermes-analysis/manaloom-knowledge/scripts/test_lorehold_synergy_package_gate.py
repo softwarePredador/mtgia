@@ -299,6 +299,29 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             ],
         )
         self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["volcanic_recursion_cut_pinnacle"]["family"],
+            "graveyard_recursion_benchmark",
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["volcanic_recursion_cut_pinnacle"]["adds"],
+            ["Volcanic Vision"],
+        )
+        self.assertEqual(
+            gate.PACKAGE_DEFINITIONS["volcanic_recursion_cut_pinnacle"]["cuts"],
+            ["Pinnacle Monk // Mystic Peak"],
+        )
+        self.assertTrue(
+            gate.PACKAGE_DEFINITIONS["volcanic_recursion_cut_pinnacle"][
+                "allow_miracle_core_cuts"
+            ],
+        )
+        self.assertIn(
+            "lorehold_recursion_cut_model_20260627_v1",
+            gate.PACKAGE_DEFINITIONS["volcanic_recursion_cut_pinnacle"][
+                "cut_safety_override_reason"
+            ],
+        )
+        self.assertEqual(
             gate.PACKAGE_DEFINITIONS["core_challenge_aetherflux_over_storm"]["cuts"],
             ["Storm Herd"],
         )
@@ -530,6 +553,10 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         )
         self.assertIn(
             "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
             default_names,
         )
 

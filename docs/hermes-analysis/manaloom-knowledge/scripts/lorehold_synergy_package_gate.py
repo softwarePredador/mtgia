@@ -41,6 +41,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+    REPORT_DIR / "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
 )
 
 
@@ -464,6 +465,22 @@ PACKAGE_DEFINITIONS: dict[str, dict[str, Any]] = {
         "adds": ["Radiant Scrollwielder"],
         "cuts": ["The Scarlet Witch"],
         "allow_miracle_core_cuts": True,
+    },
+    "volcanic_recursion_cut_pinnacle": {
+        "family": "graveyard_recursion_benchmark",
+        "hypothesis": (
+            "The recursion cut model protects Squee, Farewell, Furygale Flocking, "
+            "and Mizzix's Mastery. Volcanic Vision over Pinnacle Monk is the first "
+            "non-Squee same-lane benchmark: it trades a low-exposure ETB recursion "
+            "engine for a high-cost instant/sorcery recursion spell with opponent "
+            "creature damage annotation."
+        ),
+        "adds": ["Volcanic Vision"],
+        "cuts": ["Pinnacle Monk // Mystic Peak"],
+        "allow_miracle_core_cuts": True,
+        "cut_safety_override_reason": (
+            "preflight benchmark required by lorehold_recursion_cut_model_20260627_v1"
+        ),
     },
     "austere_command_wipe_over_emeria_tradeoff": {
         "family": "pressure_reset_tradeoff",

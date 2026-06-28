@@ -239,6 +239,85 @@ def hand_filter_cut_model_report():
     )
 
 
+def hand_filter_blocked_model_report():
+    return (
+        planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0],
+        {
+            "summary": {
+                "preflight_benchmark_ready_count": 0,
+                "recommended_next_action": (
+                    "do_not_gate_hand_filter_without_new_cut_or_runtime_evidence"
+                ),
+            },
+            "preflight_benchmark_candidates": [],
+            "pair_evaluations": [
+                {
+                    "candidate": "Valakut Awakening // Valakut Stoneforge",
+                    "cut": "Big Score",
+                    "status": "blocked_prior_reject",
+                }
+            ],
+        },
+    )
+
+
+def recursion_cut_model_report():
+    return (
+        planner.DEFAULT_RECURSION_CUT_MODEL_REPORTS[0],
+        {
+            "summary": {
+                "preflight_benchmark_ready_count": 1,
+                "recommended_next_action": (
+                    "preflight_Volcanic Vision_over_Pinnacle Monk // Mystic Peak"
+                ),
+            },
+            "preflight_benchmark_candidates": [
+                {
+                    "candidate": "Volcanic Vision",
+                    "cut": "Pinnacle Monk // Mystic Peak",
+                    "status": "preflight_benchmark_ready",
+                    "score": 112,
+                    "blockers": ["candidate_low_natural_exposure"],
+                }
+            ],
+            "pair_evaluations": [
+                {
+                    "candidate": "Volcanic Vision",
+                    "cut": "Squee, Goblin Nabob",
+                    "status": "blocked_core_or_current_engine_cut",
+                }
+            ],
+        },
+    )
+
+
+def recursion_blocked_model_report():
+    return (
+        planner.DEFAULT_RECURSION_CUT_MODEL_REPORTS[0],
+        {
+            "summary": {
+                "preflight_benchmark_ready_count": 0,
+                "recommended_next_action": (
+                    "do_not_gate_recursion_without_non_squee_cut_or_multi_card_package"
+                ),
+            },
+            "preflight_benchmark_candidates": [],
+            "pair_evaluations": [
+                {
+                    "candidate": "Volcanic Vision",
+                    "cut": "Pinnacle Monk // Mystic Peak",
+                    "status": "blocked_prior_reject",
+                },
+                {
+                    "candidate": "Restoration Seminar",
+                    "cut": "Pinnacle Monk // Mystic Peak",
+                    "status": "blocked_cut_prior_reject",
+                },
+            ],
+        },
+    )
+
+
 def test_next_action_planner_prioritizes_cut_models_before_gates():
     payload = planner.build_plan(
         miner_report=miner_report(),
@@ -311,3 +390,41 @@ def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():
     assert hand_filter_action["blocked_prior_rejections"][0]["candidate"] == (
         "Valakut Awakening // Valakut Stoneforge"
     )
+
+
+def test_next_action_planner_uses_recursion_model_when_hand_filter_blocked():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        tutor_cut_model_reports=[tutor_cut_model_report()],
+        hand_filter_cut_model_reports=[hand_filter_blocked_model_report()],
+        recursion_cut_model_reports=[recursion_cut_model_report()],
+        prior_package_reports=[prior_tutor_land_tax_report()],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == "run_recursion_benchmark_gate"
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    recursion_action = actions["run_recursion_benchmark_gate"]
+    assert recursion_action["status"] == "same_lane_benchmark_ready"
+    assert recursion_action["candidate_cards"] == ["Volcanic Vision"]
+    assert recursion_action["cut_cards"] == ["Pinnacle Monk // Mystic Peak"]
+
+
+def test_next_action_planner_moves_to_mana_after_recursion_rejects():
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        tutor_cut_model_reports=[tutor_cut_model_report()],
+        hand_filter_cut_model_reports=[hand_filter_blocked_model_report()],
+        recursion_cut_model_reports=[recursion_blocked_model_report()],
+        prior_package_reports=[prior_tutor_land_tax_report()],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == "use_mana_base_validator_not_battle_gate"
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    recursion_action = actions["avoid_recursion_without_non_squee_cut"]
+    assert recursion_action["status"] == "no_recursion_benchmark_ready"
+    assert recursion_action["priority"] == 90
+    assert recursion_action["blocked_prior_rejections"][0]["status"] == "blocked_prior_reject"
