@@ -1,5 +1,12 @@
 # XMage Absorption Workflow V2
 
+Status: `historical_superseded`.
+
+Operational use was superseded by
+`XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`. Keep this file as evidence
+for why full-XMage-first and card-by-card were rejected, but do not use old
+commands here as the current handoff contract.
+
 ## Objective
 
 Reduce the current XMage -> ManaLoom absorption cycle time by changing the
@@ -296,9 +303,7 @@ Validate strategy/project consistency:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py \
-  --pattern-registry-report docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_pattern_registry.json \
-  --pipeline-manifest docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260624_pg166_181_postsync_real_v8_manifest.json \
-  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260624_pg166_181_postsync_real_v5
+  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_$(date -u +%Y%m%d_%H%M%S)_definitive_flow
 ```
 
 ## Definition of a good next cycle

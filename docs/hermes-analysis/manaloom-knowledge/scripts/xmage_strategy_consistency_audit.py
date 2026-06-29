@@ -1,37 +1,58 @@
 #!/usr/bin/env python3
-"""Audit whether the repo is aligned with the chosen XMage acceleration strategy.
+"""Audit whether the repo is aligned with the definitive XMage -> ManaLoom flow.
 
-This script checks the project instructions and generated artifacts for the
-hybrid strategy:
+This is a governance audit, not a card-rule promoter. It checks that docs,
+scripts, and current evidence still agree on the 2026-06-29 operating model:
 
-- effective queue before card-by-card work;
-- shadow pattern registry present and non-executable;
-- pipeline emits pattern registry artifacts;
-- benchmark still recommends the hybrid strategy;
-- docs point humans/agents to the same flow.
+- official rules / Oracle metadata / local XMage are source inputs;
+- broad XMage extraction creates review candidates only;
+- pattern registry rows stay shadow-only and non-executable;
+- generic ``xmage_*_review_v1`` scopes do not become PostgreSQL truth;
+- PostgreSQL remains the durable source of truth and Hermes remains cache/lab;
+- current Lorehold 6 + 607-616 scope is visible in evidence.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-DEFAULT_REPORT_DIR = REPO_ROOT / "docs/hermes-analysis/master_optimizer_reports"
-DEFAULT_BENCHMARK = DEFAULT_REPORT_DIR / "xmage_acceleration_strategy_benchmark_20260624_pg166_181_postsync_real_v2.json"
-DEFAULT_PATTERN_REGISTRY = (
-    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_pattern_registry.json"
+REPORT_DIR = REPO_ROOT / "docs/hermes-analysis/master_optimizer_reports"
+
+DEFAULT_DEFINITIVE_FLOW = REPO_ROOT / "docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
+DEFAULT_DOC_INDEX = REPO_ROOT / "docs/hermes-analysis/BATTLE_DOCUMENTATION_STATUS_INDEX_2026-06-19.md"
+DEFAULT_ROOT_README = REPO_ROOT / "docs/hermes-analysis/README.md"
+DEFAULT_REPORT_README = REPORT_DIR / "README.md"
+DEFAULT_PIPELINE_MANIFEST_MD = (
+    REPORT_DIR
+    / "xmage_current_replay_batch_pipeline_20260629_135909_post_adagia_family_mapper_lorehold_6_607_616_manifest.md"
 )
-DEFAULT_PATTERN_SCHEMA = DEFAULT_REPORT_DIR / "xmage_pattern_registry_20260624_pg166_181_postsync_real_v2_schema_proposal.sql"
-DEFAULT_EFFECTIVE_QUEUE = DEFAULT_REPORT_DIR / "xmage_effective_queue_20260624_mapper_runtime_batch_v3_post_pg184.json"
-DEFAULT_PIPELINE_MANIFEST = (
-    DEFAULT_REPORT_DIR / "xmage_current_replay_batch_pipeline_20260624_mapper_runtime_batch_v2_manifest.json"
-)
-DEFAULT_EXPECTED_EFFECTIVE_DECK_IDS = list(range(608, 620))
+DEFAULT_RUNTIME_SURFACE_MD = REPORT_DIR / "battle_runtime_surface_manifest_20260629_post_adagia_mapper.md"
+DEFAULT_EXTERNAL_SOURCE_MD = REPORT_DIR / "mtg_battle_external_source_audit_20260629_post_adagia_mapper.md"
+
+DEFAULT_EXPECTED_FORCED_DECK_IDS = [6, *range(607, 617)]
+DEFAULT_EXPECTED_EFFECTIVE_DECK_IDS = [
+    6,
+    25,
+    31,
+    42,
+    54,
+    58,
+    62,
+    74,
+    83,
+    84,
+    104,
+    105,
+    116,
+    *range(607, 617),
+]
 
 
 @dataclass
@@ -42,14 +63,6 @@ class Check:
 
     def as_dict(self) -> dict[str, str]:
         return {"name": self.name, "status": self.status, "detail": self.detail}
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-def read_text(path: Path) -> str:
-    return path.read_text(encoding="utf-8")
 
 
 def ok(name: str, detail: str) -> Check:
@@ -67,223 +80,297 @@ def display_path(path: Path) -> str:
         return str(path)
 
 
-def contains_all(path: Path, needles: list[str]) -> Check:
+def read_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def contains_all(path: Path, needles: list[str], *, check_name: str | None = None) -> Check:
+    if not path.exists():
+        return fail(check_name or display_path(path), "missing_file")
     text = read_text(path)
     missing = [needle for needle in needles if needle not in text]
     if missing:
-        return fail(display_path(path), f"missing={missing}")
-    return ok(display_path(path), f"contains={needles}")
+        return fail(check_name or display_path(path), f"missing={missing}")
+    return ok(check_name or display_path(path), f"contains={needles}")
 
 
-def audit_pipeline() -> list[Check]:
-    path = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_current_replay_batch_pipeline.py"
+def contains_none(path: Path, needles: list[str], *, check_name: str | None = None) -> Check:
+    if not path.exists():
+        return fail(check_name or display_path(path), "missing_file")
+    text = read_text(path)
+    present = [needle for needle in needles if needle in text]
+    if present:
+        return fail(check_name or display_path(path), f"present={present}")
+    return ok(check_name or display_path(path), f"absent={needles}")
+
+
+def extract_backtick_json_object(text: str, label: str) -> dict[str, Any]:
+    pattern = re.compile(rf"- {re.escape(label)}: `(?P<json>{{.*?}})`")
+    match = pattern.search(text)
+    if not match:
+        raise ValueError(f"could not find JSON object for {label}")
+    return json.loads(match.group("json"))
+
+
+def extract_backtick_list(text: str, label: str) -> list[int]:
+    pattern = re.compile(rf"- {re.escape(label)}: `(?P<list>\[.*?\])`")
+    match = pattern.search(text)
+    if not match:
+        raise ValueError(f"could not find list for {label}")
+    return [int(value) for value in json.loads(match.group("list"))]
+
+
+def audit_docs(args: argparse.Namespace) -> list[Check]:
+    definitive_flow = Path(args.definitive_flow)
+    checks = [
+        contains_all(
+            definitive_flow,
+            [
+                "Status: `current_operating_standard`",
+                "broad XMage extraction may create review candidates and family lanes",
+                "must not create executable battle truth or PostgreSQL promotion by itself",
+                "PostgreSQL remains the durable source of truth",
+                "Hermes is cache/runtime evidence, not truth",
+                "Do not promote from `xmage_*_review_v1`",
+                "If a candidate card is not drawn/used in battle",
+                "Hazel's Brewmaster",
+            ],
+            check_name="docs.definitive_flow_contract",
+        ),
+        contains_all(
+            Path(args.root_readme),
+            [
+                "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
+                "current_operating_standard",
+                "Nao devem ser usados como contrato operacional",
+                "xmage_strategy_consistency_audit.py",
+            ],
+            check_name="docs.root_readme_points_to_definitive_flow",
+        ),
+        contains_none(
+            Path(args.root_readme),
+            [
+                "Decisao atual para acelerar XMage -> ManaLoom: usar\n    `hybrid_effective_queue_pattern_registry`",
+                "Workflow operacional atual para a fila real Lorehold 608-616",
+            ],
+            check_name="docs.root_readme_no_old_strategy_as_current",
+        ),
+        contains_all(
+            Path(args.doc_index),
+            [
+                "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
+                "current",
+                "supersede o uso operacional dos planos XMage de 2026-06-23/24",
+            ],
+            check_name="docs.status_index_marks_definitive_flow_current",
+        ),
+        contains_all(
+            Path(args.report_readme),
+            [
+                "evidence archive",
+                "not executable source of",
+                "Commit only reviewed summaries, package evidence, or final manifests",
+                "../XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
+            ],
+            check_name="docs.report_archive_boundary",
+        ),
+    ]
+    return checks
+
+
+def audit_script_surface() -> list[Check]:
+    scripts = REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts"
     return [
         contains_all(
-            path,
+            scripts / "xmage_current_replay_batch_pipeline.py",
             [
                 "import xmage_pattern_registry_builder as pattern_registry_builder",
                 "pattern_registry_builder.build_report",
                 "_pattern_registry.json",
                 "pattern_status_counts",
+                "forced_include_deck_ids",
             ],
-        )
-    ]
-
-
-def audit_docs() -> list[Check]:
-    return [
-        contains_all(
-            REPO_ROOT / "docs/hermes-analysis/README.md",
-            [
-                "XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md",
-                "LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md",
-                "hybrid_effective_queue_pattern_registry",
-                "pattern registry shadow-only",
-            ],
+            check_name="scripts.pipeline_emits_required_reports",
         ),
         contains_all(
-            REPO_ROOT / "docs/hermes-analysis/XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md",
+            scripts / "xmage_pattern_registry_builder.py",
             [
-                "xmage_pattern_registry_builder.py",
-                "promotion_status=shadow_only",
-                "Regenerate the acceleration strategy benchmark",
-                "Build the shadow pattern registry",
-            ],
-        ),
-        contains_all(
-            REPO_ROOT / "docs/hermes-analysis/XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md",
-            [
-                "xmage_pattern_registry_builder.py",
-                "can_execute_in_battle=false",
-                "shadow pattern registry",
-                "hybrid_effective_queue_pattern_registry",
-            ],
-        ),
-        contains_all(
-            REPO_ROOT / "docs/hermes-analysis/LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md",
-            [
-                "lorehold_ideal_deck_candidate_matrix.py",
-                "needs_rule_before_strategy",
-                "priority_benchmark_candidate",
-                "build_optimized_deck.py",
-                "universal_optimizer.py",
-            ],
-        ),
-    ]
-
-
-def audit_benchmark(path: Path) -> list[Check]:
-    report = load_json(path)
-    summary = report.get("summary") or {}
-    ranking = summary.get("ranking") or []
-    first = ranking[0] if ranking else {}
-    checks = []
-    if summary.get("recommended_strategy_id") == "hybrid_effective_queue_pattern_registry":
-        checks.append(ok("benchmark.recommended_strategy", "hybrid_effective_queue_pattern_registry"))
-    else:
-        checks.append(fail("benchmark.recommended_strategy", str(summary.get("recommended_strategy_id"))))
-    ranked_strategy_ids = [str(item.get("strategy_id") or "") for item in ranking]
-    if "hybrid_effective_queue_pattern_registry" in ranked_strategy_ids:
-        checks.append(ok("benchmark.hybrid_strategy_ranked", json.dumps(ranked_strategy_ids, sort_keys=True)))
-    else:
-        checks.append(fail("benchmark.hybrid_strategy_ranked", json.dumps(ranked_strategy_ids, sort_keys=True)))
-    if first.get("strategy_id") in {
-        "hybrid_effective_queue_pattern_registry",
-        "exact_scope_cluster_first",
-    }:
-        checks.append(ok("benchmark.ranking_first", json.dumps(first, sort_keys=True)))
-    else:
-        checks.append(fail("benchmark.ranking_first", json.dumps(first, sort_keys=True)))
-    return checks
-
-
-def audit_pattern_registry(path: Path) -> list[Check]:
-    report = load_json(path)
-    summary = report.get("summary") or {}
-    checks = []
-    if summary.get("promotion_status") == "shadow_only":
-        checks.append(ok("pattern_registry.promotion_status", "shadow_only"))
-    else:
-        checks.append(fail("pattern_registry.promotion_status", str(summary.get("promotion_status"))))
-    if int(summary.get("executable_pattern_count") or 0) == 0:
-        checks.append(ok("pattern_registry.executable_pattern_count", "0"))
-    else:
-        checks.append(fail("pattern_registry.executable_pattern_count", str(summary.get("executable_pattern_count"))))
-    if int(summary.get("auto_promotable_pattern_count") or 0) == 0:
-        checks.append(ok("pattern_registry.auto_promotable_pattern_count", "0"))
-    else:
-        checks.append(
-            fail("pattern_registry.auto_promotable_pattern_count", str(summary.get("auto_promotable_pattern_count")))
-        )
-    unsafe = [
-        pattern.get("pattern_id")
-        for pattern in report.get("patterns", [])
-        if pattern.get("can_execute_in_battle") or pattern.get("can_auto_promote_to_card_battle_rules")
-    ]
-    if not unsafe:
-        checks.append(ok("pattern_registry.unsafe_pattern_flags", "none"))
-    else:
-        checks.append(fail("pattern_registry.unsafe_pattern_flags", json.dumps(unsafe, sort_keys=True)))
-    return checks
-
-
-def audit_schema(path: Path) -> list[Check]:
-    return [
-        contains_all(
-            path,
-            [
-                "CREATE TABLE IF NOT EXISTS public.xmage_pattern_registry",
+                'PROMOTION_STATUS = "shadow_only"',
+                '"can_execute_in_battle": False',
+                '"can_auto_promote_to_card_battle_rules": False',
                 "promotion_status <> 'shadow_only'",
                 "can_execute_in_battle = FALSE",
-                "can_auto_promote_to_card_battle_rules = FALSE",
             ],
-        )
+            check_name="scripts.pattern_registry_shadow_only",
+        ),
+        contains_all(
+            scripts / "xmage_to_manaloom_effect_hints.py",
+            [
+                "xmage_spell_mana_ritual_variant_review_v1",
+                "xmage_exile_then_return_target_variant_review_v1",
+                "static_one_spell_per_turn_restriction_variant_review_v1",
+                "static_cast_as_flash_permission_variant_review_v1",
+                "xmage_choose_new_targets_variant_review_v1",
+                "xmage_multi_target_damage_variant_review_v1",
+                "xmage_life_gain_variant_review_v1",
+                "station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1",
+                '"runtime_missing_components": ["station_level_gate"]',
+            ],
+            check_name="scripts.effect_mapper_family_lanes_present",
+        ),
+        contains_all(
+            scripts / "xmage_semantic_family_classifier.py",
+            [
+                '"life_total_change"',
+                '"blink"',
+                '"multi_target_damage"',
+                '"redirect_target"',
+                '"untap_target"',
+                "station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1",
+            ],
+            check_name="scripts.family_classifier_matches_mapper",
+        ),
+        contains_all(
+            scripts / "battle_analyst_v9.py",
+            [
+                'effect_data.get("token_legendary")',
+                "token_legendary=bool(effect_data.get(\"token_legendary\"))",
+            ],
+            check_name="scripts.runtime_copy_token_legendary_support",
+        ),
+        contains_all(
+            scripts / "test_xmage_to_manaloom_effect_hints.py",
+            [
+                "test_adagia_maps_to_station_legendary_artifact_enchantment_copy_token",
+                "test_dynamic_mana_spell_routes_to_ritual_family",
+                "test_generic_blink_effect_routes_to_targeted_zone_transition_family",
+            ],
+            check_name="tests.mapper_family_coverage_present",
+        ),
+        contains_all(
+            scripts / "battle_card_specific_tests.py",
+            [
+                "test_adagia_station_copy_creates_legendary_artifact_or_enchantment_token",
+                "station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1",
+                'assert created["token_legendary"] is True',
+            ],
+            check_name="tests.runtime_adagia_coverage_present",
+        ),
     ]
 
 
-def audit_effective_queue(path: Path) -> list[Check]:
-    report = load_json(path)
-    counts = ((report.get("effective_queue") or {}).get("lane_counts") or {})
-    checks = []
-    if int(counts.get("package_ready_unprepared") or 0) == 0:
-        checks.append(ok("effective_queue.package_ready_unprepared", "0"))
-    else:
-        checks.append(fail("effective_queue.package_ready_unprepared", str(counts.get("package_ready_unprepared"))))
-    package_already_prepared = int(counts.get("package_already_prepared") or 0)
-    if package_already_prepared >= 0:
-        checks.append(ok("effective_queue.package_already_prepared", str(package_already_prepared)))
-    else:
-        checks.append(fail("effective_queue.package_already_prepared", str(package_already_prepared)))
-    return checks
+def audit_manifest(args: argparse.Namespace) -> list[Check]:
+    path = Path(args.pipeline_manifest_md)
+    if not path.exists():
+        return [fail("evidence.pipeline_manifest", "missing_file")]
+    text = read_text(path)
+    checks: list[Check] = []
 
-
-def audit_pipeline_manifest(path: Path, expected_effective_deck_ids: list[int]) -> list[Check]:
-    report = load_json(path)
-    scope = report.get("aggregate_scope") or {}
-    checks = []
-    effective_deck_ids = set(int(deck_id) for deck_id in scope.get("effective_deck_ids", []))
-    missing = sorted(set(int(deck_id) for deck_id in expected_effective_deck_ids) - effective_deck_ids)
-    if not missing:
-        checks.append(ok("pipeline_manifest.expected_effective_deck_ids", json.dumps(sorted(effective_deck_ids))))
-    else:
-        checks.append(fail("pipeline_manifest.expected_effective_deck_ids", f"missing={missing}"))
-
-    forced_deck_ids = set(int(deck_id) for deck_id in scope.get("forced_include_deck_ids", []))
-    missing_forced = sorted(set(int(deck_id) for deck_id in expected_effective_deck_ids) - forced_deck_ids)
-    if not missing_forced:
-        checks.append(ok("pipeline_manifest.forced_include_deck_ids", json.dumps(sorted(forced_deck_ids))))
-    else:
-        checks.append(fail("pipeline_manifest.forced_include_deck_ids", f"missing={missing_forced}"))
-
-    learned_deck_ids = {int(deck_id) for deck_id in scope.get("learned_deck_ids", [])}
-    materialized = [
-        row
-        for row in report.get("materialization", [])
-        if isinstance(row, dict) and bool(row.get("apply"))
-    ]
-    unsafe_materialized = []
-    allowed_materialized = []
-    for row in materialized:
-        learned_deck_id = row.get("learned_deck_id")
-        target_deck_id = row.get("target_deck_id")
-        sqlite_db = str(row.get("sqlite_db") or "")
-        try:
-            learned_int = int(learned_deck_id)
-            target_int = int(target_deck_id)
-        except Exception:
-            unsafe_materialized.append(row)
-            continue
-        local_learned_deck_stage = (
-            learned_int in learned_deck_ids
-            and target_int == learned_int
-            and sqlite_db.endswith("knowledge.db")
-        )
-        if local_learned_deck_stage:
-            allowed_materialized.append(learned_int)
+    try:
+        forced_deck_ids = set(extract_backtick_list(text, "Forced include deck ids"))
+        expected_forced = set(int(deck_id) for deck_id in args.expected_forced_deck_id)
+        missing_forced = sorted(expected_forced - forced_deck_ids)
+        if missing_forced:
+            checks.append(fail("evidence.forced_deck_ids", f"missing={missing_forced}"))
         else:
-            unsafe_materialized.append(row)
-    if not unsafe_materialized:
-        detail = "none" if not allowed_materialized else f"local_sqlite_learned_decks={sorted(allowed_materialized)}"
-        checks.append(ok("pipeline_manifest.materialization_apply", detail))
-    else:
-        checks.append(
-            fail(
-                "pipeline_manifest.materialization_apply",
-                json.dumps(unsafe_materialized, sort_keys=True),
-            )
+            checks.append(ok("evidence.forced_deck_ids", json.dumps(sorted(forced_deck_ids))))
+    except Exception as exc:
+        checks.append(fail("evidence.forced_deck_ids", str(exc)))
+
+    try:
+        effective_deck_ids = set(extract_backtick_list(text, "Effective deck ids"))
+        expected_effective = set(int(deck_id) for deck_id in args.expected_effective_deck_id)
+        missing_effective = sorted(expected_effective - effective_deck_ids)
+        if missing_effective:
+            checks.append(fail("evidence.effective_deck_ids", f"missing={missing_effective}"))
+        else:
+            checks.append(ok("evidence.effective_deck_ids", json.dumps(sorted(effective_deck_ids))))
+    except Exception as exc:
+        checks.append(fail("evidence.effective_deck_ids", str(exc)))
+
+    expected_counts = {
+        "Validity status counts": {
+            "ready_for_structured_xmage_pull_review_required": 158,
+            "xmage_source_valid_mapper_required": 81,
+        },
+        "Proposal status counts": {
+            "batch_pg_candidate_after_precheck": 8,
+            "runtime_family_implementation_required": 1,
+            "split_family_scope_review_required": 148,
+            "mapper_metadata_or_test_scenario_required": 81,
+        },
+        "Family counts": {
+            "manual_model": 81,
+            "ramp_permanent": 49,
+            "targeted_interaction": 24,
+            "copy_creature_token": 1,
+            "token_maker": 1,
+        },
+        "Pattern status counts": {
+            "ready_for_pg_package_generation": 8,
+            "fragmented_runtime_observation_only": 1,
+            "requires_subpattern_split_before_promotion": 20,
+        },
+    }
+    for label, expected in expected_counts.items():
+        try:
+            actual = extract_backtick_json_object(text, label)
+            mismatches = {
+                key: {"expected": value, "actual": actual.get(key)}
+                for key, value in expected.items()
+                if actual.get(key) != value
+            }
+            if mismatches:
+                checks.append(fail(f"evidence.{label.lower().replace(' ', '_')}", json.dumps(mismatches, sort_keys=True)))
+            else:
+                checks.append(ok(f"evidence.{label.lower().replace(' ', '_')}", json.dumps(expected, sort_keys=True)))
+        except Exception as exc:
+            checks.append(fail(f"evidence.{label.lower().replace(' ', '_')}", str(exc)))
+
+    checks.append(
+        contains_all(
+            path,
+            ["Pattern promotion status: `shadow_only`"],
+            check_name="evidence.pattern_promotion_shadow_only",
         )
+    )
     return checks
+
+
+def audit_gates(args: argparse.Namespace) -> list[Check]:
+    return [
+        contains_all(
+            Path(args.runtime_surface_md),
+            [
+                "Unclassified files: `0`",
+                "card_specific_runtime_rules",
+                "family_mapper_required",
+                "XMage/Oracle extraction creates review candidate; PG promotion requires focused test and safe lane",
+            ],
+            check_name="gate.runtime_surface_current",
+        ),
+        contains_all(
+            Path(args.external_source_md),
+            [
+                "Gate status: `pass`",
+                "Required gaps: `0`",
+                "Required partials: `0`",
+                "Optional gaps: `0`",
+                "Official Wizards rules remain the authority",
+                "Scryfall and MTGJSON are metadata/rulings inputs",
+                "Open engines such as Forge, Magarena, and Cockatrice are comparison references only",
+            ],
+            check_name="gate.external_source_current",
+        ),
+    ]
 
 
 def build_report(args: argparse.Namespace) -> dict[str, Any]:
     checks: list[Check] = []
-    checks.extend(audit_pipeline())
-    checks.extend(audit_docs())
-    checks.extend(audit_benchmark(Path(args.benchmark_report)))
-    checks.extend(audit_pattern_registry(Path(args.pattern_registry_report)))
-    checks.extend(audit_schema(Path(args.pattern_schema_sql)))
-    checks.extend(audit_effective_queue(Path(args.effective_queue_report)))
-    checks.extend(audit_pipeline_manifest(Path(args.pipeline_manifest), args.expected_effective_deck_id))
+    checks.extend(audit_docs(args))
+    checks.extend(audit_script_surface())
+    checks.extend(audit_manifest(args))
+    checks.extend(audit_gates(args))
     status_counts: dict[str, int] = {}
     for check in checks:
         status_counts[check.status] = status_counts.get(check.status, 0) + 1
@@ -317,11 +404,19 @@ def render_markdown(report: dict[str, Any]) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--benchmark-report", default=str(DEFAULT_BENCHMARK))
-    parser.add_argument("--pattern-registry-report", default=str(DEFAULT_PATTERN_REGISTRY))
-    parser.add_argument("--pattern-schema-sql", default=str(DEFAULT_PATTERN_SCHEMA))
-    parser.add_argument("--effective-queue-report", default=str(DEFAULT_EFFECTIVE_QUEUE))
-    parser.add_argument("--pipeline-manifest", default=str(DEFAULT_PIPELINE_MANIFEST))
+    parser.add_argument("--definitive-flow", default=str(DEFAULT_DEFINITIVE_FLOW))
+    parser.add_argument("--doc-index", default=str(DEFAULT_DOC_INDEX))
+    parser.add_argument("--root-readme", default=str(DEFAULT_ROOT_README))
+    parser.add_argument("--report-readme", default=str(DEFAULT_REPORT_README))
+    parser.add_argument("--pipeline-manifest-md", default=str(DEFAULT_PIPELINE_MANIFEST_MD))
+    parser.add_argument("--runtime-surface-md", default=str(DEFAULT_RUNTIME_SURFACE_MD))
+    parser.add_argument("--external-source-md", default=str(DEFAULT_EXTERNAL_SOURCE_MD))
+    parser.add_argument(
+        "--expected-forced-deck-id",
+        type=int,
+        action="append",
+        default=DEFAULT_EXPECTED_FORCED_DECK_IDS,
+    )
     parser.add_argument(
         "--expected-effective-deck-id",
         type=int,

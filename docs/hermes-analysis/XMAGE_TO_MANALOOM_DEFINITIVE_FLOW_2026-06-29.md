@@ -25,9 +25,7 @@ Use a staged source-and-gate pipeline:
 6. PostgreSQL package only after exact scope, tests, and precheck evidence.
 7. PostgreSQL -> Hermes/SQLite sync and replay/audit validation after apply.
 
-The definitive rule: broad XMage extraction may create review candidates and
-family lanes, but it must not create executable battle truth or PostgreSQL
-promotion by itself.
+The definitive rule: broad XMage extraction may create review candidates and family lanes, but it must not create executable battle truth or PostgreSQL promotion by itself.
 
 ## Why This Is The Best Current Flow
 

@@ -11,203 +11,160 @@ import xmage_strategy_consistency_audit as audit
 
 
 class XMageStrategyConsistencyAuditTests(unittest.TestCase):
-    def test_pattern_registry_audit_rejects_executable_shadow_pattern(self) -> None:
+    def test_manifest_audit_rejects_missing_forced_lorehold_deck(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
-            path = Path(tmp_dir) / "registry.json"
-            path.write_text(
-                json.dumps(
-                    {
-                        "summary": {
-                            "promotion_status": "shadow_only",
-                            "executable_pattern_count": 1,
-                            "auto_promotable_pattern_count": 0,
-                        },
-                        "patterns": [
-                            {
-                                "pattern_id": "unsafe",
-                                "can_execute_in_battle": True,
-                                "can_auto_promote_to_card_battle_rules": False,
-                            }
-                        ],
-                    }
-                ),
-                encoding="utf-8",
-            )
-            checks = audit.audit_pattern_registry(path)
-
-        statuses = {check.name: check.status for check in checks}
-        self.assertEqual(statuses["pattern_registry.executable_pattern_count"], "fail")
-        self.assertEqual(statuses["pattern_registry.unsafe_pattern_flags"], "fail")
-
-    def test_full_audit_passes_with_current_fixture_files(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            benchmark = root / "benchmark.json"
-            registry = root / "registry.json"
-            schema = root / "schema.sql"
-            queue = root / "queue.json"
-            manifest = root / "manifest.json"
-            benchmark.write_text(
-                json.dumps(
-                    {
-                        "summary": {
-                            "recommended_strategy_id": "hybrid_effective_queue_pattern_registry",
-                            "ranking": [
-                                {"strategy_id": "hybrid_effective_queue_pattern_registry", "decision_score": 80.1}
-                            ],
-                        }
-                    }
-                ),
-                encoding="utf-8",
-            )
-            registry.write_text(
-                json.dumps(
-                    {
-                        "summary": {
-                            "promotion_status": "shadow_only",
-                            "executable_pattern_count": 0,
-                            "auto_promotable_pattern_count": 0,
-                        },
-                        "patterns": [
-                            {
-                                "pattern_id": "safe",
-                                "can_execute_in_battle": False,
-                                "can_auto_promote_to_card_battle_rules": False,
-                            }
-                        ],
-                    }
-                ),
-                encoding="utf-8",
-            )
-            schema.write_text(
+            manifest = Path(tmp_dir) / "manifest.md"
+            manifest.write_text(
                 "\n".join(
                     [
-                        "CREATE TABLE IF NOT EXISTS public.xmage_pattern_registry ();",
-                        "promotion_status <> 'shadow_only'",
-                        "can_execute_in_battle = FALSE",
-                        "can_auto_promote_to_card_battle_rules = FALSE",
+                        "- Forced include deck ids: `[6, 607]`",
+                        "- Effective deck ids: `[6, 25, 607]`",
+                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 158, "xmage_source_valid_mapper_required": 81}`',
+                        '- Family counts: `{"manual_model": 81, "ramp_permanent": 49, "targeted_interaction": 24, "copy_creature_token": 1, "token_maker": 1}`',
+                        '- Proposal status counts: `{"batch_pg_candidate_after_precheck": 8, "runtime_family_implementation_required": 1, "split_family_scope_review_required": 148, "mapper_metadata_or_test_scenario_required": 81}`',
+                        '- Pattern status counts: `{"ready_for_pg_package_generation": 8, "fragmented_runtime_observation_only": 1, "requires_subpattern_split_before_promotion": 20}`',
+                        "- Pattern promotion status: `shadow_only`",
                     ]
                 ),
                 encoding="utf-8",
             )
-            queue.write_text(
-                json.dumps(
-                    {
-                        "effective_queue": {
-                            "lane_counts": {
-                                "package_ready_unprepared": 0,
-                                "package_already_prepared": 1,
-                            }
-                        }
-                    }
-                ),
-                encoding="utf-8",
+            args = SimpleNamespace(
+                pipeline_manifest_md=str(manifest),
+                expected_forced_deck_id=[6, 607, 608],
+                expected_effective_deck_id=[6, 25, 607, 608],
             )
+            checks = audit.audit_manifest(args)
+
+        statuses = {check.name: check.status for check in checks}
+        self.assertEqual(statuses["evidence.forced_deck_ids"], "fail")
+        self.assertEqual(statuses["evidence.effective_deck_ids"], "fail")
+
+    def test_manifest_audit_accepts_current_counts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manifest = Path(tmp_dir) / "manifest.md"
             manifest.write_text(
-                json.dumps(
-                    {
-                        "aggregate_scope": {
-                            "artifact_deck_ids": [6],
-                            "learned_deck_ids": [25, 31],
-                            "forced_include_deck_ids": [6, 608, 609],
-                            "effective_deck_ids": [6, 25, 31, 608, 609],
-                        },
-                        "materialization": [
-                            {"learned_deck_id": 25, "apply": False},
-                            {"learned_deck_id": 31, "apply": False},
-                        ],
-                    }
+                "\n".join(
+                    [
+                        "- Forced include deck ids: `[6, 607, 608]`",
+                        "- Effective deck ids: `[6, 25, 31, 607, 608]`",
+                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 158, "xmage_source_valid_mapper_required": 81}`',
+                        '- Family counts: `{"manual_model": 81, "ramp_permanent": 49, "targeted_interaction": 24, "copy_creature_token": 1, "token_maker": 1}`',
+                        '- Proposal status counts: `{"batch_pg_candidate_after_precheck": 8, "runtime_family_implementation_required": 1, "split_family_scope_review_required": 148, "mapper_metadata_or_test_scenario_required": 81}`',
+                        '- Pattern status counts: `{"ready_for_pg_package_generation": 8, "fragmented_runtime_observation_only": 1, "requires_subpattern_split_before_promotion": 20}`',
+                        "- Pattern promotion status: `shadow_only`",
+                    ]
                 ),
                 encoding="utf-8",
             )
             args = SimpleNamespace(
-                benchmark_report=str(benchmark),
-                pattern_registry_report=str(registry),
-                pattern_schema_sql=str(schema),
-                effective_queue_report=str(queue),
-                pipeline_manifest=str(manifest),
-                expected_effective_deck_id=[608, 609],
+                pipeline_manifest_md=str(manifest),
+                expected_forced_deck_id=[6, 607, 608],
+                expected_effective_deck_id=[6, 25, 31, 607, 608],
+            )
+            checks = audit.audit_manifest(args)
+
+        self.assertTrue(all(check.status == "pass" for check in checks), checks)
+
+    def test_full_audit_passes_with_current_fixture_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            definitive = root / "definitive.md"
+            root_readme = root / "README.md"
+            doc_index = root / "index.md"
+            report_readme = root / "reports.md"
+            manifest = root / "manifest.md"
+            runtime = root / "runtime.md"
+            external = root / "external.md"
+
+            definitive.write_text(
+                "\n".join(
+                    [
+                        "Status: `current_operating_standard`",
+                        "broad XMage extraction may create review candidates and family lanes",
+                        "must not create executable battle truth or PostgreSQL promotion by itself",
+                        "PostgreSQL remains the durable source of truth",
+                        "Hermes is cache/runtime evidence, not truth",
+                        "Do not promote from `xmage_*_review_v1`",
+                        "If a candidate card is not drawn/used in battle",
+                        "Hazel's Brewmaster",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            root_readme.write_text(
+                "\n".join(
+                    [
+                        "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
+                        "current_operating_standard",
+                        "Nao devem ser usados como contrato operacional",
+                        "xmage_strategy_consistency_audit.py",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            doc_index.write_text(
+                "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md current supersede o uso operacional dos planos XMage de 2026-06-23/24",
+                encoding="utf-8",
+            )
+            report_readme.write_text(
+                "evidence archive not executable source of Commit only reviewed summaries, package evidence, or final manifests ../XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
+                encoding="utf-8",
+            )
+            manifest.write_text(
+                "\n".join(
+                    [
+                        "- Forced include deck ids: `[6, 607, 608]`",
+                        "- Effective deck ids: `[6, 25, 31, 607, 608]`",
+                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 158, "xmage_source_valid_mapper_required": 81}`',
+                        '- Family counts: `{"manual_model": 81, "ramp_permanent": 49, "targeted_interaction": 24, "copy_creature_token": 1, "token_maker": 1}`',
+                        '- Proposal status counts: `{"batch_pg_candidate_after_precheck": 8, "runtime_family_implementation_required": 1, "split_family_scope_review_required": 148, "mapper_metadata_or_test_scenario_required": 81}`',
+                        '- Pattern status counts: `{"ready_for_pg_package_generation": 8, "fragmented_runtime_observation_only": 1, "requires_subpattern_split_before_promotion": 20}`',
+                        "- Pattern promotion status: `shadow_only`",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            runtime.write_text(
+                "Unclassified files: `0` card_specific_runtime_rules family_mapper_required XMage/Oracle extraction creates review candidate; PG promotion requires focused test and safe lane",
+                encoding="utf-8",
+            )
+            external.write_text(
+                "Gate status: `pass` Required gaps: `0` Required partials: `0` Optional gaps: `0` Official Wizards rules remain the authority Scryfall and MTGJSON are metadata/rulings inputs Open engines such as Forge, Magarena, and Cockatrice are comparison references only",
+                encoding="utf-8",
+            )
+
+            args = SimpleNamespace(
+                definitive_flow=str(definitive),
+                root_readme=str(root_readme),
+                doc_index=str(doc_index),
+                report_readme=str(report_readme),
+                pipeline_manifest_md=str(manifest),
+                runtime_surface_md=str(runtime),
+                external_source_md=str(external),
+                expected_forced_deck_id=[6, 607, 608],
+                expected_effective_deck_id=[6, 25, 31, 607, 608],
             )
             report = audit.build_report(args)
 
         self.assertEqual(report["status"], "pass", report["checks"])
         self.assertEqual(report["summary"]["status_counts"].get("fail", 0), 0)
 
-    def test_benchmark_audit_accepts_exact_scope_as_post_package_next_lane(self) -> None:
+    def test_root_readme_audit_rejects_old_strategy_as_current(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
-            path = Path(tmp_dir) / "benchmark.json"
+            path = Path(tmp_dir) / "README.md"
             path.write_text(
-                json.dumps(
-                    {
-                        "summary": {
-                            "recommended_strategy_id": "hybrid_effective_queue_pattern_registry",
-                            "ranking": [
-                                {"strategy_id": "exact_scope_cluster_first", "decision_score": 73.21},
-                                {"strategy_id": "hybrid_effective_queue_pattern_registry", "decision_score": 67.91},
-                            ],
-                        }
-                    }
-                ),
+                "Decisao atual para acelerar XMage -> ManaLoom: usar\n    `hybrid_effective_queue_pattern_registry`",
                 encoding="utf-8",
             )
-            checks = audit.audit_benchmark(path)
-
-        statuses = {check.name: check.status for check in checks}
-        self.assertEqual(statuses["benchmark.recommended_strategy"], "pass")
-        self.assertEqual(statuses["benchmark.hybrid_strategy_ranked"], "pass")
-        self.assertEqual(statuses["benchmark.ranking_first"], "pass")
-
-    def test_effective_queue_audit_accepts_zero_prepared_packages_after_apply(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            path = Path(tmp_dir) / "queue.json"
-            path.write_text(
-                json.dumps(
-                    {
-                        "effective_queue": {
-                            "lane_counts": {
-                                "package_ready_unprepared": 0,
-                                "package_already_prepared": 0,
-                            }
-                        }
-                    }
-                ),
-                encoding="utf-8",
-            )
-            checks = audit.audit_effective_queue(path)
-
-        statuses = {check.name: check.status for check in checks}
-        self.assertEqual(statuses["effective_queue.package_ready_unprepared"], "pass")
-        self.assertEqual(statuses["effective_queue.package_already_prepared"], "pass")
-
-    def test_pipeline_manifest_allows_local_learned_deck_materialization(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            path = Path(tmp_dir) / "manifest.json"
-            path.write_text(
-                json.dumps(
-                    {
-                        "aggregate_scope": {
-                            "artifact_deck_ids": [6],
-                            "learned_deck_ids": [25],
-                            "forced_include_deck_ids": [6, 608],
-                            "effective_deck_ids": [6, 25, 608],
-                        },
-                        "materialization": [
-                            {
-                                "apply": True,
-                                "learned_deck_id": 25,
-                                "target_deck_id": 25,
-                                "sqlite_db": "/tmp/knowledge.db",
-                            }
-                        ],
-                    }
-                ),
-                encoding="utf-8",
+            check = audit.contains_none(
+                path,
+                [
+                    "Decisao atual para acelerar XMage -> ManaLoom: usar\n    `hybrid_effective_queue_pattern_registry`"
+                ],
+                check_name="docs.root_readme_no_old_strategy_as_current",
             )
 
-            checks = audit.audit_pipeline_manifest(path, [608])
-
-        statuses = {check.name: check.status for check in checks}
-        self.assertEqual(statuses["pipeline_manifest.materialization_apply"], "pass")
+        self.assertEqual(check.status, "fail")
 
 
 if __name__ == "__main__":

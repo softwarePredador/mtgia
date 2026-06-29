@@ -4,26 +4,33 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-06-15
+Updated: 2026-06-29
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
 ## Decisoes atuais XMage -> ManaLoom
 
-- `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md`
-  - Decisao atual para acelerar XMage -> ManaLoom: usar
-    `hybrid_effective_queue_pattern_registry`.
-  - Supersede a leitura card-by-card como metodo padrao enquanto existirem
-    pacotes preparados, clusters split-scope ou runtime scopes homogeneos.
-  - Evidencia comparativa:
-    `master_optimizer_reports/xmage_acceleration_strategy_benchmark_20260624_expanded_608_619_real_v1.md`.
+- `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
+  - Status: `current_operating_standard`.
+  - Fluxo operacional atual para absorver XMage/Oracle/Fonte externa em
+    ManaLoom por familias e subpadroes, sem promover escopos genericos como
+    regra executavel.
+  - Define a hierarquia de fontes: regras oficiais + Scryfall/MTGJSON para
+    identidade/oracle/rulings, XMage local como referencia primaria de engine,
+    Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
+    PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
+  - Evidencia atual:
+    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_135909_post_adagia_family_mapper_lorehold_6_607_616_manifest.md`.
+  - Auditoria de alinhamento:
+    `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
 
-- `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`
-  - Workflow operacional atual para a fila real Lorehold 608-616,
-    novos decks nao-Lorehold e oponentes de auditoria/replay.
-  - Define lanes, comandos, gates, pattern registry shadow-only e quando
-    regenerar o benchmark.
+- `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
+  `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`
+  - Historico ainda util para entender por que rejeitamos full-XMage-first e
+    card-by-card como metodo primario.
+  - Nao devem ser usados como contrato operacional quando divergirem do fluxo
+    definitivo de 2026-06-29.
 
 ## Decisao atual Lorehold deckbuilding
 
