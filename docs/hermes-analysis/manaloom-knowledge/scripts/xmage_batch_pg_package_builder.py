@@ -15,6 +15,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import battle_rule_registry
+
 
 DEFAULT_REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
 
@@ -64,6 +66,23 @@ def select_proposals(
     return selected
 
 
+def package_deck_role(proposal: dict[str, Any]) -> dict[str, Any]:
+    deck_role = proposal.get("deck_role_json")
+    if not isinstance(deck_role, dict):
+        deck_role = {}
+    effect_json = proposal.get("effect_json")
+    if not isinstance(effect_json, dict):
+        return deck_role
+    effect = str(effect_json.get("effect") or "")
+    placeholder_role = (
+        str(deck_role.get("effect") or "") == "external_reference_required_manual_model"
+        or str(deck_role.get("category") or "") == "manual_review"
+    )
+    if effect and effect != "external_reference_required_manual_model" and placeholder_role:
+        return battle_rule_registry.deck_role_from_effect(effect_json)
+    return deck_role
+
+
 def values_rows(proposals: list[dict[str, Any]]) -> str:
     rows = []
     for proposal in proposals:
@@ -76,7 +95,7 @@ def values_rows(proposals: list[dict[str, Any]]) -> str:
                     sql_literal(proposal["oracle_hash"]),
                     sql_literal(proposal["logical_rule_key"]),
                     sql_json(proposal["effect_json"]),
-                    sql_json(proposal["deck_role_json"]),
+                    sql_json(package_deck_role(proposal)),
                     sql_literal(proposal["source"]),
                     str(float(proposal["confidence"])),
                     sql_literal(proposal["review_status"]),

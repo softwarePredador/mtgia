@@ -4070,6 +4070,19 @@ def mana_source_production_for_state(player, source):
             for permanent in player.battlefield
             if isinstance(permanent, dict) and is_battlefield_creature(permanent)
         )
+    if source.get("mana_produced_from_greatest_power_controlled_creatures"):
+        powers = [
+            int(float(permanent.get("power") or 0))
+            for permanent in player.battlefield
+            if isinstance(permanent, dict) and is_battlefield_creature(permanent)
+        ]
+        return max([0, *powers])
+    counter_scaled_mana = source.get("mana_produced_if_plus_one_counter")
+    if counter_scaled_mana not in (None, "") and (
+        get_named_counter_count(source, "+1/+1") > 0
+        or int(source.get("plus_one_counters") or 0) > 0
+    ):
+        return max(0, int(counter_scaled_mana or 0))
     if source.get("mana_produced_from_colors_among_permanents"):
         return len(_controlled_permanent_mana_colors(player))
     life_payment_divisor = int(source.get("mana_produced_from_life_payment_divisor") or 0)
@@ -4256,6 +4269,41 @@ def conditional_land_enters_tapped_for_state(land, player=None):
 def pay_mana_source_activation_costs(player, source, turn=None):
     if not isinstance(source, dict):
         return True
+    activation_mana_cost = source.get("activation_mana_cost")
+    if activation_mana_cost:
+        if not player.can_pay(activation_mana_cost):
+            emit_replay_event(
+                "mana_source_activation_skipped",
+                player=getattr(player, "name", "?"),
+                card=source.get("name", "?"),
+                reason="insufficient_mana_for_activation_cost",
+                activation_mana_cost=activation_mana_cost,
+                available_mana=player.available_mana(),
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+            return False
+        if not player.spend_mana(activation_mana_cost):
+            emit_replay_event(
+                "mana_source_activation_skipped",
+                player=getattr(player, "name", "?"),
+                card=source.get("name", "?"),
+                reason="failed_to_pay_activation_mana_cost",
+                activation_mana_cost=activation_mana_cost,
+                available_mana=player.available_mana(),
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+            return False
+        emit_replay_event(
+            "mana_source_activation_cost_paid",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            activation_mana_cost=activation_mana_cost,
+            available_mana_after=player.available_mana(),
+            turn=turn,
+            **replay_rule_fields(source),
+        )
     mill_count = int(source.get("mana_activation_mill_count") or 0)
     if mill_count > 0:
         library = getattr(player, "library", []) or []
@@ -7788,6 +7836,13 @@ class Player:
                 and not source.get("mana_source_no_tap_activation")
             )
         ]
+        sources.sort(
+            key=lambda source: (
+                1 if isinstance(source, dict) and source.get("activation_mana_cost") else 0,
+                1 if isinstance(source, dict) and is_battlefield_creature(source) else 0,
+                str(source.get("name", "")) if isinstance(source, dict) else str(source),
+            )
+        )
         active_sources = 0
         for source in sources:
             produced = mana_source_production_for_state(self, source)

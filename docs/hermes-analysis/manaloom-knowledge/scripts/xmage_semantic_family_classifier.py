@@ -905,6 +905,137 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("cycling_status") == "annotation_only"
         )
 
+    if effect == "ramp_permanent" and scope == "green_mana_dork_minus_counter_self_untap_v1":
+        return (
+            types == {"CREATURE"}
+            and ability_classes == {"GreenManaAbility", "SimpleActivatedAbility"}
+            and effect_classes == {"UntapSourceEffect"}
+            and "PutCountersSourceCost" in cost_classes
+            and bool(effect_json.get("is_mana_source"))
+            and effect_json.get("permanent_type") == "creature"
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "G"
+            and int(effect_json.get("power") or 0) == 0
+            and int(effect_json.get("toughness") or 0) == 2
+            and bool(effect_json.get("activated_put_minus_one_counter_untap_self"))
+            and effect_json.get("activated_put_minus_one_counter_untap_self_status") == "annotation_only"
+        )
+
+    if effect == "ramp_permanent" and scope == "colorless_or_legendary_any_color_uncounterable_mana_dork_v1":
+        modes = effect_json.get("conditional_mana_modes") or []
+        mode_keys = {
+            (mode.get("color"), mode.get("restriction"), mode.get("mode"))
+            for mode in modes
+            if isinstance(mode, dict)
+        }
+        return (
+            types == {"CREATURE"}
+            and {"ColorlessManaAbility", "ConditionalAnyColorManaAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and "DelightedHalflingCantCounterEffect" in effect_classes
+            and bool(effect_json.get("is_mana_source"))
+            and effect_json.get("permanent_type") == "creature"
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "C"
+            and int(effect_json.get("power") or 0) == 1
+            and int(effect_json.get("toughness") or 0) == 2
+            and effect_json.get("conditional_mana_modes_status") == "runtime_executor_v1"
+            and ("C", "any_spell", "colorless") in mode_keys
+            and all((color, "legendary_spell", "legendary_spell_uncounterable") in mode_keys for color in "WUBRG")
+            and bool(effect_json.get("legendary_mana_spent_spell_cant_be_countered"))
+            and effect_json.get("legendary_mana_uncounterable_status") == "annotation_only"
+        )
+
+    if effect == "ramp_permanent" and scope == "land_type_mana_dork_plus_counter_triples_adapt_v1":
+        return (
+            types == {"CREATURE"}
+            and {"AdaptAbility", "SimpleManaAbility"}.issubset(ability_classes)
+            and {"AnyColorLandsProduceManaEffect", "ManaEffect"}.issubset(effect_classes)
+            and bool(effect_json.get("is_mana_source"))
+            and effect_json.get("permanent_type") == "creature"
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and int(effect_json.get("mana_produced_if_plus_one_counter") or 0) == 3
+            and bool(effect_json.get("mana_colors_from_controlled_lands"))
+            and effect_json.get("produces") == "WUBRGC"
+            and effect_json.get("adapt_cost") == "{3}{G}{G}"
+            and int(effect_json.get("adapt_counters") or 0) == 3
+            and effect_json.get("adapt_status") == "annotation_only"
+        )
+
+    if effect == "ramp_permanent" and scope == "greatest_power_any_color_mana_dork_etb_draw_annotation_v1":
+        return (
+            types == {"CREATURE"}
+            and {"EntersBattlefieldAllTriggeredAbility", "SimpleManaAbility"}.issubset(ability_classes)
+            and {"AddManaInAnyCombinationEffect", "SelvalaHeartOfTheWildsEffect"}.issubset(effect_classes)
+            and bool(effect_json.get("is_mana_source"))
+            and effect_json.get("permanent_type") == "creature"
+            and bool(effect_json.get("mana_produced_from_greatest_power_controlled_creatures"))
+            and effect_json.get("produces") == "WUBRG"
+            and effect_json.get("activation_mana_cost") == "{G}"
+            and bool(effect_json.get("another_creature_enters_greatest_power_controller_may_draw"))
+            and effect_json.get("another_creature_enters_greatest_power_draw_status") == "annotation_only"
+        )
+
+    if effect == "ramp_engine" and scope == "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1":
+        return (
+            types == {"ARTIFACT", "CREATURE"}
+            and "SpellCastControllerTriggeredAbility" in ability_classes
+            and "UntilEndOfTurnManaEffect" in effect_classes
+            and effect_json.get("trigger") == "spell_cast"
+            and int(effect_json.get("spell_cast_add_mana") or 0) == 1
+            and effect_json.get("spell_cast_mana_color") == "R"
+            and effect_json.get("produces") == "R"
+            and bool(effect_json.get("mana_persists_steps"))
+            and bool(effect_json.get("boast_twice_each_turn"))
+            and effect_json.get("boast_twice_status") == "annotation_only"
+            and bool(effect_json.get("back_face_harnfel_discard_exile_two_play_this_turn"))
+            and effect_json.get("back_face_status") == "annotation_only"
+        )
+
+    if effect == "ramp_permanent" and scope == "colorless_mana_rock_planar_die_annotation_v1":
+        return (
+            types == {"ARTIFACT"}
+            and "ColorlessManaAbility" in ability_classes
+            and "FracturedPowerstoneEffect" in effect_classes
+            and bool(effect_json.get("is_mana_source"))
+            and effect_json.get("permanent_type") == "artifact"
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "C"
+            and bool(effect_json.get("activated_roll_planar_die"))
+            and effect_json.get("activated_roll_planar_die_status") == "annotation_only"
+        )
+
+    if effect == "ramp_permanent" and scope == "mdfc_green_land_pay_three_life_spell_fight_annotation_v1":
+        face = effect_json.get("mdfc_land_face") or {}
+        return (
+            types == {"LAND", "SORCERY"}
+            and {"BoostTargetEffect", "FightTargetsEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)
+            and {"AsEntersBattlefieldAbility", "GreenManaAbility"}.issubset(ability_classes)
+            and "PayLifeCost" in cost_classes
+            and face.get("produces") == "G"
+            and int(face.get("mana_produced") or 0) == 1
+            and int(face.get("may_pay_life_to_enter_untapped") or 0) == 3
+            and bool(effect_json.get("land_side_pay_three_life_else_tapped"))
+            and effect_json.get("land_side_add_mana") == "G"
+            and effect_json.get("spell_face_status") == "annotation_only"
+        )
+
+    if effect == "ramp_permanent" and scope == "mdfc_blue_land_pay_three_life_flash_redirect_creature_annotation_v1":
+        face = effect_json.get("mdfc_land_face") or {}
+        return (
+            types == {"CREATURE", "LAND"}
+            and {"ChangeATargetOfTargetSpellAbilityToSourceEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)
+            and {"AsEntersBattlefieldAbility", "BlueManaAbility", "EntersBattlefieldTriggeredAbility", "FlashAbility"}.issubset(ability_classes)
+            and "PayLifeCost" in cost_classes
+            and face.get("produces") == "U"
+            and int(face.get("mana_produced") or 0) == 1
+            and int(face.get("may_pay_life_to_enter_untapped") or 0) == 3
+            and bool(effect_json.get("land_side_pay_three_life_else_tapped"))
+            and effect_json.get("land_side_add_mana") == "U"
+            and bool(effect_json.get("flash"))
+            and bool(effect_json.get("etb_change_single_target_instant_or_sorcery_to_self"))
+            and effect_json.get("creature_face_status") == "annotation_only"
+        )
+
     if effect == "draw_cards" and scope == "veil_of_summer_draw_and_protection_waiver_v1":
         return (
             types == {"INSTANT"}

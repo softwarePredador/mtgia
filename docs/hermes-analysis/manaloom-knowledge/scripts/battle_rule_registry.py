@@ -608,6 +608,7 @@ def upsert_battle_card_rule(
     card_name: str,
     effect_json: dict[str, Any],
     *,
+    normalized_name_value: str | None = None,
     source: str,
     confidence: float,
     review_status: str,
@@ -619,7 +620,7 @@ def upsert_battle_card_rule(
     rule_version: int = 1,
 ) -> bool:
     ensure_battle_card_rules(conn)
-    normalized = normalize_card_name(card_name)
+    normalized = normalize_card_name(normalized_name_value or card_name)
     now = utc_now()
     role = deck_role_json or deck_role_from_effect(effect_json)
     normalized_rule_version = max(1, int(rule_version or 1))

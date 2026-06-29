@@ -1,0 +1,11 @@
+       normalized_name       |                       card_name                       |                logical_rule_key                 | repaired_deck_role_rows | verified_auto_rows | oracle_hash_rows | backup_rows
+-----------------------------+-------------------------------------------------------+-------------------------------------------------+-------------------------+--------------------+------------------+-------------
+ birgi, god of storytelling  | Birgi, God of Storytelling // Harnfel, Horn of Bounty | battle_rule_v1:c21762e62b990dbb474be0b5764d71a7 |                       1 |                  1 |                1 |           8
+ bridgeworks battle          | Bridgeworks Battle // Tanglespan Bridgeworks          | battle_rule_v1:d822fc4ce8a0850a7ee20dcee168e8f3 |                       1 |                  1 |                1 |           8
+ delighted halfling          | Delighted Halfling                                    | battle_rule_v1:3f0dd0a85440805f77ce47815c44214a |                       1 |                  1 |                1 |           8
+ devoted druid               | Devoted Druid                                         | battle_rule_v1:67f97b25cf58b747257151dada64b9e4 |                       1 |                  1 |                1 |           8
+ fractured powerstone        | Fractured Powerstone                                  | battle_rule_v1:0e90c515e59dff042e41f45158c63e97 |                       1 |                  1 |                1 |           8
+ hydroelectric specimen      | Hydroelectric Specimen // Hydroelectric Laboratory    | battle_rule_v1:88c8f7a7f18d2171c1d200c61f47e6d4 |                       1 |                  1 |                1 |           8
+ incubation druid            | Incubation Druid                                      | battle_rule_v1:de0ac6ce79a7fff3d4b1f65e91e73d0d |                       1 |                  1 |                1 |           8
+ selvala, heart of the wilds | Selvala, Heart of the Wilds                           | battle_rule_v1:1ee83f01d2315d8468be5462667233ad |                       1 |                  1 |                1 |           8
+(8 rows)

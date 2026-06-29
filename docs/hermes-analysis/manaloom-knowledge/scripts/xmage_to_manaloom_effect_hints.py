@@ -1818,6 +1818,258 @@ def _build_exact_runtime_variant_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        xmage_class_name == "DevotedDruid"
+        and card_types == {"CREATURE"}
+        and ability_classes == {"GreenManaAbility", "SimpleActivatedAbility"}
+        and effect_classes == {"UntapSourceEffect"}
+        and "PutCountersSourceCost" in cost_classes
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "green_mana_dork_minus_counter_self_untap_v1",
+            "fields": {
+                "permanent_type": "creature",
+                "is_creature_permanent": True,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "G",
+                "power": 0,
+                "toughness": 2,
+                "activation_requires_tap": True,
+                "activated_put_minus_one_counter_untap_self": True,
+                "activated_put_minus_one_counter_untap_self_status": "annotation_only",
+            },
+            "reason": "XMage structure matches Devoted Druid's green mana ability plus its -1/-1 counter self-untap activated ability.",
+            "signals": ["DevotedDruid", "GreenManaAbility", "PutCountersSourceCost", "UntapSourceEffect"],
+        }
+
+    if (
+        xmage_class_name == "DelightedHalfling"
+        and card_types == {"CREATURE"}
+        and {"ColorlessManaAbility", "ConditionalAnyColorManaAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+        and "DelightedHalflingCantCounterEffect" in effect_classes
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "colorless_or_legendary_any_color_uncounterable_mana_dork_v1",
+            "fields": {
+                "permanent_type": "creature",
+                "is_creature_permanent": True,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "C",
+                "power": 1,
+                "toughness": 2,
+                "activation_requires_tap": True,
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": [
+                    {
+                        "color": "C",
+                        "mode": "colorless",
+                        "restriction": "any_spell",
+                        "status": "runtime_executor_v1",
+                    },
+                    *[
+                        {
+                            "color": color,
+                            "mode": "legendary_spell_uncounterable",
+                            "restriction": "legendary_spell",
+                            "status": "runtime_executor_v1",
+                        }
+                        for color in "WUBRG"
+                    ],
+                ],
+                "legendary_mana_spent_spell_cant_be_countered": True,
+                "legendary_mana_uncounterable_status": "annotation_only",
+            },
+            "reason": "XMage structure matches Delighted Halfling's colorless mana mode, legendary-only any-color mana mode, and uncounterable rider on that mana.",
+            "signals": [
+                "DelightedHalfling",
+                "ColorlessManaAbility",
+                "ConditionalAnyColorManaAbility",
+                "DelightedHalflingCantCounterEffect",
+            ],
+        }
+
+    if (
+        xmage_class_name == "IncubationDruid"
+        and card_types == {"CREATURE"}
+        and "SimpleManaAbility" in ability_classes
+        and "AdaptAbility" in ability_classes
+        and {"AnyColorLandsProduceManaEffect", "ManaEffect"}.issubset(effect_classes)
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "land_type_mana_dork_plus_counter_triples_adapt_v1",
+            "fields": {
+                "permanent_type": "creature",
+                "is_creature_permanent": True,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "mana_produced_if_plus_one_counter": 3,
+                "mana_colors_from_controlled_lands": True,
+                "produces": "WUBRGC",
+                "power": 0,
+                "toughness": 2,
+                "activation_requires_tap": True,
+                "adapt_cost": "{3}{G}{G}",
+                "adapt_counters": 3,
+                "adapt_status": "annotation_only",
+            },
+            "reason": "XMage structure matches Incubation Druid's land-type mana ability, +1/+1 counter triple-mana replacement, and Adapt 3 activated ability.",
+            "signals": ["IncubationDruid", "SimpleManaAbility", "AnyColorLandsProduceManaEffect", "AdaptAbility"],
+        }
+
+    if (
+        xmage_class_name == "SelvalaHeartOfTheWilds"
+        and card_types == {"CREATURE"}
+        and {"EntersBattlefieldAllTriggeredAbility", "SimpleManaAbility"}.issubset(ability_classes)
+        and {"AddManaInAnyCombinationEffect", "SelvalaHeartOfTheWildsEffect"}.issubset(effect_classes)
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "greatest_power_any_color_mana_dork_etb_draw_annotation_v1",
+            "fields": {
+                "permanent_type": "creature",
+                "is_creature_permanent": True,
+                "is_mana_source": True,
+                "mana_produced_from_greatest_power_controlled_creatures": True,
+                "produces": "WUBRG",
+                "power": 2,
+                "toughness": 3,
+                "activation_requires_tap": True,
+                "activation_mana_cost": "{G}",
+                "another_creature_enters_greatest_power_controller_may_draw": True,
+                "another_creature_enters_greatest_power_draw_status": "annotation_only",
+            },
+            "reason": "XMage structure matches Selvala's greatest-power mana ability plus its another-creature ETB draw trigger.",
+            "signals": [
+                "SelvalaHeartOfTheWilds",
+                "AddManaInAnyCombinationEffect",
+                "GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES",
+                "SelvalaHeartOfTheWildsEffect",
+            ],
+        }
+
+    if (
+        xmage_class_name == "BirgiGodOfStorytelling"
+        and card_types == {"ARTIFACT", "CREATURE"}
+        and "SpellCastControllerTriggeredAbility" in ability_classes
+        and "UntilEndOfTurnManaEffect" in effect_classes
+    ):
+        return {
+            "effect": "ramp_engine",
+            "scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+            "fields": {
+                "is_creature_permanent": True,
+                "power": 3,
+                "toughness": 3,
+                "trigger": "spell_cast",
+                "spell_cast_add_mana": 1,
+                "spell_cast_mana_color": "R",
+                "produces": "R",
+                "mana_persists_steps": True,
+                "boast_twice_each_turn": True,
+                "boast_twice_status": "annotation_only",
+                "back_face_harnfel_discard_exile_two_play_this_turn": True,
+                "back_face_status": "annotation_only",
+            },
+            "reason": "XMage structure matches Birgi's spell-cast red mana trigger; boast and Harnfel backside are tracked as non-executed annotations.",
+            "signals": ["BirgiGodOfStorytelling", "SpellCastControllerTriggeredAbility", "UntilEndOfTurnManaEffect", "BoastAbility"],
+        }
+
+    if (
+        xmage_class_name == "FracturedPowerstone"
+        and card_types == {"ARTIFACT"}
+        and "ColorlessManaAbility" in ability_classes
+        and "FracturedPowerstoneEffect" in effect_classes
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "colorless_mana_rock_planar_die_annotation_v1",
+            "fields": {
+                "permanent_type": "artifact",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "C",
+                "activation_requires_tap": True,
+                "activated_roll_planar_die": True,
+                "activated_roll_planar_die_status": "annotation_only",
+            },
+            "reason": "XMage structure matches Fractured Powerstone's colorless mana rock mode plus a planar die activated ability outside ManaLoom battle scope.",
+            "signals": ["FracturedPowerstone", "ColorlessManaAbility", "FracturedPowerstoneEffect"],
+        }
+
+    if (
+        xmage_class_name == "BridgeworksBattle"
+        and card_types == {"LAND", "SORCERY"}
+        and {"BoostTargetEffect", "FightTargetsEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)
+        and {"AsEntersBattlefieldAbility", "GreenManaAbility"}.issubset(ability_classes)
+        and "PayLifeCost" in cost_classes
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "mdfc_green_land_pay_three_life_spell_fight_annotation_v1",
+            "fields": {
+                "mdfc_land_face": {
+                    "name": "Tanglespan Bridgeworks",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "mana_produced": 1,
+                    "produces": "G",
+                    "may_pay_life_to_enter_untapped": 3,
+                },
+                "spell_face_effect": "target_creature_you_control_plus_two_fight_up_to_one_opponent_creature",
+                "spell_face_status": "annotation_only",
+                "land_side_pay_three_life_else_tapped": True,
+                "land_side_add_mana": "G",
+                "nonmana_abilities_require_separate_scope": True,
+                "nonmana_abilities_status": "spell_face_annotation_only",
+            },
+            "reason": "XMage structure matches Bridgeworks Battle's green MDFC land face; the front-face pump/fight spell is retained as annotation.",
+            "signals": ["BridgeworksBattle", "GreenManaAbility", "TapSourceUnlessPaysEffect", "BoostTargetEffect", "FightTargetsEffect"],
+        }
+
+    if (
+        xmage_class_name == "HydroelectricSpecimen"
+        and card_types == {"CREATURE", "LAND"}
+        and {"ChangeATargetOfTargetSpellAbilityToSourceEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)
+        and {"AsEntersBattlefieldAbility", "BlueManaAbility", "EntersBattlefieldTriggeredAbility", "FlashAbility"}.issubset(ability_classes)
+        and "PayLifeCost" in cost_classes
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "mdfc_blue_land_pay_three_life_flash_redirect_creature_annotation_v1",
+            "fields": {
+                "mdfc_land_face": {
+                    "name": "Hydroelectric Laboratory",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "mana_produced": 1,
+                    "produces": "U",
+                    "may_pay_life_to_enter_untapped": 3,
+                },
+                "creature_face_power": 1,
+                "creature_face_toughness": 4,
+                "flash": True,
+                "etb_change_single_target_instant_or_sorcery_to_self": True,
+                "creature_face_status": "annotation_only",
+                "land_side_pay_three_life_else_tapped": True,
+                "land_side_add_mana": "U",
+                "nonmana_abilities_require_separate_scope": True,
+                "nonmana_abilities_status": "creature_face_annotation_only",
+            },
+            "reason": "XMage structure matches Hydroelectric Specimen's blue MDFC land face; the flash creature ETB redirect mode is retained as annotation.",
+            "signals": [
+                "HydroelectricSpecimen",
+                "BlueManaAbility",
+                "TapSourceUnlessPaysEffect",
+                "FlashAbility",
+                "ChangeATargetOfTargetSpellAbilityToSourceEffect",
+            ],
+        }
+
+    if (
         card_types == {"ENCHANTMENT"}
         and xmage_class_name == "BloodSun"
         and {"BloodSunEffect", "DrawCardSourceControllerEffect"}.issubset(effect_classes)

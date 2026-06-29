@@ -278,6 +278,47 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             ["new-pg"],
         )
 
+    def test_filter_rows_keeps_active_pg_exact_rule_with_placeholder_deck_role_when_hashed(self) -> None:
+        rows = [
+            {
+                "card_name": "Incubation Druid",
+                "normalized_name": "incubation druid",
+                "logical_rule_key": "pg-exact",
+                "effect_json": {
+                    "effect": "ramp_permanent",
+                    "mana_produced": 1,
+                    "mana_produced_if_plus_one_counter": 3,
+                    "battle_model_scope": "land_type_mana_dork_plus_counter_triples_adapt_v1",
+                },
+                "deck_role_json": {
+                    "category": "manual_review",
+                    "effect": "external_reference_required_manual_model",
+                },
+                "source": "curated",
+                "review_status": "verified",
+                "execution_status": "auto",
+                "oracle_hash": "hash-from-oracle",
+            }
+        ]
+        reviewed_rows = [
+            {
+                "card_name": "Incubation Druid",
+                "logical_rule_key": "reviewed-old",
+                "effect_json": {
+                    "effect": "creature",
+                    "is_mana_source": True,
+                    "battle_model_scope": "mana_dork_without_adapt_v1",
+                },
+                "deck_role_json": {"category": "ramp", "effect": "creature"},
+                "source": "curated",
+            }
+        ]
+
+        filtered = sync_pg.filter_rows_for_current_reviewed_curated(rows, reviewed_rows)
+
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0]["logical_rule_key"], "pg-exact")
+
     def test_merge_pg_rows_does_not_reappend_stale_reviewed_curated_row_when_pg_has_active_curated_card(self) -> None:
         rows = [
             {
@@ -318,6 +359,43 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
 
         self.assertEqual(len(merged), 1)
         self.assertEqual(merged[0]["logical_rule_key"], "pg-new")
+
+    def test_merge_pg_rows_uses_pg_normalized_name_to_block_split_card_stale_reviewed_row(self) -> None:
+        rows = [
+            {
+                "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "normalized_name": "birgi, god of storytelling",
+                "logical_rule_key": "pg-exact",
+                "effect_json": {
+                    "effect": "ramp_engine",
+                    "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+                },
+                "deck_role_json": {"category": "ramp", "effect": "ramp_engine"},
+                "source": "curated",
+                "review_status": "verified",
+                "execution_status": "auto",
+                "oracle_hash": "hash-from-oracle",
+            }
+        ]
+        reviewed_rows = [
+            {
+                "card_name": "Birgi, God of Storytelling",
+                "logical_rule_key": "reviewed-old",
+                "effect_json": {
+                    "effect": "creature",
+                    "battle_model_scope": "spell_cast_red_mana_trigger_v1",
+                },
+                "deck_role_json": {"category": "ramp", "effect": "creature"},
+                "source": "curated",
+                "review_status": "verified",
+                "execution_status": "auto",
+            }
+        ]
+
+        merged = sync_pg.merge_pg_rows_with_reviewed_runtime_rows(rows, reviewed_rows)
+
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(merged[0]["logical_rule_key"], "pg-exact")
 
     def test_filter_rows_for_current_reviewed_curated_drops_manual_review_placeholder_when_reviewed_rule_exists(self) -> None:
         rows = [
@@ -565,6 +643,62 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
 
         self.assertIn(("pg-key", "curated", 4), rows)
         self.assertNotIn(("local-shadow-key", "curated", 1), rows)
+
+    def test_pg_mirror_uses_pg_normalized_name_and_removes_split_card_alias_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(sqlite_db) as conn:
+                sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
+                sync_pg.battle_rule_registry.upsert_battle_card_rule(
+                    conn,
+                    "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                    {
+                        "effect": "creature",
+                        "battle_model_scope": "spell_cast_red_mana_trigger_v1",
+                    },
+                    source="curated",
+                    confidence=0.8,
+                    review_status="active",
+                    execution_status="auto",
+                    logical_rule_key_value="old-full-alias-key",
+                    oracle_hash="hash",
+                )
+                conn.commit()
+
+            changed = sync_pg.mirror_pg_rules_to_sqlite(
+                str(sqlite_db),
+                [
+                    {
+                        "normalized_name": "birgi, god of storytelling",
+                        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                        "logical_rule_key": "pg-short-key",
+                        "effect_json": {
+                            "effect": "ramp_engine",
+                            "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+                        },
+                        "deck_role_json": {"category": "ramp", "effect": "ramp_engine"},
+                        "source": "curated",
+                        "confidence": 0.94,
+                        "review_status": "verified",
+                        "execution_status": "auto",
+                        "rule_version": 2,
+                        "notes": "test",
+                        "oracle_hash": "hash",
+                    }
+                ],
+            )
+
+            with sqlite3.connect(sqlite_db) as conn:
+                rows = conn.execute(
+                    """
+                    SELECT normalized_name, logical_rule_key
+                    FROM battle_card_rules
+                    ORDER BY normalized_name, logical_rule_key
+                    """
+                ).fetchall()
+
+        self.assertGreaterEqual(changed, 2)
+        self.assertEqual(rows, [("birgi, god of storytelling", "pg-short-key")])
 
     def test_pg_mirror_keeps_reviewed_runtime_row_over_pg_review_only_snapshot(self) -> None:
         reviewed_rows = [

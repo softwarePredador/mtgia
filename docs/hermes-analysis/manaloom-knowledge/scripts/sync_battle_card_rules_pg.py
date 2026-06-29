@@ -251,6 +251,10 @@ def filter_rows_by_card_names(rows: list[dict[str, Any]], card_names: list[str])
     ]
 
 
+def row_normalized_name(row: dict[str, Any]) -> str:
+    return normalize_card_name(str(row.get("normalized_name") or row.get("card_name") or ""))
+
+
 def ensure_pg_table(cur: Any) -> None:
     for statement in [part.strip() for part in PG_SCHEMA.split(";") if part.strip()]:
         cur.execute(statement)
@@ -737,7 +741,7 @@ def filter_rows_for_current_reviewed_curated(
             or str(row.get("execution_status") or "") == "disabled"
         ):
             continue
-        normalized = normalize_card_name(str(row.get("card_name") or ""))
+        normalized = row_normalized_name(row)
         active_pg_curated_by_name.setdefault(normalized, set()).add(
             str(
                 row.get("logical_rule_key")
@@ -752,7 +756,7 @@ def filter_rows_for_current_reviewed_curated(
 
     filtered: list[dict[str, Any]] = []
     for row in rows:
-        normalized = normalize_card_name(str(row.get("card_name") or ""))
+        normalized = row_normalized_name(row)
         if str(row.get("source") or "") != "curated":
             filtered.append(row)
             continue
@@ -803,12 +807,15 @@ def runtime_rule_key(row: dict[str, Any]) -> tuple[str, str] | None:
 
 def is_manual_review_placeholder(row: dict[str, Any]) -> bool:
     deck_role_json = json_obj(row.get("deck_role_json"))
-    if str(deck_role_json.get("effect") or "") == "external_reference_required_manual_model":
-        return True
-    if str(deck_role_json.get("category") or "") == "manual_review":
-        return True
     effect_json = json_obj(row.get("effect_json"))
-    return str(effect_json.get("effect") or "") == "external_reference_required_manual_model"
+    if str(effect_json.get("effect") or "") == "external_reference_required_manual_model":
+        return True
+    if not row.get("oracle_hash"):
+        if str(deck_role_json.get("effect") or "") == "external_reference_required_manual_model":
+            return True
+        if str(deck_role_json.get("category") or "") == "manual_review":
+            return True
+    return False
 
 
 def merge_pg_rows_with_reviewed_runtime_rows(
@@ -833,7 +840,7 @@ def merge_pg_rows_with_reviewed_runtime_rows(
             continue
         if is_manual_review_placeholder(row):
             continue
-        normalized = normalize_card_name(str(row.get("card_name") or row.get("normalized_name") or ""))
+        normalized = row_normalized_name(row)
         if normalized:
             active_pg_curated_names.add(normalized)
     for row in reviewed_rows:
@@ -914,14 +921,17 @@ def cleanup_sqlite_rows_absent_from_runtime_rows(
         cursor = conn.execute(
             f"""
             DELETE FROM battle_card_rules
-            WHERE normalized_name = ?
-              AND source IN ({source_placeholders})
-              AND logical_rule_key NOT IN ({key_placeholders})
+            WHERE source IN ({source_placeholders})
+              AND (
+                (normalized_name = ? AND logical_rule_key NOT IN ({key_placeholders}))
+                OR normalized_name LIKE ?
+              )
             """,
             (
-                normalized,
                 *mirror_sources,
+                normalized,
                 *sorted(logical_keys),
+                normalized + " // %",
             ),
         )
         changed += max(0, cursor.rowcount)
@@ -957,6 +967,7 @@ def mirror_pg_rules_to_sqlite(
                 conn,
                 row["card_name"],
                 effect_json,
+                normalized_name_value=row_normalized_name(row),
                 source=row["source"],
                 confidence=row["confidence"],
                 review_status=row["review_status"],
