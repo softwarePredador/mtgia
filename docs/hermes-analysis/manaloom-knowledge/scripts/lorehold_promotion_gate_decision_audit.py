@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Consolidate Lorehold 607/614/615 promotion-gate evidence.
+"""Consolidate Lorehold promotion-gate evidence.
 
 This read-only audit consumes natural equal battle gates and decides whether a
-challenger can replace protected baseline deck_607. It does not mutate
+candidate can replace protected baseline deck_607. It does not mutate
 PostgreSQL, Hermes SQLite, or deck contents.
 """
 
@@ -175,15 +175,17 @@ def merge_result(row: dict[str, Any], result: Mapping[str, Any], seed: str) -> N
         for field in target:
             target[field] += as_int(payload.get(field))
 
-    for metric in telemetry.get("top_cards") or []:
-        key = str(metric.get("key") or "")
-        if ":" not in key:
-            continue
-        metric_name, card_name = key.split(":", 1)
-        if card_name in FOCUS_CARDS:
-            row["card_use_metrics"][card_name][metric_name] += as_int(metric.get("count"))
-
+    has_game_card_counts = False
     for game in result.get("game_results") or []:
+        card_event_counts = game.get("card_event_counts") or {}
+        if card_event_counts:
+            has_game_card_counts = True
+        for key, count in card_event_counts.items():
+            if ":" not in str(key):
+                continue
+            metric_name, card_name = str(key).split(":", 1)
+            if card_name in FOCUS_CARDS:
+                row["card_use_metrics"][card_name][metric_name] += as_int(count)
         if game.get("result") != "loss":
             continue
         turns = as_int(game.get("turns"))
@@ -191,6 +193,15 @@ def merge_result(row: dict[str, Any], result: Mapping[str, Any], seed: str) -> N
         row["loss_turn_count"] += 1
         if turns and turns <= 9:
             row["early_loss_count"] += 1
+
+    if not has_game_card_counts:
+        for metric in telemetry.get("top_cards") or []:
+            key = str(metric.get("key") or "")
+            if ":" not in key:
+                continue
+            metric_name, card_name = key.split(":", 1)
+            if card_name in FOCUS_CARDS:
+                row["card_use_metrics"][card_name][metric_name] += as_int(metric.get("count"))
 
 
 def finalize_deck_row(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -303,10 +314,17 @@ def candidate_assessment(candidate: Mapping[str, Any], baseline: Mapping[str, An
     }
 
 
-def build_report(gate_paths: Iterable[Path]) -> dict[str, Any]:
+def build_report(
+    gate_paths: Iterable[Path],
+    *,
+    baseline_key: str = BASELINE_KEY,
+    candidate_keys: Iterable[str] = CHALLENGER_KEYS,
+) -> dict[str, Any]:
     gates: list[dict[str, Any]] = []
     aggregates: dict[str, dict[str, Any]] = {}
     input_paths = list(gate_paths)
+    candidate_key_tuple = tuple(dict.fromkeys(str(key) for key in candidate_keys))
+    consumed_keys = {baseline_key, *candidate_key_tuple}
     for path in input_paths:
         payload = read_json(path)
         gates.append(
@@ -325,28 +343,29 @@ def build_report(gate_paths: Iterable[Path]) -> dict[str, Any]:
         seed = str(payload.get("simulation_seed"))
         for result in payload.get("results") or []:
             deck_key = str(result.get("deck_key") or "")
-            if deck_key not in {BASELINE_KEY, *CHALLENGER_KEYS}:
+            if deck_key not in consumed_keys:
                 continue
             row = aggregates.setdefault(deck_key, init_deck_row(deck_key))
             merge_result(row, result, seed)
 
     finalized = {deck_key: finalize_deck_row(row) for deck_key, row in sorted(aggregates.items())}
-    baseline = finalized.get(BASELINE_KEY)
+    baseline = finalized.get(baseline_key)
     candidate_rows = [
         candidate_assessment(finalized[key], baseline)
-        for key in CHALLENGER_KEYS
+        for key in candidate_key_tuple
         if baseline and key in finalized
     ]
     promoted = [row["deck_key"] for row in candidate_rows if row["status"] == "promote"]
     best_challenger = None
-    challengers = [finalized[key] for key in CHALLENGER_KEYS if key in finalized]
+    challengers = [finalized[key] for key in candidate_key_tuple if key in finalized]
     if challengers:
         best_challenger = max(challengers, key=lambda row: (as_int(row.get("wins")), -as_int(row.get("early_loss_count"))))
 
     decision_status = "promote_challenger" if promoted else "keep_protected_baseline"
     decision = {
         "status": decision_status,
-        "protected_baseline": BASELINE_KEY,
+        "protected_baseline": baseline_key,
+        "candidate_keys": list(candidate_key_tuple),
         "promoted_deck_keys": promoted,
         "best_challenger_for_package_followup": (best_challenger or {}).get("deck_key"),
         "ready_for_real_deck_change": bool(promoted),
@@ -370,6 +389,8 @@ def build_report(gate_paths: Iterable[Path]) -> dict[str, Any]:
         "source_db_mutated": False,
         "gate_paths": [rel(path) for path in input_paths],
         "gate_inputs": gates,
+        "baseline_key": baseline_key,
+        "candidate_keys": list(candidate_key_tuple),
         "deck_aggregates": finalized,
         "candidate_assessments": candidate_rows,
         "decision": decision,
@@ -406,6 +427,7 @@ def write_markdown(report: Mapping[str, Any], path: Path) -> None:
         f"- Status: `{report['status']}`",
         f"- Decision: `{decision['status']}`",
         f"- Protected baseline: `{decision['protected_baseline']}`",
+        f"- Candidate keys: `{json.dumps(decision['candidate_keys'])}`",
         f"- Promoted deck keys: `{json.dumps(decision['promoted_deck_keys'])}`",
         f"- Ready for real deck change: `{str(decision['ready_for_real_deck_change']).lower()}`",
         f"- Best challenger for package follow-up: `{decision['best_challenger_for_package_followup']}`",
@@ -470,6 +492,14 @@ def write_markdown(report: Mapping[str, Any], path: Path) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--gate", action="append", dest="gate_paths", type=Path, default=None)
+    parser.add_argument("--baseline-key", default=BASELINE_KEY)
+    parser.add_argument(
+        "--candidate-key",
+        action="append",
+        dest="candidate_keys",
+        default=None,
+        help="Deck key to assess against the protected baseline. Defaults to deck_614 and deck_615.",
+    )
     parser.add_argument(
         "--out-prefix",
         type=Path,
@@ -480,7 +510,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    report = build_report(args.gate_paths or DEFAULT_GATE_PATHS)
+    report = build_report(
+        args.gate_paths or DEFAULT_GATE_PATHS,
+        baseline_key=args.baseline_key,
+        candidate_keys=args.candidate_keys or CHALLENGER_KEYS,
+    )
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")
     json_path.parent.mkdir(parents=True, exist_ok=True)

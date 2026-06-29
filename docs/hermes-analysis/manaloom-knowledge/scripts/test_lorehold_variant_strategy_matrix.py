@@ -1,4 +1,6 @@
 import sqlite3
+import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -56,6 +58,33 @@ class LoreholdVariantStrategyMatrixTest(unittest.TestCase):
             self.assertIn("objective", deck)
             self.assertIn("strategy_package_health", deck)
             self.assertIn("next_validation_steps", deck)
+
+    def test_candidate_metadata_uses_payload_key_when_present(self):
+        payload = {
+            "candidate_key": "candidate_custom",
+            "candidate_name": "Custom Candidate",
+            "candidate_archetype": "custom-archetype",
+            "candidate_hash": "abc",
+            "strategy_version": "test",
+            "final_deck": [
+                {
+                    "card_name": "Lorehold, the Historian",
+                    "quantity": 1,
+                    "roles": ["engine"],
+                    "is_commander": True,
+                    "type_line": "Legendary Creature",
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "candidate.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            metadata, cards = matrix.load_candidate_cards(path)
+
+        self.assertEqual(metadata["deck_key"], "candidate_custom")
+        self.assertEqual(metadata["deck_name"], "Custom Candidate")
+        self.assertEqual(metadata["archetype"], "custom-archetype")
+        self.assertEqual(cards[0]["card_name"], "Lorehold, the Historian")
 
 
 if __name__ == "__main__":

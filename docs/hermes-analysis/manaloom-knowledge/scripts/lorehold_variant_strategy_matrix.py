@@ -247,11 +247,14 @@ def load_candidate_cards(path: Path) -> tuple[dict[str, Any] | None, list[dict[s
         card["functional_tags_json"] = json.dumps(card["roles"])
         card["normalized_name"] = normalize_name(card.get("card_name"))
         cards.append(card)
+    candidate_key = str(payload.get("candidate_key") or "candidate_v7")
+    candidate_name = str(payload.get("candidate_name") or "Lorehold strategy-first candidate v7")
+    candidate_archetype = str(payload.get("candidate_archetype") or "strategy-first-candidate")
     metadata = {
-        "deck_key": "candidate_v7",
+        "deck_key": candidate_key,
         "deck_id": None,
-        "deck_name": "Lorehold strategy-first candidate v7",
-        "archetype": "strategy-first-candidate",
+        "deck_name": candidate_name,
+        "archetype": candidate_archetype,
         "total_cards_declared": len(cards),
         "notes": f"candidate_hash={payload.get('candidate_hash')}",
         "source": str(path),
@@ -542,7 +545,15 @@ def build_matrix(
             cards_by_deck[candidate_metadata["deck_key"]] = candidate_cards
 
     decks = []
-    for deck_key in sorted(metadata, key=lambda key: (999999 if key == "candidate_v7" else int(key.split("_")[1]))):
+    def deck_sort_key(key: str) -> tuple[int, str]:
+        if key.startswith("deck_"):
+            try:
+                return (int(key.split("_", 1)[1]), key)
+            except (IndexError, ValueError):
+                return (999998, key)
+        return (999999, key)
+
+    for deck_key in sorted(metadata, key=deck_sort_key):
         summary = summarize_deck(metadata[deck_key], cards_by_deck.get(deck_key, []), battle_ready_names)
         summary["strategy_score"] = strategy_score(summary)
         decks.append(summary)

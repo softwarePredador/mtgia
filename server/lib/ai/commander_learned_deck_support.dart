@@ -210,6 +210,11 @@ const Map<String, Set<String>> _learnedDeckCanonicalRoleTagOverrides = {
     'engine',
     'loot',
   },
+  'land tax': {
+    'tutor',
+    'ramp',
+    'mana_fixing',
+  },
 };
 
 Map<String, int> computeCommanderLearnedDeckRoleSummary({

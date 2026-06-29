@@ -185,6 +185,20 @@ def normalize_equal_battle_gate(payload: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def normalize_promotion_decision(path: Path, payload: Mapping[str, Any]) -> dict[str, Any]:
+    decision = payload.get("decision") if isinstance(payload.get("decision"), Mapping) else {}
+    return {
+        "path": rel(path),
+        "status": decision.get("status"),
+        "protected_baseline": decision.get("protected_baseline"),
+        "candidate_keys": decision.get("candidate_keys") or [],
+        "promoted_deck_keys": decision.get("promoted_deck_keys") or [],
+        "ready_for_real_deck_change": bool(decision.get("ready_for_real_deck_change")),
+        "summary": decision.get("summary"),
+        "recommended_next_action": decision.get("recommended_next_action"),
+    }
+
+
 def summarize_package_rows(payload: Mapping[str, Any]) -> dict[str, Any]:
     packages = payload.get("packages") or []
     return {
@@ -299,6 +313,11 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
         ("thor_rule_runtime_audit", {"reviewed_rule", "runtime_test_verification"}, "Thor runtime audit"),
         ("tutor_cut_model", {"cut_pair_evaluations", "top_direct_gate_candidates"}, "tutor cut model"),
         ("variant_gap_miner", {"top_variant_candidates", "pairing_hypotheses"}, "variant gap miner"),
+        (
+            "commander_learned_deck_import",
+            {"source_system", "source_ref", "commander_name", "card_list", "card_count"},
+            "Commander learned deck import payload",
+        ),
         ("artifact_contract_audit", {"artifacts", "continuation_gate", "current_matrix"}, "artifact contract audit"),
         (
             "equal_battle_gate_checkpoint",
@@ -418,6 +437,7 @@ def build_report(
     *,
     db_path: Path = DEFAULT_DB,
     matrix_path: Path = CURRENT_MATRIX,
+    promotion_decision_path: Path | None = None,
     artifact_paths: Iterable[Path] | None = None,
 ) -> dict[str, Any]:
     paths = list(artifact_paths or REPORT_DIR.glob("lorehold*.json"))
@@ -436,16 +456,33 @@ def build_report(
     artifact_contract_pass = not unknowns and matrix_pass
     deck_universe_pass = deck_universe["status"] == "pass"
     can_run_equal_battle_gate = artifact_contract_pass and deck_universe_pass
+    promotion_decision = None
+    if promotion_decision_path and promotion_decision_path.exists():
+        promotion_decision = normalize_promotion_decision(
+            promotion_decision_path,
+            read_json(promotion_decision_path),
+        )
+    ready_for_real_deck_change = bool(
+        can_run_equal_battle_gate
+        and promotion_decision
+        and promotion_decision.get("ready_for_real_deck_change")
+    )
 
     continuation_gate = {
         "artifact_contract_status": "pass" if artifact_contract_pass else "fail",
         "deck_universe_status": deck_universe["status"],
         "current_matrix_status": "pass" if matrix_pass else "fail",
         "can_run_equal_battle_gate": can_run_equal_battle_gate,
-        "ready_for_real_deck_change": False,
+        "promotion_decision": promotion_decision,
+        "ready_for_real_deck_change": ready_for_real_deck_change,
         "real_deck_change_blocker": (
-            "requires fresh natural equal battle gate with deck_607 vs deck_614/deck_615 "
-            "and decision-trace drawn/cast/used evidence"
+            "none"
+            if ready_for_real_deck_change
+            else (
+                "requires explicit promotion decision audit with ready_for_real_deck_change=true"
+                if not promotion_decision
+                else str(promotion_decision.get("summary") or "promotion decision did not clear the gate")
+            )
         ),
     }
 
@@ -470,6 +507,7 @@ def build_report(
 
 def write_markdown(report: Mapping[str, Any], path: Path) -> None:
     gate = report["continuation_gate"]
+    promotion_decision = gate.get("promotion_decision") or {}
     matrix_summary = ((report.get("current_matrix") or {}).get("canonical_summary") or {})
     lines = [
         "# Lorehold Artifact Contract Audit",
@@ -484,6 +522,8 @@ def write_markdown(report: Mapping[str, Any], path: Path) -> None:
         f"- Can run equal battle gate: `{str(gate['can_run_equal_battle_gate']).lower()}`",
         f"- Ready for real deck change: `{str(gate['ready_for_real_deck_change']).lower()}`",
         f"- Real deck change blocker: {gate['real_deck_change_blocker']}",
+        f"- Promotion decision: `{promotion_decision.get('path', 'none')}`",
+        f"- Promoted deck keys: `{json.dumps(promotion_decision.get('promoted_deck_keys') or [])}`",
         "",
         "## Current Matrix",
         "",
@@ -524,6 +564,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--matrix", type=Path, default=CURRENT_MATRIX)
+    parser.add_argument("--promotion-decision", type=Path, default=None)
     parser.add_argument(
         "--out-prefix",
         type=Path,
@@ -534,7 +575,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    report = build_report(db_path=args.db, matrix_path=args.matrix)
+    report = build_report(
+        db_path=args.db,
+        matrix_path=args.matrix,
+        promotion_decision_path=args.promotion_decision,
+    )
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")
     json_path.parent.mkdir(parents=True, exist_ok=True)

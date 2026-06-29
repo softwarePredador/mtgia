@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "db_mutations": true,
+  "started_at": "2026-06-29T20:41:39.254865Z",
+  "finished_at": "2026-06-29T20:41:52.918410Z",
+  "commander": "Lorehold, the Historian",
+  "commander_name_normalized": "lorehold, the historian",
+  "deck_name": "Lorehold 607 + 615 Mana Engine Candidate v1",
+  "source_system": "manaloom_candidate_gate",
+  "source_ref": "lorehold_candidate_607_v615_mana_engine_v1",
+  "card_count": 100,
+  "parsed_card_count": 100,
+  "validation": {
+    "ok": true,
+    "parsed_card_count": 100,
+    "declared_card_count": 100,
+    "commander_quantity": 1,
+    "main_quantity": 99,
+    "blockers": [],
+    "warnings": []
+  },
+  "is_active": true,
+  "deactivate_other_active": true,
+  "metadata": {
+    "added": [
+      {
+        "card_name": "Mana Vault",
+        "source_deck_id": 615
+      },
+      {
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "source_deck_id": 615
+      },
+      {
+        "card_name": "The One Ring",
+        "source_deck_id": 615
+      }
+    ],
+    "base_deck_id": 607,
+    "candidate_hash": "f9494816fc96cb7cff6461beda1c306eff09df1c27bd511491b882890590c4fa",
+    "candidate_key": "candidate_607_v615_mana_engine_v1",
+    "commander_intent_score": 100.0,
+    "decision_status": "promote_challenger",
+    "evidence_paths": {
+      "artifact_contract_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_v615_mana_engine_current.json",
+      "candidate_decklist": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260629_v615_mana_engine_v1.decklist.txt",
+      "candidate_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260629_v615_mana_engine_v1.json",
+      "decision_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.json",
+      "matrix_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_v615_mana_engine_candidate_v1.json"
+    },
+    "promoted_deck_keys": [
+      "candidate_607_v615_mana_engine_v1"
+    ],
+    "ready_for_real_deck_change": true,
+    "removed": [
+      "Bender's Waterskin",
+      "The Scarlet Witch",
+      "Molecule Man"
+    ],
+    "strategy_version": "lorehold_strategy_profile_v3_2026_06_26"
+  },
+  "safety": {
+    "idempotent_key": "source_system+source_ref",
+    "no_secrets_recorded": true,
+    "dry_run_default": true
+  }
+}

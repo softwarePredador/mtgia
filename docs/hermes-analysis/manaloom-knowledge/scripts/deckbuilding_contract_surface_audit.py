@@ -26,19 +26,19 @@ README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
     REPO_ROOT
-    / "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json"
+    / "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_v615_mana_engine_candidate_v1.json"
 )
 CONTRACT_MATRIX_MD = (
     REPO_ROOT
-    / "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.md"
+    / "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_v615_mana_engine_candidate_v1.md"
 )
 ARTIFACT_CONTRACT_REPORT = (
     REPO_ROOT
-    / "docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_current.md"
+    / "docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_v615_mana_engine_current.md"
 )
 PROMOTION_DECISION_REPORT = (
     REPO_ROOT
-    / "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_decision_audit_20260629_real8_games3_seed42_7_20260625.md"
+    / "docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -91,7 +91,7 @@ def build_audit() -> dict[str, Any]:
                 "decks[] + ranked_deck_keys",
                 "lorehold_artifact_contract_audit.py",
                 "lorehold_promotion_gate_decision_audit.py",
-                "keep `607` as protected baseline",
+                "candidate_607_v615_mana_engine_v1",
             ],
         )
     )

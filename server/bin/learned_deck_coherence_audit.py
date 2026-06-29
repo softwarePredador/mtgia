@@ -2116,13 +2116,31 @@ def markdown_report(payload: dict[str, Any]) -> str:
         if off_color_count
         else "6. No current off-color cards remain after partner/deck-name inference; keep monitoring new audit artifacts."
     )
+    lorehold_active = next(
+        (
+            item
+            for item in payload.get("decks", [])
+            if item.get("commander_name") == "Lorehold, the Historian"
+        ),
+        {},
+    )
+    lorehold_source_ref = lorehold_active.get("source_ref") or "unknown"
+    lorehold_medium = sum(
+        1
+        for issue_item in lorehold_active.get("issues", [])
+        if issue_item.get("severity") == "medium"
+    )
+    lorehold_recommendation = (
+        f"2. Keep Lorehold active learned deck `{lorehold_source_ref}` under post-promotion monitoring; "
+        f"current active metadata issues: medium `{lorehold_medium}`."
+    )
     lines.extend(
         [
             "",
             "## Recommended Next Adjustments",
             "",
             "1. Continue re-deriving and backfilling active learned-deck metadata mismatches with explicit mutation approval.",
-            "2. Keep Lorehold learned deck 82 under no-swap monitoring; current metadata and strategy package checks pass.",
+            lorehold_recommendation,
             "3. Continue broader semantic/function-tag backfill for non-Lorehold learned decks using dry-run plans first.",
             "4. Treat missing legality rows separately from real illegality or off-color violations.",
             "5. Persist partner/background identity for decks where inferred partner colors explain off-color candidates.",

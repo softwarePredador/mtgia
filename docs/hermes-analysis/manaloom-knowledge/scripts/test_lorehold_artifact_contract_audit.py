@@ -120,6 +120,42 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.artifact_kind, "promotion_gate_decision_audit")
         self.assertEqual(classification.status, "pass")
 
+    def test_normalize_promotion_decision_extracts_ready_state(self) -> None:
+        payload = {
+            "decision": {
+                "status": "promote_challenger",
+                "protected_baseline": "deck_607",
+                "candidate_keys": ["candidate_custom"],
+                "promoted_deck_keys": ["candidate_custom"],
+                "ready_for_real_deck_change": True,
+                "summary": "Promotion allowed for candidate_custom.",
+            }
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "promotion.json"
+            normalized = audit.normalize_promotion_decision(path, payload)
+
+        self.assertTrue(normalized["ready_for_real_deck_change"])
+        self.assertEqual(normalized["promoted_deck_keys"], ["candidate_custom"])
+        self.assertEqual(normalized["protected_baseline"], "deck_607")
+
+    def test_commander_learned_deck_import_payload_is_recognized(self) -> None:
+        payload = {
+            "source_system": "manaloom_candidate_gate",
+            "source_ref": "lorehold_candidate_607_v615_mana_engine_v1",
+            "commander_name": "Lorehold, the Historian",
+            "card_list": "1 Lorehold, the Historian\n1 Sol Ring",
+            "card_count": 100,
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "learned_import.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "commander_learned_deck_import")
+        self.assertEqual(classification.status, "pass")
+
     def test_unknown_schema_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "unknown.json"

@@ -674,6 +674,52 @@ class LearnedDeckCoherenceAuditTest(unittest.TestCase):
         self.assertEqual(gate["status"], "pass")
         self.assertEqual(gate["failure_count"], 0)
 
+    def test_markdown_recommendation_uses_current_lorehold_source_ref(self) -> None:
+        payload = {
+            "generated_at": "now",
+            "aggregate": {
+                "summary": {"active_learned_decks": 1},
+                "severity_counts": {},
+                "by_source": {"manaloom_candidate_gate": {"active": 1}},
+            },
+            "postgres_oracle_inventory": {
+                "total_cards": 1,
+                "oracle_structured_cards": 1,
+                "oracle_structured_rate": 1.0,
+                "missing_oracle_id": 0,
+                "missing_oracle_text": 0,
+                "missing_type_line": 0,
+                "sample_unstructured_cards": [],
+            },
+            "off_color_resolution_plan": {"entries": []},
+            "decks": [
+                {
+                    "commander_name": "Lorehold, the Historian",
+                    "source_ref": "lorehold_candidate_607_v615_mana_engine_v1",
+                    "issues": [],
+                    "derived_metadata": {},
+                    "manual_off_color_review": None,
+                }
+            ],
+            "lorehold": {
+                "active_learned_deck": {},
+                "sqlite_deck": {},
+                "pg_saved_deck": {},
+                "name_match": {},
+                "no_premium_mox_present": [],
+                "strategy_source": "active_learned_deck",
+                "strategy_checks": {"passed": True, "packages": []},
+            },
+        }
+
+        markdown = audit.markdown_report(payload)
+
+        self.assertIn(
+            "Keep Lorehold active learned deck `lorehold_candidate_607_v615_mana_engine_v1`",
+            markdown,
+        )
+        self.assertNotIn("learned deck 82", markdown)
+
     def test_audit_json_includes_manual_off_color_review(self) -> None:
         learned_deck = audit.LearnedDeckAudit(
             commander_name="K-9, Mark I",

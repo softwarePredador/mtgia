@@ -160,6 +160,31 @@ RESEARCH_PLANS = {
             "The registry marks Guttersnipe lower priority because Longshot failed a similar payoff lane, so this test isolates the payoff swap only.",
         ],
     },
+    "v615_mana_engine_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_v615_mana_engine_v1",
+        "candidate_name": "Lorehold 607 + 615 Mana Engine Candidate v1",
+        "candidate_archetype": "607-615-mana-engine-candidate",
+        "added": [
+            {"card_name": "Mana Vault", "source_deck_id": 615},
+            {"card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty", "source_deck_id": 615},
+            {"card_name": "The One Ring", "source_deck_id": 615},
+        ],
+        "removed": ["Bender's Waterskin", "The Scarlet Witch", "Molecule Man"],
+        "intent": (
+            "Start from protected deck_607 and import only the 615 cards with "
+            "promotion-gate trace evidence: Mana Vault for fast mana, Birgi for "
+            "spell-chain mana, and The One Ring for draw/protection. Keep The Mind "
+            "Stone in the shell so the One Ring blink/refresh hypothesis remains "
+            "testable instead of cutting the enabler before evidence exists."
+        ),
+        "external_signals": [
+            "Promotion gate 2026-06-29 kept deck_607 as baseline but identified deck_615 as the best package-learning candidate.",
+            "deck_615 traces showed Mana Vault cost_paid=20, Birgi spell_cast_mana=25, The One Ring cost_paid=7, and stronger Winota pressure results than deck_607.",
+            "The cuts are narrow same-lane or low-observed slots: Bender's Waterskin is slower ramp, The Scarlet Witch overlaps cost-reduction/engine space, and Molecule Man had access but no recorded use metric in the promotion gate.",
+        ],
+    },
 }
 
 
@@ -318,6 +343,51 @@ def summarize_cards(rows: list[Mapping[str, Any]]) -> dict[str, Any]:
     }
 
 
+def display_card_name(card_name: Any) -> str:
+    name = str(card_name or "")
+    parts = [part.strip() for part in name.split(" // ")]
+    if len(parts) == 2 and parts[0] == parts[1]:
+        return parts[0]
+    return name
+
+
+def decklist_markdown_lines(report: Mapping[str, Any]) -> list[str]:
+    final_deck = list(report.get("final_deck") or [])
+    commander = [card for card in final_deck if card.get("is_commander")]
+    lands = [card for card in final_deck if not card.get("is_commander") and card.get("is_land")]
+    nonlands = [card for card in final_deck if not card.get("is_commander") and not card.get("is_land")]
+
+    def sorted_cards(cards: list[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+        return sorted(cards, key=lambda card: str(card.get("card_name") or "").lower())
+
+    lines: list[str] = []
+    for title, cards in (
+        ("Commander", sorted_cards(commander)),
+        ("Nonlands", sorted_cards(nonlands)),
+        ("Lands", sorted_cards(lands)),
+    ):
+        lines.extend([f"### {title}", ""])
+        for card in cards:
+            lines.append(f"{int(card.get('quantity') or 1)} {display_card_name(card.get('card_name'))}")
+        lines.append("")
+    return lines
+
+
+def render_decklist_text(report: Mapping[str, Any]) -> str:
+    final_deck = list(report.get("final_deck") or [])
+    commander = [card for card in final_deck if card.get("is_commander")]
+    lands = [card for card in final_deck if not card.get("is_commander") and card.get("is_land")]
+    nonlands = [card for card in final_deck if not card.get("is_commander") and not card.get("is_land")]
+
+    def sorted_cards(cards: list[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+        return sorted(cards, key=lambda card: str(card.get("card_name") or "").lower())
+
+    ordered_cards = sorted_cards(commander) + sorted_cards(nonlands) + sorted_cards(lands)
+    return "\n".join(
+        f"{int(card.get('quantity') or 1)} {display_card_name(card.get('card_name'))}" for card in ordered_cards
+    ) + "\n"
+
+
 def render_markdown(report: Mapping[str, Any]) -> str:
     lines = [
         f"# Lorehold 607 Research Candidate {report['plan']}",
@@ -350,6 +420,8 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     lines.extend(["", "### Strategy Package Counts", ""])
     for key, value in report["strategy_package_counts"].items():
         lines.append(f"- `{key}`: {value}")
+    lines.extend(["", "## Final Decklist", ""])
+    lines.extend(decklist_markdown_lines(report))
     return "\n".join(lines) + "\n"
 
 
@@ -386,8 +458,8 @@ def main() -> int:
         WHERE id=?
         """,
         (
-            f"Lorehold 607 Research Candidate {args.plan}",
-            f"607-research-candidate-{args.plan}",
+            str(plan.get("candidate_name") or f"Lorehold 607 Research Candidate {args.plan}"),
+            str(plan.get("candidate_archetype") or f"607-research-candidate-{args.plan}"),
             "isolated candidate generated by lorehold_607_research_candidate.py",
             int(plan["candidate_deck_id"]),
         ),
@@ -400,6 +472,9 @@ def main() -> int:
         "status": "generated_isolated_candidate",
         "source_db": str(args.source_db),
         "candidate_db": str(candidate_db),
+        "candidate_key": plan.get("candidate_key", f"candidate_607_{args.plan}"),
+        "candidate_name": plan.get("candidate_name", f"Lorehold 607 Research Candidate {args.plan}"),
+        "candidate_archetype": plan.get("candidate_archetype", f"607-research-candidate-{args.plan}"),
         "strategy_version": STRATEGY_VERSION,
         "postgres_writes": False,
         "source_db_mutated": False,
@@ -412,14 +487,17 @@ def main() -> int:
     report_stem = args.report_stem or f"lorehold_607_research_candidate_20260626_{args.plan}"
     json_path = REPORT_DIR / f"{report_stem}.json"
     md_path = REPORT_DIR / f"{report_stem}.md"
+    decklist_path = REPORT_DIR / f"{report_stem}.decklist.txt"
     json_path.write_text(json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
     md_path.write_text(render_markdown(report), encoding="utf-8")
+    decklist_path.write_text(render_decklist_text(report), encoding="utf-8")
     print(
         json.dumps(
             {
                 "status": report["status"],
                 "json": str(json_path),
                 "markdown": str(md_path),
+                "decklist": str(decklist_path),
                 "candidate_db": str(candidate_db),
             },
             indent=2,

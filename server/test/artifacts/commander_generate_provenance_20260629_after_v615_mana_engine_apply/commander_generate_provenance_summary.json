@@ -1,0 +1,1433 @@
+{
+  "status": "PASS_WITH_RISKS",
+  "mode": "read_only_provenance_audit",
+  "db_mutations": false,
+  "started_at": "2026-06-29T20:42:06.617728Z",
+  "finished_at": "2026-06-29T20:42:24.691779Z",
+  "commander_name": "Lorehold, the Historian",
+  "artifact_dir": "test/artifacts/commander_generate_provenance_20260629_after_v615_mana_engine_apply",
+  "generator_truth": {
+    "learned_deck_route_is_parallel_product_channel": true,
+    "ai_generate_reads_learned_decks_directly": true,
+    "backend_ownership": [
+      "commander_reference_profiles",
+      "commander_reference_card_stats",
+      "commander_reference_deck_analysis",
+      "commander_card_usage",
+      "commander_learned_decks",
+      "loreholdDeterministicReferenceFallbackCards"
+    ]
+  },
+  "profile": {
+    "row_exists": true,
+    "row_source": "aggregate_reference_profile_v1",
+    "row_updated_at": "2026-06-19T10:27:48.875715Z",
+    "row_confidence": "high",
+    "row_source_count": 4,
+    "usable": true,
+    "usable_confidence": "high",
+    "usable_source_count": 4,
+    "usable_runtime_origin": null,
+    "usable_runtime_reason": null
+  },
+  "reference_card_stats": {
+    "table_available": true,
+    "usable_count": 46,
+    "unresolved_count": 0,
+    "package_counts": {
+      "miracle_payoffs_expensive_spells": 12,
+      "spell_payoff_copy_package": 9,
+      "topdeck_and_miracle_setup": 7,
+      "interaction_and_resets": 7,
+      "mana_ramp_foundation": 5,
+      "draw_rummage_foundation": 3,
+      "protection_and_equipment": 3
+    },
+    "role_counts": {
+      "miracle_haymakers": 12,
+      "spell_payoffs_copy_engines": 9,
+      "topdeck_miracle_setup": 7,
+      "interaction_and_resets": 7,
+      "mana_rocks_treasure_ramp": 5,
+      "draw_rummage_opponent_turn_draw": 3,
+      "protection": 3
+    },
+    "top_sample": [
+      {
+        "card_name": "Brainstone",
+        "package_key": "topdeck_and_miracle_setup",
+        "role": "topdeck_miracle_setup",
+        "score": 94.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Library of Leng",
+        "package_key": "topdeck_and_miracle_setup",
+        "role": "topdeck_miracle_setup",
+        "score": 94.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Mikokoro, Center of the Sea",
+        "package_key": "topdeck_and_miracle_setup",
+        "role": "topdeck_miracle_setup",
+        "score": 94.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Scroll Rack",
+        "package_key": "topdeck_and_miracle_setup",
+        "role": "topdeck_miracle_setup",
+        "score": 94.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Sensei's Divining Top",
+        "package_key": "topdeck_and_miracle_setup",
+        "role": "topdeck_miracle_setup",
+        "score": 94.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Temple Bell",
+        "package_key": "topdeck_and_miracle_setup",
+        "role": "topdeck_miracle_setup",
+        "score": 94.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Victory Chimes",
+        "package_key": "topdeck_and_miracle_setup",
+        "role": "topdeck_miracle_setup",
+        "score": 94.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Arcane Signet",
+        "package_key": "mana_ramp_foundation",
+        "role": "mana_rocks_treasure_ramp",
+        "score": 90.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Boros Signet",
+        "package_key": "mana_ramp_foundation",
+        "role": "mana_rocks_treasure_ramp",
+        "score": 90.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Fellwar Stone",
+        "package_key": "mana_ramp_foundation",
+        "role": "mana_rocks_treasure_ramp",
+        "score": 90.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Sol Ring",
+        "package_key": "mana_ramp_foundation",
+        "role": "mana_rocks_treasure_ramp",
+        "score": 90.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Talisman of Conviction",
+        "package_key": "mana_ramp_foundation",
+        "role": "mana_rocks_treasure_ramp",
+        "score": 90.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Apex of Power",
+        "package_key": "miracle_payoffs_expensive_spells",
+        "role": "miracle_haymakers",
+        "score": 88.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Approach of the Second Sun",
+        "package_key": "miracle_payoffs_expensive_spells",
+        "role": "miracle_haymakers",
+        "score": 88.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Brass's Bounty",
+        "package_key": "miracle_payoffs_expensive_spells",
+        "role": "miracle_haymakers",
+        "score": 88.0,
+        "source": "aggregate_reference_profile_v1"
+      },
+      {
+        "card_name": "Call Forth the Tempest",
+        "package_key": "miracle_payoffs_expensive_spells",
+        "role": "miracle_haymakers",
+        "score": 88.0,
+        "source": "aggregate_reference_profile_v1"
+      }
+    ]
+  },
+  "reference_corpus": {
+    "available": true,
+    "source": "commander_reference_deck_corpus_v1",
+    "deck_count": 3,
+    "accepted_deck_count": 3,
+    "package_counts": {
+      "core_package": 26,
+      "theme_package": 4,
+      "support_package": 6,
+      "optional_contextual": 4
+    }
+  },
+  "usage_hot_cards": {
+    "count": 50,
+    "total_usage_count": 612,
+    "top_sample": [
+      {
+        "card_name_normalized": "plains",
+        "canonical_name": "Plains // Plains",
+        "usage_count": 14,
+        "last_used_at": "2026-06-05 23:49:03.390151Z"
+      },
+      {
+        "card_name_normalized": "mountain",
+        "canonical_name": "Mountain // Mountain",
+        "usage_count": 14,
+        "last_used_at": "2026-06-05 23:49:03.387935Z"
+      },
+      {
+        "card_name_normalized": "unexpected windfall",
+        "canonical_name": "Unexpected Windfall",
+        "usage_count": 13,
+        "last_used_at": "2026-06-12 16:19:36.104089Z"
+      },
+      {
+        "card_name_normalized": "talisman of conviction",
+        "canonical_name": "Talisman of Conviction",
+        "usage_count": 13,
+        "last_used_at": "2026-06-12 16:19:36.091558Z"
+      },
+      {
+        "card_name_normalized": "jeska's will",
+        "canonical_name": "Jeska's Will",
+        "usage_count": 13,
+        "last_used_at": "2026-06-12 16:19:35.919Z"
+      },
+      {
+        "card_name_normalized": "imperial recruiter",
+        "canonical_name": "Imperial Recruiter",
+        "usage_count": 13,
+        "last_used_at": "2026-06-12 16:19:35.908433Z"
+      },
+      {
+        "card_name_normalized": "generous gift",
+        "canonical_name": "Generous Gift",
+        "usage_count": 13,
+        "last_used_at": "2026-06-12 16:19:35.886012Z"
+      },
+      {
+        "card_name_normalized": "boros signet",
+        "canonical_name": "Boros Signet",
+        "usage_count": 13,
+        "last_used_at": "2026-06-12 16:19:35.809904Z"
+      },
+      {
+        "card_name_normalized": "boros charm",
+        "canonical_name": "Boros Charm",
+        "usage_count": 13,
+        "last_used_at": "2026-06-12 16:19:35.806243Z"
+      },
+      {
+        "card_name_normalized": "arcane signet",
+        "canonical_name": "Arcane Signet",
+        "usage_count": 13,
+        "last_used_at": "2026-06-12 16:19:35.774626Z"
+      },
+      {
+        "card_name_normalized": "worldfire",
+        "canonical_name": "Worldfire",
+        "usage_count": 12,
+        "last_used_at": "2026-06-12 16:19:36.135819Z"
+      },
+      {
+        "card_name_normalized": "wooded foothills",
+        "canonical_name": "Wooded Foothills",
+        "usage_count": 12,
+        "last_used_at": "2026-06-12 16:19:36.132324Z"
+      },
+      {
+        "card_name_normalized": "windswept heath",
+        "canonical_name": "Windswept Heath",
+        "usage_count": 12,
+        "last_used_at": "2026-06-12 16:19:36.124902Z"
+      },
+      {
+        "card_name_normalized": "wheel of fortune",
+        "canonical_name": "Wheel of Fortune",
+        "usage_count": 12,
+        "last_used_at": "2026-06-12 16:19:36.121613Z"
+      },
+      {
+        "card_name_normalized": "war room",
+        "canonical_name": "War Room",
+        "usage_count": 12,
+        "last_used_at": "2026-06-12 16:19:36.118045Z"
+      },
+      {
+        "card_name_normalized": "victory chimes",
+        "canonical_name": "Victory Chimes",
+        "usage_count": 12,
+        "last_used_at": "2026-06-12 16:19:36.113747Z"
+      }
+    ]
+  },
+  "active_learned_deck": {
+    "exists": true,
+    "deck_name": "Lorehold 607 + 615 Mana Engine Candidate v1",
+    "source_system": "manaloom_candidate_gate",
+    "source_ref": "lorehold_candidate_607_v615_mana_engine_v1",
+    "score": 141.114,
+    "legal_status": "commander_legal",
+    "card_count": 100,
+    "cards_sample": [
+      {
+        "name": "Lorehold, the Historian",
+        "quantity": 1
+      },
+      {
+        "name": "Approach of the Second Sun",
+        "quantity": 1
+      },
+      {
+        "name": "Arcane Signet",
+        "quantity": 1
+      },
+      {
+        "name": "Artist's Talent",
+        "quantity": 1
+      },
+      {
+        "name": "Avatar's Wrath",
+        "quantity": 1
+      },
+      {
+        "name": "Big Score",
+        "quantity": 1
+      },
+      {
+        "name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "quantity": 1
+      },
+      {
+        "name": "Blasphemous Act",
+        "quantity": 1
+      },
+      {
+        "name": "Boros Signet",
+        "quantity": 1
+      },
+      {
+        "name": "Call Forth the Tempest",
+        "quantity": 1
+      },
+      {
+        "name": "Creative Technique",
+        "quantity": 1
+      },
+      {
+        "name": "Dawn's Truce",
+        "quantity": 1
+      },
+      {
+        "name": "Deflecting Swat",
+        "quantity": 1
+      },
+      {
+        "name": "Emeria's Call // Emeria, Shattered Skyclave",
+        "quantity": 1
+      },
+      {
+        "name": "Esper Sentinel",
+        "quantity": 1
+      },
+      {
+        "name": "Everything Comes to Dust",
+        "quantity": 1
+      },
+      {
+        "name": "Farewell",
+        "quantity": 1
+      },
+      {
+        "name": "Fated Clash",
+        "quantity": 1
+      },
+      {
+        "name": "Fellwar Stone",
+        "quantity": 1
+      },
+      {
+        "name": "Flawless Maneuver",
+        "quantity": 1
+      }
+    ]
+  },
+  "learning_snapshot": {
+    "active_learned_deck_count": 1,
+    "best_learned_score": "141.114",
+    "usage_card_rows": 136,
+    "total_usage_count": 1237,
+    "synergy_rows": 5,
+    "best_synergy_score": 96,
+    "source_coverage": {
+      "has_usage": true,
+      "has_synergy": true,
+      "metadata_hidden": true,
+      "has_active_learned_deck": true
+    }
+  },
+  "deterministic_fallback": {
+    "enabled_for_commander": true,
+    "count": 62,
+    "sample": [
+      "Sol Ring",
+      "Arcane Signet",
+      "Boros Signet",
+      "Talisman of Conviction",
+      "Mind Stone",
+      "Fellwar Stone",
+      "Wayfarer's Bauble",
+      "Thought Vessel",
+      "Commander's Sphere",
+      "Marble Diamond",
+      "Fire Diamond",
+      "Sensei's Divining Top",
+      "Scroll Rack",
+      "Library of Leng",
+      "Brainstone",
+      "Temple Bell",
+      "Victory Chimes",
+      "Faithless Looting",
+      "Thrill of Possibility",
+      "Big Score"
+    ]
+  },
+  "source_overlap_matrix": [
+    {
+      "key": "active_learned_deck",
+      "count": 44,
+      "sample": [
+        "Ancient Tomb",
+        "Artist's Talent",
+        "Avatar's Wrath",
+        "Battlefield Forge",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Command Beacon",
+        "Dawn's Truce",
+        "Eiganjo, Seat of the Empire",
+        "Elegant Parlor",
+        "Emeria's Call // Emeria, Shattered Skyclave"
+      ]
+    },
+    {
+      "key": "usage_hot_cards",
+      "count": 18,
+      "sample": [
+        "Imperial Recruiter",
+        "Mountain // Mountain",
+        "Past in Flames",
+        "Plains // Plains",
+        "Ranger-Captain of Eos",
+        "Recruiter of the Guard",
+        "Reiterate",
+        "Reverberate",
+        "Rite of Flame",
+        "Rite of the Dragoncaller"
+      ]
+    },
+    {
+      "key": "deterministic_fallback + profile_expected_packages + reference_card_stats",
+      "count": 17,
+      "sample": [
+        "Apex of Power",
+        "Arcane Bombardment",
+        "Austere Command",
+        "Bonfire of the Damned",
+        "Brainstone",
+        "Brass's Bounty",
+        "Chandra, Hope's Beacon",
+        "Double Vision",
+        "Monastery Mentor",
+        "Primal Amulet // Primal Wellspring"
+      ]
+    },
+    {
+      "key": "deterministic_fallback",
+      "count": 15,
+      "sample": [
+        "Chaos Warp",
+        "Commander's Sphere",
+        "Fire Diamond",
+        "Light Up the Stage",
+        "Marble Diamond",
+        "Mind Stone",
+        "Reckless Impulse",
+        "Reconstruct History",
+        "Seize the Spoils",
+        "Thought Vessel"
+      ]
+    },
+    {
+      "key": "reference_corpus_packages",
+      "count": 13,
+      "sample": [
+        "Archivist of Oghma",
+        "Bolt Bend",
+        "Cavern of Souls",
+        "City of Brass",
+        "Dualcaster Mage",
+        "Enlightened Tutor",
+        "Gamble",
+        "Gemstone Caverns",
+        "Goblin Engineer",
+        "Mana Confluence"
+      ]
+    },
+    {
+      "key": "active_learned_deck + deterministic_fallback + profile_expected_packages + reference_card_stats + usage_hot_cards",
+      "count": 10,
+      "sample": [
+        "Boros Signet",
+        "Generous Gift",
+        "Path to Exile",
+        "Rise of the Eldrazi",
+        "Storm Herd",
+        "Swords to Plowshares",
+        "Talisman of Conviction",
+        "Teferi's Protection",
+        "Unexpected Windfall",
+        "Victory Chimes"
+      ]
+    },
+    {
+      "key": "active_learned_deck + reference_corpus_packages",
+      "count": 9,
+      "sample": [
+        "Arid Mesa",
+        "Bloodstained Mire",
+        "Command Tower",
+        "Deflecting Swat",
+        "Flooded Strand",
+        "Hexing Squelcher",
+        "Marsh Flats",
+        "Monument to Endurance",
+        "Redirect Lightning"
+      ]
+    },
+    {
+      "key": "active_learned_deck + usage_hot_cards",
+      "count": 9,
+      "sample": [
+        "Jeska's Will",
+        "Prismatic Vista",
+        "Reforge the Soul",
+        "Ruby Medallion",
+        "Sunbaked Canyon",
+        "Sunbillow Verge",
+        "The One Ring",
+        "War Room",
+        "Windswept Heath"
+      ]
+    },
+    {
+      "key": "active_learned_deck + deterministic_fallback + profile_expected_packages + reference_card_stats",
+      "count": 6,
+      "sample": [
+        "Approach of the Second Sun",
+        "Blasphemous Act",
+        "Creative Technique",
+        "Fellwar Stone",
+        "Lightning Greaves",
+        "Mizzix's Mastery"
+      ]
+    },
+    {
+      "key": "active_learned_deck + reference_corpus_packages + usage_hot_cards",
+      "count": 6,
+      "sample": [
+        "Sacred Foundry",
+        "Scalding Tarn",
+        "Smothering Tithe",
+        "Spectator Seating",
+        "Urza's Saga",
+        "Wooded Foothills"
+      ]
+    },
+    {
+      "key": "active_learned_deck + deterministic_fallback + profile_expected_packages + reference_card_stats + reference_corpus_packages",
+      "count": 5,
+      "sample": [
+        "Call Forth the Tempest",
+        "Esper Sentinel",
+        "Hit the Mother Lode",
+        "Library of Leng",
+        "Sol Ring"
+      ]
+    },
+    {
+      "key": "active_learned_deck + deterministic_fallback + profile_expected_packages + reference_card_stats + reference_corpus_packages + usage_hot_cards",
+      "count": 3,
+      "sample": [
+        "Arcane Signet",
+        "Scroll Rack",
+        "Sensei's Divining Top"
+      ]
+    },
+    {
+      "key": "deterministic_fallback + profile_expected_packages + reference_card_stats + reference_corpus_packages",
+      "count": 2,
+      "sample": [
+        "Dance with Calamity",
+        "Faithless Looting"
+      ]
+    },
+    {
+      "key": "deterministic_fallback + profile_expected_packages + reference_card_stats + usage_hot_cards",
+      "count": 2,
+      "sample": [
+        "Boros Charm",
+        "Storm-Kiln Artist"
+      ]
+    },
+    {
+      "key": "reference_corpus_packages + usage_hot_cards",
+      "count": 2,
+      "sample": [
+        "Plateau",
+        "Pyroblast"
+      ]
+    },
+    {
+      "key": "active_learned_deck + deterministic_fallback",
+      "count": 2,
+      "sample": [
+        "Big Score",
+        "Swiftfoot Boots"
+      ]
+    },
+    {
+      "key": "profile_expected_packages + reference_card_stats",
+      "count": 1,
+      "sample": [
+        "Mikokoro, Center of the Sea"
+      ]
+    }
+  ],
+  "deterministic_deck": {
+    "built": true,
+    "commander": {
+      "name": "Lorehold, the Historian"
+    },
+    "main_count": 99,
+    "distinct_card_count": 93,
+    "runtime_build_diagnostics": {
+      "source_precedence": [
+        "active_learned_deck",
+        "reference_card_stats",
+        "reference_corpus_packages",
+        "profile_expected_packages",
+        "usage_hot_cards",
+        "deterministic_fallback"
+      ],
+      "main_deck_quantity": 99,
+      "distinct_card_count": 93,
+      "basic_land_quantity": 0,
+      "built_in_fallback_enabled": true,
+      "built_in_fallback_used_count": 0,
+      "built_in_fallback_only_count": 0,
+      "built_in_fallback_only_sample": [],
+      "source_mix_counts": {
+        "active_learned_deck + profile_expected_packages + reference_card_stats": 6,
+        "active_learned_deck + profile_expected_packages + reference_card_stats + reference_corpus_packages + usage_hot_cards": 3,
+        "active_learned_deck": 46,
+        "active_learned_deck + profile_expected_packages + reference_card_stats + usage_hot_cards": 10,
+        "active_learned_deck + profile_expected_packages + reference_card_stats + reference_corpus_packages": 5,
+        "active_learned_deck + reference_corpus_packages": 8,
+        "active_learned_deck + usage_hot_cards": 9,
+        "active_learned_deck + reference_corpus_packages + usage_hot_cards": 6
+      },
+      "source_usage_counts": {
+        "active_learned_deck": 93,
+        "profile_expected_packages": 24,
+        "reference_card_stats": 24,
+        "reference_corpus_packages": 22,
+        "usage_hot_cards": 28
+      },
+      "card_provenance_sample": [
+        {
+          "card_name": "Approach of the Second Sun",
+          "sources": [
+            "active_learned_deck",
+            "profile_expected_packages",
+            "reference_card_stats"
+          ]
+        },
+        {
+          "card_name": "Arcane Signet",
+          "sources": [
+            "active_learned_deck",
+            "profile_expected_packages",
+            "reference_card_stats",
+            "reference_corpus_packages",
+            "usage_hot_cards"
+          ]
+        },
+        {
+          "card_name": "Artist's Talent",
+          "sources": [
+            "active_learned_deck"
+          ]
+        },
+        {
+          "card_name": "Avatar's Wrath",
+          "sources": [
+            "active_learned_deck"
+          ]
+        },
+        {
+          "card_name": "Big Score",
+          "sources": [
+            "active_learned_deck"
+          ]
+        },
+        {
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "sources": [
+            "active_learned_deck"
+          ]
+        },
+        {
+          "card_name": "Blasphemous Act",
+          "sources": [
+            "active_learned_deck",
+            "profile_expected_packages",
+            "reference_card_stats"
+          ]
+        },
+        {
+          "card_name": "Boros Signet",
+          "sources": [
+            "active_learned_deck",
+            "profile_expected_packages",
+            "reference_card_stats",
+            "usage_hot_cards"
+          ]
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "sources": [
+            "active_learned_deck",
+            "profile_expected_packages",
+            "reference_card_stats",
+            "reference_corpus_packages"
+          ]
+        },
+        {
+          "card_name": "Creative Technique",
+          "sources": [
+            "active_learned_deck",
+            "profile_expected_packages",
+            "reference_card_stats"
+          ]
+        },
+        {
+          "card_name": "Dawn's Truce",
+          "sources": [
+            "active_learned_deck"
+          ]
+        },
+        {
+          "card_name": "Deflecting Swat",
+          "sources": [
+            "active_learned_deck",
+            "reference_corpus_packages"
+          ]
+        }
+      ]
+    },
+    "source_mix_counts": {
+      "active_learned_deck": 46,
+      "active_learned_deck + profile_expected_packages + reference_card_stats + usage_hot_cards": 10,
+      "active_learned_deck + usage_hot_cards": 9,
+      "active_learned_deck + reference_corpus_packages": 8,
+      "active_learned_deck + profile_expected_packages + reference_card_stats": 6,
+      "active_learned_deck + reference_corpus_packages + usage_hot_cards": 6,
+      "active_learned_deck + profile_expected_packages + reference_card_stats + reference_corpus_packages": 5,
+      "active_learned_deck + profile_expected_packages + reference_card_stats + reference_corpus_packages + usage_hot_cards": 3
+    },
+    "cards": [
+      {
+        "card_name": "Approach of the Second Sun",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats"
+        ]
+      },
+      {
+        "card_name": "Arcane Signet",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Artist's Talent",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Avatar's Wrath",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Big Score",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Blasphemous Act",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats"
+        ]
+      },
+      {
+        "card_name": "Boros Signet",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Call Forth the Tempest",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Creative Technique",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats"
+        ]
+      },
+      {
+        "card_name": "Dawn's Truce",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Deflecting Swat",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Esper Sentinel",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Everything Comes to Dust",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Farewell",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Fated Clash",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Fellwar Stone",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats"
+        ]
+      },
+      {
+        "card_name": "Flawless Maneuver",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Furygale Flocking",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Generous Gift",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Giver of Runes",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Hexing Squelcher",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "High Noon",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Hit the Mother Lode",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Improvisation Capstone",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Insurrection",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Jeska's Will",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Land Tax",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Library of Leng",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Lightning Greaves",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats"
+        ]
+      },
+      {
+        "card_name": "Mana Vault",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Mizzix's Mastery",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats"
+        ]
+      },
+      {
+        "card_name": "Monument to Endurance",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Mother of Runes",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Path to Exile",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Pearl Medallion",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Pinnacle Monk // Mystic Peak",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Prismari Pianist",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Promise of Loyalty",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Redirect Lightning",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Reforge the Soul",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Rise of the Eldrazi",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Ruby Medallion",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Scroll Rack",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Sensei's Divining Top",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Smothering Tithe",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Sol Ring",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Starfall Invocation",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Storm Herd",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Stroke of Midnight",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Surge to Victory",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Swiftfoot Boots",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Swords to Plowshares",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Talisman of Conviction",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Teferi's Protection",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Tempt with Bunnies",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "The Mind Stone",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "The One Ring",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Thor, God of Thunder",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Tibalt's Trickery",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Tragic Arrogance",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Unexpected Windfall",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Victory Chimes",
+        "sources": [
+          "active_learned_deck",
+          "profile_expected_packages",
+          "reference_card_stats",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Winds of Abandon",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Ancient Tomb",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Arid Mesa",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Battlefield Forge",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Bloodstained Mire",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Command Beacon",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Command Tower",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Eiganjo, Seat of the Empire",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Elegant Parlor",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Exotic Orchard",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Flooded Strand",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Glittering Massif",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Marsh Flats",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages"
+        ]
+      },
+      {
+        "card_name": "Mountain",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Plains",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Plaza of Heroes",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Prismatic Vista",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Radiant Summit",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Reliquary Tower",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Sacred Foundry",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Scalding Tarn",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Spectator Seating",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Sunbaked Canyon",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Sunbillow Verge",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Turbulent Steppe",
+        "sources": [
+          "active_learned_deck"
+        ]
+      },
+      {
+        "card_name": "Urza's Saga",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "War Room",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Windswept Heath",
+        "sources": [
+          "active_learned_deck",
+          "usage_hot_cards"
+        ]
+      },
+      {
+        "card_name": "Wooded Foothills",
+        "sources": [
+          "active_learned_deck",
+          "reference_corpus_packages",
+          "usage_hot_cards"
+        ]
+      }
+    ]
+  },
+  "gaps": [],
+  "safety": {
+    "no_db_mutations": true,
+    "no_secrets_recorded": true,
+    "no_full_private_payloads": true
+  }
+}

@@ -90,6 +90,11 @@ Current Lorehold evidence generated on 2026-06-29:
 - `server/test/artifacts/commander_generate_provenance_20260629_deckbuilding_contract/commander_generate_provenance_summary.json`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_decision_audit_20260629_real8_games3_seed42_7_20260625.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260629_v615_mana_engine_v1.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260629_v615_mana_engine_v1.decklist.txt`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_v615_mana_engine_candidate_v1.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_v615_mana_engine_current.md`
 
 The current canonical Lorehold strategy matrix JSON schema is
 `decks[] + ranked_deck_keys`. Historical `ranked_decks` reports are supported
@@ -125,6 +130,25 @@ Promotion-gate decision generated on 2026-06-29:
   show real Mana Vault, Birgi, Sensei's Divining Top, The One Ring, and
   Mizzix's Mastery usage, but this supports a narrow package/cut experiment,
   not a whole-deck swap.
+
+Narrow package decision generated on 2026-06-29:
+
+- Candidate: `candidate_607_v615_mana_engine_v1`, built from protected `607`.
+- Adds from `615`: `Mana Vault`, `Birgi, God of Storytelling // Harnfel, Horn
+  of Bounty`, and `The One Ring`.
+- Cuts from `607`: `Bender's Waterskin`, `The Scarlet Witch`, and `Molecule
+  Man`.
+- Structural matrix result: candidate rank `1`, `607` rank `2`, `615` rank
+  `3`, `614` rank `4`.
+- Natural equal battle gate: `candidate_607_v615_mana_engine_v1` = `18/72`,
+  `607` = `18/72`, `615` = `16/72`, `614` = `14/72`.
+- Seed windows for the candidate: seed `42` = `6/24`, seed `7` = `2/24`,
+  seed `20260625` = `10/24`.
+- Fast-pressure Winota check: candidate = `1/9`, `607` = `1/9`.
+- Direct card-use evidence in the candidate: `Mana Vault` cost-paid/cast
+  `20`, `Birgi` trigger-resolved `87`, `The One Ring` utility activations
+  `18`.
+- Decision: `promote_challenger`; `ready_for_real_deck_change=true`.
 
 ## General Deckbuilding Gate
 
@@ -238,17 +262,13 @@ happen:
 
 ## Next Product Step
 
-For Lorehold, keep `607` as protected baseline. Do not promote `614` or `615`
-as a whole deck from the current evidence. The next real product step is a
-narrow package/cut experiment derived from `615`, with `607` as the protected
-base, focused on:
-
-- pressure resilience without losing the `607` spell-chain shell;
-- Mana Vault/Birgi acceleration where trace evidence shows real use;
-- Sensei's Divining Top and The One Ring access/usage from `615`;
-- a cut model that protects `607` anchors and proves every removed slot by
-  same-lane replacement evidence;
-- another equal battle gate before any deck mutation is accepted.
+For Lorehold, do not promote `614` or `615` as a whole deck from the current
+evidence. The narrow package/cut experiment derived from `615` has now cleared
+the current promotion gate as `candidate_607_v615_mana_engine_v1`. The next
+real product step is a guarded deck promotion package using the generated
+decklist artifact, followed by validation after the swap. Keep `607` as the
+comparison baseline for rollback and regression checks until the promoted deck
+has passed the post-swap gate.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

@@ -212,6 +212,7 @@ void main() {
           CommanderLearnedDeckCardLine(name: 'Ruby Medallion', quantity: 1),
           CommanderLearnedDeckCardLine(name: 'Scroll Rack', quantity: 1),
           CommanderLearnedDeckCardLine(name: 'Victory Chimes', quantity: 1),
+          CommanderLearnedDeckCardLine(name: 'Land Tax', quantity: 1),
           CommanderLearnedDeckCardLine(name: 'Plains', quantity: 1),
         ],
         commanderNameNormalized: 'lorehold, the historian',
@@ -221,9 +222,10 @@ void main() {
 
       expect(summary['total_lands'], equals(1));
       expect(summary['protection_count'], equals(1));
-      expect(summary['ramp_count'], equals(2));
+      expect(summary['ramp_count'], equals(3));
       expect(summary['draw_count'], equals(1));
       expect(summary['engine_count'], equals(2));
+      expect(summary['tutor_count'], equals(1));
     });
 
     test('metadata canonicalization result exposes safe fallback diagnostics',
