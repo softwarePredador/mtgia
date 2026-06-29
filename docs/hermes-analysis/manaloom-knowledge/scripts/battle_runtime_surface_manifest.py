@@ -125,6 +125,118 @@ CORE_TEST_BASENAMES = {
     "test_battle_rule_alternatives.py",
 }
 
+RULE_SOURCE_CONTRACT = {
+    "official_comprehensive_rules": {
+        "url": "https://magic.wizards.com/en/rules",
+        "use_for": "authoritative turn structure, priority, casting, stack, zones, SBAs, replacement/prevention, continuous effects, and keyword rules",
+    },
+    "xmage": {
+        "url": "https://github.com/magefree/mage",
+        "use_for": "primary open implementation reference for card-level behavior and exact ability/effect decomposition",
+    },
+    "forge": {
+        "url": "https://github.com/Card-Forge/forge",
+        "use_for": "secondary open implementation reference when XMage mapping is ambiguous or needs cross-checking",
+    },
+    "scryfall": {
+        "url": "https://scryfall.com/docs/api",
+        "use_for": "Oracle text, rulings, legalities, identifiers, and bulk card data; not a rules executor",
+    },
+    "mtgjson": {
+        "url": "https://mtgjson.com/",
+        "use_for": "portable bulk card metadata and cross-source identity checks; not a rules executor",
+    },
+    "commander": {
+        "url": "https://mtgcommander.net/index.php/rules/",
+        "use_for": "Commander-specific deck construction, command zone, commander tax, and commander damage rules",
+    },
+}
+
+RULE_AREA_DEFINITIONS: tuple[dict[str, Any], ...] = (
+    {
+        "id": "turn_priority_stack_casting_resolution",
+        "rules_refs": ["CR 117", "CR 405", "CR 500", "CR 601", "CR 608"],
+        "local_files": ["battle_analyst_v9.py", "battle_stack_casting_tests.py", "battle_turn_flow_tests.py"],
+        "status": "covered_by_core_tests",
+        "next_gate": "run stack/turn focused tests before changing priority, casting, or stack resolution",
+    },
+    {
+        "id": "mana_cost_payment_and_mana_abilities",
+        "rules_refs": ["CR 106", "CR 107.4", "CR 601.2f-h", "CR 605"],
+        "local_files": ["battle_analyst_v9.py", "battle_mana_cost_support.py", "battle_mana_tests.py"],
+        "status": "covered_with_known_mode_gaps",
+        "next_gate": "add explicit mode executor tests before promoting alternate or sacrifice mana modes",
+    },
+    {
+        "id": "zones_lki_and_object_movement",
+        "rules_refs": ["CR 400", "CR 608.2", "CR 701"],
+        "local_files": ["battle_zone_transition_support.py", "battle_zone_transition_tests.py", "battle_sba_zone_tests.py"],
+        "status": "covered_by_core_tests",
+        "next_gate": "run zone transition and SBA zone tests before changing movement helpers",
+    },
+    {
+        "id": "state_based_actions",
+        "rules_refs": ["CR 704"],
+        "local_files": ["battle_sba_support.py", "battle_sba_zone_tests.py", "battle_analyst_v9.py"],
+        "status": "covered_by_core_tests",
+        "next_gate": "run SBA tests after any damage, counters, token, aura/equipment, or legendary handling change",
+    },
+    {
+        "id": "replacement_prevention_and_damage_life",
+        "rules_refs": ["CR 119", "CR 120", "CR 614", "CR 615"],
+        "local_files": ["battle_replacement_support.py", "battle_replacement_tests.py", "battle_continuous_effects_tests.py"],
+        "status": "covered_with_known_scope_limits",
+        "next_gate": "cross-check replacement ordering against XMage/Forge when multiple replacement effects compete",
+    },
+    {
+        "id": "continuous_effect_layers",
+        "rules_refs": ["CR 613"],
+        "local_files": ["battle_continuous_effects_tests.py", "battle_card_characteristics_support.py", "battle_analyst_v9.py"],
+        "status": "partial_family_specific_support",
+        "next_gate": "do not claim generic layer engine; add family-specific tests for each promoted continuous effect",
+    },
+    {
+        "id": "combat_attack_block_damage",
+        "rules_refs": ["CR 506", "CR 508", "CR 509", "CR 510"],
+        "local_files": ["battle_combat_tests.py", "battle_targeting_tests.py", "battle_analyst_v9.py"],
+        "status": "covered_by_core_tests",
+        "next_gate": "run combat tests before changing target pressure, blocker selection, combat damage, or restrictions",
+    },
+    {
+        "id": "triggered_abilities",
+        "rules_refs": ["CR 603"],
+        "local_files": ["battle_event_trigger_tests.py", "battle_analyst_v9.py", "reviewed_battle_card_rules.py"],
+        "status": "partial_family_specific_support",
+        "next_gate": "promote triggered families only after deterministic event contract and focused replay tests",
+    },
+    {
+        "id": "modal_targets_choices_and_copying",
+        "rules_refs": ["CR 115", "CR 601.2b-d", "CR 707"],
+        "local_files": ["battle_targeting_tests.py", "battle_stack_casting_tests.py", "test_reviewed_battle_card_rules.py"],
+        "status": "covered_with_known_scope_limits",
+        "next_gate": "require target legality, selected modes, and stack provenance tests for each modal/copy family",
+    },
+    {
+        "id": "commander_format",
+        "rules_refs": ["CR 903", "Commander Rules"],
+        "local_files": ["battle_commander_tests.py", "battle_stack_casting_tests.py", "battle_analyst_v9.py"],
+        "status": "covered_with_known_scope_limits",
+        "next_gate": "verify command zone replacement, commander tax, color identity, and 21-damage lethal before deck/battle promotion",
+    },
+    {
+        "id": "card_specific_runtime_rules",
+        "rules_refs": ["Oracle text", "XMage Mage.Sets", "Forge forge-game"],
+        "local_files": [
+            "reviewed_battle_card_rules.py",
+            "battle_rule_registry.py",
+            "xmage_to_manaloom_effect_hints.py",
+            "xmage_semantic_family_classifier.py",
+        ],
+        "status": "family_mapper_required",
+        "next_gate": "XMage/Oracle extraction creates review candidate; PG promotion requires focused test and safe lane",
+    },
+)
+
 RECURRING_GATE_BASENAMES = {
     "battle_action_critic.py",
     "battle_decision_strategy_auditor.py",
@@ -223,6 +335,7 @@ FOCUSED_EVIDENCE_BASENAMES = {
     "test_battle_card_adjustment_throughput_benchmark.py",
     "battle_card_acceleration_source_audit.py",
     "test_battle_card_acceleration_source_audit.py",
+    "battle_package_end_to_end_validation.py",
     "battle_external_engine_crosscheck.py",
     "test_battle_external_engine_crosscheck.py",
     "battle_mtga_player_log_parser.py",
@@ -398,6 +511,12 @@ def build_manifest(repo_root: Path) -> dict[str, Any]:
         "outside_recurring_categories": outside_categories,
         "unclassified_files": unclassified,
     }
+    rule_status_counts = Counter(area["status"] for area in RULE_AREA_DEFINITIONS)
+    rules_alignment = {
+        "source_contract": RULE_SOURCE_CONTRACT,
+        "status_counts": dict(sorted(rule_status_counts.items())),
+        "areas": list(RULE_AREA_DEFINITIONS),
+    }
 
     return {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -405,6 +524,7 @@ def build_manifest(repo_root: Path) -> dict[str, Any]:
         "scan_roots": list(SCAN_ROOTS),
         "filename_terms": list(FILENAME_TERMS),
         "summary": summary,
+        "rules_alignment": rules_alignment,
         "files": records,
     }
 
@@ -439,6 +559,51 @@ def render_markdown(manifest: dict[str, Any]) -> str:
     )
     for coverage, count in summary["automation_coverage_counts"].items():
         lines.append(f"| `{coverage}` | `{count}` |")
+
+    rules_alignment = manifest["rules_alignment"]
+    lines.extend(
+        [
+            "",
+            "## Rules Alignment",
+            "",
+            "External source contract:",
+            "",
+            "| Source | URL | Use |",
+            "| --- | --- | --- |",
+        ]
+    )
+    for source_name, source in rules_alignment["source_contract"].items():
+        lines.append(f"| `{source_name}` | `{source['url']}` | {source['use_for']} |")
+
+    lines.extend(
+        [
+            "",
+            "Rule area status counts:",
+            "",
+            "| Status | Areas |",
+            "| --- | ---: |",
+        ]
+    )
+    for status, count in rules_alignment["status_counts"].items():
+        lines.append(f"| `{status}` | `{count}` |")
+
+    lines.extend(
+        [
+            "",
+            "| Rule area | Rule refs | Status | Local files | Next gate |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for area in rules_alignment["areas"]:
+        lines.append(
+            "| `{id}` | `{rules}` | `{status}` | `{files}` | {next_gate} |".format(
+                id=area["id"],
+                rules=", ".join(area["rules_refs"]),
+                status=area["status"],
+                files=", ".join(area["local_files"]),
+                next_gate=area["next_gate"],
+            )
+        )
 
     lines.extend(
         [

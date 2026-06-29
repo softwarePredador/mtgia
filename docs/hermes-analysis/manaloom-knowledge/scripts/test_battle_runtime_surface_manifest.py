@@ -9,10 +9,10 @@ import battle_runtime_surface_manifest as manifest_mod
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-EXPECTED_TOTAL_FILES = 146
+EXPECTED_TOTAL_FILES = 147
 EXPECTED_CATEGORY_COUNTS = {
     "core runtime": 31,
-    "focused evidence/promotion": 28,
+    "focused evidence/promotion": 29,
     "learned-deck source": 16,
     "optimizer/scorecard": 19,
     "recurring audit gate": 30,
@@ -23,18 +23,19 @@ EXPECTED_CATEGORY_COUNTS = {
 EXPECTED_AUTOMATION_COVERAGE_COUNTS = {
     "covered_by_recurring_run": 31,
     "imported_by_core_runtime": 6,
-    "outside_recurring_run": 109,
+    "outside_recurring_run": 110,
 }
 EXPECTED_GATE_EXPECTED_COUNTS = {
     "core_runtime_import_regression": 6,
     "recurring_audit_required": 31,
-    "targeted_manual_gate_required_before_change": 49,
+    "targeted_manual_gate_required_before_change": 50,
     "targeted_test_required_before_change": 60,
 }
 REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_adjustment_throughput_benchmark.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_acceleration_source_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_external_engine_crosscheck.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/battle_package_end_to_end_validation.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_action_critic.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_effect_coverage_audit.py",
@@ -64,6 +65,32 @@ def test_manifest_classifies_current_battle_surface() -> None:
     assert summary["category_counts"] == EXPECTED_CATEGORY_COUNTS
     assert summary["automation_coverage_counts"] == EXPECTED_AUTOMATION_COVERAGE_COUNTS
     assert summary["gate_expected_counts"] == EXPECTED_GATE_EXPECTED_COUNTS
+    assert manifest["rules_alignment"]["source_contract"]["official_comprehensive_rules"][
+        "url"
+    ] == "https://magic.wizards.com/en/rules"
+    assert {
+        "official_comprehensive_rules",
+        "xmage",
+        "forge",
+        "scryfall",
+        "mtgjson",
+        "commander",
+    } <= set(manifest["rules_alignment"]["source_contract"])
+    assert manifest["rules_alignment"]["status_counts"] == {
+        "covered_by_core_tests": 4,
+        "covered_with_known_mode_gaps": 1,
+        "covered_with_known_scope_limits": 3,
+        "family_mapper_required": 1,
+        "partial_family_specific_support": 2,
+    }
+    assert {
+        area["id"] for area in manifest["rules_alignment"]["areas"]
+    } >= {
+        "turn_priority_stack_casting_resolution",
+        "mana_cost_payment_and_mana_abilities",
+        "continuous_effect_layers",
+        "card_specific_runtime_rules",
+    }
 
     categories = set(summary["category_counts"])
     assert categories <= manifest_mod.ALLOWED_CATEGORIES
