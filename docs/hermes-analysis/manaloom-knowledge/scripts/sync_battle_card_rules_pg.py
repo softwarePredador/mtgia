@@ -70,6 +70,8 @@ SOURCE_PRIORITY = {
     "heuristic": 20,
 }
 
+DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", DEFAULT_DB))
+
 PG_SCHEMA = """
 CREATE TABLE IF NOT EXISTS card_battle_rules (
   normalized_name TEXT NOT NULL,
@@ -125,7 +127,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Sync Hermes battle card rules with PostgreSQL."
     )
-    parser.add_argument("--sqlite-db", default=str(DEFAULT_DB))
+    parser.add_argument("--sqlite-db", default=str(DEFAULT_SQLITE_DB))
     parser.add_argument("--skip-generated", action="store_true")
     parser.add_argument(
         "--reviewed-rules-json",

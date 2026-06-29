@@ -7,8 +7,9 @@ from learned_deck_completeness import (
     parse_learned_card_list,
 )
 
-DEFAULT_SCRIPT_DIR = Path("/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts")
-SCRIPT_DIR = Path(os.environ.get("MANALOOM_HERMES_SCRIPT_DIR", DEFAULT_SCRIPT_DIR))
+SCRIPT_DIR = Path(
+    os.environ.get("MANALOOM_HERMES_SCRIPT_DIR", Path(__file__).resolve().parent)
+).resolve()
 DB = os.environ.get("MANALOOM_KNOWLEDGE_DB", str(SCRIPT_DIR / "knowledge.db"))
 OUT = os.environ.get("MANALOOM_KNOWN_CARDS_OUT", str(SCRIPT_DIR / "known_cards_generated.json"))
 

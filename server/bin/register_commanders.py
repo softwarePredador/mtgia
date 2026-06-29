@@ -1,7 +1,19 @@
+import os
 import re, json as _json, sys, sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
 
-db = sqlite3.connect("/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_KNOWLEDGE_DB = (
+    REPO_ROOT / "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+)
+knowledge_db = (
+    os.environ.get("HERMES_KNOWLEDGE_DB")
+    or os.environ.get("MANALOOM_KNOWLEDGE_DB")
+    or str(DEFAULT_KNOWLEDGE_DB)
+)
+
+db = sqlite3.connect(knowledge_db)
 
 # Register missing commanders
 learned_cmds = db.execute("""

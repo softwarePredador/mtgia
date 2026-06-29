@@ -4,13 +4,15 @@ import sqlite3, json, os, sys, datetime
 from pathlib import Path
 from semantic_role_metrics import load_deck_metric_rows, role_sum, tag_metrics_from_deck
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[3]
 DB = os.environ.get(
     'MANALOOM_KNOWLEDGE_DB',
-    '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db',
+    str(SCRIPT_DIR / 'knowledge.db'),
 )
 PROFILE_BASE = os.environ.get(
     'MANALOOM_PROFILE_BASE',
-    '/opt/data/workspace/mtgia/server/test/artifacts',
+    str(REPO_ROOT / 'server/test/artifacts'),
 )
 
 # Commander -> (batch, filename) mapping

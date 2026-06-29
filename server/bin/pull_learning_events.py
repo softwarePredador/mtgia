@@ -18,9 +18,10 @@ SYNC_HOME = Path(os.environ.get("MTGIA_SYNC_HOME", str(REPO_ROOT)))
 SYNC_SERVER_DIR = Path(os.environ.get("MTGIA_SYNC_SERVER_DIR", str(SYNC_HOME / "server")))
 ENV_FILE = Path(os.environ.get("MTGIA_ENV_FILE", str(SYNC_SERVER_DIR / ".env")))
 
-SQLITE_DB = os.environ.get(
-    "HERMES_KNOWLEDGE_DB",
-    str(DEFAULT_KNOWLEDGE_DB),
+SQLITE_DB = (
+    os.environ.get("HERMES_KNOWLEDGE_DB")
+    or os.environ.get("MANALOOM_KNOWLEDGE_DB")
+    or str(DEFAULT_KNOWLEDGE_DB)
 )
 
 def _load_env():
@@ -40,16 +41,32 @@ def _load_env():
 
 _load_env()
 
-PG_HOST = os.environ.get("DB_HOST", "143.198.230.247")
-PG_PORT = os.environ.get("DB_PORT", "5433")
-PG_NAME = os.environ.get("DB_NAME", "halder")
-PG_USER = os.environ.get("DB_USER", "")
-PG_PASS = os.environ.get("DB_PASS", "")
+PG_HOST = os.environ.get("PGHOST") or os.environ.get("DB_HOST") or ""
+PG_PORT = os.environ.get("PGPORT") or os.environ.get("DB_PORT") or "5432"
+PG_NAME = os.environ.get("PGDATABASE") or os.environ.get("DB_NAME") or ""
+PG_USER = os.environ.get("PGUSER") or os.environ.get("DB_USER") or ""
+PG_PASS = os.environ.get("PGPASSWORD") or os.environ.get("DB_PASS") or ""
 MIN_TRAINING_CARD_COUNT = int(os.environ.get("HERMES_MIN_TRAINING_CARD_COUNT", "90"))
 
 
 def main():
     print("=== Pull deck_learning_events from PG ===")
+
+    missing_pg = [
+        name
+        for name, value in (
+            ("PGHOST/DB_HOST", PG_HOST),
+            ("PGDATABASE/DB_NAME", PG_NAME),
+            ("PGUSER/DB_USER", PG_USER),
+        )
+        if not value
+    ]
+    if missing_pg:
+        print(
+            "PG connection skipped: missing required env "
+            + ", ".join(missing_pg)
+        )
+        return 1
 
     try:
         import psycopg2

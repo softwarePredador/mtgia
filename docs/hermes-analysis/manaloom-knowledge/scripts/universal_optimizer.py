@@ -19,8 +19,9 @@ import battle_rule_registry
 from known_cards_fallback_snapshot import load_layered_known_cards
 from master_optimizer_common import battle_gate_cli_lines
 
-DB = os.environ.get('MANALOOM_KNOWLEDGE_DB', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
-BATTLE = os.environ.get('MANALOOM_BATTLE_SCRIPT', '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py')
+SCRIPT_DIR = Path(__file__).resolve().parent
+DB = os.environ.get('MANALOOM_KNOWLEDGE_DB', str(SCRIPT_DIR / 'knowledge.db'))
+BATTLE = os.environ.get('MANALOOM_BATTLE_SCRIPT', str(SCRIPT_DIR / 'battle_analyst_v9.py'))
 LOCK_FILE = '/tmp/optimizer.lock'
 
 GAMES_QUICK = 10

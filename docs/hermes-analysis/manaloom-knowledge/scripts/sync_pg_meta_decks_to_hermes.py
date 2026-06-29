@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sqlite3
 from dataclasses import dataclass
@@ -27,9 +28,8 @@ from typing import Iterable
 from db_helper import connect
 
 
-DEFAULT_SQLITE_DB = Path(
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
-)
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 
 
 @dataclass

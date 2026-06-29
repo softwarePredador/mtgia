@@ -29,10 +29,12 @@ from master_optimizer_common import get_deck_summary
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_DECK_ID = 6
 DEFAULT_BACKUP_KEEP = 5
-RUNTIME_BACKUP_DIR = Path("/data/manaloom-ops/knowledge-backups")
+RUNTIME_BACKUP_DIR = Path(
+    os.environ.get("HERMES_KNOWLEDGE_BACKUP_DIR", "/data/manaloom-ops/knowledge-backups")
+)
 
 DOCUMENTED_SERVER_HASH = "12c55613ae4f7bcd4c934fae4253cfa75fcc4946352a18a61365835427e90c08"
 DOCUMENTED_SERVER_WR = "87.3%"

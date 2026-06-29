@@ -15,9 +15,11 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SQLITE_DB="${HERMES_KNOWLEDGE_DB:-/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db}"
-EXPORT_SCRIPT="${SCRIPT_DIR}/export_hermes_learned_deck.py"
-ARTIFACT_DIR="${SCRIPT_DIR}/../test/artifacts/hermes_sync"
+REPO_ROOT="${MANALOOM_REPO:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
+HERMES_SCRIPT_DIR="${MANALOOM_HERMES_SCRIPT_DIR:-$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts}"
+SQLITE_DB="${HERMES_KNOWLEDGE_DB:-${MANALOOM_KNOWLEDGE_DB:-$HERMES_SCRIPT_DIR/knowledge.db}}"
+EXPORT_SCRIPT="${HERMES_EXPORT_SCRIPT:-$HERMES_SCRIPT_DIR/export_hermes_learned_deck.py}"
+ARTIFACT_DIR="${MANALOOM_HERMES_SYNC_ARTIFACT_DIR:-$REPO_ROOT/server/test/artifacts/hermes_sync}"
 TIMESTAMP="$(date -u +%Y%m%d_%H%M%S)"
 COMMANDER_FILTER=""
 LEARNED_ID=""
@@ -38,6 +40,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 mkdir -p "$ARTIFACT_DIR"
+
+if [[ ! -f "$EXPORT_SCRIPT" ]]; then
+    echo "Hermes export script not found: $EXPORT_SCRIPT" >&2
+    exit 1
+fi
 
 EXPORT_ARGS=(--db "$SQLITE_DB")
 if [ -n "$LEARNED_ID" ]; then

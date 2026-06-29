@@ -97,21 +97,26 @@ apply_out="$(mktemp)"
 
   echo "== pg meta decks sync =="
   python3 "$SCRIPT_DIR/sync_pg_meta_decks_to_hermes.py" \
-    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
     --limit "$META_DECK_LIMIT" \
     --min-cards "$META_DECK_MIN_CARDS" \
     --apply
 
+  echo "== legalities sync =="
+  python3 "$SCRIPT_DIR/sync_pg_legalities.py" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+    --report "$ARTIFACT_DIR/legalities_sync_auto_cycle_$(date -u +%Y%m%d_%H%M%S).json"
+
   echo "== metadata sync =="
   python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
-    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
     --report "$ARTIFACT_DIR/card_oracle_cache_sync_auto_cycle_$(date -u +%Y%m%d_%H%M%S).json"
 
   echo "== battle card rules sync =="
   battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_auto_cycle_$(date -u +%Y%m%d_%H%M%S).json"
   if [[ "${MANALOOM_BATTLE_RULES_APPLY_PG:-0}" == "1" ]]; then
     python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
-      --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+      --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
       --apply-pg \
       --report "$battle_rules_pg_report"
   else
@@ -120,14 +125,20 @@ apply_out="$(mktemp)"
   fi
 
   python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
-    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
     --apply-sqlite-from-pg \
     --include-needs-review \
     --report "$ARTIFACT_DIR/battle_card_rules_cache_sync_auto_cycle_$(date -u +%Y%m%d_%H%M%S).json"
 
+  echo "== pg/hermes/sqlite contract =="
+  python3 "$SCRIPT_DIR/pg_hermes_sqlite_contract_audit.py" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+    --out-prefix "$ARTIFACT_DIR/pg_hermes_sqlite_contract_audit_auto_cycle_$(date -u +%Y%m%d_%H%M%S)"
+
   if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
     echo "== lorehold canonical override =="
     python3 "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
+      --db "$MANALOOM_KNOWLEDGE_DB" \
       --apply-local-sqlite
   fi
 

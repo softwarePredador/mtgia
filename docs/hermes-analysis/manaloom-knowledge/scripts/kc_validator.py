@@ -11,14 +11,15 @@ from pathlib import Path
 from collections import defaultdict
 from datetime import datetime, timezone
 
-DEFAULT_SCRIPT_DIR = Path("/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts")
-SCRIPT_DIR = Path(os.environ.get("MANALOOM_HERMES_SCRIPT_DIR", DEFAULT_SCRIPT_DIR))
+SCRIPT_DIR = Path(
+    os.environ.get("MANALOOM_HERMES_SCRIPT_DIR", Path(__file__).resolve().parent)
+).resolve()
 DB = os.environ.get("MANALOOM_KNOWLEDGE_DB", str(SCRIPT_DIR / "knowledge.db"))
 OUT = os.environ.get("MANALOOM_KNOWN_CARDS_OUT", str(SCRIPT_DIR / "known_cards_generated.json"))
 LOCK = '/tmp/kc_validator.lock'
 REPORT_DIR = os.environ.get(
     "KC_VALIDATOR_REPORT_DIR",
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/kc_validator_reports",
+    str(SCRIPT_DIR.parents[1] / "kc_validator_reports"),
 )
 
 BASELINE_WR = 81.8

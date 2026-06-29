@@ -31,15 +31,12 @@ if SCRIPT_DIR and SCRIPT_DIR not in sys.path:
 
 SCRIPT_DIR_PATH = Path(SCRIPT_DIR)
 LOCAL_KNOWLEDGE_DIR = SCRIPT_DIR_PATH.parent
-REMOTE_KNOWLEDGE_DIR = Path("/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge")
 
 
 def _resolve_knowledge_dir() -> Path:
     env_dir = os.environ.get("MANALOOM_KNOWLEDGE_DIR")
     if env_dir:
         return Path(env_dir)
-    if REMOTE_KNOWLEDGE_DIR.exists():
-        return REMOTE_KNOWLEDGE_DIR
     return LOCAL_KNOWLEDGE_DIR
 
 
@@ -47,9 +44,6 @@ def _resolve_knowledge_db() -> Path:
     env_db = os.environ.get("MANALOOM_KNOWLEDGE_DB")
     if env_db:
         return Path(env_db)
-    remote_db = REMOTE_KNOWLEDGE_DIR / "scripts" / "knowledge.db"
-    if remote_db.exists():
-        return remote_db
     return SCRIPT_DIR_PATH / "knowledge.db"
 
 from battle_mana_cost_support import (

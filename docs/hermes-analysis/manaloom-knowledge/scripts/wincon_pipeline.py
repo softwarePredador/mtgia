@@ -20,7 +20,8 @@ import sys
 from pathlib import Path
 
 
-DB = Path('/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
+SCRIPT_DIR = Path(__file__).resolve().parent
+DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 LOREHOLD_DECK_ID = 6
 
 
@@ -31,16 +32,24 @@ def connect() -> sqlite3.Connection:
 
 
 def pg(sql_q: str) -> list[list[str]]:
-    password = os.environ.get('PGPASSWORD')
-    if not password:
-        return []
-    host = os.environ.get('PGHOST', '143.198.230.247')
-    port = os.environ.get('PGPORT', '5433')
-    user = os.environ.get('PGUSER', 'postgres')
-    dbname = os.environ.get('PGDATABASE', 'halder')
+    command = ['psql', '-t', '-A', '-F', '|']
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        command.append(database_url)
+    else:
+        password = os.environ.get('PGPASSWORD') or os.environ.get('DB_PASS')
+        host = os.environ.get('PGHOST') or os.environ.get('DB_HOST')
+        port = os.environ.get('PGPORT') or os.environ.get('DB_PORT') or '5432'
+        user = os.environ.get('PGUSER') or os.environ.get('DB_USER')
+        dbname = os.environ.get('PGDATABASE') or os.environ.get('DB_NAME')
+        if password and not os.environ.get('PGPASSWORD'):
+            os.environ['PGPASSWORD'] = password
+        if not all([host, user, dbname, os.environ.get('PGPASSWORD')]):
+            return []
+        command.extend(['-h', host, '-p', port, '-U', user, '-d', dbname])
     try:
         r = subprocess.run(
-            ['psql', '-h', host, '-p', port, '-U', user, '-d', dbname, '-t', '-A', '-F', '|', '-c', sql_q],
+            [*command, '-c', sql_q],
             capture_output=True,
             text=True,
             timeout=30,

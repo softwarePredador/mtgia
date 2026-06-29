@@ -5,13 +5,14 @@ import sqlite3, json, datetime
 from pathlib import Path
 from semantic_role_metrics import load_deck_metric_rows
 
+SCRIPT_DIR = Path(__file__).resolve().parent
 DB = os.environ.get(
     'MANALOOM_KNOWLEDGE_DB',
-    '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db',
+    str(SCRIPT_DIR / 'knowledge.db'),
 )
 CRON_PATH = os.environ.get(
     'MANALOOM_CRON_STATUS_PATH',
-    '/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/CRON_STATUS.md',
+    str(SCRIPT_DIR.parent / 'CRON_STATUS.md'),
 )
 
 # Find section boundaries

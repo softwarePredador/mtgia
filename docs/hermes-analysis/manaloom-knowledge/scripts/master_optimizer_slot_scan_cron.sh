@@ -56,16 +56,22 @@ if [[ -f "$SECRET_ENV" ]]; then
   export PGUSER="${PGUSER:-${DB_USER:-}}"
   export PGPASSWORD="${PGPASSWORD:-${DB_PASS:-}}"
 fi
+export MANALOOM_KNOWLEDGE_DB="${MANALOOM_KNOWLEDGE_DB:-$SCRIPT_DIR/knowledge.db}"
+
+legalities_report="$ARTIFACT_DIR/legalities_sync_slot_scan_$(date -u +%Y%m%d_%H%M%S).json"
+python3 "$SCRIPT_DIR/sync_pg_legalities.py" \
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+  --report "$legalities_report"
 
 sync_report="$ARTIFACT_DIR/card_oracle_cache_sync_slot_scan_$(date -u +%Y%m%d_%H%M%S).json"
 python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
-  --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
   --report "$sync_report"
 
 battle_rules_pg_report="$ARTIFACT_DIR/card_battle_rules_pg_sync_slot_scan_$(date -u +%Y%m%d_%H%M%S).json"
 if [[ "${MANALOOM_BATTLE_RULES_APPLY_PG:-0}" == "1" ]]; then
   python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
-    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
     --apply-pg \
     --report "$battle_rules_pg_report"
 else
@@ -75,14 +81,20 @@ fi
 
 battle_rules_report="$ARTIFACT_DIR/battle_card_rules_cache_sync_slot_scan_$(date -u +%Y%m%d_%H%M%S).json"
 python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
-  --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
   --apply-sqlite-from-pg \
   --include-needs-review \
   --report "$battle_rules_report"
 
+contract_prefix="$ARTIFACT_DIR/pg_hermes_sqlite_contract_audit_slot_scan_$(date -u +%Y%m%d_%H%M%S)"
+python3 "$SCRIPT_DIR/pg_hermes_sqlite_contract_audit.py" \
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+  --out-prefix "$contract_prefix"
+
 if [[ "$DECK_ID" == "6" && "$LOREHOLD_CANONICAL_OVERRIDE" == "1" ]]; then
   canonical_log="$ARTIFACT_DIR/lorehold_canonical_slot_scan_$(date -u +%Y%m%d_%H%M%S).log"
   python3 "$SCRIPT_DIR/lorehold_canonical_deck_snapshot.py" \
+    --db "$MANALOOM_KNOWLEDGE_DB" \
     --apply-local-sqlite | tee "$canonical_log"
 fi
 
@@ -110,9 +122,11 @@ python3 "$SCRIPT_DIR/slot_optimizer.py" "${slot_args[@]}" | tee "$slot_log"
 cp "$slot_log" "$ARTIFACT_DIR/latest_master_optimizer_slot_scan.log"
 
 echo "slot_scan=ok"
+echo "legalities_report=$legalities_report"
 echo "sync_report=$sync_report"
 echo "battle_rules_pg_report=$battle_rules_pg_report"
 echo "battle_rules_report=$battle_rules_report"
+echo "contract_report=$contract_prefix.json"
 echo "preflight_log=$preflight_log"
 echo "baseline_log=$baseline_log"
 echo "slot_log=$slot_log"

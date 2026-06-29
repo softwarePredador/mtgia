@@ -31,7 +31,8 @@ from pathlib import Path
 from learned_deck_completeness import learned_deck_completeness
 
 
-DB = Path('/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 COMMANDER = os.environ.get("HERMES_IMPORT_COMMANDER", "Lorehold, the Historian")
 
 
@@ -269,8 +270,8 @@ def deck_hash(deck: DeckBlock) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
-def import_decks(decks: list[DeckBlock], apply: bool) -> None:
-    con = sqlite3.connect(DB)
+def import_decks(decks: list[DeckBlock], apply: bool, sqlite_db: Path = DEFAULT_DB) -> None:
+    con = sqlite3.connect(sqlite_db)
     cur = con.cursor()
     cur.execute('''CREATE TABLE IF NOT EXISTS lorehold_import_runs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -363,13 +364,14 @@ def main() -> None:
     p.add_argument('--name', default='Lorehold Imported Deck', help='Default deck name')
     p.add_argument('--source', default='manual-import', help='Default source label')
     p.add_argument('--archetype', default='spellslinger', help='Default archetype')
+    p.add_argument('--sqlite-db', default=str(DEFAULT_DB), help='Path to Hermes knowledge.db')
     args = p.parse_args()
 
     text = Path(args.input).read_text(errors='replace')
     decks = parse_blocks(text, args.name, args.source, args.archetype)
     if not decks:
         raise SystemExit('No deck cards parsed. Use lines like: 1 Sol Ring')
-    import_decks(decks, args.apply)
+    import_decks(decks, args.apply, Path(args.sqlite_db))
 
 
 if __name__ == '__main__':
