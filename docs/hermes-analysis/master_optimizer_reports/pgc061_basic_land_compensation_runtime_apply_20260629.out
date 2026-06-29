@@ -1,0 +1,5 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "sql": "pgc061_basic_land_compensation_runtime_apply_20260629.sql",
+  "status": "applied"
+}

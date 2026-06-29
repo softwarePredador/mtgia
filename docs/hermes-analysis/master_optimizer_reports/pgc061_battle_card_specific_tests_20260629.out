@@ -1,0 +1,2 @@
+command: python3 docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py
+exit_code: 0

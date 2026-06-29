@@ -1,0 +1,12 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "rows": [
+    {
+      "backup_rows": 2,
+      "erode_runtime_rows": 1,
+      "sundering_basic_land_runtime_rows": 1,
+      "target_rows": 2
+    }
+  ],
+  "sql": "pgc061_basic_land_compensation_runtime_postcheck_20260629.sql"
+}

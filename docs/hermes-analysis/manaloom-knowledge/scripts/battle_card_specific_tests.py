@@ -928,6 +928,63 @@ def register_tests(battle, player):
         assert removal_event["target_controller_basic_land_tapped"] is True
         assert removal_event["basic_land_compensation_status"] == "annotation_only"
 
+    def test_basic_land_compensation_runtime_event_exposes_status():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            planeswalker = {
+                "name": "Test Walker",
+                "cmc": 3,
+                "type_line": "Legendary Planeswalker",
+                "effect": "planeswalker",
+                "loyalty": 4,
+            }
+            basic_land = {
+                "name": "Plains",
+                "cmc": 0,
+                "type_line": "Basic Land - Plains",
+                "effect": "land",
+            }
+            opponent.battlefield = [planeswalker]
+            opponent.library = [basic_land]
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {"name": "Erode", "cmc": 1, "type_line": "Instant"},
+                turn=6,
+                rng=random.Random(260628),
+                effect_data_override={
+                    "effect": "remove_permanent",
+                    "battle_model_scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1",
+                    "target": "creature_or_planeswalker",
+                    "instant": True,
+                    "target_controller_basic_land_tapped": True,
+                    "basic_land_compensation_status": "runtime_executor_v1",
+                    "basic_land_compensation_destination": "battlefield_tapped",
+                    "_rule_logical_key": "battle_rule_v1:erode-runtime-test",
+                    "_rule_source": "curated",
+                    "_rule_review_status": "verified",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert planeswalker not in opponent.battlefield
+        assert basic_land not in opponent.library
+        moved_land = next(card for card in opponent.battlefield if card.get("name") == "Plains")
+        assert moved_land["enters_tapped"] is True
+        compensation_event = next(
+            data
+            for event, data in events
+            if event == "basic_land_compensation_resolved"
+        )
+        assert compensation_event["source"] == "Erode"
+        assert compensation_event["moved_count"] == 1
+        assert compensation_event["basic_land_compensation_status"] == "runtime_executor_v1"
+
     def test_exact_land_removal_scope_can_target_land():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER

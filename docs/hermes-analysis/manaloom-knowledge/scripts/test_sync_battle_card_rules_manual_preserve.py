@@ -57,6 +57,53 @@ class SyncBattleCardRulesManualPreserveTests(unittest.TestCase):
         self.assertEqual(manual_rows[0]["review_status"], "verified")
         self.assertEqual(manual_rows[0]["effect_json"], injected_rule)
 
+    def test_oracle_normalization_preserves_trusted_runtime_effect_shape(self) -> None:
+        rows = [
+            {
+                "card_name": "Erode",
+                "effect_json": {
+                    "effect": "remove_permanent",
+                    "target": "creature_or_planeswalker",
+                    "battle_model_scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1",
+                    "basic_land_compensation_status": "runtime_executor_v1",
+                },
+                "source": "curated",
+                "confidence": 0.94,
+                "review_status": "verified",
+                "execution_status": "auto",
+                "notes": "trusted runtime row",
+            }
+        ]
+        normalized_override = {
+            "effect": "remove_creature",
+            "target": "creature",
+            "battle_model_scope": "oracle_narrowed_runtime_shape",
+            "basic_land_compensation_status": "runtime_executor_v1",
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_db = Path(tmpdir) / "knowledge.db"
+            sqlite_db.touch()
+            with (
+                mock.patch.object(sync_rules.battle, "load_card_oracle_cache", return_value={}),
+                mock.patch.object(
+                    sync_rules.battle,
+                    "normalize_effect_by_oracle",
+                    return_value=normalized_override,
+                ),
+            ):
+                normalized = sync_rules._oracle_normalized_rows(sqlite_db, rows)
+
+        effect = normalized[0]["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "creature_or_planeswalker")
+        self.assertEqual(
+            effect["battle_model_scope"],
+            "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1",
+        )
+        self.assertEqual(effect["basic_land_compensation_status"], "runtime_executor_v1")
+        self.assertNotIn("_oracle_normalized", normalized[0])
+
     def test_sqlite_registry_preserves_multiple_logical_rules_for_same_name(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_db = Path(tmpdir) / "knowledge.db"

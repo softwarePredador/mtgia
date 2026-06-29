@@ -116,6 +116,22 @@ def _oracle_normalized_rows(sqlite_db: str | Path | None, rows: list[dict]) -> l
         card = battle.merge_oracle_metadata({"name": card_name}, oracle_cache)
         effect_before = dict(row.get("effect_json") or {})
         effect_after = battle.normalize_effect_by_oracle(card, effect_before)
+        review_status = str(row.get("review_status") or "").lower()
+        execution_status = str(row.get("execution_status") or "auto").lower()
+        trusted_runtime = (
+            review_status in {"verified", "active"}
+            and execution_status in {"auto", "executable"}
+        )
+        target_before = str(effect_before.get("target") or "")
+        if (
+            trusted_runtime
+            and effect_before.get("effect") == "remove_permanent"
+            and effect_after.get("effect") == "remove_creature"
+            and "_or_" in target_before
+        ):
+            for key in ("effect", "target", "battle_model_scope"):
+                if key in effect_before:
+                    effect_after[key] = effect_before[key]
         next_row = dict(row)
         next_row["effect_json"] = effect_after
         if effect_after != effect_before:
