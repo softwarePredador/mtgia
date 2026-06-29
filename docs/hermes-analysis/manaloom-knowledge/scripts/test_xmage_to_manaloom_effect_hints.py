@@ -198,6 +198,38 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["dynamic_mana_amount"])
         self.assertEqual(primary["produces"], "R")
 
+    def test_red_utility_land_splits_exact_mana_mode_from_nonmana_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ShinkaTheBloodsoakedKeep",
+                "effect_classes": ["GainAbilityTargetEffect"],
+                "ability_classes": ["RedManaAbility", "SimpleActivatedAbility"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["LAND"]},
+            },
+            "{T}: Add {R}. {R}, {T}: Target legendary creature gains first strike until end of turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "land_tap_one_red_mana_nonmana_ability_pending_v1",
+        )
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["produces"], "R")
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertTrue(primary["activation_requires_tap"])
+        self.assertFalse(primary["activation_requires_sacrifice"])
+        self.assertTrue(primary["nonmana_abilities_require_separate_scope"])
+        self.assertEqual(primary["nonmana_effect_classes"], ["GainAbilityTargetEffect"])
+        self.assertEqual(
+            primary["nonmana_abilities_status"],
+            "separate_scope_required_before_full_card_promotion",
+        )
+        self.assertFalse(result["primary_candidate"]["requires_runtime_executor"])
+
     def test_multi_damage_and_redirect_stack_signals_route_to_families(self) -> None:
         multi = hints.build_effect_hints(
             {

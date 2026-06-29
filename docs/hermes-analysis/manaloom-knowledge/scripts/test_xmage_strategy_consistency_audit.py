@@ -22,7 +22,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                         '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 158, "xmage_source_valid_mapper_required": 81}`',
                         '- Family counts: `{"manual_model": 81, "ramp_permanent": 49, "targeted_interaction": 24, "copy_creature_token": 1, "token_maker": 1}`',
                         '- Proposal status counts: `{"batch_pg_candidate_after_precheck": 8, "runtime_family_implementation_required": 1, "split_family_scope_review_required": 148, "mapper_metadata_or_test_scenario_required": 81}`',
-                        '- Pattern status counts: `{"ready_for_pg_package_generation": 8, "fragmented_runtime_observation_only": 1, "requires_subpattern_split_before_promotion": 20}`',
+                        '- Pattern status counts: `{"fragmented_runtime_observation_only": 1, "governance_only_pending_pg_apply": 7, "ready_for_pg_package_generation": 2, "requires_subpattern_split_before_promotion": 21}`',
                         "- Pattern promotion status: `shadow_only`",
                     ]
                 ),
@@ -50,7 +50,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                         '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 158, "xmage_source_valid_mapper_required": 81}`',
                         '- Family counts: `{"manual_model": 81, "ramp_permanent": 49, "targeted_interaction": 24, "copy_creature_token": 1, "token_maker": 1}`',
                         '- Proposal status counts: `{"batch_pg_candidate_after_precheck": 8, "runtime_family_implementation_required": 1, "split_family_scope_review_required": 148, "mapper_metadata_or_test_scenario_required": 81}`',
-                        '- Pattern status counts: `{"ready_for_pg_package_generation": 8, "fragmented_runtime_observation_only": 1, "requires_subpattern_split_before_promotion": 20}`',
+                        '- Pattern status counts: `{"fragmented_runtime_observation_only": 1, "governance_only_pending_pg_apply": 7, "ready_for_pg_package_generation": 2, "requires_subpattern_split_before_promotion": 21}`',
                         "- Pattern promotion status: `shadow_only`",
                     ]
                 ),
@@ -142,7 +142,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                         '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 158, "xmage_source_valid_mapper_required": 81}`',
                         '- Family counts: `{"manual_model": 81, "ramp_permanent": 49, "targeted_interaction": 24, "copy_creature_token": 1, "token_maker": 1}`',
                         '- Proposal status counts: `{"batch_pg_candidate_after_precheck": 8, "runtime_family_implementation_required": 1, "split_family_scope_review_required": 148, "mapper_metadata_or_test_scenario_required": 81}`',
-                        '- Pattern status counts: `{"ready_for_pg_package_generation": 8, "fragmented_runtime_observation_only": 1, "requires_subpattern_split_before_promotion": 20}`',
+                        '- Pattern status counts: `{"fragmented_runtime_observation_only": 1, "governance_only_pending_pg_apply": 7, "ready_for_pg_package_generation": 2, "requires_subpattern_split_before_promotion": 21}`',
                         "- Pattern promotion status: `shadow_only`",
                     ]
                 ),

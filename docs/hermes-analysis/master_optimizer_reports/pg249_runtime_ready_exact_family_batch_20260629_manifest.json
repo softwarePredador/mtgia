@@ -1,0 +1,32 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg249_runtime_ready_exact_family_batch_20260629_143348",
+  "deploy_id": "PG249",
+  "family_counts": {
+    "free_cast": 1,
+    "targeted_interaction": 5,
+    "topdeck_play": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_rollback.sql"
+  },
+  "generated_at": "2026-06-29T14:33:48+00:00",
+  "mutations_performed": [],
+  "selected_card_names": [
+    "Verge Rangers",
+    "Firesong and Sunspeaker",
+    "Goliath Daydreamer",
+    "Boros Reckoner",
+    "Terror of the Peaks",
+    "Balefire Liege",
+    "Repercussion"
+  ],
+  "selected_count": 7,
+  "slug": "runtime_ready_exact_family_batch",
+  "status": "prepared_read_only_pending_apply_approval"
+}

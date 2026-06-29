@@ -34,7 +34,7 @@ DEFAULT_ROOT_README = REPO_ROOT / "docs/hermes-analysis/README.md"
 DEFAULT_REPORT_README = REPORT_DIR / "README.md"
 DEFAULT_PIPELINE_MANIFEST_MD = (
     REPORT_DIR
-    / "xmage_current_replay_batch_pipeline_20260629_135909_post_adagia_family_mapper_lorehold_6_607_616_manifest.md"
+    / "xmage_current_replay_batch_pipeline_20260629_143734_post_red_land_mana_split_manifest.md"
 )
 DEFAULT_RUNTIME_SURFACE_MD = REPORT_DIR / "battle_runtime_surface_manifest_20260629_post_adagia_mapper.md"
 DEFAULT_EXTERNAL_SOURCE_MD = REPORT_DIR / "mtg_battle_external_source_audit_20260629_post_adagia_mapper.md"
@@ -242,6 +242,8 @@ def audit_script_surface() -> list[Check]:
                 "xmage_multi_target_damage_variant_review_v1",
                 "xmage_life_gain_variant_review_v1",
                 "station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1",
+                "_nonmana_ability_pending",
+                "nonmana_abilities_require_separate_scope",
                 '"runtime_missing_components": ["station_level_gate"]',
             ],
             check_name="scripts.effect_mapper_family_lanes_present",
@@ -272,6 +274,7 @@ def audit_script_surface() -> list[Check]:
                 "test_adagia_maps_to_station_legendary_artifact_enchantment_copy_token",
                 "test_dynamic_mana_spell_routes_to_ritual_family",
                 "test_generic_blink_effect_routes_to_targeted_zone_transition_family",
+                "test_red_utility_land_splits_exact_mana_mode_from_nonmana_scope",
             ],
             check_name="tests.mapper_family_coverage_present",
         ),
@@ -335,9 +338,10 @@ def audit_manifest(args: argparse.Namespace) -> list[Check]:
             "token_maker": 1,
         },
         "Pattern status counts": {
-            "ready_for_pg_package_generation": 8,
             "fragmented_runtime_observation_only": 1,
-            "requires_subpattern_split_before_promotion": 20,
+            "governance_only_pending_pg_apply": 7,
+            "ready_for_pg_package_generation": 2,
+            "requires_subpattern_split_before_promotion": 21,
         },
     }
     for label, expected in expected_counts.items():

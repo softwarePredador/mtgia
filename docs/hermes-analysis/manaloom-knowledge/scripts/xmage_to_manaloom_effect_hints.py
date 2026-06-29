@@ -8994,25 +8994,60 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             produces = "R"
         elif "GreenManaAbility" in ability_classes:
             produces = "G"
+        activation_requires_tap = "TapSourceCost" in cost_classes
+        activation_requires_sacrifice = "SacrificeSourceCost" in cost_classes
+        mana_effect_classes = {
+            cls
+            for cls in effect_classes
+            if "ManaEffect" in cls or cls.startswith("AddMana") or cls in {"BasicManaEffect", "DynamicManaEffect"}
+        }
+        nonmana_effect_classes = sorted(effect_classes - mana_effect_classes)
+        exact_single_color_tap_mode = (
+            mana_produced == 1
+            and produces in {"W", "U", "B", "R", "G"}
+            and activation_requires_tap
+            and not activation_requires_sacrifice
+        )
+        color_name_by_symbol = {
+            "W": "white",
+            "U": "blue",
+            "B": "black",
+            "R": "red",
+            "G": "green",
+        }
+        scope = "xmage_land_mana_source_variant_review_v1"
+        if exact_single_color_tap_mode:
+            color_name = color_name_by_symbol[produces]
+            suffix = "_nonmana_ability_pending" if nonmana_effect_classes else "_source"
+            scope = f"land_tap_one_{color_name}_mana{suffix}_v1"
+        extra_fields = {
+            "is_mana_source": True,
+            "permanent_type": "land",
+            "mana_produced": mana_produced,
+            "produces": produces,
+            "activation_requires_tap": activation_requires_tap,
+            "activation_requires_sacrifice": activation_requires_sacrifice,
+            "conditional_any_color_mana": any("ConditionalAnyColorManaAbility" in cls for cls in ability_classes),
+        }
+        if nonmana_effect_classes:
+            extra_fields.update(
+                {
+                    "nonmana_abilities_require_separate_scope": True,
+                    "nonmana_effect_classes": nonmana_effect_classes,
+                    "nonmana_abilities_status": "separate_scope_required_before_full_card_promotion",
+                }
+            )
         candidates.append(
             _candidate(
                 effect="ramp_permanent",
-                scope="xmage_land_mana_source_variant_review_v1",
+                scope=scope,
                 reason=(
                     "XMage marks this land as a mana source; ManaLoom can route it to the "
                     "land/ramp family for focused review instead of manual card-by-card modeling."
                 ),
                 ability_kind=ability_kind,
-                requires_runtime_executor=True,
-                extra_effect_fields={
-                    "is_mana_source": True,
-                    "permanent_type": "land",
-                    "mana_produced": mana_produced,
-                    "produces": produces,
-                    "activation_requires_tap": "TapSourceCost" in cost_classes,
-                    "activation_requires_sacrifice": "SacrificeSourceCost" in cost_classes,
-                    "conditional_any_color_mana": any("ConditionalAnyColorManaAbility" in cls for cls in ability_classes),
-                },
+                requires_runtime_executor=not exact_single_color_tap_mode,
+                extra_effect_fields=extra_fields,
                 matched_signals=["LAND", "mana_source", *sorted(ability_classes & {"SimpleManaAbility", "ColorlessManaAbility", "ConditionalAnyColorManaAbility"})],
             )
         )

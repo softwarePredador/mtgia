@@ -152,6 +152,39 @@ After the 2026-06-29 family-mapper wave:
   `mapper_metadata_or_test_scenario_required=81`
 - PostgreSQL writes in this wave: `0`
 
+Post-contract checkpoint wave:
+
+- contract checkpoint:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260629_143113_contract_checkpoint.md`
+- current queue after conservative red utility-land split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_143734_post_red_land_mana_split_manifest.md`
+- PG249 package prepared read-only for seven exact runtime-backed cards:
+  `Verge Rangers`, `Firesong and Sunspeaker`, `Goliath Daydreamer`,
+  `Boros Reckoner`, `Terror of the Peaks`, `Balefire Liege`, `Repercussion`.
+- PG249 was not applied. Precheck found one target card row for each selected
+  card and the package remains blocked until explicit apply approval.
+- `Adagia, Windswept Bastion` stayed out of PG249 because the proposal still
+  requires the `station_level_gate` runtime component.
+- `Purphoros, God of the Forge` stayed out of PG249 because it is in the
+  partial preserve-shadow lane.
+
+Conservative ramp split evidence:
+
+- `Cori Mountain Monastery`, `Fire Nation Palace`,
+  `Shinka, the Bloodsoaked Keep`, and `Spinerock Knoll` now split the exact
+  red mana mode from the rest of the card using
+  `land_tap_one_red_mana_nonmana_ability_pending_v1`.
+- This is intentionally not a full-card promotion. Each card has non-mana
+  behavior that still requires a separate exact scope before PostgreSQL truth.
+- Pattern status counts after the split are:
+  `governance_only_pending_pg_apply=7`,
+  `ready_for_pg_package_generation=2`,
+  `requires_subpattern_split_before_promotion=21`,
+  `fragmented_runtime_observation_only=1`.
+- The lower ready count is correct: seven cards moved into a prepared PG
+  package, and one land subpattern became stricter because generic land-mana
+  grouping would have hidden unresolved non-mana abilities.
+
 Additional exact runtime/mapping correction:
 
 - `Adagia, Windswept Bastion` was reclassified from generic `token_maker` to
