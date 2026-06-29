@@ -208,6 +208,46 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(proposal["deck_role_json"]["category"], "protection")
         self.assertEqual(proposal["deck_role_json"]["subtype"], "phase_out")
 
+    def test_generic_xmage_review_scope_is_never_batch_pg_safe(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Sylvan Safekeeper",
+                    "severity": "high",
+                    "oracle_hash": "safe-keeper-hash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 1},
+                    "xmage": {
+                        "class_name": "SylvanSafekeeper",
+                        "path": "/xmage/SylvanSafekeeper.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": ["GainAbilityTargetEffect"],
+                        "ability_classes": ["SimpleActivatedAbility", "ShroudAbility"],
+                        "target_classes": ["TargetControlledCreaturePermanent"],
+                        "primary_effect": {
+                            "effect": "grant_protection_from_chosen_color",
+                            "battle_model_scope": "xmage_targeted_protection_variant_review_v1",
+                            "ability_kind": "activated",
+                            "targeted_protection_variant": True,
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "targeted_protection")
+        self.assertEqual(card["promotion_lane"], "split_family_scope_review_required")
+
+        generator_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = generator_report["proposals"][0]
+        self.assertFalse(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["proposal_status"], "split_family_scope_review_required")
+
     def test_classifier_marks_activated_ability_cost_reducer_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

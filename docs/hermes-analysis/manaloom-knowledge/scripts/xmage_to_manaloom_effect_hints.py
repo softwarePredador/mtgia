@@ -8806,6 +8806,280 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             )
         )
 
+    has_mana_ability = any("ManaAbility" in cls or cls == "SimpleManaAbility" for cls in ability_classes)
+    has_mana_effect = any("ManaEffect" in cls or cls.startswith("AddMana") or cls == "BasicManaEffect" for cls in effect_classes)
+    if not candidates and "LAND" in card_types and (has_mana_ability or has_mana_effect):
+        mana_produced = _first_int(r"ColorlessMana\((\d+)\)", rules_text)
+        if mana_produced is None:
+            mana_produced = 1
+        produces = "WUBRG" if any("AnyColor" in cls or "DynamicMana" in cls for cls in ability_classes) else "C"
+        if "WhiteManaAbility" in ability_classes:
+            produces = "W"
+        elif "BlueManaAbility" in ability_classes:
+            produces = "U"
+        elif "BlackManaAbility" in ability_classes:
+            produces = "B"
+        elif "RedManaAbility" in ability_classes:
+            produces = "R"
+        elif "GreenManaAbility" in ability_classes:
+            produces = "G"
+        candidates.append(
+            _candidate(
+                effect="ramp_permanent",
+                scope="xmage_land_mana_source_variant_review_v1",
+                reason=(
+                    "XMage marks this land as a mana source; ManaLoom can route it to the "
+                    "land/ramp family for focused review instead of manual card-by-card modeling."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "is_mana_source": True,
+                    "permanent_type": "land",
+                    "mana_produced": mana_produced,
+                    "produces": produces,
+                    "activation_requires_tap": "TapSourceCost" in cost_classes,
+                    "activation_requires_sacrifice": "SacrificeSourceCost" in cost_classes,
+                    "conditional_any_color_mana": any("ConditionalAnyColorManaAbility" in cls for cls in ability_classes),
+                },
+                matched_signals=["LAND", "mana_source", *sorted(ability_classes & {"SimpleManaAbility", "ColorlessManaAbility", "ConditionalAnyColorManaAbility"})],
+            )
+        )
+
+    if not candidates and "ARTIFACT" in card_types and (has_mana_ability or has_mana_effect):
+        mana_produced = _first_int(r"ColorlessMana\((\d+)\)", rules_text) or 1
+        candidates.append(
+            _candidate(
+                effect="ramp_permanent",
+                scope="xmage_artifact_mana_source_variant_review_v1",
+                reason=(
+                    "XMage exposes artifact mana-source behavior; ManaLoom can batch it as a ramp "
+                    "permanent review item while preserving any non-mana rider for focused tests."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "is_mana_source": True,
+                    "permanent_type": "artifact",
+                    "mana_produced": mana_produced,
+                    "produces": "WUBRG" if any("AnyColor" in cls for cls in ability_classes | effect_classes) else "C",
+                    "activation_requires_tap": "TapSourceCost" in cost_classes,
+                    "activation_requires_sacrifice": "SacrificeSourceCost" in cost_classes,
+                },
+                matched_signals=["ARTIFACT", "mana_source"],
+            )
+        )
+
+    if not candidates and ("CREATURE" in card_types) and (has_mana_ability or has_mana_effect):
+        candidates.append(
+            _candidate(
+                effect="ramp_permanent",
+                scope="xmage_creature_mana_source_variant_review_v1",
+                reason=(
+                    "XMage exposes creature mana-source behavior; ManaLoom can batch it with ramp "
+                    "creature review instead of leaving it as an untyped manual model."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "is_mana_source": True,
+                    "permanent_type": "creature",
+                    "activation_requires_tap": "TapSourceCost" in cost_classes,
+                },
+                matched_signals=["CREATURE", "mana_source"],
+            )
+        )
+
+    if not candidates and (
+        any("Search" in cls for cls in effect_classes)
+        or "search your library" in normalized_text
+        or "searchlibrary" in normalized_text
+    ):
+        destination = "hand"
+        if "graveyard" in normalized_text or any("Graveyard" in cls for cls in effect_classes):
+            destination = "graveyard"
+        if "battlefield" in normalized_text or any("Battlefield" in cls or "PutInPlay" in cls for cls in effect_classes):
+            destination = "battlefield"
+        if "exile" in normalized_text or any("Exile" in cls for cls in effect_classes):
+            destination = "exile"
+        candidates.append(
+            _candidate(
+                effect="tutor",
+                scope="xmage_library_search_variant_review_v1",
+                reason=(
+                    "XMage exposes library-search behavior; ManaLoom can batch this as a tutor/search "
+                    "family and derive exact target/destination constraints during focused review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints,
+                extra_effect_fields={
+                    "tutor_destination": destination,
+                    "target": "library_card",
+                    "instant": "INSTANT" in card_types,
+                    "sorcery": "SORCERY" in card_types,
+                },
+                matched_signals=["Search", "library"],
+            )
+        )
+
+    if not candidates and (
+        any("DrawCard" in cls or "Draw" in cls for cls in effect_classes)
+        or re.search(r"\bdraw(?:s)?\s+(?:x|\d+|a|that many|three|two|one)\s+card", normalized_text)
+    ):
+        draw_count = _first_int(r"drawcardsourcecontrollereffect\((\d+)\)", normalized_text)
+        if draw_count is None:
+            draw_count = _first_int(r"draw\s+(\d+)\s+cards?", normalized_text)
+        candidates.append(
+            _candidate(
+                effect="draw_cards" if card_types <= {"INSTANT", "SORCERY"} else "draw_engine",
+                scope="xmage_draw_card_variant_review_v1",
+                reason=(
+                    "XMage exposes card-draw behavior in effect classes or static text; ManaLoom can "
+                    "classify it as draw for focused runtime tests instead of manual review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    **({"draw_count": draw_count} if draw_count is not None else {}),
+                    "instant": "INSTANT" in card_types,
+                    "sorcery": "SORCERY" in card_types,
+                },
+                matched_signals=["draw"],
+            )
+        )
+
+    if not candidates and (
+        "LookAtTopCardOfLibraryAnyTimeEffect" in effect_classes
+        or "PlayFromTopOfLibraryEffect" in effect_classes
+        or "may cast" in normalized_text
+        or "without paying" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="free_cast" if ("may cast" in normalized_text or "without paying" in normalized_text) else "topdeck_play",
+                scope="xmage_cast_or_play_from_alternate_zone_variant_review_v1",
+                reason=(
+                    "XMage exposes cast/play permission from a non-hand zone or without paying mana; "
+                    "ManaLoom should route this through the free-cast/topdeck family with focused tests."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "alternate_zone_permission": True,
+                    "may_cast_without_paying_mana_cost": "without paying" in normalized_text,
+                },
+                matched_signals=["alternate_cast_or_play_permission"],
+            )
+        )
+
+    if not candidates and (
+        any(cls in effect_classes for cls in {"DestroyAllEffect", "SacrificeAllEffect", "DamageAllEffect"})
+        or "destroy each" in normalized_text
+        or "destroy all" in normalized_text
+        or "sacrifices the rest" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="board_wipe",
+                scope="xmage_mass_removal_or_sacrifice_variant_review_v1",
+                reason=(
+                    "XMage exposes mass destroy/sacrifice/damage behavior; ManaLoom can batch this "
+                    "into the board-wipe family for exact-scope runtime review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "mass_effect": True,
+                    "instant": "INSTANT" in card_types,
+                    "sorcery": "SORCERY" in card_types,
+                },
+                matched_signals=["mass_removal"],
+            )
+        )
+
+    if not candidates and (
+        "UntapLandsEffect" in effect_classes
+        or ("UntapTargetEffect" in effect_classes and "land" in normalized_text)
+    ):
+        candidates.append(
+            _candidate(
+                effect="untap_land_engine",
+                scope="xmage_land_untap_variant_review_v1",
+                reason=(
+                    "XMage exposes land untap behavior; ManaLoom can route this into the land-untap "
+                    "engine family for focused review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                matched_signals=["UntapLandsEffect", "land"],
+            )
+        )
+
+    if not candidates and (
+        "SpellsCostIncreasingAllEffect" in effect_classes
+        or "cost more to cast" in normalized_text
+        or "can't cast" in normalized_text
+        or "can cast no more than" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="passive",
+                scope="xmage_static_rule_restriction_or_tax_variant_review_v1",
+                reason=(
+                    "XMage exposes a static rule restriction or tax; ManaLoom can group it as a "
+                    "passive battlefield rule for exact-scope review."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={"static_rule_restriction": True},
+                matched_signals=["static_tax_or_restriction"],
+            )
+        )
+
+    if not candidates and (
+        "GainAbilityTargetEffect" in effect_classes
+        or "GainProtectionFromColorTargetEffect" in effect_classes
+        or "hexproof" in normalized_text
+        or "shroud" in normalized_text
+        or "protection from" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="grant_protection_from_chosen_color",
+                scope="xmage_targeted_protection_variant_review_v1",
+                reason=(
+                    "XMage exposes targeted ability/protection granting; ManaLoom can group it with "
+                    "targeted protection for exact ability and duration review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints,
+                extra_effect_fields={"targeted_protection_variant": True},
+                matched_signals=["GainAbilityTargetEffect", "protection"],
+            )
+        )
+
+    if not candidates and (
+        "ReturnFromGraveyardToHandTargetEffect" in effect_classes
+        or "ReturnFromGraveyardToBattlefieldTargetEffect" in effect_classes
+        or "return" in normalized_text and "graveyard" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="recursion",
+                scope="xmage_graveyard_return_variant_review_v1",
+                reason=(
+                    "XMage exposes graveyard return behavior; ManaLoom can group it as recursion for "
+                    "zone/destination focused review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints,
+                matched_signals=["graveyard_return"],
+            )
+        )
+
     class_to_effect = [
         ("DestroyAllEffect", "board_wipe", "destroy_all_permanents_or_creatures_variant_v1", True),
         ("DestroyTargetEffect", "removal_destroy", "targeted_destroy_variant_v1", True),

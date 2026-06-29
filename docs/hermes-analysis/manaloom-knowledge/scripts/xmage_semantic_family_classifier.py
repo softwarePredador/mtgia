@@ -3886,10 +3886,14 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
 
 
 def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
+    effect_json = primary_effect(card)
+    scope = str(effect_json.get("battle_model_scope") or "")
     if card.get("status") == "blocked_missing_xmage_class":
         return "blocked_missing_xmage_source"
     if not card.get("ready_for_structured_pull"):
         return "mapper_metadata_or_test_scenario_required"
+    if scope.startswith("xmage_") and scope.endswith("_review_v1"):
+        return "split_family_scope_review_required"
     if exact_scope_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
     if generic_runtime_batch_safe(card):

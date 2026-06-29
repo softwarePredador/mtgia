@@ -8,6 +8,77 @@ import xmage_to_manaloom_effect_hints as hints
 
 
 class XMageToManaLoomEffectHintsTests(unittest.TestCase):
+    def test_generic_land_mana_source_routes_to_reviewable_ramp_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CrystalVein",
+                "effect_classes": [],
+                "ability_classes": ["ColorlessManaAbility", "SimpleManaAbility"],
+                "cost_classes": ["TapSourceCost", "SacrificeSourceCost"],
+                "constructor_metadata": {"card_types": ["LAND"]},
+                "raw_excerpt": "new SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(2), new TapSourceCost()).addCost(new SacrificeSourceCost());",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "ramp_permanent")
+        self.assertEqual(primary["battle_model_scope"], "xmage_land_mana_source_variant_review_v1")
+        self.assertTrue(primary["is_mana_source"])
+        self.assertEqual(primary["mana_produced"], 2)
+        self.assertTrue(primary["activation_requires_sacrifice"])
+
+    def test_generic_library_search_routes_to_tutor_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Intuition",
+                "effect_classes": ["SearchEffect"],
+                "ability_classes": [],
+                "target_classes": ["TargetOpponent", "TargetCardInLibrary"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": "Search your library for any three cards and reveal them.",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "tutor")
+        self.assertEqual(primary["battle_model_scope"], "xmage_library_search_variant_review_v1")
+        self.assertTrue(primary["instant"])
+
+    def test_generic_static_draw_text_routes_to_draw_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "TymnaTheWeaver",
+                "effect_classes": ["OneShotEffect", "TymnaTheWeaverEffect"],
+                "ability_classes": ["BeginningOfPostcombatMainTriggeredAbility"],
+                "cost_classes": ["PayLifeCost"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": "you may pay X life. If you do, draw X cards",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(primary["battle_model_scope"], "xmage_draw_card_variant_review_v1")
+        self.assertEqual(primary["ability_kind"], "triggered")
+
+    def test_unrecognized_xmage_source_stays_manual(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "UnclearCard",
+                "effect_classes": ["UnclearCardEffect", "OneShotEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": "Do a very unusual thing that has no supported ManaLoom signal.",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "external_reference_required_manual_model")
+
     def test_cost_reduction_is_not_labeled_as_mana_ramp(self) -> None:
         entry = {
             "xmage_class_name": "PearlMedallion",
