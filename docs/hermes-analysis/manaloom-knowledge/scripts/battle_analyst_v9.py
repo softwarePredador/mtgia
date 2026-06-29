@@ -7853,6 +7853,7 @@ def copy_spell_on_stack(
     original_effect_data=None,
     source_card=None,
     source_effect_data=None,
+    all_players=None,
 ):
     """v9: Copy a spell on the stack (CR 706.10).
     The copy is NOT cast — triggers that care about casting do not fire.
@@ -7892,10 +7893,207 @@ def copy_spell_on_stack(
     }
     if original_x_value is not None:
         copied_effect["_resolution_context"]["x_value"] = original_x_value
+    selection = copy_spell_target_selection_context(
+        controller,
+        original_effect_data or {},
+        source_effect_data or {},
+        source_card=source_card,
+        all_players=all_players,
+    )
+    if selection:
+        copied_effect["_copy_target_selection"] = selection
+        if selection.get("declared_targets"):
+            copied_effect["declared_targets"] = selection.get("declared_targets")
+            copied_effect["_resolution_context"].update(
+                replay_fields_for_declared_targets(copied_effect)
+            )
     item = StackItem(copied_card, controller, copied_effect)
     item.was_cast = False
     stack.push(item)
     return item
+
+
+def copy_spell_choose_new_targets_runtime_enabled(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    if not bool(effect_data.get("may_choose_new_targets")):
+        return False
+    status = str(effect_data.get("choose_new_targets_status") or "").lower()
+    return status in {
+        "runtime_executor_v1",
+        "may",
+        "may_choose_new_targets",
+    }
+
+
+def same_battlefield_target(left, right):
+    if left is right:
+        return True
+    if not isinstance(left, dict) or not isinstance(right, dict):
+        return False
+    for key in ("object_id", "instance_id", "uuid", "id"):
+        left_id = left.get(key)
+        right_id = right.get(key)
+        if left_id is not None and right_id is not None and left_id == right_id:
+            return True
+    return left == right
+
+
+def copy_spell_target_selection_players(controller, all_players, declared_targets):
+    players = []
+    for candidate in [controller] + list(all_players or []):
+        if candidate is not None and candidate not in players:
+            players.append(candidate)
+    for entry in declared_targets or []:
+        if isinstance(entry, dict):
+            candidate = entry.get("controller")
+            if candidate is not None and candidate not in players:
+                players.append(candidate)
+    return players
+
+
+def alternate_targets_for_copied_spell(
+    controller,
+    original_effect_data,
+    source_card,
+    target_type,
+    players,
+):
+    candidates = []
+    effect = (original_effect_data or {}).get("effect")
+    if effect in TARGETED_REMOVAL_EFFECTS:
+        for candidate_player in players:
+            for target in removal_target_candidates(
+                candidate_player,
+                original_effect_data,
+                controller=controller,
+                source=source_card or original_effect_data,
+            ):
+                candidates.append((candidate_player, target))
+        return candidates
+    for candidate_player in players:
+        for target in getattr(candidate_player, "battlefield", []) or []:
+            if not isinstance(target, dict):
+                continue
+            if not is_legal_target(
+                original_effect_data,
+                target,
+                controller,
+                target_type=target_type,
+                target_controller=candidate_player,
+            ):
+                continue
+            candidates.append((candidate_player, target))
+    return candidates
+
+
+def copy_spell_target_selection_context(
+    controller,
+    original_effect_data,
+    source_effect_data,
+    *,
+    source_card=None,
+    all_players=None,
+):
+    status = (
+        source_effect_data.get("choose_new_targets_status")
+        if isinstance(source_effect_data, dict)
+        else None
+    )
+    if not copy_spell_choose_new_targets_runtime_enabled(source_effect_data):
+        return None
+    declared_targets = [
+        entry for entry in (original_effect_data or {}).get("declared_targets") or []
+        if isinstance(entry, dict)
+    ]
+    selection = {
+        "copy_target_selection_status": status,
+        "copy_target_selection_pipeline": "copy_spell_runtime_choose_new_targets_v1",
+        "target_reassignment_performed": False,
+        "targets": [],
+    }
+    if not declared_targets:
+        selection["copy_target_selection_reason"] = "no_declared_targets_on_copied_spell"
+        return selection
+    players = copy_spell_target_selection_players(controller, all_players, declared_targets)
+    selected_targets = []
+    replay_targets = []
+    for entry in declared_targets:
+        old_target = entry.get("target")
+        old_controller = declared_target_controller(
+            players,
+            old_target,
+            entry_controller=entry.get("controller"),
+        )
+        if old_controller is not None:
+            old_target = battlefield_object_for_target(old_controller, old_target) or old_target
+        target_type = entry.get("target_type") or removal_target_type(original_effect_data)
+        candidates = alternate_targets_for_copied_spell(
+            controller,
+            original_effect_data,
+            source_card,
+            target_type,
+            players,
+        )
+        ranked = sorted(
+            (
+                (candidate_controller, target)
+                for candidate_controller, target in candidates
+                if not same_battlefield_target(target, old_target)
+            ),
+            key=lambda pair: (
+                int(pair[0] is not controller),
+                target_priority(pair[1]),
+            ),
+            reverse=True,
+        )
+        if ranked:
+            new_controller, new_target = ranked[0]
+            selection["target_reassignment_performed"] = True
+        else:
+            new_controller, new_target = old_controller, old_target
+        next_entry = copy.deepcopy(entry)
+        next_entry["target"] = new_target
+        next_entry["controller"] = new_controller
+        next_entry["target_type"] = target_type
+        next_entry["declared_by"] = controller
+        selected_targets.append(next_entry)
+        decision = targeting_decision(
+            source_card or original_effect_data,
+            new_target,
+            controller,
+            target_controller=new_controller,
+            target_type=target_type,
+        )
+        replay_targets.append(declared_target_replay_entry(decision))
+    selection["declared_targets"] = selected_targets
+    selection["targets"] = replay_targets
+    if not selection["target_reassignment_performed"]:
+        selection["copy_target_selection_reason"] = "no_alternate_legal_target"
+    return selection
+
+
+def copy_spell_target_selection_replay_fields(copied_item):
+    effect_data = getattr(copied_item, "effect_data", None) if copied_item else None
+    selection = (
+        effect_data.get("_copy_target_selection")
+        if isinstance(effect_data, dict)
+        else None
+    )
+    if not isinstance(selection, dict):
+        return {}
+    targets = list(selection.get("targets") or [])
+    fields = {
+        "copy_target_selection_status": selection.get("copy_target_selection_status"),
+        "copy_target_selection_pipeline": selection.get("copy_target_selection_pipeline"),
+        "target_reassignment_performed": bool(selection.get("target_reassignment_performed")),
+        "copy_spell_targets": targets,
+    }
+    if selection.get("copy_target_selection_reason"):
+        fields["copy_target_selection_reason"] = selection.get("copy_target_selection_reason")
+    for key, value in replay_primary_target_fields(targets).items():
+        fields[f"copy_spell_{key}"] = value
+    return {key: value for key, value in fields.items() if value is not None}
 
 
 def copied_spell_has_required_library_target(player, stack_item):
@@ -11318,6 +11516,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 original_effect_data=top_item.effect_data,
                 source_card=c,
                 source_effect_data=eff,
+                all_players=all_players,
             )
             emit_replay_event(
                 "spell_copied",
@@ -11339,6 +11538,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 turn=turn,
                 phase=phase,
                 **copy_target,
+                **copy_spell_target_selection_replay_fields(copied_item),
                 **fields,
             )
             attach_direct_resolution_context(
@@ -32868,6 +33068,7 @@ def trigger_spell_cast_engines(
                     original_effect_data=target_item.effect_data,
                     source_card=permanent,
                     source_effect_data=permanent,
+                    all_players=all_players,
                 )
                 emit_replay_event(
                     "spell_copied",
@@ -32889,6 +33090,7 @@ def trigger_spell_cast_engines(
                     turn=turn,
                     phase=phase,
                     **copy_target,
+                    **copy_spell_target_selection_replay_fields(copied_item),
                     **replay_rule_fields(permanent),
                 )
 
@@ -32971,6 +33173,7 @@ def trigger_spell_cast_engines(
                     original_effect_data=target_item.effect_data,
                     source_card=permanent,
                     source_effect_data=permanent,
+                    all_players=all_players,
                 )
                 emit_replay_event(
                     "spell_copied",
@@ -32989,6 +33192,7 @@ def trigger_spell_cast_engines(
                     turn=turn,
                     phase=phase,
                     **copy_target,
+                    **copy_spell_target_selection_replay_fields(copied_item),
                     **replay_rule_fields(permanent),
                 )
 
@@ -33035,6 +33239,7 @@ def trigger_spell_cast_engines(
                     original_effect_data=target_item.effect_data,
                     source_card=permanent,
                     source_effect_data=permanent,
+                    all_players=all_players,
                 )
                 emit_replay_event(
                     "spell_copied",
@@ -33054,6 +33259,7 @@ def trigger_spell_cast_engines(
                     turn=turn,
                     phase=phase,
                     **copy_target,
+                    **copy_spell_target_selection_replay_fields(copied_item),
                     **replay_rule_fields(permanent),
                 )
 
@@ -38334,6 +38540,7 @@ def apply_effect_immediate(
                 original_effect_data=target_item.effect_data,
                 source_card=card,
                 source_effect_data=effect_data,
+                all_players=[player] + list(opponents or []),
             )
             emit_replay_event(
                 "spell_copied",
@@ -38351,6 +38558,7 @@ def apply_effect_immediate(
                 turn=turn,
                 phase=phase,
                 **copy_target,
+                **copy_spell_target_selection_replay_fields(copied_item),
                 **replay_rule_fields(effect_data),
             )
             return

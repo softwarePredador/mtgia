@@ -1,0 +1,14 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "rows": [
+    {
+      "backup_table_exists": 0,
+      "choose_new_targets_annotation_rows": 3,
+      "copy_spell_stack_target_rows": 3,
+      "current_annotation_rows": 3,
+      "expected_reiterate_buyback_annotation_rows": 1,
+      "target_rows": 3,
+      "trusted_target_rows": 3
+    }
+  ]
+}

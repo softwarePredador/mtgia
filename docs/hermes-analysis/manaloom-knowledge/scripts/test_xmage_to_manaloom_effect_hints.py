@@ -2928,7 +2928,15 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["effect"], "copy_spell")
         self.assertEqual(
             primary["battle_model_scope"],
-            "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1",
+            "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1",
+        )
+        self.assertEqual(primary["target"], "instant_or_sorcery_on_stack")
+        self.assertTrue(primary["may_choose_new_targets"])
+        self.assertEqual(primary["choose_new_targets_status"], "runtime_executor_v1")
+        self.assertEqual(primary["copy_target_selection_status"], "runtime_executor_v1")
+        self.assertEqual(
+            primary["copy_target_selection_pipeline"],
+            "copy_spell_runtime_choose_new_targets_v1",
         )
         self.assertTrue(primary["commander_storm"])
         self.assertFalse(result["primary_candidate"]["requires_runtime_executor"])

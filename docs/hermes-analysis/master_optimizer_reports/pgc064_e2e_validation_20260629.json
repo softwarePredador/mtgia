@@ -1,0 +1,200 @@
+{
+  "battle_execution": {
+    "event_count": 11,
+    "results": [
+      {
+        "card_name": "Reverberate",
+        "copied_spell": "Targeted Removal",
+        "copy_path": "response",
+        "copy_spell_target": "Better Target",
+        "copy_target_selection_status": "runtime_executor_v1",
+        "scenario": "reverberate_response_retargets_copied_removal",
+        "target_reassignment_performed": true
+      },
+      {
+        "card_name": "Reiterate",
+        "copied_spell": "Targeted Removal",
+        "copy_path": "response",
+        "copy_spell_target": "Better Target",
+        "copy_target_selection_status": "runtime_executor_v1",
+        "scenario": "reiterate_response_retargets_copied_removal_buyback_residual",
+        "target_reassignment_performed": true
+      },
+      {
+        "card_name": "Dualcaster Mage",
+        "copied_spell": "Targeted Removal",
+        "copy_path": "etb",
+        "copy_spell_target": "Better Target",
+        "copy_target_selection_status": "runtime_executor_v1",
+        "scenario": "dualcaster_etb_retargets_copied_removal",
+        "target_reassignment_performed": true
+      }
+    ],
+    "scenario_count": 3
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-29T10:31:16.555153+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pgc064_e2e_manifest_20260629.json",
+  "package_id": "pgc064_copy_spell_choose_new_targets_runtime",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "creature_etb_copy_stack_instant_or_sorcery_new_targets_runtime_v1",
+          "card_name": "Dualcaster Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55",
+          "oracle_hash": "e26f613394b72e9724d299512983218a",
+          "review_status": "active",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_v1",
+          "card_name": "Reverberate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0269136edf067f696c8576740b720e14",
+          "oracle_hash": "cbae05dee4261e3ed5412fd5f3591c17",
+          "review_status": "active",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [
+            "buyback_status"
+          ],
+          "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_annotation_v1",
+          "card_name": "Reiterate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405",
+          "oracle_hash": "996fb5f02f16605ff7f1c899f2c50f60",
+          "review_status": "active",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "creature_etb_copy_stack_instant_or_sorcery_new_targets_runtime_v1",
+          "card_name": "Dualcaster Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55",
+          "oracle_hash": "e26f613394b72e9724d299512983218a",
+          "review_status": "active",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_v1",
+          "card_name": "Reverberate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0269136edf067f696c8576740b720e14",
+          "oracle_hash": "cbae05dee4261e3ed5412fd5f3591c17",
+          "review_status": "active",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [
+            "buyback_status"
+          ],
+          "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_annotation_v1",
+          "card_name": "Reiterate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405",
+          "oracle_hash": "996fb5f02f16605ff7f1c899f2c50f60",
+          "review_status": "active",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "creature_etb_copy_stack_instant_or_sorcery_new_targets_runtime_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dualcaster Mage",
+          "logical_rule_key": "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reverberate",
+          "logical_rule_key": "battle_rule_v1:0269136edf067f696c8576740b720e14"
+        },
+        {
+          "annotation_fields": [
+            "buyback_status"
+          ],
+          "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_annotation_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reiterate",
+          "logical_rule_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Dualcaster Mage",
+          "component_keys": [],
+          "effect": "copy_spell",
+          "logical_rule_key": "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reverberate",
+          "component_keys": [],
+          "effect": "copy_spell",
+          "logical_rule_key": "battle_rule_v1:0269136edf067f696c8576740b720e14"
+        },
+        {
+          "annotation_fields": [
+            "buyback_status"
+          ],
+          "card_name": "Reiterate",
+          "component_keys": [],
+          "effect": "copy_spell",
+          "logical_rule_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 11,
+        "scenarios": 3
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "PGC064 Copy Spell Choose New Targets Runtime Validation"
+}

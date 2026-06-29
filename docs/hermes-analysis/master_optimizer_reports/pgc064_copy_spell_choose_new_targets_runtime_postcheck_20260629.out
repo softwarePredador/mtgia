@@ -1,0 +1,15 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "rows": [
+    {
+      "backup_rows": 3,
+      "choose_new_targets_runtime_rows": 3,
+      "clean_promoted_rows": 2,
+      "dualcaster_runtime_rows": 1,
+      "reiterate_runtime_choose_targets_buyback_residual_rows": 1,
+      "reiterate_runtime_rows": 1,
+      "reverberate_runtime_rows": 1,
+      "target_rows": 3
+    }
+  ]
+}

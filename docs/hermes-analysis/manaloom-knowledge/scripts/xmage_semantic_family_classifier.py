@@ -2116,16 +2116,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("quest_counter_threshold_to_copy") or 0) == 2
         )
 
-    if effect == "copy_spell" and scope == "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1":
+    if effect == "copy_spell" and scope in {
+        "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1",
+        "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1",
+    }:
         return (
             types == {"INSTANT"}
             and effect_classes == {"CopyTargetStackObjectEffect"}
             and ability_classes == {"CommanderStormAbility"}
             and not cost_classes
             and bool(effect_json.get("instant"))
-            and effect_json.get("target") == "instant_or_sorcery_spell"
+            and effect_json.get("target") in {
+                "instant_or_sorcery_spell",
+                "instant_or_sorcery_on_stack",
+            }
             and bool(effect_json.get("may_choose_new_targets"))
-            and effect_json.get("choose_new_targets_status") == "may"
+            and effect_json.get("choose_new_targets_status") in {
+                "may",
+                "runtime_executor_v1",
+            }
             and bool(effect_json.get("commander_storm"))
         )
 

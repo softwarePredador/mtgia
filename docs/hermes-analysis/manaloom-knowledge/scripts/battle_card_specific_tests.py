@@ -1509,9 +1509,10 @@ def register_tests(battle, player):
             assert reverberate_effect["effect"] == "copy_spell"
             assert reverberate_effect["target"] == "instant_or_sorcery_on_stack"
             assert reverberate_effect["copy_is_not_cast"] is True
-            assert reverberate_effect["choose_new_targets_status"] == "annotation_only"
+            assert reverberate_effect["choose_new_targets_status"] == "runtime_executor_v1"
+            assert reverberate_effect["copy_target_selection_status"] == "runtime_executor_v1"
             assert reverberate_effect["battle_model_scope"] == (
-                "reverberate_copy_stack_instant_or_sorcery_new_targets_annotation_v1"
+                "copy_stack_instant_or_sorcery_new_targets_runtime_v1"
             )
             assert reverberate_effect["_rule_logical_key"] == "battle_rule_v1:0269136edf067f696c8576740b720e14"
             assert reverberate_effect["_rule_oracle_hash"] == "cbae05dee4261e3ed5412fd5f3591c17"
@@ -1549,7 +1550,10 @@ def register_tests(battle, player):
         assert copied_event["copy_is_cast"] is False
         assert copied_event["rule_logical_key"] == "battle_rule_v1:0269136edf067f696c8576740b720e14"
         assert copied_event["rule_oracle_hash"] == "cbae05dee4261e3ed5412fd5f3591c17"
-        assert copied_event["choose_new_targets_status"] == "annotation_only"
+        assert copied_event["choose_new_targets_status"] == "runtime_executor_v1"
+        assert copied_event["copy_target_selection_status"] == "runtime_executor_v1"
+        assert copied_event["target_reassignment_performed"] is False
+        assert copied_event["copy_target_selection_reason"] == "no_declared_targets_on_copied_spell"
 
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
         try:
@@ -1624,8 +1628,10 @@ def register_tests(battle, player):
             assert reiterate_effect["target"] == "instant_or_sorcery_on_stack"
             assert reiterate_effect["copy_is_not_cast"] is True
             assert reiterate_effect["buyback_status"] == "annotation_only"
+            assert reiterate_effect["choose_new_targets_status"] == "runtime_executor_v1"
+            assert reiterate_effect["copy_target_selection_status"] == "runtime_executor_v1"
             assert reiterate_effect["battle_model_scope"] == (
-                "copy_stack_instant_or_sorcery_buyback_annotation_v1"
+                "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_annotation_v1"
             )
             assert reiterate_effect["_rule_logical_key"] == "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
             assert reiterate_effect["_rule_oracle_hash"] == "996fb5f02f16605ff7f1c899f2c50f60"
@@ -1656,7 +1662,10 @@ def register_tests(battle, player):
         assert copied_event["copy_is_cast"] is False
         assert copied_event["rule_logical_key"] == "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
         assert copied_event["rule_oracle_hash"] == "996fb5f02f16605ff7f1c899f2c50f60"
-        assert copied_event["choose_new_targets_status"] == "annotation_only"
+        assert copied_event["choose_new_targets_status"] == "runtime_executor_v1"
+        assert copied_event["copy_target_selection_status"] == "runtime_executor_v1"
+        assert copied_event["target_reassignment_performed"] is False
+        assert copied_event["copy_target_selection_reason"] == "no_declared_targets_on_copied_spell"
 
     def test_reiterate_skips_green_suns_copy_without_controller_library_target():
         events = []
@@ -1781,6 +1790,76 @@ def register_tests(battle, player):
         )
         assert any(card.get("name") == "Green Target" for card in responder.battlefield)
 
+    def test_copy_spell_runtime_choose_new_targets_retargets_declared_removal():
+        active = player("Active")
+        responder = player("Responder")
+        original_target = {
+            "name": "Original Target",
+            "cmc": 1,
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "type_line": "Creature — Soldier",
+        }
+        better_target = {
+            "name": "Better Target",
+            "cmc": 4,
+            "effect": "draw_engine",
+            "power": 3,
+            "toughness": 4,
+            "type_line": "Creature — Wizard",
+        }
+        active.battlefield = [original_target, better_target]
+        target_spell = {
+            "name": "Targeted Removal",
+            "cmc": 1,
+            "mana_cost": "{W}",
+            "type_line": "Instant",
+        }
+        target_effect = {
+            "effect": "remove_creature",
+            "target": "creature",
+            "exile_target": True,
+            "declared_targets": [
+                {
+                    "target": original_target,
+                    "controller": active,
+                    "target_type": "creature",
+                    "declared_by": active,
+                }
+            ],
+        }
+        source_effect = {
+            "effect": "copy_spell",
+            "may_choose_new_targets": True,
+            "choose_new_targets_status": "runtime_executor_v1",
+        }
+        stack = battle.Stack()
+        stack.push(target_spell, active, target_effect)
+
+        copy_item = battle.copy_spell_on_stack(
+            target_spell,
+            responder,
+            stack,
+            original_effect_data=target_effect,
+            source_card={"name": "Reverberate", "type_line": "Instant"},
+            source_effect_data=source_effect,
+            all_players=[active, responder],
+        )
+
+        assert copy_item is stack.items[-1]
+        copied_targets = copy_item.effect_data["declared_targets"]
+        assert copied_targets[0]["target"] is better_target
+        assert copied_targets[0]["controller"] is active
+        selection = copy_item.effect_data["_copy_target_selection"]
+        assert selection["copy_target_selection_status"] == "runtime_executor_v1"
+        assert selection["copy_target_selection_pipeline"] == "copy_spell_runtime_choose_new_targets_v1"
+        assert selection["target_reassignment_performed"] is True
+        assert selection["targets"][0]["target"] == "Better Target"
+        replay_fields = battle.copy_spell_target_selection_replay_fields(copy_item)
+        assert replay_fields["copy_spell_target"] == "Better Target"
+        assert replay_fields["copy_spell_target_controller"] == "Active"
+
     def test_dualcaster_mage_etb_copies_stack_spell_with_pg068_rule_provenance():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -1812,8 +1891,10 @@ def register_tests(battle, player):
             assert dualcaster_effect["target"] == "instant_or_sorcery_on_stack"
             assert dualcaster_effect["copy_is_not_cast"] is True
             assert dualcaster_effect["battle_model_scope"] == (
-                "creature_etb_copy_stack_instant_or_sorcery_v1"
+                "creature_etb_copy_stack_instant_or_sorcery_new_targets_runtime_v1"
             )
+            assert dualcaster_effect["choose_new_targets_status"] == "runtime_executor_v1"
+            assert dualcaster_effect["copy_target_selection_status"] == "runtime_executor_v1"
             assert dualcaster_effect["_rule_logical_key"] == "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55"
             assert dualcaster_effect["_rule_oracle_hash"] == "e26f613394b72e9724d299512983218a"
 
@@ -1854,6 +1935,10 @@ def register_tests(battle, player):
         assert copied_event["trigger"] == "enters_battlefield"
         assert copied_event["rule_logical_key"] == "battle_rule_v1:e176019b87d68d22e2388e08a4efbf55"
         assert copied_event["rule_oracle_hash"] == "e26f613394b72e9724d299512983218a"
+        assert copied_event["choose_new_targets_status"] == "runtime_executor_v1"
+        assert copied_event["copy_target_selection_status"] == "runtime_executor_v1"
+        assert copied_event["target_reassignment_performed"] is False
+        assert copied_event["copy_target_selection_reason"] == "no_declared_targets_on_copied_spell"
 
     def test_deflecting_swat_redirects_targeted_removal_for_free_with_commander():
         events = []
@@ -19646,6 +19731,7 @@ def register_tests(battle, player):
         test_reiterate_copies_stack_spell_with_pg068_rule_provenance,
         test_reiterate_skips_green_suns_copy_without_controller_library_target,
         test_reiterate_preserves_x_when_copying_green_suns_with_valid_target,
+        test_copy_spell_runtime_choose_new_targets_retargets_declared_removal,
         test_dualcaster_mage_etb_copies_stack_spell_with_pg068_rule_provenance,
         test_deflecting_swat_redirects_targeted_removal_for_free_with_commander,
         test_flawless_maneuver_protects_creatures_for_free_with_commander,

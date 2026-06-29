@@ -681,8 +681,158 @@ def run_mana_source_life_cost_spend(
     }
 
 
+def add_manifest_mana(player, mana: dict[str, Any]) -> None:
+    for color, amount in (mana or {}).items():
+        count = int(amount or 0)
+        if count <= 0:
+            continue
+        normalized = str(color).lower()
+        if normalized == "generic":
+            player.mana_pool.add_generic(count)
+        else:
+            player.mana_pool.add(normalized, count)
+
+
+def run_copy_spell_choose_new_targets(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    copy_card = dict(scenario["card"])
+    turn = int(scenario.get("turn") or 7)
+    phase = str(scenario.get("phase") or "precombat_main")
+    active = battle.Player(str(scenario.get("active_player") or "Active"), None, [])
+    responder = battle.Player(str(scenario.get("responder") or "Responder"), None, [])
+    original_target = dict(scenario.get("original_target") or {
+        "name": "Original Target",
+        "cmc": 1,
+        "effect": "creature",
+        "power": 1,
+        "toughness": 1,
+        "type_line": "Creature",
+    })
+    alternate_target = dict(scenario.get("alternate_target") or {
+        "name": "Better Target",
+        "cmc": 4,
+        "effect": "draw_engine",
+        "power": 3,
+        "toughness": 4,
+        "type_line": "Creature",
+    })
+    active.battlefield = [original_target, alternate_target]
+    target_spell = dict(scenario.get("target_spell") or {
+        "name": "Targeted Removal",
+        "cmc": 1,
+        "mana_cost": "{W}",
+        "type_line": "Instant",
+    })
+    target_effect = dict(scenario.get("target_effect") or {
+        "effect": "remove_creature",
+        "target": "creature",
+        "exile_target": True,
+    })
+    target_effect["declared_targets"] = [
+        {
+            "target": original_target,
+            "controller": active,
+            "target_type": str(scenario.get("target_type") or target_effect.get("target") or "creature"),
+            "declared_by": active,
+        }
+    ]
+    battle.store_cast_context_fields(target_effect, {"phase": phase, "role": "target_spell_fixture"})
+    stack = battle.Stack()
+    stack.push(target_spell, active, target_effect)
+
+    all_players = [active, responder]
+    copy_path = str(scenario.get("copy_path") or "response")
+    if copy_path == "response":
+        responder.hand = [copy_card]
+        add_manifest_mana(responder, scenario.get("responder_mana") or {"red": 2})
+        if not battle.priority_round(
+            active,
+            all_players,
+            stack,
+            turn,
+            random.Random(int(scenario.get("seed") or 6064)),
+            phase=phase,
+        ):
+            fail("battle_execution", f"{copy_card['name']} was not cast as response")
+    elif copy_path == "etb":
+        copy_effect = battle.get_card_effect(copy_card)
+        battle.apply_effect_immediate(
+            responder,
+            [active],
+            copy_card,
+            turn,
+            random.Random(int(scenario.get("seed") or 6064)),
+            effect_data_override=copy_effect,
+            stack=stack,
+            phase=phase,
+        )
+    else:
+        fail("battle_execution", f"unsupported copy_path {copy_path!r}")
+
+    copied_item = stack.items[-1] if getattr(stack, "items", None) else None
+    if copied_item is None or not getattr(copied_item, "card", {}).get("is_copy"):
+        fail("battle_execution", f"{copy_card['name']} did not create stack copy")
+    selection = getattr(copied_item, "effect_data", {}).get("_copy_target_selection") or {}
+    expected_status = str(scenario.get("expected_copy_target_selection_status") or "runtime_executor_v1")
+    if selection.get("copy_target_selection_status") != expected_status:
+        fail(
+            "battle_execution",
+            f"{copy_card['name']} selection status={selection.get('copy_target_selection_status')!r}",
+        )
+    if selection.get("copy_target_selection_pipeline") != "copy_spell_runtime_choose_new_targets_v1":
+        fail("battle_execution", f"{copy_card['name']} missing copy target selection pipeline")
+    expected_reassigned = bool(scenario.get("expected_target_reassignment_performed", True))
+    if bool(selection.get("target_reassignment_performed")) != expected_reassigned:
+        fail(
+            "battle_execution",
+            f"{copy_card['name']} reassigned={selection.get('target_reassignment_performed')!r}",
+        )
+    copied_targets = getattr(copied_item, "effect_data", {}).get("declared_targets") or []
+    if not copied_targets:
+        fail("battle_execution", f"{copy_card['name']} copied effect missing declared targets")
+    expected_target_name = str(scenario.get("expected_copy_target") or alternate_target.get("name"))
+    actual_target = copied_targets[0].get("target") if isinstance(copied_targets[0], dict) else None
+    actual_target_name = actual_target.get("name") if isinstance(actual_target, dict) else None
+    if actual_target_name != expected_target_name:
+        fail("battle_execution", f"{copy_card['name']} target={actual_target_name!r}")
+
+    spell_copied = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "spell_copied" and data.get("card") == copy_card.get("name")
+        ),
+        None,
+    )
+    if spell_copied is None:
+        fail("battle_events", f"missing {copy_card['name']} spell_copied event")
+    if spell_copied.get("copy_target_selection_status") != expected_status:
+        fail(
+            "battle_events",
+            f"{copy_card['name']} event target status={spell_copied.get('copy_target_selection_status')!r}",
+        )
+    if spell_copied.get("copy_spell_target") != expected_target_name:
+        fail(
+            "battle_events",
+            f"{copy_card['name']} event copy_spell_target={spell_copied.get('copy_spell_target')!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": copy_card["name"],
+        "copy_path": copy_path,
+        "copied_spell": target_spell.get("name"),
+        "copy_target_selection_status": selection.get("copy_target_selection_status"),
+        "target_reassignment_performed": bool(selection.get("target_reassignment_performed")),
+        "copy_spell_target": actual_target_name,
+    }
+
+
 SCENARIO_RUNNERS = {
     "conditional_land_play": run_conditional_land_play,
+    "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,

@@ -1064,15 +1064,18 @@ def _build_copy_stack_spell_fields(
         return None
     fields: dict[str, Any] = {
         "instant": "INSTANT" in card_types,
-        "target": "instant_or_sorcery_spell",
+        "target": "instant_or_sorcery_on_stack",
         "may_choose_new_targets": True,
-        "choose_new_targets_status": "may",
+        "choose_new_targets_status": "runtime_executor_v1",
+        "copy_target_selection_status": "runtime_executor_v1",
+        "copy_target_selection_pipeline": "copy_spell_runtime_choose_new_targets_v1",
+        "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1",
     }
     if "CommanderStormAbility" in ability_classes:
         fields["commander_storm"] = True
     return {
         "effect": "copy_spell",
-        "scope": "copy_target_instant_or_sorcery_spell_may_choose_new_targets_v1",
+        "scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1",
         "fields": fields,
         "reason": "XMage structure matches copying a target instant or sorcery spell on the stack.",
         "signals": ["CopyTargetStackObjectEffect", "TargetSpell"],
