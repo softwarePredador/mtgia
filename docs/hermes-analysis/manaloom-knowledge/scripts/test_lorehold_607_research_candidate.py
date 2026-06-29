@@ -66,6 +66,39 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
         )
         self.assertEqual(plan["removed"], ["Bender's Waterskin", "The Scarlet Witch", "Molecule Man"])
 
+    def test_v615_mana_engine_molecule_retest_reverts_only_one_ring_cut(self):
+        plan = research.RESEARCH_PLANS["v615_mana_engine_molecule_retest_v1"]
+        self.assertEqual(plan["candidate_key"], "candidate_607_v615_mana_engine_molecule_retest_v1")
+        self.assertEqual(
+            plan["added"],
+            [
+                {"card_name": "Mana Vault", "source_deck_id": 615},
+                {"card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty", "source_deck_id": 615},
+            ],
+        )
+        self.assertEqual(plan["removed"], ["Bender's Waterskin", "The Scarlet Witch"])
+
+    def test_v615_mana_engine_scarlet_retest_reverts_only_birgi_cut(self):
+        plan = research.RESEARCH_PLANS["v615_mana_engine_scarlet_retest_v1"]
+        self.assertEqual(plan["candidate_key"], "candidate_607_v615_mana_engine_scarlet_retest_v1")
+        self.assertEqual(
+            plan["added"],
+            [
+                {"card_name": "Mana Vault", "source_deck_id": 615},
+                {"card_name": "The One Ring", "source_deck_id": 615},
+            ],
+        )
+        self.assertEqual(plan["removed"], ["Bender's Waterskin", "Molecule Man"])
+
+    def test_v615_mana_engine_molecule_scarlet_retest_reverts_both_disputed_cuts(self):
+        plan = research.RESEARCH_PLANS["v615_mana_engine_molecule_scarlet_retest_v1"]
+        self.assertEqual(
+            plan["candidate_key"],
+            "candidate_607_v615_mana_engine_molecule_scarlet_retest_v1",
+        )
+        self.assertEqual(plan["added"], [{"card_name": "Mana Vault", "source_deck_id": 615}])
+        self.assertEqual(plan["removed"], ["Bender's Waterskin"])
+
     def test_render_markdown_includes_final_decklist_sections(self):
         report = {
             "plan": "test",

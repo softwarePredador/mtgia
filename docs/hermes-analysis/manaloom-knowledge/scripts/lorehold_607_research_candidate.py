@@ -185,6 +185,75 @@ RESEARCH_PLANS = {
             "The cuts are narrow same-lane or low-observed slots: Bender's Waterskin is slower ramp, The Scarlet Witch overlaps cost-reduction/engine space, and Molecule Man had access but no recorded use metric in the promotion gate.",
         ],
     },
+    "v615_mana_engine_molecule_retest_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_v615_mana_engine_molecule_retest_v1",
+        "candidate_name": "Lorehold 607 + 615 Mana Engine Molecule Retest v1",
+        "candidate_archetype": "607-615-mana-engine-molecule-retest",
+        "added": [
+            {"card_name": "Mana Vault", "source_deck_id": 615},
+            {"card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty", "source_deck_id": 615},
+        ],
+        "removed": ["Bender's Waterskin", "The Scarlet Witch"],
+        "intent": (
+            "Retest the promoted mana-engine package while restoring Molecule Man "
+            "instead of The One Ring. This isolates whether the zero-miracle "
+            "engine has more Lorehold-specific value than the draw/protection "
+            "artifact in the current candidate shell."
+        ),
+        "external_signals": [
+            "Molecule Man has a verified/auto miracle-zero runtime rule and is a topdeck/miracle ceiling piece.",
+            "The promoted candidate cut Molecule Man for The One Ring, so this is the direct ablation for that disputed cut.",
+            "The validation must inspect drawn/cast/used and miracle conversion, not only aggregate wins.",
+        ],
+    },
+    "v615_mana_engine_scarlet_retest_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_v615_mana_engine_scarlet_retest_v1",
+        "candidate_name": "Lorehold 607 + 615 Mana Engine Scarlet Retest v1",
+        "candidate_archetype": "607-615-mana-engine-scarlet-retest",
+        "added": [
+            {"card_name": "Mana Vault", "source_deck_id": 615},
+            {"card_name": "The One Ring", "source_deck_id": 615},
+        ],
+        "removed": ["Bender's Waterskin", "Molecule Man"],
+        "intent": (
+            "Retest the promoted mana-engine package while restoring The Scarlet "
+            "Witch instead of Birgi. This isolates whether static power-based "
+            "cost reduction for expensive instants and sorceries is better than "
+            "Birgi's spell-cast mana trigger in the current candidate shell."
+        ),
+        "external_signals": [
+            "The Scarlet Witch has a verified/auto static cost-reduction rule for MV4+ instants and sorceries.",
+            "The promoted candidate cut Scarlet for Birgi, so this is the direct ablation for that disputed cut.",
+            "The validation must inspect cost-reduction/card-use evidence and spell-chain conversion.",
+        ],
+    },
+    "v615_mana_engine_molecule_scarlet_retest_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_v615_mana_engine_molecule_scarlet_retest_v1",
+        "candidate_name": "Lorehold 607 + 615 Mana Engine Molecule Scarlet Retest v1",
+        "candidate_archetype": "607-615-mana-engine-molecule-scarlet-retest",
+        "added": [
+            {"card_name": "Mana Vault", "source_deck_id": 615},
+        ],
+        "removed": ["Bender's Waterskin"],
+        "intent": (
+            "Retest the current promoted package by restoring both Molecule Man "
+            "and The Scarlet Witch, keeping only the Mana Vault upgrade from the "
+            "615 package. This checks whether the older miracle/cost-reduction "
+            "engine should remain intact before valuing Birgi plus The One Ring "
+            "as a package."
+        ),
+        "external_signals": [
+            "Molecule Man and The Scarlet Witch are both verified/auto runtime cards in the 607 shell.",
+            "This is the paired ablation for the two disputed cuts in the promoted candidate.",
+            "The validation must separate package fit from individual card-rule correctness.",
+        ],
+    },
 }
 
 

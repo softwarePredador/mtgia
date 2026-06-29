@@ -1,0 +1,1439 @@
+{
+  "decision": {
+    "molecule_man": "runtime_valid_but_not_promoted_from_current_evidence",
+    "paired_restore": "promising_natural_signal_but_not_enough_to_replace_promoted_deck_without_additional_confirmation",
+    "the_scarlet_witch": "runtime_valid_and_keep_as_live_retest_candidate"
+  },
+  "forced_opening_diagnostic": {
+    "candidate_607_v615_mana_engine_molecule_retest_v1": [
+      {
+        "card_events": {
+          "Molecule Man": {
+            "cost_paid": 1,
+            "spell_cast": 1,
+            "spell_resolved": 1
+          },
+          "The Scarlet Witch": {
+            "cost_paid": 4,
+            "spell_cast": 4,
+            "spell_resolved": 4
+          }
+        },
+        "conditional": {
+          "Molecule Man": {
+            "access": {
+              "nonwin": 19,
+              "win": 5
+            },
+            "cast": {
+              "win": 1
+            },
+            "used_any": {
+              "win": 1
+            }
+          },
+          "The Scarlet Witch": {
+            "cast": {
+              "nonwin": 2,
+              "win": 2
+            },
+            "used_any": {
+              "nonwin": 2,
+              "win": 2
+            }
+          }
+        },
+        "deck_key": "deck_607",
+        "focus": {
+          "Molecule Man": {
+            "accessed_games": 24,
+            "drawn_games": 0,
+            "library_only_games": 0,
+            "near_access_games": 0,
+            "opening_hand_games": 24,
+            "trace_count": 1168,
+            "trace_games": 24
+          }
+        },
+        "games": 24,
+        "losses": 19,
+        "seed_windows": {
+          "42_forced_opening": {
+            "games": 24,
+            "losses": 19,
+            "stalls": 0,
+            "win_rate": 20.83,
+            "wins": 5
+          }
+        },
+        "stalls": 0,
+        "strategic_events": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 27,
+          "lorehold_cost_paid": 183,
+          "lorehold_spell_cast": 158,
+          "lorehold_upkeep_rummage": 69,
+          "miracle_cast": 32,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 36
+        },
+        "strategic_games": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 3,
+          "lorehold_cost_paid": 21,
+          "lorehold_spell_cast": 21,
+          "lorehold_upkeep_rummage": 11,
+          "miracle_cast": 6,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 4
+        },
+        "win_rate": 20.83,
+        "win_reasons": {
+          "elimination": 5
+        },
+        "winota": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "wins": 0
+        },
+        "wins": 5
+      },
+      {
+        "card_events": {
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+            "cost_paid": 5,
+            "spell_cast": 5,
+            "trigger_resolved": 20
+          },
+          "Mana Vault": {
+            "cost_paid": 6,
+            "spell_cast": 6
+          },
+          "Molecule Man": {
+            "cost_paid": 3,
+            "spell_cast": 3,
+            "spell_resolved": 3
+          }
+        },
+        "conditional": {
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+            "cast": {
+              "nonwin": 4,
+              "win": 1
+            },
+            "used_any": {
+              "nonwin": 4,
+              "win": 1
+            }
+          },
+          "Mana Vault": {
+            "cast": {
+              "nonwin": 4,
+              "win": 2
+            },
+            "used_any": {
+              "nonwin": 4,
+              "win": 2
+            }
+          },
+          "Molecule Man": {
+            "access": {
+              "nonwin": 18,
+              "win": 6
+            },
+            "cast": {
+              "nonwin": 1,
+              "win": 2
+            },
+            "used_any": {
+              "nonwin": 1,
+              "win": 2
+            }
+          }
+        },
+        "deck_key": "candidate_607_v615_mana_engine_molecule_retest_v1",
+        "focus": {
+          "Molecule Man": {
+            "accessed_games": 24,
+            "drawn_games": 0,
+            "library_only_games": 0,
+            "near_access_games": 0,
+            "opening_hand_games": 24,
+            "trace_count": 1164,
+            "trace_games": 24
+          }
+        },
+        "games": 24,
+        "losses": 18,
+        "seed_windows": {
+          "42_forced_opening": {
+            "games": 24,
+            "losses": 18,
+            "stalls": 0,
+            "win_rate": 25.0,
+            "wins": 6
+          }
+        },
+        "stalls": 0,
+        "strategic_events": {
+          "birgi_spell_cast_mana": 20,
+          "discard_to_top_replacement": 28,
+          "lorehold_cost_paid": 218,
+          "lorehold_spell_cast": 186,
+          "lorehold_upkeep_rummage": 97,
+          "miracle_cast": 47,
+          "spell_cast_mana_trigger": 20,
+          "topdeck_manipulation_activated": 41
+        },
+        "strategic_games": {
+          "birgi_spell_cast_mana": 4,
+          "discard_to_top_replacement": 4,
+          "lorehold_cost_paid": 24,
+          "lorehold_spell_cast": 24,
+          "lorehold_upkeep_rummage": 17,
+          "miracle_cast": 14,
+          "spell_cast_mana_trigger": 4,
+          "topdeck_manipulation_activated": 9
+        },
+        "win_rate": 25.0,
+        "win_reasons": {
+          "elimination": 6
+        },
+        "winota": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "wins": 1
+        },
+        "wins": 6
+      }
+    ],
+    "candidate_607_v615_mana_engine_molecule_scarlet_retest_v1": [
+      {
+        "card_events": {
+          "Molecule Man": {
+            "cost_paid": 1,
+            "spell_cast": 1,
+            "spell_resolved": 1
+          },
+          "The Scarlet Witch": {
+            "cost_paid": 14,
+            "spell_cast": 13,
+            "spell_resolved": 13
+          }
+        },
+        "conditional": {
+          "Molecule Man": {
+            "access": {
+              "nonwin": 21,
+              "win": 3
+            },
+            "cast": {
+              "win": 1
+            },
+            "used_any": {
+              "win": 1
+            }
+          },
+          "The Scarlet Witch": {
+            "access": {
+              "nonwin": 21,
+              "win": 3
+            },
+            "cast": {
+              "nonwin": 10,
+              "win": 3
+            },
+            "used_any": {
+              "nonwin": 10,
+              "win": 3
+            }
+          }
+        },
+        "deck_key": "deck_607",
+        "focus": {
+          "Molecule Man": {
+            "accessed_games": 24,
+            "drawn_games": 0,
+            "library_only_games": 0,
+            "near_access_games": 0,
+            "opening_hand_games": 24,
+            "trace_count": 1007,
+            "trace_games": 24
+          },
+          "The Scarlet Witch": {
+            "accessed_games": 24,
+            "drawn_games": 0,
+            "library_only_games": 0,
+            "near_access_games": 0,
+            "opening_hand_games": 24,
+            "trace_count": 1007,
+            "trace_games": 24
+          }
+        },
+        "games": 24,
+        "losses": 21,
+        "seed_windows": {
+          "42_forced_opening": {
+            "games": 24,
+            "losses": 21,
+            "stalls": 0,
+            "win_rate": 12.5,
+            "wins": 3
+          }
+        },
+        "stalls": 0,
+        "strategic_events": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 6,
+          "lorehold_cost_paid": 143,
+          "lorehold_spell_cast": 116,
+          "lorehold_upkeep_rummage": 48,
+          "miracle_cast": 23,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 18
+        },
+        "strategic_games": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 2,
+          "lorehold_cost_paid": 22,
+          "lorehold_spell_cast": 22,
+          "lorehold_upkeep_rummage": 12,
+          "miracle_cast": 8,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 4
+        },
+        "win_rate": 12.5,
+        "win_reasons": {
+          "elimination": 3
+        },
+        "winota": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "wins": 1
+        },
+        "wins": 3
+      },
+      {
+        "card_events": {
+          "Mana Vault": {
+            "cost_paid": 2,
+            "spell_cast": 2
+          },
+          "Molecule Man": {
+            "cost_paid": 1,
+            "spell_cast": 1,
+            "spell_resolved": 1
+          },
+          "The Scarlet Witch": {
+            "cost_paid": 14,
+            "spell_cast": 13,
+            "spell_resolved": 13
+          }
+        },
+        "conditional": {
+          "Mana Vault": {
+            "cast": {
+              "nonwin": 2
+            },
+            "used_any": {
+              "nonwin": 2
+            }
+          },
+          "Molecule Man": {
+            "access": {
+              "nonwin": 22,
+              "win": 2
+            },
+            "cast": {
+              "win": 1
+            },
+            "used_any": {
+              "win": 1
+            }
+          },
+          "The Scarlet Witch": {
+            "access": {
+              "nonwin": 22,
+              "win": 2
+            },
+            "cast": {
+              "nonwin": 11,
+              "win": 2
+            },
+            "used_any": {
+              "nonwin": 11,
+              "win": 2
+            }
+          }
+        },
+        "deck_key": "candidate_607_v615_mana_engine_molecule_scarlet_retest_v1",
+        "focus": {
+          "Molecule Man": {
+            "accessed_games": 24,
+            "drawn_games": 0,
+            "library_only_games": 0,
+            "near_access_games": 0,
+            "opening_hand_games": 24,
+            "trace_count": 1100,
+            "trace_games": 24
+          },
+          "The Scarlet Witch": {
+            "accessed_games": 24,
+            "drawn_games": 0,
+            "library_only_games": 0,
+            "near_access_games": 0,
+            "opening_hand_games": 24,
+            "trace_count": 1100,
+            "trace_games": 24
+          }
+        },
+        "games": 24,
+        "losses": 22,
+        "seed_windows": {
+          "42_forced_opening": {
+            "games": 24,
+            "losses": 22,
+            "stalls": 0,
+            "win_rate": 8.33,
+            "wins": 2
+          }
+        },
+        "stalls": 0,
+        "strategic_events": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 6,
+          "lorehold_cost_paid": 166,
+          "lorehold_spell_cast": 140,
+          "lorehold_upkeep_rummage": 44,
+          "miracle_cast": 9,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 16
+        },
+        "strategic_games": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 2,
+          "lorehold_cost_paid": 24,
+          "lorehold_spell_cast": 22,
+          "lorehold_upkeep_rummage": 11,
+          "miracle_cast": 6,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 4
+        },
+        "win_rate": 8.33,
+        "win_reasons": {
+          "approach": 1,
+          "elimination": 1
+        },
+        "winota": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "wins": 0
+        },
+        "wins": 2
+      }
+    ],
+    "candidate_607_v615_mana_engine_scarlet_retest_v1": [
+      {
+        "card_events": {
+          "The Scarlet Witch": {
+            "cost_paid": 18,
+            "spell_cast": 16,
+            "spell_resolved": 16
+          }
+        },
+        "conditional": {
+          "The Scarlet Witch": {
+            "access": {
+              "nonwin": 16,
+              "win": 8
+            },
+            "cast": {
+              "nonwin": 8,
+              "win": 8
+            },
+            "used_any": {
+              "nonwin": 8,
+              "win": 8
+            }
+          }
+        },
+        "deck_key": "deck_607",
+        "focus": {
+          "The Scarlet Witch": {
+            "accessed_games": 24,
+            "drawn_games": 0,
+            "library_only_games": 0,
+            "near_access_games": 0,
+            "opening_hand_games": 24,
+            "trace_count": 1354,
+            "trace_games": 24
+          }
+        },
+        "games": 24,
+        "losses": 16,
+        "seed_windows": {
+          "42_forced_opening": {
+            "games": 24,
+            "losses": 16,
+            "stalls": 0,
+            "win_rate": 33.33,
+            "wins": 8
+          }
+        },
+        "stalls": 0,
+        "strategic_events": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 11,
+          "lorehold_cost_paid": 230,
+          "lorehold_spell_cast": 198,
+          "lorehold_upkeep_rummage": 45,
+          "miracle_cast": 40,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 39
+        },
+        "strategic_games": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 3,
+          "lorehold_cost_paid": 23,
+          "lorehold_spell_cast": 23,
+          "lorehold_upkeep_rummage": 11,
+          "miracle_cast": 10,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 9
+        },
+        "win_rate": 33.33,
+        "win_reasons": {
+          "approach": 3,
+          "elimination": 5
+        },
+        "winota": {
+          "games": 3,
+          "losses": 2,
+          "stalls": 0,
+          "wins": 1
+        },
+        "wins": 8
+      },
+      {
+        "card_events": {
+          "Mana Vault": {
+            "cost_paid": 4,
+            "spell_cast": 4
+          },
+          "The One Ring": {
+            "cost_paid": 2,
+            "spell_cast": 2,
+            "spell_resolved": 1,
+            "utility_artifact_activated": 2
+          },
+          "The Scarlet Witch": {
+            "cost_paid": 18,
+            "spell_cast": 18,
+            "spell_resolved": 18
+          }
+        },
+        "conditional": {
+          "Mana Vault": {
+            "cast": {
+              "nonwin": 4
+            },
+            "used_any": {
+              "nonwin": 4
+            }
+          },
+          "The One Ring": {
+            "cast": {
+              "nonwin": 1,
+              "win": 1
+            },
+            "used_any": {
+              "nonwin": 1,
+              "win": 1
+            }
+          },
+          "The Scarlet Witch": {
+            "access": {
+              "nonwin": 22,
+              "win": 2
+            },
+            "cast": {
+              "nonwin": 16,
+              "win": 2
+            },
+            "used_any": {
+              "nonwin": 16,
+              "win": 2
+            }
+          }
+        },
+        "deck_key": "candidate_607_v615_mana_engine_scarlet_retest_v1",
+        "focus": {
+          "The Scarlet Witch": {
+            "accessed_games": 24,
+            "drawn_games": 0,
+            "library_only_games": 0,
+            "near_access_games": 0,
+            "opening_hand_games": 24,
+            "trace_count": 1023,
+            "trace_games": 24
+          }
+        },
+        "games": 24,
+        "losses": 22,
+        "seed_windows": {
+          "42_forced_opening": {
+            "games": 24,
+            "losses": 22,
+            "stalls": 0,
+            "win_rate": 8.33,
+            "wins": 2
+          }
+        },
+        "stalls": 0,
+        "strategic_events": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 14,
+          "lorehold_cost_paid": 167,
+          "lorehold_spell_cast": 141,
+          "lorehold_upkeep_rummage": 62,
+          "miracle_cast": 14,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 12
+        },
+        "strategic_games": {
+          "birgi_spell_cast_mana": 0,
+          "discard_to_top_replacement": 2,
+          "lorehold_cost_paid": 24,
+          "lorehold_spell_cast": 24,
+          "lorehold_upkeep_rummage": 13,
+          "miracle_cast": 7,
+          "spell_cast_mana_trigger": 0,
+          "topdeck_manipulation_activated": 4
+        },
+        "win_rate": 8.33,
+        "win_reasons": {
+          "elimination": 2
+        },
+        "winota": {
+          "games": 3,
+          "losses": 3,
+          "stalls": 0,
+          "wins": 0
+        },
+        "wins": 2
+      }
+    ]
+  },
+  "natural": {
+    "candidate_607_v615_mana_engine_molecule_retest_v1": {
+      "card_events": {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "cost_paid": 13,
+          "spell_cast": 12,
+          "trigger_resolved": 42
+        },
+        "Mana Vault": {
+          "cost_paid": 13,
+          "spell_cast": 13
+        },
+        "Molecule Man": {
+          "cost_paid": 3,
+          "spell_cast": 3,
+          "spell_resolved": 3
+        }
+      },
+      "conditional": {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "access": {
+            "nonwin": 8,
+            "win": 5
+          },
+          "cast": {
+            "nonwin": 7,
+            "win": 5
+          },
+          "drawn": {
+            "nonwin": 4
+          },
+          "used_any": {
+            "nonwin": 7,
+            "win": 5
+          }
+        },
+        "Mana Vault": {
+          "access": {
+            "nonwin": 11,
+            "win": 4
+          },
+          "cast": {
+            "nonwin": 10,
+            "win": 3
+          },
+          "drawn": {
+            "nonwin": 6,
+            "win": 1
+          },
+          "used_any": {
+            "nonwin": 10,
+            "win": 3
+          }
+        },
+        "Molecule Man": {
+          "access": {
+            "nonwin": 8,
+            "win": 5
+          },
+          "cast": {
+            "nonwin": 2,
+            "win": 1
+          },
+          "drawn": {
+            "nonwin": 5,
+            "win": 3
+          },
+          "used_any": {
+            "nonwin": 2,
+            "win": 1
+          }
+        }
+      },
+      "focus": {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "accessed_games": 13,
+          "drawn_games": 4,
+          "library_only_games": 49,
+          "near_access_games": 20,
+          "opening_hand_games": 3,
+          "trace_count": 3406,
+          "trace_games": 72
+        },
+        "Mana Vault": {
+          "accessed_games": 15,
+          "drawn_games": 7,
+          "library_only_games": 48,
+          "near_access_games": 20,
+          "opening_hand_games": 4,
+          "trace_count": 3406,
+          "trace_games": 72
+        },
+        "Molecule Man": {
+          "accessed_games": 13,
+          "drawn_games": 8,
+          "library_only_games": 55,
+          "near_access_games": 15,
+          "opening_hand_games": 1,
+          "trace_count": 3406,
+          "trace_games": 72
+        },
+        "The One Ring": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3406,
+          "trace_games": 72
+        },
+        "The Scarlet Witch": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3406,
+          "trace_games": 72
+        }
+      },
+      "games": 72,
+      "losses": 56,
+      "seed_windows": {
+        "20260625": {
+          "games": 24,
+          "losses": 23,
+          "stalls": 0,
+          "win_rate": 4.17,
+          "wins": 1
+        },
+        "42": {
+          "games": 24,
+          "losses": 18,
+          "stalls": 0,
+          "win_rate": 25.0,
+          "wins": 6
+        },
+        "7": {
+          "games": 24,
+          "losses": 15,
+          "stalls": 0,
+          "win_rate": 37.5,
+          "wins": 9
+        }
+      },
+      "stalls": 0,
+      "strategic_events": {
+        "birgi_spell_cast_mana": 42,
+        "discard_to_top_replacement": 64,
+        "lorehold_cost_paid": 629,
+        "lorehold_spell_cast": 537,
+        "lorehold_upkeep_rummage": 243,
+        "miracle_cast": 103,
+        "spell_cast_mana_trigger": 42,
+        "topdeck_manipulation_activated": 83
+      },
+      "strategic_games": {
+        "birgi_spell_cast_mana": 8,
+        "discard_to_top_replacement": 10,
+        "lorehold_cost_paid": 72,
+        "lorehold_spell_cast": 72,
+        "lorehold_upkeep_rummage": 50,
+        "miracle_cast": 39,
+        "spell_cast_mana_trigger": 8,
+        "topdeck_manipulation_activated": 26
+      },
+      "win_rate": 22.22,
+      "win_reasons": {
+        "approach": 4,
+        "elimination": 12
+      },
+      "winota": {
+        "games": 9,
+        "losses": 7,
+        "stalls": 0,
+        "wins": 2
+      },
+      "wins": 16
+    },
+    "candidate_607_v615_mana_engine_molecule_scarlet_retest_v1": {
+      "card_events": {
+        "Mana Vault": {
+          "cost_paid": 19,
+          "spell_cast": 19
+        },
+        "Molecule Man": {
+          "cost_paid": 1,
+          "spell_cast": 1,
+          "spell_resolved": 1
+        },
+        "The Scarlet Witch": {
+          "cost_paid": 19,
+          "spell_cast": 19,
+          "spell_resolved": 19
+        }
+      },
+      "conditional": {
+        "Mana Vault": {
+          "access": {
+            "nonwin": 14,
+            "win": 8
+          },
+          "cast": {
+            "nonwin": 12,
+            "win": 7
+          },
+          "drawn": {
+            "nonwin": 6,
+            "win": 5
+          },
+          "used_any": {
+            "nonwin": 12,
+            "win": 7
+          }
+        },
+        "Molecule Man": {
+          "access": {
+            "nonwin": 12,
+            "win": 5
+          },
+          "cast": {
+            "nonwin": 1
+          },
+          "drawn": {
+            "nonwin": 7,
+            "win": 1
+          },
+          "used_any": {
+            "nonwin": 1
+          }
+        },
+        "The Scarlet Witch": {
+          "access": {
+            "nonwin": 16,
+            "win": 9
+          },
+          "cast": {
+            "nonwin": 11,
+            "win": 8
+          },
+          "drawn": {
+            "nonwin": 4,
+            "win": 3
+          },
+          "used_any": {
+            "nonwin": 11,
+            "win": 8
+          }
+        }
+      },
+      "focus": {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3411,
+          "trace_games": 72
+        },
+        "Mana Vault": {
+          "accessed_games": 22,
+          "drawn_games": 11,
+          "library_only_games": 44,
+          "near_access_games": 21,
+          "opening_hand_games": 7,
+          "trace_count": 3411,
+          "trace_games": 72
+        },
+        "Molecule Man": {
+          "accessed_games": 17,
+          "drawn_games": 8,
+          "library_only_games": 49,
+          "near_access_games": 21,
+          "opening_hand_games": 2,
+          "trace_count": 3411,
+          "trace_games": 72
+        },
+        "The One Ring": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3411,
+          "trace_games": 72
+        },
+        "The Scarlet Witch": {
+          "accessed_games": 25,
+          "drawn_games": 7,
+          "library_only_games": 47,
+          "near_access_games": 15,
+          "opening_hand_games": 9,
+          "trace_count": 3411,
+          "trace_games": 72
+        }
+      },
+      "games": 72,
+      "losses": 53,
+      "seed_windows": {
+        "20260625": {
+          "games": 24,
+          "losses": 21,
+          "stalls": 0,
+          "win_rate": 12.5,
+          "wins": 3
+        },
+        "42": {
+          "games": 24,
+          "losses": 16,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 8
+        },
+        "7": {
+          "games": 24,
+          "losses": 16,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 8
+        }
+      },
+      "stalls": 0,
+      "strategic_events": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 49,
+        "lorehold_cost_paid": 687,
+        "lorehold_spell_cast": 593,
+        "lorehold_upkeep_rummage": 254,
+        "miracle_cast": 95,
+        "spell_cast_mana_trigger": 0,
+        "topdeck_manipulation_activated": 77
+      },
+      "strategic_games": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 8,
+        "lorehold_cost_paid": 70,
+        "lorehold_spell_cast": 70,
+        "lorehold_upkeep_rummage": 51,
+        "miracle_cast": 39,
+        "spell_cast_mana_trigger": 0,
+        "topdeck_manipulation_activated": 25
+      },
+      "win_rate": 26.39,
+      "win_reasons": {
+        "approach": 5,
+        "elimination": 14
+      },
+      "winota": {
+        "games": 9,
+        "losses": 6,
+        "stalls": 0,
+        "wins": 3
+      },
+      "wins": 19
+    },
+    "candidate_607_v615_mana_engine_scarlet_retest_v1": {
+      "card_events": {
+        "Mana Vault": {
+          "cost_paid": 18,
+          "spell_cast": 18
+        },
+        "The One Ring": {
+          "cost_paid": 14,
+          "spell_cast": 14,
+          "spell_resolved": 9,
+          "utility_artifact_activated": 13
+        },
+        "The Scarlet Witch": {
+          "cost_paid": 15,
+          "spell_cast": 15,
+          "spell_resolved": 15
+        }
+      },
+      "conditional": {
+        "Mana Vault": {
+          "access": {
+            "nonwin": 10,
+            "win": 9
+          },
+          "cast": {
+            "nonwin": 9,
+            "win": 9
+          },
+          "drawn": {
+            "nonwin": 4,
+            "win": 3
+          },
+          "used_any": {
+            "nonwin": 9,
+            "win": 9
+          }
+        },
+        "The One Ring": {
+          "access": {
+            "nonwin": 14,
+            "win": 3
+          },
+          "cast": {
+            "nonwin": 11,
+            "win": 3
+          },
+          "drawn": {
+            "nonwin": 5,
+            "win": 1
+          },
+          "used_any": {
+            "nonwin": 11,
+            "win": 3
+          }
+        },
+        "The Scarlet Witch": {
+          "access": {
+            "nonwin": 14,
+            "win": 5
+          },
+          "cast": {
+            "nonwin": 10,
+            "win": 5
+          },
+          "drawn": {
+            "nonwin": 5,
+            "win": 1
+          },
+          "used_any": {
+            "nonwin": 10,
+            "win": 5
+          }
+        }
+      },
+      "focus": {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3310,
+          "trace_games": 72
+        },
+        "Mana Vault": {
+          "accessed_games": 19,
+          "drawn_games": 7,
+          "library_only_games": 44,
+          "near_access_games": 23,
+          "opening_hand_games": 5,
+          "trace_count": 3310,
+          "trace_games": 72
+        },
+        "Molecule Man": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3310,
+          "trace_games": 72
+        },
+        "The One Ring": {
+          "accessed_games": 17,
+          "drawn_games": 6,
+          "library_only_games": 50,
+          "near_access_games": 18,
+          "opening_hand_games": 4,
+          "trace_count": 3310,
+          "trace_games": 72
+        },
+        "The Scarlet Witch": {
+          "accessed_games": 19,
+          "drawn_games": 6,
+          "library_only_games": 48,
+          "near_access_games": 22,
+          "opening_hand_games": 2,
+          "trace_count": 3310,
+          "trace_games": 72
+        }
+      },
+      "games": 72,
+      "losses": 60,
+      "seed_windows": {
+        "20260625": {
+          "games": 24,
+          "losses": 18,
+          "stalls": 0,
+          "win_rate": 25.0,
+          "wins": 6
+        },
+        "42": {
+          "games": 24,
+          "losses": 23,
+          "stalls": 0,
+          "win_rate": 4.17,
+          "wins": 1
+        },
+        "7": {
+          "games": 24,
+          "losses": 19,
+          "stalls": 0,
+          "win_rate": 20.83,
+          "wins": 5
+        }
+      },
+      "stalls": 0,
+      "strategic_events": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 88,
+        "lorehold_cost_paid": 668,
+        "lorehold_spell_cast": 564,
+        "lorehold_upkeep_rummage": 290,
+        "miracle_cast": 104,
+        "spell_cast_mana_trigger": 0,
+        "topdeck_manipulation_activated": 77
+      },
+      "strategic_games": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 11,
+        "lorehold_cost_paid": 72,
+        "lorehold_spell_cast": 72,
+        "lorehold_upkeep_rummage": 54,
+        "miracle_cast": 39,
+        "spell_cast_mana_trigger": 0,
+        "topdeck_manipulation_activated": 22
+      },
+      "win_rate": 16.67,
+      "win_reasons": {
+        "approach": 2,
+        "elimination": 10
+      },
+      "winota": {
+        "games": 9,
+        "losses": 9,
+        "stalls": 0,
+        "wins": 0
+      },
+      "wins": 12
+    },
+    "candidate_607_v615_mana_engine_v1": {
+      "card_events": {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "cost_paid": 18,
+          "spell_cast": 16,
+          "trigger_resolved": 87
+        },
+        "Mana Vault": {
+          "cost_paid": 20,
+          "spell_cast": 20
+        },
+        "The One Ring": {
+          "cost_paid": 13,
+          "spell_cast": 13,
+          "spell_resolved": 10,
+          "utility_artifact_activated": 18
+        }
+      },
+      "focus": {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "accessed_games": 20,
+          "drawn_games": 6,
+          "library_only_games": 46,
+          "near_access_games": 22,
+          "opening_hand_games": 4,
+          "trace_count": 3550,
+          "trace_games": 72
+        },
+        "Mana Vault": {
+          "accessed_games": 21,
+          "drawn_games": 13,
+          "library_only_games": 46,
+          "near_access_games": 22,
+          "opening_hand_games": 3,
+          "trace_count": 3550,
+          "trace_games": 72
+        },
+        "Molecule Man": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3550,
+          "trace_games": 72
+        },
+        "The One Ring": {
+          "accessed_games": 16,
+          "drawn_games": 7,
+          "library_only_games": 54,
+          "near_access_games": 15,
+          "opening_hand_games": 3,
+          "trace_count": 3550,
+          "trace_games": 72
+        }
+      },
+      "games": 72,
+      "losses": 54,
+      "seed_windows": {
+        "20260625": {
+          "games": 24,
+          "losses": 14,
+          "stalls": 0,
+          "win_rate": 41.67,
+          "wins": 10
+        },
+        "42": {
+          "games": 24,
+          "losses": 18,
+          "stalls": 0,
+          "win_rate": 25.0,
+          "wins": 6
+        },
+        "7": {
+          "games": 24,
+          "losses": 22,
+          "stalls": 0,
+          "win_rate": 8.33,
+          "wins": 2
+        }
+      },
+      "stalls": 0,
+      "strategic_events": {
+        "birgi_spell_cast_mana": 87,
+        "discard_to_top_replacement": 77,
+        "lorehold_cost_paid": 708,
+        "lorehold_spell_cast": 617,
+        "lorehold_upkeep_rummage": 222,
+        "miracle_cast": 98,
+        "spell_cast_mana_trigger": 87,
+        "topdeck_manipulation_activated": 82
+      },
+      "strategic_games": {
+        "birgi_spell_cast_mana": 14,
+        "discard_to_top_replacement": 12,
+        "lorehold_cost_paid": 71,
+        "lorehold_spell_cast": 71,
+        "lorehold_upkeep_rummage": 46,
+        "miracle_cast": 41,
+        "spell_cast_mana_trigger": 14,
+        "topdeck_manipulation_activated": 24
+      },
+      "win_rate": 25.0,
+      "win_reasons": {
+        "approach": 6,
+        "elimination": 12
+      },
+      "winota": {
+        "Winota, Joiner of Forces #39 (real)": {
+          "games": 9,
+          "losses": 8,
+          "stalls": 0,
+          "win_rate": 11.11,
+          "wins": 1
+        }
+      },
+      "wins": 18
+    },
+    "deck_607": {
+      "card_events": {
+        "Molecule Man": {
+          "cost_paid": 1,
+          "spell_cast": 1,
+          "spell_resolved": 1
+        }
+      },
+      "focus": {
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Mana Vault": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Molecule Man": {
+          "accessed_games": 14,
+          "drawn_games": 2,
+          "library_only_games": 53,
+          "near_access_games": 16,
+          "opening_hand_games": 3,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "The One Ring": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        }
+      },
+      "games": 72,
+      "losses": 54,
+      "seed_windows": {
+        "20260625": {
+          "games": 24,
+          "losses": 17,
+          "stalls": 0,
+          "win_rate": 29.17,
+          "wins": 7
+        },
+        "42": {
+          "games": 24,
+          "losses": 21,
+          "stalls": 0,
+          "win_rate": 12.5,
+          "wins": 3
+        },
+        "7": {
+          "games": 24,
+          "losses": 16,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 8
+        }
+      },
+      "stalls": 0,
+      "strategic_events": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 65,
+        "lorehold_cost_paid": 675,
+        "lorehold_spell_cast": 544,
+        "lorehold_upkeep_rummage": 266,
+        "miracle_cast": 85,
+        "spell_cast_mana_trigger": 0,
+        "topdeck_manipulation_activated": 80
+      },
+      "strategic_games": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 13,
+        "lorehold_cost_paid": 71,
+        "lorehold_spell_cast": 70,
+        "lorehold_upkeep_rummage": 54,
+        "miracle_cast": 35,
+        "spell_cast_mana_trigger": 0,
+        "topdeck_manipulation_activated": 21
+      },
+      "win_rate": 25.0,
+      "win_reasons": {
+        "approach": 7,
+        "elimination": 11
+      },
+      "winota": {
+        "Winota, Joiner of Forces #39 (real)": {
+          "games": 9,
+          "losses": 8,
+          "stalls": 0,
+          "win_rate": 11.11,
+          "wins": 1
+        }
+      },
+      "wins": 18
+    }
+  },
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "status": "ready",
+  "structural_matrix": {
+    "candidate_607_v615_mana_engine_molecule_retest_v1": {
+      "intent": 100.0,
+      "rank": 2,
+      "risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "rule_ready_pct": 96.8,
+      "score": 140.979
+    },
+    "candidate_607_v615_mana_engine_molecule_scarlet_retest_v1": {
+      "intent": 100.0,
+      "rank": 1,
+      "risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "rule_ready_pct": 97.9,
+      "score": 141.036
+    },
+    "candidate_607_v615_mana_engine_scarlet_retest_v1": {
+      "intent": 100.0,
+      "rank": 1,
+      "risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "rule_ready_pct": 97.9,
+      "score": 141.171
+    },
+    "candidate_607_v615_mana_engine_v1": {
+      "intent": 100.0,
+      "rank": 1,
+      "risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "rule_ready_pct": 96.8,
+      "score": 141.114
+    }
+  }
+}
