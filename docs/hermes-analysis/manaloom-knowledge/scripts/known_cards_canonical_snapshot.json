@@ -6694,19 +6694,22 @@
     "battle_rule_logical_key": "battle_rule_v1:cf02bd166a0ffd1d5e60e5ffd1201c07"
   },
   "Crop Rotation": {
-    "battle_model_scope": "sacrifice_land_for_high_value_land_v1",
-    "cmc": 1.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "sacrifice_land_for_any_land_to_battlefield_untapped_v1",
     "effect": "land_ramp",
     "instant": true,
     "land_count": 1,
     "land_enters_tapped": false,
+    "lands_to_battlefield": 1,
     "requires_sacrifice_land": true,
+    "tutor_target": "land",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.97,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0cae4a7bd1e862a0063b9c606ff96e6c"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bdce68609ebf3349f35a5e81b6bb2e22",
+    "battle_rule_oracle_hash": "67869230ccb8b4499893e14915ca8b14"
   },
   "Crosis's Catacombs": {
     "effect": "land",
@@ -8370,18 +8373,6 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:58cf40a9a929b66bca25048353cb1498"
   },
-  "Disciple of Freyalise": {
-    "effect": "creature",
-    "is_creature_permanent": true,
-    "power": 3,
-    "toughness": 3,
-    "battle_rule_source": "curated",
-    "battle_rule_review_status": "deprecated",
-    "battle_rule_execution_status": "disabled",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:767f565a6df0d05d9719e80bac2b2bf5"
-  },
   "Disciple of Freyalise // Garden of Freyalise": {
     "ability_kind": "triggered",
     "battle_model_scope": "etb_sacrifice_another_creature_gain_draw_power_or_tapped_green_land_v1",
@@ -9513,17 +9504,22 @@
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
   },
   "Electroduplicate": {
-    "battle_model_scope": "temporary_hasty_copy_token_v1",
-    "cmc": 3.0,
+    "ability_kind": "triggered",
+    "battle_model_scope": "copy_target_creature_you_control_haste_sacrifice_end_step_v1",
+    "copy_target_types": [
+      "creature"
+    ],
     "effect": "copy_creature_token",
     "sacrifice_token_at_end_step": true,
+    "target_controller": "own",
     "token_haste": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.91,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:908888276dcbc8c3db1126707691ae2c"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e62445a8a1b5b420bad5215efdc00137",
+    "battle_rule_oracle_hash": "336afa048144f8fb9a88dfc3b6588f4b"
   },
   "Electrostatic Field": {
     "cmc": 2.0,
@@ -16763,18 +16759,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Izzet Signet": {
+    "ability_kind": "activated",
     "activation_cost_generic": 1,
     "battle_model_scope": "signet_filter_mana_rock_v1",
-    "cmc": 2.0,
     "effect": "ramp_permanent",
     "mana_produced": 1,
     "produces": "UR",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.88,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a4b2c1fe2265135b1bf033d5a429d662",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0775d7b0089db2ee45cebb6804127f30",
     "battle_rule_oracle_hash": "7243690f1b89dbe49c9cdf029e9067ce"
   },
   "Jace's Archivist": {
@@ -20965,13 +20961,21 @@
     "battle_rule_logical_key": "battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167"
   },
   "Mountain // Mountain": {
+    "ability_kind": "activated",
+    "basic_land_types": [
+      "Mountain"
+    ],
+    "battle_model_scope": "basic_one_color_land_v1",
     "effect": "land",
+    "mana_produced": 1,
+    "produces": "R",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8a2127a2777cd1a0992c74c621621796",
+    "battle_rule_oracle_hash": "b3614279f2405f7c1cabda2d7252852b"
   },
   "Mountain Stronghold": {
     "effect": "land",
@@ -21360,17 +21364,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Mystical Tutor": {
-    "battle_model_scope": "instant_or_sorcery_tutor_topdeck_partial_v1",
-    "cmc": 1.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "instant_or_sorcery_tutor_to_top_v1",
     "effect": "tutor",
     "instant": true,
-    "target": "instant_or_sorcery",
+    "target": "instant_or_sorcery_to_top",
     "battle_rule_source": "curated",
-    "battle_rule_review_status": "active",
+    "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.95,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:86137800253980cc4594e0cf3fd78953"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1252b9a6b4188206efa3cf5c921afaa3",
+    "battle_rule_oracle_hash": "6a72f3c0228efaa3bb3bb616122ed036"
   },
   "Mystifying Maze": {
     "effect": "land",
@@ -23539,19 +23544,18 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Pirate's Pillage": {
+    "ability_kind": "one_shot",
     "battle_model_scope": "discard_draw_two_create_two_treasures_v1",
-    "cmc": 4.0,
     "draw_count": 2,
     "effect": "treasure_maker",
     "requires_discard_card": true,
-    "sorcery": true,
     "treasure_count": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.95,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a9f1968c9e479adf7f1a9695bfb4965",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f13cb9da00fe7eb3bf0fccef34e64d9e",
     "battle_rule_oracle_hash": "9c4fbe06104051a2e8b1d295d307b26a"
   },
   "Pit of Offerings": {
@@ -23602,13 +23606,21 @@
     "battle_rule_logical_key": "battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167"
   },
   "Plains // Plains": {
+    "ability_kind": "activated",
+    "basic_land_types": [
+      "Plains"
+    ],
+    "battle_model_scope": "basic_one_color_land_v1",
     "effect": "land",
+    "mana_produced": 1,
+    "produces": "W",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f7fde69c51ea340cdfeda1544dea220b",
+    "battle_rule_oracle_hash": "0159e87a7fe9f2edbdb9408db4e6cba8"
   },
   "Planar Birth": {
     "cmc": 2.0,
@@ -29085,17 +29097,6 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
-  },
-  "Sink into Stupor": {
-    "effect": "counter",
-    "instant": true,
-    "target": "nonland",
-    "battle_rule_source": "curated",
-    "battle_rule_review_status": "deprecated",
-    "battle_rule_execution_status": "disabled",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f6d96db6081c2fd3f48828c7594f4fcf"
   },
   "Sink into Stupor // Soporific Springs": {
     "ability_kind": "one_shot",

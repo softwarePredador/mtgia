@@ -526,7 +526,8 @@ Map<String, dynamic> _scanSyncScripts(Directory repoRoot) {
       'direction': _classifySyncDirection(name, text),
       'mentions_postgres': text.contains('psycopg') ||
           text.contains('DB_HOST') ||
-          text.contains('DATABASE_URL'),
+          text.contains('DATABASE_URL') ||
+          text.contains('from db_helper import'),
       'mentions_sqlite': text.contains('sqlite3') || text.contains('.db'),
       'has_apply_flag': text.contains('--apply') || text.contains('apply='),
     });

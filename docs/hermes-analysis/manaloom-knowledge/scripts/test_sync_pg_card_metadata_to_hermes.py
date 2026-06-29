@@ -53,6 +53,7 @@ class SyncPgCardMetadataToHermesTest(unittest.TestCase):
         rows = sync.cache_rows(
             [
                 {
+                    "card_id": "11111111-1111-1111-1111-111111111111",
                     "name": "Sol Ring",
                     "mana_cost": "{1}",
                     "type_line": "Artifact",
@@ -66,6 +67,7 @@ class SyncPgCardMetadataToHermesTest(unittest.TestCase):
                     "scryfall_id": "00000000-0000-0000-0000-000000000001",
                 },
                 {
+                    "card_id": "22222222-2222-2222-2222-222222222222",
                     "name": "Mountain",
                     "mana_cost": "",
                     "type_line": "Basic Land — Mountain",
@@ -87,11 +89,13 @@ class SyncPgCardMetadataToHermesTest(unittest.TestCase):
         self.assertTrue(report["deck_cards_table_present"])
         self.assertEqual(report["rows_total"], 3)
         self.assertEqual(report["matched_cache_rows"], 2)
+        self.assertEqual(report["card_id_rows_updated"], 2)
         self.assertEqual(report["cmc_rows_updated"], 1)
         self.assertEqual(report["suspicious_nonland_zero_cmc_after"], 0)
         sol_ring = self.cur.execute(
-            "SELECT cmc, type_line, oracle_text FROM deck_cards WHERE card_name='Sol Ring'"
+            "SELECT card_id, cmc, type_line, oracle_text FROM deck_cards WHERE card_name='Sol Ring'"
         ).fetchone()
+        self.assertEqual(sol_ring["card_id"], "11111111-1111-1111-1111-111111111111")
         self.assertEqual(sol_ring["cmc"], 1.0)
         self.assertEqual(sol_ring["type_line"], "Artifact")
         self.assertIn("Add {C}{C}", sol_ring["oracle_text"])

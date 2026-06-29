@@ -23,6 +23,7 @@ import os
 import re
 import sqlite3
 import subprocess
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -47,9 +48,8 @@ except Exception as exc:  # pragma: no cover - exercised in lean containers.
         return f"{host}:{port}/{dbname}"
 
 
-DEFAULT_SQLITE_DB = Path(
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
-)
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 
 COMBAT_KEYWORDS = (
     "flying",
@@ -70,6 +70,11 @@ def normalize_name(name: str | None) -> str:
     text = (name or "").strip().lower()
     text = re.sub(r"\s+", " ", text)
     return text
+
+
+def fold_name(name: str | None) -> str:
+    normalized = unicodedata.normalize("NFKD", normalize_name(name))
+    return "".join(char for char in normalized if not unicodedata.combining(char))
 
 
 def front_face_name(name: str | None) -> str:
@@ -109,6 +114,7 @@ def ensure_cache_table(cur: sqlite3.Cursor) -> None:
         """
         CREATE TABLE IF NOT EXISTS card_oracle_cache (
             normalized_name TEXT PRIMARY KEY,
+            card_id TEXT,
             name TEXT NOT NULL,
             mana_cost TEXT,
             colors_json TEXT,
@@ -125,6 +131,13 @@ def ensure_cache_table(cur: sqlite3.Cursor) -> None:
         )
         """
     )
+    _ensure_columns(
+        cur,
+        "card_oracle_cache",
+        {
+            "card_id": "TEXT",
+        },
+    )
 
 
 def column_names(cur: sqlite3.Cursor, table: str) -> set[str]:
@@ -134,11 +147,23 @@ def column_names(cur: sqlite3.Cursor, table: str) -> set[str]:
         return set()
 
 
+def _ensure_columns(
+    cur: sqlite3.Cursor,
+    table_name: str,
+    columns: dict[str, str],
+) -> None:
+    existing = column_names(cur, table_name)
+    for column, definition in columns.items():
+        if column not in existing:
+            cur.execute(f"ALTER TABLE {table_name} ADD COLUMN {column} {definition}")
+
+
 def ensure_deck_cards_metadata_columns(cur: sqlite3.Cursor) -> None:
     if not table_exists(cur, "deck_cards"):
         return
     columns = column_names(cur, "deck_cards")
     for name, ddl in (
+        ("card_id", "TEXT"),
         ("cmc", "REAL"),
         ("type_line", "TEXT"),
         ("oracle_text", "TEXT"),
@@ -246,6 +271,8 @@ def backfill_deck_cards_from_cache(
             "deck_cards_table_present": False,
             "rows_total": 0,
             "matched_cache_rows": 0,
+            "card_id_rows_to_update": 0,
+            "card_id_rows_updated": 0,
             "cmc_rows_to_update": 0,
             "cmc_rows_updated": 0,
             "suspicious_nonland_zero_cmc_after": 0,
@@ -264,6 +291,25 @@ def backfill_deck_cards_from_cache(
         WHERE COALESCE(dc.card_name,'')!=''
         """
     ).fetchone()[0]
+    has_card_id_column = "card_id" in column_names(cur, "card_oracle_cache")
+    card_id_to_update = (
+        cur.execute(
+            """
+            SELECT COUNT(*)
+            FROM deck_cards dc
+            JOIN card_oracle_cache coc
+              ON coc.normalized_name = lower(trim(dc.card_name))
+            WHERE COALESCE(coc.card_id, '') != ''
+              AND (
+                dc.card_id IS NULL
+                OR dc.card_id = ''
+                OR lower(dc.card_id) != lower(coc.card_id)
+              )
+            """
+        ).fetchone()[0]
+        if has_card_id_column and "card_id" in column_names(cur, "deck_cards")
+        else 0
+    )
     cmc_to_update = cur.execute(
         """
         SELECT COUNT(*)
@@ -283,6 +329,15 @@ def backfill_deck_cards_from_cache(
             """
             UPDATE deck_cards
             SET
+              card_id = COALESCE(
+                (
+                  SELECT NULLIF(coc.card_id, '')
+                  FROM card_oracle_cache coc
+                  WHERE coc.normalized_name = lower(trim(deck_cards.card_name))
+                  LIMIT 1
+                ),
+                card_id
+              ),
               cmc = COALESCE(
                 (
                   SELECT coc.cmc
@@ -335,6 +390,8 @@ def backfill_deck_cards_from_cache(
         "deck_cards_table_present": True,
         "rows_total": int(total or 0),
         "matched_cache_rows": int(matched or 0),
+        "card_id_rows_to_update": int(card_id_to_update or 0),
+        "card_id_rows_updated": 0 if dry_run else int(card_id_to_update or 0),
         "cmc_rows_to_update": int(cmc_to_update or 0),
         "cmc_rows_updated": 0 if dry_run else int(cmc_to_update or 0),
         "suspicious_nonland_zero_cmc_after": int(suspicious_after or 0),
@@ -408,14 +465,55 @@ def pg_text_array(values: list[str]) -> str:
     return "ARRAY[" + ",".join(f"'{value}'" for value in escaped) + "]::text[]"
 
 
+def pg_fold_sql(expression: str) -> str:
+    folded = f"lower({expression})"
+    for source, replacement in (
+        ("á", "a"),
+        ("à", "a"),
+        ("â", "a"),
+        ("ã", "a"),
+        ("ä", "a"),
+        ("å", "a"),
+        ("ç", "c"),
+        ("é", "e"),
+        ("è", "e"),
+        ("ê", "e"),
+        ("ë", "e"),
+        ("í", "i"),
+        ("ì", "i"),
+        ("î", "i"),
+        ("ï", "i"),
+        ("ñ", "n"),
+        ("ó", "o"),
+        ("ò", "o"),
+        ("ô", "o"),
+        ("õ", "o"),
+        ("ö", "o"),
+        ("ø", "o"),
+        ("ú", "u"),
+        ("ù", "u"),
+        ("û", "u"),
+        ("ü", "u"),
+        ("ý", "y"),
+        ("ÿ", "y"),
+    ):
+        folded = f"replace({folded}, '{source}', '{replacement}')"
+    return folded
+
+
 def cards_select_sql(pg_columns: set[str], names_sql: str | None = None) -> str:
     names_expression = names_sql or "%s"
+    folded_name = pg_fold_sql("c.name")
+    folded_front = pg_fold_sql("split_part(c.name, ' // ', 1)")
     where = f"""
         WHERE lower(c.name) = ANY({names_expression})
            OR lower(split_part(c.name, ' // ', 1)) = ANY({names_expression})
+           OR {folded_name} = ANY({names_expression})
+           OR {folded_front} = ANY({names_expression})
     """
     return f"""
         SELECT
+          c.id::text AS card_id,
           c.name,
           {selectable('mana_cost', pg_columns, 'NULL::text')} AS mana_cost,
           {selectable('type_line', pg_columns, 'NULL::text')} AS type_line,
@@ -437,7 +535,14 @@ def fetch_pg_cards(names: set[str], pg_columns: set[str]) -> list[dict[str, Any]
     if not names:
         return []
 
-    normalized = sorted({normalize_name(name) for name in names if normalize_name(name)})
+    normalized = sorted(
+        {
+            alias
+            for name in names
+            for alias in (normalize_name(name), fold_name(name))
+            if alias
+        }
+    )
     if connect is None:
         names_sql = pg_text_array(normalized)
         query = f"SELECT COALESCE(json_agg(row_to_json(t)), '[]'::json) FROM ({cards_select_sql(pg_columns, names_sql)}) t"
@@ -445,7 +550,10 @@ def fetch_pg_cards(names: set[str], pg_columns: set[str]) -> list[dict[str, Any]
 
     with connect() as conn:
         with conn.cursor() as cur:
-            cur.execute(cards_select_sql(pg_columns), (normalized, normalized))
+            cur.execute(
+                cards_select_sql(pg_columns),
+                (normalized, normalized, normalized, normalized),
+            )
             columns = [desc[0] for desc in cur.description]
             return [dict(zip(columns, row)) for row in cur.fetchall()]
 
@@ -479,7 +587,12 @@ def cache_rows(pg_cards: list[dict[str, Any]]) -> list[tuple[Any, ...]]:
     seen: set[str] = set()
 
     for card in pg_cards:
-        aliases = {normalize_name(card["name"]), normalize_name(front_face_name(card["name"]))}
+        aliases = {
+            normalize_name(card["name"]),
+            normalize_name(front_face_name(card["name"])),
+            fold_name(card["name"]),
+            fold_name(front_face_name(card["name"])),
+        }
         for alias in sorted(alias for alias in aliases if alias):
             if alias in seen:
                 continue
@@ -487,6 +600,7 @@ def cache_rows(pg_cards: list[dict[str, Any]]) -> list[tuple[Any, ...]]:
             rows.append(
                 (
                     alias,
+                    card.get("card_id"),
                     card["name"],
                     card.get("mana_cost"),
                     json_list(card.get("colors")),
@@ -509,11 +623,12 @@ def write_cache(cur: sqlite3.Cursor, rows: list[tuple[Any, ...]]) -> None:
     cur.executemany(
         """
         INSERT INTO card_oracle_cache (
-            normalized_name, name, mana_cost, colors_json, color_identity_json,
+            normalized_name, card_id, name, mana_cost, colors_json, color_identity_json,
             type_line, oracle_text, cmc, power, toughness, keywords_json,
             scryfall_id, source, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(normalized_name) DO UPDATE SET
+            card_id = excluded.card_id,
             name = excluded.name,
             mana_cost = excluded.mana_cost,
             colors_json = excluded.colors_json,
@@ -557,6 +672,7 @@ def build_report(
         "postgres_columns_present": sorted(
             column
             for column in (
+                "id",
                 "mana_cost",
                 "colors",
                 "color_identity",
@@ -638,6 +754,7 @@ def main() -> None:
         f"present={deck_cards_backfill['deck_cards_table_present']} "
         f"matched={deck_cards_backfill['matched_cache_rows']}/"
         f"{deck_cards_backfill['rows_total']} "
+        f"card_id_updates={deck_cards_backfill['card_id_rows_updated']} "
         f"cmc_updates={deck_cards_backfill['cmc_rows_updated']} "
         "suspicious_nonland_zero_cmc_after="
         f"{deck_cards_backfill['suspicious_nonland_zero_cmc_after']}"

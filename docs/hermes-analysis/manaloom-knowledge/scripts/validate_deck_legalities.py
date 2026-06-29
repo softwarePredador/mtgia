@@ -4,20 +4,23 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sqlite3
 from pathlib import Path
 
 
-DB = Path('/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db')
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--deck-id', type=int, default=6)
     parser.add_argument('--format', default='commander')
+    parser.add_argument('--sqlite-db', default=str(DEFAULT_DB))
     args = parser.parse_args()
 
-    con = sqlite3.connect(DB)
+    con = sqlite3.connect(args.sqlite_db)
     con.row_factory = sqlite3.Row
     exists = con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='card_legalities'").fetchone()
     if not exists:

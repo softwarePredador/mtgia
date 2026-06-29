@@ -20,9 +20,8 @@ from typing import Any
 from db_helper import connect, sanitized_database_target
 
 
-DEFAULT_SQLITE_DB = Path(
-    "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
-)
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 
 ROLE_TO_TAG = {
     "board_wipe": "board_wipe",

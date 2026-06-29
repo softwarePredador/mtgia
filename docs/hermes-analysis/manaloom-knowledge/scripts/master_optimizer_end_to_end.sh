@@ -48,14 +48,33 @@ if [[ -f "$SECRET_ENV" ]]; then
   export PGUSER="${PGUSER:-${DB_USER:-}}"
   export PGPASSWORD="${PGPASSWORD:-${DB_PASS:-}}"
 fi
+export MANALOOM_KNOWLEDGE_DB="${MANALOOM_KNOWLEDGE_DB:-$SCRIPT_DIR/knowledge.db}"
 
 log="$ARTIFACT_DIR/master_optimizer_end_to_end_$(date -u +%Y%m%d_%H%M%S).log"
 
 {
+  echo "== legalities sync =="
+  python3 "$SCRIPT_DIR/sync_pg_legalities.py" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+    --report "$ARTIFACT_DIR/legalities_sync_e2e_$(date -u +%Y%m%d_%H%M%S).json"
+
   echo "== metadata sync =="
   python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
-    --sqlite-db "$SCRIPT_DIR/knowledge.db" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
     --report "$ARTIFACT_DIR/card_oracle_cache_sync_e2e_$(date -u +%Y%m%d_%H%M%S).json"
+
+  echo "== battle rules sync =="
+  python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+    --apply-sqlite-from-pg \
+    --include-needs-review \
+    --export-canonical-fallback-json "$SCRIPT_DIR/known_cards_canonical_snapshot.json" \
+    --report "$ARTIFACT_DIR/battle_card_rules_cache_sync_e2e_$(date -u +%Y%m%d_%H%M%S).json"
+
+  echo "== pg/hermes/sqlite contract =="
+  python3 "$SCRIPT_DIR/pg_hermes_sqlite_contract_audit.py" \
+    --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+    --out-prefix "$ARTIFACT_DIR/pg_hermes_sqlite_contract_audit_e2e_$(date -u +%Y%m%d_%H%M%S)"
 
   echo "== preflight =="
   python3 "$SCRIPT_DIR/master_optimizer_loop.py" --preflight --report

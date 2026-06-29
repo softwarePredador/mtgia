@@ -43,6 +43,12 @@ export MANALOOM_KNOWLEDGE_DB="${MANALOOM_KNOWLEDGE_DB:-$SCRIPT_DIR/knowledge.db}
 export MANALOOM_KNOWN_CARDS_OUT="${MANALOOM_KNOWN_CARDS_OUT:-$SCRIPT_DIR/known_cards_generated.json}"
 export MANALOOM_CANONICAL_KNOWN_CARDS_JSON="${MANALOOM_CANONICAL_KNOWN_CARDS_JSON:-$SCRIPT_DIR/known_cards_canonical_snapshot.json}"
 
+legalities_report="$ARTIFACT_DIR/legalities_sync_$(date -u +%Y%m%d_%H%M%S).json"
+python3 "$SCRIPT_DIR/sync_pg_legalities.py" \
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+  --report "$legalities_report"
+cp "$legalities_report" "$ARTIFACT_DIR/latest_legalities_sync.json"
+
 sync_report="$ARTIFACT_DIR/card_metadata_sync_$(date -u +%Y%m%d_%H%M%S).json"
 python3 "$SCRIPT_DIR/sync_pg_card_metadata_to_hermes.py" \
   --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
@@ -58,10 +64,19 @@ python3 "$SCRIPT_DIR/sync_battle_card_rules_pg.py" \
   --report "$battle_rules_report"
 cp "$battle_rules_report" "$ARTIFACT_DIR/latest_battle_card_rules_cache_sync.json"
 
+contract_prefix="$ARTIFACT_DIR/pg_hermes_sqlite_contract_audit_$(date -u +%Y%m%d_%H%M%S)"
+python3 "$SCRIPT_DIR/pg_hermes_sqlite_contract_audit.py" \
+  --sqlite-db "$MANALOOM_KNOWLEDGE_DB" \
+  --out-prefix "$contract_prefix"
+cp "$contract_prefix.json" "$ARTIFACT_DIR/latest_pg_hermes_sqlite_contract_audit.json"
+cp "$contract_prefix.md" "$ARTIFACT_DIR/latest_pg_hermes_sqlite_contract_audit.md"
+
 log="$ARTIFACT_DIR/known_cards_generator_$(date -u +%Y%m%d_%H%M%S).log"
 python3 "$SCRIPT_DIR/generate_known_cards.py" | tee "$log"
 cp "$log" "$ARTIFACT_DIR/latest_known_cards_generator.log"
 
 echo "known_cards_generator=ok"
+echo "legalities_report=$legalities_report"
 echo "battle_rules_report=$battle_rules_report"
+echo "contract_report=$contract_prefix.json"
 echo "known_cards_log=$log"
