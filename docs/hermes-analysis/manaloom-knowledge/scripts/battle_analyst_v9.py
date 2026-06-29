@@ -30000,6 +30000,10 @@ def _apply_copy_token_modifiers(token, effect_data):
     token["token"] = True
     token["is_commander"] = False
     type_line = str(token.get("type_line") or "")
+    if effect_data.get("token_legendary"):
+        token["legendary"] = True
+        if "legendary" not in type_line.lower():
+            type_line = f"Legendary {type_line}".strip()
     if effect_data.get("artifact_in_addition"):
         token["artifact_token"] = True
         if "artifact" not in type_line.lower():
@@ -30287,6 +30291,7 @@ def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None,
                 haste=token.get("haste"),
                 flying=bool(token.get("flying")),
                 artifact_in_addition=bool(effect_data.get("artifact_in_addition")),
+                token_legendary=bool(effect_data.get("token_legendary")),
                 token_power=token.get("power"),
                 token_toughness=token.get("toughness"),
                 sacrifice_at_end_step=bool(token.get("sacrifice_at_end_step")),

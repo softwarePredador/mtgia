@@ -105,6 +105,144 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
 
         self.assertEqual(primary["effect"], "external_reference_required_manual_model")
 
+    def test_generic_blink_effect_routes_to_targeted_zone_transition_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Ephemerate",
+                "effect_classes": ["ExileThenReturnTargetEffect"],
+                "ability_classes": ["ReboundAbility"],
+                "target_classes": ["TargetCreaturePermanent"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": "Exile target creature you control, then return it to the battlefield under its owner's control.",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "blink")
+        self.assertEqual(primary["battle_model_scope"], "xmage_exile_then_return_target_variant_review_v1")
+        self.assertEqual(primary["zone_transition"], "exile_then_return")
+        self.assertEqual(primary["destination"], "battlefield")
+        self.assertTrue(primary["instant"])
+
+    def test_one_spell_per_turn_restriction_routes_to_passive_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "EidolonOfRhetoric",
+                "effect_classes": ["CantCastMoreThanOneSpellEffect"],
+                "ability_classes": ["SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["ENCHANTMENT", "CREATURE"]},
+            },
+            "Each player can't cast more than one spell each turn.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(primary["battle_model_scope"], "static_one_spell_per_turn_restriction_variant_review_v1")
+        self.assertEqual(primary["spell_limit_per_turn"], 1)
+        self.assertEqual(primary["restriction_controller_scope"], "each_player")
+
+    def test_cast_as_flash_permission_routes_to_passive_timing_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "VedalkenOrrery",
+                "effect_classes": ["CastAsThoughItHadFlashAllEffect"],
+                "ability_classes": ["SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            },
+            "You may cast spells as though they had flash.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "passive")
+        self.assertEqual(primary["battle_model_scope"], "static_cast_as_flash_permission_variant_review_v1")
+        self.assertTrue(primary["grants_cast_as_flash"])
+
+    def test_generic_target_untap_routes_to_targeted_interaction_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "VoltaicKey",
+                "effect_classes": ["UntapTargetEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "target_classes": ["TargetArtifactPermanent"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            },
+            "{1}, {T}: Untap target artifact.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "untap_target")
+        self.assertEqual(primary["battle_model_scope"], "xmage_targeted_untap_variant_review_v1")
+        self.assertEqual(primary["untap_target_card_types"], ["artifact"])
+        self.assertTrue(primary["activation_requires_tap"])
+
+    def test_dynamic_mana_spell_routes_to_ritual_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "ManaGeyser",
+                "effect_classes": ["DynamicManaEffect"],
+                "ability_classes": [],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+            },
+            "Add {R} for each tapped land your opponents control.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "ramp_ritual")
+        self.assertEqual(primary["battle_model_scope"], "xmage_spell_mana_ritual_variant_review_v1")
+        self.assertTrue(primary["dynamic_mana_amount"])
+        self.assertEqual(primary["produces"], "R")
+
+    def test_multi_damage_and_redirect_stack_signals_route_to_families(self) -> None:
+        multi = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Pyrokinesis",
+                "effect_classes": ["DamageMultiEffect"],
+                "ability_classes": ["AlternativeCostSourceAbility"],
+                "target_classes": ["TargetAnyTargetAmount"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+            }
+        )["primary_candidate"]["effect_json"]
+
+        redirect = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Misdirection",
+                "effect_classes": ["ChooseNewTargetsTargetEffect"],
+                "ability_classes": ["AlternativeCostSourceAbility"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+            }
+        )["primary_candidate"]["effect_json"]
+
+        self.assertEqual(multi["effect"], "multi_target_damage")
+        self.assertEqual(multi["battle_model_scope"], "xmage_multi_target_damage_variant_review_v1")
+        self.assertEqual(redirect["effect"], "redirect_target")
+        self.assertEqual(redirect["battle_model_scope"], "xmage_choose_new_targets_variant_review_v1")
+
+    def test_generic_life_gain_routes_to_life_total_family(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "HeroesRemembered",
+                "effect_classes": ["GainLifeEffect"],
+                "ability_classes": ["SuspendAbility"],
+                "constructor_metadata": {"card_types": ["SORCERY"]},
+                "raw_excerpt": "new GainLifeEffect(20)",
+            },
+            "You gain 20 life. Suspend 10-{W}.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "life_gain")
+        self.assertEqual(primary["battle_model_scope"], "xmage_life_gain_variant_review_v1")
+        self.assertEqual(primary["gain_life"], 20)
+        self.assertTrue(primary["sorcery"])
+
     def test_cost_reduction_is_not_labeled_as_mana_ramp(self) -> None:
         entry = {
             "xmage_class_name": "PearlMedallion",
@@ -1639,6 +1777,32 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target_controller"], "own")
         self.assertTrue(primary["token_haste"])
         self.assertTrue(primary["sacrifice_token_at_end_step"])
+
+    def test_adagia_maps_to_station_legendary_artifact_enchantment_copy_token(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "AdagiaWindsweptBastion",
+                "effect_classes": ["CreateTokenCopyTargetEffect"],
+                "ability_classes": ["StationAbility", "StationLevelAbility", "ActivateAsSorceryActivatedAbility"],
+                "target_classes": ["TargetPermanent"],
+                "cost_classes": ["TapSourceCost"],
+                "constructor_metadata": {"card_types": ["LAND"]},
+                "raw_excerpt": "new CreateTokenCopyTargetEffect().setPermanentModifier(token -> token.addSuperType(SuperType.LEGENDARY)); TargetPermanent(FILTER_PERMANENT_CONTROLLED_ARTIFACT_OR_ENCHANTMENT)",
+            },
+            "{3}{W}, {T}: Create a token that's a copy of target artifact or enchantment you control, except it's legendary. Activate only as a sorcery.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "copy_creature_token")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1",
+        )
+        self.assertEqual(primary["copy_target_types"], ["artifact", "enchantment"])
+        self.assertEqual(primary["target_controller"], "own")
+        self.assertTrue(primary["token_legendary"])
+        self.assertEqual(primary["station_level_required"], 12)
 
     def test_jaxis_maps_to_copy_another_creature_haste_dies_draw_sacrifice(self) -> None:
         result = hints.build_effect_hints(

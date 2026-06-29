@@ -9450,6 +9450,58 @@ def register_tests(battle, player):
         assert token.get("exile_at_end_step") is not True
         assert "artifact" in token.get("type_line", "").lower()
 
+    def test_adagia_station_copy_creates_legendary_artifact_or_enchantment_token():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            active.battlefield = [
+                {
+                    "name": "Smothering Tithe",
+                    "effect": "passive",
+                    "type_line": "Enchantment",
+                    "cmc": 4,
+                }
+            ]
+
+            battle.apply_effect_immediate(
+                active,
+                [],
+                {"name": "Adagia, Windswept Bastion", "cmc": 0, "type_line": "Land"},
+                6,
+                random.Random(685),
+                effect_data_override={
+                    "effect": "copy_creature_token",
+                    "copy_target_types": ["artifact", "enchantment"],
+                    "target_controller": "own",
+                    "token_legendary": True,
+                    "activate_only_as_sorcery": True,
+                    "activation_requires_tap": True,
+                    "station_level_required": 12,
+                    "battle_model_scope": "station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1",
+                    "_rule_logical_key": "battle_rule_v1:1ac81c8490722a209691f6421f388efd",
+                    "_rule_oracle_hash": "e6878f05503ba8e6454108ddcbfca84d",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        token = next(
+            permanent
+            for permanent in active.battlefield
+            if isinstance(permanent, dict) and permanent.get("copy_of") == "Smothering Tithe"
+        )
+        assert token.get("token") is True
+        assert token.get("legendary") is True
+        assert "legendary" in token.get("type_line", "").lower()
+        assert "enchantment" in token.get("type_line", "").lower()
+        created = next(data for event, data in events if event == "copy_creature_token_created")
+        assert created["card"] == "Adagia, Windswept Bastion"
+        assert created["target"] == "Smothering Tithe"
+        assert created["token_legendary"] is True
+        assert created["rule_logical_key"] == "battle_rule_v1:1ac81c8490722a209691f6421f388efd"
+
     def test_clone_legion_copies_each_creature_controlled_by_target_player():
         active = player("Active")
         opponent_a = player("Opponent A")
@@ -20822,6 +20874,7 @@ def register_tests(battle, player):
         test_twinflame_copies_own_creature_only_and_exiles_token_at_end_step,
         test_molten_duplication_copies_own_artifact_as_artifact_and_sacrifices_token,
         test_flash_photography_copies_target_permanent_without_temporary_cleanup,
+        test_adagia_station_copy_creates_legendary_artifact_or_enchantment_token,
         test_clone_legion_copies_each_creature_controlled_by_target_player,
         test_clone_legion_tokens_without_haste_cannot_attack_same_turn,
         test_phyrexian_metamorph_enters_as_copy_of_best_creature_and_keeps_artifact_type,

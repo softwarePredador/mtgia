@@ -327,14 +327,18 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
     },
     "targeted_interaction": {
         "effects": {
+            "blink",
             "removal_destroy",
             "removal_exile",
             "remove_permanent",
             "bounce",
             "direct_damage",
+            "multi_target_damage",
             "counter_spell",
             "add_counters",
             "draw_cards",
+            "redirect_target",
+            "untap_target",
         },
         "support_status": "runtime_family_partially_supported_review_required",
         "implementation_unit": "target legality, resolution, zone transition, and event provenance",
@@ -349,6 +353,13 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
             "test_profound_journey_rebounds_and_returns_permanents_to_battlefield",
             "test_pg202_redress_fate_returns_all_artifact_enchantment_cards",
         ],
+        "batch_strategy": "split_by_scope_before_metadata_batch",
+    },
+    "life_total_change": {
+        "effects": {"life_gain", "life_total_set"},
+        "support_status": "runtime_family_partially_supported_review_required",
+        "implementation_unit": "life total gain, doubling, and set-to-derived-value effects",
+        "family_tests": ["test_life_total_change_runtime"],
         "batch_strategy": "split_by_scope_before_metadata_batch",
     },
     "manual_model": {
@@ -2373,6 +2384,20 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and not bool(effect_json.get("token_haste"))
             and not bool(effect_json.get("sacrifice_token_at_end_step"))
             and not bool(effect_json.get("exile_token_at_end_step"))
+        )
+
+    if (
+        effect == "copy_creature_token"
+        and scope == "station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1"
+    ):
+        return (
+            "CreateTokenCopyTargetEffect" in effect_classes
+            and effect_json.get("copy_target_types") == ["artifact", "enchantment"]
+            and effect_json.get("target_controller") == "own"
+            and bool(effect_json.get("token_legendary"))
+            and bool(effect_json.get("activate_only_as_sorcery"))
+            and bool(effect_json.get("activation_requires_tap"))
+            and int(effect_json.get("station_level_required") or 0) == 12
         )
 
     if effect == "copy_creature_token" and scope == "copy_each_creature_target_player_controls_v1":

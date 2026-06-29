@@ -98,33 +98,79 @@ needs a second engine reference.
 
 ## Current Evidence
 
-Latest E2E artifact:
+Latest Lorehold and opponent replay-scope artifacts:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_e2e_acceleration_after_generic_mapper_manifest.json`
+- before family-mapper wave:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_134228_current_lorehold_6_607_616_manifest.md`
+- after family-mapper wave:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_135909_post_adagia_family_mapper_lorehold_6_607_616_manifest.md`
+- runtime surface gate:
+  `docs/hermes-analysis/master_optimizer_reports/battle_runtime_surface_manifest_20260629_post_adagia_mapper.md`
+- external source gate:
+  `docs/hermes-analysis/master_optimizer_reports/mtg_battle_external_source_audit_20260629_post_adagia_mapper.md`
 
 Current active scope:
 
-- deck IDs: `[6, 25, 31, 42, 54, 58, 62, 74, 83, 84, 104, 105, 116]`
-- total combined cards: `541`
-- actionable audited cards: `139`
-- exact local XMage source found: `139/139`
-- focused scenario generated: `139/139`
+- artifact deck IDs: `[6]`
+- learned opponent deck IDs:
+  `[25, 31, 42, 54, 58, 62, 74, 83, 84, 104, 105, 116]`
+- forced Lorehold deck IDs:
+  `[6, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]`
+- effective deck IDs:
+  `[6, 25, 31, 42, 54, 58, 62, 74, 83, 84, 104, 105, 116, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]`
+- actionable XMage-sourced validity rows: `239`
+- combined severity counts:
+  `{"critical": 1, "high": 207, "medium": 49, "pass": 534}`
 
-Before the generic XMage mapper layer:
+Before the 2026-06-29 family-mapper wave:
 
-- structured pull candidates: `5/139`
-- manual mapper backlog: `134/139`
-- detected families: `5`
+- structured XMage pull review candidates: `135/239`
+- manual mapper backlog: `104/239`
+- family counts included:
+  `ramp_permanent=49`, `tutor=16`, `free_cast=11`,
+  `targeted_interaction=10`, `passive=5`, `manual_model=104`
 
-After the generic XMage mapper layer:
+After the 2026-06-29 family-mapper wave:
 
-- structured pull candidates: `76/139`
-- manual mapper backlog: `63/139`
-- detected families: `15`
-- PostgreSQL batch candidates from generic review scopes: `0`
+- structured XMage pull review candidates: `158/239`
+- manual mapper backlog: `81/239`
+- net manual backlog reduction: `23` cards
+- family counts now include:
+  `ramp_permanent=49`, `targeted_interaction=24`, `tutor=14`,
+  `free_cast=11`, `passive=11`, `ramp_ritual=4`,
+  `life_total_change=2`, `copy_creature_token=1`,
+  `copy_spell_engine=1`, `token_maker=1`, `manual_model=81`
+- proposal status counts:
+  `batch_pg_candidate_after_precheck=8`,
+  `split_family_scope_review_required=148`,
+  `runtime_family_implementation_required=1`,
+  `mapper_metadata_or_test_scenario_required=81`
+- PostgreSQL writes in this wave: `0`
 
-The main blocker is therefore not missing XMage source. The blocker is exact
-ManaLoom mapper/runtime coverage by family.
+Additional exact runtime/mapping correction:
+
+- `Adagia, Windswept Bastion` was reclassified from generic `token_maker` to
+  `copy_creature_token` with scope
+  `station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1`.
+- Runtime now carries `token_legendary` through copy-token creation and replay
+  events.
+- Remaining `runtime_family_implementation_required` item is
+  `Hazel's Brewmaster`, because XMage shows Food token creation plus static
+  ability sharing from creature cards exiled with Hazel. That is not safe to
+  collapse into generic token creation.
+
+Runtime/source revalidation after the mapper wave:
+
+- runtime surface manifest: `147` related Python files, `0` unclassified
+  files.
+- external source audit: gate `pass`, required gaps `0`, required partials
+  `0`, optional gaps `0`.
+
+The main blocker is therefore still not missing XMage source. The blocker is
+exact ManaLoom mapper/runtime coverage by family and subpattern. Generic
+`xmage_*_review_v1` scopes are useful queue reducers, but they remain
+review-only until exact scope, focused tests, PostgreSQL package approval, and
+PG -> Hermes sync.
 
 ## Source Roles
 
@@ -339,14 +385,20 @@ Use this order until a fresh E2E queue changes it:
 
 1. Close any exact package-ready lane only if it is non-generic and has focused
    runtime/test proof.
-2. Split and test `ramp_permanent` because it currently has `29` cards and is
+2. Split and test `ramp_permanent` because it currently has `49` cards and is
    turn-timing critical.
-3. Split and test `tutor` because it has `12` cards and strongly affects
+3. Split and test `targeted_interaction` because it now has `24` cards after
+   blink, redirect, multi-damage, and target-untap routing.
+4. Split and test `tutor` because it has `14` cards and strongly affects
    combo/deck search behavior.
-4. Split and test `free_cast` because it has `6` cards and high runtime risk.
-5. Split and test `recursion`, `targeted_protection`, and `passive` in that
-   order unless a replay/deck priority makes one urgent.
-6. Work the remaining `manual_model` backlog by adding mapper patterns, not by
+5. Split and test `free_cast` because it has `11` cards and high runtime risk.
+6. Split and test `passive`, `recursion`, `targeted_protection`,
+   `ramp_ritual`, and `life_total_change` in that order unless a replay/deck
+   priority makes one urgent.
+7. Treat the remaining `token_maker` runtime item as an exact Hazel's
+   Brewmaster exception, not as permission to implement a generic token-maker
+   executor.
+8. Work the remaining `manual_model` backlog by adding mapper patterns, not by
    reviewing one card at a time.
 
 ## Required Artifacts Per Cycle
@@ -400,6 +452,17 @@ runtime/package wave, then pick the highest queue-reducing exact scope:
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_current_replay_batch_pipeline.py \
   --xmage-root /Users/desenvolvimentomobile/Downloads/mage-master \
   --skip-materialize \
+  --include-deck-id 6 \
+  --include-deck-id 607 \
+  --include-deck-id 608 \
+  --include-deck-id 609 \
+  --include-deck-id 610 \
+  --include-deck-id 611 \
+  --include-deck-id 612 \
+  --include-deck-id 613 \
+  --include-deck-id 614 \
+  --include-deck-id 615 \
+  --include-deck-id 616 \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_$(date -u +%Y%m%d_%H%M%S)_current
 ```
 

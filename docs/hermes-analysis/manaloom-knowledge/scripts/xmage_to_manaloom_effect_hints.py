@@ -8178,6 +8178,46 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 )
             )
         elif (
+            xmage_class_name == "AdagiaWindsweptBastion"
+            or (
+                _oracle_has(
+                    rules_text,
+                    "create a token that's a copy of target artifact or enchantment you control",
+                    "except it's legendary",
+                )
+                and "TargetPermanent" in target_classes
+            )
+        ):
+            candidates.append(
+                _candidate(
+                    effect="copy_creature_token",
+                    scope="station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1",
+                    reason=(
+                        "XMage exposes CreateTokenCopyTargetEffect over controlled artifact/enchantment "
+                        "targets with a legendary token modifier; ManaLoom already has copy-token "
+                        "target selection and now tracks the legendary token modifier explicitly."
+                    ),
+                    ability_kind="activated",
+                    requires_runtime_executor=True,
+                    extra_effect_fields={
+                        "copy_target_types": ["artifact", "enchantment"],
+                        "target_controller": "own",
+                        "token_legendary": True,
+                        "activate_only_as_sorcery": True,
+                        "activation_cost_mana": "{3}{W}",
+                        "activation_requires_tap": True,
+                        "station_level_required": 12,
+                        "runtime_missing_components": ["station_level_gate"],
+                    },
+                    matched_signals=[
+                        "CreateTokenCopyTargetEffect",
+                        "TargetPermanent",
+                        "FILTER_PERMANENT_CONTROLLED_ARTIFACT_OR_ENCHANTMENT",
+                        "StationLevelAbility",
+                    ],
+                )
+            )
+        elif (
             card_types == {"SORCERY"}
             and _oracle_has(
                 rules_text,
@@ -8901,7 +8941,44 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         )
 
     has_mana_ability = any("ManaAbility" in cls or cls == "SimpleManaAbility" for cls in ability_classes)
-    has_mana_effect = any("ManaEffect" in cls or cls.startswith("AddMana") or cls == "BasicManaEffect" for cls in effect_classes)
+    has_mana_effect = any(
+        "ManaEffect" in cls
+        or cls.startswith("AddMana")
+        or cls in {"BasicManaEffect", "DynamicManaEffect"}
+        for cls in effect_classes
+    )
+    if not candidates and card_types and card_types <= {"INSTANT", "SORCERY"} and has_mana_effect:
+        produces = "WUBRG"
+        if "redmana" in normalized_text or "red mana" in normalized_text or "{r}" in normalized_text:
+            produces = "R"
+        elif "blackmana" in normalized_text or "black mana" in normalized_text or "{b}" in normalized_text:
+            produces = "B"
+        elif "greenmana" in normalized_text or "green mana" in normalized_text or "{g}" in normalized_text:
+            produces = "G"
+        elif "whitemana" in normalized_text or "white mana" in normalized_text or "{w}" in normalized_text:
+            produces = "W"
+        elif "bluemana" in normalized_text or "blue mana" in normalized_text or "{u}" in normalized_text:
+            produces = "U"
+        candidates.append(
+            _candidate(
+                effect="ramp_ritual",
+                scope="xmage_spell_mana_ritual_variant_review_v1",
+                reason=(
+                    "XMage exposes a one-shot spell mana effect; ManaLoom can batch it as a ritual "
+                    "family item and split exact dynamic/counting behavior during focused review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "instant": "INSTANT" in card_types,
+                    "sorcery": "SORCERY" in card_types,
+                    "produces": produces,
+                    "dynamic_mana_amount": "DynamicManaEffect" in effect_classes,
+                    "mana_effect_classes": sorted(effect_classes & {"BasicManaEffect", "DynamicManaEffect"}),
+                },
+                matched_signals=["spell_mana_effect"],
+            )
+        )
     if not candidates and "LAND" in card_types and (has_mana_ability or has_mana_effect):
         mana_produced = _first_int(r"ColorlessMana\((\d+)\)", rules_text)
         if mana_produced is None:
@@ -8981,6 +9058,213 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "activation_requires_tap": "TapSourceCost" in cost_classes,
                 },
                 matched_signals=["CREATURE", "mana_source"],
+            )
+        )
+
+    if not candidates and "ExileThenReturnTargetEffect" in effect_classes:
+        tapped = "tapped" in normalized_text
+        delayed = (
+            "next end step" in normalized_text
+            or "delayedtriggeredability" in normalized_text
+            or "return at the beginning" in normalized_text
+        )
+        candidates.append(
+            _candidate(
+                effect="blink",
+                scope="xmage_exile_then_return_target_variant_review_v1",
+                reason=(
+                    "XMage exposes ExileThenReturnTargetEffect; ManaLoom can batch it as a blink/zone "
+                    "transition family and split immediate, tapped, and delayed-return variants by Oracle text."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints,
+                extra_effect_fields={
+                    "zone_transition": "exile_then_return",
+                    "destination": "battlefield",
+                    "return_tapped": tapped,
+                    "return_timing": "delayed_end_step" if delayed else "immediate_or_same_resolution",
+                    "instant": "INSTANT" in card_types,
+                    "sorcery": "SORCERY" in card_types,
+                },
+                matched_signals=["ExileThenReturnTargetEffect"],
+            )
+        )
+
+    if not candidates and (
+        "CantCastMoreThanOneSpellEffect" in effect_classes
+        or "EtherswornCanonistReplacementEffect" in effect_classes
+    ):
+        restricted_spell_scope = "nonartifact_spells" if "nonartifact" in normalized_text else "spells"
+        if "noncreature" in normalized_text:
+            restricted_spell_scope = "noncreature_spells"
+        candidates.append(
+            _candidate(
+                effect="passive",
+                scope="static_one_spell_per_turn_restriction_variant_review_v1",
+                reason=(
+                    "XMage exposes a one-spell-per-turn static restriction; ManaLoom should keep it "
+                    "as a passive rule family until exact player scope and exceptions are reviewed."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "static_rule_restriction": True,
+                    "spell_limit_per_turn": 1,
+                    "restricted_spell_scope": restricted_spell_scope,
+                    "restriction_controller_scope": "each_player",
+                },
+                matched_signals=[
+                    signal
+                    for signal in ["CantCastMoreThanOneSpellEffect", "EtherswornCanonistReplacementEffect"]
+                    if signal in effect_classes
+                ],
+            )
+        )
+
+    if not candidates and "CastAsThoughItHadFlashAllEffect" in effect_classes:
+        applies_to_card_types: list[str] = []
+        if "sorcery" in normalized_text:
+            applies_to_card_types.append("sorcery")
+        if "instant" in normalized_text:
+            applies_to_card_types.append("instant")
+        if "creature" in normalized_text:
+            applies_to_card_types.append("creature")
+        candidates.append(
+            _candidate(
+                effect="passive",
+                scope="static_cast_as_flash_permission_variant_review_v1",
+                reason=(
+                    "XMage exposes CastAsThoughItHadFlashAllEffect; ManaLoom can batch it as a "
+                    "static timing-permission family instead of treating it as an untyped manual model."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "grants_cast_as_flash": True,
+                    "applies_to_card_types": applies_to_card_types or ["spells"],
+                    "timing_permission_scope": "source_controller",
+                },
+                matched_signals=["CastAsThoughItHadFlashAllEffect"],
+            )
+        )
+
+    if not candidates and "ChooseNewTargetsTargetEffect" in effect_classes:
+        candidates.append(
+            _candidate(
+                effect="redirect_target",
+                scope="xmage_choose_new_targets_variant_review_v1",
+                reason=(
+                    "XMage exposes ChooseNewTargetsTargetEffect; ManaLoom can batch it as a stack "
+                    "target-redirection family and split copy-vs-retarget behavior during focused review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints or {"zone": "stack"},
+                extra_effect_fields={
+                    "chooses_new_targets": True,
+                    "target_scope": "spell_or_ability",
+                },
+                matched_signals=["ChooseNewTargetsTargetEffect"],
+            )
+        )
+
+    if not candidates and "CopyTargetStackObjectEffect" in effect_classes:
+        candidates.append(
+            _candidate(
+                effect="copy_spell",
+                scope="xmage_copy_stack_object_variant_review_v1",
+                reason=(
+                    "XMage exposes CopyTargetStackObjectEffect; ManaLoom can route it to the copy-spell "
+                    "family and split trigger/cost/target modes before PG promotion."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints or {"zone": "stack"},
+                extra_effect_fields={
+                    "copy_stack_object": True,
+                    "may_choose_new_targets": "choose new target" in normalized_text
+                    or "choose new targets" in normalized_text,
+                },
+                matched_signals=["CopyTargetStackObjectEffect"],
+            )
+        )
+
+    if not candidates and "DamageMultiEffect" in effect_classes:
+        candidates.append(
+            _candidate(
+                effect="multi_target_damage",
+                scope="xmage_multi_target_damage_variant_review_v1",
+                reason=(
+                    "XMage exposes DamageMultiEffect; ManaLoom can batch it with targeted interaction "
+                    "and split exact target count, division, and prevention rules during focused review."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints,
+                extra_effect_fields={
+                    "multi_target_damage": True,
+                    "instant": "INSTANT" in card_types,
+                    "sorcery": "SORCERY" in card_types,
+                },
+                matched_signals=["DamageMultiEffect"],
+            )
+        )
+
+    if not candidates and "UntapTargetEffect" in effect_classes:
+        target_card_types: list[str] = []
+        if "artifact" in normalized_text or any("Artifact" in cls for cls in target_classes | filter_classes):
+            target_card_types.append("artifact")
+        if "creature" in normalized_text or any("Creature" in cls for cls in target_classes | filter_classes):
+            target_card_types.append("creature")
+        candidates.append(
+            _candidate(
+                effect="untap_target",
+                scope="xmage_targeted_untap_variant_review_v1",
+                reason=(
+                    "XMage exposes UntapTargetEffect outside the land-untap family; ManaLoom can batch "
+                    "it as targeted untap utility and split artifact/creature/activation-cost behavior."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints,
+                extra_effect_fields={
+                    "untap_target": True,
+                    "untap_target_card_types": target_card_types or ["permanent"],
+                    "activation_requires_tap": "TapSourceCost" in cost_classes,
+                },
+                matched_signals=["UntapTargetEffect"],
+            )
+        )
+
+    if not candidates and "GainLifeEffect" in effect_classes and not any("LoseLife" in cls for cls in effect_classes):
+        amount = _first_int(r"gainlifeeffect\((\d+)\)", normalized_text)
+        scope = "xmage_life_gain_variant_review_v1"
+        fields: dict[str, Any] = {
+            "gain_life": amount,
+            "instant": "INSTANT" in card_types,
+            "sorcery": "SORCERY" in card_types,
+        }
+        if "double" in normalized_text and "life total" in normalized_text:
+            scope = "double_target_player_life_total_variant_review_v1"
+            fields = {
+                "life_total_change": "double_target_player_life_total",
+                "target": "player",
+                "sorcery": "SORCERY" in card_types,
+            }
+        candidates.append(
+            _candidate(
+                effect="life_total_set" if "life_total_change" in fields else "life_gain",
+                scope=scope,
+                reason=(
+                    "XMage exposes GainLifeEffect; ManaLoom can batch life-total changes separately "
+                    "from battle-damage behavior and require exact Oracle review before promotion."
+                ),
+                ability_kind=ability_kind,
+                requires_runtime_executor=True,
+                target_constraints=target_constraints,
+                extra_effect_fields=fields,
+                matched_signals=["GainLifeEffect"],
             )
         )
 
