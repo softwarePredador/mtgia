@@ -305,6 +305,11 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             {"events", "latest", "completed_games", "total_games"},
             "equal battle gate checkpoint",
         ),
+        (
+            "promotion_gate_decision_audit",
+            {"gate_paths", "decision", "deck_aggregates", "candidate_assessments"},
+            "Lorehold promotion gate decision audit",
+        ),
     ]
     for artifact_kind, required, detail in support_signatures:
         if required <= keys:

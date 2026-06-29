@@ -89,6 +89,7 @@ Current Lorehold evidence generated on 2026-06-29:
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.md`
 - `server/test/artifacts/commander_generate_provenance_20260629_deckbuilding_contract/commander_generate_provenance_summary.json`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_decision_audit_20260629_real8_games3_seed42_7_20260625.md`
 
 The current canonical Lorehold strategy matrix JSON schema is
 `decks[] + ranked_deck_keys`. Historical `ranked_decks` reports are supported
@@ -110,6 +111,20 @@ Interpretation:
   Aetherflux-style spell conversion.
 - None of these three is final from structure alone. The next decision must use
   an equal battle gate and decision trace inspection.
+
+Promotion-gate decision generated on 2026-06-29:
+
+- Scope: natural equal battle gate, no forced access, 8 real opponents,
+  3 games per opponent, simulation seeds `42`, `7`, and `20260625`.
+- Aggregate result: `607` = `18/72` wins, `615` = `16/72`, `614` = `14/72`.
+- Fast-pressure check against Winota: `607` = `1/9`, `615` = `3/9`,
+  `614` = `0/9`.
+- Decision: keep `607` as protected baseline. No challenger is ready for a
+  real deck replacement.
+- Follow-up: `615` is the best package-learning candidate because its traces
+  show real Mana Vault, Birgi, Sensei's Divining Top, The One Ring, and
+  Mizzix's Mastery usage, but this supports a narrow package/cut experiment,
+  not a whole-deck swap.
 
 ## General Deckbuilding Gate
 
@@ -166,6 +181,13 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_artifact_contra
   --out-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_current
 ```
 
+Lorehold promotion-gate decision audit:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_promotion_gate_decision_audit.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_decision_audit_20260629_real8_games3_seed42_7_20260625
+```
+
 Focused backend tests:
 
 ```bash
@@ -216,16 +238,17 @@ happen:
 
 ## Next Product Step
 
-For Lorehold, first run the artifact contract audit. Then continue from `607`
-as protected baseline, keep `615` and `614` as live challengers, and run an
-equal battle gate that records:
+For Lorehold, keep `607` as protected baseline. Do not promote `614` or `615`
+as a whole deck from the current evidence. The next real product step is a
+narrow package/cut experiment derived from `615`, with `607` as the protected
+base, focused on:
 
-- opening-hand/mulligan quality;
-- whether topdeck/miracle setup was drawn and used;
-- whether Lorehold cast discounted high-impact instants/sorceries;
-- whether protection was available during the conversion turn;
-- whether finishers closed the game or only produced value;
-- which candidate cards were drawn, cast, activated, or stranded.
+- pressure resilience without losing the `607` spell-chain shell;
+- Mana Vault/Birgi acceleration where trace evidence shows real use;
+- Sensei's Divining Top and The One Ring access/usage from `615`;
+- a cut model that protects `607` anchors and proves every removed slot by
+  same-lane replacement evidence;
+- another equal battle gate before any deck mutation is accepted.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

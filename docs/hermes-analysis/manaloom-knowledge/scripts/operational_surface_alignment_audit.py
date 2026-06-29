@@ -28,6 +28,7 @@ DECKBUILDING_CONTRACT = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.m
 XMAGE_AUDIT = SCRIPT_DIR / "xmage_strategy_consistency_audit.py"
 DECKBUILDING_AUDIT = SCRIPT_DIR / "deckbuilding_contract_surface_audit.py"
 LOREHOLD_ARTIFACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
+LOREHOLD_PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.py"
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
 VARIANT_GATE = SCRIPT_DIR / "lorehold_variant_battle_gate.py"
 STRATEGY_LEARNING_AUDIT = SCRIPT_DIR / "lorehold_strategy_learning_audit.py"
@@ -161,6 +162,8 @@ def build_checks() -> list[Check]:
                 "deck `607` is the current protected structural",
                 "deckbuilding_contract",
                 "lorehold_artifact_contract_audit.py",
+                "lorehold_promotion_gate_decision_audit.py",
+                "keep `607` as protected baseline",
             ],
             "docs.deckbuilding_contract_freezes_lorehold_gate",
         ),
@@ -192,6 +195,7 @@ def build_checks() -> list[Check]:
                 "universal_optimizer.py",
                 "historical_blocked_surfaces",
                 "lorehold_artifact_contract_audit.py",
+                "lorehold_promotion_gate_decision_audit.py",
             ],
             "scripts.deckbuilding_surface_audit_blocks_legacy",
         ),
@@ -203,6 +207,16 @@ def build_checks() -> list[Check]:
                 "ready_for_real_deck_change",
             ],
             "scripts.lorehold_artifact_contract_audit_normalizes_history",
+        ),
+        check_contains(
+            LOREHOLD_PROMOTION_DECISION_AUDIT,
+            [
+                "BASELINE_KEY = \"deck_607\"",
+                "CHALLENGER_KEYS = (\"deck_614\", \"deck_615\")",
+                "keep_protected_baseline",
+                "ready_for_real_deck_change",
+            ],
+            "scripts.lorehold_promotion_gate_decision_audit_keeps_baseline_guard",
         ),
         check_contains(
             VARIANT_MATRIX,

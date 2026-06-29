@@ -68,6 +68,10 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/lorehold_artifact_contract_audit.py`.
     O schema canonico atual da matrix e `decks[] + ranked_deck_keys`;
     `ranked_decks` e legado e so pode ser consumido via normalizador.
+  - Auditoria de decisao do promotion gate Lorehold:
+    `manaloom-knowledge/scripts/lorehold_promotion_gate_decision_audit.py`.
+    Resultado atual: manter `607` como baseline protegido; `615` e fonte para
+    teste estreito de pacote, nao troca direta de deck.
   - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
     de declarar que scripts e docs estao conversando entre si.
   - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia

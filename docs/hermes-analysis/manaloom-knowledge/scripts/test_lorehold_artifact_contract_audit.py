@@ -105,6 +105,21 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.artifact_kind, "equal_battle_gate_checkpoint")
         self.assertEqual(classification.status, "pass")
 
+    def test_promotion_gate_decision_audit_is_recognized(self) -> None:
+        payload = {
+            "gate_paths": ["gate.json"],
+            "decision": {"status": "keep_protected_baseline"},
+            "deck_aggregates": {"deck_607": {"wins": 1}},
+            "candidate_assessments": [{"deck_key": "deck_614", "status": "do_not_promote"}],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "promotion.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "promotion_gate_decision_audit")
+        self.assertEqual(classification.status, "pass")
+
     def test_unknown_schema_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "unknown.json"

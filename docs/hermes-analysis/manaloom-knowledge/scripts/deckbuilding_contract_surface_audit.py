@@ -21,6 +21,7 @@ SUPPORT_TEST = REPO_ROOT / "server/test/commander_deckbuilding_contract_support_
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
 VARIANT_GATE = SCRIPT_DIR / "lorehold_variant_battle_gate.py"
 ARTIFACT_CONTRACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
+PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -34,6 +35,10 @@ CONTRACT_MATRIX_MD = (
 ARTIFACT_CONTRACT_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_current.md"
+)
+PROMOTION_DECISION_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_decision_audit_20260629_real8_games3_seed42_7_20260625.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -85,6 +90,8 @@ def build_audit() -> dict[str, Any]:
                 "Lorehold Promotion Gate",
                 "decks[] + ranked_deck_keys",
                 "lorehold_artifact_contract_audit.py",
+                "lorehold_promotion_gate_decision_audit.py",
+                "keep `607` as protected baseline",
             ],
         )
     )
@@ -143,11 +150,23 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            PROMOTION_DECISION_AUDIT,
+            [
+                "BASELINE_KEY = \"deck_607\"",
+                "CHALLENGER_KEYS = (\"deck_614\", \"deck_615\")",
+                "ready_for_real_deck_change",
+                "keep_protected_baseline",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             README,
             [
                 "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
                 "deckbuilding_contract_surface_audit.py",
                 "lorehold_artifact_contract_audit.py",
+                "lorehold_promotion_gate_decision_audit.py",
             ],
         )
     )
@@ -173,6 +192,14 @@ def build_audit() -> dict[str, Any]:
             "exists": ARTIFACT_CONTRACT_REPORT.exists(),
             "status": "pass" if ARTIFACT_CONTRACT_REPORT.exists() else "fail",
             "missing": [] if ARTIFACT_CONTRACT_REPORT.exists() else ["artifact_contract_report"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(PROMOTION_DECISION_REPORT),
+            "exists": PROMOTION_DECISION_REPORT.exists(),
+            "status": "pass" if PROMOTION_DECISION_REPORT.exists() else "fail",
+            "missing": [] if PROMOTION_DECISION_REPORT.exists() else ["promotion_decision_report"],
         }
     )
 

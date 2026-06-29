@@ -1,0 +1,1026 @@
+{
+  "candidate_assessments": [
+    {
+      "blockers": [
+        "aggregate wins 14/72 below baseline 18/72",
+        "tied/beat baseline in only 1/3 seed windows",
+        "Winota, Joiner of Forces #39 (real): 0/9 below baseline 1/9",
+        "early losses 55 exceed baseline 45"
+      ],
+      "deck_key": "deck_614",
+      "passes": [
+        "commander_plan_trace_present"
+      ],
+      "status": "do_not_promote"
+    },
+    {
+      "blockers": [
+        "aggregate wins 16/72 below baseline 18/72"
+      ],
+      "deck_key": "deck_615",
+      "passes": [
+        "seed_window_majority_tie_or_beat",
+        "no_pressure_matchup_regression",
+        "commander_plan_trace_present"
+      ],
+      "status": "do_not_promote"
+    }
+  ],
+  "decision": {
+    "best_challenger_for_package_followup": "deck_615",
+    "promoted_deck_keys": [],
+    "protected_baseline": "deck_607",
+    "ready_for_real_deck_change": false,
+    "recommended_next_action": "Keep deck_607 as baseline; create a narrow package test from deck_615 pressure/mana positives instead of swapping decks blindly.",
+    "status": "keep_protected_baseline",
+    "summary": "No challenger cleared aggregate, seed-window, pressure-matchup, and trace gates."
+  },
+  "deck_aggregates": {
+    "deck_607": {
+      "archetype": "battle-variant",
+      "avg_loss_turn": 8.11,
+      "avg_win_turn": 15.05,
+      "card_use_metrics": {
+        "Approach of the Second Sun": {
+          "cost_paid": 9
+        },
+        "Land Tax": {
+          "cost_paid": 18
+        },
+        "Scroll Rack": {
+          "cost_paid": 6,
+          "topdeck": 30
+        },
+        "Sensei's Divining Top": {
+          "topdeck": 46
+        }
+      },
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "early_loss_count": 45,
+      "early_loss_rate": 83.33,
+      "focus_access": {
+        "Aetherflux Reservoir": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Approach of the Second Sun": {
+          "accessed_games": 23,
+          "drawn_games": 10,
+          "library_only_games": 41,
+          "near_access_games": 26,
+          "opening_hand_games": 6,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Call Forth the Tempest": {
+          "accessed_games": 17,
+          "drawn_games": 8,
+          "library_only_games": 48,
+          "near_access_games": 18,
+          "opening_hand_games": 6,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Land Tax": {
+          "accessed_games": 24,
+          "drawn_games": 13,
+          "library_only_games": 45,
+          "near_access_games": 22,
+          "opening_hand_games": 5,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Library of Leng": {
+          "accessed_games": 19,
+          "drawn_games": 6,
+          "library_only_games": 47,
+          "near_access_games": 22,
+          "opening_hand_games": 2,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Mana Vault": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Mizzix's Mastery": {
+          "accessed_games": 18,
+          "drawn_games": 7,
+          "library_only_games": 50,
+          "near_access_games": 18,
+          "opening_hand_games": 4,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Molecule Man": {
+          "accessed_games": 14,
+          "drawn_games": 2,
+          "library_only_games": 53,
+          "near_access_games": 16,
+          "opening_hand_games": 3,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Rise of the Eldrazi": {
+          "accessed_games": 18,
+          "drawn_games": 10,
+          "library_only_games": 51,
+          "near_access_games": 17,
+          "opening_hand_games": 4,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Scroll Rack": {
+          "accessed_games": 17,
+          "drawn_games": 6,
+          "library_only_games": 48,
+          "near_access_games": 16,
+          "opening_hand_games": 8,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Seething Song": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Sensei's Divining Top": {
+          "accessed_games": 25,
+          "drawn_games": 4,
+          "library_only_games": 42,
+          "near_access_games": 12,
+          "opening_hand_games": 6,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Squee, Goblin Nabob": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "Surge to Victory": {
+          "accessed_games": 13,
+          "drawn_games": 7,
+          "library_only_games": 57,
+          "near_access_games": 12,
+          "opening_hand_games": 3,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "The Mind Stone": {
+          "accessed_games": 13,
+          "drawn_games": 6,
+          "library_only_games": 56,
+          "near_access_games": 12,
+          "opening_hand_games": 4,
+          "trace_count": 3484,
+          "trace_games": 72
+        },
+        "The One Ring": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3484,
+          "trace_games": 72
+        }
+      },
+      "games": 72,
+      "losses": 54,
+      "opponents": {
+        "Aang, at the Crossroads #106 (real)": {
+          "games": 9,
+          "losses": 4,
+          "stalls": 0,
+          "win_rate": 55.56,
+          "wins": 5
+        },
+        "Kenrith, the Returned King #113 (real)": {
+          "games": 9,
+          "losses": 8,
+          "stalls": 0,
+          "win_rate": 11.11,
+          "wins": 1
+        },
+        "Rograkh, Son of Rohgahh #62 (real)": {
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "Sisay, Weatherlight Captain #61 (real)": {
+          "games": 9,
+          "losses": 8,
+          "stalls": 0,
+          "win_rate": 11.11,
+          "wins": 1
+        },
+        "Tannuk, Memorial Ensign #40 (real)": {
+          "games": 9,
+          "losses": 5,
+          "stalls": 0,
+          "win_rate": 44.44,
+          "wins": 4
+        },
+        "Umbris, Fear Manifest #114 (real)": {
+          "games": 9,
+          "losses": 7,
+          "stalls": 0,
+          "win_rate": 22.22,
+          "wins": 2
+        },
+        "Vivi Ornitier #99 (real)": {
+          "games": 9,
+          "losses": 5,
+          "stalls": 0,
+          "win_rate": 44.44,
+          "wins": 4
+        },
+        "Winota, Joiner of Forces #39 (real)": {
+          "games": 9,
+          "losses": 8,
+          "stalls": 0,
+          "win_rate": 11.11,
+          "wins": 1
+        }
+      },
+      "pressure_opponents": {
+        "Winota, Joiner of Forces #39 (real)": {
+          "games": 9,
+          "losses": 8,
+          "stalls": 0,
+          "win_rate": 11.11,
+          "wins": 1
+        }
+      },
+      "seed_windows": {
+        "20260625": {
+          "games": 24,
+          "losses": 17,
+          "stalls": 0,
+          "win_rate": 29.17,
+          "wins": 7
+        },
+        "42": {
+          "games": 24,
+          "losses": 21,
+          "stalls": 0,
+          "win_rate": 12.5,
+          "wins": 3
+        },
+        "7": {
+          "games": 24,
+          "losses": 16,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 8
+        }
+      },
+      "stalls": 0,
+      "strategic_event_counts": {
+        "discard_to_top_replacement": 65,
+        "lorehold_cost_paid": 675,
+        "lorehold_rummage_discard_to_top": 49,
+        "lorehold_spell_cast": 544,
+        "lorehold_spell_rummage": 24,
+        "lorehold_spell_rummage_discard_to_top": 16,
+        "lorehold_upkeep_rummage": 266,
+        "miracle_cast": 85,
+        "thor_cost_paid": 4,
+        "thor_noncreature_damage": 5,
+        "thor_noncreature_damage_amount": 17,
+        "topdeck_manipulation_activated": 80
+      },
+      "strategic_game_counts": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 13,
+        "lorehold_cost_paid": 71,
+        "lorehold_spell_cast": 70,
+        "lorehold_upkeep_rummage": 54,
+        "miracle_cast": 35,
+        "spell_cast_mana_trigger": 0,
+        "topdeck_manipulation_activated": 21
+      },
+      "structural_rank": 1,
+      "win_rate": 25.0,
+      "win_reasons": {
+        "approach": 7,
+        "elimination": 11
+      },
+      "wins": 18
+    },
+    "deck_614": {
+      "archetype": "lifegain-storm-variant",
+      "avg_loss_turn": 7.4,
+      "avg_win_turn": 19.21,
+      "card_use_metrics": {
+        "Aetherflux Reservoir": {
+          "cost_paid": 7
+        },
+        "Approach of the Second Sun": {
+          "miracle": 7
+        },
+        "Scroll Rack": {
+          "cost_paid": 13,
+          "topdeck": 23
+        },
+        "Seething Song": {
+          "cost_paid": 9
+        },
+        "Sensei's Divining Top": {
+          "cost_paid": 30,
+          "topdeck": 31
+        }
+      },
+      "deck_key": "deck_614",
+      "deck_name": "VARIANT Lorehold Variant 09 - Rafael Paste 2026-06-24",
+      "early_loss_count": 55,
+      "early_loss_rate": 94.83,
+      "focus_access": {
+        "Aetherflux Reservoir": {
+          "accessed_games": 23,
+          "drawn_games": 7,
+          "library_only_games": 44,
+          "near_access_games": 18,
+          "opening_hand_games": 6,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Approach of the Second Sun": {
+          "accessed_games": 18,
+          "drawn_games": 8,
+          "library_only_games": 49,
+          "near_access_games": 15,
+          "opening_hand_games": 3,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Call Forth the Tempest": {
+          "accessed_games": 21,
+          "drawn_games": 12,
+          "library_only_games": 47,
+          "near_access_games": 20,
+          "opening_hand_games": 6,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Land Tax": {
+          "accessed_games": 15,
+          "drawn_games": 7,
+          "library_only_games": 51,
+          "near_access_games": 15,
+          "opening_hand_games": 6,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Library of Leng": {
+          "accessed_games": 19,
+          "drawn_games": 6,
+          "library_only_games": 48,
+          "near_access_games": 16,
+          "opening_hand_games": 5,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Mana Vault": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Mizzix's Mastery": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Molecule Man": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Rise of the Eldrazi": {
+          "accessed_games": 17,
+          "drawn_games": 6,
+          "library_only_games": 51,
+          "near_access_games": 14,
+          "opening_hand_games": 6,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Scroll Rack": {
+          "accessed_games": 17,
+          "drawn_games": 6,
+          "library_only_games": 49,
+          "near_access_games": 14,
+          "opening_hand_games": 9,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Seething Song": {
+          "accessed_games": 11,
+          "drawn_games": 2,
+          "library_only_games": 53,
+          "near_access_games": 16,
+          "opening_hand_games": 3,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Sensei's Divining Top": {
+          "accessed_games": 20,
+          "drawn_games": 10,
+          "library_only_games": 48,
+          "near_access_games": 14,
+          "opening_hand_games": 8,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Squee, Goblin Nabob": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "Surge to Victory": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "The Mind Stone": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3433,
+          "trace_games": 72
+        },
+        "The One Ring": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3433,
+          "trace_games": 72
+        }
+      },
+      "games": 72,
+      "losses": 58,
+      "opponents": {
+        "Aang, at the Crossroads #106 (real)": {
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "Kenrith, the Returned King #113 (real)": {
+          "games": 9,
+          "losses": 6,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 3
+        },
+        "Rograkh, Son of Rohgahh #62 (real)": {
+          "games": 9,
+          "losses": 7,
+          "stalls": 0,
+          "win_rate": 22.22,
+          "wins": 2
+        },
+        "Sisay, Weatherlight Captain #61 (real)": {
+          "games": 9,
+          "losses": 7,
+          "stalls": 0,
+          "win_rate": 22.22,
+          "wins": 2
+        },
+        "Tannuk, Memorial Ensign #40 (real)": {
+          "games": 9,
+          "losses": 5,
+          "stalls": 0,
+          "win_rate": 44.44,
+          "wins": 4
+        },
+        "Umbris, Fear Manifest #114 (real)": {
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "Vivi Ornitier #99 (real)": {
+          "games": 9,
+          "losses": 6,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 3
+        },
+        "Winota, Joiner of Forces #39 (real)": {
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "pressure_opponents": {
+        "Winota, Joiner of Forces #39 (real)": {
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "seed_windows": {
+        "20260625": {
+          "games": 24,
+          "losses": 19,
+          "stalls": 0,
+          "win_rate": 20.83,
+          "wins": 5
+        },
+        "42": {
+          "games": 24,
+          "losses": 20,
+          "stalls": 0,
+          "win_rate": 16.67,
+          "wins": 4
+        },
+        "7": {
+          "games": 24,
+          "losses": 19,
+          "stalls": 0,
+          "win_rate": 20.83,
+          "wins": 5
+        }
+      },
+      "stalls": 0,
+      "strategic_event_counts": {
+        "discard_to_top_replacement": 16,
+        "hand_to_topdeck_activation": 4,
+        "lorehold_cost_paid": 581,
+        "lorehold_rummage_discard_to_top": 16,
+        "lorehold_spell_cast": 426,
+        "lorehold_upkeep_rummage": 161,
+        "miracle_cast": 93,
+        "topdeck_manipulation_activated": 102
+      },
+      "strategic_game_counts": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 5,
+        "lorehold_cost_paid": 71,
+        "lorehold_spell_cast": 71,
+        "lorehold_upkeep_rummage": 33,
+        "miracle_cast": 28,
+        "spell_cast_mana_trigger": 0,
+        "topdeck_manipulation_activated": 21
+      },
+      "structural_rank": 3,
+      "win_rate": 19.44,
+      "win_reasons": {
+        "approach": 5,
+        "elimination": 9
+      },
+      "wins": 14
+    },
+    "deck_615": {
+      "archetype": "spell-copy-big-spells-variant",
+      "avg_loss_turn": 8.14,
+      "avg_win_turn": 16.12,
+      "card_use_metrics": {
+        "Approach of the Second Sun": {
+          "cost_paid": 6
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "spell_cast_mana": 25
+        },
+        "Library of Leng": {
+          "cost_paid": 8
+        },
+        "Mana Vault": {
+          "cost_paid": 20
+        },
+        "Mizzix's Mastery": {
+          "cost_paid": 6
+        },
+        "Sensei's Divining Top": {
+          "cost_paid": 38,
+          "topdeck": 60
+        },
+        "The One Ring": {
+          "cost_paid": 7
+        }
+      },
+      "deck_key": "deck_615",
+      "deck_name": "VARIANT Lorehold Variant 10 - Rafael Paste 2026-06-24",
+      "early_loss_count": 45,
+      "early_loss_rate": 80.36,
+      "focus_access": {
+        "Aetherflux Reservoir": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Approach of the Second Sun": {
+          "accessed_games": 27,
+          "drawn_games": 9,
+          "library_only_games": 40,
+          "near_access_games": 24,
+          "opening_hand_games": 5,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "accessed_games": 12,
+          "drawn_games": 5,
+          "library_only_games": 52,
+          "near_access_games": 16,
+          "opening_hand_games": 4,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Call Forth the Tempest": {
+          "accessed_games": 18,
+          "drawn_games": 8,
+          "library_only_games": 49,
+          "near_access_games": 16,
+          "opening_hand_games": 7,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Land Tax": {
+          "accessed_games": 19,
+          "drawn_games": 6,
+          "library_only_games": 45,
+          "near_access_games": 20,
+          "opening_hand_games": 7,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Library of Leng": {
+          "accessed_games": 18,
+          "drawn_games": 5,
+          "library_only_games": 47,
+          "near_access_games": 17,
+          "opening_hand_games": 7,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Mana Vault": {
+          "accessed_games": 28,
+          "drawn_games": 9,
+          "library_only_games": 38,
+          "near_access_games": 19,
+          "opening_hand_games": 13,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Mizzix's Mastery": {
+          "accessed_games": 18,
+          "drawn_games": 10,
+          "library_only_games": 50,
+          "near_access_games": 18,
+          "opening_hand_games": 2,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Molecule Man": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Rise of the Eldrazi": {
+          "accessed_games": 15,
+          "drawn_games": 5,
+          "library_only_games": 52,
+          "near_access_games": 16,
+          "opening_hand_games": 4,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Scroll Rack": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Seething Song": {
+          "accessed_games": 21,
+          "drawn_games": 6,
+          "library_only_games": 45,
+          "near_access_games": 19,
+          "opening_hand_games": 8,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Sensei's Divining Top": {
+          "accessed_games": 28,
+          "drawn_games": 14,
+          "library_only_games": 38,
+          "near_access_games": 22,
+          "opening_hand_games": 6,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Squee, Goblin Nabob": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "Surge to Victory": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "The Mind Stone": {
+          "accessed_games": 0,
+          "drawn_games": 0,
+          "library_only_games": 0,
+          "near_access_games": 0,
+          "opening_hand_games": 0,
+          "trace_count": 3524,
+          "trace_games": 72
+        },
+        "The One Ring": {
+          "accessed_games": 16,
+          "drawn_games": 10,
+          "library_only_games": 44,
+          "near_access_games": 26,
+          "opening_hand_games": 2,
+          "trace_count": 3524,
+          "trace_games": 72
+        }
+      },
+      "games": 72,
+      "losses": 56,
+      "opponents": {
+        "Aang, at the Crossroads #106 (real)": {
+          "games": 9,
+          "losses": 7,
+          "stalls": 0,
+          "win_rate": 22.22,
+          "wins": 2
+        },
+        "Kenrith, the Returned King #113 (real)": {
+          "games": 9,
+          "losses": 7,
+          "stalls": 0,
+          "win_rate": 22.22,
+          "wins": 2
+        },
+        "Rograkh, Son of Rohgahh #62 (real)": {
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "Sisay, Weatherlight Captain #61 (real)": {
+          "games": 9,
+          "losses": 7,
+          "stalls": 0,
+          "win_rate": 22.22,
+          "wins": 2
+        },
+        "Tannuk, Memorial Ensign #40 (real)": {
+          "games": 9,
+          "losses": 9,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "Umbris, Fear Manifest #114 (real)": {
+          "games": 9,
+          "losses": 5,
+          "stalls": 0,
+          "win_rate": 44.44,
+          "wins": 4
+        },
+        "Vivi Ornitier #99 (real)": {
+          "games": 9,
+          "losses": 6,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 3
+        },
+        "Winota, Joiner of Forces #39 (real)": {
+          "games": 9,
+          "losses": 6,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 3
+        }
+      },
+      "pressure_opponents": {
+        "Winota, Joiner of Forces #39 (real)": {
+          "games": 9,
+          "losses": 6,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 3
+        }
+      },
+      "seed_windows": {
+        "20260625": {
+          "games": 24,
+          "losses": 19,
+          "stalls": 0,
+          "win_rate": 20.83,
+          "wins": 5
+        },
+        "42": {
+          "games": 24,
+          "losses": 21,
+          "stalls": 0,
+          "win_rate": 12.5,
+          "wins": 3
+        },
+        "7": {
+          "games": 24,
+          "losses": 16,
+          "stalls": 0,
+          "win_rate": 33.33,
+          "wins": 8
+        }
+      },
+      "stalls": 0,
+      "strategic_event_counts": {
+        "birgi_spell_cast_mana": 26,
+        "discard_to_top_replacement": 55,
+        "lorehold_cost_paid": 665,
+        "lorehold_rummage_discard_to_top": 55,
+        "lorehold_spell_cast": 576,
+        "lorehold_upkeep_rummage": 260,
+        "miracle_cast": 100,
+        "spell_cast_mana_trigger": 26,
+        "topdeck_manipulation_activated": 65
+      },
+      "strategic_game_counts": {
+        "birgi_spell_cast_mana": 9,
+        "discard_to_top_replacement": 7,
+        "lorehold_cost_paid": 72,
+        "lorehold_spell_cast": 72,
+        "lorehold_upkeep_rummage": 50,
+        "miracle_cast": 38,
+        "spell_cast_mana_trigger": 9,
+        "topdeck_manipulation_activated": 19
+      },
+      "structural_rank": 2,
+      "win_rate": 22.22,
+      "win_reasons": {
+        "approach": 4,
+        "elimination": 12
+      },
+      "wins": 16
+    }
+  },
+  "gate_inputs": [
+    {
+      "deck_process_isolation": true,
+      "forced_access_mode": "none",
+      "games_per_opponent": 3,
+      "opponent_kind": "real",
+      "opponent_seed": 20260626,
+      "opponents": [
+        "Vivi Ornitier #99 (real)",
+        "Sisay, Weatherlight Captain #61 (real)",
+        "Winota, Joiner of Forces #39 (real)",
+        "Kenrith, the Returned King #113 (real)",
+        "Aang, at the Crossroads #106 (real)",
+        "Umbris, Fear Manifest #114 (real)",
+        "Rograkh, Son of Rohgahh #62 (real)",
+        "Tannuk, Memorial Ensign #40 (real)"
+      ],
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_607_614_615_20260629_seed42_real8_games3.json",
+      "simulation_seed": 42,
+      "status": "ready"
+    },
+    {
+      "deck_process_isolation": true,
+      "forced_access_mode": "none",
+      "games_per_opponent": 3,
+      "opponent_kind": "real",
+      "opponent_seed": 20260626,
+      "opponents": [
+        "Vivi Ornitier #99 (real)",
+        "Sisay, Weatherlight Captain #61 (real)",
+        "Winota, Joiner of Forces #39 (real)",
+        "Kenrith, the Returned King #113 (real)",
+        "Aang, at the Crossroads #106 (real)",
+        "Umbris, Fear Manifest #114 (real)",
+        "Rograkh, Son of Rohgahh #62 (real)",
+        "Tannuk, Memorial Ensign #40 (real)"
+      ],
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_607_614_615_20260629_seed7_real8_games3.json",
+      "simulation_seed": 7,
+      "status": "ready"
+    },
+    {
+      "deck_process_isolation": true,
+      "forced_access_mode": "none",
+      "games_per_opponent": 3,
+      "opponent_kind": "real",
+      "opponent_seed": 20260626,
+      "opponents": [
+        "Vivi Ornitier #99 (real)",
+        "Sisay, Weatherlight Captain #61 (real)",
+        "Winota, Joiner of Forces #39 (real)",
+        "Kenrith, the Returned King #113 (real)",
+        "Aang, at the Crossroads #106 (real)",
+        "Umbris, Fear Manifest #114 (real)",
+        "Rograkh, Son of Rohgahh #62 (real)",
+        "Tannuk, Memorial Ensign #40 (real)"
+      ],
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_607_614_615_20260629_seed20260625_real8_games3.json",
+      "simulation_seed": 20260625,
+      "status": "ready"
+    }
+  ],
+  "gate_paths": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_607_614_615_20260629_seed42_real8_games3.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_607_614_615_20260629_seed7_real8_games3.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_gate_607_614_615_20260629_seed20260625_real8_games3.json"
+  ],
+  "generated_at": "2026-06-29T20:01:08Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "status": "pass"
+}
