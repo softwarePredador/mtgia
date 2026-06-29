@@ -28,6 +28,7 @@ FILENAME_TERMS = (
     "learned-deck",
     "optimizer",
     "coherence",
+    "seventeenlands",
 )
 
 ALLOWED_CATEGORIES = {
@@ -220,6 +221,16 @@ OPTIMIZER_BASENAMES = {
 FOCUSED_EVIDENCE_BASENAMES = {
     "external_card_rule_reference_harvester.py",
     "test_external_card_rule_reference_harvester.py",
+    "mtg_battle_external_source_audit.py",
+    "test_mtg_battle_external_source_audit.py",
+    "seventeenlands_battle_prior_compare.py",
+    "test_seventeenlands_battle_prior_compare.py",
+    "seventeenlands_general_absorption_audit.py",
+    "test_seventeenlands_general_absorption_audit.py",
+    "seventeenlands_history_learning.py",
+    "test_seventeenlands_history_learning.py",
+    "seventeenlands_replay_profile.py",
+    "test_seventeenlands_replay_profile.py",
     "xmage_current_replay_batch_pipeline.py",
     "test_xmage_current_replay_batch_pipeline.py",
     "xmage_local_rule_indexer.py",
