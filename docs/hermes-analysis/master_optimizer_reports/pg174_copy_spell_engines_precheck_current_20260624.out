@@ -1,6 +1,0 @@
-     card_name      |  normalized_name   |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
---------------------+--------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Double Vision      | double vision      | 1106bfd584470ed10401167bf452f0a4 | battle_rule_v1:6b73ccf8b05f7853dcfeae1825b70708 |                1 | e92a0077-f9af-4c56-bffa-fad73c28feac |                  2 |                         0 |                           2
- Swarm Intelligence | swarm intelligence | 1acd382841c8fabf16162bd47f9e4a03 | battle_rule_v1:9f1ee8ecd68dad5bf39139de17c013eb |                1 | 420b2a87-cc14-4113-ba70-1a592b67b190 |                  0 |                         0 |                           0
-(2 rows)
-

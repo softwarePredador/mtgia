@@ -1,5 +1,0 @@
-    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
-------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Surly Badgersaur | surly badgersaur | battle_rule_v1:a4b42e4cef8bbab31819346e7b68a263 |                  1 |                           1 |                         1 |           2
-(1 row)
-

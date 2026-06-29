@@ -1,5 +1,0 @@
-               card_name               |            normalized_name            |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
----------------------------------------+---------------------------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Razorgrass Ambush // Razorgrass Field | razorgrass ambush // razorgrass field | 3420ea7bfa507b2821269d598068cd33 | battle_rule_v1:c874e3f31bb90d28d81c0636e7870aa5 | deprecate_nonmatching_rows |                1 | 5198066a-ebb7-42ae-a7d4-919e4c78e4c6 |                  2 |                         0 |                           2
-(1 row)
-

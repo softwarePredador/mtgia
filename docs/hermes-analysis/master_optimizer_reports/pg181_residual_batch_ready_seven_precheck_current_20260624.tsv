@@ -1,8 +1,0 @@
-card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
-Bedevil	bedevil	77dcf646b59f535df941f6716b802b26	battle_rule_v1:24839f966a77da6656c462aa885ccaa4	1	01ffeddd-6500-4659-9bce-e93a343df1f5	2	0	2
-Brass's Bounty	brass's bounty	beb029ff5233032656034de922a112f0	battle_rule_v1:b5dabaaaba6b2cd47cd998989c11a1fa	1	47a1a5ab-fc1d-4b20-85b6-f83875dd3602	2	0	2
-Cathartic Reunion	cathartic reunion	27da1fd996cc7f3a85a98aea3b6c030b	battle_rule_v1:3af05007acd54aabd195ff390b8f082f	1	4013b9d7-32c9-47bd-85a6-05a58e5a1dce	2	0	2
-Crackle with Power	crackle with power	cf0db23411445756ee792506b48ae35d	battle_rule_v1:a939ce51bf83fe086fc16a40d344752d	1	762de536-968e-4bc4-af2d-2f08d04eb222	2	0	2
-Invoke Justice	invoke justice	a98214114b5acd853842ac7590854785	battle_rule_v1:13150949864474c123d5a02a7a007722	1	d0ace356-6abb-4e47-8200-5082f0144add	2	0	2
-Locket of Yesterdays	locket of yesterdays	556810471067d11936662c3406a207c8	battle_rule_v1:09662427b256781a39f50dd00ba9735b	1	6ee36947-1327-4f65-a737-3d06ecd02b80	2	0	2
-Steelshaper's Gift	steelshaper's gift	8f894c3b42872f60142063c115ef3c9a	battle_rule_v1:c7ff42f8ce9a2bca4470fba16cab034a	1	5ec487fe-0f48-4cb9-aecd-4a6b622580e9	2	0	2

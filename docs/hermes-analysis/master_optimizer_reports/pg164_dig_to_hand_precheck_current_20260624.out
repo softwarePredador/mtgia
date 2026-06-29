@@ -1,6 +1,0 @@
-     card_name      |  normalized_name   |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
---------------------+--------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Ancestral Memories | ancestral memories | 3aa69ed94731337917538028728d9f35 | battle_rule_v1:b3cae6304fa06122bbe9e880e6b425c1 |                1 | d5ea160e-26d7-4b9d-b3e3-657496eb055f |                  1 |                         1 |                           0
- Scattered Thoughts | scattered thoughts | 7f20a11914b46f22bdaab8546b22b5b6 | battle_rule_v1:8ca48cc5b636696b151dce8af41e6de3 |                1 | 9d07daf5-0f1d-439f-b141-af5b28dc4555 |                  1 |                         1 |                           0
-(2 rows)
-

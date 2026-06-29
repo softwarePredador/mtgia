@@ -1,7 +1,0 @@
-      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
----------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Elvish Spirit Guide | elvish spirit guide | battle_rule_v1:89b51a84d293b0e0f3ed43c40aeee4d9 |                  1 |                           1 |                         1 |           7
- Mountain            | mountain            | battle_rule_v1:8a2127a2777cd1a0992c74c621621796 |                  1 |                           1 |                         1 |           7
- Plains              | plains              | battle_rule_v1:f7fde69c51ea340cdfeda1544dea220b |                  1 |                           1 |                         1 |           7
-(3 rows)
-

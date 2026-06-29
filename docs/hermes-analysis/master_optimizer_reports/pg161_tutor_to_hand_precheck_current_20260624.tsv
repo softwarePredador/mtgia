@@ -1,6 +1,0 @@
-card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
-Demonic Tutor	demonic tutor	7c881aaacf79f25b41c9788cf307e795	battle_rule_v1:c7ff42f8ce9a2bca4470fba16cab034a	1	b48f808a-7759-4d81-8cca-2adb4681ef51	3	1	0
-Diabolic Intent	diabolic intent	f9559e8f061153f5b7b70303f2f322f4	battle_rule_v1:e83b8e386f8ebf8e037dab9688873ce0	1	fd1ddd2a-9690-40a7-9e2e-6ff92f9458f8	3	1	0
-Spellseeker	spellseeker	bf9a9c70cf24b529d0246eadd91693ee	battle_rule_v1:8367cbf70da28b3f24fef4a034deae63	1	56cc68ca-40a2-41fc-b959-4bf1fc314196	3	1	0
-Sylvan Scrying	sylvan scrying	00c22a38ec99c54ac1e7fb02a6230ed9	battle_rule_v1:200b39b38bf6e0159b901a483e9ee85d	1	d8ba5907-914d-484b-acc2-72d7059b5906	3	1	0
-Trophy Mage	trophy mage	5b696e4c373fb6e0b78e1d3229809a51	battle_rule_v1:9fc4f9774e576f908fd306318ce50ef7	1	97fe5230-441a-44b1-a1ef-5cd48e7fdbee	3	1	0

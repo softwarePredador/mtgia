@@ -1,9 +1,0 @@
-       card_name        |    normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
-------------------------+------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Coruscation Mage       | coruscation mage       | battle_rule_v1:e3aad3351d48453dc40be9bc1a246917 |                  1 |                           1 |                         1 |          10
- Fiery Inscription      | fiery inscription      | battle_rule_v1:1bd00fa75c597d366720ac22dd18a8fd |                  1 |                           1 |                         1 |          10
- Guttersnipe            | guttersnipe            | battle_rule_v1:5b634b726647d3bd833233759968be5a |                  1 |                           1 |                         1 |          10
- Longshot, Rebel Bowman | longshot, rebel bowman | battle_rule_v1:17f2c09b361ae9a707f4c27cece88bd0 |                  1 |                           1 |                         1 |          10
- Vivi Ornitier          | vivi ornitier          | battle_rule_v1:6a804c9cfcf1b619a6ea8f29e18b790a |                  1 |                           1 |                         1 |          10
-(5 rows)
-

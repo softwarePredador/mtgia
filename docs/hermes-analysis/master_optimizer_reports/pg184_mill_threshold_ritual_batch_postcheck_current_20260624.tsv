@@ -1,4 +1,0 @@
-card_name	normalized_name	logical_rule_key	promoted_rule_rows	promoted_verified_auto_rows	promoted_oracle_hash_rows	backup_rows
-Brain Freeze	brain freeze	battle_rule_v1:b992316c10714f267a5a33a4c62795d4	1	1	1	4
-Cabal Ritual	cabal ritual	battle_rule_v1:1842b9d1707a9f8b0fb6ca71e5585e0e	1	1	1	4
-(2 rows)

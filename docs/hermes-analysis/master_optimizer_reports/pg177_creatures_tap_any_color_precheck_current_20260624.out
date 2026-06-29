@@ -1,6 +1,0 @@
-     card_name     |  normalized_name  |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
--------------------+-------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Cryptolith Rite   | cryptolith rite   | 53ef9c8794128fdba3d1b15c9dbc9f71 | battle_rule_v1:3bb2acfbae9c082368cb5c4f55486990 |                1 | 7e66e2fe-fbc4-4b53-a6a3-a11786b42a5d |                  2 |                         0 |                           2
- Enduring Vitality | enduring vitality | 88af8c01f2653ce88bd330fb483c2417 | battle_rule_v1:0a678c0c9029d42a32bc3ab7bb5772ae |                1 | 5519ea20-663b-4e81-b616-65c6d5425ae5 |                  2 |                         0 |                           2
-(2 rows)
-

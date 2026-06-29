@@ -1,3 +1,0 @@
-card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
-Basalt Monolith	basalt monolith	7bfcb40a391bef0cb4c2f3a59c007bdc	battle_rule_v1:13a254365e4f64a322c42899dd7e9ec1	1	040b7976-58c1-4c54-b594-1c6e950a7592	2	0	2
-Grim Monolith	grim monolith	2fcac973250226ee566f69491bff9de4	battle_rule_v1:ac773d3e88bf38de11004c2943b4d871	1	cf3119bb-bce3-4be2-8ffd-2b63e57785bb	2	0	2

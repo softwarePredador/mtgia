@@ -1,4 +1,0 @@
- target_rows | furygale_runtime_rows | tempt_runtime_rows | backup_rows
--------------+-----------------------+--------------------+-------------
-           3 |                     1 |                  2 |           3
-(1 row)

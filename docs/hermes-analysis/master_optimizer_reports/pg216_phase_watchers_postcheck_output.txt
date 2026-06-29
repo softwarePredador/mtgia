@@ -1,6 +1,0 @@
-        card_name         |     normalized_name      |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
---------------------------+--------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Black Market Connections | black market connections | battle_rule_v1:9627a4437f1b6029c04032ba2e552c0b |                  1 |                           1 |                         1 |           4
- Davros, Dalek Creator    | davros, dalek creator    | battle_rule_v1:d03959f01d684d887bec04985c092274 |                  1 |                           1 |                         1 |           4
- Smuggler's Share         | smuggler's share         | battle_rule_v1:d1967f626af998349b300eee21f20156 |                  1 |                           1 |                         1 |           4
-(3 rows)

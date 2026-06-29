@@ -1,5 +1,0 @@
-      card_name      |   normalized_name   |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
----------------------+---------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Squee, Goblin Nabob | squee, goblin nabob | f8f6891272310b0d70a2b23621f7ea5d | battle_rule_v1:4565272d5decc69322e01a4f919df77e |                1 | a307ccea-dffb-4fce-b6d1-31e7450a28f6 |                  2 |                         0 |                           2
-(1 row)
-

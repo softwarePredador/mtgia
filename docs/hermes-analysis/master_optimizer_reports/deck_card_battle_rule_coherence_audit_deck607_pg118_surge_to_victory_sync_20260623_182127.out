@@ -1,5 +1,0 @@
-json_report=/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_20260623_212411.json
-md_report=/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck607_20260623_212411.md
-deck_id=607
-total_cards=94
-severity_counts={"high": 2, "medium": 8, "pass": 84}

@@ -1,6 +1,0 @@
-                       card_name                        |                    normalized_name                     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
---------------------------------------------------------+--------------------------------------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Biotransference                                        | biotransference                                        | battle_rule_v1:4b017d52015c70dfb33338170767bad8 |                  1 |                           1 |                         1 |           4
- Fable of the Mirror-Breaker // Reflection of Kiki-Jiki | fable of the mirror-breaker // reflection of kiki-jiki | battle_rule_v1:35f799486c8be66724ba9e6b155490f7 |                  1 |                           1 |                         1 |           4
- The Locust God                                         | the locust god                                         | battle_rule_v1:67d30157e4cec4c53fd99294af46a927 |                  1 |                           1 |                         1 |           4
-(3 rows)

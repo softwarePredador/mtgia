@@ -1,3 +1,0 @@
-backup_table_exists	target_rows	trusted_target_rows	current_partial_scope_rows	current_change_target_runtime_rows	current_spree_annotation_rows	current_copy_ability_annotation_rows	current_annotation_rows
-0	1	1	1	1	1	1	1
-(1 row)

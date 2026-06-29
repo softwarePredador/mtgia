@@ -1,6 +1,0 @@
-card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
-Clever Impersonator	clever impersonator	b5a888ad1107dbe2b4d9be83113e83bb	battle_rule_v1:743bc58026f68050c6ef7c902ce85cde	1	659921dc-bae4-4687-b1c8-974936b730d3	0	0	0
-Copy Artifact	copy artifact	394ca9be04e11f918cac24d8cc648f1f	battle_rule_v1:d466142f168d3c2d58c0594eb14214c9	1	fa5514d7-decb-4b07-9426-2c237f522cd5	0	0	0
-Copy Enchantment	copy enchantment	e1e0ee06fa971e9233368741b7478a7d	battle_rule_v1:ca58149e510c6834c2ed6ae602074483	1	b8cf08e8-48cc-4789-a2db-c720e2941931	2	0	2
-Mirrormade	mirrormade	49a1b071e36257efbc6ddb75d03ac14a	battle_rule_v1:d267ffd54ecf9c5026b8aaf43076edc9	1	4d122ac4-9e7c-40b3-8a9f-bb642bdab07a	2	0	2
-Phyrexian Metamorph	phyrexian metamorph	f33412ad2deef26bceca34c6b467f890	battle_rule_v1:1c9b7206e4e878ac743fc9186cdf5beb	10	0665faa4-27ea-437c-a6a9-7622fc9a3f59	0	0	0

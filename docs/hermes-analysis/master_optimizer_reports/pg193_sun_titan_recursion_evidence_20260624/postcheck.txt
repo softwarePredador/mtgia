@@ -1,4 +1,0 @@
- card_name | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Sun Titan | sun titan       | battle_rule_v1:0b081cba052dad667f72d7533ae26c98 |                  1 |                           1 |                         1 |           2
-(1 row)

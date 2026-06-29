@@ -1,4 +1,0 @@
-    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
-------------------+------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Young Pyromancer | young pyromancer | aa19f3984202416be7c877fc90ca0a1b | battle_rule_v1:8d0d283a016e6e8d51c0807ef0ae6cf9 |                1 | 719d3c60-a697-4de8-b23e-2a573d7da2c1 |                  2 |                         0 |                           2
-(1 row)

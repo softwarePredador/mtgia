@@ -1,4 +1,0 @@
-    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
-------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Trouble in Pairs | trouble in pairs | battle_rule_v1:4dce5bd251b51b0a4330813cca8bd1f5 |                  1 |                           1 |                         1 |           2
-(1 row)

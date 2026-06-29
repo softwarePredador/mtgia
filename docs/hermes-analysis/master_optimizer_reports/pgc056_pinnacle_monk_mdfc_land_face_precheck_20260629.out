@@ -1,4 +1,0 @@
- target_rows | trusted_target_rows | current_annotation_rows | current_mdfc_land_face_rows | backup_table_exists
--------------+---------------------+-------------------------+-----------------------------+---------------------
-           1 |                   1 |                       1 |                           0 |                   0
-(1 row)

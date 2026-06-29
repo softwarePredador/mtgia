@@ -1,8 +1,0 @@
-     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
---------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Chord of Calling   | chord of calling   | battle_rule_v1:1250cdd03a9389a2fe31e53ac5766394 |                  1 |                           1 |                         1 |           8
- Green Sun's Zenith | green sun's zenith | battle_rule_v1:c1c56ae7a9b9e0cae540e39cecb4f157 |                  1 |                           1 |                         1 |           8
- Nature's Rhythm    | nature's rhythm    | battle_rule_v1:6763f8258c7027a341e182900af5e8fc |                  1 |                           1 |                         1 |           8
- Whir of Invention  | whir of invention  | battle_rule_v1:719bc165cd6259a33d138d4fe2b1d2a2 |                  1 |                           1 |                         1 |           8
-(4 rows)
-

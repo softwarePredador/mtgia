@@ -1,5 +1,0 @@
-card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
-Candelabra of Tawnos	candelabra of tawnos	6121bd69a2275cd8f8a88699fd819713	battle_rule_v1:025b56533a93506e5517b27a42dcf059	1	e673ac31-f8e3-426d-8b67-b502ee24c3b7	0	0	0
-Earthcraft	earthcraft	f6496abac3c3abd4e9aceb27ba70f866	battle_rule_v1:7b54c5adbb14d83b32b736efd1c694a2	1	905d3f7e-3923-43e2-8fcc-64db5f199fa4	0	0	0
-Magus of the Candelabra	magus of the candelabra	6121bd69a2275cd8f8a88699fd819713	battle_rule_v1:5ebc277a81704d086c4c9009ce3863dc	1	d3495bc0-2822-4259-b2b5-8d8925c274ac	0	0	0
-Oboro Breezecaller	oboro breezecaller	51aa9c6083f41d49800b21ebe5bd49df	battle_rule_v1:09d7cae21ee60dcada5b267602355036	1	2572d38e-17ad-4216-8196-d44af8fc13b2	0	0	0

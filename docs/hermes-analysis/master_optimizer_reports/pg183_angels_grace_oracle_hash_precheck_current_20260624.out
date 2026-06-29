@@ -1,5 +1,0 @@
- normalized_name |                logical_rule_key                 | current_rule_oracle_hash |       expected_oracle_hash       | review_status | execution_status 
------------------+-------------------------------------------------+--------------------------+----------------------------------+---------------+------------------
- angel's grace   | battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227 |                          | 627c4ce7adf5be44b93e2b850159e5d9 | verified      | auto
-(1 row)
-

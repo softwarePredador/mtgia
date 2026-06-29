@@ -1,5 +1,0 @@
-json_report=docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg112_pg113_runtime_metadata_restore_20260623_194817.json
-md_report=docs/hermes-analysis/master_optimizer_reports/deck_card_battle_rule_coherence_audit_deck608_pg112_pg113_runtime_metadata_restore_20260623_194817.md
-deck_id=608
-total_cards=68
-severity_counts={"high": 15, "medium": 6, "pass": 47}

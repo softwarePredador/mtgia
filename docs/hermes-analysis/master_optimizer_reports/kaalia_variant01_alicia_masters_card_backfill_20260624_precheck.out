@@ -1,6 +1,0 @@
-Pager usage is off.
-              check_name              | by_scryfall_id | by_name | by_oracle_id | legality_rows 
---------------------------------------+----------------+---------+--------------+---------------
- kaalia_alicia_card_backfill_precheck |              0 |       0 |            0 |             0
-(1 row)
-

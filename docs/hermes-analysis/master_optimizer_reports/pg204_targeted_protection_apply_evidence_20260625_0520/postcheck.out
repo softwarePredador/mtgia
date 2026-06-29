@@ -1,6 +1,0 @@
-            card_name             |         normalized_name          |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
-----------------------------------+----------------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Gods Willing                     | gods willing                     | battle_rule_v1:55c7847be59181f29da7aa82c5667a30 |                  1 |                           1 |                         1 |           4
- Sejiri Shelter // Sejiri Glacier | sejiri shelter // sejiri glacier | battle_rule_v1:55c7847be59181f29da7aa82c5667a30 |                  1 |                           1 |                         1 |           4
-(2 rows)
-

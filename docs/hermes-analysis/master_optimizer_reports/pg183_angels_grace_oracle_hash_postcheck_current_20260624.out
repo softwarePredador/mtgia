@@ -1,5 +1,0 @@
- matching_oracle_hash_rows | verified_auto_rows | backup_rows 
----------------------------+--------------------+-------------
-                         1 |                  1 |           1
-(1 row)
-

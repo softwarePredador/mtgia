@@ -1,4 +1,0 @@
- target_rows | restored_hash_rows | verified_auto_rows | restored_runtime_metadata_rows | backup_rows
--------------+--------------------+--------------------+--------------------------------+-------------
-           1 |                  1 |                  1 |                              1 |           1
-(1 row)

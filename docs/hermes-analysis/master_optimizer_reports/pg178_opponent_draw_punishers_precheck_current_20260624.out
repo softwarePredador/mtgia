@@ -1,6 +1,0 @@
-     card_name     |  normalized_name  |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
--------------------+-------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Fate Unraveler    | fate unraveler    | 00c95435fc1fca776d77acfae1c4f14a | battle_rule_v1:b7c666b69b93ec1c06833d417e6a9abb |                1 | c85f5276-8c85-44f8-8d8c-a47134828218 |                  2 |                         0 |                           2
- Underworld Dreams | underworld dreams | ade82ae73b5e5030f19d03b541b04219 | battle_rule_v1:601180f3d9a50d4670765427bde20c84 |                1 | d7b50ed4-3faa-46f0-8021-43b7d2084343 |                  2 |                         0 |                           2
-(2 rows)
-

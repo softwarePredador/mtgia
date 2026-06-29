@@ -1,9 +1,0 @@
-card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
-Bloom Tender	bloom tender	53c650c8e69bf2ce0d4cc005285b434d	battle_rule_v1:8e94566195ab70c01276e70051623cb7	1	5bbf2a68-94d3-4c98-a20d-bf41cf00291e	2	0	2
-Circle of Dreams Druid	circle of dreams druid	6d1aeff2f1a2c28c74054cde37cea58f	battle_rule_v1:1b04e8096e5702d2ba0f66645728f226	1	d6344a01-f0dd-436a-940d-7c80a19f4da1	2	0	2
-Ignoble Hierarch	ignoble hierarch	dce5f09110d0296c91f79dd364780729	battle_rule_v1:f0668b054043b3db07eeb57e4cbd876e	1	8e82e007-5103-4da7-8c80-bae1caef19c2	2	0	2
-Moonsnare Prototype	moonsnare prototype	7a8aa86fec6e5cbd6e1f9002d6e2c647	battle_rule_v1:867f951a27c7284910fe5e6dd23fbc57	1	09cbab60-c112-46ec-9318-6533a363da0f	0	0	0
-Noble Hierarch	noble hierarch	6e78cce29d72fd81331490b36689fd29	battle_rule_v1:6039e5bf5989f3ab51feff2948bd0892	1	a168da2f-94fd-4201-9955-9a18fdf062be	2	0	2
-Relic of Legends	relic of legends	3b506c9dca803c9b34a7a1ed49000ab5	battle_rule_v1:4f700f70db9f348cfc3c525b2c08e9d0	1	6feb7ef4-bb3e-4b5f-938b-b54a67674131	2	0	2
-Springleaf Drum	springleaf drum	bc0d67ab4c23dc0ffed1100c30eac1d5	battle_rule_v1:b822326189437e5554828b3b6ff001c1	1	fa451259-2c5c-423c-8804-f36a61a8983f	2	0	2
-Talisman of Indulgence	talisman of indulgence	b6f7ff0127d1c9fd2c33d81fa54b64f6	battle_rule_v1:aafb809ee99cacf080c12f3c92c84e19	1	b69caae7-6c2c-4a9e-862d-01681e17964d	2	0	2

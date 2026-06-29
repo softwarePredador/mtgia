@@ -1,4 +1,0 @@
- target_rows | cycling_runtime_rows | scope_rows | reviewed_version_rows | backup_rows
--------------+----------------------+------------+-----------------------+-------------
-           1 |                    1 |          1 |                     1 |           1
-(1 row)

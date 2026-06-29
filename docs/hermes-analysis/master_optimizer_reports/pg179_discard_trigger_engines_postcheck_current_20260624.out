@@ -1,7 +1,0 @@
-    card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
------------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Feast of Sanity | feast of sanity | battle_rule_v1:8783617a8d44c4f2e0242d17976f8828 |                  1 |                           1 |                         1 |           0
- Geth's Grimoire | geth's grimoire | battle_rule_v1:293ee48b9a46181e885a4e563ef5868c |                  1 |                           1 |                         1 |           0
- Megrim          | megrim          | battle_rule_v1:3c0ccb6b440a3128acdd19b58ace0b1e |                  1 |                           1 |                         1 |           0
-(3 rows)
-

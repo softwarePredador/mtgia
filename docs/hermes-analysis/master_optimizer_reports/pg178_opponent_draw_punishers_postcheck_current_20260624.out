@@ -1,6 +1,0 @@
-     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
--------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Fate Unraveler    | fate unraveler    | battle_rule_v1:b7c666b69b93ec1c06833d417e6a9abb |                  1 |                           1 |                         1 |           4
- Underworld Dreams | underworld dreams | battle_rule_v1:601180f3d9a50d4670765427bde20c84 |                  1 |                           1 |                         1 |           4
-(2 rows)
-

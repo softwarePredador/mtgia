@@ -1,6 +1,0 @@
-     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
--------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Cryptolith Rite   | cryptolith rite   | battle_rule_v1:3bb2acfbae9c082368cb5c4f55486990 |                  1 |                           1 |                         1 |           4
- Enduring Vitality | enduring vitality | battle_rule_v1:0a678c0c9029d42a32bc3ab7bb5772ae |                  1 |                           1 |                         1 |           4
-(2 rows)
-

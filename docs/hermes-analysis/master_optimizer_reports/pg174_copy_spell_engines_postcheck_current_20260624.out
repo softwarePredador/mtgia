@@ -1,6 +1,0 @@
-     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
---------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Double Vision      | double vision      | battle_rule_v1:6b73ccf8b05f7853dcfeae1825b70708 |                  1 |                           1 |                         1 |           2
- Swarm Intelligence | swarm intelligence | battle_rule_v1:9f1ee8ecd68dad5bf39139de17c013eb |                  1 |                           1 |                         1 |           2
-(2 rows)
-

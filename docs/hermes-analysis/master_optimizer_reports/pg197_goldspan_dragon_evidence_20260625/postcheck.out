@@ -1,5 +1,0 @@
-    card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
------------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Goldspan Dragon | goldspan dragon | battle_rule_v1:dfaa0b9820c90a7835fb1fcb506ae9f3 |                  1 |                           1 |                         1 |           2
-(1 row)
-

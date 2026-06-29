@@ -1,9 +1,0 @@
- normalized_name |          expected_hash           | card_rows | existing_rule_rows | target_active_rows 
------------------+----------------------------------+-----------+--------------------+--------------------
- the mind stone  | 17bda9d167ae2799376387d03be5681f |         1 |                  0 |                  0
-(1 row)
-
- normalized_name | logical_rule_key | review_status | execution_status | rule_version | oracle_hash | effect_json | deck_role_json 
------------------+------------------+---------------+------------------+--------------+-------------+-------------+----------------
-(0 rows)
-

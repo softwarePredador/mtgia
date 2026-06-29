@@ -1,5 +1,0 @@
-        card_name         |     normalized_name      |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
---------------------------+--------------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Authority of the Consuls | authority of the consuls | 36656d2eb48fc1caaca9e723d9010724 | battle_rule_v1:9b218dccd5117a4f76319362515e4e34 | deprecate_nonmatching_rows |                1 | a5ff2002-0a02-4886-9d21-e0640a704b5b |                  2 |                         0 |                           2
-(1 row)
-

@@ -1,4 +1,0 @@
-    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
-------------------+------------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Trouble in Pairs | trouble in pairs | 518401cdd0b7850a6e29a0ec1c0b5935 | battle_rule_v1:4dce5bd251b51b0a4330813cca8bd1f5 |                1 | 56045b1c-6d1b-4e58-8393-4fd05d42e312 |                  2 |                         0 |                           2
-(1 row)

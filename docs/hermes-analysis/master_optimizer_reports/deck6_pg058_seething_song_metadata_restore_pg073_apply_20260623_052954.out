@@ -1,8 +1,0 @@
-BEGIN
-psql:docs/hermes-analysis/master_optimizer_reports/deck6_pg058_seething_song_metadata_restore_pg073_apply_20260623_052954.sql:3: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
-CREATE SCHEMA
-DO
-SELECT 1
-DO
-UPDATE 1
-COMMIT

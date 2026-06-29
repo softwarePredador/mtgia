@@ -1,5 +1,0 @@
-card_name	normalized_name	oracle_hash	logical_rule_key	target_card_rows	canonical_card_id	existing_rule_rows	expected_rule_rows_before	would_deprecate_shadow_rows
-Flesh Duplicate	flesh duplicate	93e6894ab82a238b50dcbbbd1a8d9e68	battle_rule_v1:03e13973df9fbbf9ad781f5ace004f05	1	2d6b22ab-1d6b-4ec2-b997-fc2585dd3714	0	0	0
-Imposter Mech	imposter mech	35f38b34bb79ee6327a68ece8587f7a1	battle_rule_v1:4f317236846bce55c91965bb4605762f	1	61eecc9c-9d84-4f1b-9b8c-8b0f615a87bb	2	0	2
-Mockingbird	mockingbird	f3b499fed5cd401f51e14b49fc2c9edd	battle_rule_v1:43e3543e0e752d74fab3cf0a170d081e	1	4fb74016-8681-4d2d-897e-8f98a7fd4455	0	0	0
-Phantasmal Image	phantasmal image	d354295810b0219eb38e5137a0ba0e9f	battle_rule_v1:e2b5d8a5284d2c8a2b986ecc343702cd	1	050d0e09-7bac-44c7-9cd5-36bbebb6de7a	0	0	0

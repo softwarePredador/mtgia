@@ -1,7 +1,0 @@
-        card_name        |     normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
--------------------------+-------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Galvanoth               | galvanoth               | battle_rule_v1:b8859191e53dd38d3af9f4d8db421a83 |                  1 |                           1 |                         1 |           6
- Palantír of Orthanc     | palantír of orthanc     | battle_rule_v1:26179de4259137dba13dc5d473b1fe72 |                  1 |                           1 |                         1 |           6
- Scholar of New Horizons | scholar of new horizons | battle_rule_v1:eeb6d5d36cf100b1f4136ec0b5f5d63d |                  1 |                           1 |                         1 |           6
- Velomachus Lorehold     | velomachus lorehold     | battle_rule_v1:c3e60ccbaf1d57109e270f072d834a98 |                  1 |                           1 |                         1 |           6
-(4 rows)

@@ -1,4 +1,0 @@
- target_rows | expected_hash_rows | missing_hash_rows | unexpected_existing_hash_rows | trusted_v2_executable_rows | backup_table_exists
--------------+--------------------+-------------------+-------------------------------+----------------------------+---------------------
-           5 |                  5 |                 5 |                             0 |                          5 |                   0
-(1 row)

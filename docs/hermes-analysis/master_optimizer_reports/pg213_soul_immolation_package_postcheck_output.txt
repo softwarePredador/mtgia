@@ -1,5 +1,0 @@
-    card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
------------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Soul Immolation | soul immolation | battle_rule_v1:86324946621827f59ca016b47cb61f73 |                  1 |                           1 |                         1 |           0
-(1 row)
-

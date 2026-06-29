@@ -1,6 +1,0 @@
-    card_name    | normalized_name |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
------------------+-----------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Fact or Fiction | fact or fiction | da85cd126972897c37373ad25ec5f867 | battle_rule_v1:b5c5def7cc8d30af6e2c293ea0854a5c |                1 | 5dd7f93a-1a11-4f7e-a798-3ed79de1fd34 |                  3 |                         1 |                           0
- Steam Augury    | steam augury    | 9be664a6ecce936cc53df5993a90cdcb | battle_rule_v1:e076e7cef34d9f0593c00df3e15059a7 |                1 | 6e652cd0-c03d-4356-bf41-f58549e24177 |                  1 |                         1 |                           0
-(2 rows)
-

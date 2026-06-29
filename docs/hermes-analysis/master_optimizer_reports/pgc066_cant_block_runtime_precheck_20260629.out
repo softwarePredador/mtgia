@@ -1,2 +1,0 @@
-backup_table_exists	target_rows	trusted_target_rows	current_cant_block_annotation_rows	current_cant_block_runtime_rows	current_annotation_rows
-0	2	2	2	0	2

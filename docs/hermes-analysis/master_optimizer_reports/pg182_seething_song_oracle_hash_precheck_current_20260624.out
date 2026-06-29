@@ -1,5 +1,0 @@
- normalized_name |                logical_rule_key                 | current_rule_oracle_hash |       expected_oracle_hash       | review_status | execution_status 
------------------+-------------------------------------------------+--------------------------+----------------------------------+---------------+------------------
- seething song   | battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7 |                          | ccd492289c6f1c14c8fb7a248d7bbf32 | verified      | auto
-(1 row)
-

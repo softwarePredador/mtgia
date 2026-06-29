@@ -13,6 +13,9 @@ Operational rules:
   explicitly needed for audit traceability.
 - Do not store local SQLite backups here; they are ignored by `.gitignore` and
   should be regenerated from PostgreSQL/Hermes when needed.
+- Generated JSON/JSONL/OUT/ERR/TSV/DB/log payloads and common XMage/Lorehold
+  gate output prefixes are ignored by default. Force-add only reviewed,
+  durable evidence that must survive as a contract.
 
 For the current XMage to ManaLoom flow, use
 `../XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` as the operating contract.

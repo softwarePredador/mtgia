@@ -1,4 +1,0 @@
-  card_name   | normalized_name |           oracle_hash            |                logical_rule_key                 | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
---------------+-----------------+----------------------------------+-------------------------------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Redress Fate | redress fate    | 43b0f9e8d3e2fc829b55e89d812750cd | battle_rule_v1:e78fc833fc5528c9fff3788f2d82d5d0 |                1 | 5d5e2edb-c368-443b-85f0-8da650d28863 |                  0 |                         0 |                           0
-(1 row)
