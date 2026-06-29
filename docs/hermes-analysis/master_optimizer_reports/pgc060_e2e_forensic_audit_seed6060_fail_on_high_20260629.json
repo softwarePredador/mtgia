@@ -1,0 +1,317 @@
+{
+  "replay_files": [],
+  "rule_findings": [
+    {
+      "card": "Blood Celebrant",
+      "effect": "ramp_permanent",
+      "event": "spell_cast",
+      "finding": "Game event depended on heuristic source `functional_tags_json`.",
+      "phase": "precombat_main",
+      "player": "Rowan, Scion of War #32 (real)",
+      "recommendation": "Move this card into card_battle_rules with verified/active status.",
+      "replay_id": "seed_6060",
+      "severity": "medium",
+      "turn": 5
+    },
+    {
+      "card": "Boreal Druid",
+      "effect": "ramp_permanent",
+      "event": "spell_cast",
+      "finding": "Game event depended on heuristic source `functional_tags_json`.",
+      "phase": "precombat_main",
+      "player": "Kinnan, Bonder Prodigy #72 (real)",
+      "recommendation": "Move this card into card_battle_rules with verified/active status.",
+      "replay_id": "seed_6060",
+      "severity": "medium",
+      "turn": 6
+    },
+    {
+      "card": "Torment of Hailfire",
+      "effect": "passive",
+      "event": "spell_cast",
+      "finding": "Runtime effect `passive` differs from registry effect `draw_cards`.",
+      "phase": "precombat_main",
+      "player": "Rowan, Scion of War #32 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_6060",
+      "severity": "low",
+      "turn": 7
+    },
+    {
+      "card": "Torment of Hailfire",
+      "effect": "passive",
+      "event": "spell_resolved",
+      "finding": "Runtime effect `passive` differs from registry effect `draw_cards`.",
+      "phase": "precombat_main",
+      "player": "Rowan, Scion of War #32 (real)",
+      "recommendation": "Usually oracle normalization; review only if behavior looks wrong in replay.",
+      "replay_id": "seed_6060",
+      "severity": "low",
+      "turn": 7
+    }
+  ],
+  "summary": {
+    "by_effect": {
+      "brain_freeze": 2,
+      "creature": 13,
+      "damage_any_target": 2,
+      "draw_cards": 7,
+      "draw_engine": 2,
+      "equipment_static_attachment": 2,
+      "land": 18,
+      "land_ramp": 1,
+      "passive": 3,
+      "ramp_permanent": 3,
+      "ramp_ritual": 4,
+      "recursion": 2,
+      "remove_creature": 3,
+      "remove_permanent": 2,
+      "tutor": 2
+    },
+    "by_rule_logical_key": {
+      "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4": 1,
+      "battle_rule_v1:0cae4a7bd1e862a0063b9c606ff96e6c": 1,
+      "battle_rule_v1:0d42202d79e9f7e0b0a65fe5848c9849": 2,
+      "battle_rule_v1:128e222b4de1e6308d98743711b54985": 3,
+      "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25": 3,
+      "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba": 1,
+      "battle_rule_v1:4d539456ce3026ca5a85fbadc3e7b339": 2,
+      "battle_rule_v1:5d3ec3f1d92cfe2044d0172c4e3765ba": 1,
+      "battle_rule_v1:603c776839827f2f21cef8b62e22a1be": 14,
+      "battle_rule_v1:6c79ee0d7eda6f8a02666036cad990fa": 1,
+      "battle_rule_v1:70fa2e668d7c5e40f055c04c01d25a6c": 2,
+      "battle_rule_v1:778677cb1baf3abdb20067499dbdcffd": 1,
+      "battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d": 7,
+      "battle_rule_v1:86b568648669ceb1eef6d7f6b95d4f1c": 2,
+      "battle_rule_v1:98961b0f9243bcc73308c30365ad835c": 2,
+      "battle_rule_v1:ad607c99185b8f57b168e12e24117777": 1,
+      "battle_rule_v1:b992316c10714f267a5a33a4c62795d4": 2,
+      "battle_rule_v1:c6587e309bfd402ee1b98b4848abc6d3": 1,
+      "battle_rule_v1:c8621a807cc65adc820a8b8189979f70": 2,
+      "battle_rule_v1:cab6dca71d1d5e86c85ef5f8089f1648": 1,
+      "battle_rule_v1:cc7e65cfa812dc06a42f853773180ca1": 1,
+      "battle_rule_v1:d3402dff750bf6369a6e50379066870b": 2,
+      "battle_rule_v1:e9cb68d2e2a585c86ff5699757221488": 1,
+      "battle_rule_v1:f07edd2f4f3e3c9897f03ec390a5cf44": 1,
+      "battle_rule_v1:f2d4cbe84d49d11a20aa13e9f9db53a9": 1,
+      "battle_rule_v1:ff4327093d44df534a0f3aba335e124d": 2
+    },
+    "by_source": {
+      "curated": 56,
+      "functional_tags_json": 2,
+      "known_cards_canonical_snapshot": 2,
+      "type_line_creature": 6
+    },
+    "by_status": {
+      "active": 5,
+      "fact": 6,
+      "heuristic": 2,
+      "review_only": 2,
+      "verified": 51
+    },
+    "card_event_count": 66,
+    "card_id_missing": 51,
+    "card_id_missing_accepted": 47,
+    "card_id_missing_unaccepted": 4,
+    "card_id_present": 15,
+    "cards_by_source": {
+      "curated": [
+        "Ancient Tomb",
+        "Birds of Paradise",
+        "Blood Crypt",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Command Tower",
+        "Crop Rotation",
+        "Dark Ritual",
+        "Esper Sentinel",
+        "Exotic Orchard",
+        "Fellwar Stone",
+        "Flooded Strand",
+        "Generous Gift",
+        "Glittering Massif",
+        "Hexing Squelcher",
+        "Infernal Plunge",
+        "Into the Flood Maw",
+        "Jeska's Will",
+        "Kinnan, Bonder Prodigy",
+        "Lorehold, the Historian",
+        "Mountain // Mountain",
+        "Multiversal Passage",
+        "Plains // Plains",
+        "Polluted Delta",
+        "Reanimate",
+        "Sacred Foundry",
+        "Seat of the Synod",
+        "Snap",
+        "Starting Town",
+        "Swiftfoot Boots",
+        "Thor, God of Thunder",
+        "Tropical Island",
+        "Urza's Saga",
+        "Vampiric Tutor",
+        "Volcanic Island",
+        "Walking Ballista"
+      ],
+      "functional_tags_json": [
+        "Blood Celebrant",
+        "Boreal Druid"
+      ],
+      "known_cards_canonical_snapshot": [
+        "Torment of Hailfire"
+      ],
+      "type_line_creature": [
+        "Gilded Drake",
+        "Opposition Agent",
+        "Rograkh, Son of Rohgahh",
+        "Rowan, Scion of War",
+        "Shield Sphere",
+        "Valley Floodcaller"
+      ]
+    },
+    "cards_by_status": {
+      "active": [
+        "Fellwar Stone",
+        "Lorehold, the Historian",
+        "Thor, God of Thunder"
+      ],
+      "fact": [
+        "Gilded Drake",
+        "Opposition Agent",
+        "Rograkh, Son of Rohgahh",
+        "Rowan, Scion of War",
+        "Shield Sphere",
+        "Valley Floodcaller"
+      ],
+      "heuristic": [
+        "Blood Celebrant",
+        "Boreal Druid"
+      ],
+      "review_only": [
+        "Torment of Hailfire"
+      ],
+      "verified": [
+        "Ancient Tomb",
+        "Birds of Paradise",
+        "Blood Crypt",
+        "Borne Upon a Wind",
+        "Brain Freeze",
+        "Command Tower",
+        "Crop Rotation",
+        "Dark Ritual",
+        "Esper Sentinel",
+        "Exotic Orchard",
+        "Flooded Strand",
+        "Generous Gift",
+        "Glittering Massif",
+        "Hexing Squelcher",
+        "Infernal Plunge",
+        "Into the Flood Maw",
+        "Jeska's Will",
+        "Kinnan, Bonder Prodigy",
+        "Mountain // Mountain",
+        "Multiversal Passage",
+        "Plains // Plains",
+        "Polluted Delta",
+        "Reanimate",
+        "Sacred Foundry",
+        "Seat of the Synod",
+        "Snap",
+        "Starting Town",
+        "Swiftfoot Boots",
+        "Tropical Island",
+        "Urza's Saga",
+        "Vampiric Tutor",
+        "Volcanic Island",
+        "Walking Ballista"
+      ]
+    },
+    "lineage_missing_waiver_reasons": {
+      "battle_rule_registry_without_card_identity_columns": 56,
+      "land_played_curated_runtime_rule_without_pg_card_identity": 26,
+      "type_line_creature_fact_no_rule_identity": 18
+    },
+    "lineage_unaccepted_missing_samples": [
+      {
+        "card": "Blood Celebrant",
+        "effect": "ramp_permanent",
+        "event": "spell_cast",
+        "missing_field": "rule_logical_key",
+        "source": "functional_tags_json"
+      },
+      {
+        "card": "Blood Celebrant",
+        "effect": "ramp_permanent",
+        "event": "spell_cast",
+        "missing_field": "card_id",
+        "source": "functional_tags_json"
+      },
+      {
+        "card": "Blood Celebrant",
+        "effect": "ramp_permanent",
+        "event": "spell_cast",
+        "missing_field": "semantic_hash",
+        "source": "functional_tags_json"
+      },
+      {
+        "card": "Boreal Druid",
+        "effect": "ramp_permanent",
+        "event": "spell_cast",
+        "missing_field": "rule_logical_key",
+        "source": "functional_tags_json"
+      },
+      {
+        "card": "Boreal Druid",
+        "effect": "ramp_permanent",
+        "event": "spell_cast",
+        "missing_field": "card_id",
+        "source": "functional_tags_json"
+      },
+      {
+        "card": "Boreal Druid",
+        "effect": "ramp_permanent",
+        "event": "spell_cast",
+        "missing_field": "semantic_hash",
+        "source": "functional_tags_json"
+      },
+      {
+        "card": "Torment of Hailfire",
+        "effect": "passive",
+        "event": "spell_cast",
+        "missing_field": "card_id",
+        "source": "known_cards_canonical_snapshot"
+      },
+      {
+        "card": "Torment of Hailfire",
+        "effect": "passive",
+        "event": "spell_cast",
+        "missing_field": "semantic_hash",
+        "source": "known_cards_canonical_snapshot"
+      },
+      {
+        "card": "Torment of Hailfire",
+        "effect": "passive",
+        "event": "spell_resolved",
+        "missing_field": "card_id",
+        "source": "known_cards_canonical_snapshot"
+      },
+      {
+        "card": "Torment of Hailfire",
+        "effect": "passive",
+        "event": "spell_resolved",
+        "missing_field": "semantic_hash",
+        "source": "known_cards_canonical_snapshot"
+      }
+    ],
+    "rule_logical_key_missing": 8,
+    "rule_logical_key_missing_accepted": 6,
+    "rule_logical_key_missing_unaccepted": 2,
+    "rule_logical_key_present": 58,
+    "semantic_hash_missing": 51,
+    "semantic_hash_missing_accepted": 47,
+    "semantic_hash_missing_unaccepted": 4,
+    "semantic_hash_present": 15,
+    "unique_cards": 45
+  },
+  "turn_findings": []
+}

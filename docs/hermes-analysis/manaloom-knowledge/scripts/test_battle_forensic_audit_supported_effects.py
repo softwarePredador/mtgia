@@ -40,6 +40,7 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "brain_freeze" in audit.SUPPORTED_EFFECTS
     assert "cannot_lose_turn" in audit.SUPPORTED_EFFECTS
     assert "composite_resolution" in audit.SUPPORTED_EFFECTS
+    assert "damage_any_target" in audit.SUPPORTED_EFFECTS
     assert "damage_player_and_creatures" in audit.SUPPORTED_EFFECTS
     assert "damage_wipe_treasure" in audit.SUPPORTED_EFFECTS
     assert "graveyard_flashback_grant" in audit.SUPPORTED_EFFECTS
