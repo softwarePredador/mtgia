@@ -955,20 +955,21 @@
     "battle_rule_logical_key": "battle_rule_v1:d83f2e5cb364c71f107f223491fa2dfb"
   },
   "Angel's Grace": {
+    "battle_model_scope": "split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1",
     "cmc": 1.0,
     "effect": "cannot_lose_turn",
     "instant": true,
     "life_floor_on_damage": 1,
-    "battle_model_scope": "split_second_cannot_lose_opponents_cannot_win_damage_life_floor_v1",
-    "oracle_runtime_scope": "cannot_lose_opponents_cannot_win_damage_life_floor_split_second_annotation",
     "opponents_cant_win_this_turn": true,
+    "oracle_runtime_scope": "cannot_lose_opponents_cannot_win_damage_life_floor_split_second_annotation",
     "split_second": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227"
+    "battle_rule_logical_key": "battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227",
+    "battle_rule_oracle_hash": "627c4ce7adf5be44b93e2b850159e5d9"
   },
   "Anguished Unmaking": {
     "cmc": 3.0,
@@ -5844,7 +5845,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "6dd67a5b15e472ba84c942ab36ac1786"
   },
   "Command Bridge": {
     "effect": "land",
@@ -9045,7 +9047,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "25b37ca517c49d61b17a9dc180dc8ea8"
   },
   "Eladamri's Call": {
     "effect": "tutor",
@@ -12930,10 +12933,14 @@
       "red",
       "white"
     ],
-    "battle_model_scope": "land_enters_tapped_mana_source_v1",
-    "cycling_status": "annotation_only",
+    "battle_model_scope": "land_enters_tapped_mana_source_with_cycling_runtime_v1",
+    "cycling_cost": "{2}",
+    "cycling_discard_self_status": "runtime_executor_v1",
+    "cycling_draw_count": 1,
+    "cycling_status": "runtime_executor_v1",
     "effect": "land",
     "enters_tapped": true,
+    "oracle_runtime_scope": "mountain_plains_enters_tapped_red_white_mana_and_cycling_two_runtime_v1",
     "source_colors": [
       "red",
       "white"
@@ -12942,7 +12949,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
+    "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "71d8d9152563d51114543ed1a9289903"
   },
@@ -22837,8 +22844,8 @@
     "battle_rule_logical_key": "battle_rule_v1:63081deaefeeb350bed5e0c95d4e1ac0"
   },
   "Pinnacle Monk // Mystic Peak": {
-    "back_face_land_status": "annotation_only",
-    "battle_model_scope": "front_creature_prowess_etb_return_instant_or_sorcery_graveyard_to_hand_back_land_annotation_v1",
+    "back_face_land_status": "runtime_executor_v1",
+    "battle_model_scope": "front_creature_prowess_etb_return_instant_or_sorcery_graveyard_to_hand_mdfc_red_land_life_payment_runtime_v1",
     "cmc": 5.0,
     "effect": "creature",
     "etb_recursion_count": 1,
@@ -22847,14 +22854,24 @@
     "keywords": [
       "prowess"
     ],
-    "oracle_runtime_scope": "creature_etb_return_instant_or_sorcery_graveyard_to_hand_v1",
+    "mdfc_land_face": {
+      "battle_model_scope": "mystic_peak_red_land_pay_three_life_or_enter_tapped_runtime_v1",
+      "effect": "land",
+      "enters_tapped_unless_pay_life": 3,
+      "enters_tapped_unless_pay_life_status": "runtime_executor_v1",
+      "mana_produced": 1,
+      "name": "Mystic Peak",
+      "produces": "R",
+      "type_line": "Land"
+    },
+    "oracle_runtime_scope": "front_creature_etb_return_instant_or_sorcery_and_mystic_peak_red_land_pay_three_life_etb_runtime_v1",
     "power": 2,
     "toughness": 2,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.97,
-    "battle_rule_version": 2,
+    "battle_rule_version": 3,
     "battle_rule_logical_key": "battle_rule_v1:bcde63b5e56f2b9f20af6384bc70ad5d",
     "battle_rule_oracle_hash": "aa1967461796c715e0c5e0b4d741f249"
   },
@@ -24791,7 +24808,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "ff80b35ee08bb1b68ec7c0be24d6eaaa"
   },
   "Remote Farm": {
     "effect": "land",

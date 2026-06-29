@@ -1,0 +1,4 @@
+ target_rows | restored_hash_rows | trusted_executable_rows | backup_rows
+-------------+--------------------+-------------------------+-------------
+           7 |                  7 |                       7 |           7
+(1 row)

@@ -698,7 +698,7 @@ def replay_card_snapshot(card):
     """Small JSON-safe card summary for turn-by-turn replay audits."""
     if not isinstance(card, dict):
         return {"name": str(card)}
-    return {
+    snapshot = {
         "name": card.get("name", "?"),
         "power": card.get("power"),
         "toughness": card.get("toughness"),
@@ -725,6 +725,11 @@ def replay_card_snapshot(card):
         "tapped": bool(card.get("tapped")),
         "summoning_sick": bool(card.get("summoning_sick")),
     }
+    if card.get("must_attack_defender"):
+        snapshot["must_attack_defender"] = card.get("must_attack_defender")
+    if card.get("must_attack_if_able") or card.get("must_attack"):
+        snapshot["must_attack_if_able"] = True
+    return snapshot
 
 
 class CastingContext:
@@ -3285,12 +3290,18 @@ def mana_source_colors_for_state(player, source):
     return source_colors(source)
 
 
-CONDITIONAL_MANA_RUNTIME_STATUSES = {
+GENERIC_RUNTIME_EXECUTOR_STATUSES = {
     "runtime_executor_v1",
     "runtime_executor",
     "executable",
     "enabled",
 }
+
+CONDITIONAL_MANA_RUNTIME_STATUSES = set(GENERIC_RUNTIME_EXECUTOR_STATUSES)
+
+
+def runtime_executor_status_enabled(value):
+    return str(value or "").strip().lower() in GENERIC_RUNTIME_EXECUTOR_STATUSES
 
 
 def _mana_runtime_status_enabled(value):
@@ -3443,6 +3454,8 @@ def conditional_mana_source_for_state(player, source, produced):
     configured = _configured_conditional_mana_source_for_state(player, source, produced)
     if configured:
         return configured
+    if isinstance(source, dict) and source.get("mana_produced_from_colors_among_permanents"):
+        return None
     explicit_colors = _source_explicit_mana_colors(source)
     if len(explicit_colors) <= 1:
         return None
@@ -3800,12 +3813,25 @@ def mana_source_production_for_state(player, source):
     return int(source.get("mana_produced", 1) or 0)
 
 
+def add_distributed_controlled_color_mana_to_pool(player, source, produced):
+    if not isinstance(source, dict) or not source.get("mana_produced_from_colors_among_permanents"):
+        return False
+    colors = _controlled_permanent_mana_colors(player)
+    if not colors:
+        return False
+    for color in colors[: max(0, int(produced or 0))]:
+        player.mana_pool.add(color, 1)
+    return True
+
+
 def add_player_mana_source_to_pool(player, source, turn=None):
     if not hasattr(player, "conditional_mana_sources"):
         player.conditional_mana_sources = []
     produced = mana_source_production_for_state(player, source)
     if produced <= 0:
         return False
+    if add_distributed_controlled_color_mana_to_pool(player, source, produced):
+        return True
     conditional_source = conditional_mana_source_for_state(player, source, produced)
     if conditional_source:
         player.conditional_mana_sources.append(conditional_source)
@@ -3825,9 +3851,76 @@ def _live_opponent_count(opponents):
     return count
 
 
+def _split_card_back_face_name(card):
+    if not isinstance(card, dict):
+        return None
+    name = str(card.get("name") or "")
+    if " // " not in name:
+        return None
+    back_name = name.split(" // ", 1)[1].strip()
+    return back_name or None
+
+
+def mdfc_land_face_for_card(card, effect_data):
+    if not isinstance(card, dict) or not isinstance(effect_data, dict):
+        return None
+    face = effect_data.get("mdfc_land_face") or effect_data.get("back_face_land")
+    if isinstance(face, str):
+        try:
+            face = json.loads(face)
+        except Exception:
+            face = None
+    if not isinstance(face, dict):
+        return None
+    result = dict(face)
+    result.setdefault("name", _split_card_back_face_name(card) or card.get("name", "?"))
+    result.setdefault("type_line", "Land")
+    result.setdefault("effect", "land")
+    result.setdefault("mana_produced", 1)
+    result["modal_dfc_parent_name"] = card.get("name")
+    result["played_face"] = "back"
+    return result
+
+
+def land_enter_untapped_life_cost(land):
+    if not isinstance(land, dict):
+        return 0
+    raw = (
+        land.get("may_pay_life_to_enter_untapped")
+        or land.get("enters_tapped_unless_pay_life")
+        or land.get("enters_untapped_life_cost")
+    )
+    if raw in (None, "", False):
+        oracle_text = str(land.get("oracle_text") or "").lower()
+        match = re.search(r"may pay (\d+) life\. if you don't, it enters tapped", oracle_text)
+        raw = match.group(1) if match else 0
+    try:
+        return max(0, int(raw or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
+def maybe_pay_life_for_untapped_land(player, land):
+    cost = land_enter_untapped_life_cost(land)
+    if cost <= 0:
+        return 0
+    land["enters_tapped_unless_pay_life"] = cost
+    if player is None or getattr(player, "life_cant_change", False) or getattr(player, "life", 0) <= cost:
+        land["enters_tapped"] = True
+        land["life_paid_to_enter_untapped"] = 0
+        return 0
+    change_life(player, -cost)
+    land["enters_tapped"] = False
+    land["life_paid_to_enter_untapped"] = cost
+    return cost
+
+
 def land_enters_tapped_for_state(land, player=None, opponents=None):
     if not isinstance(land, dict):
         return False
+    life_cost = land_enter_untapped_life_cost(land)
+    if life_cost > 0:
+        return int(land.get("life_paid_to_enter_untapped") or 0) <= 0
     if land.get("enters_tapped") or land.get("land_enters_tapped"):
         return True
     threshold = land.get("enters_tapped_unless_opponent_count")
@@ -7029,6 +7122,10 @@ class Player:
             if produced <= 0:
                 continue
             if not pay_mana_source_activation_costs(self, source, turn=turn):
+                continue
+            if add_distributed_controlled_color_mana_to_pool(self, source, produced):
+                mark_mana_source_used_if_nonstandard_untap(source)
+                active_sources += 1
                 continue
             conditional_source = conditional_mana_source_for_state(self, source, produced)
             if conditional_source:
@@ -15973,6 +16070,123 @@ def controlled_land_count(player):
     return sum(1 for permanent in player.battlefield if isinstance(permanent, dict) and is_effective_land(permanent))
 
 
+CYCLING_RUNTIME_STATUSES = {
+    "runtime_executor_v1",
+    "runtime_executor",
+    "executable",
+    "auto",
+}
+
+
+def cycling_runtime_enabled(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    status = str(effect_data.get("cycling_status") or "").strip().lower()
+    return status in CYCLING_RUNTIME_STATUSES
+
+
+def cycling_cost_for_effect(effect_data):
+    if not isinstance(effect_data, dict):
+        return None
+    return effect_data.get("cycling_cost") or effect_data.get("cycle_cost")
+
+
+def has_other_land_play_option(player, card):
+    for candidate in getattr(player, "hand", []) or []:
+        if candidate is card:
+            continue
+        if isinstance(candidate, dict) and is_effective_land(candidate):
+            return True
+    return False
+
+
+def should_cycle_card_from_hand(player, card, effect_data, *, phase="precombat_main"):
+    if phase not in {"precombat_main", "postcombat_main"}:
+        return False, "unsupported_phase"
+    if not isinstance(card, dict):
+        return False, "not_card"
+    if card not in getattr(player, "hand", []) or []:
+        return False, "not_in_hand"
+    if not cycling_runtime_enabled(effect_data):
+        return False, "cycling_not_runtime_enabled"
+    cycling_cost = cycling_cost_for_effect(effect_data)
+    if not cycling_cost:
+        return False, "missing_cycling_cost"
+    if not getattr(player, "library", None):
+        return False, "empty_library"
+    if not player.can_pay(cycling_cost):
+        return False, "cannot_pay_cycling_cost"
+    if is_effective_land(card):
+        lands = controlled_land_count(player)
+        land_drop_available = player.lands_played_this_turn < player.max_lands_per_turn
+        if land_drop_available and lands < 5 and not has_other_land_play_option(player, card):
+            return False, "preserve_needed_land_drop"
+    return True, "redundant_card_to_fresh_draw"
+
+
+def activate_hand_cycling(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="precombat_main",
+    stack=None,
+    max_activations=1,
+):
+    if not player.is_alive():
+        return 0
+    activated = 0
+    for card in list(player.hand):
+        if activated >= max_activations:
+            break
+        if not isinstance(card, dict):
+            continue
+        effect_data = get_card_effect(card)
+        allowed, reason = should_cycle_card_from_hand(
+            player,
+            card,
+            effect_data,
+            phase=phase,
+        )
+        if not allowed:
+            continue
+        cycling_cost = cycling_cost_for_effect(effect_data)
+        if not player.spend_mana(cycling_cost):
+            continue
+        player.hand.remove(card)
+        player.graveyard.append(card)
+        drawn = player.draw(1, rng)
+        process_player_draw_triggers(
+            player,
+            len(drawn),
+            turn,
+            "cycling",
+            all_players,
+            stack=stack,
+            turn_player=player,
+        )
+        activated += 1
+        emit_replay_event(
+            "cycling_activated",
+            player=player.name,
+            card=card.get("name", "?"),
+            cycling_cost=cycling_cost,
+            cycled_to_graveyard=True,
+            drawn=[drawn_card.get("name", "?") for drawn_card in drawn if isinstance(drawn_card, dict)],
+            draw_count=len(drawn),
+            activation_reason=reason,
+            phase=phase,
+            turn=turn,
+            mana_pool_after=player.mana_pool.snapshot(),
+            hand_size_after=len(player.hand),
+            graveyard_size_after=len(player.graveyard),
+            **replay_rule_fields(effect_data),
+        )
+    return activated
+
+
 TOPDECK_LAND_PLAY_SCOPE = "look_top_library_play_lands_from_top_if_opponent_more_lands_v1"
 
 
@@ -16055,7 +16269,12 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
         player.hand.remove(land)
 
     eff = get_card_effect(land)
-    land_permanent = enrich_card({**land, **eff, "effect": "land"})
+    mdfc_land_face = mdfc_land_face_for_card(land, eff)
+    if mdfc_land_face:
+        land_permanent = enrich_card({**mdfc_land_face, "effect": "land"})
+    else:
+        land_permanent = enrich_card({**land, **eff, "effect": "land"})
+    life_paid_to_enter_untapped = maybe_pay_life_for_untapped_land(player, land_permanent)
     if land_enters_tapped_for_state(land_permanent, player=player, opponents=opponents):
         land_permanent["enters_tapped"] = True
     land_permanent = prepare_entering_permanent(
@@ -16098,11 +16317,15 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
         "land_played",
         player=player.name,
         card=land.get("name", "?"),
-        effect=eff.get("effect", "land"),
+        effect=land_permanent.get("effect", "land"),
+        played_face_name=land_permanent.get("name") if mdfc_land_face else None,
+        modal_dfc_parent_name=land_permanent.get("modal_dfc_parent_name"),
         type_line=land_permanent.get("type_line", ""),
         mana_produced=int(land_permanent.get("mana_produced") or 1),
         enters_tapped=bool(land_permanent.get("enters_tapped")),
         tapped=bool(land_permanent.get("tapped")),
+        life_paid_to_enter_untapped=life_paid_to_enter_untapped,
+        enters_tapped_unless_pay_life=land_enter_untapped_life_cost(land_permanent),
         mana_available_from_land=mana_available_from_land,
         mana_pool_after=player.mana_pool.snapshot(),
         conditional_mana_sources_after=replay_conditional_mana_sources(player),
@@ -26474,6 +26697,30 @@ def token_count_for_effect(player, effect_data, default=5, opponents=None):
     return int(token_count)
 
 
+def attack_each_opponent_tokens_runtime_enabled(effect_data):
+    return runtime_executor_status_enabled(
+        (effect_data or {}).get("attack_each_opponent_this_turn_status")
+    )
+
+
+def _live_opponents(opponents):
+    return [
+        opponent
+        for opponent in (opponents or [])
+        if getattr(opponent, "is_alive", lambda: True)()
+    ]
+
+
+def _mark_token_must_attack_defender_until_eot(token, defender, source_card_name, turn):
+    if not isinstance(token, dict) or defender is None:
+        return
+    set_until_eot(token, "must_attack_if_able", True)
+    set_until_eot(token, "must_attack_defender", defender.name)
+    set_until_eot(token, "must_attack_source", source_card_name)
+    if turn is not None:
+        set_until_eot(token, "must_attack_until_turn", turn)
+
+
 def create_creature_tokens_from_effect(
     player,
     effect_data,
@@ -26486,6 +26733,8 @@ def create_creature_tokens_from_effect(
     active_player=None,
     all_players=None,
 ):
+    if isinstance(effect_data, dict):
+        effect_data.pop("_last_token_attack_assignments", None)
     token_count = (
         token_count_for_effect(player, effect_data, opponents=opponents)
         if count is None
@@ -26502,7 +26751,59 @@ def create_creature_tokens_from_effect(
         token_keywords.append("prowess")
     artifact_tokens = bool((effect_data or {}).get("artifact_tokens"))
     token_colors = (effect_data or {}).get("token_colors") or []
-    for _ in range(min(max(0, token_count), 20)):
+    capped_token_count = min(max(0, token_count), 20)
+    per_opponent = (effect_data or {}).get("token_count_per_opponent")
+    if (
+        count is None
+        and per_opponent not in (None, "", False)
+        and attack_each_opponent_tokens_runtime_enabled(effect_data)
+    ):
+        assignments = []
+        created = 0
+        source_card_name = (effect_data or {}).get("_source_card_name") or (effect_data or {}).get("card_name")
+        for opponent in _live_opponents(opponents):
+            if created >= capped_token_count:
+                break
+            defender_tokens = 0
+            for _ in range(max(0, int(per_opponent))):
+                if created >= capped_token_count:
+                    break
+                token = create_creature_token(
+                    player,
+                    name=token_name,
+                    power=token_power,
+                    toughness=token_toughness,
+                    haste=token_haste,
+                    flying=token_flying,
+                    keywords=token_keywords,
+                    artifact=artifact_tokens,
+                    subtype=token_subtype,
+                    colors=token_colors,
+                    opponents=opponents,
+                    turn=turn,
+                    source_event=source_event,
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
+                )
+                _mark_token_must_attack_defender_until_eot(
+                    token,
+                    opponent,
+                    source_card_name,
+                    turn,
+                )
+                defender_tokens += 1
+                created += 1
+            if defender_tokens:
+                assignments.append({
+                    "defender": opponent.name,
+                    "tokens": defender_tokens,
+                })
+        if isinstance(effect_data, dict):
+            effect_data["_last_token_attack_assignments"] = assignments
+        return token_count
+
+    for _ in range(capped_token_count):
         create_creature_token(
             player,
             name=token_name,
@@ -35650,11 +35951,164 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
     return actions_taken > 0
 
 
-def resolve_composite_resolution_effect(player, opponents, card, effect_data, turn, rng):
+def _tempting_offer_runtime_components(effect_data):
+    components = [
+        component
+        for component in list((effect_data or {}).get("_composite_rule_components") or [])
+        if runtime_executor_status_enabled(component.get("tempting_offer_opponent_choice_status"))
+    ]
+    if not components:
+        return None, None
+    draw_component = next(
+        (component for component in components if component.get("effect") == "draw_cards"),
+        None,
+    )
+    token_component = next(
+        (component for component in components if component.get("effect") == "token_maker"),
+        None,
+    )
+    if draw_component is None or token_component is None:
+        return None, None
+    return draw_component, token_component
+
+
+def _tempting_offer_choice_model(effect_data, components):
+    for source in [effect_data, *list(components or [])]:
+        if not isinstance(source, dict):
+            continue
+        model = source.get("tempting_offer_choice_model")
+        if model:
+            return str(model)
+        default = source.get("tempting_offer_default")
+        if default:
+            return str(default)
+    return "opponents_decline"
+
+
+def _opponent_accepts_tempting_offer(controller, opponent, model):
+    normalized = str(model or "opponents_decline").strip().lower()
+    if normalized in {"opponents_accept", "opponent_accepts", "accept", "always_accept"}:
+        return True, "accept_offer"
+    if normalized in {"opponents_decline", "opponent_declines", "decline", "always_decline"}:
+        return False, "decline_offer"
+    if normalized in {"table_intent_heuristic_v1", "compact_table_intent_v1"}:
+        controller_life = int(getattr(controller, "life", 0) or 0)
+        opponent_life = int(getattr(opponent, "life", 0) or 0)
+        controller_board = table_visible_board_power(controller)
+        opponent_board = table_visible_board_power(opponent)
+        accept = opponent_life <= controller_life - 8 and opponent_board <= controller_board
+        return accept, "accept_offer" if accept else "decline_offer"
+    return False, "decline_offer"
+
+
+def resolve_tempting_offer_runtime(player, opponents, card, effect_data, turn, rng, *, stack=None, phase="resolution"):
+    draw_component, token_component = _tempting_offer_runtime_components(effect_data)
+    if draw_component is None or token_component is None:
+        return None
+
+    participants = [player, *list(opponents or [])]
+    model = _tempting_offer_choice_model(effect_data, [draw_component, token_component])
+    draw_count = int(draw_component.get("count") or draw_component.get("amount") or draw_component.get("draw_count") or 1)
+    token_count = int(token_component.get("token_count") or 1)
+    choices = []
+    accepted = 0
+    opponent_cards_drawn = 0
+    opponent_tokens_created = 0
+
+    for opponent in _live_opponents(opponents):
+        accepts, choice = _opponent_accepts_tempting_offer(player, opponent, model)
+        opponent_drawn = 0
+        opponent_tokens = 0
+        if accepts:
+            accepted += 1
+            drawn = opponent.draw(max(0, draw_count), rng)
+            opponent_drawn = len(drawn)
+            opponent_cards_drawn += opponent_drawn
+            process_player_draw_triggers(
+                opponent,
+                opponent_drawn,
+                turn,
+                phase,
+                participants,
+                stack=stack,
+                turn_player=player,
+            )
+            opponent_tokens = create_creature_tokens_from_effect(
+                opponent,
+                token_component,
+                count=token_count,
+                opponents=[participant for participant in participants if participant is not opponent],
+                turn=turn,
+                source_event="tempting_offer_opponent_token",
+                stack=stack,
+                active_player=player,
+                all_players=participants,
+            )
+            opponent_tokens_created += min(max(0, opponent_tokens), 20)
+        choices.append({
+            "opponent": opponent.name,
+            "choice": choice,
+            "cards_drawn": opponent_drawn,
+            "tokens_created": opponent_tokens,
+        })
+
+    controller_bonus_draws = 0
+    controller_bonus_tokens = 0
+    if accepted:
+        drawn = player.draw(max(0, draw_count * accepted), rng)
+        controller_bonus_draws = len(drawn)
+        process_player_draw_triggers(
+            player,
+            controller_bonus_draws,
+            turn,
+            phase,
+            participants,
+            stack=stack,
+            turn_player=player,
+        )
+        controller_bonus_tokens = create_creature_tokens_from_effect(
+            player,
+            token_component,
+            count=token_count * accepted,
+            opponents=opponents,
+            turn=turn,
+            source_event="tempting_offer_controller_bonus_token",
+            stack=stack,
+            active_player=player,
+            all_players=participants,
+        )
+
+    emit_replay_event(
+        "tempting_offer_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        choice_model=model,
+        opponents_accepted=accepted,
+        opponents_declined=max(0, len(choices) - accepted),
+        choices=choices,
+        opponent_cards_drawn=opponent_cards_drawn,
+        opponent_tokens_created=opponent_tokens_created,
+        controller_bonus_cards_drawn=controller_bonus_draws,
+        controller_bonus_tokens_created=min(max(0, controller_bonus_tokens), 20),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return {
+        "effect": "tempting_offer",
+        "opponents_accepted": accepted,
+        "opponents_declined": max(0, len(choices) - accepted),
+        "controller_bonus_cards_drawn": controller_bonus_draws,
+        "controller_bonus_tokens_created": min(max(0, controller_bonus_tokens), 20),
+    }
+
+
+def resolve_composite_resolution_effect(player, opponents, card, effect_data, turn, rng, *, stack=None, phase="resolution"):
     """Resolve opt-in same-spell components without moving the source card twice."""
     applied = []
     skipped = []
     components = effect_data.get("_composite_rule_components") or []
+    participants = [player, *list(opponents or [])]
     for index, component in enumerate(components):
         component_effect = component.get("effect")
         component_fields = replay_rule_fields(component)
@@ -35688,6 +36142,9 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 opponents=opponents,
                 turn=turn,
                 source_event="composite_token_maker",
+                stack=stack,
+                active_player=player,
+                all_players=participants,
             )
             outcome = "tokens_created"
             applied.append({"effect": component_effect, "tokens_created": token_count})
@@ -35821,6 +36278,18 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
             turn=turn,
             **component_fields,
         )
+    tempting_offer_summary = resolve_tempting_offer_runtime(
+        player,
+        opponents,
+        card,
+        effect_data,
+        turn,
+        rng,
+        stack=stack,
+        phase=phase,
+    )
+    if tempting_offer_summary is not None:
+        applied.append(tempting_offer_summary)
     return {"applied": applied, "skipped": skipped}
 
 
@@ -35972,6 +36441,8 @@ def apply_effect_immediate(
             effect_data,
             turn,
             rng,
+            stack=stack,
+            phase=phase or "resolution",
         )
         emit_replay_event(
             "composite_rule_resolved",
@@ -37524,6 +37995,8 @@ def apply_effect_immediate(
             permanent["effect"] = "token_maker"
             player.battlefield.append(permanent)
         else:
+            if isinstance(effect_data, dict):
+                effect_data.setdefault("_source_card_name", card.get("name", "?"))
             requested_tokens = create_creature_tokens_from_effect(
                 player,
                 effect_data,
@@ -37557,6 +38030,8 @@ def apply_effect_immediate(
                 token_count_per_opponent=effect_data.get("token_count_per_opponent"),
                 token_flying=bool(effect_data.get("token_flying") or effect_data.get("flying")),
                 token_haste=bool(effect_data.get("token_haste") or effect_data.get("haste")),
+                attack_each_opponent_this_turn_status=effect_data.get("attack_each_opponent_this_turn_status"),
+                attack_assignment_by_opponent=effect_data.get("_last_token_attack_assignments") or [],
                 token_cap_applied=requested_tokens > 20,
                 protected_non_angel_creatures_until_next_turn=[
                     permanent.get("name", "?") for permanent in protected_until_next_turn[:20]
@@ -39330,6 +39805,41 @@ def declare_attackers_step(attacker, opponents, all_players, turn):
 
 def assign_attackers_to_defenders(attacker, attackers, alive_defenders, primary_target, target_reason):
     """Allow Commander free-for-all attacks against multiple defending players."""
+    defenders_by_name = {
+        defender.name: defender
+        for defender in alive_defenders
+        if getattr(defender, "name", None)
+    }
+    forced_groups = {}
+    flexible_attackers = []
+    for creature in attackers or []:
+        forced_defender_name = creature.get("must_attack_defender")
+        forced_defender = defenders_by_name.get(forced_defender_name)
+        if forced_defender is not None:
+            forced_groups.setdefault(forced_defender.name, [forced_defender, []])[1].append(creature)
+        else:
+            flexible_attackers.append(creature)
+    if forced_groups:
+        flexible_groups = (
+            assign_attackers_to_defenders(
+                attacker,
+                flexible_attackers,
+                alive_defenders,
+                primary_target,
+                target_reason,
+            )
+            if flexible_attackers
+            else []
+        )
+        grouped = dict(forced_groups)
+        for defender, group_attackers in flexible_groups:
+            grouped.setdefault(defender.name, [defender, []])[1].extend(group_attackers)
+        return [
+            (defender, group_attackers)
+            for defender, group_attackers in grouped.values()
+            if group_attackers
+        ]
+
     if (
         len(alive_defenders) <= 1
         or len(attackers) <= 1
@@ -40508,6 +41018,19 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             priority_round(player, all_players, stack, turn, rng)
             if turn_ended_by_effect(player):
                 return
+    activate_hand_cycling(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase="precombat_main",
+        stack=stack,
+    )
+    while not stack.empty() or _pending_triggers:
+        priority_round(player, all_players, stack, turn, rng, phase="precombat_main")
+        if turn_ended_by_effect(player):
+            return
     activate_land_tutor_creatures(player, turn, opponents)
     activate_treasure_tutor_creatures(
         player,

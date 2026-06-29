@@ -219,6 +219,8 @@ OPTIMIZER_BASENAMES = {
 }
 
 FOCUSED_EVIDENCE_BASENAMES = {
+    "battle_card_adjustment_throughput_benchmark.py",
+    "test_battle_card_adjustment_throughput_benchmark.py",
     "battle_card_acceleration_source_audit.py",
     "test_battle_card_acceleration_source_audit.py",
     "battle_external_engine_crosscheck.py",

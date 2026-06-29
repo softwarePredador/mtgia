@@ -1,0 +1,4 @@
+ target_rows | expected_hash_rows | hash_drift_rows | runtime_metadata_drift_rows | verified_auto_rows | backup_table_exists
+-------------+--------------------+-----------------+-----------------------------+--------------------+---------------------
+           1 |                  1 |               1 |                           1 |                  1 |                   0
+(1 row)

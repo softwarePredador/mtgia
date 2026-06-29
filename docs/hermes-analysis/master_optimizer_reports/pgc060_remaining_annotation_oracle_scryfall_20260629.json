@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Furygale Flocking",
+    "type_line": "Sorcery",
+    "oracle_text": "This spell costs {1} less to cast for each instant and sorcery card in your graveyard.\nFor each opponent, create two 3/3 blue and red Elemental creature tokens with flying that attack that opponent this turn if able. They gain haste until end of turn.",
+    "scryfall_uri": "https://scryfall.com/card/soc/32/furygale-flocking?utm_source=api",
+    "released_at": "2026-04-24",
+    "oracle_id": "943fc88d-c281-46bb-9dc7-1052f789362b",
+    "id": "a967af7a-03ed-4858-9c26-66f2cb706b02"
+  },
+  {
+    "name": "Tempt with Bunnies",
+    "type_line": "Sorcery",
+    "oracle_text": "Tempting Offer — Draw a card and create a 1/1 white Rabbit creature token. Then each opponent may draw a card and create a 1/1 white Rabbit creature token. For each opponent who does, you draw a card and you create a 1/1 white Rabbit creature token.",
+    "scryfall_uri": "https://scryfall.com/card/blc/13/tempt-with-bunnies?utm_source=api",
+    "released_at": "2024-08-02",
+    "oracle_id": "6874be51-623d-4eaf-a67a-2fcbb9a8ceca",
+    "id": "90cc0369-dc9b-4e75-8e3c-ec0783fa13a9"
+  }
+]

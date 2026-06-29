@@ -3398,7 +3398,7 @@
   ],
   "deck_id": 607,
   "finding_counts": {},
-  "generated_at": "2026-06-29T08:07:23+00:00",
+  "generated_at": "2026-06-29T08:32:56+00:00",
   "scope": "distinct_cards_referenced_by_deck_cards_filtered_by_deck_id",
   "severity_counts": {
     "pass": 94

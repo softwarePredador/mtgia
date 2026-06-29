@@ -1,0 +1,4 @@
+ target_rows | back_face_runtime_rows | mdfc_red_land_face_rows | reviewed_version_rows | backup_rows
+-------------+------------------------+-------------------------+-----------------------+-------------
+           1 |                      1 |                       1 |                     1 |           1
+(1 row)

@@ -4837,7 +4837,11 @@ def register_tests(battle, player):
         active.refresh_mana_sources(turn=4)
 
         assert active.available_mana() == 6
-        assert active.mana_pool.generic == 3
+        assert active.mana_pool.white == 2
+        assert active.mana_pool.blue == 2
+        assert active.mana_pool.green == 2
+        assert active.mana_pool.generic == 0
+        assert not active.can_pay("{B}")
 
     def test_circle_of_dreams_druid_refresh_counts_controlled_creatures():
         active = player("Active")
@@ -7723,12 +7727,12 @@ def register_tests(battle, player):
             "Giver of Runes": (
                 "battle_rule_v1:c2736795c0d2c41d771b8a87319618bc",
                 "ae6856021d2bee0a8ba4d7e70ce56637",
-                "creature_body_protection_activation_annotation_v1",
+                "creature_body_another_creature_protection_from_colorless_or_chosen_color_activation_runtime_v1",
             ),
             "Mother of Runes": (
                 "battle_rule_v1:85d8c93e5ff3b531d4ab9217bd956948",
                 "022c4e9496d2b5b6f0785bc63f8e9d11",
-                "creature_body_protection_activation_annotation_v1",
+                "creature_body_target_creature_protection_from_chosen_color_activation_runtime_v1",
             ),
             "Professional Face-Breaker": (
                 "battle_rule_v1:3d154b436fcb6b4f290cdd0246d5def4",
@@ -7787,6 +7791,11 @@ def register_tests(battle, player):
                     assert effect_data["etb_tutor_target"] == "creature_mana_value_1_or_less"
                     assert effect_data["etb_tutor_status"] == "runtime_library_to_hand"
                     assert effect_data["sacrifice_noncreature_silence_status"] == "annotation_only"
+                elif card["name"] in {"Giver of Runes", "Mother of Runes"}:
+                    assert effect_data["activated_protection_status"] == "runtime_executor_v1"
+                    assert effect_data["runtime_modeled_effect"] == (
+                        "creature_body_plus_targeted_protection_response"
+                    )
                 elif card["name"] != "Drannith Magistrate":
                     assert effect_data["runtime_modeled_effect"] == "creature_body_only"
                 battle.apply_effect_immediate(
@@ -10782,12 +10791,10 @@ def register_tests(battle, player):
             assert top_effect["reorder_top"] is True
             assert top_effect["reorder_top_status"] == "lorehold_first_draw_planning_executor"
             assert top_effect["activated_draw_put_self_on_top"] is True
-            assert top_effect["activated_draw_put_self_on_top_status"] == (
-                "lorehold_first_draw_miracle_window_executor"
-            )
-            assert top_effect["generic_draw_activation_status"] == "annotation_only"
+            assert top_effect["activated_draw_put_self_on_top_status"] == "runtime_executor_v1"
+            assert top_effect["generic_draw_activation_status"] == "runtime_executor_v1"
             assert top_effect["battle_model_scope"] == (
-                "senseis_top_reorder_draw_lorehold_first_draw_miracle_v1"
+                "senseis_top_reorder_and_draw_put_self_on_top_runtime_v1"
             )
             assert top_effect["_rule_logical_key"] == "battle_rule_v1:70c8478871f352b46cee1af296117951"
             assert top_effect["_rule_oracle_hash"] == "f2c5ac0f52963cd710470adc25cc6d7c"
@@ -16060,6 +16067,156 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pinnacle_monk_mystic_peak_land_face_enters_as_red_land():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.life = 40
+            active.hand = [
+                {
+                    "name": "Pinnacle Monk // Mystic Peak",
+                    "type_line": "Creature — Djinn Monk // Land",
+                    "cmc": 5,
+                }
+            ]
+
+            candidate = battle.choose_land_play_candidate(active, [opponent])
+            assert candidate is not None
+            assert battle.play_land_candidate(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=1,
+                stack=battle.Stack(),
+                candidate=candidate,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.life == 37
+        assert active.mana_pool.red == 1
+        assert active.mana_pool.generic == 0
+        assert len(active.battlefield) == 1
+        land = active.battlefield[0]
+        assert land["name"] == "Mystic Peak"
+        assert land["effect"] == "land"
+        assert land["type_line"] == "Land"
+        assert land["produces"] == "R"
+        assert land["mana_produced"] == 1
+        assert land["life_paid_to_enter_untapped"] == 3
+        assert land.get("tapped") is not True
+        land_event = next(data for event, data in events if event == "land_played")
+        assert land_event["card"] == "Pinnacle Monk // Mystic Peak"
+        assert land_event["played_face_name"] == "Mystic Peak"
+        assert land_event["effect"] == "land"
+        assert land_event["life_paid_to_enter_untapped"] == 3
+        assert land_event["mana_pool_after"]["red"] == 1
+        assert land_event["rule_logical_key"] == "battle_rule_v1:bcde63b5e56f2b9f20af6384bc70ad5d"
+
+    def test_pinnacle_monk_mystic_peak_land_face_enters_tapped_when_life_cannot_be_paid():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.life = 3
+            active.hand = [
+                {
+                    "name": "Pinnacle Monk // Mystic Peak",
+                    "type_line": "Creature — Djinn Monk // Land",
+                    "cmc": 5,
+                }
+            ]
+
+            candidate = battle.choose_land_play_candidate(active, [opponent])
+            assert candidate is not None
+            assert battle.play_land_candidate(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=1,
+                stack=battle.Stack(),
+                candidate=candidate,
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert active.life == 3
+        assert active.available_mana() == 0
+        land = active.battlefield[0]
+        assert land["name"] == "Mystic Peak"
+        assert land["tapped"] is True
+        assert land["life_paid_to_enter_untapped"] == 0
+        land_event = next(data for event, data in events if event == "land_played")
+        assert land_event["played_face_name"] == "Mystic Peak"
+        assert land_event["tapped"] is True
+        assert land_event["life_paid_to_enter_untapped"] == 0
+        assert land_event["mana_available_from_land"] is False
+
+    def test_glittering_massif_cycles_after_land_drop_is_used():
+        events = []
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = [
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains", "produces": "W", "mana_produced": 1},
+                {"name": "Mountain", "effect": "land", "type_line": "Basic Land — Mountain", "produces": "R", "mana_produced": 1},
+            ]
+            active.refresh_mana_sources(turn=2)
+            active.lands_played_this_turn = active.max_lands_per_turn
+            massif = {"name": "Glittering Massif", "type_line": "Land — Mountain Plains", "cmc": 0}
+            drawn = {"name": "Fresh Draw", "type_line": "Instant", "cmc": 2}
+            active.hand = [massif]
+            active.library = [drawn]
+
+            activated = battle.activate_hand_cycling(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=2,
+                rng=random.Random(60757),
+                phase="precombat_main",
+                stack=battle.Stack(),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = None
+
+        assert activated == 1
+        assert massif in active.graveyard
+        assert drawn in active.hand
+        assert active.available_mana() == 0
+        event = next(data for event, data in events if event == "cycling_activated")
+        assert event["card"] == "Glittering Massif"
+        assert event["cycling_cost"] == "{2}"
+        assert event["drawn"] == ["Fresh Draw"]
+        assert event["rule_logical_key"] == "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+
+    def test_glittering_massif_preserves_needed_land_drop_in_opening_hand():
+        active = player("Lorehold")
+        opponent = player("Opponent")
+        active.mana_pool.add_generic(2)
+        massif = {"name": "Glittering Massif", "type_line": "Land — Mountain Plains", "cmc": 0}
+        active.hand = [massif]
+        active.library = [{"name": "Fresh Draw", "type_line": "Instant", "cmc": 2}]
+
+        activated = battle.activate_hand_cycling(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=1,
+            rng=random.Random(60758),
+            phase="precombat_main",
+            stack=battle.Stack(),
+        )
+
+        assert activated == 0
+        assert massif in active.hand
+        assert not active.graveyard
+        assert [card.get("name") for card in active.library] == ["Fresh Draw"]
+
     def test_pg226_bedlam_reveler_etb_discards_hand_and_draws_three():
         events = []
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -16762,7 +16919,7 @@ def register_tests(battle, player):
             "Hexing Squelcher": (
                 "battle_rule_v1:c6587e309bfd402ee1b98b4848abc6d3",
                 "ed00818e6ca804b7d1a3ef47c29277ea",
-                "creature_body_uncounterable_ward_static_counter_protection_annotations_v1",
+                "creature_body_uncounterable_ward_pay_life_static_counter_protection_runtime_v1",
             ),
             "Ragavan, Nimble Pilferer": (
                 "battle_rule_v1:3e0569d6bae4ed8b6e6e4289ea75084e",
@@ -16788,7 +16945,9 @@ def register_tests(battle, player):
 
         hexing = battle.get_card_effect({"name": "Hexing Squelcher", "type_line": "Creature", "cmc": 2})
         assert hexing["spells_you_control_cant_be_countered"] is True
-        assert hexing["ward_pay_life_status"] == "annotation_only"
+        assert hexing["spells_you_control_cant_be_countered_status"] == "runtime_counter_target_filter"
+        assert hexing["ward_pay_life_status"] == "runtime_executor_v1"
+        assert hexing["other_creatures_ward_status"] == "runtime_executor_v1"
 
         ragavan = battle.get_card_effect({"name": "Ragavan, Nimble Pilferer", "type_line": "Creature", "cmc": 1})
         assert ragavan["haste"] is True
@@ -17146,6 +17305,191 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pgc060_furygale_tokens_attack_assigned_opponents_if_able():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponents = [player("Opponent A"), player("Opponent B"), player("Opponent C")]
+            all_players = [active, *opponents]
+            effect_data = {
+                "effect": "token_maker",
+                "token_count_per_opponent": 2,
+                "token_name": "Elemental Token",
+                "token_subtype": "Elemental",
+                "token_colors": ["U", "R"],
+                "token_power": 3,
+                "token_toughness": 3,
+                "token_flying": True,
+                "token_haste": True,
+                "attack_each_opponent_this_turn_status": "runtime_executor_v1",
+                "battle_model_scope": (
+                    "per_opponent_two_3_3_flying_hasty_elementals_"
+                    "graveyard_cost_reduction_runtime_attack_requirement_v1"
+                ),
+                "_rule_logical_key": "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
+                "_rule_oracle_hash": "8946b0e85c8430c6105ea70c7fb2724a",
+            }
+            battle.apply_effect_immediate(
+                active,
+                opponents,
+                {"name": "Furygale Flocking", "type_line": "Sorcery", "cmc": 10},
+                turn=7,
+                rng=random.Random(6060),
+                effect_data_override=effect_data,
+            )
+            tokens = [
+                permanent
+                for permanent in active.battlefield
+                if permanent.get("name") == "Elemental Token"
+            ]
+            assigned = {}
+            for token in tokens:
+                assigned[token.get("must_attack_defender")] = assigned.get(token.get("must_attack_defender"), 0) + 1
+                assert token.get("must_attack_if_able") is True
+                assert token.get("summoning_sick") is False
+            assert assigned == {"Opponent A": 2, "Opponent B": 2, "Opponent C": 2}
+
+            declared = battle.declare_attackers_step(active, opponents, all_players, turn=7)
+            assert declared is not None
+            attack_groups = {
+                defender.name: len(group_attackers)
+                for defender, group_attackers in declared[4]
+            }
+            assert attack_groups == {"Opponent A": 2, "Opponent B": 2, "Opponent C": 2}
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert any(
+            event == "tokens_created"
+            and data.get("card") == "Furygale Flocking"
+            and data.get("attack_each_opponent_this_turn_status") == "runtime_executor_v1"
+            and data.get("attack_assignment_by_opponent") == [
+                {"defender": "Opponent A", "tokens": 2},
+                {"defender": "Opponent B", "tokens": 2},
+                {"defender": "Opponent C", "tokens": 2},
+            ]
+            for event, data in events
+        )
+        assert any(
+            event == "multi_defender_attack"
+            and {
+                group["target"]: len(group["attackers"])
+                for group in data.get("groups", [])
+            } == {"Opponent A": 2, "Opponent B": 2, "Opponent C": 2}
+            for event, data in events
+        )
+
+    def test_pgc060_tempt_with_bunnies_opponent_choices_execute():
+        def tempt_effect(choice_model):
+            return {
+                "effect": "composite_resolution",
+                "_rule_logical_key": (
+                    "battle_rule_v1:ac96c7799172699f5d7b6b0dc5e4aa80+"
+                    "battle_rule_v1:64814289c1def19e7cd5bb7462c4cf86"
+                ),
+                "_rule_oracle_hash": "201f6c7234bfef550f3d497e736f0d7a",
+                "_composite_rule_components": [
+                    {
+                        "effect": "draw_cards",
+                        "count": 1,
+                        "battle_model_scope": "tempting_offer_base_draw_one_component_v1",
+                        "tempting_offer_opponent_choice_status": "runtime_executor_v1",
+                        "tempting_offer_choice_model": choice_model,
+                    },
+                    {
+                        "effect": "token_maker",
+                        "token_count": 1,
+                        "token_name": "Rabbit Token",
+                        "token_subtype": "Rabbit",
+                        "token_colors": ["W"],
+                        "token_power": 1,
+                        "token_toughness": 1,
+                        "battle_model_scope": "tempting_offer_base_create_1_1_white_rabbit_component_v1",
+                        "tempting_offer_opponent_choice_status": "runtime_executor_v1",
+                        "tempting_offer_choice_model": choice_model,
+                    },
+                ],
+            }
+
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player(
+                "Lorehold",
+                [
+                    {"name": "Controller Draw 1", "type_line": "Sorcery"},
+                    {"name": "Controller Draw 2", "type_line": "Sorcery"},
+                    {"name": "Controller Draw 3", "type_line": "Sorcery"},
+                    {"name": "Controller Draw 4", "type_line": "Sorcery"},
+                ],
+            )
+            opponents = [
+                player("Opponent A", [{"name": "Opponent A Draw", "type_line": "Sorcery"}]),
+                player("Opponent B", [{"name": "Opponent B Draw", "type_line": "Sorcery"}]),
+            ]
+            battle.apply_effect_immediate(
+                active,
+                opponents,
+                {"name": "Tempt with Bunnies", "type_line": "Sorcery", "cmc": 3},
+                turn=8,
+                rng=random.Random(6061),
+                effect_data_override=tempt_effect("opponents_accept"),
+            )
+            assert len(active.hand) == 3
+            assert sum(1 for permanent in active.battlefield if permanent.get("name") == "Rabbit Token") == 3
+            assert all(len(opponent.hand) == 1 for opponent in opponents)
+            assert all(
+                sum(1 for permanent in opponent.battlefield if permanent.get("name") == "Rabbit Token") == 1
+                for opponent in opponents
+            )
+
+            decline_events_start = len(events)
+            declining_active = player("Declining Lorehold", [{"name": "Base Draw", "type_line": "Sorcery"}])
+            declining_opponents = [
+                player("Decliner A", [{"name": "Unused A", "type_line": "Sorcery"}]),
+                player("Decliner B", [{"name": "Unused B", "type_line": "Sorcery"}]),
+            ]
+            battle.apply_effect_immediate(
+                declining_active,
+                declining_opponents,
+                {"name": "Tempt with Bunnies", "type_line": "Sorcery", "cmc": 3},
+                turn=8,
+                rng=random.Random(6062),
+                effect_data_override=tempt_effect("opponents_decline"),
+            )
+            assert len(declining_active.hand) == 1
+            assert sum(
+                1 for permanent in declining_active.battlefield if permanent.get("name") == "Rabbit Token"
+            ) == 1
+            assert all(len(opponent.hand) == 0 for opponent in declining_opponents)
+            assert all(
+                not any(permanent.get("name") == "Rabbit Token" for permanent in opponent.battlefield)
+                for opponent in declining_opponents
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert any(
+            event == "tempting_offer_resolved"
+            and data.get("card") == "Tempt with Bunnies"
+            and data.get("choice_model") == "opponents_accept"
+            and data.get("opponents_accepted") == 2
+            and data.get("controller_bonus_cards_drawn") == 2
+            and data.get("controller_bonus_tokens_created") == 2
+            for event, data in events
+        )
+        assert any(
+            event == "tempting_offer_resolved"
+            and data.get("card") == "Tempt with Bunnies"
+            and data.get("choice_model") == "opponents_decline"
+            and data.get("opponents_accepted") == 0
+            and data.get("opponents_declined") == 2
+            for event, data in events[decline_events_start:]
+        )
+
     def test_patrol_signaler_postcombat_activation_creates_token_and_untaps():
         events = []
         decisions = []
@@ -17429,7 +17773,7 @@ def register_tests(battle, player):
             "Furygale Flocking": (
                 "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
                 "8946b0e85c8430c6105ea70c7fb2724a",
-                "per_opponent_two_3_3_flying_hasty_elemental_tokens_v1",
+                "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_annotation_v1",
             ),
             "Prismari Pianist": (
                 "battle_rule_v1:0288989021534a6f036968f62361f634",
@@ -17443,6 +17787,9 @@ def register_tests(battle, player):
             assert effect_data["_rule_oracle_hash"] == oracle_hash
             assert effect_data["battle_model_scope"] == scope
             assert effect_data["effect"] == "token_maker"
+            if name == "Furygale Flocking":
+                assert effect_data["cost_reduction_status"] == "runtime_executor_v1"
+                assert effect_data["token_count_per_opponent"] == 2
 
         tempt_effect = battle.get_card_effect({"name": "Tempt with Bunnies", "type_line": "Sorcery", "cmc": 3})
         assert tempt_effect["effect"] == "composite_resolution"
@@ -19522,6 +19869,10 @@ def register_tests(battle, player):
         test_pg079_witch_enchanter_etb_destroys_opponent_artifact_or_enchantment,
         test_pg081_artists_talent_rummages_on_own_noncreature_spell_cast,
         test_pg081_pinnacle_monk_enters_and_returns_instant_or_sorcery_to_hand,
+        test_pinnacle_monk_mystic_peak_land_face_enters_as_red_land,
+        test_pinnacle_monk_mystic_peak_land_face_enters_tapped_when_life_cannot_be_paid,
+        test_glittering_massif_cycles_after_land_drop_is_used,
+        test_glittering_massif_preserves_needed_land_drop_in_opening_hand,
         test_pg226_bedlam_reveler_etb_discards_hand_and_draws_three,
         test_pg150_insidious_roots_creature_recursion_creates_buffed_plant_and_unlocks_token_mana,
         test_pg150_insidious_roots_ignores_noncreature_flashback_from_graveyard,
@@ -19542,6 +19893,8 @@ def register_tests(battle, player):
         test_pg089_removal_compensation_creature_tokens_are_created_for_target_controller,
         test_pg089_l6_removal_compensation_rules_resolve_from_sqlite_cache,
         test_pg091_token_maker_family_runtime_support,
+        test_pgc060_furygale_tokens_attack_assigned_opponents_if_able,
+        test_pgc060_tempt_with_bunnies_opponent_choices_execute,
         test_patrol_signaler_postcombat_activation_creates_token_and_untaps,
         test_patrol_signaler_skips_when_not_tapped_for_untap_activation,
         test_eldrazi_confluence_creates_three_scions_when_no_other_modes_are_live,

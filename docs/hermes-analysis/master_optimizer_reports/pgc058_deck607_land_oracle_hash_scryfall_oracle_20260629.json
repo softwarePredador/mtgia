@@ -1,0 +1,83 @@
+[
+  {
+    "name": "Ancient Tomb",
+    "type_line": "Land",
+    "oracle_text": "{T}: Add {C}{C}. This land deals 2 damage to you.",
+    "scryfall_uri": "https://scryfall.com/card/uma/236/ancient-tomb?utm_source=api",
+    "released_at": "2018-12-07",
+    "oracle_id": "23467047-6dba-4498-b783-1ebc4f74b8c2",
+    "id": "bd3d4b4b-cf31-4f89-8140-9650edb03c7b"
+  },
+  {
+    "name": "Command Beacon",
+    "type_line": "Land",
+    "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice this land: Put your commander into your hand from the command zone.",
+    "scryfall_uri": "https://scryfall.com/card/tdc/352/command-beacon?utm_source=api",
+    "released_at": "2025-04-11",
+    "oracle_id": "7e8c2a18-e404-40ff-a9e0-ec3eeb6d576e",
+    "id": "435e9678-9ff3-4e5d-8061-3f806e1c2ed2"
+  },
+  {
+    "name": "Eiganjo, Seat of the Empire",
+    "type_line": "Legendary Land",
+    "oracle_text": "{T}: Add {W}.\nChannel — {2}{W}, Discard this card: It deals 4 damage to target attacking or blocking creature. This ability costs {1} less to activate for each legendary creature you control.",
+    "scryfall_uri": "https://scryfall.com/card/neo/268/eiganjo-seat-of-the-empire?utm_source=api",
+    "released_at": "2022-02-18",
+    "oracle_id": "7edb3d15-4f70-4ebe-8c5e-caf6a225076d",
+    "id": "c375a022-5b57-496d-a802-e4ea8376e9e4"
+  },
+  {
+    "name": "Mountain",
+    "type_line": "Basic Land — Mountain",
+    "oracle_text": "({T}: Add {R}.)",
+    "scryfall_uri": "https://scryfall.com/card/msc/858/mountain?utm_source=api",
+    "released_at": "2026-06-26",
+    "oracle_id": "a3fb7228-e76b-4e96-a40e-20b5fed75685",
+    "id": "426b0211-3d5d-4e53-bcf6-21823c655ffd"
+  },
+  {
+    "name": "Plains",
+    "type_line": "Basic Land — Plains",
+    "oracle_text": "({T}: Add {W}.)",
+    "scryfall_uri": "https://scryfall.com/card/hob/194/plains?utm_source=api",
+    "released_at": "2026-08-14",
+    "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+    "id": "24dc369c-020a-4115-a4bb-d60a44de64e3"
+  },
+  {
+    "name": "Reliquary Tower",
+    "type_line": "Land",
+    "oracle_text": "You have no maximum hand size.\n{T}: Add {C}.",
+    "scryfall_uri": "https://scryfall.com/card/soc/398/reliquary-tower?utm_source=api",
+    "released_at": "2026-04-24",
+    "oracle_id": "c23e5b80-08d2-4e24-9908-fe2aa4f30f6f",
+    "id": "e2a27742-08c1-4153-af7f-25a7a98f585e"
+  },
+  {
+    "name": "Sunbaked Canyon",
+    "type_line": "Land",
+    "oracle_text": "{T}, Pay 1 life: Add {R} or {W}.\n{1}, {T}, Sacrifice this land: Draw a card.",
+    "scryfall_uri": "https://scryfall.com/card/mh1/247/sunbaked-canyon?utm_source=api",
+    "released_at": "2019-06-14",
+    "oracle_id": "f97fd068-b83a-4621-bf8c-cc96e880ce90",
+    "id": "c36820fa-ee86-4206-9a0d-737a67cf5208"
+  },
+  {
+    "name": "Urza's Saga",
+    "type_line": "Enchantment Land — Urza's Saga",
+    "oracle_text": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — This Saga gains \"{T}: Add {C}.\"\nII — This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact you control.'\"\nIII — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle.",
+    "scryfall_uri": "https://scryfall.com/card/mh2/259/urzas-saga?utm_source=api",
+    "released_at": "2021-06-18",
+    "oracle_id": "4c6a0c30-b547-4eff-8ff4-0ca25803c076",
+    "id": "c1e0f201-42cb-46a1-901a-65bb4fc18f6c"
+  },
+  {
+    "name": "War Room",
+    "type_line": "Land",
+    "oracle_text": "{T}: Add {C}.\n{3}, {T}, Pay life equal to the number of colors in your commanders' color identity: Draw a card.",
+    "scryfall_uri": "https://scryfall.com/card/soc/422/war-room?utm_source=api",
+    "released_at": "2026-04-24",
+    "oracle_id": "71c52bf5-2a5d-488e-8b15-7ef290e4b77d",
+    "id": "0775b4be-881c-4832-8954-d961064315b6"
+  }
+]

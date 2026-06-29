@@ -1,6 +1,6 @@
 # Deck Card Battle Rule Coherence Audit
 
-Generated at: `2026-06-29T08:07:23+00:00`
+Generated at: `2026-06-29T08:22:43+00:00`
 
 Scope: distinct cards referenced by Hermes `deck_cards` for `deck_id=607`.
 

@@ -1,0 +1,4 @@
+ target_rows | trusted_target_rows | current_annotation_rows | current_cycling_cost_rows | backup_table_exists
+-------------+---------------------+-------------------------+---------------------------+---------------------
+           1 |                   1 |                       1 |                         0 |                   0
+(1 row)
