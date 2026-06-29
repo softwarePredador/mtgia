@@ -48,11 +48,10 @@ def repercussion(battle):
     return {**card, **effect}
 
 
-def test_repercussion_uses_xmage_backed_manual_runtime_waiver():
+def test_repercussion_uses_promoted_pg_runtime_rule():
     battle = load_battle()
     effect = battle.get_card_effect(repercussion_card())
 
-    assert "Repercussion" in battle.MANUAL_RULE_RUNTIME_WAIVERS
     assert effect["effect"] == "passive"
     assert effect["global_creature_damage_reflect_to_controller"] is True
     assert effect["trigger"] == "creature_dealt_damage"
@@ -60,6 +59,7 @@ def test_repercussion_uses_xmage_backed_manual_runtime_waiver():
     assert effect["damage_amount_source"] == "damage_dealt_to_creature"
     assert effect["battle_model_scope"] == "creature_damage_controller_reflect_global_v1"
     assert effect["_rule_oracle_hash"] == "8e1ed4f8063ab89dd8906878a6232862"
+    assert effect["_rule_source"] == "curated"
     assert effect["_rule_logical_key"] == "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017"
     waiver = next(
         row
@@ -190,7 +190,7 @@ def test_repercussion_stacks_with_blasphemous_act_board_damage():
 
 if __name__ == "__main__":
     tests = [
-        test_repercussion_uses_xmage_backed_manual_runtime_waiver,
+        test_repercussion_uses_promoted_pg_runtime_rule,
         test_repercussion_cast_enters_battlefield_and_triggers,
         test_repercussion_damages_creature_controller_after_survived_creature_damage,
         test_repercussion_stacks_with_blasphemous_act_board_damage,

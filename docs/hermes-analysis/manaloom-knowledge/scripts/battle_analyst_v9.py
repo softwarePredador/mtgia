@@ -5293,11 +5293,9 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
 }
 HANDCRAFTED_KNOWN_CARDS = set(HANDCRAFTED_KNOWN_CARD_RULES)
 
-# Cards listed here intentionally bypass card_battle_rules and resolve from the
-# handcrafted table first. They are runtime hotfixes for cards whose reviewed
-# battle semantics need to override stale promoted rows until the canonical
-# snapshot/SQLite pipeline is refreshed. Any temporary waiver must be audited
-# and short-lived.
+# Cards listed here can use the handcrafted table as a temporary runtime
+# hotfix, but a synced curated/verified SQLite rule wins first. Waivers are for
+# gaps or stale non-curated rows only and must stay audited and short-lived.
 MANUAL_RULE_RUNTIME_WAIVERS = {
     "Reckless Barbarian",
     "Ephemerate",
@@ -6673,6 +6671,46 @@ def _load_known_cards_into_runtime(path: str | os.PathLike[str], *, bucket: set[
             bucket.add(card_name)
 
 
+def _resolve_battle_card_rule_effect(card, lookup_names, *, source_allowlist=None):
+    if battle_rule_registry is None:
+        return None
+    allowed_sources = (
+        {str(source).lower() for source in source_allowlist}
+        if source_allowlist is not None
+        else None
+    )
+    for lookup_name in lookup_names:
+        if hasattr(battle_rule_registry, "lookup_battle_card_rule_list"):
+            rules = battle_rule_registry.lookup_battle_card_rule_list(DB, lookup_name)
+        else:
+            rule = battle_rule_registry.lookup_battle_card_rule(DB, lookup_name)
+            rules = [rule] if rule else []
+        if allowed_sources is not None:
+            rules = [
+                rule
+                for rule in rules
+                if str((rule or {}).get("source") or "").lower() in allowed_sources
+            ]
+        if not any(rule and rule.get("effect_json") for rule in rules):
+            continue
+        composite_effect = _build_composite_battle_rule_effect(card, rules)
+        if composite_effect is not None:
+            return _enrich_effect_from_canonical_snapshot(lookup_name, composite_effect)
+        enriched_effect = _build_primary_effect_with_safe_secondary_annotations(card, rules)
+        if enriched_effect is not None:
+            return _enrich_effect_from_canonical_snapshot(lookup_name, enriched_effect)
+        rule = _select_primary_runtime_rule(rules)
+        if rule is not None:
+            effect = _annotate_runtime_rule_selection(
+                _annotated_battle_rule_effect(rule),
+                rules,
+                selection_mode="single_selected",
+            )
+            effect = _enrich_effect_from_canonical_snapshot(lookup_name, effect)
+            return normalize_effect_by_oracle(card, effect)
+    return None
+
+
 # ── KNOWN_CARDS fallback loaders ──
 # The canonical snapshot mirrors reviewed SQLite battle_card_rules for degraded
 # runtime operation. If a card is absent from the registry and the snapshot, it
@@ -6692,6 +6730,13 @@ def get_card_effect(card):
         front_face = name.split(" // ", 1)[0].strip()
         if front_face and front_face not in lookup_names:
             lookup_names.append(front_face)
+    curated_registry_effect = _resolve_battle_card_rule_effect(
+        card,
+        lookup_names,
+        source_allowlist={"curated"},
+    )
+    if curated_registry_effect is not None:
+        return curated_registry_effect
     for lookup_name in lookup_names:
         if (
             lookup_name in MANUAL_RULE_RUNTIME_WAIVERS
@@ -6706,29 +6751,9 @@ def get_card_effect(card):
                     confidence=1.0,
                 ),
             )
-    if battle_rule_registry is not None:
-        for lookup_name in lookup_names:
-            if hasattr(battle_rule_registry, "lookup_battle_card_rule_list"):
-                rules = battle_rule_registry.lookup_battle_card_rule_list(DB, lookup_name)
-            else:
-                rule = battle_rule_registry.lookup_battle_card_rule(DB, lookup_name)
-                rules = [rule] if rule else []
-            if any(rule and rule.get("effect_json") for rule in rules):
-                composite_effect = _build_composite_battle_rule_effect(card, rules)
-                if composite_effect is not None:
-                    return _enrich_effect_from_canonical_snapshot(lookup_name, composite_effect)
-                enriched_effect = _build_primary_effect_with_safe_secondary_annotations(card, rules)
-                if enriched_effect is not None:
-                    return _enrich_effect_from_canonical_snapshot(lookup_name, enriched_effect)
-                rule = _select_primary_runtime_rule(rules)
-                if rule is not None:
-                    effect = _annotate_runtime_rule_selection(
-                        _annotated_battle_rule_effect(rule),
-                        rules,
-                        selection_mode="single_selected",
-                    )
-                    effect = _enrich_effect_from_canonical_snapshot(lookup_name, effect)
-                    return normalize_effect_by_oracle(card, effect)
+    registry_effect = _resolve_battle_card_rule_effect(card, lookup_names)
+    if registry_effect is not None:
+        return registry_effect
     for lookup_name in lookup_names:
         if lookup_name in HANDCRAFTED_KNOWN_CARDS:
             handcrafted_effect = HANDCRAFTED_KNOWN_CARD_RULES.get(lookup_name)

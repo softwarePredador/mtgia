@@ -34,7 +34,8 @@ def test_verge_rangers_runtime_rule_grants_top_library_land_play() -> None:
     assert effect["battle_model_scope"] == battle.TOPDECK_LAND_PLAY_SCOPE
     assert effect["play_lands_from_top_library"] is True
     assert effect["play_from_top_condition"] == "opponent_controls_more_lands"
-    assert effect["_rule_logical_key"] == "battle_rule_v1:c795721c1dc42d0f9ee3fa23349500e1"
+    assert effect["_rule_source"] == "curated"
+    assert effect["_rule_logical_key"] == "battle_rule_v1:9cbcc91673241a282f321ffb94963ca1"
     assert effect["_rule_oracle_hash"] == "44aa2eeb2eeb517fb30478aec7cec42f"
     assert effect["_rule_review_status"] == "verified"
     assert effect["_rule_execution_status"] == "auto"

@@ -5377,8 +5377,9 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         )
 
         primary = result["primary_candidate"]["effect_json"]
-        self.assertEqual(primary["effect"], "direct_damage")
+        self.assertEqual(primary["effect"], "passive")
         self.assertEqual(primary["battle_model_scope"], "creature_damage_controller_reflect_global_v1")
+        self.assertEqual(primary["ability_kind"], "triggered_static_enchantment")
         self.assertEqual(primary["trigger"], "creature_dealt_damage")
         self.assertEqual(primary["trigger_effect"], "damage_creature_controller")
         self.assertEqual(primary["damage_amount_source"], "damage_dealt_to_creature")

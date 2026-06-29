@@ -324,6 +324,64 @@ def register_tests(battle, player, card, module_path):
                 if not had_waiver:
                     battle.MANUAL_RULE_RUNTIME_WAIVERS.discard("Waived Manual Card")
 
+    def test_curated_registry_rule_supersedes_manual_runtime_waiver():
+        if battle.battle_rule_registry is None:
+            raise AssertionError("battle_rule_registry failed to import")
+        old_db = battle.DB
+        old_manual_rule = battle.HANDCRAFTED_KNOWN_CARD_RULES.get("Curated Promoted Card")
+        had_handcrafted = "Curated Promoted Card" in battle.HANDCRAFTED_KNOWN_CARDS
+        had_waiver = "Curated Promoted Card" in battle.MANUAL_RULE_RUNTIME_WAIVERS
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "rules.db"
+            conn = sqlite3.connect(db_path)
+            battle.battle_rule_registry.upsert_battle_card_rule(
+                conn,
+                "Curated Promoted Card",
+                {"effect": "counter", "instant": True},
+                source="curated",
+                confidence=0.94,
+                review_status="verified",
+                execution_status="auto",
+                notes="Curated registry rule for waiver precedence test.",
+                logical_rule_key_value="battle_rule_v1:curated-promoted-test",
+            )
+            conn.commit()
+            conn.close()
+
+            try:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES["Curated Promoted Card"] = {
+                    "effect": "draw_cards",
+                    "count": 2,
+                }
+                battle.HANDCRAFTED_KNOWN_CARDS.add("Curated Promoted Card")
+                battle.MANUAL_RULE_RUNTIME_WAIVERS.add("Curated Promoted Card")
+                battle.DB = str(db_path)
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                battle.battle_rule_registry._RULE_LIST_CACHE.clear()
+                effect = battle.get_card_effect(
+                    {
+                        "name": "Curated Promoted Card",
+                        "type_line": "Instant",
+                        "oracle_text": "Counter target spell.",
+                    }
+                )
+
+                assert effect["effect"] == "counter"
+                assert effect["_rule_source"] == "curated"
+                assert effect["_rule_logical_key"] == "battle_rule_v1:curated-promoted-test"
+            finally:
+                battle.DB = old_db
+                battle.battle_rule_registry._RULE_CACHE.clear()
+                battle.battle_rule_registry._RULE_LIST_CACHE.clear()
+                if old_manual_rule is None:
+                    battle.HANDCRAFTED_KNOWN_CARD_RULES.pop("Curated Promoted Card", None)
+                else:
+                    battle.HANDCRAFTED_KNOWN_CARD_RULES["Curated Promoted Card"] = old_manual_rule
+                if not had_handcrafted:
+                    battle.HANDCRAFTED_KNOWN_CARDS.discard("Curated Promoted Card")
+                if not had_waiver:
+                    battle.MANUAL_RULE_RUNTIME_WAIVERS.discard("Curated Promoted Card")
+
     def test_load_deck_preserves_semantic_snapshot_identity_fields():
         old_db = battle.DB
         with tempfile.TemporaryDirectory() as tmp:

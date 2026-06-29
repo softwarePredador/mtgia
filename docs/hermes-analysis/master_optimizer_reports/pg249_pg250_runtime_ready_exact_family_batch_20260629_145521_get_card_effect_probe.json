@@ -1,0 +1,126 @@
+{
+  "rows": [
+    {
+      "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+      "blocked_alternatives": [],
+      "card_name": "Verge Rangers",
+      "effect": "topdeck_play",
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:9cbcc91673241a282f321ffb94963ca1",
+      "rule_oracle_hash": "44aa2eeb2eeb517fb30478aec7cec42f",
+      "rule_review_status": "verified",
+      "rule_source": "curated",
+      "selection": {
+        "rule_count": 1,
+        "selected_effect": "topdeck_play",
+        "selected_logical_rule_key": "battle_rule_v1:9cbcc91673241a282f321ffb94963ca1",
+        "selection_mode": "single_selected"
+      }
+    },
+    {
+      "battle_model_scope": "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+      "blocked_alternatives": [],
+      "card_name": "Firesong and Sunspeaker",
+      "effect": "creature",
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:f6858198cb699117df42e073abcee357",
+      "rule_oracle_hash": "834cfb8f0f869e7e9b4bc5342ad63046",
+      "rule_review_status": "verified",
+      "rule_source": "curated",
+      "selection": {
+        "rule_count": 1,
+        "selected_effect": "creature",
+        "selected_logical_rule_key": "battle_rule_v1:f6858198cb699117df42e073abcee357",
+        "selected_target": "any_target",
+        "selection_mode": "single_selected"
+      }
+    },
+    {
+      "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+      "blocked_alternatives": [],
+      "card_name": "Goliath Daydreamer",
+      "effect": "free_cast",
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd",
+      "rule_oracle_hash": "715d2c178b304a7c5e6beed655883851",
+      "rule_review_status": "verified",
+      "rule_source": "curated",
+      "selection": {
+        "rule_count": 1,
+        "selected_effect": "free_cast",
+        "selected_logical_rule_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd",
+        "selection_mode": "single_selected"
+      }
+    },
+    {
+      "battle_model_scope": "source_dealt_damage_reflect_to_any_target_v1",
+      "blocked_alternatives": [],
+      "card_name": "Boros Reckoner",
+      "effect": "creature",
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:f344d0f95f1afcd03e9b0d840981aeef",
+      "rule_oracle_hash": "8cb6c980428b2501343f3f38dc686efb",
+      "rule_review_status": "verified",
+      "rule_source": "curated",
+      "selection": {
+        "rule_count": 1,
+        "selected_effect": "creature",
+        "selected_logical_rule_key": "battle_rule_v1:f344d0f95f1afcd03e9b0d840981aeef",
+        "selected_target": "any_target",
+        "selection_mode": "single_selected"
+      }
+    },
+    {
+      "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+      "blocked_alternatives": [],
+      "card_name": "Terror of the Peaks",
+      "effect": "creature",
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:ae8cab02963098960997301b3c227a80",
+      "rule_oracle_hash": "90c007ac59cdd400f58e89c47d81440e",
+      "rule_review_status": "verified",
+      "rule_source": "curated",
+      "selection": {
+        "rule_count": 1,
+        "selected_effect": "creature",
+        "selected_logical_rule_key": "battle_rule_v1:ae8cab02963098960997301b3c227a80",
+        "selected_target": "any_target",
+        "selection_mode": "single_selected"
+      }
+    },
+    {
+      "battle_model_scope": "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+      "blocked_alternatives": [],
+      "card_name": "Balefire Liege",
+      "effect": "creature",
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:23affc042720e62b237989441a5e1b0e",
+      "rule_oracle_hash": "467dd11263f2854e2d9fc487a127ced6",
+      "rule_review_status": "verified",
+      "rule_source": "curated",
+      "selection": {
+        "rule_count": 1,
+        "selected_effect": "creature",
+        "selected_logical_rule_key": "battle_rule_v1:23affc042720e62b237989441a5e1b0e",
+        "selection_mode": "single_selected"
+      }
+    },
+    {
+      "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+      "blocked_alternatives": [],
+      "card_name": "Repercussion",
+      "effect": "passive",
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017",
+      "rule_oracle_hash": "8e1ed4f8063ab89dd8906878a6232862",
+      "rule_review_status": "verified",
+      "rule_source": "curated",
+      "selection": {
+        "rule_count": 1,
+        "selected_effect": "passive",
+        "selected_logical_rule_key": "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017",
+        "selection_mode": "single_selected"
+      }
+    }
+  ]
+}

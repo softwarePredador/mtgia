@@ -6776,13 +6776,13 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
     ):
         candidates.append(
             _candidate(
-                effect="direct_damage",
+                effect="passive",
                 scope="creature_damage_controller_reflect_global_v1",
                 reason=(
                     "XMage structure matches Repercussion: whenever any creature is dealt damage, "
                     "the source enchantment deals that much damage to that creature's controller."
                 ),
-                ability_kind="triggered",
+                ability_kind="triggered_static_enchantment",
                 requires_runtime_executor=True,
                 extra_effect_fields={
                     "trigger": "creature_dealt_damage",

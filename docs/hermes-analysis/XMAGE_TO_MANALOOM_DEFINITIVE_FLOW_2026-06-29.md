@@ -185,6 +185,46 @@ Conservative ramp split evidence:
   package, and one land subpattern became stricter because generic land-mana
   grouping would have hidden unresolved non-mana abilities.
 
+Post-apply E2E wave:
+
+- PG249 was applied on 2026-06-29 for:
+  `Verge Rangers`, `Firesong and Sunspeaker`, `Goliath Daydreamer`,
+  `Boros Reckoner`, `Terror of the Peaks`, `Balefire Liege`, `Repercussion`.
+- PG249 apply result: `deprecated_shadow_rows=6`, `upserted_rows=7`; postcheck
+  showed all seven selected cards with one promoted verified/auto row and
+  matching Oracle hash.
+- PG249 sync result:
+  `pg_rows_loaded=13`, `sqlite_inserted_or_updated=13`; the row count includes
+  seven active curated rules plus six deprecated disabled shadow rows.
+- Runtime probing found a real model issue: the PG249 `Repercussion` row was
+  immediate `direct_damage`, but the card must be a passive enchantment trigger
+  so it can enter the battlefield and react to later creature damage.
+- PG250 corrected only `Repercussion`: the `direct_damage` row was disabled and
+  `battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017` was promoted as
+  `passive` with `creature_damage_controller_reflect_global_v1`.
+- The battle runtime now prefers synced `curated` SQLite/PG rules over
+  temporary manual runtime waivers, while preserving waivers as fallback for
+  missing or stale non-curated rows.
+- Final runtime probe:
+  `docs/hermes-analysis/master_optimizer_reports/pg249_pg250_runtime_ready_exact_family_batch_20260629_145521_get_card_effect_probe.json`
+- Current queue after apply/sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_145746_post_pg249_pg250_apply_sync_manifest.md`
+- Current combined severity counts:
+  `{"critical": 1, "high": 200, "medium": 49, "pass": 541}`
+- Current actionable XMage-sourced validity rows:
+  `ready_for_structured_xmage_pull_review_required=151`,
+  `xmage_source_valid_mapper_required=81`.
+- Current proposal status counts:
+  `batch_pg_candidate_after_precheck=1`,
+  `partial_batch_pg_candidate_preserve_shadow_rows_after_precheck=1`,
+  `runtime_family_implementation_required=1`,
+  `split_family_scope_review_required=148`,
+  `mapper_metadata_or_test_scenario_required=81`.
+- Remaining immediate lanes are:
+  `Adagia, Windswept Bastion` pending `station_level_gate`,
+  `Purphoros, God of the Forge` in preserve-shadow partial lane, and
+  `Hazel's Brewmaster` as a runtime-family exception.
+
 Additional exact runtime/mapping correction:
 
 - `Adagia, Windswept Bastion` was reclassified from generic `token_maker` to

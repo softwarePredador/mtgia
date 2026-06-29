@@ -1,6 +1,6 @@
 # PG249 XMage Batch PostgreSQL Package
 
-Status: `prepared_read_only_pending_apply_approval`.
+Status: `applied_postchecked_synced`.
 
 This package was generated from XMage batch proposals. No SQL was executed by the builder.
 
@@ -32,7 +32,42 @@ Precheck evidence:
 - Existing shadow rows that apply would deprecate:
   `Firesong and Sunspeaker=2`, `Goliath Daydreamer=1`,
   `Terror of the Peaks=1`, `Verge Rangers=2`.
-- Apply remains blocked until explicit approval for the exact apply command.
+- Apply approval was granted by the user on 2026-06-29 and the package was
+  applied.
+
+Apply evidence:
+
+- pre-apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_144646_preapply.out`
+- apply output:
+  `docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_144646_apply.out`
+- postcheck output:
+  `docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_144646_postcheck.out`
+- Apply result: `deprecated_shadow_rows=6`, `upserted_rows=7`.
+- Postcheck result: every selected card had `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+
+SQLite/Hermes sync evidence:
+
+- PG249 sync report:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg249_runtime_ready_exact_family_batch_20260629_144739.json`
+- SQLite lookup:
+  `docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_144739_sqlite_lookup.out`
+- PostgreSQL lookup:
+  `docs/hermes-analysis/master_optimizer_reports/pg249_runtime_ready_exact_family_batch_20260629_144739_pg_lookup.out`
+- Sync result: `pg_rows_loaded=13`, `sqlite_inserted_or_updated=13`.
+- The `13` rows are the seven active curated rules plus six deprecated disabled
+  shadow rows.
+
+Runtime correction:
+
+- Post-apply runtime probing showed `Repercussion` could not remain an
+  immediate `direct_damage` rule, because the enchantment must enter the
+  battlefield and trigger passively.
+- PG250 corrected only `Repercussion` while preserving the PG249 backup and
+  rollback lineage.
+- Final runtime probe:
+  `docs/hermes-analysis/master_optimizer_reports/pg249_pg250_runtime_ready_exact_family_batch_20260629_145521_get_card_effect_probe.json`
 
 Focused runtime evidence:
 

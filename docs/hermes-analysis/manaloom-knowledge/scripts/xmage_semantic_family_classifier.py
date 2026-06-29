@@ -3361,7 +3361,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target") == "any_target"
         )
 
-    if effect == "direct_damage" and scope == "creature_damage_controller_reflect_global_v1":
+    if effect == "passive" and scope == "creature_damage_controller_reflect_global_v1":
         return (
             types == {"ENCHANTMENT"}
             and effect_classes == {"DamageTargetEffect"}

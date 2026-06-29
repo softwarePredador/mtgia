@@ -58,7 +58,8 @@ def test_boros_reckoner_get_card_effect_is_runtime_source():
     assert effect["damage_amount_source"] == "damage_dealt_to_source"
     assert effect["source_damage_reflect_to_any_target"] is True
     assert effect["activated_gain_first_strike_until_eot"] is True
-    assert effect["_rule_logical_key"] == "battle_rule_v1:f1540009e5e8a14128cf83a2f494a0db"
+    assert effect["_rule_source"] == "curated"
+    assert effect["_rule_logical_key"] == "battle_rule_v1:f344d0f95f1afcd03e9b0d840981aeef"
     assert effect["_rule_oracle_hash"] == "8cb6c980428b2501343f3f38dc686efb"
     assert effect["_rule_review_status"] == "verified"
     assert effect["_rule_execution_status"] == "auto"

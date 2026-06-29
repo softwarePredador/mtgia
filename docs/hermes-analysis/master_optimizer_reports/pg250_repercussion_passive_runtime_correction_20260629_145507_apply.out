@@ -1,0 +1,9 @@
+BEGIN
+CREATE SCHEMA
+SELECT 1
+ deprecated_rows | upserted_rows
+-----------------+---------------
+               1 |             1
+(1 row)
+
+COMMIT
