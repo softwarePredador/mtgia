@@ -991,6 +991,33 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("back_face_status") == "annotation_only"
         )
 
+    if (
+        effect == "ramp_engine"
+        and scope == "instant_sorcery_cast_red_mana_trigger_persistent_red_leaves_x_damage_annotation_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and {
+                "FlyingAbility",
+                "LeavesBattlefieldTriggeredAbility",
+                "SimpleStaticAbility",
+                "SpellCastControllerTriggeredAbility",
+            }.issubset(ability_classes)
+            and {
+                "AddManaToManaPoolSourceControllerEffect",
+                "ElectroAssaultingBatteryEffect",
+                "YouDontLoseManaEffect",
+            }.issubset(effect_classes)
+            and "TargetPlayer" in target_classes
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and int(effect_json.get("instant_sorcery_cast_add_mana") or 0) == 1
+            and effect_json.get("instant_sorcery_cast_mana_color") == "R"
+            and effect_json.get("produces") == "R"
+            and bool(effect_json.get("mana_persists_steps"))
+            and bool(effect_json.get("leaves_battlefield_pay_x_damage_target_player"))
+            and effect_json.get("leaves_battlefield_pay_x_damage_status") == "annotation_only"
+        )
+
     if effect == "ramp_permanent" and scope == "colorless_mana_rock_planar_die_annotation_v1":
         return (
             types == {"ARTIFACT"}

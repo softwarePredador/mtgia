@@ -34489,6 +34489,48 @@ def trigger_spell_cast_engines(
             continue
         if permanent.get("trigger") != "instant_sorcery_cast":
             continue
+        mana_amount = int(permanent.get("instant_sorcery_cast_add_mana") or 0)
+        if mana_amount > 0:
+            mana_color = source_colors(
+                {
+                    "produces": permanent.get("instant_sorcery_cast_mana_color")
+                    or permanent.get("spell_cast_mana_color")
+                    or permanent.get("produces")
+                }
+            )
+            color = mana_color[0] if mana_color else "generic"
+
+            def resolve_instant_sorcery_cast_mana_trigger(
+                permanent=permanent,
+                mana_amount=mana_amount,
+                color=color,
+            ):
+                player.mana_pool.add(color, mana_amount)
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    effect="add_mana",
+                    mana_added=mana_amount,
+                    mana_color=color,
+                    mana_pool=player.mana_pool.snapshot(),
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "instant_sorcery_cast",
+                resolve_instant_sorcery_cast_mana_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         if permanent.get("trigger_effect") == "add_named_counter_then_transform":
             counter_type = str(permanent.get("trigger_counter_type") or "charge")
             counter_count = max(1, int(permanent.get("trigger_counter_count") or 1))

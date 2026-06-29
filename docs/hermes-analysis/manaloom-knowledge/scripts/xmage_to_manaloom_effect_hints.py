@@ -1979,6 +1979,39 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "ElectroAssaultingBattery"
+        and card_types == {"CREATURE"}
+        and {"FlyingAbility", "LeavesBattlefieldTriggeredAbility", "SimpleStaticAbility", "SpellCastControllerTriggeredAbility"}.issubset(ability_classes)
+        and {"AddManaToManaPoolSourceControllerEffect", "ElectroAssaultingBatteryEffect", "YouDontLoseManaEffect"}.issubset(effect_classes)
+        and "TargetPlayer" in target_classes
+    ):
+        return {
+            "effect": "ramp_engine",
+            "scope": "instant_sorcery_cast_red_mana_trigger_persistent_red_leaves_x_damage_annotation_v1",
+            "fields": {
+                "is_creature_permanent": True,
+                "power": 2,
+                "toughness": 3,
+                "flying": True,
+                "trigger": "instant_sorcery_cast",
+                "instant_sorcery_cast_add_mana": 1,
+                "instant_sorcery_cast_mana_color": "R",
+                "produces": "R",
+                "mana_persists_steps": True,
+                "leaves_battlefield_pay_x_damage_target_player": True,
+                "leaves_battlefield_pay_x_damage_status": "annotation_only",
+            },
+            "reason": "XMage structure matches Electro's instant/sorcery-cast red mana trigger and red mana persistence; its leaves-battlefield X damage rider is tracked as annotation.",
+            "signals": [
+                "ElectroAssaultingBattery",
+                "SpellCastControllerTriggeredAbility(FILTER_SPELL_AN_INSTANT_OR_SORCERY)",
+                "AddManaToManaPoolSourceControllerEffect",
+                "YouDontLoseManaEffect(ManaType.RED)",
+                "ElectroAssaultingBatteryEffect",
+            ],
+        }
+
+    if (
         xmage_class_name == "FracturedPowerstone"
         and card_types == {"ARTIFACT"}
         and "ColorlessManaAbility" in ability_classes

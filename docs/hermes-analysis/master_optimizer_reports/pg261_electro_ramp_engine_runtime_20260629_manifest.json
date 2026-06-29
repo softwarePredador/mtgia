@@ -1,0 +1,42 @@
+{
+  "apply_gate": "Applied under the active XMage -> ManaLoom goal scope with explicit PostgreSQL/sync/commit authorization.",
+  "backup_table": "manaloom_deploy_audit.pg261_electro_ramp_engine_runtime_20260629_20260629_1733",
+  "deploy_id": "pg261",
+  "evidence": {
+    "deck_coherence_md": "docs/hermes-analysis/master_optimizer_reports/deck611_battle_rule_coherence_pg261_electro_postsync_20260629.md",
+    "e2e_validation_md": "docs/hermes-analysis/master_optimizer_reports/pg261_electro_ramp_engine_runtime_20260629_e2e_validation.md",
+    "runtime_probe_json": "docs/hermes-analysis/master_optimizer_reports/pg261_electro_ramp_engine_runtime_20260629_1734_get_card_effect_probe.json",
+    "strategy_consistency_md": "docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260629_1735_post_pg261_electro_ramp_engine_runtime.md",
+    "sync_report_json": "docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg261_electro_ramp_engine_runtime_20260629_1733.json",
+    "xmage_post_pipeline_manifest_md": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_1735_post_pg261_electro_ramp_engine_runtime_manifest.md"
+  },
+  "family_counts": {
+    "ramp_engine": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg261_electro_ramp_engine_runtime_20260629_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg261_electro_ramp_engine_runtime_20260629_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg261_electro_ramp_engine_runtime_20260629_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg261_electro_ramp_engine_runtime_20260629_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg261_electro_ramp_engine_runtime_20260629_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg261_electro_ramp_engine_runtime_20260629_rollback.sql"
+  },
+  "generated_at": "2026-06-29T17:33:24+00:00",
+  "mutations_performed": [
+    "precheck",
+    "postgres_apply",
+    "postcheck",
+    "pg_to_sqlite_sync",
+    "canonical_snapshot_export",
+    "runtime_probe",
+    "e2e_validation",
+    "deck611_coherence_audit",
+    "xmage_strategy_consistency_audit"
+  ],
+  "selected_card_names": [
+    "Electro, Assaulting Battery"
+  ],
+  "selected_count": 1,
+  "slug": "electro_ramp_engine_runtime_20260629",
+  "status": "applied_synced_validated"
+}

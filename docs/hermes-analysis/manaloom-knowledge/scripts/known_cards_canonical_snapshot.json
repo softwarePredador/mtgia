@@ -9471,19 +9471,27 @@
     "battle_rule_oracle_hash": "77323f8288f108b027cf698e38e08341"
   },
   "Electro, Assaulting Battery": {
-    "effect": "creature",
+    "ability_kind": "triggered",
+    "battle_model_scope": "instant_sorcery_cast_red_mana_trigger_persistent_red_leaves_x_damage_annotation_v1",
+    "effect": "ramp_engine",
+    "flying": true,
+    "instant_sorcery_cast_add_mana": 1,
+    "instant_sorcery_cast_mana_color": "R",
     "is_creature_permanent": true,
-    "keywords": [
-      "flying"
-    ],
+    "leaves_battlefield_pay_x_damage_status": "annotation_only",
+    "leaves_battlefield_pay_x_damage_target_player": true,
+    "mana_persists_steps": true,
     "power": 2,
+    "produces": "R",
     "toughness": 3,
+    "trigger": "instant_sorcery_cast",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:6b26f62e8325a486af9d5e8e594e877e"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:806bda250ae81f2871b2e6a30ab8235b",
+    "battle_rule_oracle_hash": "89bda5fb5ee7d86edea25de7fc9605ff"
   },
   "Electrodominance": {
     "cmc": 2.0,

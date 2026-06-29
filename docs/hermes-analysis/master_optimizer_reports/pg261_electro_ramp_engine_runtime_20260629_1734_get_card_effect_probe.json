@@ -1,0 +1,15 @@
+{
+  "battle_model_scope": "instant_sorcery_cast_red_mana_trigger_persistent_red_leaves_x_damage_annotation_v1",
+  "card_name": "Electro, Assaulting Battery",
+  "creature_followup_added_mana": 0,
+  "effect": "ramp_engine",
+  "execution_status": "auto",
+  "instant_sorcery_cast_add_mana": 1,
+  "instant_sorcery_cast_mana_color": "R",
+  "logical_rule_key": "battle_rule_v1:806bda250ae81f2871b2e6a30ab8235b",
+  "oracle_hash": "89bda5fb5ee7d86edea25de7fc9605ff",
+  "red_after_creature_followup": 1,
+  "red_after_instant": 1,
+  "review_status": "verified",
+  "source": "curated"
+}
