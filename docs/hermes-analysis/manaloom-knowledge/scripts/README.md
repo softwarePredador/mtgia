@@ -37,6 +37,14 @@ and covered by a focused regression test.
 
 ## Validation
 
+Run the operational surface alignment audit before claiming scripts/docs are
+aligned with the current XMage and Commander deckbuilding contracts:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260629_current
+```
+
 Run the v9 regression harness explicitly:
 
 ```bash

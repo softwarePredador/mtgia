@@ -1,0 +1,333 @@
+#!/usr/bin/env python3
+"""Audit ManaLoom battle/rules/deckbuilding surfaces against current contracts.
+
+This is a static governance audit. It does not promote card rules, mutate
+PostgreSQL, mutate Hermes SQLite, run battles, or decide deck swaps.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[3]
+DOCS_DIR = REPO_ROOT / "docs" / "hermes-analysis"
+REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
+
+README = DOCS_DIR / "README.md"
+SCRIPTS_README = SCRIPT_DIR / "README.md"
+XMAGE_FLOW = DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
+BATTLE_RULES_CONTRACT = DOCS_DIR / "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md"
+DECKBUILDING_CONTRACT = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
+XMAGE_AUDIT = SCRIPT_DIR / "xmage_strategy_consistency_audit.py"
+DECKBUILDING_AUDIT = SCRIPT_DIR / "deckbuilding_contract_surface_audit.py"
+VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
+VARIANT_GATE = SCRIPT_DIR / "lorehold_variant_battle_gate.py"
+STRATEGY_LEARNING_AUDIT = SCRIPT_DIR / "lorehold_strategy_learning_audit.py"
+IDEAL_MATRIX = SCRIPT_DIR / "lorehold_ideal_deck_candidate_matrix.py"
+BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
+UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
+ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
+DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
+
+CURRENT_XMAGE_MANIFEST = (
+    "xmage_current_replay_batch_pipeline_20260629_1746_post_pg262_exact_ritual_runtime_manifest.md"
+)
+CURRENT_LOREHOLD_MATRIX = "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract"
+
+FORBIDDEN_OPERATIONAL_SNIPPETS = {
+    README: [
+        "Decisao atual para acelerar XMage -> ManaLoom: usar\n    `hybrid_effective_queue_pattern_registry`",
+        "Workflow operacional atual para a fila real Lorehold 608-616",
+        "xmage_current_replay_batch_pipeline_20260629_135909_post_adagia_family_mapper_lorehold_6_607_616_manifest.md",
+    ],
+    XMAGE_AUDIT: [
+        "xmage_current_replay_batch_pipeline_20260629_145746_post_pg249_pg250_apply_sync_manifest.md",
+    ],
+    BUILD_OPTIMIZED_DECK: [
+        "replacement=lorehold_ideal_deck_candidate_matrix.py",
+        "generate_matrix_then_use_slot_optimizer_with_baseline_hash_guard",
+    ],
+    UNIVERSAL_OPTIMIZER: [
+        "replacement=lorehold_ideal_deck_candidate_matrix.py_then_slot_optimizer.py",
+    ],
+}
+
+
+@dataclass
+class Check:
+    name: str
+    status: str
+    detail: str
+
+    def as_dict(self) -> dict[str, str]:
+        return {"name": self.name, "status": self.status, "detail": self.detail}
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def rel(path: Path) -> str:
+    try:
+        return str(path.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(path)
+
+
+def read(path: Path) -> str:
+    return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+def check_contains(path: Path, patterns: list[str], name: str) -> Check:
+    if not path.exists():
+        return Check(name, "fail", f"missing_file:{rel(path)}")
+    text = read(path)
+    missing = [pattern for pattern in patterns if pattern not in text]
+    if missing:
+        return Check(name, "fail", "missing=" + json.dumps(missing, ensure_ascii=True))
+    return Check(name, "pass", rel(path))
+
+
+def check_absent(path: Path, patterns: list[str], name: str) -> Check:
+    if not path.exists():
+        return Check(name, "fail", f"missing_file:{rel(path)}")
+    text = read(path)
+    present = [pattern for pattern in patterns if pattern in text]
+    if present:
+        return Check(name, "fail", "present=" + json.dumps(present, ensure_ascii=True))
+    return Check(name, "pass", rel(path))
+
+
+def file_inventory() -> dict[str, int]:
+    script_files = [path for path in SCRIPT_DIR.iterdir() if path.is_file()]
+    top_docs = [path for path in DOCS_DIR.iterdir() if path.is_file() and path.suffix == ".md"]
+    report_files = [path for path in REPORT_DIR.iterdir() if path.is_file()] if REPORT_DIR.exists() else []
+    return {
+        "script_files": len(script_files),
+        "top_level_docs": len(top_docs),
+        "report_files": len(report_files),
+    }
+
+
+def build_checks() -> list[Check]:
+    checks = [
+        check_contains(
+            README,
+            [
+                "Status atual: canonico",
+                "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
+                "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+                CURRENT_XMAGE_MANIFEST,
+                "build_optimized_deck.py` e `universal_optimizer.py` ficam como historicos",
+            ],
+            "docs.root_readme_routes_current_contracts",
+        ),
+        check_contains(
+            XMAGE_FLOW,
+            [
+                "Status: `current_operating_standard`",
+                "PG262 exact ritual runtime checkpoint",
+                CURRENT_XMAGE_MANIFEST,
+                "ready_for_structured_xmage_pull_review_required=73",
+                "xmage_source_valid_mapper_required=63",
+                "runtime_family_required_count=0",
+            ],
+            "docs.xmage_flow_points_to_pg262",
+        ),
+        check_contains(
+            BATTLE_RULES_CONTRACT,
+            [
+                "Status: `frozen_operating_contract`",
+                "PostgreSQL `card_battle_rules` is the durable source of truth",
+                "Hermes SQLite is cache/lab/runtime evidence and must not overwrite PostgreSQL",
+                "Pattern registry rows are `shadow_only`, non-executable, and non-autopromotable",
+            ],
+            "docs.battle_rules_contract_freezes_source_boundaries",
+        ),
+        check_contains(
+            DECKBUILDING_CONTRACT,
+            [
+                "Status: `frozen_operating_contract`",
+                "Source Hierarchy",
+                "Lorehold Promotion Gate",
+                "deck `607` is the current protected structural",
+                "deckbuilding_contract",
+            ],
+            "docs.deckbuilding_contract_freezes_lorehold_gate",
+        ),
+        check_contains(
+            SCRIPTS_README,
+            [
+                "`battle_analyst_v9.py` is the active battle engine",
+                "Legacy engines",
+                "Refresh the SQLite battle cache from PostgreSQL first",
+            ],
+            "scripts.readme_names_active_engine_and_cache_boundary",
+        ),
+        check_contains(
+            XMAGE_AUDIT,
+            [
+                CURRENT_XMAGE_MANIFEST,
+                '"ready_for_structured_xmage_pull_review_required": 73',
+                '"xmage_source_valid_mapper_required": 63',
+                '"mapper_metadata_or_test_scenario_required": 63',
+                '"split_family_scope_review_required": 73',
+            ],
+            "scripts.xmage_strategy_audit_uses_current_manifest",
+        ),
+        check_contains(
+            DECKBUILDING_AUDIT,
+            [
+                CURRENT_LOREHOLD_MATRIX,
+                "build_optimized_deck.py",
+                "universal_optimizer.py",
+                "historical_blocked_surfaces",
+            ],
+            "scripts.deckbuilding_surface_audit_blocks_legacy",
+        ),
+        check_contains(
+            VARIANT_MATRIX,
+            [CURRENT_LOREHOLD_MATRIX],
+            "scripts.lorehold_variant_matrix_default_is_contract",
+        ),
+        check_contains(
+            VARIANT_GATE,
+            [
+                f"{CURRENT_LOREHOLD_MATRIX}.json",
+                "Aetherflux Reservoir",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "Mana Vault",
+                "Molecule Man",
+            ],
+            "scripts.lorehold_variant_gate_uses_contract_matrix_and_focus_cards",
+        ),
+        check_contains(
+            STRATEGY_LEARNING_AUDIT,
+            [f"{CURRENT_LOREHOLD_MATRIX}.json"],
+            "scripts.lorehold_strategy_learning_uses_contract_matrix",
+        ),
+        check_contains(
+            IDEAL_MATRIX,
+            [
+                "historical Lorehold rule-first candidate matrix",
+                "not the active Commander deckbuilding",
+                "lorehold_variant_strategy_matrix.py",
+                "lorehold_variant_battle_gate.py",
+            ],
+            "scripts.ideal_matrix_is_historical_methodology",
+        ),
+        check_contains(
+            BUILD_OPTIMIZED_DECK,
+            [
+                "status=historical_disabled",
+                "lorehold_variant_strategy_matrix.py_then_lorehold_variant_battle_gate.py",
+            ],
+            "scripts.build_optimized_deck_is_blocked",
+        ),
+        check_contains(
+            UNIVERSAL_OPTIMIZER,
+            [
+                "legacy_deprecated_not_authorized_for_handoff",
+                "lorehold_variant_strategy_matrix.py_then_lorehold_variant_battle_gate.py",
+                "MANALOOM_ALLOW_LEGACY_UNIVERSAL_OPTIMIZER",
+            ],
+            "scripts.universal_optimizer_is_blocked_by_default",
+        ),
+        check_contains(
+            ROUTE_GENERATE,
+            [
+                "commander_deckbuilding_contract_support.dart",
+                "'deckbuilding_contract': deckbuildingContractDiagnostics",
+            ],
+            "server.ai_generate_emits_deckbuilding_contract",
+        ),
+        check_contains(
+            DECKBUILDING_SUPPORT,
+            [
+                "commanderDeckbuildingContractVersion",
+                "buildCommanderDeckbuildingContractDiagnostics",
+                "ready_for_battle_gate",
+            ],
+            "server.deckbuilding_contract_support_exists",
+        ),
+    ]
+
+    for path, patterns in FORBIDDEN_OPERATIONAL_SNIPPETS.items():
+        checks.append(
+            check_absent(
+                path,
+                patterns,
+                f"forbidden_operational_stale_snippets.{path.name}",
+            )
+        )
+
+    return checks
+
+
+def build_report() -> dict[str, Any]:
+    checks = build_checks()
+    status_counts: dict[str, int] = {}
+    for check in checks:
+        status_counts[check.status] = status_counts.get(check.status, 0) + 1
+    return {
+        "generated_at": utc_now(),
+        "status": "pass" if status_counts.get("fail", 0) == 0 else "fail",
+        "inventory": file_inventory(),
+        "summary": {
+            "check_count": len(checks),
+            "status_counts": status_counts,
+        },
+        "checks": [check.as_dict() for check in checks],
+        "mutations_performed": [],
+    }
+
+
+def write_markdown(report: dict[str, Any], path: Path) -> None:
+    lines = [
+        "# Operational Surface Alignment Audit",
+        "",
+        f"- Generated at: `{report['generated_at']}`",
+        f"- Status: `{report['status']}`",
+        f"- Summary: `{json.dumps(report['summary'], sort_keys=True)}`",
+        f"- Inventory: `{json.dumps(report['inventory'], sort_keys=True)}`",
+        "",
+        "| Check | Status | Detail |",
+        "| --- | --- | --- |",
+    ]
+    for check in report["checks"]:
+        detail = str(check.get("detail") or "").replace("|", "\\|")
+        lines.append(f"| `{check['name']}` | `{check['status']}` | {detail} |")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--out-prefix",
+        type=Path,
+        default=REPORT_DIR / "operational_surface_alignment_audit_20260629",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    report = build_report()
+    json_path = args.out_prefix.with_suffix(".json")
+    md_path = args.out_prefix.with_suffix(".md")
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_markdown(report, md_path)
+    print(json.dumps({"status": report["status"], "json": str(json_path), "markdown": str(md_path)}))
+    return 0 if report["status"] == "pass" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

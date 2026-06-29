@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
-"""Build the active Lorehold ideal-deck candidate matrix.
+"""Build the historical Lorehold rule-first candidate matrix.
 
-This is the deterministic routing layer between:
+This read-only script is retained as methodology evidence for the older
+rule-first Lorehold workflow. It is not the active Commander deckbuilding
+handoff surface.
+
+The current handoff path is:
+
+- `COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`;
+- `lorehold_variant_strategy_matrix.py`;
+- `lorehold_variant_battle_gate.py`.
+
+This historical matrix still documents the deterministic routing layer between:
 
 - Lorehold deck variants staged in Hermes SQLite;
 - XMage/ManaLoom rule-readiness evidence;
 - the safe master optimizer battle benchmark flow.
 
-It does not mutate SQLite, PostgreSQL, or deck rows. The output is an evidence
-matrix used to decide what must be rule-ready first and which cards are worth
-benchmarking after the rules lane is closed.
+It does not mutate SQLite, PostgreSQL, or deck rows.
 """
 
 from __future__ import annotations

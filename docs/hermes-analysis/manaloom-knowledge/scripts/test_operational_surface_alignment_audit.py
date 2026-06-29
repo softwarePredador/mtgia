@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import tempfile
+import unittest
+from pathlib import Path
+
+import operational_surface_alignment_audit as audit
+
+
+class OperationalSurfaceAlignmentAuditTests(unittest.TestCase):
+    def test_current_repo_surface_passes(self) -> None:
+        report = audit.build_report()
+
+        self.assertEqual(report["status"], "pass", report["checks"])
+        self.assertEqual(report["summary"]["status_counts"].get("fail", 0), 0)
+        self.assertGreaterEqual(report["inventory"]["script_files"], 300)
+        self.assertGreaterEqual(report["inventory"]["top_level_docs"], 100)
+
+    def test_forbidden_stale_snippet_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "README.md"
+            path.write_text(
+                "Decisao atual para acelerar XMage -> ManaLoom: usar\n"
+                "    `hybrid_effective_queue_pattern_registry`",
+                encoding="utf-8",
+            )
+
+            check = audit.check_absent(
+                path,
+                [
+                    "Decisao atual para acelerar XMage -> ManaLoom: usar\n"
+                    "    `hybrid_effective_queue_pattern_registry`"
+                ],
+                "forbidden_operational_stale_snippets.README.md",
+            )
+
+        self.assertEqual(check.status, "fail")
+
+
+if __name__ == "__main__":
+    unittest.main()

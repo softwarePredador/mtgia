@@ -254,21 +254,46 @@ Subsequent runtime/promotion wave:
 - PG256 promoted `Treasonous Ogre` with life-payment red mana runtime support.
 - PG257 promoted `Phyrexian Censor` with non-Phyrexian spell-limit and
   enter-tapped static runtime support.
-- Current queue after PG257:
+- Queue after PG257:
   `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_162756_post_pg257_phyrexian_censor_static_runtime_manifest.md`
-- Current combined severity counts:
+- PG257 combined severity counts:
   `{"critical": 1, "high": 114, "medium": 57, "pass": 619}`
-- Current actionable unresolved rows in the validity/family/proposal reports:
+- PG257 actionable unresolved rows in the validity/family/proposal reports:
   `154`.
-- Current unresolved routing:
+- PG257 unresolved routing:
   `ready_for_structured_xmage_pull_review_required=91`,
   `xmage_source_valid_mapper_required=63`,
   `runtime_family_required_count=0`.
-- Current family counts include:
+- PG257 family counts include:
   `manual_model=63`, `ramp_permanent=16`, `tutor=13`,
   `targeted_interaction=12`, `recursion=11`, `free_cast=9`,
   `targeted_protection=8`, `passive=5`, `draw_engine=4`,
   `topdeck_play=3`, `board_wipe_choice=3`, `ramp_ritual=2`.
+
+PG262 exact ritual runtime checkpoint:
+
+- PG262 was applied and synced for `Mana Geyser` and `Burnt Offering`.
+- `Mana Geyser` now uses exact scope
+  `add_red_for_each_tapped_land_opponents_control_v1`, counting tapped lands
+  controlled by opponents instead of a fixed heuristic amount.
+- `Burnt Offering` now uses exact scope
+  `sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1`,
+  using the sacrificed creature mana value instead of a fixed heuristic amount.
+- PG262 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg262_exact_ritual_runtime_20260629_package.md`.
+- Current queue after PG262:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_1746_post_pg262_exact_ritual_runtime_manifest.md`.
+- Current combined severity counts:
+  `{"critical": 1, "high": 108, "medium": 45, "pass": 637}`.
+- Current unresolved routing:
+  `ready_for_structured_xmage_pull_review_required=73`,
+  `xmage_source_valid_mapper_required=63`,
+  `runtime_family_required_count=0`.
+- Current family counts include:
+  `manual_model=63`, `targeted_interaction=12`, `recursion=11`, `tutor=10`,
+  `free_cast=9`, `targeted_protection=8`, `ramp_permanent=6`, `passive=5`,
+  `draw_engine=4`, `topdeck_play=3`, `board_wipe_choice=3`,
+  `copy_spell_engine=1`, `life_total_change=1`.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope

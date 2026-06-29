@@ -34,7 +34,7 @@ DEFAULT_ROOT_README = REPO_ROOT / "docs/hermes-analysis/README.md"
 DEFAULT_REPORT_README = REPORT_DIR / "README.md"
 DEFAULT_PIPELINE_MANIFEST_MD = (
     REPORT_DIR
-    / "xmage_current_replay_batch_pipeline_20260629_145746_post_pg249_pg250_apply_sync_manifest.md"
+    / "xmage_current_replay_batch_pipeline_20260629_1746_post_pg262_exact_ritual_runtime_manifest.md"
 )
 DEFAULT_RUNTIME_SURFACE_MD = REPORT_DIR / "battle_runtime_surface_manifest_20260629_post_adagia_mapper.md"
 DEFAULT_EXTERNAL_SOURCE_MD = REPORT_DIR / "mtg_battle_external_source_audit_20260629_post_adagia_mapper.md"
@@ -334,27 +334,32 @@ def audit_manifest(args: argparse.Namespace) -> list[Check]:
 
     expected_counts = {
         "Validity status counts": {
-            "ready_for_structured_xmage_pull_review_required": 151,
-            "xmage_source_valid_mapper_required": 81,
+            "ready_for_structured_xmage_pull_review_required": 73,
+            "xmage_source_valid_mapper_required": 63,
         },
         "Proposal status counts": {
-            "batch_pg_candidate_after_precheck": 1,
-            "partial_batch_pg_candidate_preserve_shadow_rows_after_precheck": 1,
-            "runtime_family_implementation_required": 1,
-            "split_family_scope_review_required": 148,
-            "mapper_metadata_or_test_scenario_required": 81,
+            "split_family_scope_review_required": 73,
+            "mapper_metadata_or_test_scenario_required": 63,
         },
         "Family counts": {
-            "manual_model": 81,
-            "ramp_permanent": 49,
-            "targeted_interaction": 19,
-            "copy_creature_token": 1,
-            "token_maker": 1,
+            "manual_model": 63,
+            "ramp_permanent": 6,
+            "targeted_interaction": 12,
+            "recursion": 11,
+            "free_cast": 9,
+            "targeted_protection": 8,
+            "passive": 5,
+            "draw_engine": 4,
+            "topdeck_play": 3,
+            "board_wipe_choice": 3,
+            "copy_spell_engine": 1,
+            "life_total_change": 1,
+            "tutor": 10,
         },
         "Pattern status counts": {
-            "fragmented_runtime_observation_only": 1,
-            "ready_for_pg_package_generation": 2,
-            "requires_subpattern_split_before_promotion": 21,
+            "candidate_template_requires_review_tests": 8,
+            "manual_model_observation_only": 1,
+            "requires_subpattern_split_before_promotion": 11,
         },
     }
     for label, expected in expected_counts.items():

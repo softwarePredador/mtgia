@@ -33,9 +33,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_135909_post_adagia_family_mapper_lorehold_6_607_616_manifest.md`.
+    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_1746_post_pg262_exact_ritual_runtime_manifest.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
+  - Auditoria geral de superficie operacional:
+    `manaloom-knowledge/scripts/operational_surface_alignment_audit.py`.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`
@@ -61,6 +63,8 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     gate em um unico diagnostico.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
+  - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
+    de declarar que scripts e docs estao conversando entre si.
   - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia
     de apoio quando nao divergir do contrato novo.
   - `build_optimized_deck.py` e `universal_optimizer.py` ficam como historicos

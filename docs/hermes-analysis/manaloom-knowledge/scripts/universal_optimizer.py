@@ -93,7 +93,7 @@ def load_known_cards(db_path: str) -> dict[str, dict[str, object]]:
 print_legacy_battle_gate_banner()
 if not legacy_optimizer_execution_allowed():
     print("universal_optimizer_execution=blocked")
-    print("replacement=lorehold_ideal_deck_candidate_matrix.py_then_slot_optimizer.py")
+    print("replacement=lorehold_variant_strategy_matrix.py_then_lorehold_variant_battle_gate.py")
     print("override=MANALOOM_ALLOW_LEGACY_UNIVERSAL_OPTIMIZER=1 or --allow-legacy")
     sys.exit(2)
 if "--allow-legacy" in sys.argv:
