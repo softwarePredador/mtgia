@@ -572,12 +572,12 @@ def register_tests(battle, player):
             assert path_effect["destination"] == "exile"
             assert path_effect["exile_target"] is True
             assert path_effect["target_controller_basic_land_tapped"] is True
-            assert path_effect["basic_land_compensation_status"] == "annotation_only"
+            assert path_effect["basic_land_compensation_status"] == "runtime_executor_v1"
             assert path_effect["battle_model_scope"] == (
-                "path_to_exile_creature_exile_basic_land_compensation_annotation_v1"
+                "path_to_exile_creature_exile_basic_land_compensation_runtime_v1"
             )
             assert path_effect["_rule_logical_key"] == "battle_rule_v1:f1c22fd254adb5a3664c0bcccf24a9cd"
-            assert path_effect["_rule_oracle_hash"] == "861c960a37be744e45f13200349e2532"
+            assert path_effect["_rule_oracle_hash"] == "a2403ad40c99415f5f409bb09d9ea23e"
 
             active = player("Lorehold")
             opponent = player("Opponent")
@@ -612,8 +612,13 @@ def register_tests(battle, player):
         assert target not in opponent.battlefield
         assert target in opponent.exile
         assert target not in opponent.graveyard
-        assert basic_land in opponent.library
-        assert basic_land not in opponent.battlefield
+        assert basic_land not in opponent.library
+        battlefield_basic = next(
+            card
+            for card in opponent.battlefield
+            if card.get("name") == "Plains"
+        )
+        assert battlefield_basic.get("tapped") is True
         removal_event = next(
             data
             for event, data in events
@@ -621,9 +626,17 @@ def register_tests(battle, player):
         )
         assert removal_event["destination"] == "exile"
         assert removal_event["rule_logical_key"] == "battle_rule_v1:f1c22fd254adb5a3664c0bcccf24a9cd"
-        assert removal_event["rule_oracle_hash"] == "861c960a37be744e45f13200349e2532"
+        assert removal_event["rule_oracle_hash"] == "a2403ad40c99415f5f409bb09d9ea23e"
         assert removal_event["target_controller_basic_land_tapped"] is True
-        assert removal_event["basic_land_compensation_status"] == "annotation_only"
+        assert removal_event["basic_land_compensation_status"] == "runtime_executor_v1"
+        compensation_event = next(
+            data
+            for event, data in events
+            if event == "basic_land_compensation_resolved"
+        )
+        assert compensation_event["source"] == "Path to Exile"
+        assert compensation_event["moved_cards"] == ["Plains"]
+        assert compensation_event["tapped"] is True
 
     def test_swords_to_plowshares_exiles_creature_and_gains_power_life_with_pg040_rule_provenance():
         events = []
@@ -711,12 +724,12 @@ def register_tests(battle, player):
             assert winds_effect["destination"] == "exile"
             assert winds_effect["exile_target"] is True
             assert winds_effect["target_controller_basic_land_tapped"] is True
-            assert winds_effect["basic_land_compensation_status"] == "annotation_only"
+            assert winds_effect["basic_land_compensation_status"] == "runtime_executor_v1"
             assert winds_effect["overload_cost"] == "{4}{W}{W}"
-            assert winds_effect["overload_status"] == "annotation_only"
+            assert winds_effect["overload_status"] == "runtime_executor_v1"
             assert winds_effect["overload_target_rewrite"] == "target_to_each"
             assert winds_effect["battle_model_scope"] == (
-                "winds_of_abandon_opponent_creature_exile_basic_land_overload_annotation_v1"
+                "winds_of_abandon_opponent_creature_exile_basic_land_compensation_overload_runtime_v1"
             )
             assert winds_effect["_rule_logical_key"] == (
                 "battle_rule_v1:4f844346b4b2b03ff68c2935fd399f9c"
@@ -766,8 +779,13 @@ def register_tests(battle, player):
         assert target not in opponent.battlefield
         assert target in opponent.exile
         assert target not in opponent.graveyard
-        assert basic_land in opponent.library
-        assert basic_land not in opponent.battlefield
+        assert basic_land not in opponent.library
+        battlefield_basic = next(
+            card
+            for card in opponent.battlefield
+            if card.get("name") == "Plains"
+        )
+        assert battlefield_basic.get("tapped") is True
         removal_event = next(
             data
             for event, data in events
@@ -781,7 +799,15 @@ def register_tests(battle, player):
         )
         assert removal_event["rule_oracle_hash"] == "05e38c4458b7b803d038978b46f11f72"
         assert removal_event["target_controller_basic_land_tapped"] is True
-        assert removal_event["basic_land_compensation_status"] == "annotation_only"
+        assert removal_event["basic_land_compensation_status"] == "runtime_executor_v1"
+        compensation_event = next(
+            data
+            for event, data in events
+            if event == "basic_land_compensation_resolved"
+        )
+        assert compensation_event["source"] == "Winds of Abandon"
+        assert compensation_event["moved_cards"] == ["Plains"]
+        assert compensation_event["tapped"] is True
 
     def test_pg096_high_noon_is_passive_static_rule_not_creature_removal():
         events = []

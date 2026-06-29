@@ -9229,6 +9229,66 @@ def move_permanent_to_library_then_reveal(
     return "library"
 
 
+def _is_basic_land_card(card):
+    if not isinstance(card, dict):
+        return False
+    type_line = str(card.get("type_line") or "").lower()
+    return "basic" in type_line and "land" in type_line
+
+
+def resolve_basic_land_compensation(effect_data, target_controller, source_card, turn, rng, *, all_players=None):
+    if not isinstance(effect_data, dict) or target_controller is None:
+        return None
+    if str(effect_data.get("basic_land_compensation_status") or "").lower() != "runtime_executor_v1":
+        return None
+    try:
+        count = max(0, int(effect_data.get("basic_land_compensation_count") or 1))
+    except Exception:
+        count = 1
+    if count <= 0:
+        return None
+    destination = str(effect_data.get("basic_land_compensation_destination") or "battlefield_tapped")
+    found = []
+    for candidate in list(getattr(target_controller, "library", []) or []):
+        if len(found) >= count:
+            break
+        if _is_basic_land_card(candidate):
+            found.append(candidate)
+    moved = []
+    for basic_land in found:
+        if basic_land not in target_controller.library:
+            continue
+        target_controller.library.remove(basic_land)
+        permanent = enrich_card({**basic_land, "effect": "land"})
+        if destination == "battlefield_tapped" or effect_data.get("target_controller_basic_land_tapped"):
+            permanent["enters_tapped"] = True
+        permanent = prepare_entering_permanent(
+            permanent,
+            controller=target_controller,
+            all_players=all_players or [target_controller],
+            turn=turn,
+        )
+        initialize_special_land_runtime_state(permanent, turn=turn)
+        target_controller.battlefield.append(permanent)
+        moved.append(permanent)
+    if effect_data.get("shuffle_after_basic_land_compensation") and hasattr(target_controller, "shuffle"):
+        target_controller.shuffle(rng)
+    emit_replay_event(
+        "basic_land_compensation_resolved",
+        player=getattr(target_controller, "name", "?"),
+        source=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        searched_count=count,
+        moved_count=len(moved),
+        moved_cards=[card.get("name", "?") for card in moved],
+        destination=destination,
+        tapped=bool(destination == "battlefield_tapped" or effect_data.get("target_controller_basic_land_tapped")),
+        library_remaining=len(getattr(target_controller, "library", []) or []),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return moved
+
+
 def move_removed_permanent_to_destination(
     target_controller,
     target,
@@ -9277,6 +9337,14 @@ def move_removed_permanent_to_destination(
             reason="removal",
             source=source_card,
         )
+    resolve_basic_land_compensation(
+        effect_data,
+        target_controller,
+        source_card,
+        turn,
+        rng,
+        all_players=all_players,
+    )
     return destination
 
 
