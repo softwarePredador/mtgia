@@ -1,0 +1,26 @@
+# Deckbuilding Contract Surface Audit
+
+- Generated at: `2026-06-29T18:14:31.371765+00:00`
+- Status: `pass`
+- Contract: `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
+
+## Active Surfaces
+
+| Status | Path | Missing |
+| --- | --- | --- |
+| pass | `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md` |  |
+| pass | `server/lib/ai/commander_deckbuilding_contract_support.dart` |  |
+| pass | `server/routes/ai/generate/index.dart` |  |
+| pass | `server/test/commander_deckbuilding_contract_support_test.dart` |  |
+| pass | `docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_strategy_matrix.py` |  |
+| pass | `docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py` |  |
+| pass | `docs/hermes-analysis/README.md` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.md` |  |
+
+## Historical Blocked Surfaces
+
+| Status | Path | Marker |
+| --- | --- | --- |
+| pass | `docs/hermes-analysis/manaloom-knowledge/scripts/build_optimized_deck.py` | `status=historical_disabled` |
+| pass | `docs/hermes-analysis/manaloom-knowledge/scripts/universal_optimizer.py` | `legacy_deprecated_not_authorized_for_handoff` |

@@ -11,6 +11,7 @@ import '../../../lib/ai_generate_job.dart';
 import '../../../lib/ai_generate_internal_url_support.dart';
 import '../../../lib/ai_generate_performance_support.dart';
 import '../../../lib/ai/commander_reference_card_stats_support.dart';
+import '../../../lib/ai/commander_deckbuilding_contract_support.dart';
 import '../../../lib/ai/commander_reference_deck_corpus_support.dart';
 import '../../../lib/ai/commander_reference_generate_fallback_support.dart';
 import '../../../lib/ai/commander_learned_deck_support.dart';
@@ -692,6 +693,24 @@ $metaContext
             promotedLearnedCardNames: promotedLearnedCardNames,
             usageHotCardNames: usageHotCardCanonicalNames(usageHotCards),
           ).toDiagnosticsJson();
+    final deckbuildingContractDiagnostics = referenceProfile == null
+        ? null
+        : buildCommanderDeckbuildingContractDiagnostics(
+            format: format,
+            generatedDeck: validation.generatedDeck,
+            validationSummary: validation.validationSummary(),
+            referenceProfile: referenceProfile,
+            referenceCardStats: referenceCardStats,
+            unresolvedReferenceCards: unresolvedReferenceCards,
+            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+            activeLearnedDeck: activeLearnedDeck,
+            usageHotCards: usageHotCards,
+            referenceDeckEvaluation: referenceDeckEvaluation,
+            referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
+            referenceDeterministicDeckDiagnostics:
+                referenceDeterministicDeckDiagnostics,
+            generationMode: 'ai_generate',
+          );
 
     final responseBody = <String, dynamic>{
       'prompt': prompt,
@@ -721,6 +740,8 @@ $metaContext
           referenceDeterministicDeckDiagnostics:
               referenceDeterministicDeckDiagnostics,
         ),
+      if (deckbuildingContractDiagnostics != null)
+        'deckbuilding_contract': deckbuildingContractDiagnostics,
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
           stats: archetypeReferenceStats,
@@ -1380,6 +1401,25 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       generatedDeck: validation.generatedDeck,
       guidance: referenceDeckCorpusGuidance,
     );
+    final validationSummary = validation.validationSummary();
+    final deckbuildingContractDiagnostics = referenceProfile == null
+        ? null
+        : buildCommanderDeckbuildingContractDiagnostics(
+            format: format,
+            generatedDeck: validation.generatedDeck,
+            validationSummary: validationSummary,
+            referenceProfile: referenceProfile,
+            referenceCardStats: referenceCardStats,
+            unresolvedReferenceCards: unresolvedReferenceCards,
+            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+            activeLearnedDeck: activeLearnedDeck,
+            usageHotCards: usageHotCards,
+            referenceDeckEvaluation: referenceDeckEvaluation,
+            referenceDeckCorpusDiagnostics: referenceDeckCorpusDiagnostics,
+            referenceDeterministicDeckDiagnostics:
+                referenceDeterministicDeck?.toDiagnosticsJson(),
+            generationMode: generationMode,
+          );
 
     return {
       'prompt': prompt,
@@ -1395,7 +1435,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         'valid_total_cards': validation.totalResolvedCards,
         'invalid_cards': validation.invalidCards.length,
       },
-      'validation': validation.validationSummary(),
+      'validation': validationSummary,
       'semantic_layer_v2': _buildSemanticLayerV2GenerateSummary(
         validation.generatedDeck,
       ),
@@ -1411,6 +1451,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           referenceDeterministicDeckDiagnostics:
               referenceDeterministicDeck?.toDiagnosticsJson(),
         ),
+      if (deckbuildingContractDiagnostics != null)
+        'deckbuilding_contract': deckbuildingContractDiagnostics,
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
           stats: archetypeReferenceStats,
@@ -1420,6 +1462,34 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
       if (warnings.isNotEmpty) 'warnings': warnings,
     };
   } catch (e) {
+    final fallbackValidationSummary = {
+      'is_valid': false,
+      'errors': ['Falha ao validar deck mock: $e'],
+      'invalid_cards': const <String>[],
+      'suggestions': const <String, List<String>>{},
+      'warnings': const <String>[],
+    };
+    final deckbuildingContractDiagnostics = referenceProfile == null
+        ? null
+        : buildCommanderDeckbuildingContractDiagnostics(
+            format: format,
+            generatedDeck: mockDeck,
+            validationSummary: fallbackValidationSummary,
+            referenceProfile: referenceProfile,
+            referenceCardStats: referenceCardStats,
+            unresolvedReferenceCards: unresolvedReferenceCards,
+            referenceDeckCorpusGuidance: referenceDeckCorpusGuidance,
+            activeLearnedDeck: activeLearnedDeck,
+            usageHotCards: usageHotCards,
+            referenceDeckCorpusDiagnostics:
+                _buildReferenceDeckCorpusDiagnostics(
+              generatedDeck: mockDeck,
+              guidance: referenceDeckCorpusGuidance,
+            ),
+            referenceDeterministicDeckDiagnostics:
+                referenceDeterministicDeck?.toDiagnosticsJson(),
+            generationMode: generationMode,
+          );
     return {
       'prompt': prompt,
       'format': format,
@@ -1432,13 +1502,7 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
         'valid_cards': (mockDeck['cards'] as List?)?.length ?? 0,
         'invalid_cards': 0,
       },
-      'validation': {
-        'is_valid': false,
-        'errors': ['Falha ao validar deck mock: $e'],
-        'invalid_cards': const <String>[],
-        'suggestions': const <String, List<String>>{},
-        'warnings': const <String>[],
-      },
+      'validation': fallbackValidationSummary,
       if (referenceProfile != null)
         'diagnostics': buildCommanderReferenceDiagnostics(
           referenceProfile,
@@ -1453,6 +1517,8 @@ Future<Map<String, dynamic>> _buildMockGenerateResponse({
           referenceDeterministicDeckDiagnostics:
               referenceDeterministicDeck?.toDiagnosticsJson(),
         ),
+      if (deckbuildingContractDiagnostics != null)
+        'deckbuilding_contract': deckbuildingContractDiagnostics,
       if (referenceProfile == null && archetypeReferenceStats.isNotEmpty)
         'diagnostics': buildCommanderReferenceArchetypeStatsDiagnostics(
           stats: archetypeReferenceStats,

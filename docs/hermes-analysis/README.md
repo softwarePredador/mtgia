@@ -46,14 +46,23 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
 ## Decisao atual Lorehold deckbuilding
 
-- `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md`
-  - Workflow canonico para sair do ajuste lento carta-a-carta e chegar no deck
-    ideal de Lorehold com evidencia.
-  - Primeiro fecha cartas que tocam Lorehold por prontidao de regra
-    XMage/ManaLoom; depois testa somente candidatos rule-ready pelo master
-    optimizer seguro.
-  - O gerador ativo e
-    `manaloom-knowledge/scripts/lorehold_ideal_deck_candidate_matrix.py`.
+- `COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
+  - Status: `frozen_operating_contract`.
+  - Contrato atual para montar decks Commander: legalidade/identidade,
+    commander intent profile, corpus externo/referencia, learned deck/uso
+    local, fallback deterministico, validacao, matriz de estrategia e battle
+    gate.
+  - Para Lorehold, `607` e baseline estrutural protegido; `615` e `614`
+    seguem como challengers. Nenhum candidato substitui `607` sem equal battle
+    gate e trace de cartas compradas/usadas.
+  - A rota `/ai/generate` agora expõe `deckbuilding_contract`, montado por
+    `server/lib/ai/commander_deckbuilding_contract_support.dart`, para ligar
+    profile, stats, corpus, learned deck, usage hot cards, validacao e proximo
+    gate em um unico diagnostico.
+  - Auditoria de alinhamento:
+    `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
+  - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia
+    de apoio quando nao divergir do contrato novo.
   - `build_optimized_deck.py` e `universal_optimizer.py` ficam como historicos
     bloqueados/legados, nao como caminho de handoff.
 

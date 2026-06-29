@@ -32,7 +32,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
-DEFAULT_MATRIX = REPORT_DIR / "lorehold_variant_strategy_matrix_20260626_v1.json"
+DEFAULT_MATRIX = (
+    REPORT_DIR / "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json"
+)
 DEFAULT_CANDIDATE_DB = (
     REPORT_DIR
     / "lorehold_generated_candidate_20260626_pg243_strategy_first_v7"
@@ -57,8 +59,12 @@ CARD_EXPOSURE_EVENTS = {
     "utility_land_activated",
 }
 BASE_FOCUS_TRACE_CARDS = {
+    "Aetherflux Reservoir",
+    "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
     "Urza's Saga",
     "Library of Leng",
+    "Mana Vault",
+    "Molecule Man",
     "Sensei's Divining Top",
     "Scroll Rack",
     "Squee, Goblin Nabob",

@@ -649,7 +649,11 @@ def main() -> int:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--deck-ids", default=None)
     parser.add_argument("--candidate", type=Path, default=DEFAULT_CANDIDATE)
-    parser.add_argument("--out-prefix", type=Path, default=REPORT_DIR / "lorehold_variant_strategy_matrix_20260626_v1")
+    parser.add_argument(
+        "--out-prefix",
+        type=Path,
+        default=REPORT_DIR / "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract",
+    )
     args = parser.parse_args()
 
     deck_ids = parse_deck_ids(args.deck_ids)

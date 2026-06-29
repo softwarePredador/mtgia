@@ -7,6 +7,17 @@ import lorehold_variant_battle_gate as gate
 
 
 class LoreholdVariantBattleGateTest(unittest.TestCase):
+    def test_gate_defaults_follow_deckbuilding_contract_matrix(self):
+        self.assertEqual(
+            gate.DEFAULT_MATRIX.name,
+            "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json",
+        )
+        focus = gate.focus_trace_cards()
+        self.assertIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", focus)
+        self.assertIn("Mana Vault", focus)
+        self.assertIn("Aetherflux Reservoir", focus)
+        self.assertIn("Molecule Man", focus)
+
     def test_gate_telemetry_counts_lorehold_strategy_events(self):
         telemetry = gate.GateTelemetry()
         telemetry.begin("game-1")
