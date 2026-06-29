@@ -822,20 +822,16 @@ def register_tests(battle, player):
             }
             high_noon_effect = battle.get_card_effect(high_noon)
             assert high_noon_effect["effect"] == "passive"
-            assert high_noon_effect["ability_kind"] == "static"
+            assert high_noon_effect["ability_kind"] == "static_and_activated"
             assert high_noon_effect["static_spell_limit_per_turn"] == 1
             assert high_noon_effect["spell_limit_scope"] == "each_player"
-            assert high_noon_effect["spell_limit_status"] == (
-                "annotation_only_no_static_spell_limit_executor"
-            )
+            assert high_noon_effect["spell_limit_status"] == "runtime_executor_v1"
             assert high_noon_effect["activated_damage_amount"] == 5
             assert high_noon_effect["activated_damage_target"] == "any"
-            assert high_noon_effect["activated_damage_status"] == (
-                "annotation_only_no_activation_executor"
-            )
-            assert high_noon_effect["sacrifice_self_activation_status"] == "annotation_only"
+            assert high_noon_effect["activated_damage_status"] == "runtime_executor_v1"
+            assert high_noon_effect["sacrifice_self_activation_status"] == "runtime_executor_v1"
             assert high_noon_effect["battle_model_scope"] == (
-                "high_noon_one_spell_per_turn_static_activated_five_damage_annotation_v1"
+                "high_noon_one_spell_per_turn_static_and_self_sacrifice_damage_runtime_v1"
             )
             assert high_noon_effect["_rule_logical_key"] == (
                 "battle_rule_v1:fca6c4be65cae378901514ff6c8417d1"
