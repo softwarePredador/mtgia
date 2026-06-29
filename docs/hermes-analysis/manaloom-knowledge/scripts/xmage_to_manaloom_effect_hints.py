@@ -5706,13 +5706,41 @@ def _build_creature_sacrifice_ritual_fields(
 ) -> dict[str, Any] | None:
     if card_types not in ({"INSTANT"}, {"SORCERY"}):
         return None
-    if effect_classes != {"BasicManaEffect"}:
-        return None
     if ability_classes or cost_classes != {"SacrificeTargetCost"}:
         return None
 
     normalized = _normalized_rules_text(rules_text)
     is_instant = card_types == {"INSTANT"}
+
+    if (
+        effect_classes == {"AddManaInAnyCombinationEffect"}
+        and "SacrificeCostManaValue" in rules_text
+        and "ColoredManaSymbol.B" in rules_text
+        and "ColoredManaSymbol.R" in rules_text
+    ):
+        return {
+            "effect": "ramp_ritual",
+            "scope": "sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1",
+            "fields": {
+                "instant": is_instant,
+                "requires_sacrifice_creature": True,
+                "mana_produced_from_sacrificed_cmc": True,
+                "produces": "BR",
+                "mana_color_choice": ["B", "R"],
+                "mana_color_status": "abstracted_to_generic_pool_runtime",
+            },
+            "reason": "XMage structure matches Burnt Offering sacrificing a creature as an additional cost and adding black and/or red mana equal to that creature's mana value.",
+            "signals": [
+                "SacrificeTargetCost",
+                "SacrificeCostManaValue.CREATURE",
+                "AddManaInAnyCombinationEffect",
+                "ColoredManaSymbol.B",
+                "ColoredManaSymbol.R",
+            ],
+        }
+
+    if effect_classes != {"BasicManaEffect"}:
+        return None
 
     if "mana.blackmana(4)" in normalized:
         return {
@@ -5742,6 +5770,51 @@ def _build_creature_sacrifice_ritual_fields(
             "signals": ["SacrificeTargetCost", "BasicManaEffect", "RedMana(3)"],
         }
 
+    return None
+
+
+def _build_dynamic_mana_ritual_fields(
+    *,
+    xmage_class_name: str,
+    card_types: set[str],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    target_classes: set[str],
+    filter_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    normalized = _normalized_rules_text(rules_text)
+    if (
+        xmage_class_name == "ManaGeyser"
+        and card_types == {"SORCERY"}
+        and effect_classes == {"DynamicManaEffect"}
+        and not ability_classes
+        and not cost_classes
+        and "TargetController" in target_classes
+        and "FilterLandPermanent" in filter_classes
+        and "tapped land your opponents control" in normalized
+    ):
+        return {
+            "effect": "ramp_ritual",
+            "scope": "add_red_for_each_tapped_land_opponents_control_v1",
+            "fields": {
+                "sorcery": True,
+                "produces": "R",
+                "dynamic_mana_amount": True,
+                "mana_produced_from_opponents_tapped_lands": True,
+                "mana_per_tapped_land": 1,
+                "mana_color_status": "abstracted_to_generic_pool_runtime",
+            },
+            "reason": "XMage structure matches Mana Geyser adding one red mana for each tapped land controlled by opponents.",
+            "signals": [
+                "ManaGeyser",
+                "DynamicManaEffect",
+                "PermanentsOnBattlefieldCount(FilterLandPermanent)",
+                "TappedPredicate.TAPPED",
+                "TargetController.OPPONENT",
+            ],
+        }
     return None
 
 
@@ -7904,6 +7977,29 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields=dict(creature_sacrifice_ritual_fields["fields"]),
                 matched_signals=list(creature_sacrifice_ritual_fields["signals"]),
+            )
+        )
+
+    dynamic_mana_ritual_fields = _build_dynamic_mana_ritual_fields(
+        xmage_class_name=xmage_class_name,
+        card_types=card_types,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        target_classes=target_classes,
+        filter_classes=filter_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if dynamic_mana_ritual_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(dynamic_mana_ritual_fields["effect"]),
+                scope=str(dynamic_mana_ritual_fields["scope"]),
+                reason=str(dynamic_mana_ritual_fields["reason"]),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(dynamic_mana_ritual_fields["fields"]),
+                matched_signals=list(dynamic_mana_ritual_fields["signals"]),
             )
         )
 

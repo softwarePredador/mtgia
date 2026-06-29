@@ -1,0 +1,130 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-29T17:45:32.635654+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg262_exact_ritual_runtime_20260629_e2e_manifest.json",
+  "package_id": "pg262_exact_ritual_runtime_20260629_e2e_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "add_red_for_each_tapped_land_opponents_control_v1",
+          "card_name": "Mana Geyser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a1afa8a2f4322a64c0b150f3e52610c3",
+          "oracle_hash": "684f03297624aa968fe22e1b6d6f63d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1",
+          "card_name": "Burnt Offering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49d5a64329f7d552eca189abfd07c343",
+          "oracle_hash": "33ec6df2ab36a881c5cf77936bc484d1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "add_red_for_each_tapped_land_opponents_control_v1",
+          "card_name": "Mana Geyser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a1afa8a2f4322a64c0b150f3e52610c3",
+          "oracle_hash": "684f03297624aa968fe22e1b6d6f63d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1",
+          "card_name": "Burnt Offering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49d5a64329f7d552eca189abfd07c343",
+          "oracle_hash": "33ec6df2ab36a881c5cf77936bc484d1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "add_red_for_each_tapped_land_opponents_control_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mana Geyser",
+          "logical_rule_key": "battle_rule_v1:a1afa8a2f4322a64c0b150f3e52610c3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1",
+          "battle_rule_version": 2,
+          "card_name": "Burnt Offering",
+          "logical_rule_key": "battle_rule_v1:49d5a64329f7d552eca189abfd07c343"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Mana Geyser",
+          "component_keys": [],
+          "effect": "ramp_ritual",
+          "logical_rule_key": "battle_rule_v1:a1afa8a2f4322a64c0b150f3e52610c3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Burnt Offering",
+          "component_keys": [],
+          "effect": "ramp_ritual",
+          "logical_rule_key": "battle_rule_v1:49d5a64329f7d552eca189abfd07c343"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

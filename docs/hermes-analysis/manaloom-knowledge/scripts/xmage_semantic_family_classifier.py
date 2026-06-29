@@ -2132,6 +2132,38 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("produces") == "R"
         )
 
+    if effect == "ramp_ritual" and scope == "sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1":
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"AddManaInAnyCombinationEffect"}
+            and not ability_classes
+            and "SacrificeTargetCost" in cost_classes
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("requires_sacrifice_creature"))
+            and bool(effect_json.get("mana_produced_from_sacrificed_cmc"))
+            and effect_json.get("produces") == "BR"
+            and effect_json.get("mana_color_choice") == ["B", "R"]
+            and effect_json.get("mana_color_status") == "abstracted_to_generic_pool_runtime"
+        )
+
+    if effect == "ramp_ritual" and scope == "add_red_for_each_tapped_land_opponents_control_v1":
+        filter_classes = set((card.get("xmage") or {}).get("filter_classes") or [])
+        target_classes = xmage_target_classes(card)
+        return (
+            types == {"SORCERY"}
+            and effect_classes == {"DynamicManaEffect"}
+            and not ability_classes
+            and not cost_classes
+            and "TargetController" in target_classes
+            and "FilterLandPermanent" in filter_classes
+            and bool(effect_json.get("sorcery"))
+            and bool(effect_json.get("dynamic_mana_amount"))
+            and bool(effect_json.get("mana_produced_from_opponents_tapped_lands"))
+            and int(effect_json.get("mana_per_tapped_land") or 0) == 1
+            and effect_json.get("produces") == "R"
+            and effect_json.get("mana_color_status") == "abstracted_to_generic_pool_runtime"
+        )
+
     if effect == "ramp_ritual" and scope == "hand_exile_add_one_green_mana_ritual_v1":
         return (
             types == {"CREATURE"}

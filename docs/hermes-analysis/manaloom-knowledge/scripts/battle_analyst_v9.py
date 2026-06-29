@@ -16109,6 +16109,18 @@ def ritual_mana_produced(player, effect_data, opponents=None):
         target = ritual_hand_size_target(opponents)
         if target is not None:
             return len(getattr(target, "hand", []) or [])
+    if effect_data.get("mana_produced_from_opponents_tapped_lands"):
+        per_land = max(1, int(effect_data.get("mana_per_tapped_land") or 1))
+        tapped_lands = 0
+        for opponent in opponents or []:
+            for permanent in getattr(opponent, "battlefield", []) or []:
+                if (
+                    isinstance(permanent, dict)
+                    and is_effective_land(permanent)
+                    and bool(permanent.get("tapped"))
+                ):
+                    tapped_lands += 1
+        return tapped_lands * per_land
     if effect_data.get("mana_produced_from_sacrificed_cmc"):
         return max(0, int(float(effect_data.get("_last_sacrificed_cmc") or 0)))
     threshold_count = effect_data.get("threshold_graveyard_count")
@@ -16119,6 +16131,25 @@ def ritual_mana_produced(player, effect_data, opponents=None):
 
 
 def ritual_mana_replay_fields(player, effect_data, opponents=None):
+    if effect_data.get("mana_produced_from_opponents_tapped_lands"):
+        tapped_lands = [
+            {
+                "controller": getattr(opponent, "name", None),
+                "land": permanent.get("name", "?"),
+            }
+            for opponent in opponents or []
+            for permanent in getattr(opponent, "battlefield", []) or []
+            if (
+                isinstance(permanent, dict)
+                and is_effective_land(permanent)
+                and bool(permanent.get("tapped"))
+            )
+        ]
+        return {
+            "mana_amount_model": "opponents_tapped_lands",
+            "opponents_tapped_land_count": len(tapped_lands),
+            "opponents_tapped_lands": tapped_lands[:20],
+        }
     if not effect_data.get("mana_produced_from_target_opponent_hand_size"):
         return {}
     target = ritual_hand_size_target(opponents)

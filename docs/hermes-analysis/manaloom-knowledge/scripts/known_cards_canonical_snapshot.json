@@ -4309,17 +4309,25 @@
     "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
   },
   "Burnt Offering": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1",
     "effect": "ramp_ritual",
     "instant": true,
-    "mana_produced": 4,
+    "mana_color_choice": [
+      "B",
+      "R"
+    ],
+    "mana_color_status": "abstracted_to_generic_pool_runtime",
+    "mana_produced_from_sacrificed_cmc": true,
     "produces": "BR",
     "requires_sacrifice_creature": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:bccf967552b16091765b533e5a66321f"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49d5a64329f7d552eca189abfd07c343",
+    "battle_rule_oracle_hash": "33ec6df2ab36a881c5cf77936bc484d1"
   },
   "Bushwhack": {
     "cmc": 1.0,
@@ -19347,15 +19355,22 @@
     "battle_rule_oracle_hash": "c200556d1ffb8caa662c21a3b7f58dcb"
   },
   "Mana Geyser": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "add_red_for_each_tapped_land_opponents_control_v1",
+    "dynamic_mana_amount": true,
     "effect": "ramp_ritual",
-    "mana_produced": 7,
+    "mana_color_status": "abstracted_to_generic_pool_runtime",
+    "mana_per_tapped_land": 1,
+    "mana_produced_from_opponents_tapped_lands": true,
     "produces": "R",
+    "sorcery": true,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2c6cc881c92be4d266a230b2ef32c639"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a1afa8a2f4322a64c0b150f3e52610c3",
+    "battle_rule_oracle_hash": "684f03297624aa968fe22e1b6d6f63d9"
   },
   "Mana Leak": {
     "ability_kind": "one_shot",

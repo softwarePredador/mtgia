@@ -1,0 +1,42 @@
+{
+  "Burnt Offering": {
+    "battle_model_scope": "sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1",
+    "effect": "ramp_ritual",
+    "execution_status": "auto",
+    "last_sacrificed_cmc": 4,
+    "logical_rule_key": "battle_rule_v1:49d5a64329f7d552eca189abfd07c343",
+    "oracle_hash": "33ec6df2ab36a881c5cf77936bc484d1",
+    "payment_ok": true,
+    "review_status": "verified",
+    "sample_sacrificed_cmc_mana": 4,
+    "source": "curated"
+  },
+  "Mana Geyser": {
+    "battle_model_scope": "add_red_for_each_tapped_land_opponents_control_v1",
+    "effect": "ramp_ritual",
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:a1afa8a2f4322a64c0b150f3e52610c3",
+    "oracle_hash": "684f03297624aa968fe22e1b6d6f63d9",
+    "review_status": "verified",
+    "sample_replay_fields": {
+      "mana_amount_model": "opponents_tapped_lands",
+      "opponents_tapped_land_count": 3,
+      "opponents_tapped_lands": [
+        {
+          "controller": "Opponent A",
+          "land": "Island"
+        },
+        {
+          "controller": "Opponent A",
+          "land": "Swamp"
+        },
+        {
+          "controller": "Opponent B",
+          "land": "Mountain"
+        }
+      ]
+    },
+    "sample_tapped_land_mana": 3,
+    "source": "curated"
+  }
+}
