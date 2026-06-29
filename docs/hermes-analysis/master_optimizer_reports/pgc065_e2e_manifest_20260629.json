@@ -1,0 +1,102 @@
+{
+  "package_id": "pgc065_modal_target_change_runtime",
+  "title": "PGC065 Modal Target Change Runtime Validation",
+  "expected_rules": [
+    {
+      "card_name": "Return the Favor",
+      "execution_status": "auto",
+      "forbid_annotation_only": false,
+      "logical_rule_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2",
+      "min_rule_version": 3,
+      "normalized_name": "return the favor",
+      "oracle_hash": "a24911b7ea2027ebba59bb6792eee776",
+      "required_effect_fields": {
+        "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+        "change_target_mode_status": "runtime_executor_v1",
+        "copy_activated_triggered_ability_status": "annotation_only",
+        "effect": "copy_spell",
+        "instant": true,
+        "spree": true,
+        "spree_additional_cost_status": "annotation_only",
+        "target": "instant_or_sorcery_on_stack",
+        "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Untimely Malfunction",
+      "execution_status": "auto",
+      "forbid_annotation_only": false,
+      "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8",
+      "min_rule_version": 3,
+      "normalized_name": "untimely malfunction",
+      "oracle_hash": "877f2d75c90c7886ca9536135829bb90",
+      "required_effect_fields": {
+        "battle_model_scope": "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+        "cant_block_mode_status": "annotation_only",
+        "destroy_artifact_mode": true,
+        "effect": "remove_permanent",
+        "instant": true,
+        "redirect_target_mode_status": "runtime_executor_v1",
+        "target": "artifact",
+        "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "execution_scenarios": [
+    {
+      "card": {"cmc": 2, "mana_cost": "{1}{R}", "name": "Return the Favor", "type_line": "Instant"},
+      "expected_new_target": "Opponent Threat",
+      "expected_status_key": "change_target_mode_status",
+      "expected_status_value": "runtime_executor_v1",
+      "name": "return_the_favor_changes_single_target_stack_removal",
+      "responder_mana": {"generic": 1, "red": 1},
+      "type": "change_single_target_response"
+    },
+    {
+      "card": {"cmc": 2, "mana_cost": "{1}{R}", "name": "Untimely Malfunction", "type_line": "Instant"},
+      "expected_new_target": "Opponent Threat",
+      "expected_status_key": "redirect_target_mode_status",
+      "expected_status_value": "runtime_executor_v1",
+      "name": "untimely_malfunction_redirects_single_target_stack_removal",
+      "responder_mana": {"generic": 1, "red": 1},
+      "type": "change_single_target_response"
+    }
+  ],
+  "runtime_checks": [
+    {
+      "card": {"cmc": 2, "mana_cost": "{1}{R}", "name": "Return the Favor", "type_line": "Instant"},
+      "effect": "copy_spell",
+      "forbid_annotation_only": false,
+      "logical_rule_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2",
+      "required_effect_fields": {
+        "change_target_mode_status": "runtime_executor_v1",
+        "copy_activated_triggered_ability_status": "annotation_only",
+        "spree_additional_cost_status": "annotation_only",
+        "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1"
+      }
+    },
+    {
+      "card": {"cmc": 2, "mana_cost": "{1}{R}", "name": "Untimely Malfunction", "type_line": "Instant"},
+      "effect": "remove_permanent",
+      "forbid_annotation_only": false,
+      "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8",
+      "required_effect_fields": {
+        "cant_block_mode_status": "annotation_only",
+        "redirect_target_mode_status": "runtime_executor_v1",
+        "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1"
+      }
+    }
+  ],
+  "snapshot_checks": [
+    {
+      "card_name": "Return the Favor",
+      "logical_rule_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2"
+    },
+    {
+      "card_name": "Untimely Malfunction",
+      "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8"
+    }
+  ]
+}

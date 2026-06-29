@@ -449,6 +449,68 @@ def _build_single_target_stack_redirect_fields(
     if "spell or ability with a single target" not in normalized and "numberoftargetspredicate(1)" not in normalized:
         return None
 
+    if "CopyTargetStackObjectEffect" in effect_classes:
+        fields: dict[str, Any] = {
+            "instant": True,
+            "target": "instant_or_sorcery_on_stack",
+            "modes": ["copy_instant_or_sorcery_spell", "change_single_target"],
+            "may_choose_new_targets": True,
+            "choose_new_targets_status": "may_choose_new_targets",
+            "change_target_mode_status": "runtime_executor_v1",
+            "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1",
+            "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_spree_change_target_runtime_partial_v1",
+        }
+        if "spree" in normalized or "spreeability" in normalized:
+            fields["spree_additional_cost_status"] = "annotation_only"
+        if "activated ability" in normalized or "triggered ability" in normalized:
+            fields["copy_activated_triggered_ability_status"] = "annotation_only"
+        return {
+            "effect": "copy_spell",
+            "scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+            "fields": fields,
+            "reason": (
+                "XMage structure matches a modal spell that can copy a stack object and change the "
+                "target of a single-target spell or ability; ManaLoom executes the target-change "
+                "mode and keeps unsupported modal copy/cost riders annotated."
+            ),
+            "signals": [
+                "CopyTargetStackObjectEffect",
+                "ChooseNewTargetsTargetEffect",
+                "TargetStackObject",
+                "NumberOfTargetsPredicate(1)",
+            ],
+        }
+
+    if "DestroyTargetEffect" in effect_classes and (
+        "artifact" in normalized or "filterartifactpermanent" in normalized
+    ):
+        fields = {
+            "instant": True,
+            "target": "artifact",
+            "modes": ["destroy_artifact", "redirect_target", "cant_block"],
+            "destroy_artifact_mode": True,
+            "redirect_target_mode_status": "runtime_executor_v1",
+            "cant_block_mode_status": "annotation_only",
+            "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1",
+            "oracle_runtime_scope": "destroy_target_artifact_redirect_runtime_cant_block_annotation_v1",
+        }
+        return {
+            "effect": "remove_permanent",
+            "scope": "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+            "fields": fields,
+            "reason": (
+                "XMage structure matches a modal instant with destroy-artifact and single-target "
+                "redirect modes; ManaLoom executes destroy-artifact and redirect-target while "
+                "leaving the can't-block mode annotated."
+            ),
+            "signals": [
+                "DestroyTargetEffect",
+                "ChooseNewTargetsTargetEffect",
+                "TargetStackObject",
+                "NumberOfTargetsPredicate(1)",
+            ],
+        }
+
     if "SpellCostReductionSourceEffect" in effect_classes and (
         "ferociouscondition.instance" in normalized
         or _oracle_has(rules_text, "if you control a creature with power 4 or greater")

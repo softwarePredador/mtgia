@@ -5784,6 +5784,95 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(proposal["deck_role_json"]["category"], "combo_value")
         self.assertEqual(proposal["deck_role_json"]["effect"], "copy_spell")
 
+    def test_classifier_marks_modal_copy_change_target_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Return the Favor",
+                        "severity": "high",
+                        "oracle_hash": "returnhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "ReturnTheFavor",
+                            "path": "/xmage/ReturnTheFavor.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "CopyTargetStackObjectEffect",
+                                "ChooseNewTargetsTargetEffect",
+                            ],
+                            "ability_classes": ["SpreeAbility"],
+                            "target_classes": ["TargetStackObject"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "copy_spell",
+                                "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+                                "instant": True,
+                                "target": "instant_or_sorcery_on_stack",
+                                "modes": ["copy_instant_or_sorcery_spell", "change_single_target"],
+                                "may_choose_new_targets": True,
+                                "change_target_mode_status": "runtime_executor_v1",
+                                "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1",
+                                "spree_additional_cost_status": "annotation_only",
+                                "copy_activated_triggered_ability_status": "annotation_only",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+        self.assertEqual(report["families"][0]["family_id"], "targeted_interaction")
+
+    def test_classifier_marks_modal_destroy_artifact_redirect_scope_as_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Untimely Malfunction",
+                        "severity": "high",
+                        "oracle_hash": "untimelyhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "UntimelyMalfunction",
+                            "path": "/xmage/UntimelyMalfunction.java",
+                            "types": ["INSTANT"],
+                            "effect_classes": [
+                                "DestroyTargetEffect",
+                                "ChooseNewTargetsTargetEffect",
+                            ],
+                            "ability_classes": [],
+                            "target_classes": ["TargetPermanent", "TargetStackObject"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "remove_permanent",
+                                "battle_model_scope": "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+                                "instant": True,
+                                "target": "artifact",
+                                "modes": ["destroy_artifact", "redirect_target", "cant_block"],
+                                "destroy_artifact_mode": True,
+                                "redirect_target_mode_status": "runtime_executor_v1",
+                                "cant_block_mode_status": "annotation_only",
+                                "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+        self.assertEqual(report["families"][0]["family_id"], "targeted_interaction")
+
     def test_classifier_marks_candelabra_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

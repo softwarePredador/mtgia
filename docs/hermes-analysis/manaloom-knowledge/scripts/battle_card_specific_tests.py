@@ -17036,6 +17036,134 @@ def register_tests(battle, player):
         assert redirect_event["new_target"] == "Opponent Threat"
         assert redirect_event["rule_logical_key"] == "battle_rule_v1:bolt-bend-test"
 
+    def test_modal_runtime_target_change_modes_redirect_single_target_stack_object():
+        fixtures = [
+            (
+                "Runtime Untimely Redirect Test",
+                {
+                    "effect": "remove_permanent",
+                    "instant": True,
+                    "target": "artifact",
+                    "modes": ["destroy_artifact", "redirect_target", "cant_block"],
+                    "redirect_target_mode_status": "runtime_executor_v1",
+                    "cant_block_mode_status": "annotation_only",
+                    "battle_model_scope": "modal_destroy_artifact_redirect_or_cant_block_redirect_runtime_v1",
+                    "_rule_logical_key": "battle_rule_v1:runtime-untimely-redirect-test",
+                    "_rule_oracle_hash": "runtime-untimely-redirect-test-hash",
+                },
+                "redirect_target_mode_status",
+            ),
+            (
+                "Runtime Return Favor Change Target Test",
+                {
+                    "effect": "copy_spell",
+                    "instant": True,
+                    "target": "instant_or_sorcery_on_stack",
+                    "modes": ["copy_instant_or_sorcery_spell", "change_single_target"],
+                    "may_choose_new_targets": True,
+                    "change_target_mode_status": "runtime_executor_v1",
+                    "spree_additional_cost_status": "annotation_only",
+                    "copy_activated_triggered_ability_status": "annotation_only",
+                    "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+                    "_rule_logical_key": "battle_rule_v1:runtime-return-favor-change-target-test",
+                    "_rule_oracle_hash": "runtime-return-favor-change-target-test-hash",
+                },
+                "change_target_mode_status",
+            ),
+        ]
+
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_rules = {
+            name: battle.HANDCRAFTED_KNOWN_CARD_RULES.get(name)
+            for name, _effect, _status_key in fixtures
+        }
+        previous_known = {
+            name: name in battle.HANDCRAFTED_KNOWN_CARDS
+            for name, _effect, _status_key in fixtures
+        }
+        try:
+            for name, effect, status_key in fixtures:
+                events = []
+                battle.REPLAY_EVENT_HANDLER = lambda event, data, events=events: events.append((event, data))
+                card = {
+                    "name": name,
+                    "cmc": 2,
+                    "mana_cost": "{1}{R}",
+                    "type_line": "Instant",
+                }
+                battle.HANDCRAFTED_KNOWN_CARD_RULES[name] = {**card, **effect}
+                battle.HANDCRAFTED_KNOWN_CARDS.add(name)
+
+                responder = player("Responder", [card])
+                responder.hand = [card]
+                responder.mana_pool.add_generic(1)
+                responder.mana_pool.add("red", 1)
+                protected = {
+                    "name": "Protected Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 2,
+                    "toughness": 2,
+                }
+                responder.battlefield = [protected]
+                caster = player("Caster")
+                opponent_threat = {
+                    "name": "Opponent Threat",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 6,
+                    "toughness": 6,
+                }
+                caster.battlefield = [opponent_threat]
+                removal = {"name": "Targeted Removal", "cmc": 2, "type_line": "Instant"}
+                removal_effect = {
+                    "effect": "remove_creature",
+                    "instant": True,
+                    "declared_targets": [
+                        {
+                            "target": protected,
+                            "controller": responder,
+                            "target_type": "creature",
+                            "declared_by": caster,
+                        }
+                    ],
+                }
+                stack = battle.Stack()
+                stack.push(removal, caster, removal_effect)
+
+                assert battle.priority_round(
+                    caster,
+                    [caster, responder],
+                    stack,
+                    4,
+                    random.Random(6501),
+                    phase="combat",
+                )
+                redirected_target = stack.items[-1].effect_data["declared_targets"][0]["target"]
+                assert redirected_target is opponent_threat
+                event = next(
+                    data
+                    for replay_event, data in events
+                    if replay_event == "redirect_removal_resolved"
+                    and data.get("card") == name
+                )
+                assert event["old_target"] == "Protected Creature"
+                assert event["new_target"] == "Opponent Threat"
+                assert event["target_change_applied"] is True
+                assert event[status_key] == "runtime_executor_v1"
+                assert event["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            for name, previous_rule in previous_rules.items():
+                if previous_rule is None:
+                    battle.HANDCRAFTED_KNOWN_CARD_RULES.pop(name, None)
+                else:
+                    battle.HANDCRAFTED_KNOWN_CARD_RULES[name] = previous_rule
+                if previous_known[name]:
+                    battle.HANDCRAFTED_KNOWN_CARDS.add(name)
+                else:
+                    battle.HANDCRAFTED_KNOWN_CARDS.discard(name)
+
     def test_pg086_angels_grace_rule_resolves_from_sqlite_cache():
         effect_data = battle.get_card_effect(
             {"name": "Angel's Grace", "type_line": "Instant", "cmc": 1}
@@ -18065,13 +18193,14 @@ def register_tests(battle, player):
         assert return_effect["_rule_oracle_hash"] == "a24911b7ea2027ebba59bb6792eee776"
         assert (
             return_effect["battle_model_scope"]
-            == "spree_copy_instant_or_sorcery_stack_spell_change_target_annotation_v1"
+            == "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1"
         )
         assert return_effect["target"] == "instant_or_sorcery_on_stack"
         assert return_effect["may_choose_new_targets"] is True
         assert return_effect["spree_additional_cost_status"] == "annotation_only"
         assert return_effect["copy_activated_triggered_ability_status"] == "annotation_only"
-        assert return_effect["change_target_mode_status"] == "annotation_only"
+        assert return_effect["change_target_mode_status"] == "runtime_executor_v1"
+        assert return_effect["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
 
         untimely_effect = battle.get_card_effect(
             {"name": "Untimely Malfunction", "type_line": "Instant", "cmc": 2}
@@ -18081,12 +18210,13 @@ def register_tests(battle, player):
         assert untimely_effect["_rule_oracle_hash"] == "877f2d75c90c7886ca9536135829bb90"
         assert (
             untimely_effect["battle_model_scope"]
-            == "modal_destroy_artifact_redirect_or_cant_block_annotation_v1"
+            == "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1"
         )
         assert untimely_effect["target"] == "artifact"
         assert untimely_effect["destroy_artifact_mode"] is True
-        assert untimely_effect["redirect_target_mode_status"] == "annotation_only"
+        assert untimely_effect["redirect_target_mode_status"] == "runtime_executor_v1"
         assert untimely_effect["cant_block_mode_status"] == "annotation_only"
+        assert untimely_effect["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
 
     def test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance():
         events = []
@@ -18171,6 +18301,117 @@ def register_tests(battle, player):
             and data.get("rule_oracle_hash") == "a24911b7ea2027ebba59bb6792eee776"
             for event, data in events
         )
+
+    def test_pg065_modal_target_change_runtime_rules_redirect_stack_target():
+        fixtures = [
+            (
+                "Untimely Malfunction",
+                "redirect_target_mode_status",
+                "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8",
+                "877f2d75c90c7886ca9536135829bb90",
+            ),
+            (
+                "Return the Favor",
+                "change_target_mode_status",
+                "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2",
+                "a24911b7ea2027ebba59bb6792eee776",
+            ),
+        ]
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        try:
+            for index, (card_name, status_key, logical_key, oracle_hash) in enumerate(fixtures):
+                events = []
+                battle.REPLAY_EVENT_HANDLER = lambda event, data, events=events: events.append((event, data))
+                card = {
+                    "name": card_name,
+                    "type_line": "Instant",
+                    "cmc": 2,
+                    "mana_cost": "{1}{R}",
+                }
+                effect_data = battle.get_card_effect(card)
+                assert effect_data[status_key] == "runtime_executor_v1"
+                assert effect_data["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
+
+                responder = player("Responder", [card])
+                responder.hand = [card]
+                responder.mana_pool.add_generic(1)
+                responder.mana_pool.add("red", 1)
+                protected = {
+                    "name": "Protected Creature",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "cmc": 2,
+                }
+                responder.battlefield = [protected]
+
+                caster = player("Caster")
+                opponent_threat = {
+                    "name": "Opponent Threat",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 6,
+                    "toughness": 6,
+                    "cmc": 6,
+                }
+                caster.battlefield = [opponent_threat]
+                removal = {
+                    "name": f"Targeted Removal {index + 1}",
+                    "cmc": 2,
+                    "type_line": "Instant",
+                }
+                removal_effect = {
+                    "effect": "remove_creature",
+                    "instant": True,
+                    "declared_targets": [
+                        {
+                            "target": protected,
+                            "controller": responder,
+                            "target_type": "creature",
+                            "declared_by": caster,
+                        }
+                    ],
+                }
+                stack = battle.Stack()
+                stack.push(removal, caster, removal_effect)
+
+                assert battle.priority_round(
+                    caster,
+                    [caster, responder],
+                    stack,
+                    6505 + index,
+                    random.Random(6505 + index),
+                    phase="combat",
+                )
+                assert card not in responder.hand
+                assert stack.items[-1].effect_data["declared_targets"][0]["target"] is opponent_threat
+
+                spell_event = next(
+                    data
+                    for replay_event, data in events
+                    if replay_event == "spell_cast" and data.get("card") == card_name
+                )
+                assert spell_event["role"] == "response"
+                assert spell_event["response_to"] == removal["name"]
+                assert spell_event["rule_logical_key"] == logical_key
+                assert spell_event["rule_oracle_hash"] == oracle_hash
+
+                redirect_event = next(
+                    data
+                    for replay_event, data in events
+                    if replay_event == "redirect_removal_resolved"
+                    and data.get("card") == card_name
+                )
+                assert redirect_event["old_target"] == "Protected Creature"
+                assert redirect_event["new_target"] == "Opponent Threat"
+                assert redirect_event["target_change_applied"] is True
+                assert redirect_event[status_key] == "runtime_executor_v1"
+                assert redirect_event["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
+                assert redirect_event["rule_logical_key"] == logical_key
+                assert redirect_event["rule_oracle_hash"] == oracle_hash
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
 
     def test_pg093_insurrection_uses_compact_steal_attack_runtime():
         events = []
@@ -20031,6 +20272,7 @@ def register_tests(battle, player):
         test_pg081_redirect_lightning_redirects_single_target_stack_object,
         test_pg240_bolt_bend_ferocious_cost_reduction_requires_power_four_creature,
         test_pg240_bolt_bend_redirects_with_only_single_red_under_ferocious,
+        test_modal_runtime_target_change_modes_redirect_single_target_stack_object,
         test_pg241_penance_activates_in_combat_window_and_prevents_matching_damage,
         test_pg241_penance_skips_non_black_red_source,
         test_removal_exile_stack_target_exiles_spell_instead_of_countering_to_graveyard,
@@ -20053,6 +20295,7 @@ def register_tests(battle, player):
         test_pg092_deck608_modal_interaction_rules_resolve_from_sqlite_cache,
         test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance,
         test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance,
+        test_pg065_modal_target_change_runtime_rules_redirect_stack_target,
         test_exact_erode_scope_can_target_planeswalker_and_preserves_basic_land_annotation,
         test_exact_land_removal_scope_can_target_land,
         test_pg093_insurrection_uses_compact_steal_attack_runtime,

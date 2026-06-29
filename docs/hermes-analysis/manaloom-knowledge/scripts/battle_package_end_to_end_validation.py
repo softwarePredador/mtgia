@@ -830,9 +830,113 @@ def run_copy_spell_choose_new_targets(
     }
 
 
+def run_change_single_target_response(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    response_card = dict(scenario["card"])
+    turn = int(scenario.get("turn") or 7)
+    phase = str(scenario.get("phase") or "combat")
+    caster = battle.Player(str(scenario.get("caster") or "Caster"), None, [])
+    responder = battle.Player(str(scenario.get("responder") or "Responder"), None, [])
+    protected = dict(scenario.get("protected_target") or {
+        "name": "Protected Creature",
+        "cmc": 2,
+        "effect": "creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature",
+    })
+    redirect_target = dict(scenario.get("redirect_target") or {
+        "name": "Opponent Threat",
+        "cmc": 5,
+        "effect": "creature",
+        "power": 5,
+        "toughness": 5,
+        "type_line": "Creature",
+    })
+    responder.battlefield = [protected]
+    caster.battlefield = [redirect_target]
+    target_spell = dict(scenario.get("target_spell") or {
+        "name": "Targeted Removal",
+        "cmc": 2,
+        "mana_cost": "{1}{B}",
+        "type_line": "Instant",
+    })
+    target_effect = dict(scenario.get("target_effect") or {
+        "effect": "remove_creature",
+        "target": "creature",
+        "instant": True,
+    })
+    target_effect["declared_targets"] = [
+        {
+            "target": protected,
+            "controller": responder,
+            "target_type": str(scenario.get("target_type") or target_effect.get("target") or "creature"),
+            "declared_by": caster,
+        }
+    ]
+    stack = battle.Stack()
+    stack.push(target_spell, caster, target_effect)
+    responder.hand = [response_card]
+    add_manifest_mana(responder, scenario.get("responder_mana") or {"generic": 1, "red": 1})
+    if not battle.priority_round(
+        caster,
+        [caster, responder],
+        stack,
+        turn,
+        random.Random(int(scenario.get("seed") or 6065)),
+        phase=phase,
+    ):
+        fail("battle_execution", f"{response_card['name']} was not cast as target-change response")
+
+    changed_entry = stack.items[-1].effect_data["declared_targets"][0]
+    actual_target = changed_entry.get("target")
+    actual_target_name = actual_target.get("name") if isinstance(actual_target, dict) else None
+    expected_target_name = str(scenario.get("expected_new_target") or redirect_target.get("name"))
+    if actual_target_name != expected_target_name:
+        fail("battle_execution", f"{response_card['name']} new target={actual_target_name!r}")
+
+    redirect_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "redirect_removal_resolved" and data.get("card") == response_card.get("name")
+        ),
+        None,
+    )
+    if redirect_event is None:
+        fail("battle_events", f"missing {response_card['name']} redirect_removal_resolved event")
+    if redirect_event.get("target_change_applied") is not True:
+        fail("battle_events", f"{response_card['name']} target_change_applied={redirect_event.get('target_change_applied')!r}")
+    if redirect_event.get("old_target") != protected.get("name"):
+        fail("battle_events", f"{response_card['name']} old_target={redirect_event.get('old_target')!r}")
+    if redirect_event.get("new_target") != expected_target_name:
+        fail("battle_events", f"{response_card['name']} new_target={redirect_event.get('new_target')!r}")
+    expected_status_key = scenario.get("expected_status_key")
+    expected_status_value = scenario.get("expected_status_value", "runtime_executor_v1")
+    if expected_status_key and redirect_event.get(expected_status_key) != expected_status_value:
+        fail(
+            "battle_events",
+            f"{response_card['name']} {expected_status_key}={redirect_event.get(expected_status_key)!r}",
+        )
+    if redirect_event.get("target_change_pipeline") != "single_target_stack_object_redirect_runtime_v1":
+        fail("battle_events", f"{response_card['name']} missing target_change_pipeline")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": response_card["name"],
+        "old_target": protected.get("name"),
+        "new_target": actual_target_name,
+        "target_change_applied": True,
+        "target_change_pipeline": redirect_event.get("target_change_pipeline"),
+    }
+
+
 SCENARIO_RUNNERS = {
     "conditional_land_play": run_conditional_land_play,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
+    "change_single_target_response": run_change_single_target_response,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,

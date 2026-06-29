@@ -10177,6 +10177,32 @@ def redirectable_stack_context(redirector, all_players, stack_item):
     }
 
 
+def effect_can_change_single_stack_target(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    if effect_data.get("effect") == "redirect_removal":
+        return True
+    modes = {str(mode or "").lower() for mode in _as_list(effect_data.get("modes"))}
+    redirect_status = str(effect_data.get("redirect_target_mode_status") or "").lower()
+    change_status = str(effect_data.get("change_target_mode_status") or "").lower()
+    return (
+        ("redirect_target" in modes and redirect_status == "runtime_executor_v1")
+        or ("change_single_target" in modes and change_status == "runtime_executor_v1")
+    )
+
+
+def target_change_runtime_replay_fields(effect_data):
+    fields = {}
+    if not isinstance(effect_data, dict):
+        return fields
+    for key in ("redirect_target_mode_status", "change_target_mode_status"):
+        if effect_data.get(key):
+            fields[key] = effect_data.get(key)
+    if fields:
+        fields["target_change_pipeline"] = "single_target_stack_object_redirect_runtime_v1"
+    return fields
+
+
 def resolve_redirect_removal(player, all_players, card, effect_data, turn, phase=None):
     context = (effect_data or {}).get("_redirect_context") or {}
     stack_item = context.get("stack_item")
@@ -10194,6 +10220,7 @@ def resolve_redirect_removal(player, all_players, card, effect_data, turn, phase
             result="no_redirect_target",
             turn=turn,
             phase=phase,
+            **target_change_runtime_replay_fields(effect_data or {}),
             **replay_rule_fields(effect_data or {}),
         )
         finish_resolved_spell(player, card, turn=turn)
@@ -10217,6 +10244,7 @@ def resolve_redirect_removal(player, all_players, card, effect_data, turn, phase
             result=context.get("result") or "no_legal_new_target",
             turn=turn,
             phase=phase,
+            **target_change_runtime_replay_fields(effect_data or {}),
             **replay_rule_fields(effect_data or {}),
         )
         finish_resolved_spell(player, card, turn=turn)
@@ -10245,6 +10273,7 @@ def resolve_redirect_removal(player, all_players, card, effect_data, turn, phase
         result="redirected",
         turn=turn,
         phase=phase,
+        **target_change_runtime_replay_fields(effect_data or {}),
         **replay_rule_fields(effect_data or {}),
     )
     finish_resolved_spell(player, card, turn=turn)
@@ -11343,7 +11372,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
             instants = [c for c in player.hand if is_instant(c)]
             for c in instants:
                 eff = get_card_effect(c)
-                if eff.get("effect") != "redirect_removal":
+                if not effect_can_change_single_stack_target(eff):
                     continue
                 if not can_pay_card_for_effect(player, c, eff):
                     continue

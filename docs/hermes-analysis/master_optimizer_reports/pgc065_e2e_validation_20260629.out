@@ -1,0 +1,167 @@
+{
+  "battle_execution": {
+    "event_count": 4,
+    "results": [
+      {
+        "card_name": "Return the Favor",
+        "new_target": "Opponent Threat",
+        "old_target": "Protected Creature",
+        "scenario": "return_the_favor_changes_single_target_stack_removal",
+        "target_change_applied": true,
+        "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1"
+      },
+      {
+        "card_name": "Untimely Malfunction",
+        "new_target": "Opponent Threat",
+        "old_target": "Protected Creature",
+        "scenario": "untimely_malfunction_redirects_single_target_stack_removal",
+        "target_change_applied": true,
+        "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1"
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-29T10:48:38.650213+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pgc065_e2e_manifest_20260629.json",
+  "package_id": "pgc065_modal_target_change_runtime",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [
+            "spree_additional_cost_status",
+            "copy_activated_triggered_ability_status"
+          ],
+          "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+          "card_name": "Return the Favor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2",
+          "oracle_hash": "a24911b7ea2027ebba59bb6792eee776",
+          "review_status": "verified",
+          "rule_version": 3
+        },
+        {
+          "annotation_fields": [
+            "cant_block_mode_status"
+          ],
+          "battle_model_scope": "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+          "card_name": "Untimely Malfunction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8",
+          "oracle_hash": "877f2d75c90c7886ca9536135829bb90",
+          "review_status": "verified",
+          "rule_version": 3
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [
+            "copy_activated_triggered_ability_status",
+            "spree_additional_cost_status"
+          ],
+          "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+          "card_name": "Return the Favor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2",
+          "oracle_hash": "a24911b7ea2027ebba59bb6792eee776",
+          "review_status": "verified",
+          "rule_version": 3
+        },
+        {
+          "annotation_fields": [
+            "cant_block_mode_status"
+          ],
+          "battle_model_scope": "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+          "card_name": "Untimely Malfunction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8",
+          "oracle_hash": "877f2d75c90c7886ca9536135829bb90",
+          "review_status": "verified",
+          "rule_version": 3
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [
+            "copy_activated_triggered_ability_status",
+            "spree_additional_cost_status"
+          ],
+          "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+          "battle_rule_version": 3,
+          "card_name": "Return the Favor",
+          "logical_rule_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2"
+        },
+        {
+          "annotation_fields": [
+            "cant_block_mode_status"
+          ],
+          "battle_model_scope": "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+          "battle_rule_version": 3,
+          "card_name": "Untimely Malfunction",
+          "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [
+            "copy_activated_triggered_ability_status",
+            "spree_additional_cost_status"
+          ],
+          "card_name": "Return the Favor",
+          "component_keys": [],
+          "effect": "copy_spell",
+          "logical_rule_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2"
+        },
+        {
+          "annotation_fields": [
+            "cant_block_mode_status"
+          ],
+          "card_name": "Untimely Malfunction",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 4,
+        "scenarios": 2
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "PGC065 Modal Target Change Runtime Validation"
+}

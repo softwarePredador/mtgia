@@ -2590,6 +2590,73 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["cost_reduction_generic"], 3)
         self.assertEqual(primary["cost_reduction_condition"], "control_creature_power_4_or_greater")
 
+    def test_modal_copy_change_target_maps_to_partial_runtime_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["CopyTargetStackObjectEffect", "ChooseNewTargetsTargetEffect"],
+                "target_classes": ["TargetStackObject"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new SpreeAbility()); "
+                    "this.getSpellAbility().addEffect(new CopyTargetStackObjectEffect()); "
+                    "this.getSpellAbility().addEffect(new ChooseNewTargetsTargetEffect(true, true)); "
+                    "FilterStackObject filter = new FilterStackObject(\"spell or ability with a single target\"); "
+                    "filter.add(new NumberOfTargetsPredicate(1)); "
+                    "this.getSpellAbility().addTarget(new TargetStackObject(filter)); "
+                    "Copy target instant spell, sorcery spell, activated ability, or triggered ability. "
+                    "You may choose new targets for the copy. Change the target of target spell or ability with a single target."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "copy_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+        )
+        self.assertEqual(primary["target"], "instant_or_sorcery_on_stack")
+        self.assertEqual(primary["change_target_mode_status"], "runtime_executor_v1")
+        self.assertEqual(
+            primary["target_change_pipeline"],
+            "single_target_stack_object_redirect_runtime_v1",
+        )
+        self.assertEqual(primary["spree_additional_cost_status"], "annotation_only")
+        self.assertEqual(primary["copy_activated_triggered_ability_status"], "annotation_only")
+
+    def test_modal_destroy_artifact_redirect_maps_to_partial_runtime_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "effect_classes": ["DestroyTargetEffect", "ChooseNewTargetsTargetEffect"],
+                "target_classes": ["TargetPermanent", "TargetStackObject"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.getSpellAbility().addTarget(new TargetPermanent(StaticFilters.FILTER_ARTIFACT_PERMANENT)); "
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect()); "
+                    "FilterStackObject filter = new FilterStackObject(\"spell or ability with a single target\"); "
+                    "filter.add(new NumberOfTargetsPredicate(1)); "
+                    "this.getSpellAbility().addTarget(new TargetStackObject(filter)); "
+                    "this.getSpellAbility().addEffect(new ChooseNewTargetsTargetEffect(true, true)); "
+                    "Target creature can't block this turn."
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "remove_permanent")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+        )
+        self.assertEqual(primary["target"], "artifact")
+        self.assertTrue(primary["destroy_artifact_mode"])
+        self.assertEqual(primary["redirect_target_mode_status"], "runtime_executor_v1")
+        self.assertEqual(primary["cant_block_mode_status"], "annotation_only")
+        self.assertEqual(
+            primary["target_change_pipeline"],
+            "single_target_stack_object_redirect_runtime_v1",
+        )
+
     def test_mana_leak_maps_to_exact_soft_counter_scope(self) -> None:
         result = hints.build_effect_hints(
             {

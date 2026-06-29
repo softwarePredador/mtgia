@@ -476,6 +476,15 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         and effect_json.get("effect") == "redirect_removal"
     ):
         return "targeted_interaction"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
+        in {
+            "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+            "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+        }
+        and effect_json.get("effect") in {"remove_permanent", "copy_spell"}
+    ):
+        return "targeted_interaction"
     return family_for_effect(effect_json.get("effect"))
 
 
@@ -1250,6 +1259,43 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("cost_reduction_applies_to") == "this_spell"
             and int(effect_json.get("cost_reduction_generic") or 0) == 3
             and effect_json.get("cost_reduction_condition") == "control_creature_power_4_or_greater"
+        )
+
+    if (
+        effect == "copy_spell"
+        and scope == "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1"
+    ):
+        modes = set(effect_json.get("modes") or [])
+        return (
+            types == {"INSTANT"}
+            and {"CopyTargetStackObjectEffect", "ChooseNewTargetsTargetEffect"}.issubset(effect_classes)
+            and "TargetStackObject" in target_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "instant_or_sorcery_on_stack"
+            and {"copy_instant_or_sorcery_spell", "change_single_target"}.issubset(modes)
+            and bool(effect_json.get("may_choose_new_targets"))
+            and effect_json.get("change_target_mode_status") == "runtime_executor_v1"
+            and effect_json.get("target_change_pipeline") == "single_target_stack_object_redirect_runtime_v1"
+            and effect_json.get("spree_additional_cost_status") == "annotation_only"
+            and effect_json.get("copy_activated_triggered_ability_status") == "annotation_only"
+        )
+
+    if (
+        effect == "remove_permanent"
+        and scope == "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1"
+    ):
+        modes = set(effect_json.get("modes") or [])
+        return (
+            types == {"INSTANT"}
+            and {"DestroyTargetEffect", "ChooseNewTargetsTargetEffect"}.issubset(effect_classes)
+            and "TargetStackObject" in target_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "artifact"
+            and bool(effect_json.get("destroy_artifact_mode"))
+            and {"destroy_artifact", "redirect_target", "cant_block"}.issubset(modes)
+            and effect_json.get("redirect_target_mode_status") == "runtime_executor_v1"
+            and effect_json.get("cant_block_mode_status") == "annotation_only"
+            and effect_json.get("target_change_pipeline") == "single_target_stack_object_redirect_runtime_v1"
         )
 
     if effect == "damage_each_opponent" and scope == "spell_damage_each_opponent_v1":
