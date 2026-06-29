@@ -154,6 +154,7 @@ def test_run_gate_report_marks_accessed_candidate_without_use_as_inconclusive() 
         assert observations["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]["observed"] is True
         assert report["candidate_scoreability"]["status"] == "candidate_not_used"
         assert report["candidate_scoreability"]["scoring_allowed"] is False
+        assert report["candidate_scoreability"]["thresholds"]["min_used_events"] == 1
         assert report["status"] == "inconclusive_candidate_not_used"
 
 
@@ -176,6 +177,33 @@ def test_run_gate_report_allows_used_candidate_for_scoring() -> None:
         assert report["candidate_scoreability"]["scoring_allowed"] is True
         assert report["status"] == "battle_prior_passed"
         assert report["postgres_writes"] is False
+
+
+def test_run_gate_report_blocks_used_candidate_with_insufficient_sample() -> None:
+    with tempfile.TemporaryDirectory() as tmp_name:
+        tmp = Path(tmp_name)
+        prior = tmp / "prior.json"
+        gate = tmp / "gate.json"
+        prior.write_text(json.dumps(fixture_prior()) + "\n", encoding="utf-8")
+        gate.write_text(json.dumps(fixture_gate_report(accessed=True, used=True)) + "\n", encoding="utf-8")
+        report = compare.run_gate_report(
+            prior_path=prior,
+            gate_report_path=gate,
+            candidate_key="candidate_607_birgi_v1",
+            candidate_cards=["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+            player_slots=2,
+            min_used_events=2,
+        )
+
+        scoreability = report["candidate_scoreability"]
+        assert scoreability["status"] == "candidate_insufficient_sample"
+        assert scoreability["scoring_allowed"] is False
+        assert scoreability["candidate_insufficient_sample_cards"] == [
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        ]
+        card = scoreability["cards"]["Birgi, God of Storytelling // Harnfel, Horn of Bounty"]
+        assert card["evidence_status"] == "used_insufficient_sample"
+        assert report["status"] == "inconclusive_candidate_insufficient_sample"
 
 
 def test_run_gate_report_marks_library_only_candidate_inconclusive() -> None:
@@ -205,5 +233,6 @@ if __name__ == "__main__":
     test_run_reads_json_and_jsonl()
     test_run_gate_report_marks_accessed_candidate_without_use_as_inconclusive()
     test_run_gate_report_allows_used_candidate_for_scoring()
+    test_run_gate_report_blocks_used_candidate_with_insufficient_sample()
     test_run_gate_report_marks_library_only_candidate_inconclusive()
-    print("6 tests passed")
+    print("7 tests passed")

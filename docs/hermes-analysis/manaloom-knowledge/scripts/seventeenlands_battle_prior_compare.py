@@ -562,23 +562,37 @@ def compare_gate_to_prior(prior: dict[str, Any], observed: dict[str, Any]) -> di
     }
 
 
-def candidate_scoreability(observed: Mapping[str, Any]) -> dict[str, Any]:
+def candidate_scoreability(
+    observed: Mapping[str, Any],
+    *,
+    min_accessed_games: int = 1,
+    min_used_events: int = 1,
+    min_trace_count: int = 1,
+) -> dict[str, Any]:
+    thresholds = {
+        "min_accessed_games": max(0, min_accessed_games),
+        "min_trace_count": max(0, min_trace_count),
+        "min_used_events": max(1, min_used_events),
+    }
     observations = observed.get("candidate_observations") or {}
     if not isinstance(observations, Mapping) or not observations:
         return {
             "candidate_count": 0,
             "candidate_accessed_not_used_cards": [],
+            "candidate_insufficient_sample_cards": [],
             "candidate_near_access_only_cards": [],
             "candidate_unobserved_cards": [],
             "candidate_used_cards": [],
             "recommended_next_action": "inspect_battle_prior_rhythm_only",
             "scoring_allowed": True,
             "status": "not_applicable",
+            "thresholds": thresholds,
         }
 
     cards: dict[str, dict[str, Any]] = {}
     used_cards: list[str] = []
     accessed_not_used_cards: list[str] = []
+    insufficient_sample_cards: list[str] = []
     near_access_only_cards: list[str] = []
     unobserved_cards: list[str] = []
 
@@ -592,47 +606,82 @@ def candidate_scoreability(observed: Mapping[str, Any]) -> dict[str, Any]:
         drawn_games = int(numeric_count(payload.get("drawn_games")))
         opening_hand_games = int(numeric_count(payload.get("opening_hand_games")))
         near_access_games = int(numeric_count(payload.get("near_access_games")))
+        trace_count = int(numeric_count(payload.get("trace_count")))
         observed_flag = bool(payload.get("observed"))
-        accessed = any(value > 0 for value in (accessed_games, drawn_games, opening_hand_games))
-        if "accessed_games" not in payload and observed_flag:
+        accessed_total = accessed_games + drawn_games + opening_hand_games
+        has_access_fields = any(
+            key in payload
+            for key in ("accessed_games", "drawn_games", "opening_hand_games")
+        )
+        accessed = accessed_total > 0
+        if not has_access_fields and observed_flag:
             accessed = True
 
         if direct_events > 0:
-            evidence_status = "used"
-            used_cards.append(str(card))
+            if direct_events < thresholds["min_used_events"]:
+                evidence_status = "used_insufficient_sample"
+                insufficient_sample_cards.append(str(card))
+            elif (
+                has_access_fields
+                and thresholds["min_accessed_games"] > 0
+                and accessed_total < thresholds["min_accessed_games"]
+            ):
+                evidence_status = "access_insufficient_sample"
+                insufficient_sample_cards.append(str(card))
+            else:
+                evidence_status = "used"
+                used_cards.append(str(card))
         elif accessed:
-            evidence_status = "accessed_not_used"
-            accessed_not_used_cards.append(str(card))
+            if (
+                has_access_fields
+                and thresholds["min_accessed_games"] > 0
+                and accessed_total < thresholds["min_accessed_games"]
+            ):
+                evidence_status = "access_insufficient_sample"
+                insufficient_sample_cards.append(str(card))
+            else:
+                evidence_status = "accessed_not_used"
+                accessed_not_used_cards.append(str(card))
         elif near_access_games > 0:
             evidence_status = "near_access_not_used"
             near_access_only_cards.append(str(card))
+        elif trace_count < thresholds["min_trace_count"]:
+            evidence_status = "trace_insufficient_sample"
+            insufficient_sample_cards.append(str(card))
         else:
             evidence_status = "unobserved"
             unobserved_cards.append(str(card))
 
         cards[str(card)] = {
             "accessed_games": accessed_games,
+            "accessed_total_games": accessed_total,
             "direct_card_events": direct_events,
             "drawn_games": drawn_games,
             "evidence_status": evidence_status,
             "near_access_games": near_access_games,
             "observed": observed_flag,
             "opening_hand_games": opening_hand_games,
+            "trace_count": trace_count,
         }
 
     if not cards:
         return {
             "candidate_count": 0,
             "candidate_accessed_not_used_cards": [],
+            "candidate_insufficient_sample_cards": [],
             "candidate_near_access_only_cards": [],
             "candidate_unobserved_cards": [],
             "candidate_used_cards": [],
             "recommended_next_action": "inspect_battle_prior_rhythm_only",
             "scoring_allowed": True,
             "status": "not_applicable",
+            "thresholds": thresholds,
         }
 
-    if unobserved_cards:
+    if insufficient_sample_cards:
+        status = "candidate_insufficient_sample"
+        next_action = "increase_gate_sample_or_lower_thresholds_before_scoring"
+    elif unobserved_cards:
         status = "candidate_unobserved"
         next_action = "rerun_with_forced_focus_access_or_larger_natural_sample_until_candidate_accessed"
     elif accessed_not_used_cards or near_access_only_cards:
@@ -645,6 +694,7 @@ def candidate_scoreability(observed: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "candidate_count": len(cards),
         "candidate_accessed_not_used_cards": accessed_not_used_cards,
+        "candidate_insufficient_sample_cards": insufficient_sample_cards,
         "candidate_near_access_only_cards": near_access_only_cards,
         "candidate_unobserved_cards": unobserved_cards,
         "candidate_used_cards": used_cards,
@@ -652,15 +702,27 @@ def candidate_scoreability(observed: Mapping[str, Any]) -> dict[str, Any]:
         "recommended_next_action": next_action,
         "scoring_allowed": status == "candidate_used",
         "status": status,
+        "thresholds": thresholds,
     }
 
 
 def battle_prior_status(
     comparison: Mapping[str, Any],
     observed: Mapping[str, Any] | None = None,
+    *,
+    min_accessed_games: int = 1,
+    min_used_events: int = 1,
+    min_trace_count: int = 1,
 ) -> str:
     if observed is not None:
-        scoreability = candidate_scoreability(observed)
+        scoreability = candidate_scoreability(
+            observed,
+            min_accessed_games=min_accessed_games,
+            min_used_events=min_used_events,
+            min_trace_count=min_trace_count,
+        )
+        if scoreability["candidate_insufficient_sample_cards"]:
+            return "inconclusive_candidate_insufficient_sample"
         if scoreability["candidate_unobserved_cards"]:
             return "inconclusive_candidate_unobserved"
         if (
@@ -710,8 +772,12 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines.append(f"- status: `{scoreability.get('status')}`")
         lines.append(f"- scoring_allowed: `{scoreability.get('scoring_allowed')}`")
         lines.append(f"- next_action: `{scoreability.get('recommended_next_action')}`")
+        lines.append(f"- thresholds: `{scoreability.get('thresholds')}`")
         lines.append(
             f"- accessed_not_used: `{scoreability.get('candidate_accessed_not_used_cards')}`"
+        )
+        lines.append(
+            f"- insufficient_sample: `{scoreability.get('candidate_insufficient_sample_cards')}`"
         )
         lines.append(f"- unobserved: `{scoreability.get('candidate_unobserved_cards')}`")
         lines.append(f"- used: `{scoreability.get('candidate_used_cards')}`")
@@ -732,6 +798,9 @@ def run(
     candidate_cards: list[str],
     game_count: int | None,
     player_slots: int | None,
+    min_accessed_games: int = 1,
+    min_used_events: int = 1,
+    min_trace_count: int = 1,
 ) -> dict[str, Any]:
     prior = load_json(prior_path)
     events = iter_jsonl(events_path)
@@ -744,7 +813,12 @@ def run(
         player_slots=inferred_player_slots,
     )
     comparison = compare_to_prior(prior, observed)
-    scoreability = candidate_scoreability(observed)
+    scoreability = candidate_scoreability(
+        observed,
+        min_accessed_games=min_accessed_games,
+        min_used_events=min_used_events,
+        min_trace_count=min_trace_count,
+    )
     return {
         "candidate_scoreability": scoreability,
         "comparison": comparison,
@@ -752,7 +826,13 @@ def run(
         "observed_summary": observed,
         "postgres_writes": False,
         "prior_path": str(prior_path),
-        "status": battle_prior_status(comparison, observed),
+        "status": battle_prior_status(
+            comparison,
+            observed,
+            min_accessed_games=min_accessed_games,
+            min_used_events=min_used_events,
+            min_trace_count=min_trace_count,
+        ),
         "source_db_mutated": False,
     }
 
@@ -764,6 +844,9 @@ def run_gate_report(
     candidate_key: str | None,
     candidate_cards: list[str],
     player_slots: int | None,
+    min_accessed_games: int = 1,
+    min_used_events: int = 1,
+    min_trace_count: int = 1,
 ) -> dict[str, Any]:
     prior = load_json(prior_path)
     gate_report = load_json(gate_report_path)
@@ -774,7 +857,12 @@ def run_gate_report(
         player_slots=player_slots,
     )
     comparison = compare_gate_to_prior(prior, observed)
-    scoreability = candidate_scoreability(observed)
+    scoreability = candidate_scoreability(
+        observed,
+        min_accessed_games=min_accessed_games,
+        min_used_events=min_used_events,
+        min_trace_count=min_trace_count,
+    )
     return {
         "candidate_scoreability": scoreability,
         "candidate_key": candidate_key,
@@ -783,7 +871,13 @@ def run_gate_report(
         "observed_summary": observed,
         "postgres_writes": False,
         "prior_path": str(prior_path),
-        "status": battle_prior_status(comparison, observed),
+        "status": battle_prior_status(
+            comparison,
+            observed,
+            min_accessed_games=min_accessed_games,
+            min_used_events=min_used_events,
+            min_trace_count=min_trace_count,
+        ),
         "source_db_mutated": False,
     }
 
@@ -797,6 +891,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--candidate-card", action="append", default=[])
     parser.add_argument("--game-count", type=int)
     parser.add_argument("--player-slots", type=int)
+    parser.add_argument("--min-accessed-games", type=int, default=1)
+    parser.add_argument("--min-used-events", type=int, default=1)
+    parser.add_argument("--min-trace-count", type=int, default=1)
     parser.add_argument("--output-json", type=Path)
     parser.add_argument("--output-md", type=Path)
     return parser
@@ -813,6 +910,9 @@ def main(argv: list[str] | None = None) -> int:
             candidate_cards=args.candidate_card,
             game_count=args.game_count,
             player_slots=args.player_slots,
+            min_accessed_games=args.min_accessed_games,
+            min_used_events=args.min_used_events,
+            min_trace_count=args.min_trace_count,
         )
     else:
         report = run_gate_report(
@@ -821,6 +921,9 @@ def main(argv: list[str] | None = None) -> int:
             candidate_key=args.candidate_key,
             candidate_cards=args.candidate_card,
             player_slots=args.player_slots,
+            min_accessed_games=args.min_accessed_games,
+            min_used_events=args.min_used_events,
+            min_trace_count=args.min_trace_count,
         )
     if args.output_json:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)

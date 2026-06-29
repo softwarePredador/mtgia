@@ -50,19 +50,19 @@ def fixture_row() -> dict[str, str]:
         "on_play": "True",
         "num_turns": "2",
         "won": "True",
-        "opening_hand": "100|101|102|103|104|105|106",
-        "user_turn_1_cards_drawn": "107",
-        "user_turn_1_lands_played": "100",
-        "user_turn_1_creatures_cast": "101",
+        "opening_hand": "1100|1101|1102|1103|1104|1105|1106",
+        "user_turn_1_cards_drawn": "1107",
+        "user_turn_1_lands_played": "1100",
+        "user_turn_1_creatures_cast": "1101",
         "user_turn_1_user_mana_spent": "1.0",
         "user_turn_1_eot_user_life": "20.0",
         "oppo_turn_1_oppo_combat_damage_taken": "0.0",
         "oppo_turn_1_eot_oppo_life": "20.0",
-        "user_turn_2_cards_drawn_or_tutored": "108",
-        "user_turn_2_non_creatures_cast": "109|110",
-        "user_turn_2_user_instants_sorceries_cast": "111",
-        "user_turn_2_user_abilities": "112",
-        "user_turn_2_creatures_attacked": "101",
+        "user_turn_2_cards_drawn_or_tutored": "1108",
+        "user_turn_2_non_creatures_cast": "1109|1110",
+        "user_turn_2_user_instants_sorceries_cast": "1111",
+        "user_turn_2_user_abilities": "1112",
+        "user_turn_2_creatures_attacked": "1101",
         "user_turn_2_oppo_combat_damage_taken": "2.0",
         "user_turn_2_user_mana_spent": "3.0",
         "user_turn_2_eot_user_cards_in_hand": "4.0",
@@ -93,7 +93,7 @@ def test_normalize_turn_events_emits_behavior_events() -> None:
     assert "combat_damage" in event_types
     assert "end_turn_state" in event_types
     cast = next(event for event in events if event["event_type"] == "cast_creature")
-    assert cast["arena_id"] == "101"
+    assert cast["arena_id"] == "1101"
     assert cast["owner_side"] == "user"
 
 
@@ -107,9 +107,35 @@ def test_profile_report_is_read_only_and_documents_limits() -> None:
     assert report["postgres_writes"] is False
     assert report["source_db_mutated"] is False
     assert report["rows_sampled"] == 1
-    assert report["sample_summary"]["top_arena_ids"]["101"] == 3
+    assert report["sample_summary"]["top_arena_ids"]["1101"] == 3
     assert any("Do not promote card battle rules" in item for item in report["not_recommended_use"])
     assert "turn_behavior_metrics" in report["sample_summary"]
+    assert report["manaloom_signal_coverage"]["deckbuilder_access_gate_ready"] is True
+    assert report["manaloom_signal_coverage"]["runtime_rule_oracle_ready"] is False
+    adjustments = {item["area"]: item for item in report["manaloom_general_adjustments"]}
+    assert adjustments["deckbuilder_scoreability_gate"]["status"] == "ready"
+    assert adjustments["card_rule_promotion"]["status"] == "blocked_by_methodology"
+
+
+def test_card_observation_metrics_separate_access_from_use() -> None:
+    report = profile.profile_rows(
+        source="fixture.csv",
+        source_label="fixture",
+        fieldnames=FIELDNAMES,
+        rows=[fixture_row()],
+        top_card_metric_limit=10,
+    )
+    metrics = report["sample_summary"]["card_observation_metrics"]
+    by_use = {row["arena_id"]: row for row in metrics["top_by_direct_use"]}
+    by_access = {row["arena_id"]: row for row in metrics["top_by_natural_access"]}
+    assert metrics["top_by_direct_use"][0]["arena_id"] == "1101"
+    assert by_use["1101"]["opening_or_candidate_hand_entries"] == 1
+    assert by_use["1101"]["creature_cast_entries"] == 1
+    assert by_use["1101"]["attack_or_block_entries"] == 1
+    assert by_use["1101"]["natural_access_entries"] == 1
+    assert by_use["1101"]["direct_use_entries"] == 2
+    assert by_use["1109"]["noncreature_cast_entries"] == 1
+    assert by_access["1100"]["land_played_entries"] == 1
 
 
 def test_run_reads_local_csv_fixture() -> None:
@@ -133,5 +159,6 @@ if __name__ == "__main__":
     test_split_id_list_filters_zero_and_pipe_values()
     test_normalize_turn_events_emits_behavior_events()
     test_profile_report_is_read_only_and_documents_limits()
+    test_card_observation_metrics_separate_access_from_use()
     test_run_reads_local_csv_fixture()
-    print("5 tests passed")
+    print("6 tests passed")

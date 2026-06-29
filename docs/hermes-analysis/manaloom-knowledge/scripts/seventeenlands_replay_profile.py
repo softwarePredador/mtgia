@@ -103,6 +103,45 @@ IMPORTANT_SUFFIXES = [
     "user_mana_spent",
     "oppo_mana_spent",
 ]
+ACCESS_SUFFIXES = {
+    "cards_drawn",
+    "cards_tutored",
+    "cards_drawn_or_tutored",
+}
+DIRECT_USE_SUFFIXES = {
+    "lands_played",
+    "creatures_cast",
+    "non_creatures_cast",
+    "user_instants_sorceries_cast",
+    "oppo_instants_sorceries_cast",
+    "user_abilities",
+    "oppo_abilities",
+    "creatures_attacked",
+    "creatures_blocked",
+    "creatures_unblocked",
+    "creatures_blocking",
+}
+CORE_BATTLE_SUFFIX_GROUPS = {
+    "access": ACCESS_SUFFIXES,
+    "land_play": {"lands_played"},
+    "spell_cast": {
+        "creatures_cast",
+        "non_creatures_cast",
+        "user_instants_sorceries_cast",
+        "oppo_instants_sorceries_cast",
+    },
+    "ability": {"user_abilities", "oppo_abilities"},
+    "combat": {
+        "creatures_attacked",
+        "creatures_blocked",
+        "creatures_unblocked",
+        "creatures_blocking",
+        "oppo_combat_damage_taken",
+        "user_combat_damage_taken",
+    },
+    "mana_spend": {"user_mana_spent", "oppo_mana_spent"},
+    "end_turn_state": EOT_LIST_SUFFIXES | EOT_SCALAR_SUFFIXES,
+}
 
 
 def utc_now() -> str:
@@ -450,12 +489,204 @@ def finalize_turn_metrics(turn_metrics: dict[str, dict[str, Any]]) -> dict[str, 
     return finalized
 
 
+def empty_card_observation() -> dict[str, Any]:
+    return {
+        "ability_entries": 0,
+        "attack_or_block_entries": 0,
+        "battlefield_eot_entries": 0,
+        "creature_cast_entries": 0,
+        "direct_use_entries": 0,
+        "discard_entries": 0,
+        "drawn_entries": 0,
+        "drawn_or_tutored_entries": 0,
+        "first_access_turn": None,
+        "first_seen_turn": None,
+        "first_use_turn": None,
+        "instant_sorcery_cast_entries": 0,
+        "land_played_entries": 0,
+        "natural_access_entries": 0,
+        "noncreature_cast_entries": 0,
+        "opening_or_candidate_hand_entries": 0,
+        "total_observation_entries": 0,
+        "tutored_entries": 0,
+    }
+
+
+def min_turn(current: int | None, turn: int | None) -> int | None:
+    if turn is None:
+        return current
+    if current is None:
+        return turn
+    return min(current, turn)
+
+
+def update_card_observation(
+    card_observations: dict[str, dict[str, Any]],
+    arena_id: str,
+    *,
+    suffix: str | None = None,
+    base_column: str | None = None,
+    turn: int | None = None,
+) -> None:
+    row = card_observations.setdefault(arena_id, empty_card_observation())
+    row["total_observation_entries"] += 1
+    row["first_seen_turn"] = min_turn(row["first_seen_turn"], turn)
+
+    if base_column in BASE_ID_LIST_COLUMNS:
+        row["opening_or_candidate_hand_entries"] += 1
+        row["natural_access_entries"] += 1
+        row["first_access_turn"] = min_turn(row["first_access_turn"], turn)
+
+    if suffix in ACCESS_SUFFIXES:
+        row["natural_access_entries"] += 1
+        row["first_access_turn"] = min_turn(row["first_access_turn"], turn)
+    if suffix == "cards_drawn":
+        row["drawn_entries"] += 1
+    elif suffix == "cards_tutored":
+        row["tutored_entries"] += 1
+    elif suffix == "cards_drawn_or_tutored":
+        row["drawn_or_tutored_entries"] += 1
+    elif suffix == "cards_discarded":
+        row["discard_entries"] += 1
+
+    if suffix in DIRECT_USE_SUFFIXES:
+        row["direct_use_entries"] += 1
+        row["first_use_turn"] = min_turn(row["first_use_turn"], turn)
+    if suffix == "lands_played":
+        row["land_played_entries"] += 1
+    elif suffix == "creatures_cast":
+        row["creature_cast_entries"] += 1
+    elif suffix == "non_creatures_cast":
+        row["noncreature_cast_entries"] += 1
+    elif suffix in {"user_instants_sorceries_cast", "oppo_instants_sorceries_cast"}:
+        row["instant_sorcery_cast_entries"] += 1
+    elif suffix in {"user_abilities", "oppo_abilities"}:
+        row["ability_entries"] += 1
+    elif suffix in {
+        "creatures_attacked",
+        "creatures_blocked",
+        "creatures_unblocked",
+        "creatures_blocking",
+    }:
+        row["attack_or_block_entries"] += 1
+    elif suffix in EOT_LIST_SUFFIXES:
+        row["battlefield_eot_entries"] += 1
+
+
+def finalize_card_observation_metrics(
+    card_observations: dict[str, dict[str, Any]],
+    *,
+    top_limit: int,
+) -> dict[str, Any]:
+    rows: dict[str, dict[str, Any]] = {}
+    for arena_id, payload in card_observations.items():
+        if not is_card_like_arena_id(arena_id):
+            continue
+        row = dict(payload)
+        row["access_minus_use_entries"] = (
+            int(row["natural_access_entries"]) - int(row["direct_use_entries"])
+        )
+        rows[arena_id] = row
+
+    def top_by(*keys: str) -> list[dict[str, Any]]:
+        ordered = sorted(
+            rows.items(),
+            key=lambda item: tuple(int(item[1].get(key, 0)) for key in keys),
+            reverse=True,
+        )
+        return [
+            {"arena_id": arena_id, **payload}
+            for arena_id, payload in ordered[:top_limit]
+        ]
+
+    return {
+        "top_by_direct_use": top_by("direct_use_entries", "natural_access_entries", "total_observation_entries"),
+        "top_by_natural_access": top_by("natural_access_entries", "direct_use_entries", "total_observation_entries"),
+        "top_by_total_observations": top_by("total_observation_entries", "direct_use_entries", "natural_access_entries"),
+    }
+
+
+def suffix_group_has_signal(
+    suffix_counts: Counter[str],
+    suffixes: set[str],
+) -> bool:
+    return any(suffix_counts.get(suffix, 0) > 0 for suffix in suffixes)
+
+
+def build_manaloom_signal_coverage(
+    *,
+    fieldnames: list[str],
+    suffix_counts: Counter[str],
+    rows_sampled: int,
+) -> dict[str, Any]:
+    coverage = {
+        "rows_sampled": rows_sampled,
+        "base_hand_columns_present": sorted(
+            column for column in BASE_ID_LIST_COLUMNS if column in fieldnames
+        ),
+        "suffix_group_signal": {
+            group: suffix_group_has_signal(suffix_counts, suffixes)
+            for group, suffixes in CORE_BATTLE_SUFFIX_GROUPS.items()
+        },
+    }
+    signals = coverage["suffix_group_signal"]
+    coverage["battle_prior_ready"] = all(
+        bool(signals.get(group))
+        for group in ("land_play", "spell_cast", "combat", "mana_spend")
+    )
+    coverage["deckbuilder_access_gate_ready"] = bool(
+        coverage["base_hand_columns_present"]
+        and signals.get("access")
+        and signals.get("spell_cast")
+    )
+    coverage["runtime_rule_oracle_ready"] = False
+    return coverage
+
+
+def derive_manaloom_adjustments(coverage: dict[str, Any]) -> list[dict[str, Any]]:
+    signals = coverage["suffix_group_signal"]
+    return [
+        {
+            "area": "battle_replay_cadence_gate",
+            "status": "ready" if coverage["battle_prior_ready"] else "needs_more_history",
+            "adjustment": "Compare ManaLoom battle telemetry against external cadence for land drops, spell actions, mana spend, and combat pressure before trusting tuning changes.",
+            "evidence_signals": {
+                key: bool(signals.get(key))
+                for key in ("land_play", "spell_cast", "mana_spend", "combat")
+            },
+        },
+        {
+            "area": "deckbuilder_scoreability_gate",
+            "status": "ready" if coverage["deckbuilder_access_gate_ready"] else "needs_more_history",
+            "adjustment": "Do not score a swap or heuristic unless the candidate card/action was accessed and used, or the run is explicitly marked inconclusive.",
+            "evidence_signals": {
+                "base_hand_columns_present": bool(coverage["base_hand_columns_present"]),
+                "access": bool(signals.get("access")),
+                "spell_cast": bool(signals.get("spell_cast")),
+            },
+        },
+        {
+            "area": "battle_event_contract",
+            "status": "ready",
+            "adjustment": "Normalize battle logs around play_land, cast_creature, cast_noncreature, activate_ability, combat_damage, mana_spent, draw/tutor, and end_turn_state events.",
+            "evidence_signals": dict(signals),
+        },
+        {
+            "area": "card_rule_promotion",
+            "status": "blocked_by_methodology",
+            "adjustment": "Keep PostgreSQL/Hermes reviewed rules as the source of card behavior; 17Lands replay columns can expose usage patterns, not exact rules text or stack semantics.",
+            "evidence_signals": {"runtime_rule_oracle_ready": False},
+        },
+    ]
+
+
 def profile_rows(
     *,
     source: str,
     source_label: str,
     fieldnames: list[str],
     rows: list[dict[str, str]],
+    top_card_metric_limit: int = 25,
 ) -> dict[str, Any]:
     header = classify_header(fieldnames)
     nonempty_suffix_counts: Counter[str] = Counter()
@@ -465,6 +696,7 @@ def profile_rows(
     outcomes: Counter[str] = Counter()
     turn_count_distribution: Counter[str] = Counter()
     turn_metrics: dict[str, dict[str, Any]] = {}
+    card_observations: dict[str, dict[str, Any]] = {}
 
     for row in rows:
         colors[row.get("main_colors", "") or "(empty)"] += 1
@@ -474,6 +706,11 @@ def profile_rows(
         for base_column in BASE_ID_LIST_COLUMNS:
             for arena_id in split_id_list(row.get(base_column)):
                 arena_id_counts[arena_id] += 1
+                update_card_observation(
+                    card_observations,
+                    arena_id,
+                    base_column=base_column,
+                )
         for name in fieldnames:
             raw = row.get(name)
             if raw is None or str(raw).strip() == "":
@@ -488,10 +725,30 @@ def profile_rows(
             if suffix in ID_LIST_SUFFIXES:
                 for arena_id in split_id_list(raw):
                     arena_id_counts[arena_id] += 1
+                    update_card_observation(
+                        card_observations,
+                        arena_id,
+                        suffix=suffix,
+                        turn=turn,
+                    )
+            elif suffix in EOT_LIST_SUFFIXES:
+                for arena_id in split_id_list(raw):
+                    arena_id_counts[arena_id] += 1
+                    update_card_observation(
+                        card_observations,
+                        arena_id,
+                        suffix=suffix,
+                        turn=turn,
+                    )
             if suffix in IMPORTANT_SUFFIXES:
                 update_turn_metric(turn_metrics, active_side, turn, suffix, raw)
 
     first_game = rows[0] if rows else {}
+    signal_coverage = build_manaloom_signal_coverage(
+        fieldnames=fieldnames,
+        suffix_counts=nonempty_suffix_counts,
+        rows_sampled=len(rows),
+    )
     report = {
         "generated_at": utc_now(),
         "source": source,
@@ -517,7 +774,13 @@ def profile_rows(
                 if is_card_like_arena_id(key)
             },
             "turn_behavior_metrics": finalize_turn_metrics(turn_metrics),
+            "card_observation_metrics": finalize_card_observation_metrics(
+                card_observations,
+                top_limit=top_card_metric_limit,
+            ),
         },
+        "manaloom_signal_coverage": signal_coverage,
+        "manaloom_general_adjustments": derive_manaloom_adjustments(signal_coverage),
         "recommended_use": [
             "Calibrate battle/deckbuilder tempo priors: land drops, mana spend, cast timing, combat pressure.",
             "Compare ManaLoom simulated games against real MTGA limited cadence before tuning heuristics.",
@@ -528,6 +791,7 @@ def profile_rows(
             "Do not promote card battle rules directly from replay_data.",
             "Do not treat PremierDraft behavior as Commander/Lorehold strategy proof.",
             "Do not infer exact stack, target selection, replacement effects, or hidden choices from these columns alone.",
+            "Do not treat every high numeric Arena ID in ability/action columns as a resolved card without annotation.",
         ],
         "next_integration_steps": [
             "Persist this profile as an artifact, not a database write.",
@@ -537,6 +801,7 @@ def profile_rows(
         ],
         "arena_id_notes": [
             "Small numeric IDs can be hidden/unknown Arena-side markers in replay_data, not Scryfall-resolvable cards.",
+            "High numeric IDs from ability/action columns may still need Scryfall/cache annotation before card-level interpretation.",
             "EOT *_in_play columns are treated as battlefield card ID lists, not scalar counts.",
         ],
     }
@@ -652,6 +917,14 @@ def render_markdown(report: dict[str, Any]) -> str:
     ]
     for item in report["recommended_use"]:
         lines.append(f"- {item}")
+    lines.extend(["", "## ManaLoom General Adjustments", ""])
+    for item in report.get("manaloom_general_adjustments", []):
+        lines.append(
+            f"- {item['area']}: `{item['status']}` - {item['adjustment']}"
+        )
+    if report.get("manaloom_signal_coverage"):
+        lines.extend(["", "## ManaLoom Signal Coverage", ""])
+        lines.append(f"- `{report['manaloom_signal_coverage']}`")
     lines.extend(["", "## What This Must Not Be Used For", ""])
     for item in report["not_recommended_use"]:
         lines.append(f"- {item}")
@@ -672,6 +945,13 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.extend(["", "## Turn Behavior Metrics", ""])
     for turn, metrics in list(summary["turn_behavior_metrics"].items())[:12]:
         lines.append(f"- Turn {turn}: `{metrics}`")
+    card_metrics = summary.get("card_observation_metrics") or {}
+    if card_metrics:
+        lines.extend(["", "## Card Observation Metrics", ""])
+        for payload in list(card_metrics.get("top_by_direct_use", []))[:20]:
+            arena_id = payload.get("arena_id")
+            details = {key: value for key, value in payload.items() if key != "arena_id"}
+            lines.append(f"- Direct use `{arena_id}`: `{details}`")
     if "arena_id_annotations" in report:
         lines.extend(["", "## Arena ID Annotations", ""])
         for arena_id, payload in list(report["arena_id_annotations"].items())[:20]:
@@ -691,6 +971,7 @@ def run(
     resolve_card_names: bool = False,
     cache_path: Path | None = None,
     max_card_name_lookups: int = 10,
+    top_card_metric_limit: int = 25,
 ) -> dict[str, Any]:
     fieldnames, rows = read_sample_rows(source, sample_rows)
     report = profile_rows(
@@ -698,6 +979,7 @@ def run(
         source_label=source_label,
         fieldnames=fieldnames,
         rows=rows,
+        top_card_metric_limit=top_card_metric_limit,
     )
     if resolve_card_names:
         annotate_card_names(
@@ -722,6 +1004,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("docs/hermes-analysis/master_optimizer_reports/arena_id_cache.json"),
     )
     parser.add_argument("--max-card-name-lookups", type=int, default=10)
+    parser.add_argument("--top-card-metric-limit", type=int, default=25)
     return parser
 
 
@@ -736,6 +1019,7 @@ def main(argv: list[str] | None = None) -> int:
         resolve_card_names=args.resolve_card_names,
         cache_path=args.arena_id_cache if args.resolve_card_names else None,
         max_card_name_lookups=args.max_card_name_lookups,
+        top_card_metric_limit=args.top_card_metric_limit,
     )
     if args.output_json:
         args.output_json.parent.mkdir(parents=True, exist_ok=True)
