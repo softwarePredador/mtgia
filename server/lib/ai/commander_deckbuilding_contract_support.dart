@@ -6,7 +6,60 @@ import 'commander_reference_profile_support.dart';
 import 'deck_learning_event_support.dart';
 
 const commanderDeckbuildingContractVersion =
-    'commander_deckbuilding_contract_v1_2026-06-29';
+    'commander_deckbuilding_contract_v2_2026-06-29';
+
+const commanderDeckPlanningFlowVersion =
+    'commander_deck_planning_flow_v1_2026-06-29';
+
+const commanderDeckPlanningFlow = [
+  'format_legality_and_power_bracket',
+  'commander_intent_and_archetype',
+  'primary_and_backup_win_plan',
+  'mana_foundation_and_curve',
+  'card_flow_and_resource_engine',
+  'interaction_protection_and_resilience',
+  'commander_specific_packages',
+  'combo_synergy_and_finishers',
+  'reference_corpus_and_learned_usage',
+  'lane_balanced_cuts_and_anchor_protection',
+  'goldfish_battle_replay_iteration',
+];
+
+const commanderDeckPlanningLaneOrder = [
+  'legal_identity',
+  'power_bracket',
+  'commander_intent',
+  'win_plan',
+  'mana_base',
+  'ramp',
+  'curve',
+  'card_draw_selection',
+  'tutors_access',
+  'interaction_removal',
+  'protection_resilience',
+  'board_wipes',
+  'recursion_recovery',
+  'commander_synergy_engine',
+  'payoffs_finishers',
+  'combo_lines',
+  'meta_pressure_answers',
+  'budget_collection_constraints',
+  'same_lane_cuts',
+  'battle_and_replay_validation',
+];
+
+const commanderDeckOverviewRequiredFields = [
+  'commander_plan_sentence',
+  'power_bracket_target',
+  'primary_win_lines',
+  'backup_win_lines',
+  'role_counts_vs_targets',
+  'mana_curve_and_sources',
+  'package_lanes_with_key_cards',
+  'source_provenance_by_anchor',
+  'protected_anchors_and_cut_rules',
+  'known_risks_and_validation_status',
+];
 
 Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   required String format,
@@ -156,6 +209,10 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
     'status': status,
     'commander_name': commanderName,
     if (generationMode != null) 'generation_mode': generationMode,
+    'planning_flow_version': commanderDeckPlanningFlowVersion,
+    'planning_flow': commanderDeckPlanningFlow,
+    'lane_order': commanderDeckPlanningLaneOrder,
+    'deck_overview_required_fields': commanderDeckOverviewRequiredFields,
     'source_hierarchy': const [
       'official_identity_legal_validation',
       'reference_profile',

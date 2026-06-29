@@ -10,6 +10,111 @@ Card-rule work answers: "can the battle runtime execute this card correctly?"
 Deckbuilding work answers: "does this commander deck have the right plan,
 package density, legality, source provenance, and battle proof?"
 
+## Research-Backed Deck Planning Flow
+
+External research was reviewed on 2026-06-29 and folded into the current
+ManaLoom deckbuilding contract. The relevant learning is not "copy one public
+template"; it is a planning order:
+
+1. validate Commander format, color identity, singleton, commander count, and
+   intended power bracket;
+2. read the commander as the deck's strategic center: what it enables, what
+   it pays off, when it must be cast, and what failure modes kill it;
+3. state the primary and backup win plans before selecting flex cards;
+4. build the mana foundation and curve first: lands, color sources, ramp type,
+   commander turn target, and whether ramp competes with the commander's curve;
+5. add card flow: draw, selection, rummage, impulse, tutors, and engines that
+   let the deck keep executing after the opening setup;
+6. add interaction and survival: targeted removal, protection/resilience,
+   board wipes, graveyard hate or table-specific answers;
+7. fill commander-specific package lanes: enablers, payoffs, recursion,
+   pressure absorbers, and any mechanic the commander uniquely exploits;
+8. check deterministic win lines, combo packages, or finishers through
+   Commander Spellbook/public primers/reference corpus;
+9. score public reference decks and EDHREC data as evidence lanes, not as
+   automatic truth;
+10. cut by lane: each added card must compete with the same functional slot or
+    carry an explicit package hypothesis and equal-gate evidence;
+11. validate by legal service, strategy matrix, goldfish/curve checks, battle
+    gates, and replay traces, then iterate.
+
+Canonical planning flow identifiers exposed by backend diagnostics:
+
+1. `format_legality_and_power_bracket`
+2. `commander_intent_and_archetype`
+3. `primary_and_backup_win_plan`
+4. `mana_foundation_and_curve`
+5. `card_flow_and_resource_engine`
+6. `interaction_protection_and_resilience`
+7. `commander_specific_packages`
+8. `combo_synergy_and_finishers`
+9. `reference_corpus_and_learned_usage`
+10. `lane_balanced_cuts_and_anchor_protection`
+11. `goldfish_battle_replay_iteration`
+
+Current source learning:
+
+| Source | URL | Learning imported into ManaLoom | Guardrail |
+| --- | --- | --- | --- |
+| Wizards Commander format page | https://magic.wizards.com/en/formats/commander | official 99+1 shape, singleton, color identity, multiplayer/power bracket framing | legality and bracket only, not strategy quality |
+| EDHREC Commander deckbuilding guide | https://edhrec.com/articles/how-to-build-a-commander-deck | deckbuilding starts from categories and then checks whether the list plays the intended way | category counts are starting points, not final proof |
+| The Command Zone template discussion via EDHREC | https://edhrec.com/articles/the-command-zone-commander-deckbuilding-template-for-the-new-era-the-command-zone-658-mtg-edh-magic-gathering | Commander decks need balanced ratios of ramp, draw, disruption, and related roles | template ratios must bend to commander intent and table speed |
+| EDHREC ramp guide | https://edhrec.com/guides/the-edhrec-guide-to-ramp-in-commander | ramp is about playing ahead of curve; commander mana value and ramp timing matter | "more mana" is not enough if ramp competes with the commander turn |
+| BinderBrew Commander template | https://binderbrew.com/commander-deck-building-template | core slots are lands, ramp, draw, removal before commander-specific payoffs | template is flexible by power, budget, theme, and commander |
+| Card Kingdom ramp/draw article | https://blog.cardkingdom.com/whats-better-in-commander-card-draw-or-ramp/ | ramp, draw, removal, and recursion are structural pillars | pillar counts do not replace package synergy or battle proof |
+| Commander Spellbook | https://commanderspellbook.com/ | combo package discovery, variants, bracket hints, and deterministic finishers | combo relation is not full deck balance or runtime proof |
+
+## Lane Order And Deck Overview Contract
+
+Every generated or optimized Commander deck must expose this lane order in
+diagnostics and use it when deciding cuts:
+
+1. `legal_identity`
+2. `power_bracket`
+3. `commander_intent`
+4. `win_plan`
+5. `mana_base`
+6. `ramp`
+7. `curve`
+8. `card_draw_selection`
+9. `tutors_access`
+10. `interaction_removal`
+11. `protection_resilience`
+12. `board_wipes`
+13. `recursion_recovery`
+14. `commander_synergy_engine`
+15. `payoffs_finishers`
+16. `combo_lines`
+17. `meta_pressure_answers`
+18. `budget_collection_constraints`
+19. `same_lane_cuts`
+20. `battle_and_replay_validation`
+
+The deck overview is not allowed to be a loose card list. It must include:
+
+- one sentence for the commander's intended game plan;
+- target power bracket or documented unknown bracket;
+- primary and backup win lines;
+- role counts versus commander-specific targets;
+- mana curve and color-source/ramp summary;
+- package lanes with key cards, enablers, payoffs, and protected anchors;
+- source provenance for important cards;
+- cut rules and cross-lane tradeoffs;
+- known risks, validation status, battle status, and next gate.
+
+Canonical deck overview field identifiers exposed by backend diagnostics:
+
+1. `commander_plan_sentence`
+2. `power_bracket_target`
+3. `primary_win_lines`
+4. `backup_win_lines`
+5. `role_counts_vs_targets`
+6. `mana_curve_and_sources`
+7. `package_lanes_with_key_cards`
+8. `source_provenance_by_anchor`
+9. `protected_anchors_and_cut_rules`
+10. `known_risks_and_validation_status`
+
 ## Frozen Decision
 
 Do not optimize every commander by copying the current Lorehold deck 607 flow.
@@ -95,6 +200,7 @@ Current Lorehold evidence generated on 2026-06-29:
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_v615_mana_engine_candidate_v1.md`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.md`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_v615_mana_engine_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_cut_methodology_reaudit_20260629.md`
 
 The current canonical Lorehold strategy matrix JSON schema is
 `decks[] + ranked_deck_keys`. Historical `ranked_decks` reports are supported
@@ -131,7 +237,8 @@ Promotion-gate decision generated on 2026-06-29:
   Mizzix's Mastery usage, but this supports a narrow package/cut experiment,
   not a whole-deck swap.
 
-Narrow package decision generated on 2026-06-29:
+Narrow package decision generated on 2026-06-29, then corrected by cut-method
+reaudit:
 
 - Candidate: `candidate_607_v615_mana_engine_v1`, built from protected `607`.
 - Adds from `615`: `Mana Vault`, `Birgi, God of Storytelling // Harnfel, Horn
@@ -148,7 +255,15 @@ Narrow package decision generated on 2026-06-29:
 - Direct card-use evidence in the candidate: `Mana Vault` cost-paid/cast
   `20`, `Birgi` trigger-resolved `87`, `The One Ring` utility activations
   `18`.
-- Decision: `promote_challenger`; `ready_for_real_deck_change=true`.
+- Initial decision before cut-method reaudit:
+  `promote_challenger`; `ready_for_real_deck_change=true`.
+- Corrected decision after
+  `lorehold_cut_methodology_reaudit_20260629`: the package is
+  `battle_cleared_with_cut_methodology_caveat`, not ready for final real deck
+  change. `Mana Vault` over `Bender's Waterskin` is valid same-lane ramp;
+  `Birgi` over `The Scarlet Witch` is same-macro but needs confirmation; `The
+  One Ring` over `Molecule Man` is cross-lane and must be recut before any
+  ideal-deck claim.
 
 ## General Deckbuilding Gate
 
@@ -268,12 +383,16 @@ happen:
 ## Next Product Step
 
 For Lorehold, do not promote `614` or `615` as a whole deck from the current
-evidence. The narrow package/cut experiment derived from `615` has now cleared
-the current promotion gate as `candidate_607_v615_mana_engine_v1`. The next
-real product step is a guarded deck promotion package using the generated
-decklist artifact, followed by validation after the swap. Keep `607` as the
-comparison baseline for rollback and regression checks until the promoted deck
-has passed the post-swap gate.
+evidence. Also do not promote `candidate_607_v615_mana_engine_v1` as the final
+ideal deck yet: it tied the protected baseline in battle but failed the
+post-hoc lane/cut methodology for `The One Ring` over `Molecule Man`.
+
+The next real product step is a methodologically repaired candidate: keep the
+validated `Mana Vault` ramp lane, confirm or reject `Birgi` versus `The Scarlet
+Witch` with mana-produced/mana-saved telemetry, and test `The One Ring` only
+against draw/protection/value slots. Keep `607` as the comparison baseline for
+rollback and regression checks until the repaired candidate passes the same
+strategy, battle, and cut-method gates.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

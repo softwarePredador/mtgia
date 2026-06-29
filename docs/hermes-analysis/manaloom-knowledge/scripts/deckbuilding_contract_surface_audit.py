@@ -40,6 +40,10 @@ PROMOTION_DECISION_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.md"
 )
+CUT_METHODOLOGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/lorehold_cut_methodology_reaudit_20260629.md"
+)
 
 REQUIRED_FOCUS_CARDS = {
     "Aetherflux Reservoir",
@@ -88,6 +92,9 @@ def build_audit() -> dict[str, Any]:
                 "Status: `frozen_operating_contract`",
                 "Source Hierarchy",
                 "Lorehold Promotion Gate",
+                "Research-Backed Deck Planning Flow",
+                "Lane Order And Deck Overview Contract",
+                "battle_cleared_with_cut_methodology_caveat",
                 "decks[] + ranked_deck_keys",
                 "lorehold_artifact_contract_audit.py",
                 "lorehold_promotion_gate_decision_audit.py",
@@ -100,6 +107,10 @@ def build_audit() -> dict[str, Any]:
             SUPPORT_FILE,
             [
                 "commanderDeckbuildingContractVersion",
+                "commanderDeckPlanningFlowVersion",
+                "commanderDeckPlanningFlow",
+                "commanderDeckPlanningLaneOrder",
+                "commanderDeckOverviewRequiredFields",
                 "buildCommanderDeckbuildingContractDiagnostics",
                 "ready_for_battle_gate",
             ],
@@ -120,6 +131,8 @@ def build_audit() -> dict[str, Any]:
             [
                 "ready_for_battle_gate",
                 "reference_lanes_missing",
+                "planning_flow",
+                "lane_balanced_cuts_and_anchor_protection",
             ],
         )
     )
@@ -201,6 +214,17 @@ def build_audit() -> dict[str, Any]:
             "status": "pass" if PROMOTION_DECISION_REPORT.exists() else "fail",
             "missing": [] if PROMOTION_DECISION_REPORT.exists() else ["promotion_decision_report"],
         }
+    )
+    checks.append(
+        check_contains(
+            CUT_METHODOLOGY_REPORT,
+            [
+                "battle_cleared_with_cut_methodology_caveat",
+                "The One Ring",
+                "Molecule Man",
+                "blocked_cross_lane_cut",
+            ],
+        )
     )
 
     historical = []

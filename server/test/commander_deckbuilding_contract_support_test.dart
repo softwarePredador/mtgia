@@ -112,6 +112,42 @@ void main() {
       expect(diagnostics['version'], commanderDeckbuildingContractVersion);
       expect(diagnostics['status'], 'ready_for_battle_gate');
       expect(
+        diagnostics['planning_flow_version'],
+        commanderDeckPlanningFlowVersion,
+      );
+      expect(
+        diagnostics['planning_flow'],
+        containsAll([
+          'commander_intent_and_archetype',
+          'primary_and_backup_win_plan',
+          'lane_balanced_cuts_and_anchor_protection',
+          'goldfish_battle_replay_iteration',
+        ]),
+      );
+      expect(
+        diagnostics['lane_order'],
+        containsAllInOrder([
+          'legal_identity',
+          'commander_intent',
+          'win_plan',
+          'mana_base',
+          'ramp',
+          'card_draw_selection',
+          'interaction_removal',
+          'same_lane_cuts',
+          'battle_and_replay_validation',
+        ]),
+      );
+      expect(
+        diagnostics['deck_overview_required_fields'],
+        containsAll([
+          'commander_plan_sentence',
+          'primary_win_lines',
+          'role_counts_vs_targets',
+          'protected_anchors_and_cut_rules',
+        ]),
+      );
+      expect(
         (diagnostics['gates'] as Map)['has_any_reference_lane'],
         isTrue,
       );
