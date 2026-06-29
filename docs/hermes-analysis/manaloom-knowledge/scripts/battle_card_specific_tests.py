@@ -6862,7 +6862,7 @@ def register_tests(battle, player):
         assert any(card.get("name") == "Lotus Petal" for card in active.graveyard)
         assert not any(card.get("name") == "Lotus Petal" for card in active.battlefield)
 
-    def test_pg071_ruby_medallion_is_annotation_only_cost_reducer_not_mana_source():
+    def test_pg071_ruby_medallion_is_static_cost_reducer_not_mana_source():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
         battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
@@ -6872,12 +6872,11 @@ def register_tests(battle, player):
             active.hand = [ruby]
             effect_data = battle.get_card_effect(ruby)
 
-            assert effect_data["effect"] == "passive"
-            assert effect_data["cost_reduction"] == 1
-            assert effect_data["cost_reduction_color"] == "R"
-            assert effect_data["cost_reduction_status"] == "annotation_only_no_dynamic_cost_executor"
-            assert effect_data["dynamic_cost_executor"] is False
-            assert effect_data["battle_model_scope"] == "red_spell_cost_reduction_annotation_only_v1"
+            assert effect_data["effect"] == "static_cost_reduction"
+            assert effect_data["cost_reduction_generic"] == 1
+            assert effect_data["applies_to_spell_colors"] == ["R"]
+            assert effect_data["cost_reduction_applies_to"] == "spells_you_cast"
+            assert effect_data["battle_model_scope"] == "static_cost_reduction_for_matching_spells_v1"
             assert effect_data["_rule_logical_key"] == "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
             assert effect_data["_rule_oracle_hash"] == "52bc55846d69bacf3afba1ffa734b81e"
 
@@ -6906,7 +6905,7 @@ def register_tests(battle, player):
             for card in active.battlefield
             if card.get("name") == "Ruby Medallion"
         )
-        assert ruby_permanent["effect"] == "passive"
+        assert ruby_permanent["effect"] == "static_cost_reduction"
         assert not battle.is_mana_source_permanent(ruby_permanent)
         assert active.available_mana() == 0
 
@@ -19308,7 +19307,7 @@ def register_tests(battle, player):
         test_pg070_faithless_looting_draws_two_discards_two_with_rule_provenance,
         test_pg070_gamble_tutors_then_randomly_discards_with_rule_provenance,
         test_pg071_lotus_petal_is_one_shot_fast_mana_with_rule_provenance,
-        test_pg071_ruby_medallion_is_annotation_only_cost_reducer_not_mana_source,
+        test_pg071_ruby_medallion_is_static_cost_reducer_not_mana_source,
         test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance,
         test_pg086_counter_target_filter_respects_uncounterable_static_shield,
         test_pg086_removal_targets_filter_nontoken_and_mana_value_max,
