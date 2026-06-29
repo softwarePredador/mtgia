@@ -80,19 +80,54 @@ def get_path(value: Any, path: str) -> Any:
     return current
 
 
-def expected_rules_by_key(manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def expected_rule_identity(rule: dict[str, Any]) -> tuple[str, str]:
+    logical_key = str(rule.get("logical_rule_key") or "").strip()
+    normalized_name = str(rule.get("normalized_name") or "").strip()
+    if not normalized_name:
+        normalized_name = str(rule.get("card_name") or "").strip().lower()
+    if not logical_key:
+        fail("manifest", "expected_rules entry missing logical_rule_key")
+    if not normalized_name:
+        fail("manifest", f"expected rule {logical_key} missing normalized_name/card_name")
+    return normalized_name, logical_key
+
+
+def expected_rules_by_key(manifest: dict[str, Any]) -> dict[tuple[str, str], dict[str, Any]]:
     rules = manifest.get("expected_rules") or []
-    by_key: dict[str, dict[str, Any]] = {}
+    by_key: dict[tuple[str, str], dict[str, Any]] = {}
     for rule in rules:
-        logical_key = str(rule.get("logical_rule_key") or "").strip()
-        if not logical_key:
-            fail("manifest", "expected_rules entry missing logical_rule_key")
-        if logical_key in by_key:
-            fail("manifest", f"duplicate expected rule {logical_key}")
-        by_key[logical_key] = dict(rule)
+        key = expected_rule_identity(rule)
+        if key in by_key:
+            fail("manifest", f"duplicate expected rule {key[0]} {key[1]}")
+        by_key[key] = dict(rule)
     if not by_key:
         fail("manifest", "expected_rules must not be empty")
     return by_key
+
+
+def find_expected_rule(
+    expected_by_key: dict[tuple[str, str], dict[str, Any]],
+    logical_key: str,
+    *,
+    card_name: str | None = None,
+    normalized_name: str | None = None,
+) -> dict[str, Any]:
+    normalized = str(normalized_name or "").strip()
+    if not normalized and card_name:
+        normalized = str(card_name).strip().lower()
+    if normalized:
+        expected = expected_by_key.get((normalized, logical_key))
+        if expected is not None:
+            return expected
+    matches = [
+        expected
+        for (expected_name, expected_key), expected in expected_by_key.items()
+        if expected_key == logical_key
+        and (not normalized or expected_name == normalized)
+    ]
+    if len(matches) == 1:
+        return matches[0]
+    fail("manifest", f"unable to resolve expected rule for {normalized or card_name} {logical_key}")
 
 
 def validate_effect_fields(stage: str, logical_key: str, effect_json: dict[str, Any], expected: dict[str, Any]) -> None:
@@ -140,7 +175,9 @@ def validate_rule_row(stage: str, logical_key: str, row: dict[str, Any], expecte
     }
 
 
-def fetch_postgres_rows(logical_keys: list[str]) -> dict[str, dict[str, Any]]:
+def fetch_postgres_rows(expected_by_key: dict[tuple[str, str], dict[str, Any]]) -> dict[tuple[str, str], dict[str, Any]]:
+    logical_keys = sorted({logical_key for _normalized, logical_key in expected_by_key})
+    normalized_names = sorted({normalized for normalized, _logical_key in expected_by_key})
     with closing(db_helper.connect()) as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -150,32 +187,39 @@ def fetch_postgres_rows(logical_keys: list[str]) -> dict[str, dict[str, Any]]:
                        rule_version, oracle_hash, reviewed_by
                 FROM public.card_battle_rules
                 WHERE logical_rule_key IN %s
+                  AND normalized_name IN %s
                 ORDER BY logical_rule_key
                 """,
-                (tuple(logical_keys),),
+                (tuple(logical_keys), tuple(normalized_names)),
             )
             columns = [desc[0] for desc in cur.description]
             return {
-                row[columns.index("logical_rule_key")]: dict(zip(columns, row))
+                (
+                    row[columns.index("normalized_name")],
+                    row[columns.index("logical_rule_key")],
+                ): dict(zip(columns, row))
                 for row in cur.fetchall()
             }
 
 
-def validate_postgres(expected_by_key: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
-    rows = fetch_postgres_rows(list(expected_by_key))
+def validate_postgres(expected_by_key: dict[tuple[str, str], dict[str, Any]]) -> list[dict[str, Any]]:
+    rows = fetch_postgres_rows(expected_by_key)
     missing = sorted(set(expected_by_key) - set(rows))
     if missing:
         fail("postgres", f"missing expected rows: {missing}")
     return [
-        validate_rule_row("postgres", key, rows[key], expected_by_key[key])
+        validate_rule_row("postgres", key[1], rows[key], expected_by_key[key])
         for key in expected_by_key
     ]
 
 
-def validate_sqlite(path: Path, expected_by_key: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+def validate_sqlite(path: Path, expected_by_key: dict[tuple[str, str], dict[str, Any]]) -> list[dict[str, Any]]:
     if not path.exists():
         fail("sqlite", f"missing db {path}")
-    placeholders = ",".join("?" for _ in expected_by_key)
+    logical_keys = sorted({logical_key for _normalized, logical_key in expected_by_key})
+    normalized_names = sorted({normalized for normalized, _logical_key in expected_by_key})
+    logical_placeholders = ",".join("?" for _ in logical_keys)
+    normalized_placeholders = ",".join("?" for _ in normalized_names)
     with closing(sqlite3.connect(path)) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute(
@@ -184,22 +228,23 @@ def validate_sqlite(path: Path, expected_by_key: dict[str, dict[str, Any]]) -> l
                    source, confidence, review_status, execution_status,
                    rule_version, oracle_hash
             FROM battle_card_rules
-            WHERE logical_rule_key IN ({placeholders})
+            WHERE logical_rule_key IN ({logical_placeholders})
+              AND normalized_name IN ({normalized_placeholders})
             ORDER BY logical_rule_key
             """,
-            tuple(expected_by_key),
+            (*logical_keys, *normalized_names),
         ).fetchall()
-    by_key = {row["logical_rule_key"]: dict(row) for row in rows}
+    by_key = {(row["normalized_name"], row["logical_rule_key"]): dict(row) for row in rows}
     missing = sorted(set(expected_by_key) - set(by_key))
     if missing:
         fail("sqlite", f"missing expected rows: {missing}")
     return [
-        validate_rule_row("sqlite", key, by_key[key], expected_by_key[key])
+        validate_rule_row("sqlite", key[1], by_key[key], expected_by_key[key])
         for key in expected_by_key
     ]
 
 
-def validate_snapshot(path: Path, manifest: dict[str, Any], expected_by_key: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+def validate_snapshot(path: Path, manifest: dict[str, Any], expected_by_key: dict[tuple[str, str], dict[str, Any]]) -> list[dict[str, Any]]:
     if not path.exists():
         fail("snapshot", f"missing snapshot {path}")
     snapshot = load_json(path)
@@ -213,7 +258,10 @@ def validate_snapshot(path: Path, manifest: dict[str, Any], expected_by_key: dic
         entry = snapshot.get(card_name)
         if not isinstance(entry, dict):
             fail("snapshot", f"missing card {card_name}")
-        expected = {**expected_by_key.get(logical_key, {}), **check}
+        expected = {
+            **find_expected_rule(expected_by_key, logical_key, card_name=card_name),
+            **check,
+        }
         if entry.get("battle_rule_logical_key") != logical_key:
             fail("snapshot", f"{card_name} logical key={entry.get('battle_rule_logical_key')!r}")
         if expected.get("oracle_hash") and entry.get("battle_rule_oracle_hash") != expected["oracle_hash"]:
@@ -470,7 +518,91 @@ def run_remove_permanent_basic_land_compensation(
     }
 
 
+def run_conditional_land_play(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Lorehold"), None, [])
+    active.hand = [card]
+    active.battlefield = [dict(item) for item in scenario.get("battlefield", [])]
+    opponents = [
+        battle.Player(str(name), None, [])
+        for name in scenario.get("opponents", [])
+    ]
+    all_players = [active, *opponents]
+    turn = int(scenario.get("turn") or 1)
+    played = battle.play_land_candidate(
+        active,
+        opponents,
+        all_players,
+        turn,
+        battle.Stack(),
+        {"card": card, "source_zone": "hand"},
+    )
+    if played is not True:
+        fail("battle_execution", f"{card['name']} land play returned {played!r}")
+    permanent = next(
+        (
+            item
+            for item in active.battlefield
+            if isinstance(item, dict) and item.get("name") == card.get("name")
+        ),
+        None,
+    )
+    if permanent is None:
+        fail("battle_execution", f"{card['name']} not found on battlefield")
+    expected_tapped = bool(scenario.get("expected_tapped"))
+    if bool(permanent.get("tapped")) != expected_tapped:
+        fail("battle_execution", f"{card['name']} tapped={permanent.get('tapped')!r}")
+    land_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "land_played" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if land_event is None:
+        fail("battle_events", f"missing {card['name']} land_played event")
+    if bool(land_event.get("enters_tapped")) != expected_tapped:
+        fail("battle_events", f"{card['name']} event enters_tapped={land_event.get('enters_tapped')!r}")
+    for key in (
+        "conditional_enters_tapped_status",
+        "conditional_enters_tapped_profile",
+        "conditional_enters_tapped_reason",
+    ):
+        if key in scenario and land_event.get(key) != scenario[key]:
+            fail("battle_events", f"{card['name']} {key}={land_event.get(key)!r}")
+    if "conditional_enters_tapped_land_count" in scenario:
+        if int(land_event.get("conditional_enters_tapped_land_count") or 0) != int(
+            scenario["conditional_enters_tapped_land_count"]
+        ):
+            fail(
+                "battle_events",
+                f"{card['name']} land count={land_event.get('conditional_enters_tapped_land_count')!r}",
+            )
+    if "conditional_enters_tapped_condition_met" in scenario:
+        if bool(land_event.get("conditional_enters_tapped_condition_met")) != bool(
+            scenario["conditional_enters_tapped_condition_met"]
+        ):
+            fail(
+                "battle_events",
+                f"{card['name']} condition_met={land_event.get('conditional_enters_tapped_condition_met')!r}",
+            )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "expected_tapped": expected_tapped,
+        "actual_tapped": bool(permanent.get("tapped")),
+        "land_count": land_event.get("conditional_enters_tapped_land_count"),
+        "reason": land_event.get("conditional_enters_tapped_reason"),
+    }
+
+
 SCENARIO_RUNNERS = {
+    "conditional_land_play": run_conditional_land_play,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,
     "tempting_offer_decline": run_tempting_offer_decline,

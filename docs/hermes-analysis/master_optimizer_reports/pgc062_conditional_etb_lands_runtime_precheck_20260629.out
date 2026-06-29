@@ -1,0 +1,12 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "rows": [
+    {
+      "backup_table_exists": 0,
+      "current_conditional_etb_annotation_rows": 3,
+      "target_rows": 3,
+      "trusted_target_rows": 3
+    }
+  ],
+  "sql": "pgc062_conditional_etb_lands_runtime_precheck_20260629.sql"
+}

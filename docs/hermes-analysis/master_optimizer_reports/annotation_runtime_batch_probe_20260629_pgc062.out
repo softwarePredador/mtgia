@@ -1,0 +1,258 @@
+{
+  "clean_cards": [
+    "Clifftop Retreat",
+    "Erode",
+    "Inspiring Vantage",
+    "Sundown Pass"
+  ],
+  "families": [
+    {
+      "annotation_fields": "none",
+      "card_count": 4,
+      "cards": [
+        "Clifftop Retreat",
+        "Erode",
+        "Inspiring Vantage",
+        "Sundown Pass"
+      ]
+    },
+    {
+      "annotation_fields": "choose_new_targets_status",
+      "card_count": 2,
+      "cards": [
+        "Dualcaster Mage",
+        "Reverberate"
+      ]
+    },
+    {
+      "annotation_fields": "tap_damage_status",
+      "card_count": 2,
+      "cards": [
+        "City of Brass",
+        "Elves of Deep Shadow"
+      ]
+    },
+    {
+      "annotation_fields": "activated_ability_lock_status",
+      "card_count": 1,
+      "cards": [
+        "Grand Abolisher"
+      ]
+    },
+    {
+      "annotation_fields": "activated_artifact_reanimation_status",
+      "card_count": 1,
+      "cards": [
+        "Goblin Engineer"
+      ]
+    },
+    {
+      "annotation_fields": "activated_top_five_nonhuman_creature_to_battlefield_status",
+      "card_count": 1,
+      "cards": [
+        "Kinnan, Bonder Prodigy"
+      ]
+    },
+    {
+      "annotation_fields": "activated_untap_another_permanent_status + etb_discard_creature_tutor_status",
+      "card_count": 1,
+      "cards": [
+        "Formidable Speaker"
+      ]
+    },
+    {
+      "annotation_fields": "activation_execution_status",
+      "card_count": 1,
+      "cards": [
+        "Aetherflux Reservoir"
+      ]
+    },
+    {
+      "annotation_fields": "alternate_cost_exile_blue_card_status",
+      "card_count": 1,
+      "cards": [
+        "Force of Negation"
+      ]
+    },
+    {
+      "annotation_fields": "artifact_power_bonus_status + magecraft_treasure_status",
+      "card_count": 1,
+      "cards": [
+        "Storm-Kiln Artist"
+      ]
+    },
+    {
+      "annotation_fields": "back_face.runtime_status + back_face_runtime_status + boast_runtime_status",
+      "card_count": 1,
+      "cards": [
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ]
+    },
+    {
+      "annotation_fields": "buyback_status + choose_new_targets_status",
+      "card_count": 1,
+      "cards": [
+        "Reiterate"
+      ]
+    },
+    {
+      "annotation_fields": "cant_block_mode_status",
+      "card_count": 1,
+      "cards": [
+        "Sundering Eruption // Volcanic Fissure"
+      ]
+    },
+    {
+      "annotation_fields": "cant_block_mode_status + redirect_target_mode_status",
+      "card_count": 1,
+      "cards": [
+        "Untimely Malfunction"
+      ]
+    },
+    {
+      "annotation_fields": "change_target_mode_status + copy_activated_triggered_ability_status + spree_additional_cost_status",
+      "card_count": 1,
+      "cards": [
+        "Return the Favor"
+      ]
+    },
+    {
+      "annotation_fields": "combat_damage_exile_top_opponent_library_status + combat_damage_treasure_trigger_status + dash_status + temporary_cast_permission_status",
+      "card_count": 1,
+      "cards": [
+        "Ragavan, Nimble Pilferer"
+      ]
+    },
+    {
+      "annotation_fields": "combat_damage_treasure_trigger_status + treasure_impulse_draw_status",
+      "card_count": 1,
+      "cards": [
+        "Professional Face-Breaker"
+      ]
+    },
+    {
+      "annotation_fields": "conditional_instant_sorcery_mana_status + etb_milled_card_play_status",
+      "card_count": 1,
+      "cards": [
+        "Tablet of Discovery"
+      ]
+    },
+    {
+      "annotation_fields": "counter_unless_pays_status + soft_counter_payment_status + storm_copy_status",
+      "card_count": 1,
+      "cards": [
+        "Flusterstorm"
+      ]
+    },
+    {
+      "annotation_fields": "cycle_trigger_status + cycling_status",
+      "card_count": 1,
+      "cards": [
+        "Magmakin Artillerist"
+      ]
+    },
+    {
+      "annotation_fields": "death_return_status",
+      "card_count": 1,
+      "cards": [
+        "Enduring Vitality"
+      ]
+    },
+    {
+      "annotation_fields": "end_step_sacrifice_status + escape_grant_status",
+      "card_count": 1,
+      "cards": [
+        "Underworld Breach"
+      ]
+    },
+    {
+      "annotation_fields": "etb_until_source_leaves_status",
+      "card_count": 1,
+      "cards": [
+        "Touch the Spirit Realm"
+      ]
+    },
+    {
+      "annotation_fields": "extort_execution_status",
+      "card_count": 1,
+      "cards": [
+        "Blind Obedience"
+      ]
+    },
+    {
+      "annotation_fields": "graveyard_named_copy_scaling_status",
+      "card_count": 1,
+      "cards": [
+        "Rite of Flame"
+      ]
+    },
+    {
+      "annotation_fields": "leave_battlefield_illusion_token_status",
+      "card_count": 1,
+      "cards": [
+        "Skyclave Apparition"
+      ]
+    },
+    {
+      "annotation_fields": "library_shuffle_status + sacrifice_noncreature_silence_status",
+      "card_count": 1,
+      "cards": [
+        "Ranger-Captain of Eos"
+      ]
+    },
+    {
+      "annotation_fields": "life_loss_on_colored_mana_status",
+      "card_count": 1,
+      "cards": [
+        "Tarnished Citadel"
+      ]
+    },
+    {
+      "annotation_fields": "life_payment_status",
+      "card_count": 1,
+      "cards": [
+        "Mana Confluence"
+      ]
+    },
+    {
+      "annotation_fields": "mana_source_mill_status",
+      "card_count": 1,
+      "cards": [
+        "Millikin"
+      ]
+    },
+    {
+      "annotation_fields": "modes[0].mode_status",
+      "card_count": 1,
+      "cards": [
+        "Boros Charm"
+      ]
+    },
+    {
+      "annotation_fields": "overload_status",
+      "card_count": 1,
+      "cards": [
+        "Vandalblast"
+      ]
+    },
+    {
+      "annotation_fields": "static_ability_status",
+      "card_count": 1,
+      "cards": [
+        "Drannith Magistrate"
+      ]
+    },
+    {
+      "annotation_fields": "upkeep_win_status",
+      "card_count": 1,
+      "cards": [
+        "Knuckles the Echidna"
+      ]
+    }
+  ],
+  "generated_at_utc": "2026-06-29T09:51:06.390878+00:00",
+  "input_pgc060_card_count": 39,
+  "runtime_clean_card_count": 4,
+  "runtime_executor_present_count": 5,
+  "runtime_still_annotation_card_count": 35
+}

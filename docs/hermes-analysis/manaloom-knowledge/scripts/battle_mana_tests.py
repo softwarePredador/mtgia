@@ -335,6 +335,149 @@ def register_tests(battle, player):
         assert active.can_pay_card({"name": "Red Spell", "cmc": 1, "mana_cost": "{R}"}) is True
         assert active.can_pay_card({"name": "Blue Spell", "cmc": 1, "mana_cost": "{U}"}) is False
 
+    def test_check_land_enters_untapped_only_with_required_land_subtype():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            clifftop = {
+                "name": "Clifftop Retreat",
+                "effect": "land",
+                "type_line": "Land",
+                "produces": "RW",
+                "mana_produced": 1,
+                "conditional_enters_tapped_status": "runtime_executor_v1",
+                "conditional_enters_tapped_profile": "checkland",
+                "enters_tapped_unless_control_land_subtypes": ["Mountain", "Plains"],
+            }
+            active.hand = [clifftop]
+            assert battle.play_land_candidate(
+                active,
+                [],
+                [active],
+                1,
+                battle.Stack(),
+                {"card": clifftop, "source_zone": "hand"},
+            ) is True
+            assert active.battlefield[-1].get("tapped") is True
+
+            active = player("Active")
+            clifftop = dict(clifftop)
+            active.hand = [clifftop]
+            active.battlefield = [
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land - Plains"}
+            ]
+            assert battle.play_land_candidate(
+                active,
+                [],
+                [active],
+                2,
+                battle.Stack(),
+                {"card": clifftop, "source_zone": "hand"},
+            ) is True
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert active.battlefield[-1].get("tapped") in (None, False)
+        played = [
+            data
+            for event, data in events
+            if event == "land_played" and data.get("card") == "Clifftop Retreat"
+        ]
+        assert played[0]["enters_tapped"] is True
+        assert played[0]["conditional_enters_tapped_reason"] == "missing_required_land_subtype"
+        assert played[1]["enters_tapped"] is False
+        assert played[1]["conditional_enters_tapped_reason"] == "controlled_required_land_subtype"
+
+    def test_fastland_enters_tapped_at_three_other_lands():
+        active = player("Active")
+        inspiring = {
+            "name": "Inspiring Vantage",
+            "effect": "land",
+            "type_line": "Land",
+            "produces": "RW",
+            "mana_produced": 1,
+            "conditional_enters_tapped_status": "runtime_executor_v1",
+            "conditional_enters_tapped_profile": "fastland",
+            "enters_tapped_if_control_lands_min": 3,
+        }
+        active.hand = [inspiring]
+        active.battlefield = [
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land - Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land - Mountain"},
+        ]
+        assert battle.play_land_candidate(
+            active,
+            [],
+            [active],
+            3,
+            battle.Stack(),
+            {"card": inspiring, "source_zone": "hand"},
+        ) is True
+        assert active.battlefield[-1].get("tapped") in (None, False)
+
+        active = player("Active")
+        inspiring = dict(inspiring)
+        active.hand = [inspiring]
+        active.battlefield = [
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land - Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land - Mountain"},
+            {"name": "Sacred Foundry", "effect": "land", "type_line": "Land - Mountain Plains"},
+        ]
+        assert battle.play_land_candidate(
+            active,
+            [],
+            [active],
+            4,
+            battle.Stack(),
+            {"card": inspiring, "source_zone": "hand"},
+        ) is True
+        assert active.battlefield[-1].get("tapped") is True
+
+    def test_slowland_enters_untapped_with_two_other_lands():
+        active = player("Active")
+        sundown = {
+            "name": "Sundown Pass",
+            "effect": "land",
+            "type_line": "Land",
+            "produces": "RW",
+            "mana_produced": 1,
+            "conditional_enters_tapped_status": "runtime_executor_v1",
+            "conditional_enters_tapped_profile": "slowland",
+            "enters_tapped_unless_control_lands_min": 2,
+        }
+        active.hand = [sundown]
+        active.battlefield = [
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land - Plains"},
+        ]
+        assert battle.play_land_candidate(
+            active,
+            [],
+            [active],
+            3,
+            battle.Stack(),
+            {"card": sundown, "source_zone": "hand"},
+        ) is True
+        assert active.battlefield[-1].get("tapped") is True
+
+        active = player("Active")
+        sundown = dict(sundown)
+        active.hand = [sundown]
+        active.battlefield = [
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land - Plains"},
+            {"name": "Mountain", "effect": "land", "type_line": "Basic Land - Mountain"},
+        ]
+        assert battle.play_land_candidate(
+            active,
+            [],
+            [active],
+            4,
+            battle.Stack(),
+            {"card": sundown, "source_zone": "hand"},
+        ) is True
+        assert active.battlefield[-1].get("tapped") in (None, False)
+
     def test_global_creatures_tap_for_any_color_passive_turns_creatures_into_mana_sources():
         active = player("Active")
         active.battlefield = [
@@ -594,6 +737,9 @@ def register_tests(battle, player):
         test_opening_hand_virtual_mana_respects_sunbillow_red_condition,
         test_spectator_seating_enters_tapped_with_fewer_than_two_opponents,
         test_spectator_seating_enters_untapped_with_two_opponents_and_only_pays_boros,
+        test_check_land_enters_untapped_only_with_required_land_subtype,
+        test_fastland_enters_tapped_at_three_other_lands,
+        test_slowland_enters_untapped_with_two_other_lands,
         test_global_creatures_tap_for_any_color_passive_turns_creatures_into_mana_sources,
         test_enduring_vitality_static_mana_grant_respects_summoning_sickness_on_self,
         test_training_grounds_reduces_generic_creature_activation_cost_to_floor_one,

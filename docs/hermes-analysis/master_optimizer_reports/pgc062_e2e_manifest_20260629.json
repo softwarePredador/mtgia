@@ -1,0 +1,188 @@
+{
+  "package_id": "pgc062_conditional_etb_lands_runtime",
+  "title": "PGC062 Conditional ETB Lands Runtime Validation",
+  "expected_rules": [
+    {
+      "card_name": "Clifftop Retreat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+      "min_rule_version": 2,
+      "normalized_name": "clifftop retreat",
+      "oracle_hash": "48ea345a9823024a12c03d458106af4e",
+      "required_effect_fields": {
+        "battle_model_scope": "check_land_dual_source_etb_runtime_v1",
+        "conditional_enters_tapped_profile": "checkland",
+        "conditional_enters_tapped_status": "runtime_executor_v1",
+        "effect": "land",
+        "oracle_runtime_scope": "conditional_etb_checkland_subtype_runtime_v1",
+        "produces": "RW"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Inspiring Vantage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+      "min_rule_version": 2,
+      "normalized_name": "inspiring vantage",
+      "oracle_hash": "eb2813246000c2c0bfe218cb61fed144",
+      "required_effect_fields": {
+        "battle_model_scope": "fastland_dual_source_etb_runtime_v1",
+        "conditional_enters_tapped_profile": "fastland",
+        "conditional_enters_tapped_status": "runtime_executor_v1",
+        "effect": "land",
+        "enters_tapped_if_control_lands_min": 3,
+        "oracle_runtime_scope": "conditional_etb_fastland_other_land_count_runtime_v1",
+        "produces": "RW"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sundown Pass",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+      "min_rule_version": 2,
+      "normalized_name": "sundown pass",
+      "oracle_hash": "2f86ee5bc9a587b6a45b4eddf98e663c",
+      "required_effect_fields": {
+        "battle_model_scope": "slowland_dual_source_etb_runtime_v1",
+        "conditional_enters_tapped_profile": "slowland",
+        "conditional_enters_tapped_status": "runtime_executor_v1",
+        "effect": "land",
+        "enters_tapped_unless_control_lands_min": 2,
+        "oracle_runtime_scope": "conditional_etb_slowland_other_land_count_runtime_v1",
+        "produces": "RW"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "execution_scenarios": [
+    {
+      "card": {"cmc": 0, "name": "Clifftop Retreat", "type_line": "Land"},
+      "conditional_enters_tapped_condition_met": false,
+      "conditional_enters_tapped_land_count": 0,
+      "conditional_enters_tapped_profile": "checkland",
+      "conditional_enters_tapped_reason": "missing_required_land_subtype",
+      "conditional_enters_tapped_status": "runtime_executor_v1",
+      "expected_tapped": true,
+      "name": "clifftop_tapped_without_plains_or_mountain",
+      "turn": 1,
+      "type": "conditional_land_play"
+    },
+    {
+      "battlefield": [{"effect": "land", "name": "Plains", "type_line": "Basic Land - Plains"}],
+      "card": {"cmc": 0, "name": "Clifftop Retreat", "type_line": "Land"},
+      "conditional_enters_tapped_condition_met": true,
+      "conditional_enters_tapped_land_count": 1,
+      "conditional_enters_tapped_profile": "checkland",
+      "conditional_enters_tapped_reason": "controlled_required_land_subtype",
+      "conditional_enters_tapped_status": "runtime_executor_v1",
+      "expected_tapped": false,
+      "name": "clifftop_untapped_with_plains",
+      "turn": 2,
+      "type": "conditional_land_play"
+    },
+    {
+      "battlefield": [
+        {"effect": "land", "name": "Plains", "type_line": "Basic Land - Plains"},
+        {"effect": "land", "name": "Mountain", "type_line": "Basic Land - Mountain"}
+      ],
+      "card": {"cmc": 0, "name": "Inspiring Vantage", "type_line": "Land"},
+      "conditional_enters_tapped_condition_met": true,
+      "conditional_enters_tapped_land_count": 2,
+      "conditional_enters_tapped_profile": "fastland",
+      "conditional_enters_tapped_reason": "land_count_below_tapped_threshold",
+      "conditional_enters_tapped_status": "runtime_executor_v1",
+      "expected_tapped": false,
+      "name": "inspiring_untapped_with_two_other_lands",
+      "turn": 3,
+      "type": "conditional_land_play"
+    },
+    {
+      "battlefield": [
+        {"effect": "land", "name": "Plains", "type_line": "Basic Land - Plains"},
+        {"effect": "land", "name": "Mountain", "type_line": "Basic Land - Mountain"},
+        {"effect": "land", "name": "Sacred Foundry", "type_line": "Land - Mountain Plains"}
+      ],
+      "card": {"cmc": 0, "name": "Inspiring Vantage", "type_line": "Land"},
+      "conditional_enters_tapped_condition_met": false,
+      "conditional_enters_tapped_land_count": 3,
+      "conditional_enters_tapped_profile": "fastland",
+      "conditional_enters_tapped_reason": "land_count_at_or_above_tapped_threshold",
+      "conditional_enters_tapped_status": "runtime_executor_v1",
+      "expected_tapped": true,
+      "name": "inspiring_tapped_with_three_other_lands",
+      "turn": 4,
+      "type": "conditional_land_play"
+    },
+    {
+      "battlefield": [{"effect": "land", "name": "Plains", "type_line": "Basic Land - Plains"}],
+      "card": {"cmc": 0, "name": "Sundown Pass", "type_line": "Land"},
+      "conditional_enters_tapped_condition_met": false,
+      "conditional_enters_tapped_land_count": 1,
+      "conditional_enters_tapped_profile": "slowland",
+      "conditional_enters_tapped_reason": "land_count_below_untapped_threshold",
+      "conditional_enters_tapped_status": "runtime_executor_v1",
+      "expected_tapped": true,
+      "name": "sundown_tapped_with_one_other_land",
+      "turn": 3,
+      "type": "conditional_land_play"
+    },
+    {
+      "battlefield": [
+        {"effect": "land", "name": "Plains", "type_line": "Basic Land - Plains"},
+        {"effect": "land", "name": "Mountain", "type_line": "Basic Land - Mountain"}
+      ],
+      "card": {"cmc": 0, "name": "Sundown Pass", "type_line": "Land"},
+      "conditional_enters_tapped_condition_met": true,
+      "conditional_enters_tapped_land_count": 2,
+      "conditional_enters_tapped_profile": "slowland",
+      "conditional_enters_tapped_reason": "land_count_met_untapped_threshold",
+      "conditional_enters_tapped_status": "runtime_executor_v1",
+      "expected_tapped": false,
+      "name": "sundown_untapped_with_two_other_lands",
+      "turn": 4,
+      "type": "conditional_land_play"
+    }
+  ],
+  "runtime_checks": [
+    {
+      "card": {"cmc": 0, "name": "Clifftop Retreat", "type_line": "Land"},
+      "effect": "land",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+      "required_effect_fields": {
+        "battle_model_scope": "check_land_dual_source_etb_runtime_v1",
+        "conditional_enters_tapped_status": "runtime_executor_v1"
+      }
+    },
+    {
+      "card": {"cmc": 0, "name": "Inspiring Vantage", "type_line": "Land"},
+      "effect": "land",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+      "required_effect_fields": {
+        "battle_model_scope": "fastland_dual_source_etb_runtime_v1",
+        "conditional_enters_tapped_status": "runtime_executor_v1"
+      }
+    },
+    {
+      "card": {"cmc": 0, "name": "Sundown Pass", "type_line": "Land"},
+      "effect": "land",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+      "required_effect_fields": {
+        "battle_model_scope": "slowland_dual_source_etb_runtime_v1",
+        "conditional_enters_tapped_status": "runtime_executor_v1"
+      }
+    }
+  ],
+  "snapshot_checks": [
+    {"card_name": "Clifftop Retreat", "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"},
+    {"card_name": "Inspiring Vantage", "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"},
+    {"card_name": "Sundown Pass", "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"}
+  ]
+}

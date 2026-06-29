@@ -1,0 +1,13 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "rows": [
+    {
+      "backup_rows": 3,
+      "clifftop_runtime_rows": 1,
+      "inspiring_runtime_rows": 1,
+      "sundown_runtime_rows": 1,
+      "target_rows": 3
+    }
+  ],
+  "sql": "pgc062_conditional_etb_lands_runtime_postcheck_20260629.sql"
+}

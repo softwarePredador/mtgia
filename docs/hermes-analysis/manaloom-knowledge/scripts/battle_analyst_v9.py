@@ -3923,6 +3923,9 @@ def land_enters_tapped_for_state(land, player=None, opponents=None):
         return int(land.get("life_paid_to_enter_untapped") or 0) <= 0
     if land.get("enters_tapped") or land.get("land_enters_tapped"):
         return True
+    conditional = conditional_land_enters_tapped_for_state(land, player=player)
+    if conditional is not None:
+        return conditional
     threshold = land.get("enters_tapped_unless_opponent_count")
     oracle_text = str(land.get("oracle_text") or "").lower()
     if threshold in (None, "", 0) and re.search(
@@ -3937,6 +3940,52 @@ def land_enters_tapped_for_state(land, player=None, opponents=None):
     except (TypeError, ValueError):
         return False
     return _live_opponent_count(opponents) < required_opponents
+
+
+def conditional_land_enters_tapped_for_state(land, player=None):
+    if not isinstance(land, dict):
+        return None
+    status = str(land.get("conditional_enters_tapped_status") or "").strip().lower()
+    if status != "runtime_executor_v1":
+        return None
+    other_land_count = controlled_land_count(player) if player is not None else 0
+    land["conditional_enters_tapped_land_count"] = other_land_count
+    required_subtypes = (
+        land.get("enters_tapped_unless_control_land_subtypes")
+        or land.get("enters_tapped_unless_control_subtypes")
+    )
+    if required_subtypes:
+        condition_met = _player_controls_any_subtype(player, required_subtypes)
+        land["conditional_enters_tapped_condition_met"] = condition_met
+        land["conditional_enters_tapped_reason"] = (
+            "controlled_required_land_subtype" if condition_met else "missing_required_land_subtype"
+        )
+        return not condition_met
+    if land.get("enters_tapped_if_control_lands_min") not in (None, ""):
+        try:
+            threshold = int(land.get("enters_tapped_if_control_lands_min") or 0)
+        except (TypeError, ValueError):
+            threshold = 0
+        enters_tapped = other_land_count >= threshold
+        land["conditional_enters_tapped_condition_met"] = not enters_tapped
+        land["conditional_enters_tapped_reason"] = (
+            "land_count_below_tapped_threshold" if not enters_tapped else "land_count_at_or_above_tapped_threshold"
+        )
+        return enters_tapped
+    if land.get("enters_tapped_unless_control_lands_min") not in (None, ""):
+        try:
+            threshold = int(land.get("enters_tapped_unless_control_lands_min") or 0)
+        except (TypeError, ValueError):
+            threshold = 0
+        condition_met = other_land_count >= threshold
+        land["conditional_enters_tapped_condition_met"] = condition_met
+        land["conditional_enters_tapped_reason"] = (
+            "land_count_met_untapped_threshold" if condition_met else "land_count_below_untapped_threshold"
+        )
+        return not condition_met
+    land["conditional_enters_tapped_condition_met"] = True
+    land["conditional_enters_tapped_reason"] = "no_runtime_condition"
+    return False
 
 
 def pay_mana_source_activation_costs(player, source, turn=None):
@@ -16327,6 +16376,11 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
         tapped=bool(land_permanent.get("tapped")),
         life_paid_to_enter_untapped=life_paid_to_enter_untapped,
         enters_tapped_unless_pay_life=land_enter_untapped_life_cost(land_permanent),
+        conditional_enters_tapped_status=land_permanent.get("conditional_enters_tapped_status"),
+        conditional_enters_tapped_profile=land_permanent.get("conditional_enters_tapped_profile"),
+        conditional_enters_tapped_condition_met=land_permanent.get("conditional_enters_tapped_condition_met"),
+        conditional_enters_tapped_land_count=land_permanent.get("conditional_enters_tapped_land_count"),
+        conditional_enters_tapped_reason=land_permanent.get("conditional_enters_tapped_reason"),
         mana_available_from_land=mana_available_from_land,
         mana_pool_after=player.mana_pool.snapshot(),
         conditional_mana_sources_after=replay_conditional_mana_sources(player),
