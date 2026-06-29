@@ -88,6 +88,12 @@ Current Lorehold evidence generated on 2026-06-29:
 
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.md`
 - `server/test/artifacts/commander_generate_provenance_20260629_deckbuilding_contract/commander_generate_provenance_summary.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_current.md`
+
+The current canonical Lorehold strategy matrix JSON schema is
+`decks[] + ranked_deck_keys`. Historical `ranked_decks` reports are supported
+only through `lorehold_artifact_contract_audit.py` as legacy artifacts; they
+must not be consumed directly by continuation gates or deck-change logic.
 
 Current structural ranking from decks `607-616`:
 
@@ -116,8 +122,10 @@ Every generated or optimized Commander deck must pass:
 5. role/package target check;
 6. source provenance check;
 7. no raw multi-row rule/tag fanout in deck joins;
-8. battle gate for any structural promotion;
-9. drawn/cast/used or focused-test evidence for any card-specific conclusion.
+8. artifact-contract check for every matrix, gate, exposure, replay, and
+   historical Lorehold report consumed by the decision;
+9. battle gate for any structural promotion;
+10. drawn/cast/used or focused-test evidence for any card-specific conclusion.
 
 ## Lorehold Promotion Gate
 
@@ -149,6 +157,13 @@ Lorehold variant strategy matrix:
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_strategy_matrix.py \
   --deck-ids 607,608,609,610,611,612,613,614,615,616 \
   --out-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract
+```
+
+Lorehold artifact contract audit:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_artifact_contract_audit.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_current
 ```
 
 Focused backend tests:
@@ -196,11 +211,14 @@ happen:
 - unresolved/off-color cards are repaired silently without diagnostics;
 - raw multi-row intelligence tables are joined into deck rows without
   aggregation.
+- a historical Lorehold artifact is consumed as if it had the current schema
+  without first passing `lorehold_artifact_contract_audit.py`.
 
 ## Next Product Step
 
-For Lorehold, continue from `607` as protected baseline, keep `615` and `614` as
-live challengers, and run an equal battle gate that records:
+For Lorehold, first run the artifact contract audit. Then continue from `607`
+as protected baseline, keep `615` and `614` as live challengers, and run an
+equal battle gate that records:
 
 - opening-hand/mulligan quality;
 - whether topdeck/miracle setup was drawn and used;

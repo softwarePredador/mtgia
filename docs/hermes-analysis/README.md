@@ -63,6 +63,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     gate em um unico diagnostico.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
+  - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em
+    nova decisao:
+    `manaloom-knowledge/scripts/lorehold_artifact_contract_audit.py`.
+    O schema canonico atual da matrix e `decks[] + ranked_deck_keys`;
+    `ranked_decks` e legado e so pode ser consumido via normalizador.
   - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
     de declarar que scripts e docs estao conversando entre si.
   - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia

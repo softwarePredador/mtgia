@@ -27,6 +27,7 @@ BATTLE_RULES_CONTRACT = DOCS_DIR / "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-0
 DECKBUILDING_CONTRACT = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 XMAGE_AUDIT = SCRIPT_DIR / "xmage_strategy_consistency_audit.py"
 DECKBUILDING_AUDIT = SCRIPT_DIR / "deckbuilding_contract_surface_audit.py"
+LOREHOLD_ARTIFACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
 VARIANT_GATE = SCRIPT_DIR / "lorehold_variant_battle_gate.py"
 STRATEGY_LEARNING_AUDIT = SCRIPT_DIR / "lorehold_strategy_learning_audit.py"
@@ -159,6 +160,7 @@ def build_checks() -> list[Check]:
                 "Lorehold Promotion Gate",
                 "deck `607` is the current protected structural",
                 "deckbuilding_contract",
+                "lorehold_artifact_contract_audit.py",
             ],
             "docs.deckbuilding_contract_freezes_lorehold_gate",
         ),
@@ -189,8 +191,18 @@ def build_checks() -> list[Check]:
                 "build_optimized_deck.py",
                 "universal_optimizer.py",
                 "historical_blocked_surfaces",
+                "lorehold_artifact_contract_audit.py",
             ],
             "scripts.deckbuilding_surface_audit_blocks_legacy",
+        ),
+        check_contains(
+            LOREHOLD_ARTIFACT_AUDIT,
+            [
+                "strategy_matrix_current_v1",
+                "strategy_matrix_legacy_ranked_decks_v0",
+                "ready_for_real_deck_change",
+            ],
+            "scripts.lorehold_artifact_contract_audit_normalizes_history",
         ),
         check_contains(
             VARIANT_MATRIX,

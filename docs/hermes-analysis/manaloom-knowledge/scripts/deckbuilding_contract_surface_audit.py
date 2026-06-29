@@ -20,6 +20,7 @@ GENERATE_ROUTE = REPO_ROOT / "server/routes/ai/generate/index.dart"
 SUPPORT_TEST = REPO_ROOT / "server/test/commander_deckbuilding_contract_support_test.dart"
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
 VARIANT_GATE = SCRIPT_DIR / "lorehold_variant_battle_gate.py"
+ARTIFACT_CONTRACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -29,6 +30,10 @@ CONTRACT_MATRIX_JSON = (
 CONTRACT_MATRIX_MD = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.md"
+)
+ARTIFACT_CONTRACT_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260629_current.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -78,6 +83,8 @@ def build_audit() -> dict[str, Any]:
                 "Status: `frozen_operating_contract`",
                 "Source Hierarchy",
                 "Lorehold Promotion Gate",
+                "decks[] + ranked_deck_keys",
+                "lorehold_artifact_contract_audit.py",
             ],
         )
     )
@@ -126,10 +133,21 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            ARTIFACT_CONTRACT_AUDIT,
+            [
+                "strategy_matrix_current_v1",
+                "strategy_matrix_legacy_ranked_decks_v0",
+                "ready_for_real_deck_change",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             README,
             [
                 "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
                 "deckbuilding_contract_surface_audit.py",
+                "lorehold_artifact_contract_audit.py",
             ],
         )
     )
@@ -147,6 +165,14 @@ def build_audit() -> dict[str, Any]:
             "exists": CONTRACT_MATRIX_MD.exists(),
             "status": "pass" if CONTRACT_MATRIX_MD.exists() else "fail",
             "missing": [] if CONTRACT_MATRIX_MD.exists() else ["matrix_md"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(ARTIFACT_CONTRACT_REPORT),
+            "exists": ARTIFACT_CONTRACT_REPORT.exists(),
+            "status": "pass" if ARTIFACT_CONTRACT_REPORT.exists() else "fail",
+            "missing": [] if ARTIFACT_CONTRACT_REPORT.exists() else ["artifact_contract_report"],
         }
     )
 
