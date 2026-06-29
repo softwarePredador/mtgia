@@ -99,6 +99,10 @@ class RuntimePgRuleFallbackForPromotedHotfixesTests(unittest.TestCase):
 
     def test_manual_runtime_waivers_have_owner_expiry_and_promotion_target(self) -> None:
         inventory = battle.manual_runtime_waiver_inventory()
+        incident_window_start = datetime(2026, 6, 19, 0, 0, 0, tzinfo=timezone.utc)
+        global_expires_at = datetime.fromisoformat(
+            battle._WAIVER_EXPIRES_AT_UTC.replace("Z", "+00:00")
+        )
         self.assertEqual(
             {entry["card"] for entry in inventory},
             battle.MANUAL_RULE_RUNTIME_WAIVERS,
@@ -115,7 +119,9 @@ class RuntimePgRuleFallbackForPromotedHotfixesTests(unittest.TestCase):
                 self.assertEqual(entry["promotion_target"], "card_battle_rules")
                 self.assertEqual(opened_at.tzinfo, timezone.utc)
                 self.assertGreater(expires_at, opened_at)
-                self.assertLessEqual(opened_at, datetime(2026, 6, 19, 23, 59, 59, tzinfo=timezone.utc))
+                self.assertGreaterEqual(opened_at, incident_window_start)
+                self.assertLessEqual(opened_at, global_expires_at)
+                self.assertEqual(expires_at, global_expires_at)
                 self.assertTrue(entry["reason"])
                 self.assertTrue(entry["source_runs"])
                 self.assertTrue(entry["rule_logical_key"].startswith("battle_rule_v1:"))
