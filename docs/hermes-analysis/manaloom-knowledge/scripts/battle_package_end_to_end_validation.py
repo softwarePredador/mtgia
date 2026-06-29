@@ -819,6 +819,72 @@ def run_copy_spell_choose_new_targets(
             "battle_events",
             f"{copy_card['name']} event copy_spell_target={spell_copied.get('copy_spell_target')!r}",
         )
+    buyback_result = None
+    if "expected_buyback_paid" in scenario:
+        expected_buyback_paid = bool(scenario.get("expected_buyback_paid"))
+        spell_cast = next(
+            (
+                data
+                for event, data in reversed(events)
+                if event == "spell_cast" and data.get("card") == copy_card.get("name")
+            ),
+            None,
+        )
+        if spell_cast is None:
+            fail("battle_events", f"missing {copy_card['name']} spell_cast event")
+        if bool(spell_cast.get("buyback_paid")) != expected_buyback_paid:
+            fail(
+                "battle_events",
+                f"{copy_card['name']} buyback_paid={spell_cast.get('buyback_paid')!r}",
+            )
+        expected_buyback_status = scenario.get("expected_buyback_status")
+        if expected_buyback_status and spell_cast.get("buyback_status") != expected_buyback_status:
+            fail(
+                "battle_events",
+                f"{copy_card['name']} buyback_status={spell_cast.get('buyback_status')!r}",
+            )
+        expected_buyback_cost = scenario.get("expected_buyback_cost")
+        if expected_buyback_cost and spell_cast.get("buyback_cost") != expected_buyback_cost:
+            fail(
+                "battle_events",
+                f"{copy_card['name']} buyback_cost={spell_cast.get('buyback_cost')!r}",
+            )
+        spell_resolved = next(
+            (
+                data
+                for event, data in reversed(events)
+                if event == "spell_resolved" and data.get("card") == copy_card.get("name")
+            ),
+            None,
+        )
+        if spell_resolved is None:
+            fail("battle_events", f"missing {copy_card['name']} spell_resolved event")
+        expected_destination = scenario.get("expected_resolution_destination")
+        if expected_destination and spell_resolved.get("destination") != expected_destination:
+            fail(
+                "battle_events",
+                f"{copy_card['name']} destination={spell_resolved.get('destination')!r}",
+            )
+        returned_to_hand = any(
+            event == "buyback_returned_to_hand"
+            and data.get("card") == copy_card.get("name")
+            for event, data in events
+        )
+        if returned_to_hand != expected_buyback_paid:
+            fail(
+                "battle_events",
+                f"{copy_card['name']} buyback_returned_to_hand={returned_to_hand!r}",
+            )
+        if expected_buyback_paid and not any(card.get("name") == copy_card.get("name") for card in responder.hand):
+            fail("battle_execution", f"{copy_card['name']} did not return to hand after buyback")
+        if not expected_buyback_paid and not any(card.get("name") == copy_card.get("name") for card in responder.graveyard):
+            fail("battle_execution", f"{copy_card['name']} did not move to graveyard without buyback")
+        buyback_result = {
+            "buyback_paid": expected_buyback_paid,
+            "buyback_status": spell_cast.get("buyback_status"),
+            "buyback_cost": spell_cast.get("buyback_cost"),
+            "destination": spell_resolved.get("destination"),
+        }
     return {
         "scenario": scenario.get("name"),
         "card_name": copy_card["name"],
@@ -827,6 +893,7 @@ def run_copy_spell_choose_new_targets(
         "copy_target_selection_status": selection.get("copy_target_selection_status"),
         "target_reassignment_performed": bool(selection.get("target_reassignment_performed")),
         "copy_spell_target": actual_target_name,
+        **({"buyback": buyback_result} if buyback_result is not None else {}),
     }
 
 

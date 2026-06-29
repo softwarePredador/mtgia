@@ -883,6 +883,8 @@ def resolved_spell_destination(card, effect_data, effect, player=None):
         if not effect_data.get("_approach_cast_count_recorded") and player is not None:
             return "graveyard" if getattr(player, "approach_count", 0) >= 1 else "library"
         return "library"
+    if buyback_was_paid(effect_data):
+        return "hand"
     if is_instant_or_sorcery_spell(card):
         return "graveyard"
     if effect == "land":
@@ -1828,6 +1830,77 @@ def card_cost_for_effect(player, card, effect_data, additional_generic=0):
 
 def can_pay_card_for_effect(player, card, effect_data, additional_generic=0):
     return player.can_pay(card_cost_for_effect(player, card, effect_data, additional_generic))
+
+
+def card_cost_for_effect_with_additional_costs(
+    player,
+    card,
+    effect_data,
+    *,
+    additional_costs=None,
+    additional_generic=0,
+):
+    alternative_cost, _alternative_cost_kind = alternative_cost_for_effect(player, card, effect_data)
+    return card_cost_for_player_state(
+        player,
+        card,
+        additional_generic,
+        alternative_cost=alternative_cost,
+        additional_costs=additional_costs,
+    )
+
+
+def buyback_runtime_enabled(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    return str(effect_data.get("buyback_status") or "").lower() == "runtime_executor_v1"
+
+
+def buyback_cost_for_effect(effect_data):
+    if not buyback_runtime_enabled(effect_data):
+        return None
+    return effect_data.get("buyback_cost") or effect_data.get("buyback_additional_cost")
+
+
+def buyback_replay_fields(effect_data):
+    if not isinstance(effect_data, dict):
+        return {}
+    fields = {}
+    if effect_data.get("buyback_status"):
+        fields["buyback_status"] = effect_data.get("buyback_status")
+    if effect_data.get("buyback_cost"):
+        fields["buyback_cost"] = effect_data.get("buyback_cost")
+    if effect_data.get("_buyback_paid") is not None:
+        fields["buyback_paid"] = bool(effect_data.get("_buyback_paid"))
+    return fields
+
+
+def mark_buyback_cast_choice(player, card, effect_data):
+    """Choose optional buyback when the full locked cost is payable."""
+    if not buyback_runtime_enabled(effect_data):
+        return [], False
+    buyback_cost = buyback_cost_for_effect(effect_data)
+    if not buyback_cost:
+        effect_data["_buyback_paid"] = False
+        return [], False
+    additional_costs = [buyback_cost]
+    full_cost = card_cost_for_effect_with_additional_costs(
+        player,
+        card,
+        effect_data,
+        additional_costs=additional_costs,
+    )
+    if player.can_pay(full_cost):
+        effect_data["_buyback_paid"] = True
+        effect_data["_buyback_additional_costs"] = additional_costs
+        return additional_costs, True
+    effect_data["_buyback_paid"] = False
+    effect_data.pop("_buyback_additional_costs", None)
+    return [], False
+
+
+def buyback_was_paid(effect_data):
+    return buyback_runtime_enabled(effect_data) and bool(effect_data.get("_buyback_paid"))
 
 
 def begin_cast_context(
@@ -2892,6 +2965,20 @@ def mark_goliath_daydreamer_exile_on_resolution(player, card, effect_data, turn=
 
 def finish_resolved_spell(player, card, turn=None, effect_data=None):
     mark_goliath_daydreamer_exile_on_resolution(player, card, effect_data, turn)
+    if buyback_was_paid(effect_data or {}):
+        player.hand.append(card)
+        emit_replay_event(
+            "buyback_returned_to_hand",
+            player=player.name,
+            card=card.get("name", "?") if isinstance(card, dict) else str(card),
+            from_zone="stack",
+            to_zone="hand",
+            destination="hand",
+            turn=turn,
+            **buyback_replay_fields(effect_data or {}),
+            **replay_rule_fields(effect_data or {}),
+        )
+        return
     if isinstance(card, dict) and card.get("_exile_on_resolution"):
         reason = card.get("_exile_on_resolution_reason") or "replacement_exile_on_resolution"
         move_to_exile(player, card, reason=reason, turn=turn)
@@ -11627,7 +11714,13 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 continue
             fields = replay_rule_fields(eff)
             alternative_cost, alternative_cost_kind = alternative_cost_for_effect(player, c, eff)
-            locked_cost = card_cost_for_effect(player, c, eff)
+            additional_costs, buyback_paid = mark_buyback_cast_choice(player, c, eff)
+            locked_cost = card_cost_for_effect_with_additional_costs(
+                player,
+                c,
+                eff,
+                additional_costs=additional_costs,
+            )
             emit_decision_trace(
                 decision_type="response",
                 player=player,
@@ -11655,6 +11748,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     "stack_threat_score": score,
                     "available_instants": len(instants),
                     "copyable_stack_target": 1,
+                    "buyback_paid": int(buyback_paid),
                 },
                 rule_source=fields.get("rule_source", "battle_heuristic"),
                 rule_status=fields.get("rule_review_status", "heuristic"),
@@ -11678,6 +11772,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 role="response",
                 response_to=top_item.card.get("name", "?"),
                 locked_cost=replay_cost_snapshot(locked_cost),
+                additional_costs=list(additional_costs or []),
                 alternative_cost=alternative_cost,
                 alternative_cost_kind=alternative_cost_kind,
                 may_choose_new_targets_for_target_spell=bool(
@@ -11687,6 +11782,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     "choose_new_targets_for_target_spell_status"
                 ),
                 **copy_target,
+                **buyback_replay_fields(eff),
                 **fields,
             )
             mark_cast_ledger_emitted(eff)
@@ -11700,6 +11796,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                         "source_zone": "hand",
                         "cast_pipeline": "response_stack_cast_minimal",
                         "locked_cost": replay_cost_snapshot(locked_cost),
+                        "additional_costs": list(additional_costs or []),
                         "alternative_cost": alternative_cost,
                         "alternative_cost_kind": alternative_cost_kind,
                         "targets": [copy_target],
@@ -11738,6 +11835,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 phase=phase,
                 **copy_target,
                 **copy_spell_target_selection_replay_fields(copied_item),
+                **buyback_replay_fields(eff),
                 **fields,
             )
             attach_direct_resolution_context(
@@ -11761,9 +11859,10 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 copied_stack_object=getattr(copied_item, "card", {}).get("name", "?") if copied_item else None,
                 turn=turn,
                 **spell_resolution_context_fields(c, eff, eff.get("effect", "unknown")),
+                **buyback_replay_fields(eff),
                 **fields,
             )
-            finish_resolved_spell(player, c, turn=turn)
+            finish_resolved_spell(player, c, turn=turn, effect_data=eff)
             return True
         if player.is_human:
             # Lorehold: use protection in response to high-threat spells

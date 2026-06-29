@@ -1632,11 +1632,12 @@ def register_tests(battle, player):
             assert reiterate_effect["effect"] == "copy_spell"
             assert reiterate_effect["target"] == "instant_or_sorcery_on_stack"
             assert reiterate_effect["copy_is_not_cast"] is True
-            assert reiterate_effect["buyback_status"] == "annotation_only"
+            assert reiterate_effect["buyback_status"] == "runtime_executor_v1"
+            assert reiterate_effect["buyback_cost"] == "{3}"
             assert reiterate_effect["choose_new_targets_status"] == "runtime_executor_v1"
             assert reiterate_effect["copy_target_selection_status"] == "runtime_executor_v1"
             assert reiterate_effect["battle_model_scope"] == (
-                "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_annotation_v1"
+                "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1"
             )
             assert reiterate_effect["_rule_logical_key"] == "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
             assert reiterate_effect["_rule_oracle_hash"] == "996fb5f02f16605ff7f1c899f2c50f60"
@@ -1669,8 +1670,195 @@ def register_tests(battle, player):
         assert copied_event["rule_oracle_hash"] == "996fb5f02f16605ff7f1c899f2c50f60"
         assert copied_event["choose_new_targets_status"] == "runtime_executor_v1"
         assert copied_event["copy_target_selection_status"] == "runtime_executor_v1"
+        assert copied_event["buyback_status"] == "runtime_executor_v1"
+        assert copied_event["buyback_paid"] is False
         assert copied_event["target_reassignment_performed"] is False
         assert copied_event["copy_target_selection_reason"] == "no_declared_targets_on_copied_spell"
+
+    def test_copy_spell_buyback_runtime_returns_to_hand_only_when_paid():
+        runtime_name = "Runtime Reiterate Buyback Test"
+        runtime_rule = {
+            "name": runtime_name,
+            "effect": "copy_spell",
+            "instant": True,
+            "target": "instant_or_sorcery_on_stack",
+            "copy_is_not_cast": True,
+            "may_choose_new_targets": True,
+            "choose_new_targets_status": "runtime_executor_v1",
+            "copy_target_selection_status": "runtime_executor_v1",
+            "copy_target_selection_pipeline": "copy_spell_runtime_choose_new_targets_v1",
+            "buyback_status": "runtime_executor_v1",
+            "buyback_cost": "{3}",
+            "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
+            "_rule_logical_key": "battle_rule_v1:runtime-reiterate-buyback-test",
+            "_rule_oracle_hash": "runtime-reiterate-buyback-test-hash",
+        }
+        previous_rule = battle.HANDCRAFTED_KNOWN_CARD_RULES.get(runtime_name)
+        had_known_card = runtime_name in battle.HANDCRAFTED_KNOWN_CARDS
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        try:
+            battle.HANDCRAFTED_KNOWN_CARD_RULES[runtime_name] = runtime_rule
+            battle.HANDCRAFTED_KNOWN_CARDS.add(runtime_name)
+
+            events = []
+            battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+            active = player("Active")
+            responder = player("Responder")
+            buyback_card = {
+                "name": runtime_name,
+                "cmc": 3,
+                "mana_cost": "{1}{R}{R}",
+                "type_line": "Instant",
+            }
+            responder.hand = [buyback_card]
+            responder.mana_pool.add("red", 2)
+            responder.mana_pool.add_generic(4)
+            target_spell = {"name": "Targeted Insight", "cmc": 3, "type_line": "Sorcery"}
+            stack = battle.Stack()
+            stack.push(target_spell, active, {"effect": "draw_cards", "count": 1})
+
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                6701,
+                random.Random(6701),
+                phase="precombat_main",
+            ) is True
+            assert buyback_card in responder.hand
+            assert buyback_card not in responder.graveyard
+            cast_event = next(
+                data
+                for event, data in events
+                if event == "spell_cast" and data.get("card") == runtime_name
+            )
+            assert cast_event["buyback_status"] == "runtime_executor_v1"
+            assert cast_event["buyback_cost"] == "{3}"
+            assert cast_event["buyback_paid"] is True
+            assert cast_event["locked_cost"]["generic"] == 4
+            assert cast_event["locked_cost"]["colored"]["red"] == 2
+            resolved_event = next(
+                data
+                for event, data in events
+                if event == "spell_resolved" and data.get("card") == runtime_name
+            )
+            assert resolved_event["destination"] == "hand"
+            assert any(
+                event == "buyback_returned_to_hand"
+                and data.get("card") == runtime_name
+                and data.get("buyback_paid") is True
+                for event, data in events
+            )
+
+            events.clear()
+            active = player("Active")
+            responder = player("Responder")
+            no_buyback_card = {
+                "name": runtime_name,
+                "cmc": 3,
+                "mana_cost": "{1}{R}{R}",
+                "type_line": "Instant",
+            }
+            responder.hand = [no_buyback_card]
+            responder.mana_pool.add("red", 2)
+            responder.mana_pool.add_generic(1)
+            stack = battle.Stack()
+            stack.push(target_spell, active, {"effect": "draw_cards", "count": 1})
+
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                6702,
+                random.Random(6702),
+                phase="precombat_main",
+            ) is True
+            assert no_buyback_card not in responder.hand
+            assert no_buyback_card in responder.graveyard
+            no_buyback_cast = next(
+                data
+                for event, data in events
+                if event == "spell_cast" and data.get("card") == runtime_name
+            )
+            assert no_buyback_cast["buyback_paid"] is False
+            no_buyback_resolved = next(
+                data
+                for event, data in events
+                if event == "spell_resolved" and data.get("card") == runtime_name
+            )
+            assert no_buyback_resolved["destination"] == "graveyard"
+            assert not any(event == "buyback_returned_to_hand" for event, _data in events)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_rule is None:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop(runtime_name, None)
+            else:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES[runtime_name] = previous_rule
+            if had_known_card:
+                battle.HANDCRAFTED_KNOWN_CARDS.add(runtime_name)
+            else:
+                battle.HANDCRAFTED_KNOWN_CARDS.discard(runtime_name)
+
+    def test_pg067_reiterate_buyback_returns_to_hand_with_sqlite_rule():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            responder = player("Responder")
+            reiterate = {
+                "name": "Reiterate",
+                "cmc": 3,
+                "mana_cost": "{1}{R}{R}",
+                "type_line": "Instant",
+            }
+            responder.hand = [reiterate]
+            responder.mana_pool.add("red", 2)
+            responder.mana_pool.add_generic(4)
+            target_spell = {
+                "name": "Targeted Insight",
+                "cmc": 3,
+                "mana_cost": "{2}{U}",
+                "type_line": "Sorcery",
+            }
+            stack = battle.Stack()
+            stack.push(target_spell, active, {"effect": "draw_cards", "count": 1})
+
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                6703,
+                random.Random(6703),
+                phase="precombat_main",
+            ) is True
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert reiterate in responder.hand
+        assert reiterate not in responder.graveyard
+        cast_event = next(
+            data
+            for event, data in events
+            if event == "spell_cast" and data.get("card") == "Reiterate"
+        )
+        assert cast_event["buyback_status"] == "runtime_executor_v1"
+        assert cast_event["buyback_cost"] == "{3}"
+        assert cast_event["buyback_paid"] is True
+        assert cast_event["rule_logical_key"] == "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
+        resolved_event = next(
+            data
+            for event, data in events
+            if event == "spell_resolved" and data.get("card") == "Reiterate"
+        )
+        assert resolved_event["destination"] == "hand"
+        assert any(
+            event == "buyback_returned_to_hand"
+            and data.get("card") == "Reiterate"
+            and data.get("buyback_paid") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
+            for event, data in events
+        )
 
     def test_reiterate_skips_green_suns_copy_without_controller_library_target():
         events = []
@@ -20284,6 +20472,8 @@ def register_tests(battle, player):
         test_pg192_sand_scout_tutors_desert_when_behind_and_creates_one_sand_warrior_per_turn,
         test_reverberate_copies_stack_spell_with_pg038_rule_provenance,
         test_reiterate_copies_stack_spell_with_pg068_rule_provenance,
+        test_copy_spell_buyback_runtime_returns_to_hand_only_when_paid,
+        test_pg067_reiterate_buyback_returns_to_hand_with_sqlite_rule,
         test_reiterate_skips_green_suns_copy_without_controller_library_target,
         test_reiterate_preserves_x_when_copying_green_suns_with_valid_target,
         test_copy_spell_runtime_choose_new_targets_retargets_declared_removal,

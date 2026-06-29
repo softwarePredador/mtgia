@@ -3008,6 +3008,40 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["commander_storm"])
         self.assertFalse(result["primary_candidate"]["requires_runtime_executor"])
 
+    def test_reiterate_maps_to_copy_stack_buyback_runtime_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "Reiterate",
+                "effect_classes": ["CopyTargetStackObjectEffect"],
+                "ability_classes": ["BuybackAbility"],
+                "target_classes": ["TargetSpell"],
+                "constructor_metadata": {"card_types": ["INSTANT"]},
+                "raw_excerpt": (
+                    "this.addAbility(new BuybackAbility(\"{3}\")); "
+                    "this.getSpellAbility().addEffect(new CopyTargetStackObjectEffect()); "
+                    "this.getSpellAbility().addTarget(new TargetSpell(StaticFilters.FILTER_SPELL_INSTANT_OR_SORCERY));"
+                ),
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "copy_spell")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
+        )
+        self.assertEqual(primary["target"], "instant_or_sorcery_on_stack")
+        self.assertTrue(primary["may_choose_new_targets"])
+        self.assertEqual(primary["choose_new_targets_status"], "runtime_executor_v1")
+        self.assertEqual(primary["copy_target_selection_status"], "runtime_executor_v1")
+        self.assertEqual(primary["buyback_status"], "runtime_executor_v1")
+        self.assertEqual(primary["buyback_cost"], "{3}")
+        self.assertEqual(
+            primary["oracle_runtime_scope"],
+            "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_buyback_runtime_v1",
+        )
+        self.assertFalse(result["primary_candidate"]["requires_runtime_executor"])
+
     def test_mystical_tutor_maps_to_instant_or_sorcery_topdeck_tutor_scope(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -5784,6 +5784,55 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(proposal["deck_role_json"]["category"], "combo_value")
         self.assertEqual(proposal["deck_role_json"]["effect"], "copy_spell")
 
+    def test_classifier_and_generator_mark_reiterate_buyback_copy_scope_as_batch_safe(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Reiterate",
+                    "severity": "high",
+                    "oracle_hash": "reiteratehash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 1},
+                    "xmage": {
+                        "class_name": "Reiterate",
+                        "path": "/xmage/Reiterate.java",
+                        "types": ["INSTANT"],
+                        "effect_classes": ["CopyTargetStackObjectEffect"],
+                        "ability_classes": ["BuybackAbility"],
+                        "target_classes": ["TargetSpell"],
+                        "cost_classes": [],
+                        "primary_effect": {
+                            "effect": "copy_spell",
+                            "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
+                            "instant": True,
+                            "target": "instant_or_sorcery_on_stack",
+                            "may_choose_new_targets": True,
+                            "choose_new_targets_status": "runtime_executor_v1",
+                            "copy_target_selection_status": "runtime_executor_v1",
+                            "copy_target_selection_pipeline": "copy_spell_runtime_choose_new_targets_v1",
+                            "buyback_status": "runtime_executor_v1",
+                            "buyback_cost": "{3}",
+                            "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_buyback_runtime_v1",
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        self.assertEqual(family_report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+        self.assertEqual(family_report["families"][0]["family_id"], "targeted_interaction")
+
+        generator_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+        self.assertEqual(proposal["deck_role_json"]["category"], "interaction")
+        self.assertEqual(proposal["deck_role_json"]["effect"], "targeted_interaction")
+
     def test_classifier_marks_modal_copy_change_target_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

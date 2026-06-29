@@ -479,6 +479,7 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
     if (
         str(effect_json.get("battle_model_scope") or "")
         in {
+            "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
             "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
             "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
         }
@@ -2182,6 +2183,27 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
                 "runtime_executor_v1",
             }
             and bool(effect_json.get("commander_storm"))
+        )
+
+    if (
+        effect == "copy_spell"
+        and scope == "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1"
+    ):
+        return (
+            types == {"INSTANT"}
+            and effect_classes == {"CopyTargetStackObjectEffect"}
+            and "BuybackAbility" in ability_classes
+            and "TargetSpell" in target_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "instant_or_sorcery_on_stack"
+            and bool(effect_json.get("may_choose_new_targets"))
+            and effect_json.get("choose_new_targets_status") == "runtime_executor_v1"
+            and effect_json.get("copy_target_selection_status") == "runtime_executor_v1"
+            and effect_json.get("copy_target_selection_pipeline") == "copy_spell_runtime_choose_new_targets_v1"
+            and effect_json.get("buyback_status") == "runtime_executor_v1"
+            and isinstance(effect_json.get("buyback_cost"), str)
+            and effect_json.get("oracle_runtime_scope")
+            == "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_buyback_runtime_v1"
         )
 
     if effect == "untap_land_engine" and scope == "x_tap_untap_x_lands_v1":

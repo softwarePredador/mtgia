@@ -1122,8 +1122,11 @@ def _build_copy_stack_spell_fields(
 ) -> dict[str, Any] | None:
     if "CopyTargetStackObjectEffect" not in effect_classes:
         return None
-    if "TargetSpell" not in rules_text and "targetspell" not in _normalized_rules_text(rules_text):
+    normalized = _normalized_rules_text(rules_text)
+    if "TargetSpell" not in rules_text and "targetspell" not in normalized:
         return None
+    buyback_match = re.search(r"BuybackAbility\(\"([^\"]+)\"\)", str(rules_text or ""))
+    has_mana_buyback = "BuybackAbility" in ability_classes and buyback_match is not None
     fields: dict[str, Any] = {
         "instant": "INSTANT" in card_types,
         "target": "instant_or_sorcery_on_stack",
@@ -1131,16 +1134,32 @@ def _build_copy_stack_spell_fields(
         "choose_new_targets_status": "runtime_executor_v1",
         "copy_target_selection_status": "runtime_executor_v1",
         "copy_target_selection_pipeline": "copy_spell_runtime_choose_new_targets_v1",
-        "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1",
+        "oracle_runtime_scope": (
+            "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_buyback_runtime_v1"
+            if has_mana_buyback
+            else "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1"
+        ),
     }
+    scope = "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1"
+    signals = ["CopyTargetStackObjectEffect", "TargetSpell"]
+    reason = "XMage structure matches copying a target instant or sorcery spell on the stack."
+    if has_mana_buyback:
+        fields["buyback_status"] = "runtime_executor_v1"
+        fields["buyback_cost"] = buyback_match.group(1)
+        scope = "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1"
+        signals.append("BuybackAbility")
+        reason = (
+            "XMage structure matches copying a target instant or sorcery spell on the stack "
+            "with a mana buyback optional additional cost."
+        )
     if "CommanderStormAbility" in ability_classes:
         fields["commander_storm"] = True
     return {
         "effect": "copy_spell",
-        "scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1",
+        "scope": scope,
         "fields": fields,
-        "reason": "XMage structure matches copying a target instant or sorcery spell on the stack.",
-        "signals": ["CopyTargetStackObjectEffect", "TargetSpell"],
+        "reason": reason,
+        "signals": signals,
     }
 
 

@@ -24865,8 +24865,9 @@
     "battle_rule_logical_key": "battle_rule_v1:96aaf3627d3740cec22086acb290065e"
   },
   "Reiterate": {
-    "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_annotation_v1",
-    "buyback_status": "annotation_only",
+    "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
+    "buyback_cost": "{3}",
+    "buyback_status": "runtime_executor_v1",
     "choose_new_targets_status": "runtime_executor_v1",
     "cmc": 3.0,
     "copy_is_not_cast": true,
@@ -24875,13 +24876,13 @@
     "effect": "copy_spell",
     "instant": true,
     "may_choose_new_targets": true,
-    "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1",
+    "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_buyback_runtime_v1",
     "target": "instant_or_sorcery_on_stack",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "active",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.91,
-    "battle_rule_version": 2,
+    "battle_rule_version": 3,
     "battle_rule_logical_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405",
     "battle_rule_oracle_hash": "996fb5f02f16605ff7f1c899f2c50f60"
   },

@@ -1,0 +1,60 @@
+{
+  "package_id": "pgc067_buyback_runtime",
+  "title": "PGC067 Buyback Runtime Validation",
+  "expected_rules": [
+    {
+      "card_name": "Reiterate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405",
+      "min_rule_version": 3,
+      "normalized_name": "reiterate",
+      "oracle_hash": "996fb5f02f16605ff7f1c899f2c50f60",
+      "required_effect_fields": {
+        "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
+        "buyback_cost": "{3}",
+        "buyback_status": "runtime_executor_v1",
+        "choose_new_targets_status": "runtime_executor_v1",
+        "copy_target_selection_status": "runtime_executor_v1",
+        "effect": "copy_spell",
+        "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_buyback_runtime_v1",
+        "target": "instant_or_sorcery_on_stack"
+      },
+      "review_status": "active"
+    }
+  ],
+  "execution_scenarios": [
+    {
+      "card": {"cmc": 3, "mana_cost": "{1}{R}{R}", "name": "Reiterate", "type_line": "Instant"},
+      "expected_buyback_cost": "{3}",
+      "expected_buyback_paid": true,
+      "expected_buyback_status": "runtime_executor_v1",
+      "expected_copy_target": "Better Target",
+      "expected_resolution_destination": "hand",
+      "name": "reiterate_response_copy_pays_buyback_returns_to_hand",
+      "responder_mana": {"generic": 4, "red": 2},
+      "type": "copy_spell_choose_new_targets"
+    }
+  ],
+  "runtime_checks": [
+    {
+      "card": {"cmc": 3, "mana_cost": "{1}{R}{R}", "name": "Reiterate", "type_line": "Instant"},
+      "effect": "copy_spell",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405",
+      "required_effect_fields": {
+        "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
+        "buyback_cost": "{3}",
+        "buyback_status": "runtime_executor_v1",
+        "choose_new_targets_status": "runtime_executor_v1",
+        "copy_target_selection_status": "runtime_executor_v1"
+      }
+    }
+  ],
+  "snapshot_checks": [
+    {
+      "card_name": "Reiterate",
+      "logical_rule_key": "battle_rule_v1:18eeabc2a2fa631d99caf65a43a8c405"
+    }
+  ]
+}
