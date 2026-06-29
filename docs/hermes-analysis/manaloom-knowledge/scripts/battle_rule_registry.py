@@ -566,15 +566,24 @@ def lookup_battle_card_rule(
         )
         cached = _RULE_CACHE.get(cache_key)
     rules = cached[1] if cached else {}
-    normalized = normalize_card_name(card_name)
-    rule = rules.get(normalized)
-    if rule:
-        return dict(rule)
-    face_prefix = f"{normalized} //"
-    rule = next(
-        (value for key, value in rules.items() if key.startswith(face_prefix)),
-        None,
-    )
+    normalized_names = [normalize_card_name(card_name)]
+    if " // " in str(card_name):
+        front_face = normalize_card_name(str(card_name).split(" // ", 1)[0])
+        if front_face and front_face not in normalized_names:
+            normalized_names.append(front_face)
+    for normalized in normalized_names:
+        rule = rules.get(normalized)
+        if rule:
+            return dict(rule)
+    rule = None
+    for normalized in normalized_names:
+        face_prefix = f"{normalized} //"
+        rule = next(
+            (value for key, value in rules.items() if key.startswith(face_prefix)),
+            None,
+        )
+        if rule:
+            break
     return dict(rule) if rule else None
 
 
@@ -590,15 +599,21 @@ def lookup_battle_card_rule_list(
         include_review_only=include_review_only,
         runtime_safe_only=runtime_safe_only,
     )
-    normalized = normalize_card_name(card_name)
-    values = rules.get(normalized)
-    if values:
-        return [dict(rule) for rule in values]
-    face_prefix = f"{normalized} //"
+    normalized_names = [normalize_card_name(card_name)]
+    if " // " in str(card_name):
+        front_face = normalize_card_name(str(card_name).split(" // ", 1)[0])
+        if front_face and front_face not in normalized_names:
+            normalized_names.append(front_face)
+    for normalized in normalized_names:
+        values = rules.get(normalized)
+        if values:
+            return [dict(rule) for rule in values]
     matches: list[dict[str, Any]] = []
-    for key, value in rules.items():
-        if key.startswith(face_prefix):
-            matches.extend(dict(rule) for rule in value)
+    for normalized in normalized_names:
+        face_prefix = f"{normalized} //"
+        for key, value in rules.items():
+            if key.startswith(face_prefix):
+                matches.extend(dict(rule) for rule in value)
     matches.sort(key=_rule_rank)
     return matches
 

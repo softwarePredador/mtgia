@@ -185,6 +185,47 @@ class DeckCardBattleRuleCoherenceAuditTest(unittest.TestCase):
         self.assertIn("sink into stupor", battle_rules)
         self.assertEqual(report["cards"][0]["severity"], "pass")
 
+    def test_mdfc_full_name_uses_front_face_canonical_rule_alias(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(db) as conn:
+                conn.row_factory = sqlite3.Row
+                create_schema(conn)
+                insert_deck_card(
+                    conn,
+                    "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                    oracle_text="Whenever you cast a spell, add {R}.",
+                    type_line="Legendary Creature // Legendary Artifact",
+                )
+                conn.execute(
+                    """
+                    INSERT INTO battle_card_rules (
+                        normalized_name, logical_rule_key, card_name, effect_json,
+                        deck_role_json, source, confidence, review_status,
+                        execution_status, oracle_hash, notes, created_at, updated_at, last_seen_at
+                    ) VALUES (?, ?, ?, ?, ?, 'curated', 0.94, 'verified', 'auto', 'hash', '', '2026-06-29T00:00:00Z', '2026-06-29T00:00:00Z', '2026-06-29T00:00:00Z')
+                    """,
+                    (
+                        "birgi, god of storytelling",
+                        "pg-short-key",
+                        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                        json.dumps(
+                            {
+                                "effect": "ramp_engine",
+                                "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+                            },
+                            sort_keys=True,
+                        ),
+                        json.dumps({"category": "ramp", "effect": "ramp_engine"}, sort_keys=True),
+                    ),
+                )
+                battle_rules = audit.load_battle_rules(conn)
+                report = audit.build_report(conn)
+
+        full_name = "birgi, god of storytelling // harnfel, horn of bounty"
+        self.assertIn(full_name, battle_rules)
+        self.assertEqual(report["cards"][0]["severity"], "pass")
+
     def test_exact_scoped_rule_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             db = Path(tmpdir) / "knowledge.db"

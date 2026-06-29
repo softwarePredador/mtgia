@@ -232,6 +232,9 @@ def load_battle_rules(conn: sqlite3.Connection) -> dict[str, list[dict[str, Any]
         payload["deck_role_json"] = safe_json_loads(row["deck_role_json"], {})
         normalized = normalize_name(row["normalized_name"])
         grouped[normalized].append(payload)
+        display_name = normalize_name(str(row["card_name"] or ""))
+        if display_name and display_name != normalized:
+            grouped[display_name].append(payload)
         front_face = normalize_name(str(row["card_name"] or "").split(" // ", 1)[0])
         if front_face != normalized:
             grouped[front_face].append(payload)

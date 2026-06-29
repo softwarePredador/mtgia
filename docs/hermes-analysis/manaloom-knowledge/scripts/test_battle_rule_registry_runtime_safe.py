@@ -69,6 +69,46 @@ def test_runtime_safe_filter_separates_review_only_rules():
     assert set(runtime_rules) == {"safe spell"}
 
 
+def test_split_card_full_name_lookup_falls_back_to_front_face_rule():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        sqlite_db = Path(tmpdir) / "knowledge.db"
+        with closing(sqlite3.connect(sqlite_db)) as conn:
+            registry.ensure_battle_card_rules(conn)
+            registry.upsert_battle_card_rule(
+                conn,
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                {
+                    "effect": "ramp_engine",
+                    "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+                },
+                normalized_name_value="birgi, god of storytelling",
+                source="curated",
+                confidence=0.94,
+                review_status="verified",
+                execution_status="auto",
+                logical_rule_key_value="pg-short-key",
+                oracle_hash="hash",
+            )
+            conn.commit()
+
+        rule = registry.lookup_battle_card_rule(
+            sqlite_db,
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            runtime_safe_only=True,
+        )
+        rules = registry.lookup_battle_card_rule_list(
+            sqlite_db,
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            runtime_safe_only=True,
+        )
+
+    assert rule is not None
+    assert rule["logical_rule_key"] == "pg-short-key"
+    assert [item["logical_rule_key"] for item in rules] == ["pg-short-key"]
+
+
 if __name__ == "__main__":
     test_runtime_safe_filter_separates_review_only_rules()
+    test_split_card_full_name_lookup_falls_back_to_front_face_rule()
     print("PASS test_runtime_safe_filter_separates_review_only_rules")
+    print("PASS test_split_card_full_name_lookup_falls_back_to_front_face_rule")
