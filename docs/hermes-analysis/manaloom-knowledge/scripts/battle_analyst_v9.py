@@ -1903,6 +1903,75 @@ def buyback_was_paid(effect_data):
     return buyback_runtime_enabled(effect_data) and bool(effect_data.get("_buyback_paid"))
 
 
+def spree_runtime_enabled(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    return bool(effect_data.get("spree")) and str(
+        effect_data.get("spree_additional_cost_status") or ""
+    ).lower() == "runtime_executor_v1"
+
+
+def spree_mode_cost_for_effect(effect_data, mode):
+    if not spree_runtime_enabled(effect_data):
+        return None
+    mode_costs = effect_data.get("spree_mode_costs") or effect_data.get("mode_additional_costs")
+    if isinstance(mode_costs, dict):
+        return mode_costs.get(mode)
+    default_cost = effect_data.get("spree_mode_cost") or effect_data.get("spree_additional_cost")
+    return default_cost
+
+
+def spree_replay_fields(effect_data):
+    if not isinstance(effect_data, dict):
+        return {}
+    fields = {}
+    if effect_data.get("spree_additional_cost_status"):
+        fields["spree_additional_cost_status"] = effect_data.get("spree_additional_cost_status")
+    if effect_data.get("_spree_selected_modes") is not None:
+        fields["spree_selected_modes"] = list(effect_data.get("_spree_selected_modes") or [])
+    if effect_data.get("_spree_additional_costs") is not None:
+        fields["spree_additional_costs"] = list(effect_data.get("_spree_additional_costs") or [])
+    if effect_data.get("_spree_additional_cost_paid") is not None:
+        fields["spree_additional_cost_paid"] = bool(effect_data.get("_spree_additional_cost_paid"))
+    return fields
+
+
+def mark_spree_cast_choice(player, card, effect_data, mode):
+    """Select the runtime mode cost for a spree response path when payable."""
+    if not spree_runtime_enabled(effect_data):
+        return [], False
+    mode_cost = spree_mode_cost_for_effect(effect_data, mode)
+    if not mode_cost:
+        effect_data["_spree_selected_modes"] = [mode]
+        effect_data["_spree_additional_costs"] = []
+        effect_data["_spree_additional_cost_paid"] = False
+        return [], False
+    additional_costs = [mode_cost]
+    full_cost = card_cost_for_effect_with_additional_costs(
+        player,
+        card,
+        effect_data,
+        additional_costs=additional_costs,
+    )
+    if player.can_pay(full_cost):
+        effect_data["_spree_selected_modes"] = [mode]
+        effect_data["_spree_additional_costs"] = additional_costs
+        effect_data["_spree_additional_cost_paid"] = True
+        return additional_costs, True
+    effect_data["_spree_selected_modes"] = [mode]
+    effect_data["_spree_additional_costs"] = additional_costs
+    effect_data["_spree_additional_cost_paid"] = False
+    return [], False
+
+
+def merge_additional_costs(*cost_groups):
+    costs = []
+    for group in cost_groups:
+        for cost in group or []:
+            costs.append(cost)
+    return costs
+
+
 def begin_cast_context(
     player,
     card,
@@ -8196,23 +8265,61 @@ def copied_spell_has_required_library_target(player, stack_item):
     return spell_has_required_library_target(player, effect_data)
 
 
+def copy_activated_triggered_ability_runtime_enabled(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    return str(effect_data.get("copy_activated_triggered_ability_status") or "").lower() == (
+        "runtime_executor_v1"
+    )
+
+
+def stack_item_is_activated_or_triggered_ability(stack_item):
+    if not stack_item or getattr(stack_item, "countered", False):
+        return False
+    target_card = getattr(stack_item, "card", None)
+    target_effect = getattr(stack_item, "effect_data", None) or {}
+    type_line = str((target_card or {}).get("type_line") or "").lower()
+    effect = str(target_effect.get("effect") or "").lower()
+    return (
+        bool((target_card or {}).get("is_triggered_ability"))
+        or bool((target_card or {}).get("is_activated_ability"))
+        or effect in {"triggered_ability", "activated_ability"}
+        or "triggered ability" in type_line
+        or "activated ability" in type_line
+    )
+
+
 def copy_spell_stack_target_context(player, stack_item, effect_data):
     if not stack_item or getattr(stack_item, "countered", False):
         return None
     target_card = getattr(stack_item, "card", None)
-    if not is_instant_or_sorcery_spell(target_card):
+    target_is_spell = is_instant_or_sorcery_spell(target_card)
+    target_is_ability = stack_item_is_activated_or_triggered_ability(stack_item)
+    if not target_is_spell and not (
+        target_is_ability and copy_activated_triggered_ability_runtime_enabled(effect_data)
+    ):
         return None
     target_scope = str((effect_data or {}).get("target") or "instant_or_sorcery_on_stack").lower()
     if target_scope.startswith("own_") and getattr(stack_item, "controller", None) is not player:
         return None
-    if not copied_spell_has_required_library_target(player, stack_item):
+    if target_is_spell and not copied_spell_has_required_library_target(player, stack_item):
         return None
+    target_type = "instant_or_sorcery_on_stack"
+    targeting_pipeline = "stack_copy_target_minimal"
+    if target_is_ability:
+        target_type = "activated_or_triggered_ability_on_stack"
+        targeting_pipeline = "stack_object_ability_copy_target_runtime"
     return {
         "target": target_card.get("name", "?"),
-        "target_type": "instant_or_sorcery_on_stack",
+        "target_type": target_type,
         "target_controller": getattr(getattr(stack_item, "controller", None), "name", None),
         "target_legal": True,
-        "targeting_pipeline": "stack_copy_target_minimal",
+        "targeting_pipeline": targeting_pipeline,
+        "copy_activated_triggered_ability_status": (
+            (effect_data or {}).get("copy_activated_triggered_ability_status")
+            if target_is_ability
+            else (effect_data or {}).get("copy_activated_triggered_ability_status")
+        ),
     }
 
 
@@ -10478,9 +10585,10 @@ def resolve_redirect_removal(player, all_players, card, effect_data, turn, phase
             turn=turn,
             phase=phase,
             **target_change_runtime_replay_fields(effect_data or {}),
+            **spree_replay_fields(effect_data or {}),
             **replay_rule_fields(effect_data or {}),
         )
-        finish_resolved_spell(player, card, turn=turn)
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return False
 
     old_target = context.get("old_target")
@@ -10502,9 +10610,10 @@ def resolve_redirect_removal(player, all_players, card, effect_data, turn, phase
             turn=turn,
             phase=phase,
             **target_change_runtime_replay_fields(effect_data or {}),
+            **spree_replay_fields(effect_data or {}),
             **replay_rule_fields(effect_data or {}),
         )
-        finish_resolved_spell(player, card, turn=turn)
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return False
 
     entry = context["declared_entry"]
@@ -10531,9 +10640,10 @@ def resolve_redirect_removal(player, all_players, card, effect_data, turn, phase
         turn=turn,
         phase=phase,
         **target_change_runtime_replay_fields(effect_data or {}),
+        **spree_replay_fields(effect_data or {}),
         **replay_rule_fields(effect_data or {}),
     )
-    finish_resolved_spell(player, card, turn=turn)
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     return True
 
 
@@ -11636,9 +11746,22 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 redirect_context = redirectable_stack_context(player, all_players, top_item)
                 if not redirect_context or not redirect_context.get("new_target"):
                     continue
+                spree_additional_costs, spree_paid = mark_spree_cast_choice(
+                    player,
+                    c,
+                    eff,
+                    "change_single_target",
+                )
+                if spree_runtime_enabled(eff) and not spree_paid:
+                    continue
                 fields = replay_rule_fields(eff)
                 alternative_cost, alternative_cost_kind = alternative_cost_for_effect(player, c, eff)
-                locked_cost = card_cost_for_effect(player, c, eff)
+                locked_cost = card_cost_for_effect_with_additional_costs(
+                    player,
+                    c,
+                    eff,
+                    additional_costs=spree_additional_costs,
+                )
                 emit_decision_trace(
                     decision_type="response",
                     player=player,
@@ -11666,6 +11789,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                         "stack_threat_score": score,
                         "available_instants": len(instants),
                         "redirectable_stack_target": 1,
+                        "spree_additional_cost_paid": int(spree_paid),
                     },
                     rule_source=fields.get("rule_source", "battle_heuristic"),
                     rule_status=fields.get("rule_review_status", "heuristic"),
@@ -11689,8 +11813,10 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     role="response",
                     response_to=top_item.card.get("name", "?"),
                     locked_cost=replay_cost_snapshot(locked_cost),
+                    additional_costs=list(spree_additional_costs or []),
                     alternative_cost=alternative_cost,
                     alternative_cost_kind=alternative_cost_kind,
+                    **spree_replay_fields(eff),
                     **fields,
                 )
                 resolve_redirect_removal(
@@ -11714,7 +11840,19 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 continue
             fields = replay_rule_fields(eff)
             alternative_cost, alternative_cost_kind = alternative_cost_for_effect(player, c, eff)
-            additional_costs, buyback_paid = mark_buyback_cast_choice(player, c, eff)
+            spree_additional_costs, spree_paid = mark_spree_cast_choice(
+                player,
+                c,
+                eff,
+                "copy_instant_or_sorcery_spell",
+            )
+            if spree_runtime_enabled(eff) and not spree_paid:
+                continue
+            buyback_additional_costs, buyback_paid = mark_buyback_cast_choice(player, c, eff)
+            additional_costs = merge_additional_costs(
+                spree_additional_costs,
+                buyback_additional_costs,
+            )
             locked_cost = card_cost_for_effect_with_additional_costs(
                 player,
                 c,
@@ -11748,6 +11886,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     "stack_threat_score": score,
                     "available_instants": len(instants),
                     "copyable_stack_target": 1,
+                    "spree_additional_cost_paid": int(spree_paid),
                     "buyback_paid": int(buyback_paid),
                 },
                 rule_source=fields.get("rule_source", "battle_heuristic"),
@@ -11782,6 +11921,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     "choose_new_targets_for_target_spell_status"
                 ),
                 **copy_target,
+                **spree_replay_fields(eff),
                 **buyback_replay_fields(eff),
                 **fields,
             )
@@ -11835,6 +11975,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 phase=phase,
                 **copy_target,
                 **copy_spell_target_selection_replay_fields(copied_item),
+                **spree_replay_fields(eff),
                 **buyback_replay_fields(eff),
                 **fields,
             )
@@ -11859,6 +12000,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 copied_stack_object=getattr(copied_item, "card", {}).get("name", "?") if copied_item else None,
                 turn=turn,
                 **spell_resolution_context_fields(c, eff, eff.get("effect", "unknown")),
+                **spree_replay_fields(eff),
                 **buyback_replay_fields(eff),
                 **fields,
             )

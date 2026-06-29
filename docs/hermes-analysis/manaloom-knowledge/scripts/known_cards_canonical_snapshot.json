@@ -25265,11 +25265,17 @@
     "battle_rule_logical_key": "battle_rule_v1:c00113b80fabb02be02604cb4e498bb1"
   },
   "Return the Favor": {
-    "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+    "battle_model_scope": "spree_copy_stack_object_change_target_selected_mode_runtime_v1",
     "change_target_mode_status": "runtime_executor_v1",
     "choose_new_targets_status": "may_choose_new_targets",
     "cmc": 2.0,
-    "copy_activated_triggered_ability_status": "annotation_only",
+    "copy_activated_triggered_ability_status": "runtime_executor_v1",
+    "copy_stack_object_types": [
+      "instant_spell",
+      "sorcery_spell",
+      "activated_ability",
+      "triggered_ability"
+    ],
     "effect": "copy_spell",
     "instant": true,
     "may_choose_new_targets": true,
@@ -25277,16 +25283,21 @@
       "copy_instant_or_sorcery_spell",
       "change_single_target"
     ],
-    "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_spree_change_target_runtime_partial_v1",
+    "oracle_runtime_scope": "copy_stack_object_or_change_single_target_spree_selected_mode_runtime_v1",
     "spree": true,
-    "spree_additional_cost_status": "annotation_only",
-    "target": "instant_or_sorcery_on_stack",
+    "spree_additional_cost_status": "runtime_executor_v1",
+    "spree_mode_costs": {
+      "change_single_target": "{1}",
+      "copy_instant_or_sorcery_spell": "{1}"
+    },
+    "spree_selected_mode_cost_status": "runtime_executor_v1",
+    "target": "stack_object",
     "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.92,
-    "battle_rule_version": 3,
+    "battle_rule_version": 4,
     "battle_rule_logical_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2",
     "battle_rule_oracle_hash": "a24911b7ea2027ebba59bb6792eee776"
   },

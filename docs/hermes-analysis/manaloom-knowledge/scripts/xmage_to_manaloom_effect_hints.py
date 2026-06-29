@@ -452,31 +452,44 @@ def _build_single_target_stack_redirect_fields(
     if "CopyTargetStackObjectEffect" in effect_classes:
         fields: dict[str, Any] = {
             "instant": True,
-            "target": "instant_or_sorcery_on_stack",
+            "target": "stack_object",
+            "copy_stack_object_types": [
+                "instant_spell",
+                "sorcery_spell",
+                "activated_ability",
+                "triggered_ability",
+            ],
             "modes": ["copy_instant_or_sorcery_spell", "change_single_target"],
             "may_choose_new_targets": True,
             "choose_new_targets_status": "may_choose_new_targets",
             "change_target_mode_status": "runtime_executor_v1",
             "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1",
-            "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_spree_change_target_runtime_partial_v1",
+            "oracle_runtime_scope": "copy_stack_object_or_change_single_target_spree_selected_mode_runtime_v1",
         }
         if "spree" in normalized or "spreeability" in normalized:
-            fields["spree_additional_cost_status"] = "annotation_only"
+            fields["spree"] = True
+            fields["spree_additional_cost_status"] = "runtime_executor_v1"
+            fields["spree_selected_mode_cost_status"] = "runtime_executor_v1"
+            fields["spree_mode_costs"] = {
+                "copy_instant_or_sorcery_spell": "{1}",
+                "change_single_target": "{1}",
+            }
         if "activated ability" in normalized or "triggered ability" in normalized:
-            fields["copy_activated_triggered_ability_status"] = "annotation_only"
+            fields["copy_activated_triggered_ability_status"] = "runtime_executor_v1"
         return {
             "effect": "copy_spell",
-            "scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+            "scope": "spree_copy_stack_object_change_target_selected_mode_runtime_v1",
             "fields": fields,
             "reason": (
-                "XMage structure matches a modal spell that can copy a stack object and change the "
-                "target of a single-target spell or ability; ManaLoom executes the target-change "
-                "mode and keeps unsupported modal copy/cost riders annotated."
+                "XMage structure matches a modal spree spell that can copy a stack object or change "
+                "the target of a single-target spell or ability; ManaLoom executes each selected "
+                "response mode with its additional spree cost."
             ),
             "signals": [
                 "CopyTargetStackObjectEffect",
                 "ChooseNewTargetsTargetEffect",
                 "TargetStackObject",
+                "SpreeAbility",
                 "NumberOfTargetsPredicate(1)",
             ],
         }

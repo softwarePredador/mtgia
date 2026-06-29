@@ -693,6 +693,53 @@ def add_manifest_mana(player, mana: dict[str, Any]) -> None:
             player.mana_pool.add(normalized, count)
 
 
+def assert_expected_event_fields(stage: str, card_name: str, event_data: dict[str, Any], expected: dict[str, Any]) -> None:
+    for key, expected_value in expected.items():
+        if event_data.get(key) != expected_value:
+            fail(stage, f"{card_name} {key}={event_data.get(key)!r}, expected {expected_value!r}")
+
+
+def validate_expected_locked_cost(stage: str, card_name: str, event_data: dict[str, Any], expected_cost: dict[str, Any] | None) -> None:
+    if not expected_cost:
+        return
+    actual_cost = event_data.get("locked_cost") or {}
+    if "generic" in expected_cost and int(actual_cost.get("generic") or 0) != int(expected_cost["generic"]):
+        fail(stage, f"{card_name} locked_cost.generic={actual_cost.get('generic')!r}")
+    expected_colored = expected_cost.get("colored") or {}
+    actual_colored = actual_cost.get("colored") or {}
+    for color, amount in expected_colored.items():
+        if int(actual_colored.get(color) or 0) != int(amount or 0):
+            fail(stage, f"{card_name} locked_cost.colored.{color}={actual_colored.get(color)!r}")
+
+
+def validate_expected_spree_fields(stage: str, card_name: str, event_data: dict[str, Any], scenario: dict[str, Any]) -> dict[str, Any] | None:
+    if "expected_spree_additional_cost_paid" not in scenario:
+        return None
+    expected_paid = bool(scenario.get("expected_spree_additional_cost_paid"))
+    if bool(event_data.get("spree_additional_cost_paid")) != expected_paid:
+        fail(
+            stage,
+            f"{card_name} spree_additional_cost_paid={event_data.get('spree_additional_cost_paid')!r}",
+        )
+    expected_status = scenario.get("expected_spree_status")
+    if expected_status and event_data.get("spree_additional_cost_status") != expected_status:
+        fail(stage, f"{card_name} spree_additional_cost_status={event_data.get('spree_additional_cost_status')!r}")
+    if "expected_spree_selected_modes" in scenario:
+        expected_modes = list(scenario.get("expected_spree_selected_modes") or [])
+        if list(event_data.get("spree_selected_modes") or []) != expected_modes:
+            fail(stage, f"{card_name} spree_selected_modes={event_data.get('spree_selected_modes')!r}")
+    if "expected_spree_additional_costs" in scenario:
+        expected_costs = list(scenario.get("expected_spree_additional_costs") or [])
+        if list(event_data.get("spree_additional_costs") or []) != expected_costs:
+            fail(stage, f"{card_name} spree_additional_costs={event_data.get('spree_additional_costs')!r}")
+    return {
+        "spree_additional_cost_paid": bool(event_data.get("spree_additional_cost_paid")),
+        "spree_additional_cost_status": event_data.get("spree_additional_cost_status"),
+        "spree_selected_modes": list(event_data.get("spree_selected_modes") or []),
+        "spree_additional_costs": list(event_data.get("spree_additional_costs") or []),
+    }
+
+
 def run_copy_spell_choose_new_targets(
     battle,
     scenario: dict[str, Any],
@@ -731,14 +778,15 @@ def run_copy_spell_choose_new_targets(
         "target": "creature",
         "exile_target": True,
     })
-    target_effect["declared_targets"] = [
-        {
-            "target": original_target,
-            "controller": active,
-            "target_type": str(scenario.get("target_type") or target_effect.get("target") or "creature"),
-            "declared_by": active,
-        }
-    ]
+    if not bool(scenario.get("omit_declared_targets")):
+        target_effect["declared_targets"] = [
+            {
+                "target": original_target,
+                "controller": active,
+                "target_type": str(scenario.get("target_type") or target_effect.get("target") or "creature"),
+                "declared_by": active,
+            }
+        ]
     battle.store_cast_context_fields(target_effect, {"phase": phase, "role": "target_spell_fixture"})
     stack = battle.Stack()
     stack.push(target_spell, active, target_effect)
@@ -791,12 +839,15 @@ def run_copy_spell_choose_new_targets(
             f"{copy_card['name']} reassigned={selection.get('target_reassignment_performed')!r}",
         )
     copied_targets = getattr(copied_item, "effect_data", {}).get("declared_targets") or []
-    if not copied_targets:
+    expected_target_name = scenario.get("expected_copy_target")
+    if not copied_targets and expected_target_name:
         fail("battle_execution", f"{copy_card['name']} copied effect missing declared targets")
-    expected_target_name = str(scenario.get("expected_copy_target") or alternate_target.get("name"))
-    actual_target = copied_targets[0].get("target") if isinstance(copied_targets[0], dict) else None
+    if expected_target_name is None and not bool(scenario.get("omit_declared_targets")):
+        expected_target_name = alternate_target.get("name")
+    expected_target_name = str(expected_target_name) if expected_target_name is not None else None
+    actual_target = copied_targets[0].get("target") if copied_targets and isinstance(copied_targets[0], dict) else None
     actual_target_name = actual_target.get("name") if isinstance(actual_target, dict) else None
-    if actual_target_name != expected_target_name:
+    if expected_target_name is not None and actual_target_name != expected_target_name:
         fail("battle_execution", f"{copy_card['name']} target={actual_target_name!r}")
 
     spell_copied = next(
@@ -814,22 +865,32 @@ def run_copy_spell_choose_new_targets(
             "battle_events",
             f"{copy_card['name']} event target status={spell_copied.get('copy_target_selection_status')!r}",
         )
-    if spell_copied.get("copy_spell_target") != expected_target_name:
+    if expected_target_name is not None and spell_copied.get("copy_spell_target") != expected_target_name:
         fail(
             "battle_events",
             f"{copy_card['name']} event copy_spell_target={spell_copied.get('copy_spell_target')!r}",
         )
+    expected_copy_event_fields = scenario.get("expected_copy_event_fields") or {}
+    assert_expected_event_fields("battle_events", copy_card["name"], spell_copied, expected_copy_event_fields)
+    spell_cast = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "spell_cast" and data.get("card") == copy_card.get("name")
+        ),
+        None,
+    )
+    locked_cost_result = None
+    spree_result = None
+    if scenario.get("expected_locked_cost") or "expected_spree_additional_cost_paid" in scenario:
+        if spell_cast is None:
+            fail("battle_events", f"missing {copy_card['name']} spell_cast event")
+        validate_expected_locked_cost("battle_events", copy_card["name"], spell_cast, scenario.get("expected_locked_cost"))
+        locked_cost_result = spell_cast.get("locked_cost")
+        spree_result = validate_expected_spree_fields("battle_events", copy_card["name"], spell_cast, scenario)
     buyback_result = None
     if "expected_buyback_paid" in scenario:
         expected_buyback_paid = bool(scenario.get("expected_buyback_paid"))
-        spell_cast = next(
-            (
-                data
-                for event, data in reversed(events)
-                if event == "spell_cast" and data.get("card") == copy_card.get("name")
-            ),
-            None,
-        )
         if spell_cast is None:
             fail("battle_events", f"missing {copy_card['name']} spell_cast event")
         if bool(spell_cast.get("buyback_paid")) != expected_buyback_paid:
@@ -893,7 +954,112 @@ def run_copy_spell_choose_new_targets(
         "copy_target_selection_status": selection.get("copy_target_selection_status"),
         "target_reassignment_performed": bool(selection.get("target_reassignment_performed")),
         "copy_spell_target": actual_target_name,
+        **({"locked_cost": locked_cost_result} if locked_cost_result is not None else {}),
+        **({"spree": spree_result} if spree_result is not None else {}),
         **({"buyback": buyback_result} if buyback_result is not None else {}),
+    }
+
+
+def run_copy_stack_ability_response(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    response_card = dict(scenario["card"])
+    turn = int(scenario.get("turn") or 7)
+    phase = str(scenario.get("phase") or "precombat_main")
+    active = battle.Player(str(scenario.get("active_player") or "Active"), None, [])
+    responder = battle.Player(str(scenario.get("responder") or "Responder"), None, [])
+    responder.hand = [response_card]
+    add_manifest_mana(responder, scenario.get("responder_mana") or {"generic": 1, "red": 2})
+    resolved: list[str] = []
+    ability_card = dict(
+        scenario.get("ability_card")
+        or {
+            "name": "Triggered Ability Fixture",
+            "type_line": "Triggered Ability",
+            "is_triggered_ability": True,
+        }
+    )
+    ability_effect = dict(
+        scenario.get("ability_effect")
+        or {
+            "effect": "triggered_ability",
+        }
+    )
+    ability_effect["resolver"] = lambda: resolved.append("resolved")
+    stack = battle.Stack()
+    stack.push(ability_card, active, ability_effect)
+
+    if not battle.priority_round(
+        active,
+        [active, responder],
+        stack,
+        turn,
+        random.Random(int(scenario.get("seed") or 6070)),
+        phase=phase,
+    ):
+        fail("battle_execution", f"{response_card['name']} was not cast as ability-copy response")
+    copied_item = stack.items[-1] if getattr(stack, "items", None) else None
+    if copied_item is None or not getattr(copied_item, "card", {}).get("is_copy"):
+        fail("battle_execution", f"{response_card['name']} did not create ability copy")
+    if getattr(copied_item, "effect_data", {}).get("effect") != "triggered_ability":
+        fail("battle_execution", f"{response_card['name']} copied effect={getattr(copied_item, 'effect_data', {}).get('effect')!r}")
+
+    spell_cast = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "spell_cast" and data.get("card") == response_card.get("name")
+        ),
+        None,
+    )
+    if spell_cast is None:
+        fail("battle_events", f"missing {response_card['name']} spell_cast event")
+    validate_expected_locked_cost("battle_events", response_card["name"], spell_cast, scenario.get("expected_locked_cost"))
+    spree_result = validate_expected_spree_fields("battle_events", response_card["name"], spell_cast, scenario)
+
+    spell_copied = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "spell_copied" and data.get("card") == response_card.get("name")
+        ),
+        None,
+    )
+    if spell_copied is None:
+        fail("battle_events", f"missing {response_card['name']} spell_copied event")
+    expected_target_type = scenario.get("expected_target_type", "activated_or_triggered_ability_on_stack")
+    if spell_copied.get("target_type") != expected_target_type:
+        fail("battle_events", f"{response_card['name']} target_type={spell_copied.get('target_type')!r}")
+    expected_copy_status = scenario.get("expected_copy_ability_status", "runtime_executor_v1")
+    if spell_copied.get("copy_activated_triggered_ability_status") != expected_copy_status:
+        fail(
+            "battle_events",
+            f"{response_card['name']} copy_activated_triggered_ability_status={spell_copied.get('copy_activated_triggered_ability_status')!r}",
+        )
+
+    if not battle.priority_round(
+        active,
+        [active, responder],
+        stack,
+        turn + 1,
+        random.Random(int(scenario.get("resolve_seed") or 6071)),
+        phase=phase,
+    ):
+        fail("battle_execution", f"{response_card['name']} copied ability did not resolve")
+    expected_resolutions = int(scenario.get("expected_copy_resolutions") or 1)
+    if len(resolved) != expected_resolutions:
+        fail("battle_execution", f"{response_card['name']} copied ability resolutions={len(resolved)}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": response_card["name"],
+        "copied_stack_object": ability_card.get("name"),
+        "target_type": spell_copied.get("target_type"),
+        "copy_activated_triggered_ability_status": spell_copied.get("copy_activated_triggered_ability_status"),
+        "locked_cost": spell_cast.get("locked_cost"),
+        "spree": spree_result,
+        "copy_resolutions": len(resolved),
     }
 
 
@@ -990,6 +1156,24 @@ def run_change_single_target_response(
         )
     if redirect_event.get("target_change_pipeline") != "single_target_stack_object_redirect_runtime_v1":
         fail("battle_events", f"{response_card['name']} missing target_change_pipeline")
+    spell_cast = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "spell_cast" and data.get("card") == response_card.get("name")
+        ),
+        None,
+    )
+    locked_cost_result = None
+    spree_result = None
+    if scenario.get("expected_locked_cost") or "expected_spree_additional_cost_paid" in scenario:
+        if spell_cast is None:
+            fail("battle_events", f"missing {response_card['name']} spell_cast event")
+        validate_expected_locked_cost("battle_events", response_card["name"], spell_cast, scenario.get("expected_locked_cost"))
+        locked_cost_result = spell_cast.get("locked_cost")
+        spree_result = validate_expected_spree_fields("battle_events", response_card["name"], spell_cast, scenario)
+        if "expected_spree_additional_cost_paid" in scenario:
+            validate_expected_spree_fields("battle_events", response_card["name"], redirect_event, scenario)
     return {
         "scenario": scenario.get("name"),
         "card_name": response_card["name"],
@@ -997,6 +1181,8 @@ def run_change_single_target_response(
         "new_target": actual_target_name,
         "target_change_applied": True,
         "target_change_pipeline": redirect_event.get("target_change_pipeline"),
+        **({"locked_cost": locked_cost_result} if locked_cost_result is not None else {}),
+        **({"spree": spree_result} if spree_result is not None else {}),
     }
 
 
@@ -1188,6 +1374,7 @@ def run_nonfliers_cant_block_rider(
 
 SCENARIO_RUNNERS = {
     "conditional_land_play": run_conditional_land_play,
+    "copy_stack_ability_response": run_copy_stack_ability_response,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,

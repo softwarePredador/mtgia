@@ -2613,16 +2613,20 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["effect"], "copy_spell")
         self.assertEqual(
             primary["battle_model_scope"],
-            "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+            "spree_copy_stack_object_change_target_selected_mode_runtime_v1",
         )
-        self.assertEqual(primary["target"], "instant_or_sorcery_on_stack")
+        self.assertEqual(primary["target"], "stack_object")
         self.assertEqual(primary["change_target_mode_status"], "runtime_executor_v1")
         self.assertEqual(
             primary["target_change_pipeline"],
             "single_target_stack_object_redirect_runtime_v1",
         )
-        self.assertEqual(primary["spree_additional_cost_status"], "annotation_only")
-        self.assertEqual(primary["copy_activated_triggered_ability_status"], "annotation_only")
+        self.assertTrue(primary["spree"])
+        self.assertEqual(primary["spree_additional_cost_status"], "runtime_executor_v1")
+        self.assertEqual(primary["spree_selected_mode_cost_status"], "runtime_executor_v1")
+        self.assertEqual(primary["spree_mode_costs"]["copy_instant_or_sorcery_spell"], "{1}")
+        self.assertEqual(primary["spree_mode_costs"]["change_single_target"], "{1}")
+        self.assertEqual(primary["copy_activated_triggered_ability_status"], "runtime_executor_v1")
 
     def test_modal_destroy_artifact_redirect_maps_to_partial_runtime_scope(self) -> None:
         result = hints.build_effect_hints(

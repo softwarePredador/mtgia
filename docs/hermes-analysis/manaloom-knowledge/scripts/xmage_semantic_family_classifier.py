@@ -482,6 +482,7 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
             "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
             "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
             "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+            "spree_copy_stack_object_change_target_selected_mode_runtime_v1",
         }
         and effect_json.get("effect") in {"remove_permanent", "copy_spell"}
     ):
@@ -1262,23 +1263,42 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("cost_reduction_condition") == "control_creature_power_4_or_greater"
         )
 
-    if (
-        effect == "copy_spell"
-        and scope == "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1"
-    ):
+    if effect == "copy_spell" and scope in {
+        "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+        "spree_copy_stack_object_change_target_selected_mode_runtime_v1",
+    }:
         modes = set(effect_json.get("modes") or [])
+        target = effect_json.get("target")
+        is_new_runtime_scope = scope == "spree_copy_stack_object_change_target_selected_mode_runtime_v1"
         return (
             types == {"INSTANT"}
             and {"CopyTargetStackObjectEffect", "ChooseNewTargetsTargetEffect"}.issubset(effect_classes)
             and "TargetStackObject" in target_classes
             and bool(effect_json.get("instant"))
-            and effect_json.get("target") == "instant_or_sorcery_on_stack"
+            and target in {"instant_or_sorcery_on_stack", "stack_object"}
             and {"copy_instant_or_sorcery_spell", "change_single_target"}.issubset(modes)
             and bool(effect_json.get("may_choose_new_targets"))
             and effect_json.get("change_target_mode_status") == "runtime_executor_v1"
             and effect_json.get("target_change_pipeline") == "single_target_stack_object_redirect_runtime_v1"
-            and effect_json.get("spree_additional_cost_status") == "annotation_only"
-            and effect_json.get("copy_activated_triggered_ability_status") == "annotation_only"
+            and (
+                (
+                    is_new_runtime_scope
+                    and target == "stack_object"
+                    and effect_json.get("spree_additional_cost_status") == "runtime_executor_v1"
+                    and effect_json.get("copy_activated_triggered_ability_status") == "runtime_executor_v1"
+                )
+                or (
+                    not is_new_runtime_scope
+                    and effect_json.get("spree_additional_cost_status") in {
+                        "annotation_only",
+                        "runtime_executor_v1",
+                    }
+                    and effect_json.get("copy_activated_triggered_ability_status") in {
+                        "annotation_only",
+                        "runtime_executor_v1",
+                    }
+                )
+            )
         )
 
     if (

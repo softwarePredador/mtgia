@@ -1799,6 +1799,211 @@ def register_tests(battle, player):
             else:
                 battle.HANDCRAFTED_KNOWN_CARDS.discard(runtime_name)
 
+    def test_spree_copy_runtime_requires_selected_mode_additional_cost():
+        runtime_name = "Runtime Return Favor Spree Cost Test"
+        runtime_rule = {
+            "name": runtime_name,
+            "effect": "copy_spell",
+            "instant": True,
+            "target": "stack_object",
+            "modes": ["copy_instant_or_sorcery_spell", "change_single_target"],
+            "may_choose_new_targets": True,
+            "choose_new_targets_status": "may_choose_new_targets",
+            "copy_activated_triggered_ability_status": "runtime_executor_v1",
+            "spree": True,
+            "spree_additional_cost_status": "runtime_executor_v1",
+            "spree_selected_mode_cost_status": "runtime_executor_v1",
+            "spree_mode_costs": {
+                "copy_instant_or_sorcery_spell": "{1}",
+                "change_single_target": "{1}",
+            },
+            "battle_model_scope": "spree_copy_stack_object_change_target_selected_mode_runtime_v1",
+            "_rule_logical_key": "battle_rule_v1:runtime-return-favor-spree-cost-test",
+            "_rule_oracle_hash": "runtime-return-favor-spree-cost-test-hash",
+        }
+        previous_rule = battle.HANDCRAFTED_KNOWN_CARD_RULES.get(runtime_name)
+        had_known_card = runtime_name in battle.HANDCRAFTED_KNOWN_CARDS
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        try:
+            battle.HANDCRAFTED_KNOWN_CARD_RULES[runtime_name] = runtime_rule
+            battle.HANDCRAFTED_KNOWN_CARDS.add(runtime_name)
+
+            events = []
+            battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+            active = player("Active")
+            responder = player("Responder")
+            card = {
+                "name": runtime_name,
+                "cmc": 2,
+                "mana_cost": "{R}{R}",
+                "type_line": "Instant",
+            }
+            responder.hand = [card]
+            responder.mana_pool.add("red", 2)
+            target_spell = {
+                "name": "Targeted Insight",
+                "cmc": 3,
+                "mana_cost": "{2}{U}",
+                "type_line": "Sorcery",
+            }
+            stack = battle.Stack()
+            stack.push(target_spell, active, {"effect": "draw_cards", "count": 1})
+
+            battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                6801,
+                random.Random(6801),
+                phase="precombat_main",
+            )
+            assert card in responder.hand
+            assert not any(
+                event == "spell_cast" and data.get("card") == runtime_name
+                for event, data in events
+            )
+
+            events.clear()
+            active = player("Active")
+            responder = player("Responder")
+            card = {
+                "name": runtime_name,
+                "cmc": 2,
+                "mana_cost": "{R}{R}",
+                "type_line": "Instant",
+            }
+            responder.hand = [card]
+            responder.mana_pool.add("red", 2)
+            responder.mana_pool.add_generic(1)
+            stack = battle.Stack()
+            stack.push(target_spell, active, {"effect": "draw_cards", "count": 1})
+
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                6802,
+                random.Random(6802),
+                phase="precombat_main",
+            ) is True
+            assert card not in responder.hand
+            cast_event = next(
+                data
+                for event, data in events
+                if event == "spell_cast" and data.get("card") == runtime_name
+            )
+            assert cast_event["locked_cost"]["generic"] == 1
+            assert cast_event["locked_cost"]["colored"]["red"] == 2
+            assert cast_event["spree_additional_cost_status"] == "runtime_executor_v1"
+            assert cast_event["spree_selected_modes"] == ["copy_instant_or_sorcery_spell"]
+            assert cast_event["spree_additional_costs"] == ["{1}"]
+            assert cast_event["spree_additional_cost_paid"] is True
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_rule is None:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop(runtime_name, None)
+            else:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES[runtime_name] = previous_rule
+            if had_known_card:
+                battle.HANDCRAFTED_KNOWN_CARDS.add(runtime_name)
+            else:
+                battle.HANDCRAFTED_KNOWN_CARDS.discard(runtime_name)
+
+    def test_copy_stack_object_runtime_copies_triggered_ability():
+        runtime_name = "Runtime Return Favor Ability Copy Test"
+        runtime_rule = {
+            "name": runtime_name,
+            "effect": "copy_spell",
+            "instant": True,
+            "target": "stack_object",
+            "modes": ["copy_instant_or_sorcery_spell", "change_single_target"],
+            "may_choose_new_targets": True,
+            "choose_new_targets_status": "may_choose_new_targets",
+            "copy_activated_triggered_ability_status": "runtime_executor_v1",
+            "spree": True,
+            "spree_additional_cost_status": "runtime_executor_v1",
+            "spree_selected_mode_cost_status": "runtime_executor_v1",
+            "spree_mode_costs": {
+                "copy_instant_or_sorcery_spell": "{1}",
+                "change_single_target": "{1}",
+            },
+            "battle_model_scope": "spree_copy_stack_object_change_target_selected_mode_runtime_v1",
+            "_rule_logical_key": "battle_rule_v1:runtime-return-favor-ability-copy-test",
+            "_rule_oracle_hash": "runtime-return-favor-ability-copy-test-hash",
+        }
+        previous_rule = battle.HANDCRAFTED_KNOWN_CARD_RULES.get(runtime_name)
+        had_known_card = runtime_name in battle.HANDCRAFTED_KNOWN_CARDS
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        resolved = []
+        try:
+            battle.HANDCRAFTED_KNOWN_CARD_RULES[runtime_name] = runtime_rule
+            battle.HANDCRAFTED_KNOWN_CARDS.add(runtime_name)
+            events = []
+            battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+
+            active = player("Active")
+            responder = player("Responder")
+            card = {
+                "name": runtime_name,
+                "cmc": 2,
+                "mana_cost": "{R}{R}",
+                "type_line": "Instant",
+            }
+            responder.hand = [card]
+            responder.mana_pool.add("red", 2)
+            responder.mana_pool.add_generic(1)
+            trigger_card = {
+                "name": "Lorehold Trigger",
+                "type_line": "Triggered Ability",
+                "is_triggered_ability": True,
+            }
+            trigger_effect = {
+                "effect": "triggered_ability",
+                "resolver": lambda: resolved.append("resolved"),
+            }
+            stack = battle.Stack()
+            stack.push(trigger_card, active, trigger_effect)
+
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                6803,
+                random.Random(6803),
+                phase="precombat_main",
+            ) is True
+            assert stack.items[-1].card.get("is_copy") is True
+            assert stack.items[-1].effect_data.get("effect") == "triggered_ability"
+
+            copied_event = next(
+                data
+                for event, data in events
+                if event == "spell_copied" and data.get("card") == runtime_name
+            )
+            assert copied_event["target_type"] == "activated_or_triggered_ability_on_stack"
+            assert copied_event["copy_activated_triggered_ability_status"] == "runtime_executor_v1"
+            assert copied_event["spree_additional_cost_paid"] is True
+
+            assert battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                6804,
+                random.Random(6804),
+                phase="precombat_main",
+            ) is True
+            assert resolved == ["resolved"]
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            if previous_rule is None:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES.pop(runtime_name, None)
+            else:
+                battle.HANDCRAFTED_KNOWN_CARD_RULES[runtime_name] = previous_rule
+            if had_known_card:
+                battle.HANDCRAFTED_KNOWN_CARDS.add(runtime_name)
+            else:
+                battle.HANDCRAFTED_KNOWN_CARDS.discard(runtime_name)
+
     def test_pg067_reiterate_buyback_returns_to_hand_with_sqlite_rule():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -17251,13 +17456,19 @@ def register_tests(battle, player):
                 {
                     "effect": "copy_spell",
                     "instant": True,
-                    "target": "instant_or_sorcery_on_stack",
+                    "target": "stack_object",
                     "modes": ["copy_instant_or_sorcery_spell", "change_single_target"],
                     "may_choose_new_targets": True,
                     "change_target_mode_status": "runtime_executor_v1",
-                    "spree_additional_cost_status": "annotation_only",
-                    "copy_activated_triggered_ability_status": "annotation_only",
-                    "battle_model_scope": "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
+                    "spree": True,
+                    "spree_additional_cost_status": "runtime_executor_v1",
+                    "spree_selected_mode_cost_status": "runtime_executor_v1",
+                    "spree_mode_costs": {
+                        "copy_instant_or_sorcery_spell": "{1}",
+                        "change_single_target": "{1}",
+                    },
+                    "copy_activated_triggered_ability_status": "runtime_executor_v1",
+                    "battle_model_scope": "spree_copy_stack_object_change_target_selected_mode_runtime_v1",
                     "_rule_logical_key": "battle_rule_v1:runtime-return-favor-change-target-test",
                     "_rule_oracle_hash": "runtime-return-favor-change-target-test-hash",
                 },
@@ -17281,7 +17492,7 @@ def register_tests(battle, player):
                 card = {
                     "name": name,
                     "cmc": 2,
-                    "mana_cost": "{1}{R}",
+                    "mana_cost": "{R}{R}" if "Return Favor" in name else "{1}{R}",
                     "type_line": "Instant",
                 }
                 battle.HANDCRAFTED_KNOWN_CARD_RULES[name] = {**card, **effect}
@@ -17290,7 +17501,7 @@ def register_tests(battle, player):
                 responder = player("Responder", [card])
                 responder.hand = [card]
                 responder.mana_pool.add_generic(1)
-                responder.mana_pool.add("red", 1)
+                responder.mana_pool.add("red", 2 if "Return Favor" in name else 1)
                 protected = {
                     "name": "Protected Creature",
                     "effect": "creature",
@@ -17345,6 +17556,16 @@ def register_tests(battle, player):
                 assert event["target_change_applied"] is True
                 assert event[status_key] == "runtime_executor_v1"
                 assert event["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
+                if "Return Favor" in name:
+                    spell_event = next(
+                        data
+                        for replay_event, data in events
+                        if replay_event == "spell_cast" and data.get("card") == name
+                    )
+                    assert spell_event["locked_cost"]["generic"] == 1
+                    assert spell_event["locked_cost"]["colored"]["red"] == 2
+                    assert spell_event["spree_additional_cost_paid"] is True
+                    assert event["spree_additional_cost_paid"] is True
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
             for name, previous_rule in previous_rules.items():
@@ -18386,12 +18607,16 @@ def register_tests(battle, player):
         assert return_effect["_rule_oracle_hash"] == "a24911b7ea2027ebba59bb6792eee776"
         assert (
             return_effect["battle_model_scope"]
-            == "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1"
+            == "spree_copy_stack_object_change_target_selected_mode_runtime_v1"
         )
-        assert return_effect["target"] == "instant_or_sorcery_on_stack"
+        assert return_effect["target"] == "stack_object"
         assert return_effect["may_choose_new_targets"] is True
-        assert return_effect["spree_additional_cost_status"] == "annotation_only"
-        assert return_effect["copy_activated_triggered_ability_status"] == "annotation_only"
+        assert return_effect["spree"] is True
+        assert return_effect["spree_additional_cost_status"] == "runtime_executor_v1"
+        assert return_effect["spree_selected_mode_cost_status"] == "runtime_executor_v1"
+        assert return_effect["spree_mode_costs"]["copy_instant_or_sorcery_spell"] == "{1}"
+        assert return_effect["spree_mode_costs"]["change_single_target"] == "{1}"
+        assert return_effect["copy_activated_triggered_ability_status"] == "runtime_executor_v1"
         assert return_effect["change_target_mode_status"] == "runtime_executor_v1"
         assert return_effect["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
 
@@ -18519,7 +18744,7 @@ def register_tests(battle, player):
                     "name": card_name,
                     "type_line": "Instant",
                     "cmc": 2,
-                    "mana_cost": "{1}{R}",
+                    "mana_cost": "{R}{R}" if card_name == "Return the Favor" else "{1}{R}",
                 }
                 effect_data = battle.get_card_effect(card)
                 assert effect_data[status_key] == "runtime_executor_v1"
@@ -18528,7 +18753,7 @@ def register_tests(battle, player):
                 responder = player("Responder", [card])
                 responder.hand = [card]
                 responder.mana_pool.add_generic(1)
-                responder.mana_pool.add("red", 1)
+                responder.mana_pool.add("red", 2 if card_name == "Return the Favor" else 1)
                 protected = {
                     "name": "Protected Creature",
                     "effect": "creature",
@@ -18589,6 +18814,13 @@ def register_tests(battle, player):
                 assert spell_event["response_to"] == removal["name"]
                 assert spell_event["rule_logical_key"] == logical_key
                 assert spell_event["rule_oracle_hash"] == oracle_hash
+                if card_name == "Return the Favor":
+                    assert spell_event["locked_cost"]["generic"] == 1
+                    assert spell_event["locked_cost"]["colored"]["red"] == 2
+                    assert spell_event["spree_additional_cost_status"] == "runtime_executor_v1"
+                    assert spell_event["spree_selected_modes"] == ["change_single_target"]
+                    assert spell_event["spree_additional_costs"] == ["{1}"]
+                    assert spell_event["spree_additional_cost_paid"] is True
 
                 redirect_event = next(
                     data
@@ -18603,6 +18835,8 @@ def register_tests(battle, player):
                 assert redirect_event["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
                 assert redirect_event["rule_logical_key"] == logical_key
                 assert redirect_event["rule_oracle_hash"] == oracle_hash
+                if card_name == "Return the Favor":
+                    assert redirect_event["spree_additional_cost_paid"] is True
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
@@ -20473,6 +20707,8 @@ def register_tests(battle, player):
         test_reverberate_copies_stack_spell_with_pg038_rule_provenance,
         test_reiterate_copies_stack_spell_with_pg068_rule_provenance,
         test_copy_spell_buyback_runtime_returns_to_hand_only_when_paid,
+        test_spree_copy_runtime_requires_selected_mode_additional_cost,
+        test_copy_stack_object_runtime_copies_triggered_ability,
         test_pg067_reiterate_buyback_returns_to_hand_with_sqlite_rule,
         test_reiterate_skips_green_suns_copy_without_controller_library_target,
         test_reiterate_preserves_x_when_copying_green_suns_with_valid_target,
