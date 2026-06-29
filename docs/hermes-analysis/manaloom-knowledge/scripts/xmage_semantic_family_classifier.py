@@ -479,7 +479,7 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
     if (
         str(effect_json.get("battle_model_scope") or "")
         in {
-            "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+            "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
             "spree_copy_instant_or_sorcery_stack_spell_change_target_runtime_v1",
         }
         and effect_json.get("effect") in {"remove_permanent", "copy_spell"}
@@ -1282,7 +1282,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
 
     if (
         effect == "remove_permanent"
-        and scope == "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1"
+        and scope == "modal_destroy_artifact_redirect_target_cant_block_runtime_v1"
     ):
         modes = set(effect_json.get("modes") or [])
         return (
@@ -1294,7 +1294,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("destroy_artifact_mode"))
             and {"destroy_artifact", "redirect_target", "cant_block"}.issubset(modes)
             and effect_json.get("redirect_target_mode_status") == "runtime_executor_v1"
-            and effect_json.get("cant_block_mode_status") == "annotation_only"
+            and effect_json.get("cant_block_mode_status") == "runtime_executor_v1"
             and effect_json.get("target_change_pipeline") == "single_target_stack_object_redirect_runtime_v1"
         )
 
@@ -3744,7 +3744,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("basic_land_compensation_status") == "annotation_only"
         )
 
-    if effect == "remove_permanent" and scope == "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1":
+    if effect == "remove_permanent" and scope == "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1":
         return (
             types == {"LAND", "SORCERY"}
             and {
@@ -3758,8 +3758,8 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("sorcery"))
             and effect_json.get("target") == "land"
             and bool(effect_json.get("target_controller_basic_land_tapped"))
-            and effect_json.get("basic_land_compensation_status") == "annotation_only"
-            and effect_json.get("cant_block_mode_status") == "annotation_only"
+            and effect_json.get("basic_land_compensation_status") == "runtime_executor_v1"
+            and effect_json.get("cant_block_mode_status") == "runtime_executor_v1"
             and effect_json.get("cant_block_target_restriction") == "creatures_without_flying"
             and bool(effect_json.get("land_side_pay_three_life_else_tapped"))
             and effect_json.get("land_side_add_mana") == "R"

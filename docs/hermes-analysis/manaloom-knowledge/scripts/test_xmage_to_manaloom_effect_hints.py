@@ -1972,12 +1972,12 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["effect"], "remove_permanent")
         self.assertEqual(
             primary["battle_model_scope"],
-            "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1",
+            "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1",
         )
         self.assertEqual(primary["target"], "land")
         self.assertTrue(primary["target_controller_basic_land_tapped"])
-        self.assertEqual(primary["basic_land_compensation_status"], "annotation_only")
-        self.assertEqual(primary["cant_block_mode_status"], "annotation_only")
+        self.assertEqual(primary["basic_land_compensation_status"], "runtime_executor_v1")
+        self.assertEqual(primary["cant_block_mode_status"], "runtime_executor_v1")
         self.assertTrue(primary["land_side_pay_three_life_else_tapped"])
         self.assertEqual(primary["land_side_add_mana"], "R")
 
@@ -2646,12 +2646,12 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["effect"], "remove_permanent")
         self.assertEqual(
             primary["battle_model_scope"],
-            "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+            "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
         )
         self.assertEqual(primary["target"], "artifact")
         self.assertTrue(primary["destroy_artifact_mode"])
         self.assertEqual(primary["redirect_target_mode_status"], "runtime_executor_v1")
-        self.assertEqual(primary["cant_block_mode_status"], "annotation_only")
+        self.assertEqual(primary["cant_block_mode_status"], "runtime_executor_v1")
         self.assertEqual(
             primary["target_change_pipeline"],
             "single_target_stack_object_redirect_runtime_v1",

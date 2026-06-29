@@ -1,0 +1,152 @@
+{
+  "battle_execution": {
+    "event_count": 9,
+    "results": [
+      {
+        "affected": [
+          "Large Ground Blocker"
+        ],
+        "blockers": [
+          "Small Ground Blocker"
+        ],
+        "cant_block_mode_status": "runtime_executor_v1",
+        "card_name": "Untimely Malfunction",
+        "scenario": "untimely_malfunction_target_creature_cant_block"
+      },
+      {
+        "blockers": [
+          "Flying Blocker"
+        ],
+        "cant_block_mode_status": "runtime_executor_v1",
+        "cant_block_target_restriction": "creatures_without_flying",
+        "card_name": "Sundering Eruption // Volcanic Fissure",
+        "scenario": "sundering_eruption_nonfliers_cant_block_rider",
+        "target_removed": "Target Land"
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-29T11:13:40.035353+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pgc066_e2e_manifest_20260629.json",
+  "package_id": "pgc066_cant_block_runtime",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1",
+          "card_name": "Sundering Eruption // Volcanic Fissure",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a",
+          "oracle_hash": "09148a5a6f4d14c04a30bf19819e20b8",
+          "review_status": "verified",
+          "rule_version": 4
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
+          "card_name": "Untimely Malfunction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8",
+          "oracle_hash": "877f2d75c90c7886ca9536135829bb90",
+          "review_status": "verified",
+          "rule_version": 4
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1",
+          "card_name": "Sundering Eruption // Volcanic Fissure",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a",
+          "oracle_hash": "09148a5a6f4d14c04a30bf19819e20b8",
+          "review_status": "verified",
+          "rule_version": 4
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
+          "card_name": "Untimely Malfunction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8",
+          "oracle_hash": "877f2d75c90c7886ca9536135829bb90",
+          "review_status": "verified",
+          "rule_version": 4
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1",
+          "battle_rule_version": 4,
+          "card_name": "Sundering Eruption // Volcanic Fissure",
+          "logical_rule_key": "battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
+          "battle_rule_version": 4,
+          "card_name": "Untimely Malfunction",
+          "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Sundering Eruption // Volcanic Fissure",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Untimely Malfunction",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 9,
+        "scenarios": 2
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "PGC066 Cant Block Runtime Validation"
+}

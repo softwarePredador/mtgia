@@ -933,12 +933,200 @@ def run_change_single_target_response(
     }
 
 
+def _default_cant_block_attacker() -> dict[str, Any]:
+    return {
+        "name": "Lorehold Attacker",
+        "effect": "creature",
+        "type_line": "Creature",
+        "power": 4,
+        "toughness": 4,
+    }
+
+
+def _block_assignment_names(assignments: list[tuple[dict[str, Any], list[dict[str, Any]]]]) -> list[str]:
+    names: list[str] = []
+    for _attacker, blockers in assignments:
+        names.extend(blocker.get("name", "?") for blocker in blockers)
+    return names
+
+
+def run_target_creature_cant_block(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    turn = int(scenario.get("turn") or 8)
+    active = battle.Player(str(scenario.get("player") or "Lorehold"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    attacker = dict(scenario.get("attacker") or _default_cant_block_attacker())
+    active.battlefield = [attacker]
+    blockers = [
+        dict(blocker)
+        for blocker in scenario.get(
+            "blockers",
+            [
+                {
+                    "name": "Large Ground Blocker",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 6,
+                    "toughness": 6,
+                },
+                {
+                    "name": "Small Ground Blocker",
+                    "effect": "creature",
+                    "type_line": "Creature",
+                    "power": 1,
+                    "toughness": 1,
+                },
+            ],
+        )
+    ]
+    opponent.battlefield = blockers
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=turn,
+        rng=random.Random(int(scenario.get("seed") or 6066)),
+    )
+    expected_affected = set(scenario.get("expected_affected") or ["Large Ground Blocker"])
+    affected = {
+        permanent.get("name")
+        for permanent in opponent.battlefield
+        if permanent.get("cant_block")
+    }
+    if affected != expected_affected:
+        fail("battle_execution", f"{card['name']} cant_block affected={sorted(affected)}")
+    if any(permanent.get("name") in expected_affected for permanent in opponent.graveyard):
+        fail("battle_execution", f"{card['name']} destroyed cant-block target instead of applying restriction")
+    opponent.life = int(scenario.get("defender_life") or attacker.get("power") or 4)
+    attacker["attacking"] = True
+    assignments = battle.declare_blockers_step(
+        opponent,
+        [attacker],
+        turn,
+        random.Random(int(scenario.get("block_seed") or 6067)),
+    )
+    blocker_names = _block_assignment_names(assignments)
+    expected_blockers = list(scenario.get("expected_blockers") or ["Small Ground Blocker"])
+    if blocker_names != expected_blockers:
+        fail("battle_execution", f"{card['name']} blockers={blocker_names}, expected {expected_blockers}")
+    event = next(
+        (
+            data
+            for replay_event, data in events
+            if replay_event == "cant_block_until_eot_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} cant_block_until_eot_resolved event")
+    if event.get("cant_block_mode_status") != "runtime_executor_v1":
+        fail("battle_events", f"{card['name']} cant_block status={event.get('cant_block_mode_status')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card.get("name"),
+        "affected": sorted(affected),
+        "blockers": blocker_names,
+        "cant_block_mode_status": event.get("cant_block_mode_status"),
+    }
+
+
+def run_nonfliers_cant_block_rider(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    turn = int(scenario.get("turn") or 8)
+    active = battle.Player(str(scenario.get("player") or "Lorehold"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    attacker = dict(scenario.get("attacker") or _default_cant_block_attacker())
+    active.battlefield = [attacker]
+    target_land = dict(scenario.get("target_land") or {"name": "Target Land", "type_line": "Land", "effect": "land"})
+    ground_blocker = dict(
+        scenario.get("ground_blocker")
+        or {
+            "name": "Ground Blocker",
+            "effect": "creature",
+            "type_line": "Creature",
+            "power": 5,
+            "toughness": 5,
+        }
+    )
+    flying_blocker = dict(
+        scenario.get("flying_blocker")
+        or {
+            "name": "Flying Blocker",
+            "effect": "creature",
+            "type_line": "Creature",
+            "flying": True,
+            "power": 4,
+            "toughness": 4,
+        }
+    )
+    opponent.battlefield = [target_land, ground_blocker, flying_blocker]
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=turn,
+        rng=random.Random(int(scenario.get("seed") or 6068)),
+    )
+    if any(permanent.get("name") == target_land.get("name") for permanent in opponent.battlefield):
+        fail("battle_execution", f"{card['name']} did not remove target land")
+    if ground_blocker.get("cant_block") is not True:
+        fail("battle_execution", f"{card['name']} did not mark ground blocker cant_block")
+    if flying_blocker.get("cant_block") is True:
+        fail("battle_execution", f"{card['name']} marked flying blocker cant_block")
+    opponent.life = int(scenario.get("defender_life") or attacker.get("power") or 4)
+    attacker["attacking"] = True
+    assignments = battle.declare_blockers_step(
+        opponent,
+        [attacker],
+        turn,
+        random.Random(int(scenario.get("block_seed") or 6069)),
+    )
+    blocker_names = _block_assignment_names(assignments)
+    expected_blockers = list(scenario.get("expected_blockers") or [flying_blocker.get("name")])
+    if blocker_names != expected_blockers:
+        fail("battle_execution", f"{card['name']} blockers={blocker_names}, expected {expected_blockers}")
+    event = next(
+        (
+            data
+            for replay_event, data in events
+            if replay_event == "cant_block_until_eot_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} cant_block_until_eot_resolved event")
+    if event.get("cant_block_mode_status") != "runtime_executor_v1":
+        fail("battle_events", f"{card['name']} cant_block status={event.get('cant_block_mode_status')!r}")
+    if event.get("cant_block_target_restriction") != "creatures_without_flying":
+        fail("battle_events", f"{card['name']} restriction={event.get('cant_block_target_restriction')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card.get("name"),
+        "target_removed": target_land.get("name"),
+        "blockers": blocker_names,
+        "cant_block_mode_status": event.get("cant_block_mode_status"),
+        "cant_block_target_restriction": event.get("cant_block_target_restriction"),
+    }
+
+
 SCENARIO_RUNNERS = {
     "conditional_land_play": run_conditional_land_play,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
+    "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
+    "target_creature_cant_block": run_target_creature_cant_block,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,
     "tempting_offer_decline": run_tempting_offer_decline,
 }

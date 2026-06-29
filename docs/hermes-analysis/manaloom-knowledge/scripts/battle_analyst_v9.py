@@ -9560,6 +9560,118 @@ def create_removal_compensation_tokens(effect_data, target_controller, source_ca
     return created
 
 
+def cant_block_runtime_enabled(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    return str(effect_data.get("cant_block_mode_status") or "").lower() == "runtime_executor_v1"
+
+
+def cant_block_runtime_replay_fields(effect_data):
+    fields = {}
+    if not isinstance(effect_data, dict):
+        return fields
+    if effect_data.get("cant_block_mode_status"):
+        fields["cant_block_mode_status"] = effect_data.get("cant_block_mode_status")
+    if effect_data.get("cant_block_target_restriction"):
+        fields["cant_block_target_restriction"] = effect_data.get("cant_block_target_restriction")
+    return fields
+
+
+def _cant_block_restriction_matches(creature, restriction):
+    if not is_battlefield_creature(creature):
+        return False
+    restriction = str(restriction or "target_creature").lower()
+    if restriction == "creatures_without_flying":
+        return not bool(creature.get("flying"))
+    return True
+
+
+def cant_block_mode_target_candidates(player, opponents, card, effect_data):
+    if not cant_block_runtime_enabled(effect_data):
+        return []
+    modes = {str(mode or "").lower() for mode in _as_list(effect_data.get("modes"))}
+    if "cant_block" not in modes:
+        return []
+    candidates = []
+    for opponent in prioritize_evaluation_target_opponents(player, opponents):
+        for permanent in getattr(opponent, "battlefield", []) or []:
+            if not _cant_block_restriction_matches(permanent, "target_creature"):
+                continue
+            if creature_cannot_block(permanent):
+                continue
+            if not is_legal_target(
+                card,
+                permanent,
+                player,
+                target_type="creature",
+                target_controller=opponent,
+            ):
+                continue
+            candidates.append((opponent, permanent))
+    candidates.sort(key=lambda item: target_priority(item[1]), reverse=True)
+    return candidates
+
+
+def apply_cant_block_until_eot_runtime(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    *,
+    target_controller=None,
+    target=None,
+    all_players=None,
+):
+    if not cant_block_runtime_enabled(effect_data):
+        return []
+    players = list(all_players or [player, *(opponents or [])])
+    restriction = str(effect_data.get("cant_block_target_restriction") or "").lower()
+    selected_mode = str(effect_data.get("_selected_mode") or "").lower()
+    affected = []
+    if restriction == "creatures_without_flying":
+        for controller in players:
+            for permanent in getattr(controller, "battlefield", []) or []:
+                if _cant_block_restriction_matches(permanent, restriction):
+                    affected.append((controller, permanent))
+    elif selected_mode == "cant_block" and target_controller is not None and target is not None:
+        if _cant_block_restriction_matches(target, "target_creature"):
+            affected.append((target_controller, target))
+    else:
+        return []
+
+    unique = []
+    seen = set()
+    for controller, creature in affected:
+        marker = id(creature)
+        if marker in seen:
+            continue
+        seen.add(marker)
+        set_until_eot(creature, "cant_block", True)
+        set_until_eot(creature, "cant_block_source", card.get("name", "?"))
+        unique.append(
+            {
+                "controller": getattr(controller, "name", "?"),
+                "card": creature.get("name", "?"),
+                "flying": bool(creature.get("flying")),
+            }
+        )
+    if unique:
+        emit_replay_event(
+            "cant_block_until_eot_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            selected_mode=selected_mode or None,
+            affected_count=len(unique),
+            affected=unique,
+            duration="until_end_of_turn",
+            turn=turn,
+            **cant_block_runtime_replay_fields(effect_data),
+            **replay_rule_fields(effect_data),
+        )
+    return unique
+
+
 def is_permanent_card(card):
     if not isinstance(card, dict):
         return False
@@ -9842,6 +9954,28 @@ def prepare_declared_removal_targets(player, opponents, card, effect_data):
             )
             replay.append(declared_target_replay_entry(decision))
         return {**effect_data, "declared_targets": declared_targets}, replay
+    cant_block_candidates = cant_block_mode_target_candidates(player, opponents, card, effect_data)
+    if cant_block_candidates:
+        opponent, target = cant_block_candidates[0]
+        decision = targeting_decision(
+            card,
+            target,
+            player,
+            target_controller=opponent,
+            target_type="creature",
+        )
+        return {
+            **effect_data,
+            "_selected_mode": "cant_block",
+            "declared_targets": [
+                {
+                    "target": target,
+                    "controller": opponent,
+                    "target_type": "creature",
+                    "declared_by": player,
+                }
+            ],
+        }, [declared_target_replay_entry(decision)]
     return effect_data, []
 
 
@@ -10031,6 +10165,32 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         )
         return True
 
+    if str(effect_data.get("_selected_mode") or "").lower() == "cant_block":
+        applied = apply_cant_block_until_eot_runtime(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            target_controller=target_controller,
+            target=target,
+            all_players=players,
+        )
+        if not applied:
+            emit_replay_event(
+                "cant_block_until_eot_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                selected_mode="cant_block",
+                affected_count=0,
+                affected=[],
+                result="no_legal_target",
+                turn=turn,
+                **cant_block_runtime_replay_fields(effect_data),
+                **replay_rule_fields(effect_data),
+            )
+        return True
+
     life_gain_requested, life_gained = apply_removal_life_gain(
         effect_data,
         target_controller,
@@ -10100,6 +10260,16 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         effect_data,
         turn,
         rng,
+        all_players=players,
+    )
+    apply_cant_block_until_eot_runtime(
+        player,
+        opponents,
+        card,
+        effect_data,
+        turn,
+        target_controller=target_controller,
+        target=target,
         all_players=players,
     )
     create_removal_compensation_tokens(effect_data, target_controller, card, turn)

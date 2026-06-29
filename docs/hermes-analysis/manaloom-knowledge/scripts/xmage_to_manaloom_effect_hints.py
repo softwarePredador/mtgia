@@ -490,18 +490,18 @@ def _build_single_target_stack_redirect_fields(
             "modes": ["destroy_artifact", "redirect_target", "cant_block"],
             "destroy_artifact_mode": True,
             "redirect_target_mode_status": "runtime_executor_v1",
-            "cant_block_mode_status": "annotation_only",
+            "cant_block_mode_status": "runtime_executor_v1",
             "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1",
-            "oracle_runtime_scope": "destroy_target_artifact_redirect_runtime_cant_block_annotation_v1",
+            "oracle_runtime_scope": "destroy_target_artifact_redirect_target_cant_block_runtime_v1",
         }
         return {
             "effect": "remove_permanent",
-            "scope": "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1",
+            "scope": "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
             "fields": fields,
             "reason": (
                 "XMage structure matches a modal instant with destroy-artifact and single-target "
-                "redirect modes; ManaLoom executes destroy-artifact and redirect-target while "
-                "leaving the can't-block mode annotated."
+                "redirect modes; ManaLoom executes destroy-artifact, redirect-target, and target "
+                "creature can't-block modes."
             ),
             "signals": [
                 "DestroyTargetEffect",
@@ -4248,16 +4248,17 @@ def _build_exact_runtime_variant_fields(
     ):
         return {
             "effect": "remove_permanent",
-            "scope": "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1",
+            "scope": "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1",
             "fields": {
                 "sorcery": True,
                 "target": "land",
                 "target_controller_basic_land_tapped": True,
-                "basic_land_compensation_status": "annotation_only",
-                "cant_block_mode_status": "annotation_only",
+                "basic_land_compensation_status": "runtime_executor_v1",
+                "cant_block_mode_status": "runtime_executor_v1",
                 "cant_block_target_restriction": "creatures_without_flying",
                 "land_side_pay_three_life_else_tapped": True,
                 "land_side_add_mana": "R",
+                "oracle_runtime_scope": "target_controller_basic_land_search_to_battlefield_tapped_nonfliers_cant_block_runtime_v1",
             },
             "reason": (
                 "XMage structure matches Sundering Eruption destroying target land, "

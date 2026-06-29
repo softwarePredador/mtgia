@@ -1001,11 +1001,16 @@ def register_tests(battle, player):
             opponent.battlefield = [target_land]
             effect_data = {
                 "effect": "remove_permanent",
-                "battle_model_scope": "destroy_target_land_target_controller_basic_land_tapped_nonfliers_cant_block_or_tapped_red_land_v1",
+                "battle_model_scope": (
+                    "destroy_target_land_target_controller_basic_land_tapped_runtime_"
+                    "nonfliers_cant_block_runtime_v1"
+                ),
                 "target": "land",
                 "sorcery": True,
                 "target_controller_basic_land_tapped": True,
-                "basic_land_compensation_status": "annotation_only",
+                "basic_land_compensation_status": "runtime_executor_v1",
+                "cant_block_mode_status": "runtime_executor_v1",
+                "cant_block_target_restriction": "creatures_without_flying",
                 "_rule_logical_key": "battle_rule_v1:sundering-eruption-test",
                 "_rule_source": "curated",
                 "_rule_review_status": "verified",
@@ -1031,7 +1036,7 @@ def register_tests(battle, player):
         )
         assert removal_event["target"] == "Ancient Tomb"
         assert removal_event["target_type"] == "land"
-        assert removal_event["basic_land_compensation_status"] == "annotation_only"
+        assert removal_event["basic_land_compensation_status"] == "runtime_executor_v1"
 
     def test_star_of_extinction_exact_scope_destroys_target_land_then_damages_creatures_and_planeswalkers():
         events = []
@@ -18210,12 +18215,12 @@ def register_tests(battle, player):
         assert untimely_effect["_rule_oracle_hash"] == "877f2d75c90c7886ca9536135829bb90"
         assert (
             untimely_effect["battle_model_scope"]
-            == "modal_destroy_artifact_redirect_runtime_cant_block_annotation_v1"
+            == "modal_destroy_artifact_redirect_target_cant_block_runtime_v1"
         )
         assert untimely_effect["target"] == "artifact"
         assert untimely_effect["destroy_artifact_mode"] is True
         assert untimely_effect["redirect_target_mode_status"] == "runtime_executor_v1"
-        assert untimely_effect["cant_block_mode_status"] == "annotation_only"
+        assert untimely_effect["cant_block_mode_status"] == "runtime_executor_v1"
         assert untimely_effect["target_change_pipeline"] == "single_target_stack_object_redirect_runtime_v1"
 
     def test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance():
@@ -18412,6 +18417,315 @@ def register_tests(battle, player):
                 assert redirect_event["rule_oracle_hash"] == oracle_hash
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    def test_modal_cant_block_runtime_modes_affect_declare_blockers_until_eot():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            attacker = {
+                "name": "Lorehold Attacker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            active.battlefield = [attacker]
+            large_blocker = {
+                "name": "Large Ground Blocker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 6,
+                "toughness": 6,
+            }
+            small_blocker = {
+                "name": "Small Ground Blocker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 1,
+                "toughness": 1,
+            }
+            opponent.battlefield = [large_blocker, small_blocker]
+            untimely = {
+                "name": "Runtime Cant Block Target Test",
+                "type_line": "Instant",
+                "cmc": 2,
+            }
+            untimely_effect = {
+                "effect": "remove_permanent",
+                "instant": True,
+                "target": "artifact",
+                "modes": ["destroy_artifact", "redirect_target", "cant_block"],
+                "cant_block_mode_status": "runtime_executor_v1",
+                "battle_model_scope": "modal_destroy_artifact_redirect_runtime_cant_block_runtime_v1",
+                "_rule_logical_key": "battle_rule_v1:runtime-cant-block-target-test",
+                "_rule_oracle_hash": "runtime-cant-block-target-test-hash",
+            }
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                untimely,
+                6601,
+                random.Random(6601),
+                effect_data_override=untimely_effect,
+            )
+
+            assert large_blocker in opponent.battlefield
+            assert large_blocker.get("cant_block") is True
+            assert small_blocker.get("cant_block") is not True
+            opponent.life = 4
+            attacker["attacking"] = True
+            assignments = battle.declare_blockers_step(opponent, [attacker], 6601, random.Random(6602))
+            assert assignments == [(attacker, [small_blocker])]
+            event = next(
+                data
+                for replay_event, data in events
+                if replay_event == "cant_block_until_eot_resolved"
+                and data.get("card") == "Runtime Cant Block Target Test"
+            )
+            assert event["selected_mode"] == "cant_block"
+            assert event["affected_count"] == 1
+            assert event["affected"][0]["card"] == "Large Ground Blocker"
+            assert event["cant_block_mode_status"] == "runtime_executor_v1"
+
+            battle.clear_until_eot(opponent)
+            assert large_blocker.get("cant_block") is not True
+
+            events.clear()
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            attacker = {
+                "name": "Lorehold Giant",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            active.battlefield = [attacker]
+            target_land = {"name": "Target Land", "type_line": "Land", "effect": "land"}
+            ground_blocker = {
+                "name": "Ground Blocker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 5,
+                "toughness": 5,
+            }
+            flying_blocker = {
+                "name": "Flying Blocker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "flying": True,
+                "power": 4,
+                "toughness": 4,
+            }
+            opponent.battlefield = [target_land, ground_blocker, flying_blocker]
+            sundering = {
+                "name": "Runtime Nonfliers Cant Block Test",
+                "type_line": "Sorcery",
+                "cmc": 3,
+            }
+            sundering_effect = {
+                "effect": "remove_permanent",
+                "sorcery": True,
+                "target": "land",
+                "cant_block_mode_status": "runtime_executor_v1",
+                "cant_block_target_restriction": "creatures_without_flying",
+                "battle_model_scope": (
+                    "destroy_target_land_target_controller_basic_land_tapped_runtime_"
+                    "nonfliers_cant_block_runtime_v1"
+                ),
+                "_rule_logical_key": "battle_rule_v1:runtime-nonfliers-cant-block-test",
+                "_rule_oracle_hash": "runtime-nonfliers-cant-block-test-hash",
+            }
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                sundering,
+                6602,
+                random.Random(6603),
+                effect_data_override=sundering_effect,
+            )
+
+            assert target_land not in opponent.battlefield
+            assert attacker.get("cant_block") is True
+            assert ground_blocker.get("cant_block") is True
+            assert flying_blocker.get("cant_block") is not True
+            opponent.life = 4
+            attacker["attacking"] = True
+            assignments = battle.declare_blockers_step(opponent, [attacker], 6602, random.Random(6604))
+            assert assignments == [(attacker, [flying_blocker])]
+            event = next(
+                data
+                for replay_event, data in events
+                if replay_event == "cant_block_until_eot_resolved"
+                and data.get("card") == "Runtime Nonfliers Cant Block Test"
+            )
+            assert event["affected_count"] == 2
+            assert {entry["card"] for entry in event["affected"]} == {
+                "Lorehold Giant",
+                "Ground Blocker",
+            }
+            assert event["cant_block_target_restriction"] == "creatures_without_flying"
+            assert event["cant_block_mode_status"] == "runtime_executor_v1"
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    def test_pg066_cant_block_runtime_rules_resolve_from_sqlite_cache():
+        sundering_effect = battle.get_card_effect(
+            {"name": "Sundering Eruption // Volcanic Fissure", "type_line": "Sorcery", "cmc": 3}
+        )
+        assert sundering_effect["effect"] == "remove_permanent"
+        assert sundering_effect["_rule_logical_key"] == (
+            "battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a"
+        )
+        assert sundering_effect["_rule_oracle_hash"] == "09148a5a6f4d14c04a30bf19819e20b8"
+        assert (
+            sundering_effect["battle_model_scope"]
+            == "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1"
+        )
+        assert sundering_effect["target"] == "land"
+        assert sundering_effect["basic_land_compensation_status"] == "runtime_executor_v1"
+        assert sundering_effect["cant_block_mode_status"] == "runtime_executor_v1"
+        assert sundering_effect["cant_block_target_restriction"] == "creatures_without_flying"
+
+        untimely_effect = battle.get_card_effect(
+            {"name": "Untimely Malfunction", "type_line": "Instant", "cmc": 2}
+        )
+        assert (
+            untimely_effect["battle_model_scope"]
+            == "modal_destroy_artifact_redirect_target_cant_block_runtime_v1"
+        )
+        assert untimely_effect["redirect_target_mode_status"] == "runtime_executor_v1"
+        assert untimely_effect["cant_block_mode_status"] == "runtime_executor_v1"
+
+    def test_pg066_untimely_malfunction_cant_block_mode_uses_sqlite_rule():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            attacker = {
+                "name": "Lorehold Attacker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            active.battlefield = [attacker]
+            large_blocker = {
+                "name": "Large Ground Blocker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 6,
+                "toughness": 6,
+            }
+            small_blocker = {
+                "name": "Small Ground Blocker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 1,
+                "toughness": 1,
+            }
+            opponent.battlefield = [large_blocker, small_blocker]
+            card = {"name": "Untimely Malfunction", "type_line": "Instant", "cmc": 2}
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                6606,
+                random.Random(6606),
+                effect_data_override=battle.get_card_effect(card),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert large_blocker in opponent.battlefield
+        assert large_blocker.get("cant_block") is True
+        assert small_blocker.get("cant_block") is not True
+        opponent.life = 4
+        attacker["attacking"] = True
+        assignments = battle.declare_blockers_step(opponent, [attacker], 6606, random.Random(6607))
+        assert assignments == [(attacker, [small_blocker])]
+        event = next(
+            data
+            for replay_event, data in events
+            if replay_event == "cant_block_until_eot_resolved"
+            and data.get("card") == "Untimely Malfunction"
+        )
+        assert event["selected_mode"] == "cant_block"
+        assert event["affected_count"] == 1
+        assert event["cant_block_mode_status"] == "runtime_executor_v1"
+        assert event["rule_logical_key"] == "battle_rule_v1:667ba8e5e69696402f9cd213886e57a8"
+
+    def test_pg066_sundering_eruption_nonfliers_cant_block_uses_sqlite_rule():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            attacker = {
+                "name": "Lorehold Giant",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 4,
+                "toughness": 4,
+            }
+            active.battlefield = [attacker]
+            target_land = {"name": "Target Land", "type_line": "Land", "effect": "land"}
+            ground_blocker = {
+                "name": "Ground Blocker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "power": 5,
+                "toughness": 5,
+            }
+            flying_blocker = {
+                "name": "Flying Blocker",
+                "effect": "creature",
+                "type_line": "Creature",
+                "flying": True,
+                "power": 4,
+                "toughness": 4,
+            }
+            opponent.battlefield = [target_land, ground_blocker, flying_blocker]
+            card = {
+                "name": "Sundering Eruption // Volcanic Fissure",
+                "type_line": "Sorcery",
+                "cmc": 3,
+            }
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                card,
+                6608,
+                random.Random(6608),
+                effect_data_override=battle.get_card_effect(card),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target_land not in opponent.battlefield
+        assert attacker.get("cant_block") is True
+        assert ground_blocker.get("cant_block") is True
+        assert flying_blocker.get("cant_block") is not True
+        opponent.life = 4
+        attacker["attacking"] = True
+        assignments = battle.declare_blockers_step(opponent, [attacker], 6608, random.Random(6609))
+        assert assignments == [(attacker, [flying_blocker])]
+        event = next(
+            data
+            for replay_event, data in events
+            if replay_event == "cant_block_until_eot_resolved"
+            and data.get("card") == "Sundering Eruption // Volcanic Fissure"
+        )
+        assert event["affected_count"] == 2
+        assert event["cant_block_target_restriction"] == "creatures_without_flying"
+        assert event["cant_block_mode_status"] == "runtime_executor_v1"
+        assert event["rule_logical_key"] == "battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a"
 
     def test_pg093_insurrection_uses_compact_steal_attack_runtime():
         events = []
@@ -20296,8 +20610,11 @@ def register_tests(battle, player):
         test_pg092_untimely_malfunction_removes_artifact_only_with_rule_provenance,
         test_pg092_return_the_favor_requires_stack_spell_target_with_rule_provenance,
         test_pg065_modal_target_change_runtime_rules_redirect_stack_target,
+        test_modal_cant_block_runtime_modes_affect_declare_blockers_until_eot,
+        test_pg066_cant_block_runtime_rules_resolve_from_sqlite_cache,
+        test_pg066_untimely_malfunction_cant_block_mode_uses_sqlite_rule,
+        test_pg066_sundering_eruption_nonfliers_cant_block_uses_sqlite_rule,
         test_exact_erode_scope_can_target_planeswalker_and_preserves_basic_land_annotation,
-        test_exact_land_removal_scope_can_target_land,
         test_pg093_insurrection_uses_compact_steal_attack_runtime,
         test_pg093_insurrection_rule_resolves_from_sqlite_cache,
     ]
