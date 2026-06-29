@@ -219,6 +219,8 @@ OPTIMIZER_BASENAMES = {
 }
 
 FOCUSED_EVIDENCE_BASENAMES = {
+    "battle_card_acceleration_source_audit.py",
+    "test_battle_card_acceleration_source_audit.py",
     "battle_external_engine_crosscheck.py",
     "test_battle_external_engine_crosscheck.py",
     "battle_mtga_player_log_parser.py",

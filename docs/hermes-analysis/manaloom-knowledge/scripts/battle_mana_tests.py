@@ -80,7 +80,9 @@ def register_tests(battle, player):
         ]
         active.refresh_mana_sources(turn=1)
 
-        assert active.mana_pool.wildcard == 2
+        assert active.mana_pool.wildcard == 0
+        assert len(active.conditional_mana_sources) == 2
+        assert active.available_mana() == 2
         assert active.can_pay_card({"name": "Boros Spell", "cmc": 2, "mana_cost": "{W}{R}"})
         assert active.spend_card_mana({"name": "Boros Spell", "cmc": 2, "mana_cost": "{W}{R}"})
         assert active.available_mana() == 0
@@ -137,7 +139,8 @@ def register_tests(battle, player):
 
         active.refresh_mana_sources(turn=1)
         assert active.available_mana() == 7
-        assert active.mana_pool.wildcard == 2
+        assert active.mana_pool.wildcard == 0
+        assert len(active.conditional_mana_sources) == 2
         assert active.mana_pool.colorless == 5
         mana_vault = next(card for card in active.battlefield if card["name"] == "Mana Vault")
         assert mana_vault["tapped"] is True
@@ -153,7 +156,8 @@ def register_tests(battle, player):
         )
         active.refresh_mana_sources(turn=2)
         assert active.available_mana() == 5
-        assert active.mana_pool.wildcard == 3
+        assert active.mana_pool.wildcard == 0
+        assert len(active.conditional_mana_sources) == 3
         assert active.mana_pool.colorless == 2
 
     def test_pain_mana_source_shapes_refresh_without_new_runtime_executor():
@@ -196,8 +200,140 @@ def register_tests(battle, player):
         active.refresh_mana_sources(turn=1)
         assert active.available_mana() == 3
         assert active.mana_pool.black == 1
-        assert active.mana_pool.wildcard == 2
+        assert active.mana_pool.wildcard == 0
+        assert len(active.conditional_mana_sources) == 2
         assert active.life == 40
+
+    def test_sunbillow_verge_white_unconditional_red_requires_plains_or_mountain():
+        sunbillow = {
+            "name": "Sunbillow Verge",
+            "effect": "land",
+            "type_line": "Land",
+            "produces": "W",
+            "mana_produced": 1,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": "white",
+                    "mode": "unconditional_white_mana",
+                    "restriction": "any_spell",
+                    "status": "runtime_executor_v1",
+                },
+                {
+                    "color": "red",
+                    "mode": "red_if_control_mountain_or_plains",
+                    "requires_control_subtypes": ["Mountain", "Plains"],
+                    "restriction": "any_spell",
+                    "status": "runtime_executor_v1",
+                },
+            ],
+        }
+        red_spell = {"name": "Red Spell", "cmc": 1, "mana_cost": "{R}"}
+        white_spell = {"name": "White Spell", "cmc": 1, "mana_cost": "{W}"}
+
+        active = player("Active")
+        active.battlefield = [sunbillow.copy()]
+        active.refresh_mana_sources(turn=1)
+
+        assert active.available_mana() == 1
+        assert active.can_pay_card(white_spell) is True
+        assert active.can_pay_card(red_spell) is False
+
+        active.battlefield.append(
+            {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"}
+        )
+        active.refresh_mana_sources(turn=2)
+
+        assert active.available_mana() == 2
+        assert active.can_pay_card(red_spell) is True
+        assert active.spend_card_mana(red_spell) is True
+        assert active.available_mana() == 1
+
+    def test_opening_hand_virtual_mana_respects_sunbillow_red_condition():
+        sunbillow = {
+            "name": "Sunbillow Verge",
+            "effect": "land",
+            "type_line": "Land",
+            "produces": "W",
+            "mana_produced": 1,
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": "white",
+                    "mode": "unconditional_white_mana",
+                    "restriction": "any_spell",
+                    "status": "runtime_executor_v1",
+                },
+                {
+                    "color": "red",
+                    "mode": "red_if_control_mountain_or_plains",
+                    "requires_control_subtypes": ["Mountain", "Plains"],
+                    "restriction": "any_spell",
+                    "status": "runtime_executor_v1",
+                },
+            ],
+        }
+        red_spell = {"name": "Red Spell", "cmc": 1, "mana_cost": "{R}"}
+
+        assert battle._opening_hand_subset_can_pay_cost(red_spell, [sunbillow]) is False
+        assert battle._opening_hand_subset_can_pay_cost(
+            red_spell,
+            [
+                sunbillow,
+                {"name": "Plains", "effect": "land", "type_line": "Basic Land — Plains"},
+            ],
+        ) is True
+
+    def test_spectator_seating_enters_tapped_with_fewer_than_two_opponents():
+        active = player("Active")
+        opponent = player("Opponent")
+        land = {
+            "name": "Spectator Seating",
+            "effect": "land",
+            "type_line": "Land",
+            "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {R} or {W}.",
+            "produces": "RW",
+            "mana_produced": 1,
+        }
+        active.hand = [land]
+
+        assert battle.play_land_candidate(
+            active,
+            [opponent],
+            [active, opponent],
+            1,
+            battle.Stack(),
+            {"card": land, "source_zone": "hand"},
+        ) is True
+        assert active.battlefield[0].get("tapped") is True
+        assert active.available_mana() == 0
+
+    def test_spectator_seating_enters_untapped_with_two_opponents_and_only_pays_boros():
+        active = player("Active")
+        opponent_a = player("Opponent A")
+        opponent_b = player("Opponent B")
+        land = {
+            "name": "Spectator Seating",
+            "effect": "land",
+            "type_line": "Land",
+            "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {R} or {W}.",
+            "produces": "RW",
+            "mana_produced": 1,
+        }
+        active.hand = [land]
+
+        assert battle.play_land_candidate(
+            active,
+            [opponent_a, opponent_b],
+            [active, opponent_a, opponent_b],
+            1,
+            battle.Stack(),
+            {"card": land, "source_zone": "hand"},
+        ) is True
+        assert active.battlefield[0].get("tapped") in (None, False)
+        assert active.available_mana() == 1
+        assert active.can_pay_card({"name": "Red Spell", "cmc": 1, "mana_cost": "{R}"}) is True
+        assert active.can_pay_card({"name": "Blue Spell", "cmc": 1, "mana_cost": "{U}"}) is False
 
     def test_global_creatures_tap_for_any_color_passive_turns_creatures_into_mana_sources():
         active = player("Active")
@@ -454,6 +590,10 @@ def register_tests(battle, player):
         test_l1b_nonfetch_lands_refresh_as_flexible_mana_sources,
         test_l3a_artifact_mana_rocks_refresh_with_oracle_scopes,
         test_pain_mana_source_shapes_refresh_without_new_runtime_executor,
+        test_sunbillow_verge_white_unconditional_red_requires_plains_or_mountain,
+        test_opening_hand_virtual_mana_respects_sunbillow_red_condition,
+        test_spectator_seating_enters_tapped_with_fewer_than_two_opponents,
+        test_spectator_seating_enters_untapped_with_two_opponents_and_only_pays_boros,
         test_global_creatures_tap_for_any_color_passive_turns_creatures_into_mana_sources,
         test_enduring_vitality_static_mana_grant_respects_summoning_sickness_on_self,
         test_training_grounds_reduces_generic_creature_activation_cost_to_floor_one,

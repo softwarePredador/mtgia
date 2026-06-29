@@ -3285,6 +3285,203 @@ def mana_source_colors_for_state(player, source):
     return source_colors(source)
 
 
+CONDITIONAL_MANA_RUNTIME_STATUSES = {
+    "runtime_executor_v1",
+    "runtime_executor",
+    "executable",
+    "enabled",
+}
+
+
+def _mana_runtime_status_enabled(value):
+    return str(value or "").strip().lower() in CONDITIONAL_MANA_RUNTIME_STATUSES
+
+
+def _mana_mode_color(value):
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    upper = raw.upper()
+    if upper in MANA_SYMBOL_TO_POOL:
+        return MANA_SYMBOL_TO_POOL[upper]
+    lowered = raw.lower()
+    aliases = {
+        "w": "white",
+        "u": "blue",
+        "b": "black",
+        "r": "red",
+        "g": "green",
+        "c": "colorless",
+        "any": "wildcard",
+        "any_color": "wildcard",
+    }
+    lowered = aliases.get(lowered, lowered)
+    if lowered in {"white", "blue", "black", "red", "green", "colorless", "generic", "wildcard"}:
+        return lowered
+    return None
+
+
+def _source_explicit_mana_colors(source):
+    if not isinstance(source, dict):
+        return []
+    explicit = (
+        source.get("produces")
+        or source.get("produced_mana")
+        or source.get("color_identity")
+    )
+    if isinstance(explicit, str):
+        explicit = re.findall(r"[WUBRGC]", explicit.upper())
+    elif not isinstance(explicit, list):
+        explicit = _as_list(explicit)
+    colors = []
+    for value in explicit or []:
+        color = _mana_mode_color(value)
+        if color and color not in colors:
+            colors.append(color)
+    return colors
+
+
+def _read_conditional_mana_modes(source):
+    modes = source.get("conditional_mana_modes") if isinstance(source, dict) else None
+    if isinstance(modes, str):
+        decoded = read_json_list(modes)
+        if decoded is None:
+            try:
+                decoded = json.loads(modes)
+            except Exception:
+                decoded = None
+        modes = decoded
+    return [mode for mode in _as_list(modes) if isinstance(mode, dict)]
+
+
+def _player_controls_any_subtype(player, subtypes):
+    subtype_values = [str(value).strip() for value in _as_list(subtypes) if str(value).strip()]
+    if not subtype_values:
+        return True
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if any(permanent_has_subtype(permanent, subtype) for subtype in subtype_values):
+            return True
+    return False
+
+
+def _conditional_mana_mode_conditions_met(player, mode):
+    required_subtypes = (
+        mode.get("requires_control_subtypes")
+        or mode.get("requires_control_land_subtypes")
+        or mode.get("requires_control_basic_land_subtypes")
+    )
+    if required_subtypes and not _player_controls_any_subtype(player, required_subtypes):
+        return False
+    return True
+
+
+def _conditional_mana_source_entry(source, amount, modes, source_kind):
+    available_modes = []
+    seen = set()
+    for mode in modes:
+        color = _mana_mode_color(mode.get("color") or mode.get("mana") or mode.get("produces"))
+        if not color:
+            continue
+        key = (
+            color,
+            str(mode.get("restriction") or mode.get("spend_restriction") or "").strip().lower(),
+            str(mode.get("mode") or mode.get("condition") or "").strip().lower(),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        available_modes.append(
+            {
+                "color": color,
+                "restriction": mode.get("restriction") or mode.get("spend_restriction") or "any_spell",
+                "mode": mode.get("mode") or mode.get("condition") or source_kind,
+                "life_loss_on_spend": int(mode.get("life_loss_on_spend") or 0),
+            }
+        )
+    if not available_modes:
+        return None
+    return {
+        "source": source.get("name", "?") if isinstance(source, dict) else str(source),
+        "amount": max(0, int(amount or 0)),
+        "remaining": max(0, int(amount or 0)),
+        "modes": available_modes,
+        "source_kind": source_kind,
+        "rule_fields": replay_rule_fields(source) if isinstance(source, dict) else {},
+    }
+
+
+def _configured_conditional_mana_source_for_state(player, source, produced):
+    if not isinstance(source, dict):
+        return None
+    modes = _read_conditional_mana_modes(source)
+    if not modes:
+        return None
+    overall_runtime_enabled = _mana_runtime_status_enabled(source.get("conditional_mana_modes_status"))
+    active_modes = []
+    for mode in modes:
+        mode_status = mode.get("status")
+        if mode_status and not _mana_runtime_status_enabled(mode_status):
+            continue
+        if not mode_status and not overall_runtime_enabled:
+            continue
+        if not _conditional_mana_mode_conditions_met(player, mode):
+            continue
+        active_modes.append(mode)
+    if not active_modes:
+        return None
+    return _conditional_mana_source_entry(
+        source,
+        produced,
+        active_modes,
+        "configured_conditional_mana_modes",
+    )
+
+
+def conditional_mana_source_for_state(player, source, produced):
+    configured = _configured_conditional_mana_source_for_state(player, source, produced)
+    if configured:
+        return configured
+    explicit_colors = _source_explicit_mana_colors(source)
+    if len(explicit_colors) <= 1:
+        return None
+    return _conditional_mana_source_entry(
+        source,
+        produced,
+        [{"color": color, "restriction": "any_spell", "mode": "explicit_mana_choice"} for color in explicit_colors],
+        "explicit_mana_choices",
+    )
+
+
+def replay_conditional_mana_source(source):
+    if not isinstance(source, dict):
+        return {}
+    modes = source.get("modes") or []
+    return {
+        "source": source.get("source"),
+        "amount": int(source.get("remaining", source.get("amount", 0)) or 0),
+        "colors": sorted({mode.get("color") for mode in modes if mode.get("color")}),
+        "modes": [
+            {
+                "color": mode.get("color"),
+                "restriction": mode.get("restriction"),
+                "mode": mode.get("mode"),
+            }
+            for mode in modes
+        ],
+        "source_kind": source.get("source_kind"),
+    }
+
+
+def replay_conditional_mana_sources(player):
+    return [
+        replay_conditional_mana_source(source)
+        for source in getattr(player, "conditional_mana_sources", []) or []
+        if int(source.get("remaining", 0) or 0) > 0
+    ]
+
+
 def add_plus_one_counters(permanent, count=1):
     if not isinstance(permanent, dict):
         return
@@ -3601,6 +3798,52 @@ def mana_source_production_for_state(player, source):
     if source.get("mana_produced_from_colors_among_permanents"):
         return len(_controlled_permanent_mana_colors(player))
     return int(source.get("mana_produced", 1) or 0)
+
+
+def add_player_mana_source_to_pool(player, source, turn=None):
+    if not hasattr(player, "conditional_mana_sources"):
+        player.conditional_mana_sources = []
+    produced = mana_source_production_for_state(player, source)
+    if produced <= 0:
+        return False
+    conditional_source = conditional_mana_source_for_state(player, source, produced)
+    if conditional_source:
+        player.conditional_mana_sources.append(conditional_source)
+        return True
+    colors = mana_source_colors_for_state(player, source)
+    color = colors[0] if len(colors) == 1 else "generic"
+    player.mana_pool.add(color, produced)
+    return True
+
+
+def _live_opponent_count(opponents):
+    count = 0
+    for opponent in opponents or []:
+        if hasattr(opponent, "is_alive") and not opponent.is_alive():
+            continue
+        count += 1
+    return count
+
+
+def land_enters_tapped_for_state(land, player=None, opponents=None):
+    if not isinstance(land, dict):
+        return False
+    if land.get("enters_tapped") or land.get("land_enters_tapped"):
+        return True
+    threshold = land.get("enters_tapped_unless_opponent_count")
+    oracle_text = str(land.get("oracle_text") or "").lower()
+    if threshold in (None, "", 0) and re.search(
+        r"enters tapped unless you have (two|2) or more opponents",
+        oracle_text,
+    ):
+        threshold = 2
+    if threshold in (None, "", 0):
+        return False
+    try:
+        required_opponents = max(0, int(threshold))
+    except (TypeError, ValueError):
+        return False
+    return _live_opponent_count(opponents) < required_opponents
 
 
 def pay_mana_source_activation_costs(player, source, turn=None):
@@ -6705,6 +6948,7 @@ class Player:
         self.commander_damage_by_source = defaultdict(int)
         self.mana_pool = ManaPool()
         self.restricted_mana = {}
+        self.conditional_mana_sources = []
         self.lands_played_this_turn = 0
         self.max_lands_per_turn = 1
         self.is_human = is_human
@@ -6761,6 +7005,7 @@ class Player:
         """Untap mana sources once for this player's turn."""
         self.mana_pool.empty()
         self.restricted_mana = {}
+        self.conditional_mana_sources = []
         refresh_graveyard_count_creature_statics_for_player(
             self,
             turn=turn,
@@ -6785,6 +7030,12 @@ class Player:
                 continue
             if not pay_mana_source_activation_costs(self, source, turn=turn):
                 continue
+            conditional_source = conditional_mana_source_for_state(self, source, produced)
+            if conditional_source:
+                self.conditional_mana_sources.append(conditional_source)
+                mark_mana_source_used_if_nonstandard_untap(source)
+                active_sources += 1
+                continue
             colors = mana_source_colors_for_state(self, source)
             # A source with multiple options is treated as flexible generic unless
             # the imported data specifies one concrete produced color.
@@ -6798,6 +7049,7 @@ class Player:
             mana=self.available_mana(),
             sources=active_sources,
             mana_pool=self.mana_pool.snapshot(),
+            conditional_mana_sources=replay_conditional_mana_sources(self),
             treasures=self.treasures,
             turn=turn,
         )
@@ -6806,7 +7058,11 @@ class Player:
         return treasure_mana_value_for_player(self)
 
     def available_mana(self):
-        return self.mana_pool.total() + (self.treasures * self.treasure_mana_value())
+        conditional_total = sum(
+            max(0, int(source.get("remaining", 0) or 0))
+            for source in getattr(self, "conditional_mana_sources", []) or []
+        )
+        return self.mana_pool.total() + conditional_total + (self.treasures * self.treasure_mana_value())
 
     def add_restricted_mana(self, amount, restriction, color="wildcard"):
         restriction = str(restriction or "").strip().lower()
@@ -6827,6 +7083,18 @@ class Player:
             restriction: defaultdict(int, dict(colors))
             for restriction, colors in self.restricted_mana.items()
         }
+        conditional_sources = []
+        for source in getattr(self, "conditional_mana_sources", []) or []:
+            if not isinstance(source, dict):
+                continue
+            cloned = dict(source)
+            cloned["modes"] = [dict(mode) for mode in source.get("modes", []) if isinstance(mode, dict)]
+            cloned["remaining"] = max(
+                0,
+                int(source.get("remaining", source.get("amount", 0)) or 0),
+            )
+            if cloned["remaining"] > 0 and cloned["modes"]:
+                conditional_sources.append(cloned)
         treasure_unit_value = max(1, int(self.treasure_mana_value() or 1))
         treasure_mana = self.treasures * treasure_unit_value
         life_payment = 0
@@ -6849,6 +7117,90 @@ class Player:
                 if tag == "any_spell" or tag in spend_tags:
                     allowed.append(restriction)
             return allowed
+
+        def conditional_mode_allowed(mode):
+            restriction = str(mode.get("restriction") or "any_spell").strip().lower()
+            tag = restriction_aliases.get(restriction, restriction)
+            return tag in {"", "any", "any_spell"} or tag in spend_tags
+
+        def conditional_modes_for_color(source, color):
+            exact = []
+            flexible = []
+            for mode in source.get("modes", []) or []:
+                if not conditional_mode_allowed(mode):
+                    continue
+                mode_color = str(mode.get("color") or "").strip().lower()
+                if mode_color == color:
+                    exact.append(mode)
+                elif mode_color == "wildcard":
+                    flexible.append(mode)
+            return exact + flexible
+
+        def conditional_modes_for_generic(source):
+            modes = [
+                mode
+                for mode in source.get("modes", []) or []
+                if conditional_mode_allowed(mode)
+            ]
+            return sorted(modes, key=lambda mode: int(mode.get("life_loss_on_spend") or 0))
+
+        def conditional_color_available(color):
+            return sum(
+                int(source.get("remaining", 0) or 0)
+                for source in conditional_sources
+                if int(source.get("remaining", 0) or 0) > 0
+                and conditional_modes_for_color(source, color)
+            )
+
+        def spend_conditional_color_up_to(color, amount=1):
+            nonlocal life_payment
+            remaining = int(amount or 0)
+            spent = 0
+            for source in conditional_sources:
+                if remaining <= 0:
+                    break
+                source_remaining = int(source.get("remaining", 0) or 0)
+                if source_remaining <= 0:
+                    continue
+                modes = conditional_modes_for_color(source, color)
+                if not modes:
+                    continue
+                paid = min(source_remaining, remaining)
+                mode = modes[0]
+                source["remaining"] = source_remaining - paid
+                life_payment += int(mode.get("life_loss_on_spend") or 0) * paid
+                spent += paid
+                remaining -= paid
+            return spent
+
+        def conditional_generic_available():
+            return sum(
+                int(source.get("remaining", 0) or 0)
+                for source in conditional_sources
+                if int(source.get("remaining", 0) or 0) > 0
+                and conditional_modes_for_generic(source)
+            )
+
+        def spend_conditional_generic_up_to(amount):
+            nonlocal life_payment
+            remaining = int(amount or 0)
+            spent = 0
+            for source in conditional_sources:
+                if remaining <= 0:
+                    break
+                source_remaining = int(source.get("remaining", 0) or 0)
+                if source_remaining <= 0:
+                    continue
+                modes = conditional_modes_for_generic(source)
+                if not modes:
+                    continue
+                paid = min(source_remaining, remaining)
+                mode = modes[0]
+                source["remaining"] = source_remaining - paid
+                life_payment += int(mode.get("life_loss_on_spend") or 0) * paid
+                spent += paid
+                remaining -= paid
+            return spent
 
         def restricted_color_available(color):
             available = 0
@@ -6928,6 +7280,11 @@ class Player:
                 generic_missing -= paid
                 if generic_missing == 0:
                     return True
+            conditional_available = conditional_generic_available()
+            if conditional_available:
+                generic_missing -= spend_conditional_generic_up_to(generic_missing)
+                if generic_missing == 0:
+                    return True
             restricted_available = restricted_generic_available()
             if restricted_available:
                 if restricted_available + treasure_mana < generic_missing:
@@ -6947,6 +7304,8 @@ class Player:
             wildcard_paid = min(pool["wildcard"], missing)
             pool["wildcard"] -= wildcard_paid
             missing -= wildcard_paid
+            if missing:
+                missing -= spend_conditional_color_up_to(color, missing)
             restricted_available = restricted_color_available(color)
             if missing and restricted_available:
                 if restricted_available + treasure_mana < missing:
@@ -6961,6 +7320,8 @@ class Player:
                 pool[color] -= 1
             elif pool["wildcard"] > 0:
                 pool["wildcard"] -= 1
+            elif spend_conditional_color_up_to(color):
+                pass
             elif spend_restricted_color_up_to(color):
                 pass
             elif treasure_mana > 0:
@@ -6976,6 +7337,8 @@ class Player:
                 pool[chosen] -= 1
             elif pool["wildcard"] > 0:
                 pool["wildcard"] -= 1
+            elif any(spend_conditional_color_up_to(color) for color in options):
+                pass
             elif any(spend_restricted_color_up_to(color) for color in options):
                 pass
             elif treasure_mana > 0:
@@ -6991,6 +7354,8 @@ class Player:
                 pool[chosen] -= 1
             elif pool["wildcard"] > 0:
                 pool["wildcard"] -= 1
+            elif any(spend_conditional_color_up_to(color) for color in options):
+                pass
             elif any(spend_restricted_color_up_to(color) for color in options):
                 pass
             elif treasure_mana > 0:
@@ -7005,6 +7370,8 @@ class Player:
                 pool[color] -= 1
             elif pool["wildcard"] > 0:
                 pool["wildcard"] -= 1
+            elif color and spend_conditional_color_up_to(color):
+                pass
             elif color and spend_restricted_color_up_to(color):
                 pass
             elif treasure_mana > 0:
@@ -7014,7 +7381,7 @@ class Player:
 
         if not spend_generic(parsed["generic"]):
             return None
-        return pool, treasure_mana // treasure_unit_value, life_payment, restricted_pool
+        return pool, treasure_mana // treasure_unit_value, life_payment, restricted_pool, conditional_sources
 
     def can_pay(self, cost):
         return self._payment_plan(cost) is not None
@@ -7027,7 +7394,7 @@ class Player:
         plan = self._payment_plan(cost)
         if plan is None:
             return False
-        pool, self.treasures, life_payment, restricted_pool = plan
+        pool, self.treasures, life_payment, restricted_pool, conditional_sources = plan
         for color, amount in pool.items():
             setattr(self.mana_pool, color, amount)
         self.restricted_mana = {
@@ -7042,6 +7409,11 @@ class Player:
             for restriction, colors in restricted_pool.items()
             if any(amount > 0 for amount in colors.values())
         }
+        self.conditional_mana_sources = [
+            source
+            for source in conditional_sources
+            if int(source.get("remaining", 0) or 0) > 0
+        ]
         if life_payment:
             change_life(self, -life_payment)
         return True
@@ -7850,13 +8222,33 @@ def _opening_hand_virtual_mana_pool(lands):
     return pool
 
 
+def _opening_hand_virtual_player(lands):
+    ghost = Player("__opening_hand__", None, [])
+    ghost.battlefield = []
+    fetch_fixing_sources = 0
+    for land in lands:
+        if not isinstance(land, dict):
+            ghost.battlefield.append(land)
+            continue
+        if normalize_card_name(land.get("name", "")) in FETCH_LAND_NAMES:
+            fetch_fixing_sources += 1
+            continue
+        permanent = enrich_card({**land, "effect": "land"})
+        initialize_special_land_runtime_state(permanent, turn=0)
+        ghost.battlefield.append(permanent)
+    ghost.treasures = 0
+    ghost.restricted_mana = {}
+    ghost.conditional_mana_sources = []
+    ghost.refresh_mana_sources(turn=0)
+    if fetch_fixing_sources:
+        ghost.mana_pool.add("wildcard", fetch_fixing_sources)
+    return ghost
+
+
 def _opening_hand_subset_can_pay_cost(card, land_subset):
     if not isinstance(card, dict):
         return False
-    ghost = Player("__opening_hand__", None, [])
-    ghost.mana_pool = _opening_hand_virtual_mana_pool(land_subset)
-    ghost.treasures = 0
-    ghost.restricted_mana = {}
+    ghost = _opening_hand_virtual_player(land_subset)
     return ghost.can_pay(card_mana_cost(card))
 
 
@@ -9660,16 +10052,19 @@ def _can_pay_any_survival_response_from_state(
     treasures,
     restricted_mana,
     life,
+    conditional_mana_sources=None,
 ):
     original_pool = player.mana_pool.snapshot()
     original_treasures = player.treasures
     original_restricted = copy.deepcopy(player.restricted_mana)
+    original_conditional = copy.deepcopy(getattr(player, "conditional_mana_sources", []))
     original_life = player.life
     try:
         for color, amount in pool_snapshot.items():
             setattr(player.mana_pool, color, amount)
         player.treasures = treasures
         player.restricted_mana = copy.deepcopy(restricted_mana)
+        player.conditional_mana_sources = copy.deepcopy(conditional_mana_sources or [])
         player.life = life
         return any(player.can_pay_card(card) for card, _effect in response_cards)
     finally:
@@ -9677,6 +10072,7 @@ def _can_pay_any_survival_response_from_state(
             setattr(player.mana_pool, color, amount)
         player.treasures = original_treasures
         player.restricted_mana = original_restricted
+        player.conditional_mana_sources = original_conditional
         player.life = original_life
 
 
@@ -9702,7 +10098,7 @@ def survival_response_reservation_context(player, card, effect_data=None, additi
     payment_plan = player._payment_plan(card_mana_cost(card, additional_generic))
     if payment_plan is None:
         return None
-    pool_after, treasures_after, life_payment, restricted_after = payment_plan
+    pool_after, treasures_after, life_payment, restricted_after, conditional_after = payment_plan
     life_after = player.life - life_payment
     if _can_pay_any_survival_response_from_state(
         player,
@@ -9711,6 +10107,7 @@ def survival_response_reservation_context(player, card, effect_data=None, additi
         treasures_after,
         restricted_after,
         life_after,
+        conditional_after,
     ):
         return None
     return {
@@ -15591,13 +15988,24 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
 
     eff = get_card_effect(land)
     land_permanent = enrich_card({**land, **eff, "effect": "land"})
+    if land_enters_tapped_for_state(land_permanent, player=player, opponents=opponents):
+        land_permanent["enters_tapped"] = True
+    land_permanent = prepare_entering_permanent(
+        land_permanent,
+        controller=player,
+        all_players=all_players,
+        turn=turn,
+    )
     initialize_special_land_runtime_state(land_permanent, turn)
     player.battlefield.append(land_permanent)
     player.lands_played_this_turn += 1
-    player.mana_pool.add(
-        source_colors(land_permanent)[0],
-        int(land_permanent.get("mana_produced") or 1),
-    )
+    mana_available_from_land = False
+    if not land_permanent.get("tapped"):
+        mana_available_from_land = add_player_mana_source_to_pool(
+            player,
+            land_permanent,
+            turn=turn,
+        )
     trigger_landfall(
         player,
         land_permanent,
@@ -15625,7 +16033,11 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
         effect=eff.get("effect", "land"),
         type_line=land_permanent.get("type_line", ""),
         mana_produced=int(land_permanent.get("mana_produced") or 1),
+        enters_tapped=bool(land_permanent.get("enters_tapped")),
+        tapped=bool(land_permanent.get("tapped")),
+        mana_available_from_land=mana_available_from_land,
         mana_pool_after=player.mana_pool.snapshot(),
+        conditional_mana_sources_after=replay_conditional_mana_sources(player),
         board_snapshot=[replay_card_snapshot(card) for card in player.battlefield],
         life_after=player.life,
         source_zone=source_zone,

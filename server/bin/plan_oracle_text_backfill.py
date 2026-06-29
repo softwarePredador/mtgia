@@ -31,6 +31,7 @@ REPO_ROOT = SCRIPT_DIR.parents[1]
 LEARNED_AUDIT_PATH = SCRIPT_DIR / "learned_deck_coherence_audit.py"
 SCRYFALL_NAMED_URL = "https://api.scryfall.com/cards/named"
 USER_AGENT = "ManaLoomOracleTextBackfillPlan/1.0"
+MULTIFACE_SEPARATORS = (" // ", "//", " / ")
 
 
 def utc_now() -> str:
@@ -56,6 +57,74 @@ def normalize_key(value: str | None) -> str:
     return " ".join(value.strip().lower().split())
 
 
+def strip_decklist_quantity(value: str) -> str:
+    """Remove common decklist quantity prefixes without touching card names."""
+    text = " ".join(str(value or "").strip().split())
+    if not text:
+        return ""
+    text = re_sub(r"^\s*\d+\s*x?\s+", "", text, flags="i")
+    text = re_sub(r"^\s*x\d+\s+", "", text, flags="i")
+    return text.strip()
+
+
+def strip_set_suffix(value: str) -> str:
+    """Remove a trailing set-code collector suffix from pasted decklist names."""
+    text = " ".join(str(value or "").strip().split())
+    return re_sub(r"\s+\([A-Za-z0-9]{2,6}\)\s*$", "", text).strip()
+
+
+def front_face_name(value: str) -> str | None:
+    text = str(value or "").strip()
+    for separator in MULTIFACE_SEPARATORS:
+        if separator in text:
+            first = text.split(separator, 1)[0].strip()
+            return first or None
+    return None
+
+
+def scryfall_lookup_attempts(name: str) -> list[dict[str, str]]:
+    """Build deterministic Scryfall lookup attempts from safest to riskiest.
+
+    Exact original-name lookup remains first. Front-face exact lookup catches
+    MDFC/split/adventure rows imported with display-name variants or pasted set
+    suffixes. Fuzzy is deliberately last because it is not identity-safe enough
+    for automatic PostgreSQL writes.
+    """
+    attempts: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+
+    def add(strategy: str, mode: str, query: str | None) -> None:
+        cleaned = " ".join(str(query or "").strip().split())
+        if not cleaned:
+            return
+        key = (mode, normalize_key(cleaned))
+        if key in seen:
+            return
+        seen.add(key)
+        attempts.append({"strategy": strategy, "mode": mode, "query": cleaned})
+
+    original = " ".join(str(name or "").strip().split())
+    without_quantity = strip_decklist_quantity(original)
+    without_set = strip_set_suffix(without_quantity)
+    add("exact_original", "exact", original)
+    if without_quantity != original:
+        add("exact_without_quantity", "exact", without_quantity)
+    if without_set != without_quantity:
+        add("exact_without_set_suffix", "exact", without_set)
+    add("exact_front_face", "exact", front_face_name(without_set))
+    add("fuzzy_original", "fuzzy", without_set or original)
+    return attempts
+
+
+def re_sub(pattern: str, replacement: str, value: str, *, flags: str = "") -> str:
+    import re
+
+    re_flags = 0
+    if "i" in flags.lower():
+        re_flags |= re.IGNORECASE
+    return re.sub(pattern, replacement, value, flags=re_flags)
+
+
 def scryfall_oracle_text(card: dict[str, Any]) -> str:
     oracle_text = str(card.get("oracle_text") or "").strip()
     if oracle_text:
@@ -79,6 +148,8 @@ def scryfall_oracle_text(card: dict[str, Any]) -> str:
 
 def scryfall_candidate(card: dict[str, Any]) -> dict[str, Any]:
     oracle_text = scryfall_oracle_text(card)
+    faces = card.get("card_faces")
+    card_faces_present = isinstance(faces, list) and bool(faces)
     return {
         "found": True,
         "id": card.get("id"),
@@ -86,14 +157,23 @@ def scryfall_candidate(card: dict[str, Any]) -> dict[str, Any]:
         "name": card.get("name"),
         "type_line": card.get("type_line"),
         "layout": card.get("layout"),
+        "card_faces_present": card_faces_present,
+        "card_face_count": len(faces) if isinstance(faces, list) else 0,
         "oracle_text_present": bool(oracle_text),
         "oracle_text_length": len(oracle_text),
         "color_identity": card.get("color_identity") or [],
     }
 
 
-def fetch_scryfall_exact(name: str, timeout_seconds: int) -> dict[str, Any]:
-    query = urllib.parse.urlencode({"exact": name})
+def fetch_scryfall_named(
+    query_name: str,
+    *,
+    mode: str,
+    timeout_seconds: int,
+) -> dict[str, Any]:
+    if mode not in {"exact", "fuzzy"}:
+        raise ValueError(f"Unsupported Scryfall named lookup mode: {mode}")
+    query = urllib.parse.urlencode({mode: query_name})
     request = urllib.request.Request(
         f"{SCRYFALL_NAMED_URL}?{query}",
         headers={
@@ -119,7 +199,11 @@ def fetch_scryfall_exact(name: str, timeout_seconds: int) -> dict[str, Any]:
             details = str(error)
         return {"found": False, "status": error.code, "error": details}
     except Exception as error:
-        curl_result = fetch_scryfall_exact_with_curl(name, timeout_seconds)
+        curl_result = fetch_scryfall_named_with_curl(
+            query_name,
+            mode=mode,
+            timeout_seconds=timeout_seconds,
+        )
         if curl_result.get("found"):
             return curl_result | {"transport": "curl_fallback"}
         return {
@@ -129,11 +213,15 @@ def fetch_scryfall_exact(name: str, timeout_seconds: int) -> dict[str, Any]:
         }
 
 
-def fetch_scryfall_exact_with_curl(
-    name: str,
+def fetch_scryfall_named_with_curl(
+    query_name: str,
+    *,
+    mode: str,
     timeout_seconds: int,
 ) -> dict[str, Any]:
-    query = urllib.parse.urlencode({"exact": name})
+    if mode not in {"exact", "fuzzy"}:
+        raise ValueError(f"Unsupported Scryfall named lookup mode: {mode}")
+    query = urllib.parse.urlencode({mode: query_name})
     url = f"{SCRYFALL_NAMED_URL}?{query}"
     try:
         result = subprocess.run(
@@ -165,6 +253,44 @@ def fetch_scryfall_exact_with_curl(
         "status": decoded.get("status") if isinstance(decoded, dict) else None,
         "error": decoded.get("details") if isinstance(decoded, dict) else None,
     }
+
+
+def fetch_scryfall_best_match(name: str, timeout_seconds: int) -> dict[str, Any]:
+    attempts = scryfall_lookup_attempts(name)
+    failures: list[dict[str, Any]] = []
+    for attempt in attempts:
+        result = fetch_scryfall_named(
+            attempt["query"],
+            mode=attempt["mode"],
+            timeout_seconds=timeout_seconds,
+        )
+        if result.get("found"):
+            return result | {
+                "lookup_strategy": attempt["strategy"],
+                "lookup_mode": attempt["mode"],
+                "lookup_query": attempt["query"],
+                "lookup_attempts": attempts,
+            }
+        failures.append(
+            {
+                "strategy": attempt["strategy"],
+                "mode": attempt["mode"],
+                "query": attempt["query"],
+                "status": result.get("status"),
+                "error": result.get("error"),
+            }
+        )
+    return {
+        "found": False,
+        "lookup_attempts": attempts,
+        "lookup_failures": failures,
+        "error": failures[-1]["error"] if failures else "no lookup attempts",
+    }
+
+
+def fetch_scryfall_exact(name: str, timeout_seconds: int) -> dict[str, Any]:
+    """Backward-compatible wrapper kept for older callers/tests."""
+    return fetch_scryfall_named(name, mode="exact", timeout_seconds=timeout_seconds)
 
 
 @dataclass
@@ -375,7 +501,7 @@ def main(argv: list[str] | None = None) -> int:
     scryfall_by_name: dict[str, dict[str, Any]] = {}
     if not args.no_scryfall:
         for index, item in enumerate(planned):
-            scryfall_by_name[item.name] = fetch_scryfall_exact(
+            scryfall_by_name[item.name] = fetch_scryfall_best_match(
                 item.name,
                 args.timeout_seconds,
             )
