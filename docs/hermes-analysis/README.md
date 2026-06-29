@@ -11,6 +11,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
 ## Decisoes atuais XMage -> ManaLoom
 
+- `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`
+  - Status: `frozen_operating_contract`.
+  - Contrato congelado de seguimento: rode um checkpoint curto de invariantes e
+    siga para family mapping/subpadroes; nao reabra a estrategia inteira quando
+    o checkpoint passar.
+  - Define a ordem padrao: pacote exato nao-generico pronto, `ramp_permanent`,
+    `targeted_interaction`, `tutor`, `free_cast`, depois familias residuais por
+    evidencia de replay/deck.
+  - Bloqueia promocao de `xmage_*_review_v1`, execucao de pattern registry,
+    Hermes como verdade acima do PostgreSQL e battle agregado sem carta
+    comprada/usada ou focused test.
+
 - `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
   - Status: `current_operating_standard`.
   - Fluxo operacional atual para absorver XMage/Oracle/Fonte externa em

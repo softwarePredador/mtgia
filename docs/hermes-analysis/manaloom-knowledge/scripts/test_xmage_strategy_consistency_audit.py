@@ -69,6 +69,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
             definitive = root / "definitive.md"
+            contract = root / "contract.md"
             root_readme = root / "README.md"
             doc_index = root / "index.md"
             report_readme = root / "reports.md"
@@ -80,6 +81,8 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                 "\n".join(
                     [
                         "Status: `current_operating_standard`",
+                        "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md",
+                        "If the contract checkpoint passes",
                         "broad XMage extraction may create review candidates and family lanes",
                         "must not create executable battle truth or PostgreSQL promotion by itself",
                         "PostgreSQL remains the durable source of truth",
@@ -91,9 +94,30 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
+            contract.write_text(
+                "\n".join(
+                    [
+                        "Status: `frozen_operating_contract`",
+                        "Do not revalidate the whole battle/rules philosophy before each card wave.",
+                        "PostgreSQL `card_battle_rules` is the durable source of truth",
+                        "Hermes SQLite is cache/lab/runtime evidence and must not overwrite PostgreSQL",
+                        "Broad XMage extraction may create review candidates and family lanes only",
+                        "Generic `xmage_*_review_v1` scopes are review/split-only and never batch PG candidates",
+                        "Pattern registry rows are `shadow_only`, non-executable, and non-autopromotable",
+                        "A battle aggregate is not card-level proof unless the candidate card was drawn/used or a focused test exercised it",
+                        "Rebuild the current replay/deck scope queue",
+                        "ramp_permanent",
+                        "targeted_interaction",
+                        "Hazel's Brewmaster",
+                    ]
+                ),
+                encoding="utf-8",
+            )
             root_readme.write_text(
                 "\n".join(
                     [
+                        "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md",
+                        "frozen_operating_contract",
                         "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
                         "current_operating_standard",
                         "Nao devem ser usados como contrato operacional",
@@ -103,7 +127,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                 encoding="utf-8",
             )
             doc_index.write_text(
-                "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md current supersede o uso operacional dos planos XMage de 2026-06-23/24",
+                "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md checkpoint curto de invariantes XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md current supersede o uso operacional dos planos XMage de 2026-06-23/24",
                 encoding="utf-8",
             )
             report_readme.write_text(
@@ -135,6 +159,7 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
 
             args = SimpleNamespace(
                 definitive_flow=str(definitive),
+                frozen_contract=str(contract),
                 root_readme=str(root_readme),
                 doc_index=str(doc_index),
                 report_readme=str(report_readme),
@@ -148,6 +173,31 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
 
         self.assertEqual(report["status"], "pass", report["checks"])
         self.assertEqual(report["summary"]["status_counts"].get("fail", 0), 0)
+
+    def test_frozen_contract_audit_rejects_missing_shadow_guardrail(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "contract.md"
+            path.write_text(
+                "\n".join(
+                    [
+                        "Status: `frozen_operating_contract`",
+                        "Do not revalidate the whole battle/rules philosophy before each card wave.",
+                        "PostgreSQL `card_battle_rules` is the durable source of truth",
+                        "Hermes SQLite is cache/lab/runtime evidence and must not overwrite PostgreSQL",
+                        "Broad XMage extraction may create review candidates and family lanes only",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            check = audit.contains_all(
+                path,
+                [
+                    "Pattern registry rows are `shadow_only`, non-executable, and non-autopromotable",
+                ],
+                check_name="docs.frozen_family_pipeline_contract",
+            )
+
+        self.assertEqual(check.status, "fail")
 
     def test_root_readme_audit_rejects_old_strategy_as_current(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

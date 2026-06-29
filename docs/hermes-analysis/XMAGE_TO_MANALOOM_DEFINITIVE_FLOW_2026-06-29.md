@@ -11,6 +11,13 @@ This document supersedes the operational parts of:
 Those files remain historical evidence. This file defines the current flow to
 use for card-rule acceleration.
 
+Execution contract:
+
+- `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md` freezes how to follow
+  this flow day to day.
+- If the contract checkpoint passes, do not revalidate the full strategy again;
+  rebuild the queue and continue family/subpattern work.
+
 ## Decision
 
 Use a staged source-and-gate pipeline:
