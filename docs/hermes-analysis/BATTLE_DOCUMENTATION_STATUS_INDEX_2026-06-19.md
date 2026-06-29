@@ -43,6 +43,7 @@ Regra operacional:
 | --- | --- | --- |
 | `BATTLE_VALIDATION_REGISTER_2026-06-19.md` | current | Fonte viva de pendencias, tratativas fechadas e evidencia principal. |
 | `BATTLE_SYSTEM_LOGIC.md` | current | Arquitetura/logica atual; cruzar qualquer conclusao de pronto com o register. |
+| `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` | current | Fluxo operacional atual para absorcao XMage/Oracle -> ManaLoom; supersede o uso operacional dos planos XMage de 2026-06-23/24 e fixa gates contra promocao automatica de escopos genericos. |
 | `BATTLE_GENERATOR_LOREHOLD_TASK_MATRIX_2026-06-17.md` | current | Matriz de trabalho atualizada em 2026-06-19; usar como backlog/priorizacao. |
 | `ALL_CARD_CANDIDATE_REVIEW_2026-06-19.md` | current | Fila atual de candidatos/templates/review. |
 | `LOREHOLD_DECK6_STRATEGY_COHERENCE_AUDIT_2026-06-19.md` | current | Fonte atual sobre coerencia do deck aprendido Lorehold e metadata resolvida. |
