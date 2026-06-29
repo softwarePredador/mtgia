@@ -7968,6 +7968,55 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
 
     normalized_text = _normalized_rules_text(rules_text)
 
+    if (
+        xmage_class_name == "HazelsBrewmaster"
+        or (
+            "EntersBattlefieldOrAttacksSourceTriggeredAbility" in ability_classes
+            and "CreateTokenEffect" in effect_classes
+            and "ExileTargetEffect" in effect_classes
+            and "FoodToken" in _combined_rules_text(index_entry, rules_text)
+            and _oracle_has(
+                rules_text,
+                "foods you control have all activated abilities",
+                "creature cards exiled with",
+            )
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="etb_or_attack_exile_graveyard_card_create_food_share_exiled_creature_activated_abilities_v1",
+                reason=(
+                    "XMage models Hazel's Brewmaster as an ETB/attack trigger that exiles up to one "
+                    "graveyard card, creates a Food token, and a static effect granting Foods activated "
+                    "abilities from creature cards exiled with the source."
+                ),
+                ability_kind="triggered_static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 3,
+                    "toughness": 4,
+                    "keywords": ["menace"],
+                    "menace": True,
+                    "trigger": "enters_battlefield_or_attacks",
+                    "trigger_effect": "exile_graveyard_card_create_food",
+                    "hazel_brewmaster_etb_or_attack_exile_graveyard_card_create_food": True,
+                    "target_zone": "graveyard",
+                    "target_count_max": 1,
+                    "target_optional": True,
+                    "create_food_token": True,
+                    "foods_gain_activated_abilities_from_exiled_creatures": True,
+                },
+                matched_signals=[
+                    "EntersBattlefieldOrAttacksSourceTriggeredAbility",
+                    "ExileTargetEffect",
+                    "CreateTokenEffect",
+                    "FoodToken",
+                    "HazelsBrewmasterAbilityEffect",
+                ],
+            )
+        )
+
     if "CreateTokenCopyTargetEffect" in effect_classes:
         if (
             xmage_class_name == "SpringheartNantuko"
@@ -8207,7 +8256,6 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                         "activation_cost_mana": "{3}{W}",
                         "activation_requires_tap": True,
                         "station_level_required": 12,
-                        "runtime_missing_components": ["station_level_gate"],
                     },
                     matched_signals=[
                         "CreateTokenCopyTargetEffect",

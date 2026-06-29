@@ -426,6 +426,13 @@ def family_for_effect(effect: str | None) -> str:
 
 def family_for_effect_json(effect_json: dict[str, Any]) -> str:
     if (
+        str(effect_json.get("battle_model_scope") or "")
+        == "etb_or_attack_exile_graveyard_card_create_food_share_exiled_creature_activated_abilities_v1"
+        and effect_json.get("trigger") == "enters_battlefield_or_attacks"
+        and effect_json.get("trigger_effect") == "exile_graveyard_card_create_food"
+    ):
+        return "token_maker"
+    if (
         str(effect_json.get("battle_model_scope") or "") == "controlled_creature_enters_damage_each_opponent_v1"
         and effect_json.get("trigger") == "creature_you_control_enters"
         and effect_json.get("trigger_effect") == "damage_each_opponent"
@@ -451,6 +458,13 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
         == "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1"
         and effect_json.get("effect")
         == "destroy_target_land_then_damage_all_creatures_and_planeswalkers"
+    ):
+        return "targeted_interaction"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
+        == "creature_damage_controller_reflect_global_v1"
+        and effect_json.get("trigger") == "creature_dealt_damage"
+        and effect_json.get("trigger_effect") == "damage_creature_controller"
     ):
         return "targeted_interaction"
     if (
@@ -2517,6 +2531,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("token_colors") == ["G"]
             and int(effect_json.get("token_power") or 0) == 1
             and int(effect_json.get("token_toughness") or 0) == 1
+        )
+
+    if (
+        effect == "creature"
+        and scope == "etb_or_attack_exile_graveyard_card_create_food_share_exiled_creature_activated_abilities_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and {"CreateTokenEffect", "ExileTargetEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldOrAttacksSourceTriggeredAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and bool(effect_json.get("hazel_brewmaster_etb_or_attack_exile_graveyard_card_create_food"))
+            and bool(effect_json.get("create_food_token"))
+            and bool(effect_json.get("foods_gain_activated_abilities_from_exiled_creatures"))
+            and effect_json.get("target_zone") == "graveyard"
+            and int(effect_json.get("target_count_max") or 0) == 1
         )
 
     if effect == "token_maker" and scope == "saga_goblin_rummage_transform_reflection_copy_v1":

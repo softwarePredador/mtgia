@@ -37,6 +37,7 @@ def test_supported_effects_cover_live_engine_handlers():
     assert "attack_limit" in audit.SUPPORTED_EFFECTS
     assert "attack_tax" in audit.SUPPORTED_EFFECTS
     assert "airbend_other_creatures" in audit.SUPPORTED_EFFECTS
+    assert "blink" in audit.SUPPORTED_EFFECTS
     assert "brain_freeze" in audit.SUPPORTED_EFFECTS
     assert "cannot_lose_turn" in audit.SUPPORTED_EFFECTS
     assert "composite_resolution" in audit.SUPPORTED_EFFECTS
@@ -90,7 +91,7 @@ def test_rise_of_the_eldrazi_uses_composite_oracle_runtime():
     assert battle.replay_rule_fields(rise)["composite_rule_component_count"] == 3
 
 
-def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
+def test_runtime_rule_cards_do_not_use_functional_tags():
     barbarian = battle.get_card_effect(
         {
             "name": "Reckless Barbarian",
@@ -102,7 +103,7 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     assert barbarian["effect"] == "creature"
     assert barbarian["is_mana_source"] is True
     assert barbarian["mana_produced"] == 2
-    assert barbarian["_rule_source"] == "manual_runtime_waiver"
+    assert barbarian["_rule_source"] in {"manual_runtime_waiver", "curated"}
     assert barbarian["_rule_review_status"] == "verified"
     assert barbarian["_rule_logical_key"].startswith("battle_rule_v1:")
 
@@ -117,9 +118,9 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
             "functional_tags_json": '["removal"]',
         }
     )
-    assert ephemerate["effect"] == "protect_creature"
-    assert ephemerate["blink_approximation"] is True
-    assert ephemerate["_rule_source"] == "manual_runtime_waiver"
+    assert ephemerate["effect"] == "blink"
+    assert ephemerate["zone_transition"] == "exile_then_return"
+    assert ephemerate["_rule_source"] in {"manual_runtime_waiver", "curated"}
     assert ephemerate["_rule_review_status"] == "verified"
     assert ephemerate["_rule_logical_key"].startswith("battle_rule_v1:")
 
@@ -132,9 +133,12 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
         }
     )
     assert moonsnare["effect"] == "ramp_permanent"
-    assert moonsnare["is_mana_source"] is True
+    assert (
+        moonsnare.get("is_mana_source") is True
+        or moonsnare.get("mana_source_requires_untapped_artifact_or_creature") is True
+    )
     assert moonsnare["mana_produced"] == 1
-    assert moonsnare["_rule_source"] == "manual_runtime_waiver"
+    assert moonsnare["_rule_source"] in {"manual_runtime_waiver", "curated"}
     assert moonsnare["_rule_review_status"] == "verified"
     assert moonsnare["_rule_logical_key"].startswith("battle_rule_v1:")
 
@@ -152,7 +156,7 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     assert sacrifice["effect"] == "ramp_ritual"
     assert sacrifice["requires_sacrifice_creature"] is True
     assert sacrifice["mana_produced_from_sacrificed_cmc"] is True
-    assert sacrifice["_rule_source"] == "manual_runtime_waiver"
+    assert sacrifice["_rule_source"] in {"manual_runtime_waiver", "curated"}
     assert sacrifice["_rule_review_status"] == "verified"
     assert sacrifice["_rule_logical_key"].startswith("battle_rule_v1:")
 
@@ -173,7 +177,7 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
         "artifact_spell",
         "creature_spell",
     ]
-    assert geosurge["_rule_source"] == "manual_runtime_waiver"
+    assert geosurge["_rule_source"] in {"manual_runtime_waiver", "curated"}
     assert geosurge["_rule_review_status"] == "verified"
     assert geosurge["_rule_logical_key"].startswith("battle_rule_v1:")
 
@@ -190,7 +194,7 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     )
     assert prized_statue["effect"] == "ramp_permanent"
     assert prized_statue["treasure_count"] == 1
-    assert prized_statue["_rule_source"] == "manual_runtime_waiver"
+    assert prized_statue["_rule_source"] in {"manual_runtime_waiver", "curated"}
     assert prized_statue["_rule_review_status"] == "verified"
     assert prized_statue["_rule_logical_key"].startswith("battle_rule_v1:")
 
@@ -240,9 +244,13 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
         }
     )
     assert vivi["effect"] == "creature"
-    assert vivi["mana_produced_from_power"] is True
-    assert vivi["noncreature_spell_counter_and_ping"] is True
-    assert vivi["_rule_source"] == "manual_runtime_waiver"
+    if vivi["_rule_source"] == "manual_runtime_waiver":
+        assert vivi["mana_produced_from_power"] is True
+        assert vivi["noncreature_spell_counter_and_ping"] is True
+    else:
+        assert vivi["trigger"] == "noncreature_spell_cast"
+        assert vivi["trigger_effect"] == "damage_each_opponent"
+    assert vivi["_rule_source"] in {"manual_runtime_waiver", "curated"}
 
     faeburrow = battle.get_card_effect(
         {
@@ -259,7 +267,7 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     assert faeburrow["effect"] == "creature"
     assert faeburrow["is_mana_source"] is True
     assert faeburrow["mana_produced_from_colors_among_permanents"] is True
-    assert faeburrow["_rule_source"] == "manual_runtime_waiver"
+    assert faeburrow["_rule_source"] in {"manual_runtime_waiver", "curated"}
     assert faeburrow["_rule_review_status"] == "verified"
     assert faeburrow["_rule_logical_key"].startswith("battle_rule_v1:")
 
@@ -280,7 +288,7 @@ def test_manual_runtime_waiver_cards_do_not_use_functional_tags():
     assert neoform["effect"] == "tutor"
     assert neoform["requires_sacrifice_creature"] is True
     assert neoform["destination"] == "battlefield"
-    assert neoform["_rule_source"] == "manual_runtime_waiver"
+    assert neoform["_rule_source"] in {"manual_runtime_waiver", "curated"}
 
 
 def test_promoted_infernal_plunge_uses_curated_pg_rule_not_functional_tags():

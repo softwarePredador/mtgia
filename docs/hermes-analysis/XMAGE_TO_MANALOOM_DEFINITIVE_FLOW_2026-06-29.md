@@ -207,23 +207,26 @@ Post-apply E2E wave:
   missing or stale non-curated rows.
 - Final runtime probe:
   `docs/hermes-analysis/master_optimizer_reports/pg249_pg250_runtime_ready_exact_family_batch_20260629_145521_get_card_effect_probe.json`
-- Current queue after apply/sync:
+- Queue after PG249/PG250 apply/sync:
   `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_145746_post_pg249_pg250_apply_sync_manifest.md`
-- Current combined severity counts:
+- PG249/PG250 combined severity counts:
   `{"critical": 1, "high": 200, "medium": 49, "pass": 541}`
-- Current actionable XMage-sourced validity rows:
+- PG249/PG250 actionable XMage-sourced validity rows:
   `ready_for_structured_xmage_pull_review_required=151`,
   `xmage_source_valid_mapper_required=81`.
-- Current proposal status counts:
+- PG249/PG250 proposal status counts:
   `batch_pg_candidate_after_precheck=1`,
   `partial_batch_pg_candidate_preserve_shadow_rows_after_precheck=1`,
   `runtime_family_implementation_required=1`,
   `split_family_scope_review_required=148`,
   `mapper_metadata_or_test_scenario_required=81`.
-- Remaining immediate lanes are:
+- At that point, the remaining immediate lanes were:
   `Adagia, Windswept Bastion` pending `station_level_gate`,
   `Purphoros, God of the Forge` in preserve-shadow partial lane, and
   `Hazel's Brewmaster` as a runtime-family exception.
+
+This was historical PG249/PG250 state. It is superseded by the subsequent
+PG251+ runtime/promotion wave below.
 
 Additional exact runtime/mapping correction:
 
@@ -236,6 +239,43 @@ Additional exact runtime/mapping correction:
   `Hazel's Brewmaster`, because XMage shows Food token creation plus static
   ability sharing from creature cards exiled with Hazel. That is not safe to
   collapse into generic token creation.
+
+Subsequent runtime/promotion wave:
+
+- PG251 was applied and synced for `Adagia, Windswept Bastion`,
+  `Hazel's Brewmaster`, and `Purphoros, God of the Forge`.
+- PG252 promoted sixteen manual runtime-waiver rules into reviewed PostgreSQL
+  truth.
+- PG253 promoted nine existing focused runtime rules into PostgreSQL.
+- PG254 promoted fourteen blink/static/legacy runtime rules and corrected the
+  forensic tests to accept synced curated PostgreSQL rules.
+- PG255 promoted `Ashnod's Altar`, `Chrome Mox`, and `Mox Diamond` fast-mana
+  runtime rules.
+- PG256 promoted `Treasonous Ogre` with life-payment red mana runtime support.
+- PG257 promoted `Phyrexian Censor` with non-Phyrexian spell-limit and
+  enter-tapped static runtime support.
+- Current queue after PG257:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_162756_post_pg257_phyrexian_censor_static_runtime_manifest.md`
+- Current combined severity counts:
+  `{"critical": 1, "high": 114, "medium": 57, "pass": 619}`
+- Current actionable unresolved rows in the validity/family/proposal reports:
+  `154`.
+- Current unresolved routing:
+  `ready_for_structured_xmage_pull_review_required=91`,
+  `xmage_source_valid_mapper_required=63`,
+  `runtime_family_required_count=0`.
+- Current family counts include:
+  `manual_model=63`, `ramp_permanent=16`, `tutor=13`,
+  `targeted_interaction=12`, `recursion=11`, `free_cast=9`,
+  `targeted_protection=8`, `passive=5`, `draw_engine=4`,
+  `topdeck_play=3`, `board_wipe_choice=3`, `ramp_ritual=2`.
+
+`Adagia, Windswept Bastion` is no longer blocked on
+`station_level_gate`: the exact scope
+`station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1`
+now carries `station_level_required=12`, activation cost `{3}{W}`, tap
+requirement, controlled artifact/enchantment targets, and legendary token
+creation through focused runtime tests and PostgreSQL sync.
 
 Runtime/source revalidation after the mapper wave:
 

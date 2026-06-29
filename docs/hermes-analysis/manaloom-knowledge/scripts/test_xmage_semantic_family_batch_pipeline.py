@@ -7873,6 +7873,68 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertNotIn("toughness", proposal["effect_json"])
         self.assertNotIn("is_creature_permanent", proposal["effect_json"])
 
+    def test_hazels_brewmaster_food_ability_share_scope_is_batch_safe(self) -> None:
+        report = generator.build_generator_report(
+            batch_audit={
+                "cards": [
+                    {
+                        "card_name": "Hazel's Brewmaster",
+                        "severity": "high",
+                        "oracle_hash": "hazelhash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 2},
+                        "xmage": {
+                            "class_name": "HazelsBrewmaster",
+                            "path": "/xmage/HazelsBrewmaster.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": ["ExileTargetEffect", "CreateTokenEffect"],
+                            "ability_classes": [
+                                "EntersBattlefieldOrAttacksSourceTriggeredAbility",
+                                "SimpleStaticAbility",
+                                "MenaceAbility",
+                            ],
+                            "target_classes": ["TargetCardInGraveyard"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "creature",
+                                "battle_model_scope": (
+                                    "etb_or_attack_exile_graveyard_card_create_food_share_exiled_creature_activated_abilities_v1"
+                                ),
+                                "power": 3,
+                                "toughness": 4,
+                                "trigger": "enters_battlefield_or_attacks",
+                                "trigger_effect": "exile_graveyard_card_create_food",
+                                "hazel_brewmaster_etb_or_attack_exile_graveyard_card_create_food": True,
+                                "target_zone": "graveyard",
+                                "target_count_max": 1,
+                                "target_optional": True,
+                                "create_food_token": True,
+                                "foods_gain_activated_abilities_from_exiled_creatures": True,
+                            },
+                        },
+                    }
+                ]
+            },
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Hazel's Brewmaster",
+                        "candidate_rule": {"oracle_hash": "hazelhash"},
+                    }
+                ]
+            },
+        )
+
+        proposal = report["proposals"][0]
+        self.assertEqual(proposal["family_id"], "token_maker")
+        self.assertEqual(proposal["proposal_status"], "batch_pg_candidate_after_precheck")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["source"], "curated")
+        self.assertEqual(proposal["execution_status"], "auto")
+
     def test_controlled_creature_etb_damage_family_accepts_simple_enchantment_creature_sources(self) -> None:
         report = classifier.build_family_report(
             {
@@ -8253,7 +8315,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                             "cost_classes": [],
                             "target_classes": [],
                             "primary_effect": {
-                                "effect": "direct_damage",
+                                "effect": "passive",
                                 "battle_model_scope": "creature_damage_controller_reflect_global_v1",
                                 "trigger": "creature_dealt_damage",
                                 "trigger_effect": "damage_creature_controller",
@@ -8291,7 +8353,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                         "cost_classes": [],
                         "target_classes": [],
                         "primary_effect": {
-                            "effect": "direct_damage",
+                            "effect": "passive",
                             "battle_model_scope": "creature_damage_controller_reflect_global_v1",
                             "trigger": "creature_dealt_damage",
                             "trigger_effect": "damage_creature_controller",

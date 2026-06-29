@@ -1835,6 +1835,44 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["target_controller"], "own")
         self.assertTrue(primary["token_legendary"])
         self.assertEqual(primary["station_level_required"], 12)
+        self.assertNotIn("runtime_missing_components", primary)
+
+    def test_hazels_brewmaster_maps_to_food_ability_share_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "HazelsBrewmaster",
+                "effect_classes": ["ExileTargetEffect", "CreateTokenEffect"],
+                "ability_classes": [
+                    "EntersBattlefieldOrAttacksSourceTriggeredAbility",
+                    "SimpleStaticAbility",
+                    "MenaceAbility",
+                ],
+                "target_classes": ["TargetCardInGraveyard"],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+                "raw_excerpt": (
+                    "new EntersBattlefieldOrAttacksSourceTriggeredAbility(new ExileTargetEffect().setToSourceExileZone(true)); "
+                    "ability.addEffect(new CreateTokenEffect(new FoodToken()).concatBy(\"and\")); "
+                    "Foods you control have all activated abilities of all creature cards exiled with Hazel's Brewmaster."
+                ),
+            },
+            "Whenever Hazel's Brewmaster enters or attacks, exile up to one target card from a graveyard and create a Food token. "
+            "Foods you control have all activated abilities of all creature cards exiled with Hazel's Brewmaster.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "etb_or_attack_exile_graveyard_card_create_food_share_exiled_creature_activated_abilities_v1",
+        )
+        self.assertEqual(primary["trigger"], "enters_battlefield_or_attacks")
+        self.assertEqual(primary["trigger_effect"], "exile_graveyard_card_create_food")
+        self.assertTrue(primary["hazel_brewmaster_etb_or_attack_exile_graveyard_card_create_food"])
+        self.assertTrue(primary["create_food_token"])
+        self.assertTrue(primary["foods_gain_activated_abilities_from_exiled_creatures"])
+        self.assertEqual(primary["target_zone"], "graveyard")
+        self.assertEqual(primary["target_count_max"], 1)
 
     def test_jaxis_maps_to_copy_another_creature_haste_dies_draw_sacrifice(self) -> None:
         result = hints.build_effect_hints(

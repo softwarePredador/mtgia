@@ -1052,6 +1052,8 @@ def can_cast_in_phase(card, effect_data, phase, controller=None):
         return False
     if spell_type_cast_lock_for_card(controller, card, effect_data):
         return False
+    if static_spell_limit_lock_for_card(controller, card, effect_data):
+        return False
     if phase not in MAIN_PHASES and controller_casts_nonland_as_flash(controller, card):
         return True
     if effect_data.get("effect") == "creature" and phase not in MAIN_PHASES:
@@ -2450,6 +2452,105 @@ def spell_type_cast_lock_for_card(player, card, effect_data=None):
     return None
 
 
+def _spell_limit_scope_applies_to_card(scope, card, effect_data=None):
+    scope = str(scope or "spells").lower()
+    type_line = str(card.get("type_line") or "").lower() if isinstance(card, dict) else ""
+    effect_name = str((effect_data or {}).get("effect") or card.get("effect") if isinstance(card, dict) else "").lower()
+    is_creature_spell = (
+        "creature" in type_line
+        or effect_name == "creature"
+        or (isinstance(card, dict) and is_creature_card(card))
+    )
+    is_artifact_spell = "artifact" in type_line or bool(isinstance(card, dict) and card.get("artifact"))
+    is_phyrexian_spell = "phyrexian" in type_line or bool(
+        isinstance(card, dict)
+        and any(str(subtype).lower() == "phyrexian" for subtype in _as_list(card.get("subtypes")))
+    )
+    if scope == "noncreature_spells":
+        return not is_creature_spell
+    if scope == "nonartifact_spells":
+        return not is_artifact_spell
+    if scope == "nonphyrexian_spells":
+        return not is_phyrexian_spell
+    return True
+
+
+def _spell_limit_count_for_scope(player, scope):
+    scope = str(scope or "spells").lower()
+    if scope == "noncreature_spells":
+        return int(getattr(player, "noncreature_spells_cast_this_turn", 0) or 0)
+    if scope == "nonartifact_spells":
+        return int(getattr(player, "nonartifact_spells_cast_this_turn", 0) or 0)
+    if scope == "nonphyrexian_spells":
+        return int(getattr(player, "nonphyrexian_spells_cast_this_turn", 0) or 0)
+    return int(getattr(player, "spells_cast_this_turn", 0) or 0)
+
+
+def active_static_spell_limit_restrictions(player):
+    return [
+        restriction
+        for restriction in getattr(player, "static_spell_limit_restrictions", []) or []
+        if isinstance(restriction, dict)
+    ]
+
+
+def static_spell_limit_lock_for_card(player, card, effect_data=None):
+    if player is None or not isinstance(card, dict):
+        return None
+    for restriction in active_static_spell_limit_restrictions(player):
+        scope = restriction.get("restricted_spell_scope") or "spells"
+        if not _spell_limit_scope_applies_to_card(scope, card, effect_data):
+            continue
+        limit = max(1, int(restriction.get("spell_limit_per_turn") or 1))
+        if _spell_limit_count_for_scope(player, scope) >= limit:
+            return restriction
+    return None
+
+
+def register_static_spell_limit_restriction(controller, source, all_players, turn=None):
+    if controller is None or not isinstance(source, dict):
+        return []
+    if not source.get("static_rule_restriction") or not source.get("spell_limit_per_turn"):
+        return []
+    participants = list(all_players or [controller])
+    scope = str(source.get("restriction_controller_scope") or "controller").lower()
+    if scope not in {"each_player", "all_players"}:
+        participants = [controller]
+    restriction = {
+        "source": source.get("name", "?"),
+        "source_player": getattr(controller, "name", "?"),
+        "spell_limit_per_turn": int(source.get("spell_limit_per_turn") or 1),
+        "restricted_spell_scope": source.get("restricted_spell_scope") or "spells",
+        "restriction_controller_scope": scope,
+        "turn_registered": turn,
+        "rule_logical_key": source.get("_rule_logical_key"),
+    }
+    registered = []
+    for participant in participants:
+        existing = [
+            item
+            for item in getattr(participant, "static_spell_limit_restrictions", []) or []
+            if not (
+                isinstance(item, dict)
+                and item.get("source") == restriction["source"]
+                and item.get("source_player") == restriction["source_player"]
+            )
+        ]
+        participant.static_spell_limit_restrictions = [*existing, dict(restriction)]
+        registered.append(getattr(participant, "name", "?"))
+    emit_replay_event(
+        "static_spell_limit_registered",
+        player=getattr(controller, "name", "?"),
+        card=source.get("name", "?"),
+        affected_players=registered,
+        spell_limit_per_turn=restriction["spell_limit_per_turn"],
+        restricted_spell_scope=restriction["restricted_spell_scope"],
+        turn=turn,
+        **replay_rule_fields(source),
+    )
+    return registered
+
+
 def add_spell_type_cast_lock(
     participant,
     *,
@@ -2793,6 +2894,7 @@ def is_station_card(card):
     return isinstance(card, dict) and (
         "station" in str(card.get("type_line", "")).lower()
         or bool(card.get("station_threshold"))
+        or bool(card.get("station_level_required"))
     )
 
 
@@ -3970,6 +4072,9 @@ def mana_source_production_for_state(player, source):
         )
     if source.get("mana_produced_from_colors_among_permanents"):
         return len(_controlled_permanent_mana_colors(player))
+    life_payment_divisor = int(source.get("mana_produced_from_life_payment_divisor") or 0)
+    if life_payment_divisor > 0:
+        return max(0, int(getattr(player, "life", 0) or 0) // life_payment_divisor)
     return int(source.get("mana_produced", 1) or 0)
 
 
@@ -4523,16 +4628,166 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "is_mana_source": True,
             "mana_produced": 2,
             "produces": "R",
-            "battle_model_scope": "reckless_barbarian_creature_mana_source_waiver_v1",
+            "battle_model_scope": "creature_sacrifice_add_two_red_mana_v1",
+            "_rule_oracle_hash": "2624a42fe38948a6225a247ba102d11d",
         }
     ),
     "Ephemerate": handcrafted_runtime_rule(
         {
-            "effect": "protect_creature",
+            "effect": "blink",
             "instant": True,
-            "target": "own_creature",
-            "blink_approximation": True,
-            "battle_model_scope": "ephemerate_blink_as_protect_creature_waiver_v1",
+            "target": "creature_you_control",
+            "blink_target_scope": "creature_you_control",
+            "zone_transition": "exile_then_return",
+            "destination": "battlefield",
+            "return_timing": "immediate_or_same_resolution",
+            "rebound": True,
+            "battle_model_scope": "exile_then_return_target_creature_you_control_rebound_v1",
+            "_rule_oracle_hash": "4671452857f7b532c0c9cc6088b3e25c",
+        }
+    ),
+    "Displacer Kitten": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered",
+            "cmc": 4.0,
+            "effect": "creature",
+            "mana_cost": "{3}{U}",
+            "colors": ["U"],
+            "type_line": "Creature - Cat Beast",
+            "power": 2,
+            "toughness": 2,
+            "subtypes": ["Cat", "Beast"],
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "blink",
+            "blink_target_scope": "up_to_one_nonland_permanent_you_control",
+            "blink_optional": True,
+            "zone_transition": "exile_then_return",
+            "destination": "battlefield",
+            "return_timing": "immediate_or_same_resolution",
+            "battle_model_scope": "noncreature_spell_cast_blink_up_to_one_nonland_permanent_you_control_v1",
+            "_rule_oracle_hash": "16da6e6f7355a5732ee2f80d55f35ebc",
+        }
+    ),
+    "Emiel the Blessed": handcrafted_runtime_rule(
+        {
+            "ability_kind": "activated_and_triggered",
+            "cmc": 4.0,
+            "effect": "creature",
+            "mana_cost": "{2}{W}{W}",
+            "colors": ["W"],
+            "type_line": "Legendary Creature - Unicorn",
+            "legendary": True,
+            "power": 4,
+            "toughness": 4,
+            "subtypes": ["Unicorn"],
+            "activated_blink": True,
+            "activation_cost_generic": 3,
+            "blink_target_scope": "another_creature_you_control",
+            "zone_transition": "exile_then_return",
+            "destination": "battlefield",
+            "return_timing": "immediate_or_same_resolution",
+            "controlled_other_creature_etb_optional_counter": True,
+            "controlled_other_creature_etb_counter_cost": "{G/W}",
+            "controlled_other_creature_etb_counter_count": 1,
+            "controlled_unicorn_etb_counter_count": 2,
+            "battle_model_scope": "activated_blink_another_creature_you_control_plus_creature_etb_counter_metadata_v1",
+            "_rule_oracle_hash": "9c568dbb78c72979a6e2e528f2ea5385",
+        }
+    ),
+    "Deafening Silence": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 1.0,
+            "effect": "passive",
+            "mana_cost": "{W}",
+            "colors": ["W"],
+            "type_line": "Enchantment",
+            "static_rule_restriction": True,
+            "spell_limit_per_turn": 1,
+            "restricted_spell_scope": "noncreature_spells",
+            "restriction_controller_scope": "each_player",
+            "battle_model_scope": "each_player_one_noncreature_spell_per_turn_static_v1",
+            "_rule_oracle_hash": "7ee68f02b4a79a4c3e00fbe14caceda1",
+        }
+    ),
+    "Archon of Emeria": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 3.0,
+            "effect": "creature",
+            "mana_cost": "{2}{W}",
+            "colors": ["W"],
+            "type_line": "Creature - Archon",
+            "power": 2,
+            "toughness": 3,
+            "subtypes": ["Archon"],
+            "flying": True,
+            "static_rule_restriction": True,
+            "spell_limit_per_turn": 1,
+            "restricted_spell_scope": "spells",
+            "restriction_controller_scope": "each_player",
+            "opponents_nonbasic_lands_enter_tapped": True,
+            "battle_model_scope": "each_player_one_spell_per_turn_opponent_nonbasic_lands_enter_tapped_v1",
+            "_rule_oracle_hash": "a52d85813ecf212a3bfc84e249a2c90a",
+        }
+    ),
+    "Eidolon of Rhetoric": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 3.0,
+            "effect": "creature",
+            "mana_cost": "{2}{W}",
+            "colors": ["W"],
+            "type_line": "Enchantment Creature - Spirit",
+            "power": 1,
+            "toughness": 4,
+            "subtypes": ["Spirit"],
+            "static_rule_restriction": True,
+            "spell_limit_per_turn": 1,
+            "restricted_spell_scope": "spells",
+            "restriction_controller_scope": "each_player",
+            "battle_model_scope": "each_player_one_spell_per_turn_static_creature_v1",
+            "_rule_oracle_hash": "cf8c850002241fd1afe4e8ca46884774",
+        }
+    ),
+    "Ethersworn Canonist": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 2.0,
+            "effect": "creature",
+            "mana_cost": "{1}{W}",
+            "colors": ["W"],
+            "type_line": "Artifact Creature - Human Cleric",
+            "artifact": True,
+            "power": 2,
+            "toughness": 2,
+            "subtypes": ["Human", "Cleric"],
+            "static_rule_restriction": True,
+            "spell_limit_per_turn": 1,
+            "restricted_spell_scope": "nonartifact_spells",
+            "restriction_controller_scope": "each_player",
+            "battle_model_scope": "each_player_one_nonartifact_spell_per_turn_static_artifact_creature_v1",
+            "_rule_oracle_hash": "e8466942a00d320a7a9c067c0861fb27",
+        }
+    ),
+    "Phyrexian Censor": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 3.0,
+            "effect": "creature",
+            "mana_cost": "{2}{W}",
+            "colors": ["W"],
+            "type_line": "Creature - Phyrexian Wizard",
+            "power": 3,
+            "toughness": 3,
+            "subtypes": ["Phyrexian", "Wizard"],
+            "static_rule_restriction": True,
+            "spell_limit_per_turn": 1,
+            "restricted_spell_scope": "nonphyrexian_spells",
+            "restriction_controller_scope": "each_player",
+            "nonphyrexian_creatures_enter_tapped": True,
+            "battle_model_scope": "each_player_one_nonphyrexian_spell_per_turn_nonphyrexian_creatures_enter_tapped_v1",
+            "_rule_oracle_hash": "deafed84b14f2008e85145ee17c162a7",
         }
     ),
     "Moonsnare Prototype": handcrafted_runtime_rule(
@@ -4552,7 +4807,8 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "requires_sacrifice_creature": True,
             "mana_produced_from_sacrificed_cmc": True,
             "produces": "B",
-            "battle_model_scope": "sacrifice_creature_cmc_black_ritual_waiver_v1",
+            "battle_model_scope": "sacrifice_creature_add_black_equal_sacrificed_mana_value_v1",
+            "_rule_oracle_hash": "57ca43a79d7a466b97c5be6afddbbe37",
         }
     ),
     "Geosurge": handcrafted_runtime_rule(
@@ -4561,7 +4817,8 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "mana_produced": 7,
             "produces": "R",
             "restricted_to_spell_categories": ["artifact_spell", "creature_spell"],
-            "battle_model_scope": "geosurge_red_creature_artifact_ritual_waiver_v1",
+            "battle_model_scope": "add_seven_red_spend_only_artifact_or_creature_spells_v1",
+            "_rule_oracle_hash": "a19284fe4a3b41b3e37b14f037c91621",
         }
     ),
     "Mardu Devotee": handcrafted_runtime_rule(
@@ -4573,7 +4830,8 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "mana_filter_once_per_turn": True,
             "activation_cost_generic": 1,
             "produces": "RWB",
-            "battle_model_scope": "mardu_devotee_scry_and_mana_filter_waiver_v1",
+            "battle_model_scope": "creature_etb_scry_two_and_one_mana_mardu_filter_v1",
+            "_rule_oracle_hash": "95569a7b24c32433f2f8386c32688a50",
         }
     ),
     "Orcish Lumberjack": handcrafted_runtime_rule(
@@ -4585,7 +4843,8 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "mana_produced": 3,
             "produces": "RG",
             "requires_sacrifice_forest_for_mana": True,
-            "battle_model_scope": "orcish_lumberjack_forest_sacrifice_mana_waiver_v1",
+            "battle_model_scope": "creature_tap_sacrifice_forest_add_three_red_or_green_v1",
+            "_rule_oracle_hash": "b63a428ffc3dff109028c603c0f54923",
         }
     ),
     "Prized Statue": handcrafted_runtime_rule(
@@ -4633,7 +4892,40 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "is_mana_source": True,
             "mana_produced_from_colors_among_permanents": True,
             "produces": "WUBRG",
-            "battle_model_scope": "faeburrow_elder_color_diversity_mana_creature_waiver_v1",
+            "battle_model_scope": "creature_tap_add_one_mana_each_color_among_permanents_v1",
+            "_rule_oracle_hash": "85c90e2fe09a1b85984007a14e3db900",
+        }
+    ),
+    "Treasonous Ogre": handcrafted_runtime_rule(
+        {
+            "ability_kind": "activated",
+            "cmc": 4.0,
+            "effect": "creature",
+            "mana_cost": "{3}{R}",
+            "colors": ["R"],
+            "type_line": "Creature - Ogre Shaman",
+            "power": 2,
+            "toughness": 3,
+            "subtypes": ["Ogre", "Shaman"],
+            "dethrone": True,
+            "is_mana_source": True,
+            "mana_source_no_tap_activation": True,
+            "mana_produced_from_life_payment_divisor": 3,
+            "produces": "R",
+            "life_payment_status": "runtime_executor_v1",
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": "R",
+                    "mode": "pay_3_life_activation",
+                    "restriction": "any_spell",
+                    "status": "runtime_executor_v1",
+                    "life_loss_on_spend": 3,
+                    "life_payment_kind": "pay_life_activation",
+                }
+            ],
+            "battle_model_scope": "creature_pay_three_life_add_one_red_mana_dethrone_v1",
+            "_rule_oracle_hash": "741590c7114b82776c38a21056cfed58",
         }
     ),
     "Neoform": handcrafted_runtime_rule(
@@ -4644,7 +4936,8 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "requires_sacrifice_creature": True,
             "sacrificed_creature_mv_plus_one": True,
             "enters_with_plus_one_counter": True,
-            "battle_model_scope": "neoform_sacrifice_creature_tutor_waiver_v1",
+            "battle_model_scope": "sacrifice_creature_tutor_creature_mv_plus_one_to_battlefield_counter_v1",
+            "_rule_oracle_hash": "ae81715abd94b17c07451a09cf5b8db6",
         }
     ),
     "Semblance Anvil": handcrafted_runtime_rule(
@@ -5299,6 +5592,13 @@ HANDCRAFTED_KNOWN_CARDS = set(HANDCRAFTED_KNOWN_CARD_RULES)
 MANUAL_RULE_RUNTIME_WAIVERS = {
     "Reckless Barbarian",
     "Ephemerate",
+    "Displacer Kitten",
+    "Emiel the Blessed",
+    "Deafening Silence",
+    "Archon of Emeria",
+    "Eidolon of Rhetoric",
+    "Ethersworn Canonist",
+    "Phyrexian Censor",
     "Moonsnare Prototype",
     "Sacrifice",
     "Geosurge",
@@ -5309,6 +5609,7 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Ponder",
     "Vivi Ornitier",
     "Faeburrow Elder",
+    "Treasonous Ogre",
     "Neoform",
     "Semblance Anvil",
     "Planetarium of Wan Shi Tong",
@@ -5368,9 +5669,44 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "2026-06-19T17:54:15Z",
     ),
     "Ephemerate": manual_runtime_waiver_metadata(
-        "Model blink as protect_creature so exile-removal heuristics do not override return text.",
+        "Replace blink-as-protection approximation with XMage-backed exile-then-return target creature semantics.",
         ["lorehold_deck6_manual_waiver_forensic_20260619_seed_63201745", "20260619_181408"],
         "2026-06-19T18:14:08Z",
+    ),
+    "Displacer Kitten": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed noncreature-spell blink trigger for up to one nonland permanent you control.",
+        ["DisplacerKitten.java", "pg254_blink_and_legacy_runtime_batch"],
+        "2026-06-29T18:35:00Z",
+    ),
+    "Emiel the Blessed": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed activated blink for another creature you control plus ETB counter metadata.",
+        ["EmielTheBlessed.java", "pg254_blink_and_legacy_runtime_batch"],
+        "2026-06-29T18:35:00Z",
+    ),
+    "Deafening Silence": manual_runtime_waiver_metadata(
+        "Replace generic passive row with XMage-backed each-player one noncreature spell per turn static restriction.",
+        ["DeafeningSilence.java", "pg254_blink_and_legacy_runtime_batch"],
+        "2026-06-29T18:45:00Z",
+    ),
+    "Archon of Emeria": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed one-spell static restriction and opponent nonbasic-land enter-tapped static.",
+        ["ArchonOfEmeria.java", "pg254_blink_and_legacy_runtime_batch"],
+        "2026-06-29T18:45:00Z",
+    ),
+    "Eidolon of Rhetoric": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed each-player one spell per turn static restriction.",
+        ["EidolonOfRhetoric.java", "pg254_blink_and_legacy_runtime_batch"],
+        "2026-06-29T18:45:00Z",
+    ),
+    "Ethersworn Canonist": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed each-player one nonartifact spell per turn static restriction.",
+        ["EtherswornCanonist.java", "pg254_blink_and_legacy_runtime_batch"],
+        "2026-06-29T18:45:00Z",
+    ),
+    "Phyrexian Censor": manual_runtime_waiver_metadata(
+        "Replace generic static restriction shadow with XMage-backed non-Phyrexian spell limit and non-Phyrexian creature enter-tapped semantics.",
+        ["PhyrexianCensor.java", "pg257_phyrexian_censor_static_batch"],
+        "2026-06-29T19:25:00Z",
     ),
     "Moonsnare Prototype": manual_runtime_waiver_metadata(
         "Replace heuristic ramp_permanent spell-cast evidence with verified artifact mana-source semantics.",
@@ -5421,6 +5757,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace functional-tag lineage blocker with conservative color-diversity creature mana-source semantics.",
         ["20260619_213957", "20260619_214539"],
         "2026-06-19T21:45:39Z",
+    ),
+    "Treasonous Ogre": manual_runtime_waiver_metadata(
+        "Replace one-mana creature approximation with XMage-backed repeatable pay-three-life red mana activation.",
+        ["TreasonousOgre.java", "pg256_creature_mana_life_payment_batch"],
+        "2026-06-29T19:15:00Z",
     ),
     "Neoform": manual_runtime_waiver_metadata(
         "Replace stale/heuristic tutor evidence with sacrifice, MV+1 battlefield tutor, and counter semantics.",
@@ -5951,10 +6292,14 @@ def normalize_effect_by_oracle(card, effect_data):
         and "exile target creature you control" in text
         and "return it to the battlefield" in text
     ):
-        normalized["effect"] = "protect_creature"
-        normalized["target"] = "own_creature"
+        normalized["effect"] = "blink"
+        normalized["target"] = "creature_you_control"
+        normalized["blink_target_scope"] = "creature_you_control"
+        normalized["zone_transition"] = "exile_then_return"
+        normalized["destination"] = "battlefield"
+        normalized["return_timing"] = "immediate_or_same_resolution"
         normalized["instant"] = True
-        normalized["blink_approximation"] = True
+        normalized["rebound"] = "rebound" in text
         return normalized
 
     if (
@@ -6269,6 +6614,24 @@ COMPOSABLE_RESOLUTION_EFFECTS = {
     "token_maker",
     "extra_turn",
     "extra_combat",
+}
+
+EXECUTABLE_ACTIVATED_SECONDARY_EFFECTS = {
+    "copy_creature_token",
+}
+
+ACTIVATED_SECONDARY_PROMOTED_KEYS = {
+    "activate_only_as_sorcery",
+    "activation_cost_colors",
+    "activation_cost_generic",
+    "activation_cost_mana",
+    "activation_requires_tap",
+    "copy_target_types",
+    "exclude_source_from_copy_targets",
+    "station_level_required",
+    "station_threshold",
+    "target_controller",
+    "token_legendary",
 }
 
 COMPOSITE_BLOCKING_EFFECT_KEYS = {
@@ -6658,6 +7021,68 @@ def _build_primary_effect_with_safe_secondary_annotations(card, rules):
     )
 
 
+def _is_executable_activated_secondary_rule(rule):
+    effect = rule.get("effect_json") or {}
+    execution_status = _rule_execution_status(rule)
+    if execution_status not in {"auto", "executable"}:
+        return False
+    review_status = str(rule.get("review_status") or "").lower()
+    if review_status not in {"verified", "active"}:
+        return False
+    if effect.get("effect") not in EXECUTABLE_ACTIVATED_SECONDARY_EFFECTS:
+        return False
+    return effect.get("ability_kind") == "activated" or any(
+        key.startswith("activation_") for key in effect
+    )
+
+
+def _build_primary_effect_with_executable_activated_abilities(card, rules):
+    if len(rules) < 2:
+        return None
+    primary_rule = _select_primary_runtime_rule(rules)
+    if primary_rule is None:
+        return None
+    primary_key = str(primary_rule.get("logical_rule_key") or "")
+    primary = normalize_effect_by_oracle(
+        card,
+        _annotated_battle_rule_effect(primary_rule),
+    )
+    activated_effects = []
+    merged_rules = []
+    blocked_rules = []
+    for rule in rules:
+        if not rule:
+            continue
+        if str(rule.get("logical_rule_key") or "") == primary_key:
+            continue
+        if _is_executable_activated_secondary_rule(rule):
+            activated_effect = _annotated_battle_rule_effect(rule)
+            activated_effects.append(activated_effect)
+            merged_rules.append(rule)
+            continue
+        summary = _battle_rule_summary(rule)
+        summary["runtime_reason"] = _runtime_rule_skip_reason(rule)
+        blocked_rules.append(summary)
+    if not activated_effects:
+        return None
+    primary["_activated_rule_effects"] = activated_effects
+    if len(activated_effects) == 1:
+        activated = activated_effects[0]
+        primary["activated_effect"] = activated.get("effect")
+        primary["activated_battle_model_scope"] = activated.get("battle_model_scope")
+        for key in ACTIVATED_SECONDARY_PROMOTED_KEYS:
+            value = activated.get(key)
+            if value not in (None, False, "", [], {}):
+                primary[key] = value
+    return _build_runtime_rule_selection_with_merged_annotations(
+        primary,
+        rules,
+        selection_mode="primary_with_executable_activated_abilities",
+        merged_rules=merged_rules,
+        blocked_rules=blocked_rules,
+    )
+
+
 def _load_known_cards_into_runtime(path: str | os.PathLike[str], *, bucket: set[str] | None = None) -> None:
     try:
         decoded = load_snapshot_file(path)
@@ -6699,6 +7124,9 @@ def _resolve_battle_card_rule_effect(card, lookup_names, *, source_allowlist=Non
         enriched_effect = _build_primary_effect_with_safe_secondary_annotations(card, rules)
         if enriched_effect is not None:
             return _enrich_effect_from_canonical_snapshot(lookup_name, enriched_effect)
+        activated_effect = _build_primary_effect_with_executable_activated_abilities(card, rules)
+        if activated_effect is not None:
+            return _enrich_effect_from_canonical_snapshot(lookup_name, activated_effect)
         rule = _select_primary_runtime_rule(rules)
         if rule is not None:
             effect = _annotate_runtime_rule_selection(
@@ -7210,6 +7638,8 @@ class Player:
             self.spells_cast_this_turn = 0
             self.spell_mana_value_cast_this_turn = 0
             self.instant_or_sorcery_spells_cast_this_turn = 0
+            self.nonartifact_spells_cast_this_turn = 0
+            self.nonphyrexian_spells_cast_this_turn = 0
             self._spells_cast_turn_marker = turn_marker
         if mana_value is None and card is not None:
             mana_value = card_mana_value(card)
@@ -7221,6 +7651,10 @@ class Player:
         self.spell_mana_value_cast_this_turn += spell_mana_value
         if card is not None and is_instant_or_sorcery_spell(card):
             self.instant_or_sorcery_spells_cast_this_turn += 1
+        if card is not None and "artifact" not in str(card.get("type_line") or "").lower():
+            self.nonartifact_spells_cast_this_turn += 1
+        if card is not None and "phyrexian" not in str(card.get("type_line") or "").lower():
+            self.nonphyrexian_spells_cast_this_turn += 1
         return self.spells_cast_this_turn
 
     def record_noncreature_spell_cast(self, turn_marker=None):
@@ -7298,6 +7732,7 @@ class Player:
         self.silenced_opponents_until_eot = False
         self.non_hand_cast_locks = []
         self.spell_type_cast_locks = []
+        self.static_spell_limit_restrictions = []
         self.approach_count = 0
         self.treasures = 0
         self.draw_engines = 0
@@ -7318,7 +7753,9 @@ class Player:
         self.spells_cast_this_turn = 0
         self.spell_mana_value_cast_this_turn = 0
         self.instant_or_sorcery_spells_cast_this_turn = 0
+        self.nonartifact_spells_cast_this_turn = 0
         self._spells_cast_turn_marker = None
+        self.nonphyrexian_spells_cast_this_turn = 0
         self.noncreature_spells_cast_this_turn = 0
         self._noncreature_spells_cast_turn_marker = None
         self.life_lost_this_turn = 0
@@ -7348,6 +7785,7 @@ class Player:
                 is_battlefield_creature(source)
                 and player_mana_source_permanent(self, source)
                 and source.get("summoning_sick")
+                and not source.get("mana_source_no_tap_activation")
             )
         ]
         active_sources = 0
@@ -7497,9 +7935,18 @@ class Player:
                 modes = conditional_modes_for_color(source, color)
                 if not modes:
                     continue
-                paid = min(source_remaining, remaining)
                 mode = modes[0]
-                life_loss = int(mode.get("life_loss_on_spend") or 0) * paid
+                life_loss_per_unit = int(mode.get("life_loss_on_spend") or 0)
+                max_affordable = source_remaining
+                if life_loss_per_unit > 0:
+                    max_affordable = min(
+                        max_affordable,
+                        max(0, (self.life - life_payment) // life_loss_per_unit),
+                    )
+                paid = min(max_affordable, remaining)
+                if paid <= 0:
+                    continue
+                life_loss = life_loss_per_unit * paid
                 source["remaining"] = source_remaining - paid
                 life_payment += life_loss
                 if life_loss:
@@ -7540,9 +7987,18 @@ class Player:
                 modes = conditional_modes_for_generic(source)
                 if not modes:
                     continue
-                paid = min(source_remaining, remaining)
                 mode = modes[0]
-                life_loss = int(mode.get("life_loss_on_spend") or 0) * paid
+                life_loss_per_unit = int(mode.get("life_loss_on_spend") or 0)
+                max_affordable = source_remaining
+                if life_loss_per_unit > 0:
+                    max_affordable = min(
+                        max_affordable,
+                        max(0, (self.life - life_payment) // life_loss_per_unit),
+                    )
+                paid = min(max_affordable, remaining)
+                if paid <= 0:
+                    continue
+                life_loss = life_loss_per_unit * paid
                 source["remaining"] = source_remaining - paid
                 life_payment += life_loss
                 if life_loss:
@@ -13714,6 +14170,15 @@ def resolve_generic_permanent_etb(
                 turn=turn,
                 source_event="etb_token_created",
             )
+    if effect_data.get("hazel_brewmaster_etb_or_attack_exile_graveyard_card_create_food"):
+        resolve_hazels_brewmaster_trigger(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
+            source_event="enters_battlefield",
+        )
     if effect_data.get("etb_recursion_count"):
         resolve_etb_graveyard_recursion(player, permanent, effect_data, turn)
     if effect_data.get("etb_copy_target_types"):
@@ -13946,6 +14411,190 @@ def _harnessed_blink_target_score(permanent):
     if permanent.get("effect") in {"passive", "ramp_permanent"} and score == 0:
         score -= 8
     return score
+
+
+BLINK_TRANSIENT_KEYS = (
+    "tapped",
+    "summoning_sick",
+    "utility_artifact_used_this_turn",
+    "utility_land_used_this_turn",
+    "discard_modal_modes_used_this_turn",
+)
+
+
+def _blink_target_is_token(permanent):
+    type_line = str(permanent.get("type_line") or "").lower()
+    return bool(permanent.get("is_token") or permanent.get("tag") == "token" or "token" in type_line)
+
+
+def blink_target_matches_scope(permanent, source_effect, *, source_permanent=None):
+    if not isinstance(permanent, dict):
+        return False
+    if _blink_target_is_token(permanent) and not source_effect.get("blink_tokens_can_return"):
+        return False
+    scope = str(
+        source_effect.get("blink_target_scope")
+        or source_effect.get("target")
+        or "permanent_you_control"
+    ).lower()
+    type_line = str(permanent.get("type_line") or "").lower()
+    is_creature = is_battlefield_creature(permanent)
+    if "another" in scope and source_permanent is not None and permanent is source_permanent:
+        return False
+    if "nonland" in scope and "land" in type_line:
+        return False
+    if "creature" in scope and not is_creature:
+        return False
+    return True
+
+
+def choose_blink_target(player, source_effect, *, source_permanent=None):
+    candidates = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not blink_target_matches_scope(
+            permanent,
+            source_effect,
+            source_permanent=source_permanent,
+        ):
+            continue
+        score = _harnessed_blink_target_score(permanent)
+        if is_battlefield_creature(permanent):
+            score += 10
+        if permanent is source_permanent:
+            score += 2
+        if source_effect.get("blink_optional") and score <= 0:
+            continue
+        candidates.append((score, permanent))
+    if not candidates:
+        return None, 0
+    candidates.sort(key=lambda item: (-item[0], item[1].get("name", "?")))
+    return candidates[0][1], candidates[0][0]
+
+
+def resolve_blink_permanent(
+    player,
+    opponents,
+    source_card,
+    source_effect,
+    target,
+    turn,
+    rng,
+    *,
+    all_players=None,
+    phase="resolution",
+    trigger_spell=None,
+):
+    all_players = all_players or [player, *(opponents or [])]
+    if target is None or target not in getattr(player, "battlefield", []):
+        emit_replay_event(
+            "blink_skipped",
+            player=player.name,
+            card=source_card.get("name", "?") if isinstance(source_card, dict) else str(source_card),
+            reason="target_missing",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(source_effect),
+        )
+        return None
+
+    target_name = target.get("name", "?")
+    player.battlefield.remove(target)
+    target_effect = get_card_effect(target)
+    reentry_payload = {**target_effect, **target}
+    for transient_key in BLINK_TRANSIENT_KEYS:
+        reentry_payload.pop(transient_key, None)
+    if source_effect.get("return_tapped"):
+        reentry_payload["enters_tapped"] = True
+    returned = prepare_entering_permanent(
+        enrich_card(reentry_payload),
+        controller=player,
+        all_players=all_players,
+        turn=turn,
+    )
+    player.battlefield.append(returned)
+    other_players = [participant for participant in all_players if participant is not player]
+    resolve_generic_permanent_etb(
+        player,
+        other_players,
+        returned,
+        reentry_payload,
+        turn,
+        rng,
+        all_players=all_players,
+        phase=phase,
+    )
+    if is_battlefield_creature(returned):
+        process_controlled_creature_enters_triggers(
+            player,
+            other_players,
+            returned,
+            turn,
+            source_event="blink",
+            all_players=all_players,
+        )
+        process_opponent_controlled_creature_enters_triggers(
+            player,
+            returned,
+            turn,
+            source_event="blink",
+            all_players=all_players,
+        )
+    emit_replay_event(
+        "blink_resolved",
+        player=player.name,
+        card=source_card.get("name", "?") if isinstance(source_card, dict) else str(source_card),
+        target=target_name,
+        returned=returned.get("name", "?"),
+        trigger_spell=trigger_spell.get("name", "?") if isinstance(trigger_spell, dict) else None,
+        return_tapped=bool(source_effect.get("return_tapped")),
+        zone_transition=source_effect.get("zone_transition", "exile_then_return"),
+        destination=source_effect.get("destination", "battlefield"),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(source_effect),
+    )
+    check_sbas_until_stable(all_players)
+    return returned
+
+
+def resolve_blink_effect(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    all_players=None,
+    phase="resolution",
+):
+    target, target_score = choose_blink_target(player, effect_data)
+    if target is None:
+        emit_replay_event(
+            "blink_skipped",
+            player=player.name,
+            card=card.get("name", "?"),
+            reason="no_valid_blink_target",
+            target_scope=effect_data.get("blink_target_scope") or effect_data.get("target"),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return None
+    returned = resolve_blink_permanent(
+        player,
+        opponents,
+        card,
+        effect_data,
+        target,
+        turn,
+        rng,
+        all_players=all_players,
+        phase=phase,
+    )
+    if returned is not None:
+        returned["_blink_target_score"] = target_score
+    return returned
 
 
 def _choose_harnessed_blink_target(player, source_permanent):
@@ -27467,6 +28116,144 @@ def create_creature_token(
     return token
 
 
+def create_food_token(
+    player,
+    *,
+    source_card=None,
+    copied_activated_ability_fields=None,
+    turn=None,
+    source_event="food_token_created",
+    effect_data=None,
+):
+    token = {
+        "name": "Food Token",
+        "cmc": 0,
+        "tag": "token",
+        "token": True,
+        "effect": "artifact",
+        "type_line": "Artifact Token — Food",
+        "artifact_token": True,
+        "subtype": "Food",
+        "tapped": False,
+    }
+    copied_fields = dict(copied_activated_ability_fields or {})
+    if copied_fields:
+        token.update(copied_fields)
+        token["hazel_brewmaster_activated_abilities_copied"] = sorted(copied_fields)
+    player.battlefield.append(token)
+    emit_replay_event(
+        source_event,
+        player=player.name,
+        card=(source_card or {}).get("name", "?") if isinstance(source_card, dict) else "?",
+        token=token["name"],
+        copied_activated_ability_fields=sorted(copied_fields),
+        turn=turn,
+        **replay_rule_fields(effect_data or {}),
+    )
+    return token
+
+
+def _hazel_brewmaster_target_candidates(player, opponents):
+    participants = [player] + list(opponents or [])
+    candidates = []
+    for owner in participants:
+        for card in list(getattr(owner, "graveyard", []) or []):
+            if not isinstance(card, dict):
+                continue
+            is_creature = is_creature_card(card) or is_battlefield_creature(card)
+            score = (1 if is_creature else 0, card_power_value(card, default=0), str(card.get("name") or ""))
+            candidates.append((score, owner, card))
+    return sorted(candidates, key=lambda row: row[0], reverse=True)
+
+
+def _activated_ability_fields_for_hazel(card):
+    if not isinstance(card, dict):
+        return {}
+    copied = {}
+    for key, value in card.items():
+        if key.startswith("activated_") or key in {
+            "is_mana_source",
+            "mana_produced",
+            "mana_colors",
+            "mana_produced_colors",
+        }:
+            copied[key] = copy.deepcopy(value)
+    return copied
+
+
+def resolve_hazels_brewmaster_trigger(
+    player,
+    opponents,
+    source,
+    effect_data,
+    turn,
+    *,
+    source_event,
+):
+    candidates = _hazel_brewmaster_target_candidates(player, opponents)
+    selected_owner = None
+    selected_card = None
+    if candidates:
+        _score, selected_owner, selected_card = candidates[0]
+        selected_owner.graveyard.remove(selected_card)
+        move_to_exile(selected_owner, selected_card, reason="hazels_brewmaster", turn=turn)
+    exiled_creatures = list(source.get("hazel_exiled_creature_cards") or [])
+    copied_fields = {}
+    if selected_card is not None and (is_creature_card(selected_card) or is_battlefield_creature(selected_card)):
+        exiled_creatures.append(copy.deepcopy(selected_card))
+        copied_fields.update(_activated_ability_fields_for_hazel(selected_card))
+    source["hazel_exiled_creature_cards"] = exiled_creatures
+    if copied_fields:
+        source.setdefault("hazel_shared_activated_ability_fields", {}).update(copied_fields)
+    food = create_food_token(
+        player,
+        source_card=source,
+        copied_activated_ability_fields=source.get("hazel_shared_activated_ability_fields"),
+        turn=turn,
+        source_event="hazels_brewmaster_food_created",
+        effect_data=effect_data,
+    )
+    emit_replay_event(
+        "trigger_resolved",
+        player=player.name,
+        card=source.get("name", "?"),
+        trigger="enters_battlefield_or_attacks",
+        source_event=source_event,
+        effect="exile_graveyard_card_create_food",
+        exiled_card=selected_card.get("name", "?") if isinstance(selected_card, dict) else None,
+        exiled_card_owner=getattr(selected_owner, "name", None),
+        exiled_card_is_creature=bool(
+            selected_card is not None
+            and (is_creature_card(selected_card) or is_battlefield_creature(selected_card))
+        ),
+        food_token=food.get("name"),
+        foods_gain_activated_abilities=bool(effect_data.get("foods_gain_activated_abilities_from_exiled_creatures")),
+        copied_activated_ability_fields=sorted(source.get("hazel_shared_activated_ability_fields") or {}),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return food
+
+
+def resolve_hazels_brewmaster_attack_triggers(player, attackers, opponents, turn):
+    resolved = 0
+    for attacker in list(attackers or []):
+        if not isinstance(attacker, dict):
+            continue
+        if not attacker.get("hazel_brewmaster_etb_or_attack_exile_graveyard_card_create_food"):
+            continue
+        resolve_hazels_brewmaster_trigger(
+            player,
+            opponents,
+            attacker,
+            attacker,
+            turn,
+            source_event="attacks",
+        )
+        resolved += 1
+    return resolved
+
+
 def token_count_for_effect(player, effect_data, default=5, opponents=None):
     per_opponent = (effect_data or {}).get("token_count_per_opponent")
     if per_opponent not in (None, "", False):
@@ -27630,7 +28417,7 @@ def permanent_is_opponent_enter_tapped_subject(permanent):
     if not isinstance(permanent, dict):
         return False
     type_line = str(permanent.get("type_line") or "").lower()
-    return is_battlefield_creature(permanent) or "artifact" in type_line
+    return is_battlefield_creature(permanent) or "artifact" in type_line or "land" in type_line
 
 
 def opponent_enter_tapped_static_sources(permanent, controller, all_players):
@@ -27642,13 +28429,28 @@ def opponent_enter_tapped_static_sources(permanent, controller, all_players):
         return []
     sources = []
     for source_controller in all_players:
-        if source_controller is controller:
-            continue
         for source in getattr(source_controller, "battlefield", []) or []:
             if not isinstance(source, dict):
                 continue
+            permanent_type_line = str(permanent.get("type_line") or "").lower()
+            if (
+                source.get("nonphyrexian_creatures_enter_tapped")
+                and is_battlefield_creature(permanent)
+                and "phyrexian" not in permanent_type_line
+            ):
+                sources.append((source_controller, source, "nonphyrexian_creature"))
+                continue
+            if source_controller is controller:
+                continue
             if source.get("opponents_creatures_enter_tapped") and is_battlefield_creature(permanent):
                 sources.append((source_controller, source, "opponent_creature"))
+                continue
+            if (
+                source.get("opponents_nonbasic_lands_enter_tapped")
+                and "land" in permanent_type_line
+                and "basic" not in permanent_type_line
+            ):
+                sources.append((source_controller, source, "opponent_nonbasic_land"))
                 continue
             if (
                 source.get("opponents_artifacts_creatures_enter_tapped")
@@ -28125,6 +28927,13 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
     """Apply shared creature-entry state for permanents with engine effects."""
     if not isinstance(permanent, dict):
         return permanent
+    if permanent.get("station_level_required") and not permanent.get("station_threshold"):
+        permanent["station_threshold"] = int(permanent.get("station_level_required") or 0)
+    if permanent.get("station_threshold"):
+        permanent["station_online"] = (
+            int(permanent.get("charge_counters") or 0)
+            >= int(permanent.get("station_threshold") or 0)
+        )
     if permanent.get("does_not_untap_normally"):
         permanent["does_not_untap_in_untap_step"] = True
     enters_tapped = bool(permanent.get("enters_tapped"))
@@ -30268,6 +31077,27 @@ def resolve_copy_permanent_etb(player, opponents, permanent, effect_data, turn):
 
 def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None, *, finish_spell=True):
     """Create one or more token copies of legal permanents."""
+    station_level_required = int(effect_data.get("station_level_required") or 0)
+    if station_level_required > 0:
+        current_level = int(
+            card.get("charge_counters")
+            or card.get("station_level")
+            or 0
+        )
+        if not card.get("station_online") and current_level < station_level_required:
+            emit_replay_event(
+                "copy_creature_token_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                reason="station_level_required",
+                station_level_required=station_level_required,
+                station_level=current_level,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            if finish_spell:
+                finish_resolved_spell(player, card, turn=turn)
+            return None
     candidates = copy_token_target_candidates(player, opponents or [], effect_data)
     if effect_data.get("exclude_source_from_copy_targets"):
         candidates = [
@@ -32752,6 +33582,76 @@ def trigger_spell_cast_engines(
         spell_is_creature = is_creature_card(spell) or "creature" in str(spell.get("type_line") or "").lower()
         if trigger_kind == "noncreature_spell_cast" and spell_is_creature:
             continue
+        if permanent.get("trigger_effect") == "blink":
+            target, target_score = choose_blink_target(
+                player,
+                permanent,
+                source_permanent=permanent,
+            )
+            if target is None:
+                emit_replay_event(
+                    "trigger_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    reason="no_valid_blink_target",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+
+            def resolve_spell_cast_blink_trigger(
+                permanent=permanent,
+                target=target,
+                target_score=target_score,
+                trigger_kind=trigger_kind,
+                spell=spell,
+            ):
+                returned = resolve_blink_permanent(
+                    player,
+                    opponents,
+                    permanent,
+                    permanent,
+                    target,
+                    turn,
+                    random.Random(turn or 0),
+                    all_players=all_players,
+                    phase=phase,
+                    trigger_spell=spell,
+                )
+                if returned is not None:
+                    emit_replay_event(
+                        "trigger_resolved",
+                        player=player.name,
+                        card=permanent.get("name", "?"),
+                        trigger=trigger_kind,
+                        trigger_spell=spell.get("name", "?"),
+                        effect="blink",
+                        blinked=target.get("name", "?"),
+                        returned=returned.get("name", "?"),
+                        target_score=target_score,
+                        turn=turn,
+                        phase=phase,
+                        **replay_rule_fields(permanent),
+                    )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_spell_cast_blink_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "trigger_spell": spell.get("name", "?"),
+                    "blink_target": target.get("name", "?"),
+                    "blink_target_score": target_score,
+                },
+            )
+            continue
         if permanent.get("trigger_effect") == "boost_source_until_eot":
             power_bonus = int(permanent.get("trigger_power_bonus_until_eot") or 0)
             toughness_bonus = int(permanent.get("trigger_toughness_bonus_until_eot") or 0)
@@ -34565,7 +35465,234 @@ def is_artifact_spell_for_controller(player, spell):
     return False
 
 
+def executable_activated_rule_effects(permanent, *, effect=None):
+    if not isinstance(permanent, dict):
+        return []
+    effects = []
+    for activated in permanent.get("_activated_rule_effects") or []:
+        if not isinstance(activated, dict):
+            continue
+        if effect is not None and activated.get("effect") != effect:
+            continue
+        effects.append(activated)
+    return effects
+
+
+def activation_cost_text_for_effect(effect_data):
+    if effect_data.get("activation_cost_mana"):
+        return str(effect_data.get("activation_cost_mana"))
+    return _activation_cost_text(
+        int(effect_data.get("activation_cost_generic") or 0),
+        effect_data.get("activation_cost_colors") or [],
+    )
+
+
+def activated_copy_creature_token_station_ready(permanent, effect_data):
+    station_level_required = int(effect_data.get("station_level_required") or 0)
+    if station_level_required <= 0:
+        return True
+    current_level = int(
+        permanent.get("charge_counters")
+        or permanent.get("station_level")
+        or 0
+    )
+    return bool(permanent.get("station_online")) or current_level >= station_level_required
+
+
+def activate_secondary_copy_creature_token_abilities(player, opponents, turn, *, phase="precombat_main"):
+    if phase not in MAIN_PHASES:
+        return 0
+    activations = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("_activated_copy_creature_token_last_turn") == turn:
+            continue
+        for ability in executable_activated_rule_effects(permanent, effect="copy_creature_token"):
+            if ability.get("activate_only_as_sorcery") and phase not in MAIN_PHASES:
+                continue
+            if ability.get("activation_requires_tap") and permanent.get("tapped"):
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="copy_creature_token",
+                    reason="source_already_tapped",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(ability),
+                )
+                continue
+            if not activated_copy_creature_token_station_ready(permanent, ability):
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="copy_creature_token",
+                    reason="station_level_required",
+                    station_level_required=ability.get("station_level_required"),
+                    station_level=int(permanent.get("charge_counters") or permanent.get("station_level") or 0),
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(ability),
+                )
+                continue
+            targets = copy_token_target_candidates(player, opponents or [], ability)
+            if ability.get("exclude_source_from_copy_targets"):
+                targets = [target for target in targets if target is not permanent]
+            if not targets:
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="copy_creature_token",
+                    reason="no_valid_copy_target",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(ability),
+                )
+                continue
+            activation_cost = activation_cost_text_for_effect(ability)
+            if not player.can_pay(activation_cost) or not player.spend_mana(activation_cost):
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    effect="copy_creature_token",
+                    reason="failed_to_pay_activation_cost",
+                    activation_cost=activation_cost,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(ability),
+                )
+                continue
+            if ability.get("activation_requires_tap"):
+                permanent["tapped"] = True
+            permanent["_activated_copy_creature_token_last_turn"] = turn
+            created = resolve_copy_creature_token(
+                player,
+                permanent,
+                ability,
+                turn,
+                opponents=opponents,
+                finish_spell=False,
+            )
+            emit_replay_event(
+                "activated_ability_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                ability="copy_creature_token",
+                activation_cost=activation_cost,
+                tokens_created=len(created or []),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(ability),
+            )
+            activations += 1
+            break
+    return activations
+
+
+def activate_blink_abilities(player, opponents, all_players, turn, rng, *, phase="precombat_main"):
+    if phase not in MAIN_PHASES:
+        return 0
+    activations = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("activated_blink"):
+            continue
+        if permanent.get("_activated_blink_last_turn") == turn:
+            continue
+        if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="blink",
+                reason="source_already_tapped",
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        target, target_score = choose_blink_target(
+            player,
+            permanent,
+            source_permanent=permanent,
+        )
+        if target is None:
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="blink",
+                reason="no_valid_blink_target",
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        activation_cost = activation_cost_text_for_effect(permanent)
+        if not player.can_pay(activation_cost) or not player.spend_mana(activation_cost):
+            emit_replay_event(
+                "activated_ability_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                effect="blink",
+                reason="failed_to_pay_activation_cost",
+                activation_cost=activation_cost,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(permanent),
+            )
+            continue
+        if permanent.get("activation_requires_tap"):
+            permanent["tapped"] = True
+        permanent["_activated_blink_last_turn"] = turn
+        returned = resolve_blink_permanent(
+            player,
+            opponents,
+            permanent,
+            permanent,
+            target,
+            turn,
+            rng,
+            all_players=all_players,
+            phase=phase,
+        )
+        emit_replay_event(
+            "activated_ability_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            ability="blink",
+            activation_cost=activation_cost,
+            blinked=target.get("name", "?"),
+            returned=returned.get("name", "?") if isinstance(returned, dict) else None,
+            target_score=target_score,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+        activations += 1
+    return activations
+
+
 def process_precombat_main_phase_engines(player, opponents, all_players, turn, rng, *, stack=None):
+    activate_blink_abilities(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase="precombat_main",
+    )
+    activate_secondary_copy_creature_token_abilities(
+        player,
+        opponents,
+        turn,
+        phase="precombat_main",
+    )
     for permanent in list(getattr(player, "battlefield", []) or []):
         if not isinstance(permanent, dict):
             continue
@@ -37356,6 +38483,12 @@ def apply_effect_immediate(
         if not permanent.get("creature_type_suppressed"):
             permanent["effect"] = "creature"
         player.battlefield.append(permanent)
+        register_static_spell_limit_restriction(
+            player,
+            permanent,
+            all_players_for_entry,
+            turn=turn,
+        )
         refresh_controlled_static_indestructible(
             player,
             turn=turn,
@@ -37481,6 +38614,18 @@ def apply_effect_immediate(
                 summoning_sick=permanent.get("summoning_sick"),
                 turn=turn,
             )
+    elif effect == "blink":
+        resolve_blink_effect(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            rng,
+            all_players=all_players_for_entry,
+            phase=phase or "resolution",
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "passive":
         if is_instant(card) or is_sorcery(card):
             finish_resolved_spell(player, card, turn=turn)
@@ -37488,6 +38633,12 @@ def apply_effect_immediate(
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
             player.battlefield.append(permanent)
+            register_static_spell_limit_restriction(
+                player,
+                permanent,
+                all_players_for_entry,
+                turn=turn,
+            )
             resolve_generic_permanent_etb(
                 player,
                 opponents,
@@ -41527,6 +42678,12 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         rng,
         phase="combat",
         stack=stack,
+    )
+    resolve_hazels_brewmaster_attack_triggers(
+        attacker,
+        attackers,
+        alive_defenders,
+        turn,
     )
     resolve_attacking_discard_draw_activations(
         attacker,

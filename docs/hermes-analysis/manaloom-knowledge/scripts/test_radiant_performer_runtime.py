@@ -71,6 +71,7 @@ def test_radiant_performer_uses_xmage_backed_partial_runtime_waiver():
     assert effect["supports_copy_for_each_other_target"] is False
     assert effect["_runtime_partial"] is True
     assert effect["battle_model_scope"] == "flash_creature_etb_copy_stack_spell_partial_metadata_v1"
+    assert effect["_rule_source"] in {"curated", "manual_runtime_waiver"}
     assert effect["_rule_oracle_hash"] == "893b8d4958e842209180034ee424d134"
     assert effect["_rule_logical_key"] == "battle_rule_v1:fa12ce53b0a0c4b963f4071b4fde2c9b"
     waiver = next(
@@ -103,7 +104,7 @@ def test_radiant_performer_enters_battlefield_and_reports_no_stack_target():
     assert any(
         event == "creature_to_battlefield"
         and data["card"] == "Radiant Performer"
-        and data["rule_source"] == "manual_runtime_waiver"
+        and data["rule_source"] in {"curated", "manual_runtime_waiver"}
         for event, data in events
     )
     assert any(

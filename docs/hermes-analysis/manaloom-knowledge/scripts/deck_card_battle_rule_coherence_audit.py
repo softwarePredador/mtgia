@@ -380,12 +380,22 @@ def classify_card(
         or str(rule.get("execution_status") or "") in NON_EXECUTABLE_STATUSES
     ]
     if review_only:
-        severity = "medium" if land_only_backlog else "high"
+        severity = "pass" if trusted else ("medium" if land_only_backlog else "high")
+        code = (
+            "shadow_rule_preserved_for_history"
+            if trusted
+            else "review_only_or_needs_review_rule"
+        )
+        detail = (
+            f"{len(review_only)} review-only/shadow rows are preserved but ignored because trusted executable rule exists."
+            if trusted
+            else f"{len(review_only)} active rows are needs_review/review_only/disabled."
+        )
         findings.append(
             {
                 "severity": severity,
-                "code": "review_only_or_needs_review_rule",
-                "detail": f"{len(review_only)} active rows are needs_review/review_only/disabled.",
+                "code": code,
+                "detail": detail,
             }
         )
 

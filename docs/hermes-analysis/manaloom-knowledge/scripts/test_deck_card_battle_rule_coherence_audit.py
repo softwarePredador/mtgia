@@ -315,6 +315,48 @@ class DeckCardBattleRuleCoherenceAuditTest(unittest.TestCase):
         self.assertEqual(card["trusted_executable_rule_count"], 1)
         self.assertEqual(card["review_only_rule_count"], 0)
 
+    def test_review_only_shadow_with_trusted_rule_is_not_actionable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db = Path(tmpdir) / "knowledge.db"
+            with sqlite3.connect(db) as conn:
+                conn.row_factory = sqlite3.Row
+                create_schema(conn)
+                insert_deck_card(
+                    conn,
+                    "Purphoros, God of the Forge",
+                    oracle_text="Whenever another creature enters the battlefield under your control, Purphoros deals 2 damage to each opponent.",
+                    type_line="Legendary Enchantment Creature — God",
+                )
+                insert_rule(
+                    conn,
+                    "Purphoros, God of the Forge",
+                    {
+                        "effect": "passive",
+                        "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
+                    },
+                    logical_rule_key="battle_rule_v1:trusted_purphoros",
+                )
+                insert_rule(
+                    conn,
+                    "Purphoros, God of the Forge",
+                    {"effect": "pump_all"},
+                    review_status="needs_review",
+                    execution_status="review_only",
+                    source="generated",
+                    oracle_hash=None,
+                    logical_rule_key="battle_rule_v1:generated_pump_shadow",
+                )
+                report = audit.build_report(conn)
+
+        card = report["cards"][0]
+        self.assertEqual(card["severity"], "pass")
+        self.assertEqual(card["trusted_executable_rule_count"], 1)
+        self.assertEqual(card["review_only_rule_count"], 1)
+        self.assertIn(
+            "shadow_rule_preserved_for_history",
+            {finding["code"] for finding in card["findings"]},
+        )
+
     def test_nonland_without_rule_is_high_but_basic_land_is_medium(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             db = Path(tmpdir) / "knowledge.db"

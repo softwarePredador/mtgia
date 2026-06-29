@@ -37,6 +37,7 @@ SUPPORTED_EFFECTS = {
     "attack_tax",
     "airbend_other_creatures",
     "board_wipe",
+    "blink",
     "brain_freeze",
     "combo",
     "composite_resolution",
