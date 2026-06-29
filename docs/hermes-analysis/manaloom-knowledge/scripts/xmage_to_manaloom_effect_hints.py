@@ -4634,7 +4634,7 @@ def _build_simple_creature_mana_source_fields(
     ):
         return {
             "effect": "creature",
-            "scope": "one_mana_one_one_black_pain_mana_dork_v1",
+            "scope": "one_mana_one_one_black_pain_mana_dork_runtime_v1",
             "fields": {
                 "power": 1,
                 "toughness": 1,
@@ -4642,9 +4642,22 @@ def _build_simple_creature_mana_source_fields(
                 "mana_produced": 1,
                 "produces": "B",
                 "damage_on_tap": 1,
-                "tap_damage_status": "annotation_only",
+                "tap_damage_status": "runtime_executor_v1",
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": [
+                    {
+                        "color": "B",
+                        "mode": "damage_on_tap",
+                        "restriction": "any_spell",
+                        "status": "runtime_executor_v1",
+                        "life_loss_on_spend": 1,
+                        "life_loss_kind": "damage_on_tap",
+                        "life_loss_status": "tap_damage_status",
+                    }
+                ],
+                "oracle_runtime_scope": "pain_mana_source_life_cost_runtime_v1",
             },
-            "reason": "XMage structure matches a 1/1 creature that taps for black mana and deals 1 damage to its controller.",
+            "reason": "XMage structure matches a 1/1 creature that taps for black mana and deals 1 damage to its controller; ManaLoom now executes that damage as a conditional mana spend cost.",
             "signals": ["SimpleManaAbility", "DamageControllerEffect", "BlackMana(1)", "MageInt(1)", "mana_source"],
         }
 
@@ -4916,14 +4929,39 @@ def _build_pain_land_fields(
     ):
         return {
             "effect": "land",
-            "scope": "colorless_or_any_color_pain_land_v1",
+            "scope": "colorless_or_any_color_pain_land_runtime_v1",
             "fields": {
                 "mana_produced": 1,
                 "produces": "CWUBRG",
                 "life_for_colored_mana": 3,
-                "life_loss_on_colored_mana_status": "annotation_only",
+                "life_loss_on_colored_mana_status": "runtime_executor_v1",
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": [
+                    {
+                        "color": "C",
+                        "mode": "colorless_no_life_loss",
+                        "restriction": "any_spell",
+                        "status": "runtime_executor_v1",
+                        "life_loss_on_spend": 0,
+                        "life_loss_kind": "none",
+                        "life_loss_status": "runtime_executor_v1",
+                    },
+                    *[
+                        {
+                            "color": color,
+                            "mode": "damage_on_colored_mana",
+                            "restriction": "any_spell",
+                            "status": "runtime_executor_v1",
+                            "life_loss_on_spend": 3,
+                            "life_loss_kind": "damage_on_colored_mana",
+                            "life_loss_status": "life_loss_on_colored_mana_status",
+                        }
+                        for color in "WUBRG"
+                    ],
+                ],
+                "oracle_runtime_scope": "pain_mana_source_life_cost_runtime_v1",
             },
-            "reason": "XMage structure matches a land that adds colorless freely or any color while dealing 3 damage to its controller.",
+            "reason": "XMage structure matches a land that adds colorless freely or any color while dealing 3 damage to its controller; ManaLoom now executes the colored damage as a conditional mana spend cost.",
             "signals": ["LAND", "SimpleManaAbility", "AnyColorManaAbility", "DamageControllerEffect", "ColorlessMana(1)"],
         }
     return None

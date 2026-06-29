@@ -55,7 +55,7 @@
   },
   "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
   "database_target": "143.198.230.247:5433/halder",
-  "generated_at_utc": "2026-06-29T09:54:21.277514+00:00",
+  "generated_at_utc": "2026-06-29T10:09:15.047645+00:00",
   "manifest": "docs/hermes-analysis/master_optimizer_reports/pgc062_e2e_manifest_20260629.json",
   "package_id": "pgc062_conditional_etb_lands_runtime",
   "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",

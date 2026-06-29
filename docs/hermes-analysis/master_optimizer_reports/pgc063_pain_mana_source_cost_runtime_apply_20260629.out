@@ -1,0 +1,6 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "error": null,
+  "sql": "pgc063_pain_mana_source_cost_runtime_apply_20260629.sql",
+  "status": "applied"
+}

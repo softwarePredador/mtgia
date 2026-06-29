@@ -951,12 +951,14 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
 
         primary = result["primary_candidate"]["effect_json"]
         self.assertEqual(primary["effect"], "creature")
-        self.assertEqual(primary["battle_model_scope"], "one_mana_one_one_black_pain_mana_dork_v1")
+        self.assertEqual(primary["battle_model_scope"], "one_mana_one_one_black_pain_mana_dork_runtime_v1")
         self.assertTrue(primary["is_mana_source"])
         self.assertEqual(primary["mana_produced"], 1)
         self.assertEqual(primary["produces"], "B")
         self.assertEqual(primary["damage_on_tap"], 1)
-        self.assertEqual(primary["tap_damage_status"], "annotation_only")
+        self.assertEqual(primary["tap_damage_status"], "runtime_executor_v1")
+        self.assertEqual(primary["conditional_mana_modes_status"], "runtime_executor_v1")
+        self.assertEqual(primary["conditional_mana_modes"][0]["life_loss_on_spend"], 1)
 
     def test_tarnished_citadel_maps_to_colorless_or_any_color_pain_land_scope(self) -> None:
         result = hints.build_effect_hints(
@@ -977,11 +979,14 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
 
         primary = result["primary_candidate"]["effect_json"]
         self.assertEqual(primary["effect"], "land")
-        self.assertEqual(primary["battle_model_scope"], "colorless_or_any_color_pain_land_v1")
+        self.assertEqual(primary["battle_model_scope"], "colorless_or_any_color_pain_land_runtime_v1")
         self.assertEqual(primary["mana_produced"], 1)
         self.assertEqual(primary["produces"], "CWUBRG")
         self.assertEqual(primary["life_for_colored_mana"], 3)
-        self.assertEqual(primary["life_loss_on_colored_mana_status"], "annotation_only")
+        self.assertEqual(primary["life_loss_on_colored_mana_status"], "runtime_executor_v1")
+        self.assertEqual(primary["conditional_mana_modes_status"], "runtime_executor_v1")
+        self.assertEqual(primary["conditional_mana_modes"][0]["life_loss_on_spend"], 0)
+        self.assertEqual(primary["conditional_mana_modes"][1]["life_loss_on_spend"], 3)
 
     def test_redress_fate_maps_to_all_artifact_enchantment_recursion_scope(self) -> None:
         result = hints.build_effect_hints(

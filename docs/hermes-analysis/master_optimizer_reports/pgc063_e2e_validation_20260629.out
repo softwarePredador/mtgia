@@ -1,0 +1,244 @@
+{
+  "battle_execution": {
+    "event_count": 9,
+    "results": [
+      {
+        "available_mana_after_refresh": 1,
+        "available_mana_after_spend": 0,
+        "card_name": "City of Brass",
+        "cost": "{W}",
+        "life_after_spend": 39,
+        "life_cost_events": 1,
+        "scenario": "city_white_mana_deals_one_damage_on_spend"
+      },
+      {
+        "available_mana_after_refresh": 1,
+        "available_mana_after_spend": 0,
+        "card_name": "Elves of Deep Shadow",
+        "cost": "{B}",
+        "life_after_spend": 39,
+        "life_cost_events": 1,
+        "scenario": "elves_black_mana_deals_one_damage_on_spend"
+      },
+      {
+        "available_mana_after_refresh": 1,
+        "available_mana_after_spend": 0,
+        "card_name": "Mana Confluence",
+        "cost": "{R}",
+        "life_after_spend": 39,
+        "life_cost_events": 1,
+        "scenario": "mana_confluence_red_mana_pays_one_life_on_spend"
+      },
+      {
+        "available_mana_after_refresh": 1,
+        "available_mana_after_spend": 0,
+        "card_name": "Tarnished Citadel",
+        "cost": "{1}",
+        "life_after_spend": 40,
+        "life_cost_events": 0,
+        "scenario": "tarnished_colorless_mana_has_no_life_loss"
+      },
+      {
+        "available_mana_after_refresh": 1,
+        "available_mana_after_spend": 0,
+        "card_name": "Tarnished Citadel",
+        "cost": "{G}",
+        "life_after_spend": 37,
+        "life_cost_events": 1,
+        "scenario": "tarnished_colored_mana_deals_three_damage_on_spend"
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-29T10:08:56.768754+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pgc063_e2e_manifest_20260629.json",
+  "package_id": "pgc063_pain_mana_source_cost_runtime",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "five_color_tap_damage_land_runtime_v1",
+          "card_name": "City of Brass",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+          "oracle_hash": "969b41c45b968319b44f77454c6ac55b",
+          "review_status": "verified",
+          "rule_version": 3
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "one_mana_one_one_black_pain_mana_dork_runtime_v1",
+          "card_name": "Elves of Deep Shadow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1272fb910383d34360702e343ec16b37",
+          "oracle_hash": "5dd30cbea74064369bcba667795049e2",
+          "review_status": "verified",
+          "rule_version": 3
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "five_color_life_paid_land_runtime_v1",
+          "card_name": "Mana Confluence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+          "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+          "review_status": "verified",
+          "rule_version": 3
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "colorless_or_any_color_pain_land_runtime_v1",
+          "card_name": "Tarnished Citadel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d5663032352408a845b7602f9cb5adf9",
+          "oracle_hash": "d8bdb24e586e16274f0bd42e40e2dc58",
+          "review_status": "verified",
+          "rule_version": 3
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "five_color_tap_damage_land_runtime_v1",
+          "card_name": "City of Brass",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+          "oracle_hash": "969b41c45b968319b44f77454c6ac55b",
+          "review_status": "verified",
+          "rule_version": 3
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "one_mana_one_one_black_pain_mana_dork_runtime_v1",
+          "card_name": "Elves of Deep Shadow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1272fb910383d34360702e343ec16b37",
+          "oracle_hash": "5dd30cbea74064369bcba667795049e2",
+          "review_status": "verified",
+          "rule_version": 3
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "five_color_life_paid_land_runtime_v1",
+          "card_name": "Mana Confluence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+          "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+          "review_status": "verified",
+          "rule_version": 3
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "colorless_or_any_color_pain_land_runtime_v1",
+          "card_name": "Tarnished Citadel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d5663032352408a845b7602f9cb5adf9",
+          "oracle_hash": "d8bdb24e586e16274f0bd42e40e2dc58",
+          "review_status": "verified",
+          "rule_version": 3
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "five_color_tap_damage_land_runtime_v1",
+          "battle_rule_version": 3,
+          "card_name": "City of Brass",
+          "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "one_mana_one_one_black_pain_mana_dork_runtime_v1",
+          "battle_rule_version": 3,
+          "card_name": "Elves of Deep Shadow",
+          "logical_rule_key": "battle_rule_v1:1272fb910383d34360702e343ec16b37"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "five_color_life_paid_land_runtime_v1",
+          "battle_rule_version": 3,
+          "card_name": "Mana Confluence",
+          "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "colorless_or_any_color_pain_land_runtime_v1",
+          "battle_rule_version": 3,
+          "card_name": "Tarnished Citadel",
+          "logical_rule_key": "battle_rule_v1:d5663032352408a845b7602f9cb5adf9"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "City of Brass",
+          "component_keys": [],
+          "effect": "land",
+          "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elves of Deep Shadow",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1272fb910383d34360702e343ec16b37"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mana Confluence",
+          "component_keys": [],
+          "effect": "land",
+          "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tarnished Citadel",
+          "component_keys": [],
+          "effect": "land",
+          "logical_rule_key": "battle_rule_v1:d5663032352408a845b7602f9cb5adf9"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 9,
+        "scenarios": 5
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "PGC063 Pain Mana Source Cost Runtime Validation"
+}

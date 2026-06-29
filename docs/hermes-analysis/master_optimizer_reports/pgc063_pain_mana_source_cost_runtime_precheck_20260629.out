@@ -1,0 +1,15 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "rows": [
+    {
+      "backup_table_exists": 0,
+      "colored_life_loss_annotation_rows": 1,
+      "current_annotation_rows": 4,
+      "life_payment_annotation_rows": 1,
+      "tap_damage_annotation_rows": 2,
+      "target_rows": 4,
+      "trusted_target_rows": 4
+    }
+  ],
+  "sql": "pgc063_pain_mana_source_cost_runtime_precheck_20260629.sql"
+}

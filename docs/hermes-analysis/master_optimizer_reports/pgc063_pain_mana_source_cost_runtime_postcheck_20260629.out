@@ -1,0 +1,15 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "rows": [
+    {
+      "backup_rows": 4,
+      "city_runtime_rows": 1,
+      "elves_runtime_rows": 1,
+      "mana_confluence_runtime_rows": 1,
+      "runtime_rows": 4,
+      "target_rows": 4,
+      "tarnished_runtime_rows": 1
+    }
+  ],
+  "sql": "pgc063_pain_mana_source_cost_runtime_postcheck_20260629.sql"
+}

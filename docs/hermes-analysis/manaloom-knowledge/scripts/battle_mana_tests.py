@@ -204,6 +204,153 @@ def register_tests(battle, player):
         assert len(active.conditional_mana_sources) == 2
         assert active.life == 40
 
+    def test_runtime_pain_mana_source_costs_are_paid_when_mana_is_spent():
+        def modes(colors, life_loss, kind, status):
+            return [
+                {
+                    "color": color,
+                    "mode": kind,
+                    "restriction": "any_spell",
+                    "status": "runtime_executor_v1",
+                    "life_loss_on_spend": life_loss,
+                    "life_loss_kind": kind,
+                    "life_loss_status": status,
+                }
+                for color in colors
+            ]
+
+        def run_source(source, cost, expected_life, expected_event):
+            events = []
+            previous_handler = battle.REPLAY_EVENT_HANDLER
+            battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+            active = player("Active")
+            active.life = 40
+            active.battlefield = [source]
+            try:
+                active.refresh_mana_sources(turn=3)
+                assert active.life == 40
+                assert active.available_mana() == 1
+                assert active.can_pay(cost) is True
+                assert active.life == 40
+                assert active.spend_mana(cost) is True
+            finally:
+                battle.REPLAY_EVENT_HANDLER = previous_handler
+
+            assert active.life == expected_life
+            paid_events = [
+                data
+                for event, data in events
+                if event == "conditional_mana_life_cost_paid"
+            ]
+            if expected_event is None:
+                assert paid_events == []
+                return
+            assert len(paid_events) == 1
+            paid = paid_events[0]
+            for key, value in expected_event.items():
+                assert paid.get(key) == value
+
+        run_source(
+            {
+                "name": "City of Brass",
+                "effect": "land",
+                "type_line": "Land",
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "tap_damage_status": "runtime_executor_v1",
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": modes("WUBRG", 1, "damage_on_tap", "tap_damage_status"),
+            },
+            "{W}",
+            39,
+            {
+                "source": "City of Brass",
+                "color": "white",
+                "life_loss": 1,
+                "life_loss_kind": "damage_on_tap",
+                "life_loss_status": "tap_damage_status",
+                "life_before": 40,
+                "life_after": 39,
+            },
+        )
+        run_source(
+            {
+                "name": "Elves of Deep Shadow",
+                "effect": "creature",
+                "type_line": "Creature - Elf Druid",
+                "power": 1,
+                "toughness": 1,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "B",
+                "tap_damage_status": "runtime_executor_v1",
+                "summoning_sick": False,
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": modes("B", 1, "damage_on_tap", "tap_damage_status"),
+            },
+            "{B}",
+            39,
+            {
+                "source": "Elves of Deep Shadow",
+                "color": "black",
+                "life_loss": 1,
+                "life_loss_kind": "damage_on_tap",
+                "life_loss_status": "tap_damage_status",
+            },
+        )
+        run_source(
+            {
+                "name": "Mana Confluence",
+                "effect": "land",
+                "type_line": "Land",
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "life_payment_status": "runtime_executor_v1",
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": modes("WUBRG", 1, "pay_life_activation", "life_payment_status"),
+            },
+            "{R}",
+            39,
+            {
+                "source": "Mana Confluence",
+                "color": "red",
+                "life_loss": 1,
+                "life_loss_kind": "pay_life_activation",
+                "life_loss_status": "life_payment_status",
+            },
+        )
+        tarnished_citadel = {
+            "name": "Tarnished Citadel",
+            "effect": "land",
+            "type_line": "Land",
+            "mana_produced": 1,
+            "produces": "CWUBRG",
+            "life_loss_on_colored_mana_status": "runtime_executor_v1",
+            "conditional_mana_modes_status": "runtime_executor_v1",
+            "conditional_mana_modes": [
+                {
+                    "color": "C",
+                    "mode": "colorless_no_life_loss",
+                    "restriction": "any_spell",
+                    "status": "runtime_executor_v1",
+                },
+                *modes("WUBRG", 3, "damage_on_colored_mana", "life_loss_on_colored_mana_status"),
+            ],
+        }
+        run_source(dict(tarnished_citadel), "{1}", 40, None)
+        run_source(
+            dict(tarnished_citadel),
+            "{G}",
+            37,
+            {
+                "source": "Tarnished Citadel",
+                "color": "green",
+                "life_loss": 3,
+                "life_loss_kind": "damage_on_colored_mana",
+                "life_loss_status": "life_loss_on_colored_mana_status",
+            },
+        )
+
     def test_sunbillow_verge_white_unconditional_red_requires_plains_or_mountain():
         sunbillow = {
             "name": "Sunbillow Verge",
@@ -733,6 +880,7 @@ def register_tests(battle, player):
         test_l1b_nonfetch_lands_refresh_as_flexible_mana_sources,
         test_l3a_artifact_mana_rocks_refresh_with_oracle_scopes,
         test_pain_mana_source_shapes_refresh_without_new_runtime_executor,
+        test_runtime_pain_mana_source_costs_are_paid_when_mana_is_spent,
         test_sunbillow_verge_white_unconditional_red_requires_plains_or_mountain,
         test_opening_hand_virtual_mana_respects_sunbillow_red_condition,
         test_spectator_seating_enters_tapped_with_fewer_than_two_opponents,

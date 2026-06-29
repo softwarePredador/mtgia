@@ -601,8 +601,89 @@ def run_conditional_land_play(
     }
 
 
+def run_mana_source_life_cost_spend(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card({**card, **effect, **dict(scenario.get("source_overrides") or {})})
+    active = battle.Player(str(scenario.get("player") or "Lorehold"), None, [])
+    active.life = int(scenario.get("starting_life") or 40)
+    active.battlefield = [source]
+    turn = int(scenario.get("turn") or 1)
+    cost = scenario.get("cost")
+    if not cost:
+        fail("battle_execution", f"{card['name']} scenario missing cost")
+
+    active.refresh_mana_sources(turn=turn)
+    expected_life_after_refresh = int(
+        scenario.get("expected_life_after_refresh", active.life)
+    )
+    if active.life != expected_life_after_refresh:
+        fail(
+            "battle_execution",
+            f"{card['name']} life after refresh={active.life}, expected {expected_life_after_refresh}",
+        )
+    available_mana_after_refresh = active.available_mana()
+    if "expected_available_mana_after_refresh" in scenario:
+        expected_available = int(scenario["expected_available_mana_after_refresh"])
+        if available_mana_after_refresh != expected_available:
+            fail(
+                "battle_execution",
+                f"{card['name']} available mana={available_mana_after_refresh}, expected {expected_available}",
+            )
+
+    can_pay = active.can_pay(cost)
+    if bool(can_pay) != bool(scenario.get("expected_can_pay", True)):
+        fail("battle_execution", f"{card['name']} can_pay({cost})={can_pay}")
+    if active.life != expected_life_after_refresh:
+        fail("battle_execution", f"{card['name']} can_pay mutated life to {active.life}")
+
+    spent = active.spend_mana(cost)
+    if bool(spent) != bool(scenario.get("expected_spent", True)):
+        fail("battle_execution", f"{card['name']} spend_mana({cost})={spent}")
+    expected_life_after_spend = int(scenario.get("expected_life_after_spend", active.life))
+    if active.life != expected_life_after_spend:
+        fail(
+            "battle_execution",
+            f"{card['name']} life after spend={active.life}, expected {expected_life_after_spend}",
+        )
+    expected_event = scenario.get("expected_life_cost_event")
+    matching_events = [
+        data
+        for event, data in events
+        if event == "conditional_mana_life_cost_paid"
+        and data.get("source") == card.get("name")
+    ]
+    if expected_event is None:
+        if matching_events:
+            fail("battle_events", f"{card['name']} unexpected life-cost event")
+    else:
+        if not matching_events:
+            fail("battle_events", f"{card['name']} missing conditional_mana_life_cost_paid")
+        event = matching_events[-1]
+        for key, expected_value in expected_event.items():
+            if event.get(key) != expected_value:
+                fail(
+                    "battle_events",
+                    f"{card['name']} {key}={event.get(key)!r}, expected {expected_value!r}",
+                )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cost": cost,
+        "available_mana_after_refresh": available_mana_after_refresh,
+        "available_mana_after_spend": active.available_mana(),
+        "life_after_spend": active.life,
+        "life_cost_events": len(matching_events),
+    }
+
+
 SCENARIO_RUNNERS = {
     "conditional_land_play": run_conditional_land_play,
+    "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,
     "tempting_offer_decline": run_tempting_offer_decline,

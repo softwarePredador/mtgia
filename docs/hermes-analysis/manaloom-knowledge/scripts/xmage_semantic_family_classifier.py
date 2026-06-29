@@ -2605,7 +2605,11 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("produces") == "G"
         )
 
-    if effect == "creature" and scope == "one_mana_one_one_black_pain_mana_dork_v1":
+    if effect == "creature" and scope in {
+        "one_mana_one_one_black_pain_mana_dork_v1",
+        "one_mana_one_one_black_pain_mana_dork_runtime_v1",
+    }:
+        runtime_scope = scope.endswith("_runtime_v1")
         return (
             types == {"CREATURE"}
             and ability_classes == {"SimpleManaAbility"}
@@ -2617,7 +2621,16 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("mana_produced") or 0) == 1
             and effect_json.get("produces") == "B"
             and int(effect_json.get("damage_on_tap") or 0) == 1
-            and effect_json.get("tap_damage_status") == "annotation_only"
+            and effect_json.get("tap_damage_status") == (
+                "runtime_executor_v1" if runtime_scope else "annotation_only"
+            )
+            and (
+                not runtime_scope
+                or (
+                    effect_json.get("conditional_mana_modes_status") == "runtime_executor_v1"
+                    and effect_json.get("oracle_runtime_scope") == "pain_mana_source_life_cost_runtime_v1"
+                )
+            )
         )
 
     if effect == "creature" and scope == "one_mana_one_one_white_mana_dork_v1":
@@ -2706,7 +2719,11 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("opponent_land_color_dependency"))
         )
 
-    if effect == "land" and scope == "colorless_or_any_color_pain_land_v1":
+    if effect == "land" and scope in {
+        "colorless_or_any_color_pain_land_v1",
+        "colorless_or_any_color_pain_land_runtime_v1",
+    }:
+        runtime_scope = scope.endswith("_runtime_v1")
         return (
             types == {"LAND"}
             and effect_classes == {"DamageControllerEffect"}
@@ -2715,7 +2732,16 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("mana_produced") or 0) == 1
             and effect_json.get("produces") == "CWUBRG"
             and int(effect_json.get("life_for_colored_mana") or 0) == 3
-            and effect_json.get("life_loss_on_colored_mana_status") == "annotation_only"
+            and effect_json.get("life_loss_on_colored_mana_status") == (
+                "runtime_executor_v1" if runtime_scope else "annotation_only"
+            )
+            and (
+                not runtime_scope
+                or (
+                    effect_json.get("conditional_mana_modes_status") == "runtime_executor_v1"
+                    and effect_json.get("oracle_runtime_scope") == "pain_mana_source_life_cost_runtime_v1"
+                )
+            )
         )
 
     if effect == "ramp_permanent" and scope == "creature_support_any_color_mana_rock_v1":

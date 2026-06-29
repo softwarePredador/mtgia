@@ -5388,18 +5388,67 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "City of Brass": {
-    "battle_model_scope": "five_color_tap_damage_land_annotation_v1",
+    "battle_model_scope": "five_color_tap_damage_land_runtime_v1",
+    "conditional_mana_modes": [
+      {
+        "color": "W",
+        "life_loss_kind": "damage_on_tap",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "tap_damage_status",
+        "mode": "damage_on_tap",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "U",
+        "life_loss_kind": "damage_on_tap",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "tap_damage_status",
+        "mode": "damage_on_tap",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "B",
+        "life_loss_kind": "damage_on_tap",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "tap_damage_status",
+        "mode": "damage_on_tap",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "R",
+        "life_loss_kind": "damage_on_tap",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "tap_damage_status",
+        "mode": "damage_on_tap",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "G",
+        "life_loss_kind": "damage_on_tap",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "tap_damage_status",
+        "mode": "damage_on_tap",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      }
+    ],
+    "conditional_mana_modes_status": "runtime_executor_v1",
+    "damage_on_tap": 1,
     "effect": "land",
     "mana_produced": 1,
-    "oracle_runtime_scope": "mana_source_runtime_with_annotation_only_clauses",
+    "oracle_runtime_scope": "pain_mana_source_life_cost_runtime_v1",
     "pg051_l1b_land_family": "deck6_nonfetch_mana_land",
     "produces": "WUBRG",
-    "tap_damage_status": "annotation_only",
+    "tap_damage_status": "runtime_executor_v1",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
+    "battle_rule_version": 3,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "969b41c45b968319b44f77454c6ac55b"
   },
@@ -9353,20 +9402,33 @@
   },
   "Elves of Deep Shadow": {
     "ability_kind": "activated",
-    "battle_model_scope": "one_mana_one_one_black_pain_mana_dork_v1",
+    "battle_model_scope": "one_mana_one_one_black_pain_mana_dork_runtime_v1",
+    "conditional_mana_modes": [
+      {
+        "color": "B",
+        "life_loss_kind": "damage_on_tap",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "tap_damage_status",
+        "mode": "damage_on_tap",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      }
+    ],
+    "conditional_mana_modes_status": "runtime_executor_v1",
     "damage_on_tap": 1,
     "effect": "creature",
     "is_mana_source": true,
     "mana_produced": 1,
+    "oracle_runtime_scope": "pain_mana_source_life_cost_runtime_v1",
     "power": 1,
     "produces": "B",
-    "tap_damage_status": "annotation_only",
+    "tap_damage_status": "runtime_executor_v1",
     "toughness": 1,
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.94,
-    "battle_rule_version": 2,
+    "battle_rule_version": 3,
     "battle_rule_logical_key": "battle_rule_v1:1272fb910383d34360702e343ec16b37",
     "battle_rule_oracle_hash": "5dd30cbea74064369bcba667795049e2"
   },
@@ -18744,18 +18806,67 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Mana Confluence": {
-    "battle_model_scope": "five_color_life_paid_land_annotation_v1",
+    "battle_model_scope": "five_color_life_paid_land_runtime_v1",
+    "conditional_mana_modes": [
+      {
+        "color": "W",
+        "life_loss_kind": "pay_life_activation",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "life_payment_status",
+        "mode": "pay_life_activation",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "U",
+        "life_loss_kind": "pay_life_activation",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "life_payment_status",
+        "mode": "pay_life_activation",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "B",
+        "life_loss_kind": "pay_life_activation",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "life_payment_status",
+        "mode": "pay_life_activation",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "R",
+        "life_loss_kind": "pay_life_activation",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "life_payment_status",
+        "mode": "pay_life_activation",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "G",
+        "life_loss_kind": "pay_life_activation",
+        "life_loss_on_spend": 1,
+        "life_loss_status": "life_payment_status",
+        "mode": "pay_life_activation",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      }
+    ],
+    "conditional_mana_modes_status": "runtime_executor_v1",
     "effect": "land",
-    "life_payment_status": "annotation_only",
+    "life_payment": 1,
+    "life_payment_status": "runtime_executor_v1",
     "mana_produced": 1,
-    "oracle_runtime_scope": "mana_source_runtime_with_annotation_only_clauses",
+    "oracle_runtime_scope": "pain_mana_source_life_cost_runtime_v1",
     "pg051_l1b_land_family": "deck6_nonfetch_mana_land",
     "produces": "WUBRG",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
+    "battle_rule_version": 3,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "11173c5296485bfd3cdd28822d4634e9"
   },
@@ -31240,17 +31351,75 @@
   },
   "Tarnished Citadel": {
     "ability_kind": "activated",
-    "battle_model_scope": "colorless_or_any_color_pain_land_v1",
+    "battle_model_scope": "colorless_or_any_color_pain_land_runtime_v1",
+    "conditional_mana_modes": [
+      {
+        "color": "C",
+        "life_loss_kind": "none",
+        "life_loss_on_spend": 0,
+        "life_loss_status": "runtime_executor_v1",
+        "mode": "colorless_no_life_loss",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "W",
+        "life_loss_kind": "damage_on_colored_mana",
+        "life_loss_on_spend": 3,
+        "life_loss_status": "life_loss_on_colored_mana_status",
+        "mode": "damage_on_colored_mana",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "U",
+        "life_loss_kind": "damage_on_colored_mana",
+        "life_loss_on_spend": 3,
+        "life_loss_status": "life_loss_on_colored_mana_status",
+        "mode": "damage_on_colored_mana",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "B",
+        "life_loss_kind": "damage_on_colored_mana",
+        "life_loss_on_spend": 3,
+        "life_loss_status": "life_loss_on_colored_mana_status",
+        "mode": "damage_on_colored_mana",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "R",
+        "life_loss_kind": "damage_on_colored_mana",
+        "life_loss_on_spend": 3,
+        "life_loss_status": "life_loss_on_colored_mana_status",
+        "mode": "damage_on_colored_mana",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      },
+      {
+        "color": "G",
+        "life_loss_kind": "damage_on_colored_mana",
+        "life_loss_on_spend": 3,
+        "life_loss_status": "life_loss_on_colored_mana_status",
+        "mode": "damage_on_colored_mana",
+        "restriction": "any_spell",
+        "status": "runtime_executor_v1"
+      }
+    ],
+    "conditional_mana_modes_status": "runtime_executor_v1",
     "effect": "land",
     "life_for_colored_mana": 3,
-    "life_loss_on_colored_mana_status": "annotation_only",
+    "life_loss_on_colored_mana_status": "runtime_executor_v1",
     "mana_produced": 1,
+    "oracle_runtime_scope": "pain_mana_source_life_cost_runtime_v1",
     "produces": "CWUBRG",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.94,
-    "battle_rule_version": 2,
+    "battle_rule_version": 3,
     "battle_rule_logical_key": "battle_rule_v1:d5663032352408a845b7602f9cb5adf9",
     "battle_rule_oracle_hash": "d8bdb24e586e16274f0bd42e40e2dc58"
   },

@@ -3409,6 +3409,8 @@ def _conditional_mana_source_entry(source, amount, modes, source_kind):
                 "restriction": mode.get("restriction") or mode.get("spend_restriction") or "any_spell",
                 "mode": mode.get("mode") or mode.get("condition") or source_kind,
                 "life_loss_on_spend": int(mode.get("life_loss_on_spend") or 0),
+                "life_loss_kind": mode.get("life_loss_kind") or mode.get("life_payment_kind") or "life_loss",
+                "life_loss_status": mode.get("life_loss_status") or mode.get("status"),
             }
         )
     if not available_modes:
@@ -3480,6 +3482,8 @@ def replay_conditional_mana_source(source):
                 "color": mode.get("color"),
                 "restriction": mode.get("restriction"),
                 "mode": mode.get("mode"),
+                "life_loss_on_spend": int(mode.get("life_loss_on_spend") or 0),
+                "life_loss_kind": mode.get("life_loss_kind"),
             }
             for mode in modes
         ],
@@ -7230,6 +7234,7 @@ class Player:
             for restriction, colors in self.restricted_mana.items()
         }
         conditional_sources = []
+        conditional_life_payments = []
         for source in getattr(self, "conditional_mana_sources", []) or []:
             if not isinstance(source, dict):
                 continue
@@ -7313,8 +7318,22 @@ class Player:
                     continue
                 paid = min(source_remaining, remaining)
                 mode = modes[0]
+                life_loss = int(mode.get("life_loss_on_spend") or 0) * paid
                 source["remaining"] = source_remaining - paid
-                life_payment += int(mode.get("life_loss_on_spend") or 0) * paid
+                life_payment += life_loss
+                if life_loss:
+                    conditional_life_payments.append({
+                        "source": source.get("source"),
+                        "source_kind": source.get("source_kind"),
+                        "color": color,
+                        "mode": mode.get("mode"),
+                        "restriction": mode.get("restriction"),
+                        "amount_paid": paid,
+                        "life_loss": life_loss,
+                        "life_loss_kind": mode.get("life_loss_kind") or "life_loss",
+                        "life_loss_status": mode.get("life_loss_status"),
+                        "rule_fields": dict(source.get("rule_fields") or {}),
+                    })
                 spent += paid
                 remaining -= paid
             return spent
@@ -7342,8 +7361,22 @@ class Player:
                     continue
                 paid = min(source_remaining, remaining)
                 mode = modes[0]
+                life_loss = int(mode.get("life_loss_on_spend") or 0) * paid
                 source["remaining"] = source_remaining - paid
-                life_payment += int(mode.get("life_loss_on_spend") or 0) * paid
+                life_payment += life_loss
+                if life_loss:
+                    conditional_life_payments.append({
+                        "source": source.get("source"),
+                        "source_kind": source.get("source_kind"),
+                        "color": mode.get("color"),
+                        "mode": mode.get("mode"),
+                        "restriction": mode.get("restriction"),
+                        "amount_paid": paid,
+                        "life_loss": life_loss,
+                        "life_loss_kind": mode.get("life_loss_kind") or "life_loss",
+                        "life_loss_status": mode.get("life_loss_status"),
+                        "rule_fields": dict(source.get("rule_fields") or {}),
+                    })
                 spent += paid
                 remaining -= paid
             return spent
@@ -7527,7 +7560,14 @@ class Player:
 
         if not spend_generic(parsed["generic"]):
             return None
-        return pool, treasure_mana // treasure_unit_value, life_payment, restricted_pool, conditional_sources
+        return (
+            pool,
+            treasure_mana // treasure_unit_value,
+            life_payment,
+            restricted_pool,
+            conditional_sources,
+            conditional_life_payments,
+        )
 
     def can_pay(self, cost):
         return self._payment_plan(cost) is not None
@@ -7540,7 +7580,7 @@ class Player:
         plan = self._payment_plan(cost)
         if plan is None:
             return False
-        pool, self.treasures, life_payment, restricted_pool, conditional_sources = plan
+        pool, self.treasures, life_payment, restricted_pool, conditional_sources, conditional_life_payments = plan
         for color, amount in pool.items():
             setattr(self.mana_pool, color, amount)
         self.restricted_mana = {
@@ -7560,8 +7600,35 @@ class Player:
             for source in conditional_sources
             if int(source.get("remaining", 0) or 0) > 0
         ]
-        if life_payment:
-            change_life(self, -life_payment)
+        conditional_life_total = sum(
+            max(0, int(payment.get("life_loss") or 0))
+            for payment in conditional_life_payments
+        )
+        for payment in conditional_life_payments:
+            amount = max(0, int(payment.get("life_loss") or 0))
+            if amount <= 0:
+                continue
+            life_before = self.life
+            change_life(self, -amount)
+            emit_replay_event(
+                "conditional_mana_life_cost_paid",
+                player=self.name,
+                source=payment.get("source"),
+                source_kind=payment.get("source_kind"),
+                color=payment.get("color"),
+                mode=payment.get("mode"),
+                restriction=payment.get("restriction"),
+                amount_paid=payment.get("amount_paid"),
+                life_loss=amount,
+                life_loss_kind=payment.get("life_loss_kind"),
+                life_loss_status=payment.get("life_loss_status"),
+                life_before=life_before,
+                life_after=self.life,
+                **dict(payment.get("rule_fields") or {}),
+            )
+        remaining_life_payment = max(0, int(life_payment or 0) - conditional_life_total)
+        if remaining_life_payment:
+            change_life(self, -remaining_life_payment)
         return True
 
     def spend_card_mana(self, card, additional_generic=0):
@@ -10313,7 +10380,14 @@ def survival_response_reservation_context(player, card, effect_data=None, additi
     payment_plan = player._payment_plan(card_mana_cost(card, additional_generic))
     if payment_plan is None:
         return None
-    pool_after, treasures_after, life_payment, restricted_after, conditional_after = payment_plan
+    (
+        pool_after,
+        treasures_after,
+        life_payment,
+        restricted_after,
+        conditional_after,
+        _conditional_life_payments,
+    ) = payment_plan
     life_after = player.life - life_payment
     if _can_pay_any_survival_response_from_state(
         player,
