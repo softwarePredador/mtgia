@@ -219,6 +219,10 @@ OPTIMIZER_BASENAMES = {
 }
 
 FOCUSED_EVIDENCE_BASENAMES = {
+    "battle_external_engine_crosscheck.py",
+    "test_battle_external_engine_crosscheck.py",
+    "battle_mtga_player_log_parser.py",
+    "test_battle_mtga_player_log_parser.py",
     "external_card_rule_reference_harvester.py",
     "test_external_card_rule_reference_harvester.py",
     "mtg_battle_external_source_audit.py",

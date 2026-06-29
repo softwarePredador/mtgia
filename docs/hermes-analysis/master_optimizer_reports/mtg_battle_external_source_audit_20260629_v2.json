@@ -1,0 +1,1214 @@
+{
+  "generated_at_utc": "2026-06-29T06:22:30+00:00",
+  "optional_gaps": [],
+  "postgres_writes": false,
+  "recommendations": [],
+  "repo_root": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia",
+  "required_gaps": [],
+  "required_partials": [],
+  "requirements": [
+    {
+      "area": "source hierarchy",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/mtg_battle_external_source_audit.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_rules_2026_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/mtg_battle_external_source_audit.py"
+      ],
+      "id": "official_rules_authority_anchored",
+      "keyword_groups": [
+        [
+          "Comprehensive Rules",
+          "official_rules"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "Comprehensive Rules",
+            "official_rules"
+          ],
+          "found": [
+            "Comprehensive Rules",
+            "official_rules"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Keep the official rules source in the external audit and add/update rule-version tests when the official document changes.",
+      "rationale": "ManaLoom should anchor battle semantics to official rules before simulator or telemetry sources.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619",
+        "wotc_rules_page"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "turn structure",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_turn_flow_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_turn_flow_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+      ],
+      "id": "turn_structure_and_phase_order",
+      "keyword_groups": [
+        [
+          "beginning",
+          "precombat",
+          "combat",
+          "postcombat",
+          "ending"
+        ],
+        [
+          "phase",
+          "turn"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "beginning",
+            "precombat",
+            "combat",
+            "postcombat",
+            "ending"
+          ],
+          "found": [
+            "beginning",
+            "precombat",
+            "combat",
+            "postcombat",
+            "ending"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "phase",
+            "turn"
+          ],
+          "found": [
+            "phase",
+            "turn"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add focused turn-flow tests covering beginning, main, combat, postcombat, and ending phase transitions.",
+      "rationale": "Battle simulation must model the turn skeleton before card-specific logic can be trusted.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "priority and stack",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_contract_static_audit.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_contract_static_audit.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+      ],
+      "id": "priority_stack_and_resolution",
+      "keyword_groups": [
+        [
+          "priority_window",
+          "priority"
+        ],
+        [
+          "stack_depth",
+          "stack_object",
+          "spell_resolved"
+        ],
+        [
+          "cast_pipeline",
+          "locked_cost"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "priority_window",
+            "priority"
+          ],
+          "found": [
+            "priority_window",
+            "priority"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "stack_depth",
+            "stack_object",
+            "spell_resolved"
+          ],
+          "found": [
+            "stack_depth",
+            "stack_object",
+            "spell_resolved"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "cast_pipeline",
+            "locked_cost"
+          ],
+          "found": [
+            "cast_pipeline",
+            "locked_cost"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Extend stack casting tests and event contracts with priority window, stack depth, locked cost, and resolution metadata.",
+      "rationale": "Stack and priority are the main boundary between card text mapping and legal executable gameplay.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "casting, costs, and targets",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_targeting_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_stack_casting_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_mana_cost_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_targeting_tests.py"
+      ],
+      "id": "casting_cost_target_legality",
+      "keyword_groups": [
+        [
+          "target",
+          "targets"
+        ],
+        [
+          "mana_cost",
+          "locked_cost",
+          "cost"
+        ],
+        [
+          "illegal",
+          "legality"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "target",
+            "targets"
+          ],
+          "found": [
+            "target",
+            "targets"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "mana_cost",
+            "locked_cost",
+            "cost"
+          ],
+          "found": [
+            "mana_cost",
+            "locked_cost",
+            "cost"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "illegal",
+            "legality"
+          ],
+          "found": [
+            "illegal"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add cast-legality fixtures for cost locking, target selection, and illegal cast rejection.",
+      "rationale": "ManaLoom cannot compare card strength if the cast legality and target model is fuzzy.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619",
+        "scryfall_api",
+        "mtgjson_v5"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "combat",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_combat_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+      ],
+      "id": "combat_step_model",
+      "keyword_groups": [
+        [
+          "attack",
+          "attacker",
+          "attackers"
+        ],
+        [
+          "block",
+          "blocker",
+          "blockers"
+        ],
+        [
+          "combat_damage",
+          "combat damage"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "attack",
+            "attacker",
+            "attackers"
+          ],
+          "found": [
+            "attack",
+            "attacker",
+            "attackers"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "block",
+            "blocker",
+            "blockers"
+          ],
+          "found": [
+            "block",
+            "blocker",
+            "blockers"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "combat_damage",
+            "combat damage"
+          ],
+          "found": [
+            "combat_damage",
+            "combat damage"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add combat regression tests for attacker declaration, blocker declaration, combat damage, and related replay events.",
+      "rationale": "Combat needs both official step ordering and telemetry-aware outcome logging.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619",
+        "seventeenlands_public_datasets"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "state-based actions",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_zone_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_sba_zone_tests.py"
+      ],
+      "id": "state_based_actions",
+      "keyword_groups": [
+        [
+          "state_based",
+          "sba",
+          "state-based"
+        ],
+        [
+          "permanent_moved_by_sba",
+          "player_eliminated",
+          "graveyard"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "state_based",
+            "sba",
+            "state-based"
+          ],
+          "found": [
+            "sba",
+            "state-based"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "permanent_moved_by_sba",
+            "player_eliminated",
+            "graveyard"
+          ],
+          "found": [
+            "permanent_moved_by_sba",
+            "player_eliminated",
+            "graveyard"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add state-based action support/tests for lethal damage, zero toughness, legendary/commander edge cases, and player loss.",
+      "rationale": "SBA support prevents impossible board states from contaminating replay learning.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "replacement and prevention",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replacement_tests.py"
+      ],
+      "id": "replacement_and_prevention_effects",
+      "keyword_groups": [
+        [
+          "ReplacementRegistry",
+          "replacement"
+        ],
+        [
+          "replacement_applied",
+          "prevention",
+          "prevent"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "ReplacementRegistry",
+            "replacement"
+          ],
+          "found": [
+            "ReplacementRegistry",
+            "replacement"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "replacement_applied",
+            "prevention",
+            "prevent"
+          ],
+          "found": [
+            "replacement_applied",
+            "prevention",
+            "prevent"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add tests for replacement ordering, prevention shields, and emitted causal event metadata.",
+      "rationale": "Replacement/prevention changes event causality and must be learned as an event transform, not as after-the-fact text.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "continuous effects and layers",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_characteristics_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_continuous_effects_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_continuous_effects_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_characteristics_support.py"
+      ],
+      "id": "continuous_effect_layers",
+      "keyword_groups": [
+        [
+          "continuous",
+          "apply_continuous_effects"
+        ],
+        [
+          "layer",
+          "sublayer"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "continuous",
+            "apply_continuous_effects"
+          ],
+          "found": [
+            "continuous",
+            "apply_continuous_effects"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "layer",
+            "sublayer"
+          ],
+          "found": [
+            "layer",
+            "sublayer"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add layer-order fixtures for characteristics, control, type/color, ability, and power/toughness sublayers.",
+      "rationale": "Layer handling protects card characteristics and power/toughness calculations from order bugs.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "triggered abilities",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_trigger_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+      ],
+      "id": "triggered_ability_resolution",
+      "keyword_groups": [
+        [
+          "trigger",
+          "triggered"
+        ],
+        [
+          "trigger_resolved",
+          "event_payload"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "trigger",
+            "triggered"
+          ],
+          "found": [
+            "trigger",
+            "triggered"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "trigger_resolved",
+            "event_payload"
+          ],
+          "found": [
+            "trigger_resolved",
+            "event_payload"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add trigger queue/resolution tests with emitted event payloads and source object identity.",
+      "rationale": "Triggered abilities are a frequent bridge from Oracle text to runtime event queues.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619",
+        "scryfall_api"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "zones",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_tests.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_support.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_zone_transition_tests.py"
+      ],
+      "id": "zone_transition_ledger",
+      "keyword_groups": [
+        [
+          "from_zone",
+          "source_zone"
+        ],
+        [
+          "to_zone",
+          "destination",
+          "zone_after"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "from_zone",
+            "source_zone"
+          ],
+          "found": [
+            "from_zone"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "to_zone",
+            "destination",
+            "zone_after"
+          ],
+          "found": [
+            "to_zone",
+            "destination"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add zone transition tests that prove source/destination metadata survives replacement and SBA paths.",
+      "rationale": "Zone transitions are required for graveyard, exile, stack, library, command zone, and blink learning.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "Commander constraints",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_commander_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_commander_tests.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py"
+      ],
+      "id": "commander_and_deck_legality",
+      "keyword_groups": [
+        [
+          "commander",
+          "command_zone"
+        ],
+        [
+          "color_identity",
+          "legalities",
+          "legality"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "commander",
+            "command_zone"
+          ],
+          "found": [
+            "commander",
+            "command_zone"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "color_identity",
+            "legalities",
+            "legality"
+          ],
+          "found": [
+            "legalities",
+            "legality"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Add commander legality fixtures tied to card metadata identifiers and command-zone transitions.",
+      "rationale": "Commander deckbuilding cannot be judged apart from commander identity, command zone, and legal card universe.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619",
+        "mtgjson_v5",
+        "scryfall_api"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "Oracle/rulings metadata",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_card_rule_reference_harvester.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/reviewed_battle_card_rules.py"
+      ],
+      "id": "oracle_rulings_metadata_pipeline",
+      "keyword_groups": [
+        [
+          "oracle",
+          "rulings",
+          "scryfall"
+        ],
+        [
+          "oracle_hash",
+          "rule_version"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "oracle",
+            "rulings",
+            "scryfall"
+          ],
+          "found": [
+            "oracle",
+            "scryfall"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "oracle_hash",
+            "rule_version"
+          ],
+          "found": [
+            "oracle_hash",
+            "rule_version"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Keep Oracle/rulings harvest and PG sync metadata tied to oracle_hash/rule_version.",
+      "rationale": "Card text and rulings must be canonicalized before pattern families are promoted.",
+      "required_for_gate": true,
+      "source_ids": [
+        "scryfall_api",
+        "mtgjson_v5"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "XMage source absorption",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_batch_pg_package_builder.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_local_rule_indexer.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_semantic_family_classifier.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_to_manaloom_effect_hints.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_local_rule_indexer.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_to_manaloom_effect_hints.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_semantic_family_classifier.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_batch_pg_package_builder.py"
+      ],
+      "id": "xmage_semantic_family_absorption",
+      "keyword_groups": [
+        [
+          "XMage",
+          "xmage"
+        ],
+        [
+          "semantic",
+          "family",
+          "effect"
+        ],
+        [
+          "candidate_only",
+          "manual review",
+          "review_policy"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "XMage",
+            "xmage"
+          ],
+          "found": [
+            "XMage",
+            "xmage"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "semantic",
+            "family",
+            "effect"
+          ],
+          "found": [
+            "semantic",
+            "family",
+            "effect"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "candidate_only",
+            "manual review",
+            "review_policy"
+          ],
+          "found": [
+            "candidate_only",
+            "manual review",
+            "review_policy"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Keep XMage adapters producing family candidates with explicit non-authoritative review policy.",
+      "rationale": "XMage should accelerate card families, but promotion still needs Oracle alignment and ManaLoom tests.",
+      "required_for_gate": true,
+      "source_ids": [
+        "wotc_comprehensive_rules_20260619",
+        "scryfall_api"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "public battle history learning",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_battle_prior_compare.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_general_absorption_audit.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_history_learning.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_replay_profile.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_replay_profile.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_battle_prior_compare.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_general_absorption_audit.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/seventeenlands_history_learning.py"
+      ],
+      "id": "seventeenlands_history_learning",
+      "keyword_groups": [
+        [
+          "replay_data",
+          "DEFAULT_REPLAY_URL",
+          "17Lands"
+        ],
+        [
+          "turn_behavior_by_history",
+          "sequence_learning"
+        ],
+        [
+          "card_lifecycle",
+          "use_after_access_rate"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "replay_data",
+            "DEFAULT_REPLAY_URL",
+            "17Lands"
+          ],
+          "found": [
+            "replay_data",
+            "DEFAULT_REPLAY_URL",
+            "17Lands"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "turn_behavior_by_history",
+            "sequence_learning"
+          ],
+          "found": [
+            "turn_behavior_by_history",
+            "sequence_learning"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "card_lifecycle",
+            "use_after_access_rate"
+          ],
+          "found": [
+            "card_lifecycle",
+            "use_after_access_rate"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Keep 17Lands learners focused on sequence/card lifecycle priors and compare them against ManaLoom replay behavior.",
+      "rationale": "17Lands should feed general cadence and lifecycle priors, not card-rule authority.",
+      "required_for_gate": true,
+      "source_ids": [
+        "seventeenlands_public_datasets"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "structured replay logs",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_contract_static_audit.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_event_contract_static_audit.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/replay_decision_auditor.py"
+      ],
+      "id": "structured_replay_and_event_contracts",
+      "keyword_groups": [
+        [
+          "replay.events.jsonl",
+          "decision_trace"
+        ],
+        [
+          "MINIMUM_FIELDS_BY_EVENT",
+          "minimum_fields_for_event"
+        ],
+        [
+          "observed_event_missing_minimum_fields",
+          "event_contract"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "replay.events.jsonl",
+            "decision_trace"
+          ],
+          "found": [
+            "replay.events.jsonl",
+            "decision_trace"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "MINIMUM_FIELDS_BY_EVENT",
+            "minimum_fields_for_event"
+          ],
+          "found": [
+            "MINIMUM_FIELDS_BY_EVENT",
+            "minimum_fields_for_event"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "observed_event_missing_minimum_fields",
+            "event_contract"
+          ],
+          "found": [
+            "observed_event_missing_minimum_fields",
+            "event_contract"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Expand event contract tests whenever a new runtime event type or log-learning consumer is added.",
+      "rationale": "Learning from battles requires stable structured event fields, not only rendered play-by-play text.",
+      "required_for_gate": true,
+      "source_ids": [
+        "seventeenlands_public_datasets",
+        "wotc_mtga_detailed_logs"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "local Arena Player.log ingestion",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_mtga_player_log_parser.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_mtga_player_log_parser.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_mtga_player_log_parser.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_mtga_player_log_parser.py"
+      ],
+      "id": "mtga_player_log_ingestion",
+      "keyword_groups": [
+        [
+          "Player.log",
+          "Detailed Logs",
+          "GRE"
+        ],
+        [
+          "GameStateMessage",
+          "turnInfo",
+          "annotations"
+        ],
+        [
+          "raw_log_lines_persisted",
+          "privacy_policy",
+          "read-only"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "Player.log",
+            "Detailed Logs",
+            "GRE"
+          ],
+          "found": [
+            "Player.log",
+            "Detailed Logs",
+            "GRE"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "GameStateMessage",
+            "turnInfo",
+            "annotations"
+          ],
+          "found": [
+            "GameStateMessage",
+            "turnInfo",
+            "annotations"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "raw_log_lines_persisted",
+            "privacy_policy",
+            "read-only"
+          ],
+          "found": [
+            "raw_log_lines_persisted",
+            "privacy_policy",
+            "read-only"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Keep the Player.log parser read-only, explicit-input only, and privacy-preserving before using real local logs.",
+      "rationale": "Arena Player.log can be useful for user-local telemetry, but there is no approved public bulk source in this repo yet.",
+      "required_for_gate": false,
+      "source_ids": [
+        "wotc_mtga_detailed_logs",
+        "gathering_gg_mtga_parser"
+      ],
+      "status": "covered"
+    },
+    {
+      "area": "independent engine comparison",
+      "evidence_paths": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_external_engine_crosscheck.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_external_engine_crosscheck.py"
+      ],
+      "expected_globs": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_external_engine_crosscheck.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_external_engine_crosscheck.py"
+      ],
+      "id": "independent_engine_crosscheck_beyond_xmage",
+      "keyword_groups": [
+        [
+          "Forge",
+          "Magarena",
+          "Cockatrice"
+        ],
+        [
+          "comparison",
+          "crosscheck",
+          "adapter"
+        ],
+        [
+          "Official Wizards rules",
+          "promotion_policy",
+          "non-authoritative"
+        ]
+      ],
+      "keyword_hits": [
+        {
+          "accepted_any_of": [
+            "Forge",
+            "Magarena",
+            "Cockatrice"
+          ],
+          "found": [
+            "Forge",
+            "Magarena",
+            "Cockatrice"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "comparison",
+            "crosscheck",
+            "adapter"
+          ],
+          "found": [
+            "comparison",
+            "crosscheck",
+            "adapter"
+          ]
+        },
+        {
+          "accepted_any_of": [
+            "Official Wizards rules",
+            "promotion_policy",
+            "non-authoritative"
+          ],
+          "found": [
+            "Official Wizards rules",
+            "promotion_policy"
+          ]
+        }
+      ],
+      "missing_globs": [],
+      "missing_keyword_groups": [],
+      "missing_recommendation": "Use external engine crosscheck candidates only for semantic families where XMage is missing, ambiguous, or contradicted by tests.",
+      "rationale": "External engines can find disagreements, but none should bypass official rules plus ManaLoom runtime tests.",
+      "required_for_gate": false,
+      "source_ids": [
+        "forge_rules_engine",
+        "magarena_engine",
+        "cockatrice_client_replays"
+      ],
+      "status": "covered"
+    }
+  ],
+  "source_inventory": [
+    {
+      "do_not_use_for": "Card telemetry, deck performance, or player behavior frequency.",
+      "id": "wotc_comprehensive_rules_20260619",
+      "name": "Magic: The Gathering Comprehensive Rules",
+      "reliability": "authoritative",
+      "source_type": "official_rules",
+      "url": "https://media.wizards.com/2026/downloads/MagicCompRules%2020260619.txt",
+      "use_for": "Primary semantics for phases, priority, stack, combat, zones, state-based actions, replacement effects, and layers."
+    },
+    {
+      "do_not_use_for": "Executable card implementation details.",
+      "id": "wotc_rules_page",
+      "name": "Wizards Rules and Documents",
+      "reliability": "authoritative_index",
+      "source_type": "official_index",
+      "url": "https://magic.wizards.com/en/rules",
+      "use_for": "Current official rules landing page and document freshness checks."
+    },
+    {
+      "do_not_use_for": "Stable public schema, bulk corpus availability, or Commander strategy truth.",
+      "id": "wotc_mtga_detailed_logs",
+      "name": "MTG Arena detailed log support article",
+      "reliability": "official_availability_not_schema_contract",
+      "source_type": "official_telemetry_availability",
+      "url": "https://mtgarena-support.wizards.com/hc/en-us/articles/360000726823-Creating-Log-Files-on-PC-Mac-Steam",
+      "use_for": "Evidence that Arena detailed logs exist and must be enabled for local telemetry collection."
+    },
+    {
+      "do_not_use_for": "Official schema guarantees, rules authority, or promotion without ManaLoom tests.",
+      "id": "gathering_gg_mtga_parser",
+      "name": "gathering-gg MTG Arena log parser",
+      "reliability": "community_parser_reference",
+      "source_type": "open_source_log_parser_reference",
+      "url": "https://github.com/gathering-gg/parser",
+      "use_for": "Implementation precedent for extracting local Arena log telemetry into structured local analysis."
+    },
+    {
+      "do_not_use_for": "Turn order, priority, stack execution, or battle outcome priors.",
+      "id": "scryfall_api",
+      "name": "Scryfall API",
+      "reliability": "high_quality_card_metadata",
+      "source_type": "card_oracle_api",
+      "url": "https://scryfall.com/docs/api",
+      "use_for": "Oracle text, rulings endpoints, identifiers, and card search metadata."
+    },
+    {
+      "do_not_use_for": "Battle sequence telemetry or rules authority over Wizards documents.",
+      "id": "mtgjson_v5",
+      "name": "MTGJSON v5",
+      "reliability": "high_quality_aggregated_metadata",
+      "source_type": "bulk_card_data",
+      "url": "https://mtgjson.com/",
+      "use_for": "Bulk card, set, legality, keyword, and ruling-shaped data models."
+    },
+    {
+      "do_not_use_for": "Commander staples, exact Oracle semantics, or paper multiplayer metagame truth.",
+      "id": "seventeenlands_public_datasets",
+      "name": "17Lands public datasets",
+      "reliability": "high_for_arena_limited_telemetry",
+      "source_type": "public_game_history_corpus",
+      "url": "https://www.17lands.com/public_datasets",
+      "use_for": "Observed turn cadence, card access/use lifecycle, and game history priors."
+    },
+    {
+      "do_not_use_for": "Replacing official rules or bypassing ManaLoom runtime tests.",
+      "id": "forge_rules_engine",
+      "name": "Forge rules engine",
+      "reliability": "useful_comparison_not_authority",
+      "source_type": "independent_open_engine",
+      "url": "https://github.com/Card-Forge/forge",
+      "use_for": "Independent implementation comparison for families not covered by XMage."
+    },
+    {
+      "do_not_use_for": "Automatic rules enforcement truth.",
+      "id": "cockatrice_client_replays",
+      "name": "Cockatrice",
+      "reliability": "manual_game_replay_reference",
+      "source_type": "open_client_and_replay_surface",
+      "url": "https://github.com/Cockatrice/Cockatrice",
+      "use_for": "Replay/client concepts and manual game-state references."
+    },
+    {
+      "do_not_use_for": "Authoritative rule interpretation.",
+      "id": "magarena_engine",
+      "name": "Magarena",
+      "reliability": "comparison_reference",
+      "source_type": "independent_open_engine",
+      "url": "https://github.com/magarena/magarena",
+      "use_for": "Additional card scripting and AI implementation comparison when XMage/Forge disagree or lack coverage."
+    }
+  ],
+  "summary": {
+    "gate_status": "pass",
+    "optional_gap_count": 0,
+    "optional_requirement_count": 2,
+    "required_gap_count": 0,
+    "required_partial_count": 0,
+    "required_requirement_count": 15,
+    "requirement_count": 17,
+    "source_count": 10,
+    "source_type_counts": {
+      "bulk_card_data": 1,
+      "card_oracle_api": 1,
+      "independent_open_engine": 2,
+      "official_index": 1,
+      "official_rules": 1,
+      "official_telemetry_availability": 1,
+      "open_client_and_replay_surface": 1,
+      "open_source_log_parser_reference": 1,
+      "public_game_history_corpus": 1
+    },
+    "status_counts": {
+      "covered": 17
+    }
+  }
+}

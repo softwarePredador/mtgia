@@ -72,6 +72,15 @@ SOURCE_INVENTORY: tuple[SourceReference, ...] = (
         do_not_use_for="Stable public schema, bulk corpus availability, or Commander strategy truth.",
     ),
     SourceReference(
+        id="gathering_gg_mtga_parser",
+        name="gathering-gg MTG Arena log parser",
+        url="https://github.com/gathering-gg/parser",
+        source_type="open_source_log_parser_reference",
+        reliability="community_parser_reference",
+        use_for="Implementation precedent for extracting local Arena log telemetry into structured local analysis.",
+        do_not_use_for="Official schema guarantees, rules authority, or promotion without ManaLoom tests.",
+    ),
+    SourceReference(
         id="scryfall_api",
         name="Scryfall API",
         url="https://scryfall.com/docs/api",
@@ -383,18 +392,19 @@ REQUIREMENTS: tuple[BattleRequirement, ...] = (
     BattleRequirement(
         id="mtga_player_log_ingestion",
         area="local Arena Player.log ingestion",
-        source_ids=("wotc_mtga_detailed_logs",),
+        source_ids=("wotc_mtga_detailed_logs", "gathering_gg_mtga_parser"),
         required_for_gate=False,
         expected_globs=(
-            "docs/hermes-analysis/manaloom-knowledge/scripts/mtga_player_log*.py",
-            "docs/hermes-analysis/manaloom-knowledge/scripts/*player_log*.py",
+            "docs/hermes-analysis/manaloom-knowledge/scripts/battle_mtga_player_log_parser.py",
+            "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_mtga_player_log_parser.py",
         ),
         keyword_groups=(
             ("Player.log", "Detailed Logs", "GRE"),
             ("GameStateMessage", "turnInfo", "annotations"),
+            ("raw_log_lines_persisted", "privacy_policy", "read-only"),
         ),
         rationale="Arena Player.log can be useful for user-local telemetry, but there is no approved public bulk source in this repo yet.",
-        missing_recommendation="Add a read-only Player.log parser only if the project receives real local logs and privacy handling requirements.",
+        missing_recommendation="Keep the Player.log parser read-only, explicit-input only, and privacy-preserving before using real local logs.",
     ),
     BattleRequirement(
         id="independent_engine_crosscheck_beyond_xmage",
@@ -402,16 +412,16 @@ REQUIREMENTS: tuple[BattleRequirement, ...] = (
         source_ids=("forge_rules_engine", "magarena_engine", "cockatrice_client_replays"),
         required_for_gate=False,
         expected_globs=(
-            "docs/hermes-analysis/manaloom-knowledge/scripts/forge_*",
-            "docs/hermes-analysis/manaloom-knowledge/scripts/magarena_*",
-            "docs/hermes-analysis/manaloom-knowledge/scripts/cockatrice_*",
+            "docs/hermes-analysis/manaloom-knowledge/scripts/battle_external_engine_crosscheck.py",
+            "docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_external_engine_crosscheck.py",
         ),
         keyword_groups=(
             ("Forge", "Magarena", "Cockatrice"),
             ("comparison", "crosscheck", "adapter"),
+            ("Official Wizards rules", "promotion_policy", "non-authoritative"),
         ),
         rationale="External engines can find disagreements, but none should bypass official rules plus ManaLoom runtime tests.",
-        missing_recommendation="Add comparison adapters only for semantic families where XMage is missing, ambiguous, or contradicted by tests.",
+        missing_recommendation="Use external engine crosscheck candidates only for semantic families where XMage is missing, ambiguous, or contradicted by tests.",
     ),
 )
 

@@ -15,6 +15,7 @@ def test_source_inventory_anchors_authoritative_rules_and_external_logs() -> Non
 
     assert by_id["wotc_comprehensive_rules_20260619"].reliability == "authoritative"
     assert by_id["wotc_mtga_detailed_logs"].source_type == "official_telemetry_availability"
+    assert by_id["gathering_gg_mtga_parser"].source_type == "open_source_log_parser_reference"
     assert by_id["scryfall_api"].source_type == "card_oracle_api"
     assert by_id["seventeenlands_public_datasets"].source_type == "public_game_history_corpus"
     assert by_id["forge_rules_engine"].source_type == "independent_open_engine"
@@ -56,12 +57,15 @@ def test_real_repo_external_battle_source_audit_has_no_required_gaps() -> None:
 
     assert report["postgres_writes"] is False
     assert report["summary"]["required_gap_count"] == 0
+    assert report["summary"]["optional_gap_count"] == 0
     assert report["summary"]["gate_status"] == "pass"
     assert requirements["priority_stack_and_resolution"]["status"] != "gap"
     assert requirements["combat_step_model"]["status"] != "gap"
     assert requirements["seventeenlands_history_learning"]["status"] != "gap"
     assert requirements["mtga_player_log_ingestion"]["required_for_gate"] is False
+    assert requirements["mtga_player_log_ingestion"]["status"] == "covered"
     assert requirements["independent_engine_crosscheck_beyond_xmage"]["required_for_gate"] is False
+    assert requirements["independent_engine_crosscheck_beyond_xmage"]["status"] == "covered"
 
 
 if __name__ == "__main__":
