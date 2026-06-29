@@ -1,0 +1,4 @@
+ target_rows | trusted_target_rows | current_annotation_rows | backup_table_exists
+-------------+---------------------+-------------------------+---------------------
+           3 |                   3 |                       3 |                   0
+(1 row)

@@ -17773,7 +17773,7 @@ def register_tests(battle, player):
             "Furygale Flocking": (
                 "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
                 "8946b0e85c8430c6105ea70c7fb2724a",
-                "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_annotation_v1",
+                "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_requirement_v1",
             ),
             "Prismari Pianist": (
                 "battle_rule_v1:0288989021534a6f036968f62361f634",
@@ -17789,6 +17789,7 @@ def register_tests(battle, player):
             assert effect_data["effect"] == "token_maker"
             if name == "Furygale Flocking":
                 assert effect_data["cost_reduction_status"] == "runtime_executor_v1"
+                assert effect_data["attack_each_opponent_this_turn_status"] == "runtime_executor_v1"
                 assert effect_data["token_count_per_opponent"] == 2
 
         tempt_effect = battle.get_card_effect({"name": "Tempt with Bunnies", "type_line": "Sorcery", "cmc": 3})
@@ -17807,9 +17808,13 @@ def register_tests(battle, player):
             for component in tempt_effect.get("_composite_rule_components", [])
         }
         assert scopes == {
-            "tempting_offer_base_draw_one_component_v1",
-            "tempting_offer_base_create_1_1_white_rabbit_component_v1",
+            "tempting_offer_base_draw_one_component_runtime_v1",
+            "tempting_offer_base_create_1_1_white_rabbit_component_runtime_v1",
         }
+        assert all(
+            component.get("tempting_offer_opponent_choice_status") == "runtime_executor_v1"
+            for component in tempt_effect.get("_composite_rule_components", [])
+        )
 
     def test_pg114_emerias_call_creates_angels_and_protects_non_angels_until_next_turn():
         events = []

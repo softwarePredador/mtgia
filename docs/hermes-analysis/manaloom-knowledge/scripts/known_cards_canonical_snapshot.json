@@ -12055,8 +12055,8 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Furygale Flocking": {
-    "attack_each_opponent_this_turn_status": "annotation_only",
-    "battle_model_scope": "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_annotation_v1",
+    "attack_each_opponent_this_turn_status": "runtime_executor_v1",
+    "battle_model_scope": "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_requirement_v1",
     "cmc": 10.0,
     "cost_reduction_amount_source": "instant_sorcery_cards_in_your_graveyard_count",
     "cost_reduction_applies_to": "this_spell",
@@ -12068,7 +12068,7 @@
       "instant",
       "sorcery"
     ],
-    "oracle_runtime_scope": "graveyard_instant_sorcery_cost_reduction_runtime_per_opponent_tokens_attack_annotation_v1",
+    "oracle_runtime_scope": "graveyard_instant_sorcery_cost_reduction_runtime_per_opponent_tokens_attack_requirement_v1",
     "token_colors": [
       "U",
       "R"
@@ -12084,7 +12084,7 @@
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.95,
-    "battle_rule_version": 3,
+    "battle_rule_version": 4,
     "battle_rule_logical_key": "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
     "battle_rule_oracle_hash": "8946b0e85c8430c6105ea70c7fb2724a"
   },
@@ -31633,19 +31633,19 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Tempt with Bunnies": {
-    "battle_model_scope": "tempting_offer_base_draw_one_component_v1",
+    "battle_model_scope": "tempting_offer_base_draw_one_component_runtime_v1",
     "cmc": 3.0,
     "compose_on_resolution": true,
     "count": 1,
     "effect": "draw_cards",
-    "oracle_runtime_scope": "tempting_offer_base_draw_one_opponent_choice_annotation_v1",
+    "oracle_runtime_scope": "tempting_offer_base_draw_one_opponent_choice_runtime_v1",
     "tempting_offer_default": "opponents_decline",
-    "tempting_offer_opponent_choice_status": "annotation_only",
+    "tempting_offer_opponent_choice_status": "runtime_executor_v1",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.92,
-    "battle_rule_version": 2,
+    "battle_rule_version": 3,
     "battle_rule_logical_key": "battle_rule_v1:ac96c7799172699f5d7b6b0dc5e4aa80",
     "battle_rule_oracle_hash": "201f6c7234bfef550f3d497e736f0d7a"
   },
