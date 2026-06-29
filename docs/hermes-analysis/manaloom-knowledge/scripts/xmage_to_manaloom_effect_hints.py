@@ -181,6 +181,11 @@ def _scenario_names(effect: str, scope: str = "") -> list[str]:
             "cast mana-value-4 instant or sorcery with generic cost reduced by source power",
             "cast mana-value-3 or non-instant/sorcery spell without reduction",
         ]
+    if scope == "colorless_land_tap_or_tap_sacrifice_two_colorless_mode_v1":
+        return [
+            "tap land for one colorless mana without sacrificing it",
+            "tap and sacrifice land for two colorless mana when the extra mana unlocks a cast",
+        ]
     mapping = {
         "static_cost_reduction": [
             "cast matching spell with one less generic cost",
@@ -5000,6 +5005,75 @@ def _build_dynamic_any_color_land_fields(
     return None
 
 
+def _build_colorless_land_sacrifice_mana_mode_fields(
+    *,
+    index_entry: dict[str, Any],
+    effect_classes: set[str],
+    ability_classes: set[str],
+    cost_classes: set[str],
+    rules_text: str,
+) -> dict[str, Any] | None:
+    card_types = _constructor_card_types(index_entry)
+    if card_types != {"LAND"} or effect_classes:
+        return None
+
+    raw_excerpt = _normalized_rules_text(str(index_entry.get("raw_excerpt") or ""))
+    normalized = _normalized_rules_text(rules_text)
+    has_base_colorless = "ColorlessManaAbility" in ability_classes
+    has_sacrifice_mode = (
+        "SimpleManaAbility" in ability_classes
+        and {"TapSourceCost", "SacrificeSourceCost"}.issubset(cost_classes)
+        and (
+            "mana.colorlessmana(2)" in raw_excerpt
+            or "mana.colorlessmana(2)" in normalized
+            or "add {c}{c}" in normalized
+        )
+    )
+    if not (has_base_colorless and has_sacrifice_mode):
+        return None
+
+    return {
+        "effect": "ramp_permanent",
+        "scope": "colorless_land_tap_or_tap_sacrifice_two_colorless_mode_v1",
+        "fields": {
+            "is_mana_source": True,
+            "permanent_type": "land",
+            "mana_produced": 1,
+            "produces": "C",
+            "activation_requires_tap": True,
+            "has_default_colorless_mana_ability": True,
+            "default_mana_produced": 1,
+            "has_sacrifice_mana_mode": True,
+            "sacrifice_mana_produced": 2,
+            "sacrifice_mana_mode_status": "runtime_required",
+            "alternate_mana_modes": [
+                {
+                    "mode": "tap_sacrifice_for_two_colorless",
+                    "produces": "C",
+                    "mana_produced": 2,
+                    "activation_requires_tap": True,
+                    "activation_requires_sacrifice": True,
+                    "status": "runtime_required",
+                }
+            ],
+            "oracle_runtime_scope": "land_alternate_sacrifice_mana_mode_runtime_required_v1",
+        },
+        "reason": (
+            "XMage structure matches a land with the normal ColorlessManaAbility plus a SimpleManaAbility "
+            "that taps and sacrifices the source for two colorless mana. ManaLoom must keep the default "
+            "one-mana land mode separate from the sacrificial two-mana burst before this can be promoted."
+        ),
+        "signals": [
+            "LAND",
+            "ColorlessManaAbility",
+            "SimpleManaAbility",
+            "TapSourceCost",
+            "SacrificeSourceCost",
+            "ColorlessMana(2)",
+        ],
+    }
+
+
 def _build_pain_land_fields(
     *,
     index_entry: dict[str, Any],
@@ -7376,6 +7450,26 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=False,
                 extra_effect_fields=dict(dynamic_any_color_land_fields["fields"]),
                 matched_signals=list(dynamic_any_color_land_fields["signals"]),
+            )
+        )
+
+    colorless_land_sacrifice_mana_mode_fields = _build_colorless_land_sacrifice_mana_mode_fields(
+        index_entry=index_entry,
+        effect_classes=effect_classes,
+        ability_classes=ability_classes,
+        cost_classes=cost_classes,
+        rules_text=rules_text,
+    )
+    if colorless_land_sacrifice_mana_mode_fields is not None:
+        candidates.append(
+            _candidate(
+                effect=str(colorless_land_sacrifice_mana_mode_fields["effect"]),
+                scope=str(colorless_land_sacrifice_mana_mode_fields["scope"]),
+                reason=str(colorless_land_sacrifice_mana_mode_fields["reason"]),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields=dict(colorless_land_sacrifice_mana_mode_fields["fields"]),
+                matched_signals=list(colorless_land_sacrifice_mana_mode_fields["signals"]),
             )
         )
 

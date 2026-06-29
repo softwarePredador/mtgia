@@ -248,6 +248,51 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertFalse(proposal["safe_for_batch_pg_package"])
         self.assertEqual(proposal["proposal_status"], "split_family_scope_review_required")
 
+    def test_land_sacrifice_mana_mode_scope_stays_out_of_batch_pg_until_runtime(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Crystal Vein",
+                    "severity": "high",
+                    "oracle_hash": "crystal-vein-hash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "CrystalVein",
+                        "path": "/xmage/CrystalVein.java",
+                        "types": ["LAND"],
+                        "effect_classes": [],
+                        "ability_classes": ["ColorlessManaAbility", "SimpleManaAbility"],
+                        "cost_classes": ["TapSourceCost", "SacrificeSourceCost"],
+                        "primary_effect": {
+                            "effect": "ramp_permanent",
+                            "battle_model_scope": "colorless_land_tap_or_tap_sacrifice_two_colorless_mode_v1",
+                            "ability_kind": "activated",
+                            "is_mana_source": True,
+                            "permanent_type": "land",
+                            "mana_produced": 1,
+                            "produces": "C",
+                            "has_sacrifice_mana_mode": True,
+                            "sacrifice_mana_mode_status": "runtime_required",
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "ramp_permanent")
+        self.assertEqual(card["promotion_lane"], "split_family_scope_review_required")
+
+        generator_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = generator_report["proposals"][0]
+        self.assertFalse(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["proposal_status"], "split_family_scope_review_required")
+
     def test_classifier_marks_activated_ability_cost_reducer_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

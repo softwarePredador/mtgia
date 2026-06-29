@@ -8,7 +8,7 @@ import xmage_to_manaloom_effect_hints as hints
 
 
 class XMageToManaLoomEffectHintsTests(unittest.TestCase):
-    def test_generic_land_mana_source_routes_to_reviewable_ramp_family(self) -> None:
+    def test_colorless_land_with_sacrifice_mana_mode_keeps_modes_separate(self) -> None:
         result = hints.build_effect_hints(
             {
                 "xmage_class_name": "CrystalVein",
@@ -23,10 +23,36 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         primary = result["primary_candidate"]["effect_json"]
 
         self.assertEqual(primary["effect"], "ramp_permanent")
-        self.assertEqual(primary["battle_model_scope"], "xmage_land_mana_source_variant_review_v1")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "colorless_land_tap_or_tap_sacrifice_two_colorless_mode_v1",
+        )
         self.assertTrue(primary["is_mana_source"])
-        self.assertEqual(primary["mana_produced"], 2)
-        self.assertTrue(primary["activation_requires_sacrifice"])
+        self.assertEqual(primary["mana_produced"], 1)
+        self.assertEqual(primary["default_mana_produced"], 1)
+        self.assertTrue(primary["has_sacrifice_mana_mode"])
+        self.assertEqual(primary["sacrifice_mana_produced"], 2)
+        self.assertEqual(primary["sacrifice_mana_mode_status"], "runtime_required")
+        self.assertEqual(
+            primary["alternate_mana_modes"],
+            [
+                {
+                    "mode": "tap_sacrifice_for_two_colorless",
+                    "produces": "C",
+                    "mana_produced": 2,
+                    "activation_requires_tap": True,
+                    "activation_requires_sacrifice": True,
+                    "status": "runtime_required",
+                }
+            ],
+        )
+        self.assertEqual(
+            result["primary_candidate"]["suggested_tests"],
+            [
+                "tap land for one colorless mana without sacrificing it",
+                "tap and sacrifice land for two colorless mana when the extra mana unlocks a cast",
+            ],
+        )
 
     def test_generic_library_search_routes_to_tutor_family(self) -> None:
         result = hints.build_effect_hints(

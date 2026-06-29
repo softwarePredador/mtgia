@@ -52,6 +52,44 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
                 )
             conn.commit()
 
+    def test_colorless_land_sacrifice_mana_mode_does_not_overproduce_before_runtime_executor(self) -> None:
+        player = battle.Player("Pilot", None, [])
+        crystal_vein = {
+            "name": "Crystal Vein",
+            "type_line": "Land",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "colorless_land_tap_or_tap_sacrifice_two_colorless_mode_v1",
+            "is_mana_source": True,
+            "permanent_type": "land",
+            "mana_produced": 1,
+            "produces": "C",
+            "has_default_colorless_mana_ability": True,
+            "default_mana_produced": 1,
+            "has_sacrifice_mana_mode": True,
+            "sacrifice_mana_produced": 2,
+            "sacrifice_mana_mode_status": "runtime_required",
+            "alternate_mana_modes": [
+                {
+                    "mode": "tap_sacrifice_for_two_colorless",
+                    "produces": "C",
+                    "mana_produced": 2,
+                    "activation_requires_tap": True,
+                    "activation_requires_sacrifice": True,
+                    "status": "runtime_required",
+                }
+            ],
+            "oracle_runtime_scope": "land_alternate_sacrifice_mana_mode_runtime_required_v1",
+        }
+        player.battlefield = [crystal_vein]
+
+        self.assertEqual(battle.mana_source_production_for_state(player, crystal_vein), 1)
+
+        player.refresh_mana_sources(turn=1)
+
+        self.assertEqual(player.available_mana(), 1)
+        self.assertEqual(len(player.battlefield), 1)
+        self.assertEqual(player.battlefield[0]["name"], "Crystal Vein")
+
     def test_snapshot_payload_uses_registry_priority_instead_of_last_row_wins(self) -> None:
         payload = build_snapshot_payload(
             [
