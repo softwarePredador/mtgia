@@ -1050,8 +1050,11 @@ def _build_mill_spell_fields(
             "fields": {
                 "activation_requires_tap": True,
                 "activation_requires_sacrifice_permanent": True,
+                "activation_sacrifice_target_type": "artifact",
                 "target": "player",
                 "mill_count": mill_count,
+                "artifact_enters_untap_source": True,
+                "artifact_enters_untap_source_status": "annotation_only",
             },
             "reason": "XMage structure matches an activated artifact that taps and sacrifices a permanent to mill a target player.",
             "signals": ["MillCardsTargetEffect", "SimpleActivatedAbility", "TapSourceCost", "SacrificeTargetCost"],
@@ -5572,6 +5575,7 @@ def _build_tutor_to_hand_fields(
                     "target": target,
                     "tutor_destination": "hand",
                     "delayed_upkeep_mana_payment": "{2}{G}{G}",
+                    "delayed_upkeep_payment_status": "annotation_only",
                     "lose_game_if_unpaid": True,
                 },
                 "reason": "XMage structure matches a pact tutor with delayed upkeep payment-or-lose trigger.",
@@ -5587,6 +5591,7 @@ def _build_tutor_to_hand_fields(
                     "target": target,
                     "tutor_destination": "hand",
                     "random_discard_after_tutor": 1,
+                    "discard_after_tutor_random": 1,
                     "damage_each_opponent_if_artifact_discarded": 2,
                 },
                 "reason": "XMage structure matches artifact tutor to hand plus random discard and artifact-discard damage rider.",
@@ -9456,6 +9461,39 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "sorcery": "SORCERY" in card_types,
                 },
                 matched_signals=["mass_removal"],
+            )
+        )
+
+    if not candidates and (
+        xmage_class_name == "CloudOfFaeries"
+        or (
+            "UntapLandsEffect" in effect_classes
+            and "EntersBattlefieldTriggeredAbility" in ability_classes
+            and "CyclingAbility" in ability_classes
+            and "CREATURE" in card_types
+        )
+    ):
+        candidates.append(
+            _candidate(
+                effect="untap_land_engine",
+                scope="etb_untap_up_to_two_lands_cycling_two_v1",
+                reason=(
+                    "XMage exposes Cloud of Faeries ETB UntapLandsEffect(2) plus Cycling {2}; "
+                    "ManaLoom can execute the ETB land untap and keeps cycling as annotation."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "etb_untap_lands_count": 2,
+                    "etb_untap_lands_optional": True,
+                    "cycling_cost": "{2}",
+                    "cycling_status": "annotation_only",
+                },
+                matched_signals=[
+                    "UntapLandsEffect",
+                    "EntersBattlefieldTriggeredAbility",
+                    "CyclingAbility",
+                ],
             )
         )
 

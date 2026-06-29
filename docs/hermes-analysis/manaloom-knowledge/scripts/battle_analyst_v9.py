@@ -11776,6 +11776,28 @@ def choose_mill_target(player, opponents, total_mill):
     return min(alive_opponents, key=lambda opponent: (len(opponent.library), opponent.life, opponent.name))
 
 
+def graveyard_distinct_card_type_count(player):
+    card_types = set()
+    for card in getattr(player, "graveyard", []) or []:
+        if not isinstance(card, dict):
+            continue
+        type_line = str(card.get("type_line") or "").lower()
+        for card_type in (
+            "artifact",
+            "battle",
+            "creature",
+            "enchantment",
+            "instant",
+            "land",
+            "planeswalker",
+            "sorcery",
+            "tribal",
+        ):
+            if card_type in type_line:
+                card_types.add(card_type)
+    return len(card_types)
+
+
 def priority_order_from(active_player, all_players):
     if active_player in all_players:
         idx = all_players.index(active_player)
@@ -23157,6 +23179,92 @@ def activate_graveyard_recycling_artifacts(
     return 0
 
 
+def activate_mill_engines(player, opponents, all_players, turn, rng, *, phase="precombat_main"):
+    if phase not in {"precombat_main", "postcombat_main"} or not player.is_alive():
+        return 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") != "mill_engine":
+            continue
+        if permanent.get("utility_artifact_used_this_turn"):
+            continue
+        if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "mill_engine_source_already_tapped",
+                phase=phase,
+            )
+            continue
+        sacrifice_type = str(permanent.get("activation_sacrifice_target_type") or "artifact").lower()
+        sacrifice_candidates = [
+            candidate
+            for candidate in list(player.battlefield)
+            if isinstance(candidate, dict)
+            and (
+                (sacrifice_type == "artifact" and is_artifact_permanent(candidate))
+                or sacrifice_type in {"permanent", "any"}
+            )
+        ]
+        if not sacrifice_candidates:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "no_sacrifice_target_for_mill_engine",
+                phase=phase,
+                risk_flags=["missing_sacrifice_target"],
+            )
+            continue
+        sacrifice_candidates.sort(
+            key=lambda candidate: (
+                1 if candidate is permanent else 0,
+                0 if candidate.get("is_token") or candidate.get("tag") == "token" else 1,
+                int(float(candidate.get("cmc") or candidate.get("mana_value") or 0)),
+                candidate.get("name", "?"),
+            )
+        )
+        sacrificed = sacrifice_candidates[0]
+        mill_count = int(permanent.get("mill_count") or 0)
+        if mill_count <= 0:
+            continue
+        target = choose_mill_target(player, opponents, mill_count)
+        library_before = len(getattr(target, "library", []) or [])
+        if permanent.get("activation_requires_tap"):
+            permanent["tapped"] = True
+        if sacrificed in player.battlefield:
+            player.battlefield.remove(sacrificed)
+        if not sacrificed.get("is_token"):
+            player.graveyard.append(sacrificed)
+        player.record_permanent_sacrificed(sacrificed, turn)
+        milled = []
+        for _ in range(min(mill_count, len(target.library))):
+            milled_card = target.library.pop(0)
+            target.graveyard.append(milled_card)
+            milled.append(milled_card)
+        permanent["utility_artifact_used_this_turn"] = True
+        emit_replay_event(
+            "mill_engine_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="tap_sacrifice_artifact_target_player_mill",
+            sacrificed=sacrificed.get("name", "?"),
+            target_player=target.name,
+            requested_mill=mill_count,
+            cards_milled=len(milled),
+            milled=[milled_card.get("name", "?") for milled_card in milled if isinstance(milled_card, dict)],
+            target_library_before=library_before,
+            target_library_after=len(target.library),
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return 1
+    return 0
+
+
 def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, phase="postcombat_main"):
     if not player.is_alive():
         return 0
@@ -23177,6 +23285,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
     }
 
     if activate_graveyard_recycling_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
+
+    if activate_mill_engines(
         player,
         opponents,
         all_players,
@@ -26669,6 +26787,9 @@ def library_tutor_candidates(player, target_type):
                 candidates.append(candidate)
         elif target_type in ("green_creature", "green_creature_to_battlefield"):
             if is_creature_card(candidate) and card_has_color(candidate, "G"):
+                candidates.append(candidate)
+        elif target_type == "demon":
+            if "demon" in type_line:
                 candidates.append(candidate)
     return candidates
 
@@ -38720,8 +38841,40 @@ def apply_effect_immediate(
             )
     elif effect == "untap_land_engine":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
-        permanent["effect"] = "untap_land_engine"
+        if is_creature_card(card) and effect_data.get("etb_untap_lands_count"):
+            permanent["effect"] = "creature"
+            permanent["haste"] = has_haste(permanent)
+            permanent["summoning_sick"] = not permanent["haste"]
+            permanent["tapped"] = False
+        else:
+            permanent["effect"] = "untap_land_engine"
         player.battlefield.append(permanent)
+        etb_untap_count = int(effect_data.get("etb_untap_lands_count") or 0)
+        if etb_untap_count > 0:
+            tapped_lands = [
+                land
+                for land in player.battlefield
+                if isinstance(land, dict)
+                and is_effective_land(land)
+                and land.get("tapped")
+            ]
+            selected_lands = tapped_lands[:etb_untap_count]
+            for land in selected_lands:
+                land["tapped"] = False
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="untap_lands",
+                untapped_lands=[land.get("name", "?") for land in selected_lands],
+                untapped_count=len(selected_lands),
+                max_count=etb_untap_count,
+                optional=bool(effect_data.get("etb_untap_lands_optional")),
+                turn=turn,
+                phase=phase or "resolution",
+                **replay_rule_fields(effect_data),
+            )
     elif effect == "ramp_ritual":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
@@ -38873,9 +39026,85 @@ def apply_effect_immediate(
             battle_model_scope=effect_data.get("battle_model_scope"),
             turn=turn,
         )
+    elif effect == "mill_engine":
+        permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+        permanent["effect"] = "mill_engine"
+        player.battlefield.append(permanent)
+        emit_replay_event(
+            "mill_engine_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            activation_requires_tap=bool(effect_data.get("activation_requires_tap")),
+            activation_sacrifice_target_type=effect_data.get("activation_sacrifice_target_type"),
+            mill_count=int(effect_data.get("mill_count") or 0),
+            turn=turn,
+            phase=phase or "resolution",
+            **replay_rule_fields(effect_data),
+        )
     elif effect == "land_recursion_creature":
         resolve_land_recursion_creature(player, card, effect_data, turn)
     elif effect == "modal_spell":
+        if effect_data.get("battle_model_scope") == "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1":
+            fields = replay_rule_fields(effect_data)
+            selected_modes = []
+            library_target_type = effect_data.get("mode_one_target") or "artifact_to_hand"
+            library_candidates = constrained_library_tutor_candidates(player, library_target_type, effect_data)
+            if library_candidates:
+                scored_library = [
+                    (
+                        candidate,
+                        *tutor_candidate_score(candidate, library_target_type, player, opponents, turn),
+                    )
+                    for candidate in library_candidates
+                ]
+                scored_library.sort(key=lambda item: (-item[1], item[0].get("name", "?")))
+                selected_artifact = scored_library[0][0]
+                if selected_artifact in player.library:
+                    player.library.remove(selected_artifact)
+                    player.hand.append(selected_artifact)
+                    selected_modes.append(
+                        {
+                            "mode": "artifact_library_to_hand",
+                            "card": selected_artifact.get("name", "?"),
+                        }
+                    )
+
+            graveyard_artifacts = [
+                grave_card
+                for grave_card in list(player.graveyard)
+                if isinstance(grave_card, dict)
+                and "artifact" in str(grave_card.get("type_line") or "").lower()
+            ]
+            if graveyard_artifacts:
+                graveyard_artifacts.sort(
+                    key=lambda grave_card: (
+                        -int(float(grave_card.get("cmc") or grave_card.get("mana_value") or 0)),
+                        grave_card.get("name", "?"),
+                    )
+                )
+                returned_artifact = graveyard_artifacts[0]
+                player.graveyard.remove(returned_artifact)
+                player.hand.append(returned_artifact)
+                selected_modes.append(
+                    {
+                        "mode": "artifact_graveyard_to_hand",
+                        "card": returned_artifact.get("name", "?"),
+                    }
+                )
+
+            emit_replay_event(
+                "modal_spell_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                selected_modes=selected_modes,
+                mode_count=len(selected_modes),
+                mode_min=int(effect_data.get("mode_min") or 1),
+                mode_max=int(effect_data.get("mode_max") or 2),
+                turn=turn,
+                **fields,
+            )
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+            return
         if effect_data.get("battle_model_scope") == "choose_three_pump_blink_tapped_or_create_eldrazi_scion_v1":
             resolve_eldrazi_confluence(
                 player,
@@ -40231,6 +40460,12 @@ def apply_effect_immediate(
             )
     elif effect == "tutor":
         target_type = effect_data.get("target", "any")
+        original_target_type = target_type
+        delirium_required = int(effect_data.get("delirium_graveyard_card_type_count") or 0)
+        delirium_card_type_count = graveyard_distinct_card_type_count(player) if delirium_required else 0
+        delirium_active = bool(delirium_required and delirium_card_type_count >= delirium_required)
+        if delirium_active and effect_data.get("delirium_target"):
+            target_type = effect_data.get("delirium_target")
         found = None
         candidates = constrained_library_tutor_candidates(player, target_type, effect_data)
         selected_candidates = []
@@ -40292,6 +40527,10 @@ def apply_effect_immediate(
             ],
             score_components={
                 "target_type": target_type,
+                "original_target_type": original_target_type,
+                "delirium_required_card_types": delirium_required,
+                "delirium_card_type_count": delirium_card_type_count,
+                "delirium_active": delirium_active,
                 "candidate_count": len(candidates),
                 "selection_count": selection_count,
                 "selected_reason": found_reason,
@@ -40337,6 +40576,10 @@ def apply_effect_immediate(
             player=player.name,
             card=card.get("name", "?"),
             target_type=target_type,
+            original_target_type=original_target_type,
+            delirium_required_card_types=delirium_required,
+            delirium_card_type_count=delirium_card_type_count,
+            delirium_active=delirium_active,
             found=found.get("name", "?") if found else None,
             found_cards=[item.get("name", "?") for item in moved_cards],
             destination=destination,
@@ -40390,6 +40633,50 @@ def apply_effect_immediate(
                 ],
                 replacement_used=discard_resolution["used_replacement"],
                 hand_size=len(player.hand),
+                turn=turn,
+                **fields,
+            )
+            damage_each = int(effect_data.get("damage_each_opponent_if_artifact_discarded") or 0)
+            discarded_is_artifact = (
+                isinstance(discarded_card, dict)
+                and "artifact" in str(discarded_card.get("type_line") or "").lower()
+            )
+            if damage_each > 0 and discarded_is_artifact:
+                damaged_opponents = []
+                for opponent in opponents:
+                    if not opponent.is_alive():
+                        continue
+                    life_before = opponent.life
+                    dealt = deal_damage(opponent, damage_each, source=card)
+                    damaged_opponents.append(
+                        {
+                            "player": opponent.name,
+                            "life_before": life_before,
+                            "life_after": opponent.life,
+                            "damage_dealt": damage_each if dealt else 0,
+                        }
+                    )
+                emit_replay_event(
+                    "random_discard_artifact_damage_resolved",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    discarded=discarded_card.get("name", "?"),
+                    damage_each_opponent=damage_each,
+                    damaged_opponents=damaged_opponents,
+                    turn=turn,
+                    **fields,
+                )
+        if effect_data.get("delayed_upkeep_mana_payment"):
+            emit_replay_event(
+                "delayed_upkeep_payment_created",
+                player=player.name,
+                card=card.get("name", "?"),
+                delayed_upkeep_mana_payment=effect_data.get("delayed_upkeep_mana_payment"),
+                lose_game_if_unpaid=bool(effect_data.get("lose_game_if_unpaid")),
+                delayed_upkeep_payment_status=effect_data.get(
+                    "delayed_upkeep_payment_status",
+                    "annotation_only",
+                ),
                 turn=turn,
                 **fields,
             )

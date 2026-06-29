@@ -824,6 +824,87 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
     target_classes = xmage_target_classes(card)
     filter_classes = set((card.get("xmage") or {}).get("filter_classes") or [])
 
+    if effect == "mill_engine" and scope == "artifact_tap_sacrifice_permanent_target_player_mill_v1":
+        return (
+            types == {"ARTIFACT"}
+            and {"MillCardsTargetEffect", "UntapSourceEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldAllTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {"SacrificeTargetCost", "TapSourceCost"}.issubset(cost_classes)
+            and "TargetPlayer" in target_classes
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("activation_requires_sacrifice_permanent"))
+            and effect_json.get("activation_sacrifice_target_type") == "artifact"
+            and int(effect_json.get("mill_count") or 0) == 3
+            and effect_json.get("target") == "player"
+            and bool(effect_json.get("artifact_enters_untap_source"))
+            and effect_json.get("artifact_enters_untap_source_status") == "annotation_only"
+        )
+
+    if effect == "modal_spell" and scope == "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1":
+        return (
+            types == {"INSTANT"}
+            and {"ReturnFromGraveyardToHandTargetEffect", "SearchLibraryPutInHandEffect"}.issubset(effect_classes)
+            and {"TargetCardInLibrary", "TargetCardInYourGraveyard"}.issubset(target_classes)
+            and bool(effect_json.get("instant"))
+            and int(effect_json.get("mode_min") or 0) == 1
+            and int(effect_json.get("mode_max") or 0) == 2
+            and effect_json.get("mode_one_target") == "artifact_to_hand"
+            and effect_json.get("mode_two_target") == "artifact_from_graveyard_to_hand"
+        )
+
+    if effect == "tutor" and scope == "artifact_tutor_to_hand_random_discard_damage_if_artifact_discarded_v1":
+        return (
+            types == {"SORCERY"}
+            and {"RecklessHandlingEffect", "SearchLibraryPutInHandEffect"}.issubset(effect_classes)
+            and "TargetCardInLibrary" in target_classes
+            and not ability_classes
+            and not bool(effect_json.get("instant"))
+            and effect_json.get("target") == "artifact_to_hand"
+            and effect_json.get("tutor_destination") == "hand"
+            and int(effect_json.get("random_discard_after_tutor") or 0) == 1
+            and int(effect_json.get("discard_after_tutor_random") or 0) == 1
+            and int(effect_json.get("damage_each_opponent_if_artifact_discarded") or 0) == 2
+        )
+
+    if effect == "tutor" and scope == "conditional_delirium_restricted_or_any_tutor_to_hand_v1":
+        return (
+            types == {"SORCERY"}
+            and {"ConditionalOneShotEffect", "SearchLibraryPutInHandEffect"}.issubset(effect_classes)
+            and "DeliriumCondition" in xmage_condition_classes(card)
+            and "TargetCardInLibrary" in target_classes
+            and not ability_classes
+            and not bool(effect_json.get("instant"))
+            and effect_json.get("target") == "demon_to_hand"
+            and effect_json.get("delirium_target") == "any_to_hand"
+            and int(effect_json.get("delirium_graveyard_card_type_count") or 0) == 4
+            and effect_json.get("tutor_destination") == "hand"
+        )
+
+    if effect == "tutor" and scope == "pact_green_creature_tutor_to_hand_delayed_payment_v1":
+        return (
+            types == {"INSTANT"}
+            and {"CreateDelayedTriggeredAbilityEffect", "SearchLibraryPutInHandEffect"}.issubset(effect_classes)
+            and "PactDelayedTriggeredAbility" in ability_classes
+            and "TargetCardInLibrary" in target_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "green_creature_to_hand"
+            and effect_json.get("tutor_destination") == "hand"
+            and effect_json.get("delayed_upkeep_mana_payment") == "{2}{G}{G}"
+            and effect_json.get("delayed_upkeep_payment_status") == "annotation_only"
+            and bool(effect_json.get("lose_game_if_unpaid"))
+        )
+
+    if effect == "untap_land_engine" and scope == "etb_untap_up_to_two_lands_cycling_two_v1":
+        return (
+            types == {"CREATURE"}
+            and "UntapLandsEffect" in effect_classes
+            and {"CyclingAbility", "EntersBattlefieldTriggeredAbility", "FlyingAbility"}.issubset(ability_classes)
+            and int(effect_json.get("etb_untap_lands_count") or 0) == 2
+            and bool(effect_json.get("etb_untap_lands_optional"))
+            and effect_json.get("cycling_cost") == "{2}"
+            and effect_json.get("cycling_status") == "annotation_only"
+        )
+
     if effect == "draw_cards" and scope == "veil_of_summer_draw_and_protection_waiver_v1":
         return (
             types == {"INSTANT"}
