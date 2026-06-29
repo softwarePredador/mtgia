@@ -2001,6 +2001,31 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "CursedMirror"
+        and card_types == {"ARTIFACT"}
+        and {"EntersBattlefieldAbility", "RedManaAbility"}.issubset(ability_classes)
+        and "CopyPermanentEffect" in effect_classes
+    ):
+        return {
+            "effect": "ramp_permanent",
+            "scope": "red_mana_rock_etb_copy_creature_haste_annotation_v1",
+            "fields": {
+                "permanent_type": "artifact",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "R",
+                "activation_requires_tap": True,
+                "etb_may_copy_any_creature_until_eot": True,
+                "etb_copy_grants_haste": True,
+                "etb_copy_status": "annotation_only",
+                "nonmana_abilities_require_separate_scope": True,
+                "nonmana_abilities_status": "etb_copy_creature_haste_annotation_only",
+            },
+            "reason": "XMage structure matches Cursed Mirror's red mana rock ability; the ETB temporary creature-copy-with-haste choice is retained as annotation.",
+            "signals": ["CursedMirror", "RedManaAbility", "EntersBattlefieldAbility", "CopyPermanentEffect", "HasteAbility"],
+        }
+
+    if (
         xmage_class_name == "BridgeworksBattle"
         and card_types == {"LAND", "SORCERY"}
         and {"BoostTargetEffect", "FightTargetsEffect", "TapSourceUnlessPaysEffect"}.issubset(effect_classes)

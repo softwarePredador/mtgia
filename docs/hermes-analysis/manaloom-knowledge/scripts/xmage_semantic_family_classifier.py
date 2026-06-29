@@ -1004,6 +1004,21 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("activated_roll_planar_die_status") == "annotation_only"
         )
 
+    if effect == "ramp_permanent" and scope == "red_mana_rock_etb_copy_creature_haste_annotation_v1":
+        return (
+            types == {"ARTIFACT"}
+            and {"EntersBattlefieldAbility", "RedManaAbility"}.issubset(ability_classes)
+            and "CopyPermanentEffect" in effect_classes
+            and bool(effect_json.get("is_mana_source"))
+            and effect_json.get("permanent_type") == "artifact"
+            and int(effect_json.get("mana_produced") or 0) == 1
+            and effect_json.get("produces") == "R"
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("etb_may_copy_any_creature_until_eot"))
+            and bool(effect_json.get("etb_copy_grants_haste"))
+            and effect_json.get("etb_copy_status") == "annotation_only"
+        )
+
     if effect == "ramp_permanent" and scope == "mdfc_green_land_pay_three_life_spell_fight_annotation_v1":
         face = effect_json.get("mdfc_land_face") or {}
         return (

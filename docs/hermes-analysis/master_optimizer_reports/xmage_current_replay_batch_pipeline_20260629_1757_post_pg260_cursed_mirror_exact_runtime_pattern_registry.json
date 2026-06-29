@@ -1,0 +1,2994 @@
+{
+  "generated_at": "2026-06-29T17:25:54+00:00",
+  "mutations_performed": [],
+  "patterns": [
+    {
+      "ability_kind_counts": {
+        "activated": 3,
+        "one_shot": 5,
+        "triggered": 3
+      },
+      "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 11,
+      "cards": [
+        "Bond of Insight",
+        "Charmbreaker Devils",
+        "Codex Shredder",
+        "Endurance",
+        "Experimental Overload",
+        "Flashback",
+        "Gandalf's Sanction",
+        "Moonshadow",
+        "Perpetual Timepiece",
+        "Pulsemage Advocate",
+        "Worldfire"
+      ],
+      "effect": "recursion",
+      "family_id": "recursion",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:13c4c7948f2b787f7acd",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 11
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Bond of Insight",
+        "Charmbreaker Devils",
+        "Codex Shredder",
+        "Endurance",
+        "Experimental Overload",
+        "Flashback",
+        "Gandalf's Sanction",
+        "Moonshadow",
+        "Perpetual Timepiece",
+        "Pulsemage Advocate"
+      ],
+      "subpattern_count": 6,
+      "subpatterns": [
+        {
+          "cards": [
+            "Bond of Insight",
+            "Experimental Overload",
+            "Flashback"
+          ],
+          "count": 3,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 3
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "recursion",
+            "target_constraints": {
+              "zone": "graveyard"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "4509d91f715112fb"
+        },
+        {
+          "cards": [
+            "Charmbreaker Devils",
+            "Endurance",
+            "Moonshadow"
+          ],
+          "count": 3,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 3
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "recursion",
+            "target_constraints": {},
+            "template_fields": {}
+          },
+          "subpattern_key": "a90f0024f6b06598"
+        },
+        {
+          "cards": [
+            "Codex Shredder",
+            "Perpetual Timepiece"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 2
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "recursion",
+            "target_constraints": {
+              "zone": "graveyard"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "c2ab49126d34f7f8"
+        },
+        {
+          "cards": [
+            "Pulsemage Advocate"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "recursion",
+            "target_constraints": {
+              "controller_scope": "source_controller",
+              "zone": "graveyard"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "0987969a80bd96e5"
+        },
+        {
+          "cards": [
+            "Worldfire"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "recursion",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "6ee2ac6da6bc1b00"
+        },
+        {
+          "cards": [
+            "Gandalf's Sanction"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "recursion",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "d18e0664af81ae5f"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "BondOfInsight",
+        "CharmbreakerDevils",
+        "CodexShredder",
+        "Endurance",
+        "ExperimentalOverload",
+        "Flashback",
+        "GandalfsSanction",
+        "Moonshadow",
+        "PerpetualTimepiece",
+        "PulsemageAdvocate",
+        "Worldfire"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "activated": 1,
+        "one_shot": 7,
+        "static": 1,
+        "triggered": 1
+      },
+      "battle_model_scope": "xmage_library_search_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 10,
+      "cards": [
+        "Beseech the Mirror",
+        "Deathbellow War Cry",
+        "Entomb",
+        "Gifts Ungiven",
+        "Intuition",
+        "Invasion of Ikoria",
+        "Opposition Agent",
+        "Oswald Fiddlebender",
+        "Praetor's Grasp",
+        "Transmute Artifact"
+      ],
+      "effect": "tutor",
+      "family_id": "tutor",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:826ded38ac7738fc5e9b",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 10
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Beseech the Mirror",
+        "Deathbellow War Cry",
+        "Entomb",
+        "Gifts Ungiven",
+        "Intuition",
+        "Invasion of Ikoria",
+        "Opposition Agent",
+        "Oswald Fiddlebender",
+        "Praetor's Grasp",
+        "Transmute Artifact"
+      ],
+      "subpattern_count": 10,
+      "subpatterns": [
+        {
+          "cards": [
+            "Praetor's Grasp"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "tutor",
+            "target_constraints": {
+              "controller_scope": "opponent"
+            },
+            "template_fields": {
+              "instant": false,
+              "sorcery": true,
+              "target": "library_card",
+              "tutor_destination": "exile"
+            }
+          },
+          "subpattern_key": "1269cd9aaf9d7c72"
+        },
+        {
+          "cards": [
+            "Deathbellow War Cry"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "tutor",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {
+              "instant": false,
+              "sorcery": true,
+              "target": "library_card",
+              "tutor_destination": "battlefield"
+            }
+          },
+          "subpattern_key": "2b85287df6f7fff4"
+        },
+        {
+          "cards": [
+            "Opposition Agent"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "tutor",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": false,
+              "sorcery": false,
+              "target": "library_card",
+              "tutor_destination": "exile"
+            }
+          },
+          "subpattern_key": "5378210bb3a42de2"
+        },
+        {
+          "cards": [
+            "Transmute Artifact"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "tutor",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {
+              "instant": false,
+              "sorcery": true,
+              "target": "library_card",
+              "tutor_destination": "battlefield"
+            }
+          },
+          "subpattern_key": "5b8e72854f1130dc"
+        },
+        {
+          "cards": [
+            "Gifts Ungiven"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "tutor",
+            "target_constraints": {
+              "controller_scope": "opponent"
+            },
+            "template_fields": {
+              "instant": true,
+              "sorcery": false,
+              "target": "library_card",
+              "tutor_destination": "hand"
+            }
+          },
+          "subpattern_key": "8040a433d1872e75"
+        },
+        {
+          "cards": [
+            "Oswald Fiddlebender"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "tutor",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "template_fields": {
+              "instant": false,
+              "sorcery": false,
+              "target": "library_card",
+              "tutor_destination": "battlefield"
+            }
+          },
+          "subpattern_key": "8d687fab3aa450e7"
+        },
+        {
+          "cards": [
+            "Entomb"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "tutor",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": true,
+              "sorcery": false,
+              "target": "library_card",
+              "tutor_destination": "graveyard"
+            }
+          },
+          "subpattern_key": "a9cd793986e32c04"
+        },
+        {
+          "cards": [
+            "Intuition"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "tutor",
+            "target_constraints": {
+              "controller_scope": "opponent"
+            },
+            "template_fields": {
+              "instant": true,
+              "sorcery": false,
+              "target": "library_card",
+              "tutor_destination": "graveyard"
+            }
+          },
+          "subpattern_key": "c61c761c16fc95c3"
+        },
+        {
+          "cards": [
+            "Invasion of Ikoria"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "tutor",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {
+              "instant": false,
+              "sorcery": false,
+              "target": "library_card",
+              "tutor_destination": "battlefield"
+            }
+          },
+          "subpattern_key": "c8e5a4fd5b39bf0e"
+        },
+        {
+          "cards": [
+            "Beseech the Mirror"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "tutor",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": false,
+              "sorcery": true,
+              "target": "library_card",
+              "tutor_destination": "exile"
+            }
+          },
+          "subpattern_key": "f2889a98fbec2229"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "BeseechTheMirror",
+        "DeathbellowWarCry",
+        "Entomb",
+        "GiftsUngiven",
+        "Intuition",
+        "InvasionOfIkoria",
+        "OppositionAgent",
+        "OswaldFiddlebender",
+        "PraetorsGrasp",
+        "TransmuteArtifact"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "activated": 1,
+        "one_shot": 3,
+        "static": 2,
+        "triggered": 3
+      },
+      "battle_model_scope": "xmage_cast_or_play_from_alternate_zone_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 9,
+      "cards": [
+        "Aminatou's Augury",
+        "Arcane Bombardment",
+        "Assemble the Players",
+        "Chaos Wand",
+        "Epic Experiment",
+        "Etali, Primal Conqueror",
+        "Radiant Scrollwielder",
+        "Squee, the Immortal",
+        "Summons of Saruman"
+      ],
+      "effect": "free_cast",
+      "family_id": "free_cast",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:acc6128f873af5ee076e",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 9
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Aminatou's Augury",
+        "Arcane Bombardment",
+        "Assemble the Players",
+        "Chaos Wand",
+        "Epic Experiment",
+        "Etali, Primal Conqueror",
+        "Radiant Scrollwielder",
+        "Squee, the Immortal",
+        "Summons of Saruman"
+      ],
+      "subpattern_count": 5,
+      "subpatterns": [
+        {
+          "cards": [
+            "Aminatou's Augury",
+            "Epic Experiment",
+            "Summons of Saruman"
+          ],
+          "count": 3,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 3
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "free_cast",
+            "target_constraints": {},
+            "template_fields": {
+              "alternate_zone_permission": true,
+              "may_cast_without_paying_mana_cost": true
+            }
+          },
+          "subpattern_key": "73b92b26214176b9"
+        },
+        {
+          "cards": [
+            "Arcane Bombardment",
+            "Etali, Primal Conqueror"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 2
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "free_cast",
+            "target_constraints": {},
+            "template_fields": {
+              "alternate_zone_permission": true,
+              "may_cast_without_paying_mana_cost": true
+            }
+          },
+          "subpattern_key": "24ad038be7375414"
+        },
+        {
+          "cards": [
+            "Assemble the Players",
+            "Squee, the Immortal"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 2
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "free_cast",
+            "target_constraints": {},
+            "template_fields": {
+              "alternate_zone_permission": true,
+              "may_cast_without_paying_mana_cost": false
+            }
+          },
+          "subpattern_key": "96279508c65a2ff2"
+        },
+        {
+          "cards": [
+            "Radiant Scrollwielder"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "free_cast",
+            "target_constraints": {},
+            "template_fields": {
+              "alternate_zone_permission": true,
+              "may_cast_without_paying_mana_cost": false
+            }
+          },
+          "subpattern_key": "180fe73a54fa8702"
+        },
+        {
+          "cards": [
+            "Chaos Wand"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "free_cast",
+            "target_constraints": {},
+            "template_fields": {
+              "alternate_zone_permission": true,
+              "may_cast_without_paying_mana_cost": true
+            }
+          },
+          "subpattern_key": "dae7395dbb072077"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "AminatousAugury",
+        "ArcaneBombardment",
+        "AssembleThePlayers",
+        "ChaosWand",
+        "EpicExperiment",
+        "EtaliPrimalConqueror",
+        "RadiantScrollwielder",
+        "SqueeTheImmortal",
+        "SummonsOfSaruman"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "activated": 2,
+        "one_shot": 1,
+        "static": 3,
+        "triggered": 2
+      },
+      "battle_model_scope": "xmage_targeted_protection_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 8,
+      "cards": [
+        "Akroma's Will",
+        "Clout of the Dominus",
+        "Eight-and-a-Half-Tails",
+        "Hellkite Courser",
+        "Protective Bubble",
+        "Sylvan Safekeeper",
+        "Volatile Stormdrake",
+        "Zephid's Embrace"
+      ],
+      "effect": "grant_protection_from_chosen_color",
+      "family_id": "targeted_protection",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:5f8c877ffd79caf5b6be",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 8
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Akroma's Will",
+        "Clout of the Dominus",
+        "Eight-and-a-Half-Tails",
+        "Hellkite Courser",
+        "Protective Bubble",
+        "Sylvan Safekeeper",
+        "Volatile Stormdrake",
+        "Zephid's Embrace"
+      ],
+      "subpattern_count": 6,
+      "subpatterns": [
+        {
+          "cards": [
+            "Clout of the Dominus",
+            "Protective Bubble",
+            "Zephid's Embrace"
+          ],
+          "count": 3,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 3
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "grant_protection_from_chosen_color",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {
+              "targeted_protection_variant": true
+            }
+          },
+          "subpattern_key": "d4e2eb9683926251"
+        },
+        {
+          "cards": [
+            "Volatile Stormdrake"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "grant_protection_from_chosen_color",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "opponent"
+            },
+            "template_fields": {
+              "targeted_protection_variant": true
+            }
+          },
+          "subpattern_key": "2a8c658f10480a2a"
+        },
+        {
+          "cards": [
+            "Sylvan Safekeeper"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "grant_protection_from_chosen_color",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {
+              "targeted_protection_variant": true
+            }
+          },
+          "subpattern_key": "aadffb88a2d9c74f"
+        },
+        {
+          "cards": [
+            "Hellkite Courser"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "grant_protection_from_chosen_color",
+            "target_constraints": {
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {
+              "targeted_protection_variant": true
+            }
+          },
+          "subpattern_key": "ab09f6c8fe389fe6"
+        },
+        {
+          "cards": [
+            "Akroma's Will"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "grant_protection_from_chosen_color",
+            "target_constraints": {},
+            "template_fields": {
+              "targeted_protection_variant": true
+            }
+          },
+          "subpattern_key": "c61b86d9f52641a2"
+        },
+        {
+          "cards": [
+            "Eight-and-a-Half-Tails"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "grant_protection_from_chosen_color",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ],
+              "controller_scope": "source_controller",
+              "zone": "stack"
+            },
+            "template_fields": {
+              "targeted_protection_variant": true
+            }
+          },
+          "subpattern_key": "f227455f33e2fcb5"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "AkromasWill",
+        "CloutOfTheDominus",
+        "EightAndAHalfTails",
+        "HellkiteCourser",
+        "ProtectiveBubble",
+        "SylvanSafekeeper",
+        "VolatileStormdrake",
+        "ZephidsEmbrace"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "activated": 4,
+        "one_shot": 1,
+        "static": 1,
+        "triggered": 1
+      },
+      "battle_model_scope": "xmage_targeted_untap_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 7,
+      "cards": [
+        "Manifold Key",
+        "Nature's Chosen",
+        "Tezzeret the Seeker",
+        "Tezzeret, Cruel Captain",
+        "Thousand-Year Elixir",
+        "Tyvar, Jubilant Brawler",
+        "Voltaic Key"
+      ],
+      "effect": "untap_target",
+      "family_id": "targeted_interaction",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:17bfdc5de1bd268961c2",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 7
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Manifold Key",
+        "Nature's Chosen",
+        "Tezzeret the Seeker",
+        "Tezzeret, Cruel Captain",
+        "Thousand-Year Elixir",
+        "Tyvar, Jubilant Brawler",
+        "Voltaic Key"
+      ],
+      "subpattern_count": 6,
+      "subpatterns": [
+        {
+          "cards": [
+            "Manifold Key",
+            "Thousand-Year Elixir"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 2
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "untap_target",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {
+              "activation_requires_tap": true,
+              "untap_target": true,
+              "untap_target_card_types": [
+                "artifact",
+                "creature"
+              ]
+            }
+          },
+          "subpattern_key": "33591e398ea0a6bf"
+        },
+        {
+          "cards": [
+            "Tezzeret, Cruel Captain"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "untap_target",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "template_fields": {
+              "activation_requires_tap": false,
+              "untap_target": true,
+              "untap_target_card_types": [
+                "artifact",
+                "creature"
+              ]
+            }
+          },
+          "subpattern_key": "0cd4dff3136f2b54"
+        },
+        {
+          "cards": [
+            "Tyvar, Jubilant Brawler"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "untap_target",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "zone": "graveyard"
+            },
+            "template_fields": {
+              "activation_requires_tap": false,
+              "untap_target": true,
+              "untap_target_card_types": [
+                "creature"
+              ]
+            }
+          },
+          "subpattern_key": "4d4d0a3a9892bde5"
+        },
+        {
+          "cards": [
+            "Tezzeret the Seeker"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "untap_target",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "template_fields": {
+              "activation_requires_tap": false,
+              "untap_target": true,
+              "untap_target_card_types": [
+                "artifact"
+              ]
+            }
+          },
+          "subpattern_key": "96fb09a9522e9702"
+        },
+        {
+          "cards": [
+            "Nature's Chosen"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "untap_target",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {
+              "activation_requires_tap": false,
+              "untap_target": true,
+              "untap_target_card_types": [
+                "artifact",
+                "creature"
+              ]
+            }
+          },
+          "subpattern_key": "9cfd77329b23c7bd"
+        },
+        {
+          "cards": [
+            "Voltaic Key"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "untap_target",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "template_fields": {
+              "activation_requires_tap": true,
+              "untap_target": true,
+              "untap_target_card_types": [
+                "artifact"
+              ]
+            }
+          },
+          "subpattern_key": "adc8f00b7bc07127"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "ManifoldKey",
+        "NaturesChosen",
+        "TezzeretCruelCaptain",
+        "TezzeretTheSeeker",
+        "ThousandYearElixir",
+        "TyvarJubilantBrawler",
+        "VoltaicKey"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "one_shot": 1,
+        "static": 1,
+        "triggered": 3
+      },
+      "battle_model_scope": "xmage_creature_mana_source_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 5,
+      "cards": [
+        "\"Name Sticker\" Goblin",
+        "Ashling, Flame Dancer",
+        "Blazing Firesinger",
+        "Electro, Assaulting Battery",
+        "Neheb, the Eternal"
+      ],
+      "effect": "ramp_permanent",
+      "family_id": "ramp_permanent",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:b256332cd625a288e19d",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 5
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "\"Name Sticker\" Goblin",
+        "Ashling, Flame Dancer",
+        "Blazing Firesinger",
+        "Electro, Assaulting Battery",
+        "Neheb, the Eternal"
+      ],
+      "subpattern_count": 3,
+      "subpatterns": [
+        {
+          "cards": [
+            "\"Name Sticker\" Goblin",
+            "Electro, Assaulting Battery",
+            "Neheb, the Eternal"
+          ],
+          "count": 3,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 3
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "ramp_permanent",
+            "target_constraints": {},
+            "template_fields": {
+              "activation_requires_tap": false,
+              "is_mana_source": true,
+              "permanent_type": "creature"
+            }
+          },
+          "subpattern_key": "f3e3c96c856f667d"
+        },
+        {
+          "cards": [
+            "Ashling, Flame Dancer"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "ramp_permanent",
+            "target_constraints": {},
+            "template_fields": {
+              "activation_requires_tap": false,
+              "is_mana_source": true,
+              "permanent_type": "creature"
+            }
+          },
+          "subpattern_key": "bbf5af33bd047ba6"
+        },
+        {
+          "cards": [
+            "Blazing Firesinger"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "ramp_permanent",
+            "target_constraints": {},
+            "template_fields": {
+              "activation_requires_tap": false,
+              "is_mana_source": true,
+              "permanent_type": "creature"
+            }
+          },
+          "subpattern_key": "ce5c8c5193d81e2f"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "AshlingFlameDancer",
+        "BlazingFiresinger",
+        "ElectroAssaultingBattery",
+        "NameStickerGoblin",
+        "NehebTheEternal"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "static": 1,
+        "triggered": 3
+      },
+      "battle_model_scope": "xmage_draw_card_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 4,
+      "cards": [
+        "Alhammarret's Archive",
+        "Currency Converter",
+        "Naktamun Lorespinner // Wheel of Fortune",
+        "Tymna the Weaver"
+      ],
+      "effect": "draw_engine",
+      "family_id": "draw_engine",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:360faa5d8dc0e38bd662",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 4
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Alhammarret's Archive",
+        "Currency Converter",
+        "Naktamun Lorespinner // Wheel of Fortune",
+        "Tymna the Weaver"
+      ],
+      "subpattern_count": 3,
+      "subpatterns": [
+        {
+          "cards": [
+            "Currency Converter",
+            "Tymna the Weaver"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 2
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "draw_engine",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": false,
+              "sorcery": false
+            }
+          },
+          "subpattern_key": "65ea2655db4f2196"
+        },
+        {
+          "cards": [
+            "Naktamun Lorespinner // Wheel of Fortune"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "draw_engine",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": false,
+              "sorcery": true
+            }
+          },
+          "subpattern_key": "09ea9375ceb1055a"
+        },
+        {
+          "cards": [
+            "Alhammarret's Archive"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "draw_engine",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": false,
+              "sorcery": false
+            }
+          },
+          "subpattern_key": "2f08d5e8d7daaf0d"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "AlhammarretsArchive",
+        "CurrencyConverter",
+        "NaktamunLorespinner",
+        "TymnaTheWeaver"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "activated": 2,
+        "one_shot": 1
+      },
+      "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 3,
+      "cards": [
+        "Culling Ritual",
+        "Dauntless Dismantler",
+        "Karn's Sylex"
+      ],
+      "effect": "board_wipe",
+      "family_id": "board_wipe_choice",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:0536d374294086471dab",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 3
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Culling Ritual",
+        "Dauntless Dismantler",
+        "Karn's Sylex"
+      ],
+      "subpattern_count": 2,
+      "subpatterns": [
+        {
+          "cards": [
+            "Dauntless Dismantler",
+            "Karn's Sylex"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 2
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "board_wipe",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": false,
+              "mass_effect": true,
+              "sorcery": false
+            }
+          },
+          "subpattern_key": "05ab4c9672c301e9"
+        },
+        {
+          "cards": [
+            "Culling Ritual"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "board_wipe",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": false,
+              "mass_effect": true,
+              "sorcery": true
+            }
+          },
+          "subpattern_key": "ea6bc544c155025d"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "CullingRitual",
+        "DauntlessDismantler",
+        "KarnsSylex"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "static": 3
+      },
+      "battle_model_scope": "xmage_static_rule_restriction_or_tax_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 3,
+      "cards": [
+        "Aven Interrupter",
+        "Hope of Ghirapur",
+        "Void Winnower"
+      ],
+      "effect": "passive",
+      "family_id": "passive",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:d82c95d9e316c01aa6e2",
+      "pattern_status": "candidate_template_requires_review_tests",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 3
+      },
+      "recommended_action": "Review before promotion.",
+      "required_evidence_before_promotion": [
+        "review",
+        "focused test",
+        "promotion gate"
+      ],
+      "sample_cards": [
+        "Aven Interrupter",
+        "Hope of Ghirapur",
+        "Void Winnower"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Aven Interrupter",
+            "Hope of Ghirapur",
+            "Void Winnower"
+          ],
+          "count": 3,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 3
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "passive",
+            "target_constraints": {},
+            "template_fields": {
+              "static_rule_restriction": true
+            }
+          },
+          "subpattern_key": "f7981fd1576deb77"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "AvenInterrupter",
+        "HopeOfGhirapur",
+        "VoidWinnower"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "activated": 2,
+        "static": 1
+      },
+      "battle_model_scope": "xmage_cast_or_play_from_alternate_zone_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 3,
+      "cards": [
+        "Bolas's Citadel",
+        "Lens of Clarity",
+        "Mystic Forge"
+      ],
+      "effect": "topdeck_play",
+      "family_id": "topdeck_play",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:75bb38142301fb533e61",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 3
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Bolas's Citadel",
+        "Lens of Clarity",
+        "Mystic Forge"
+      ],
+      "subpattern_count": 2,
+      "subpatterns": [
+        {
+          "cards": [
+            "Bolas's Citadel",
+            "Mystic Forge"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 2
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "topdeck_play",
+            "target_constraints": {},
+            "template_fields": {
+              "alternate_zone_permission": true,
+              "may_cast_without_paying_mana_cost": false
+            }
+          },
+          "subpattern_key": "b0c3861946da2db6"
+        },
+        {
+          "cards": [
+            "Lens of Clarity"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "topdeck_play",
+            "target_constraints": {},
+            "template_fields": {
+              "alternate_zone_permission": true,
+              "may_cast_without_paying_mana_cost": false
+            }
+          },
+          "subpattern_key": "32afbb202a81df79"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "BolassCitadel",
+        "LensOfClarity",
+        "MysticForge"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "static": 2
+      },
+      "battle_model_scope": "static_cast_as_flash_permission_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 2,
+      "cards": [
+        "Tidal Barracuda",
+        "Valley Floodcaller"
+      ],
+      "effect": "passive",
+      "family_id": "passive",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:aabdfb3e2398480521ad",
+      "pattern_status": "candidate_template_requires_review_tests",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 2
+      },
+      "recommended_action": "Review before promotion.",
+      "required_evidence_before_promotion": [
+        "review",
+        "focused test",
+        "promotion gate"
+      ],
+      "sample_cards": [
+        "Tidal Barracuda",
+        "Valley Floodcaller"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Tidal Barracuda",
+            "Valley Floodcaller"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 2
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "passive",
+            "target_constraints": {},
+            "template_fields": {
+              "applies_to_card_types": [
+                "creature"
+              ],
+              "grants_cast_as_flash": true,
+              "timing_permission_scope": "source_controller"
+            }
+          },
+          "subpattern_key": "3690acb008e260d6"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "TidalBarracuda",
+        "ValleyFloodcaller"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "one_shot": 2
+      },
+      "battle_model_scope": "xmage_spell_mana_ritual_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 2,
+      "cards": [
+        "Burnt Offering",
+        "Mana Geyser"
+      ],
+      "effect": "ramp_ritual",
+      "family_id": "ramp_ritual",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:8371d134b3e32b636072",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 2
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Burnt Offering",
+        "Mana Geyser"
+      ],
+      "subpattern_count": 2,
+      "subpatterns": [
+        {
+          "cards": [
+            "Burnt Offering"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "ramp_ritual",
+            "target_constraints": {},
+            "template_fields": {
+              "dynamic_mana_amount": false,
+              "instant": true,
+              "mana_effect_classes": [],
+              "produces": "R",
+              "sorcery": false
+            }
+          },
+          "subpattern_key": "1d81a13734fce982"
+        },
+        {
+          "cards": [
+            "Mana Geyser"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "ramp_ritual",
+            "target_constraints": {},
+            "template_fields": {
+              "dynamic_mana_amount": true,
+              "instant": false,
+              "mana_effect_classes": [
+                "DynamicManaEffect"
+              ],
+              "produces": "R",
+              "sorcery": true
+            }
+          },
+          "subpattern_key": "2e76e1ad3be70b06"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "BurntOffering",
+        "ManaGeyser"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "one_shot": 1,
+        "triggered": 1
+      },
+      "battle_model_scope": "xmage_multi_target_damage_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 2,
+      "cards": [
+        "Fury",
+        "Pyrokinesis"
+      ],
+      "effect": "multi_target_damage",
+      "family_id": "targeted_interaction",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:14e0677d968e9febefb0",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 2
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Fury",
+        "Pyrokinesis"
+      ],
+      "subpattern_count": 2,
+      "subpatterns": [
+        {
+          "cards": [
+            "Fury"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "multi_target_damage",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {
+              "instant": false,
+              "multi_target_damage": true,
+              "sorcery": false
+            }
+          },
+          "subpattern_key": "3b5983a7f88a7ba2"
+        },
+        {
+          "cards": [
+            "Pyrokinesis"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "multi_target_damage",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {
+              "instant": true,
+              "multi_target_damage": true,
+              "sorcery": false
+            }
+          },
+          "subpattern_key": "717f9df0eb52653e"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "Fury",
+        "Pyrokinesis"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "triggered": 1
+      },
+      "battle_model_scope": "xmage_copy_stack_object_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 1,
+      "cards": [
+        "Jin-Gitaxias, Progress Tyrant"
+      ],
+      "effect": "copy_spell",
+      "family_id": "copy_spell_engine",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:324a035e0415c1ad1fef",
+      "pattern_status": "candidate_template_requires_review_tests",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "recommended_action": "Review before promotion.",
+      "required_evidence_before_promotion": [
+        "review",
+        "focused test",
+        "promotion gate"
+      ],
+      "sample_cards": [
+        "Jin-Gitaxias, Progress Tyrant"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Jin-Gitaxias, Progress Tyrant"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "copy_spell",
+            "target_constraints": {
+              "zone": "stack"
+            },
+            "template_fields": {
+              "copy_stack_object": true,
+              "may_choose_new_targets": true
+            }
+          },
+          "subpattern_key": "761123783777a438"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "JinGitaxiasProgressTyrant"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "triggered": 1
+      },
+      "battle_model_scope": "xmage_life_gain_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 1,
+      "cards": [
+        "Archivist of Oghma"
+      ],
+      "effect": "life_gain",
+      "family_id": "life_total_change",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:9a45c50d168106187436",
+      "pattern_status": "candidate_template_requires_review_tests",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "recommended_action": "Review before promotion.",
+      "required_evidence_before_promotion": [
+        "review",
+        "focused test",
+        "promotion gate"
+      ],
+      "sample_cards": [
+        "Archivist of Oghma"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Archivist of Oghma"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "life_gain",
+            "target_constraints": {},
+            "template_fields": {
+              "gain_life": 1,
+              "instant": false,
+              "sorcery": false
+            }
+          },
+          "subpattern_key": "6ccf4c880f93c6d6"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "ArchivistOfOghma"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "one_shot": 1
+      },
+      "battle_model_scope": "xmage_artifact_mana_source_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 1,
+      "cards": [
+        "Lion's Eye Diamond"
+      ],
+      "effect": "ramp_permanent",
+      "family_id": "ramp_permanent",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:ca27b6a9e2c974306bab",
+      "pattern_status": "candidate_template_requires_review_tests",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "recommended_action": "Review before promotion.",
+      "required_evidence_before_promotion": [
+        "review",
+        "focused test",
+        "promotion gate"
+      ],
+      "sample_cards": [
+        "Lion's Eye Diamond"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Lion's Eye Diamond"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "ramp_permanent",
+            "target_constraints": {},
+            "template_fields": {
+              "activation_requires_sacrifice": true,
+              "activation_requires_tap": false,
+              "is_mana_source": true,
+              "mana_produced": 1,
+              "permanent_type": "artifact",
+              "produces": "WUBRG"
+            }
+          },
+          "subpattern_key": "355ffe1db64313c1"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "LionsEyeDiamond"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "triggered": 1
+      },
+      "battle_model_scope": "xmage_land_mana_source_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 1,
+      "cards": [
+        "Growing Rites of Itlimoc"
+      ],
+      "effect": "ramp_permanent",
+      "family_id": "ramp_permanent",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:6204ec24b582c06a65e9",
+      "pattern_status": "candidate_template_requires_review_tests",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "recommended_action": "Review before promotion.",
+      "required_evidence_before_promotion": [
+        "review",
+        "focused test",
+        "promotion gate"
+      ],
+      "sample_cards": [
+        "Growing Rites of Itlimoc"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Growing Rites of Itlimoc"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "ramp_permanent",
+            "target_constraints": {},
+            "template_fields": {
+              "activation_requires_sacrifice": false,
+              "activation_requires_tap": false,
+              "conditional_any_color_mana": false,
+              "is_mana_source": true,
+              "mana_produced": 1,
+              "nonmana_abilities_require_separate_scope": true,
+              "nonmana_abilities_status": "separate_scope_required_before_full_card_promotion",
+              "nonmana_effect_classes": [
+                "LookLibraryAndPickControllerEffect",
+                "TransformSourceEffect"
+              ],
+              "permanent_type": "land",
+              "produces": "G"
+            }
+          },
+          "subpattern_key": "89baa2c486577f42"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "GrowingRitesOfItlimoc"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "one_shot": 1
+      },
+      "battle_model_scope": "targeted_destroy_variant_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 1,
+      "cards": [
+        "Abrade"
+      ],
+      "effect": "removal_destroy",
+      "family_id": "targeted_interaction",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:329f97cc5643657813fe",
+      "pattern_status": "requires_subpattern_split_before_promotion",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "recommended_action": "Split by ability kind, target constraints, triggers, costs, and secondary effects before promotion.",
+      "required_evidence_before_promotion": [
+        "subpattern split",
+        "focused ManaLoom tests per subpattern",
+        "package generation only for exact supported subpatterns"
+      ],
+      "sample_cards": [
+        "Abrade"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Abrade"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "removal_destroy",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "82630cd7c9ecdd3b"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "Abrade"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "one_shot": 1
+      },
+      "battle_model_scope": "xmage_choose_new_targets_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 1,
+      "cards": [
+        "Misdirection"
+      ],
+      "effect": "redirect_target",
+      "family_id": "targeted_interaction",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:4b0569f3d046f0dede2e",
+      "pattern_status": "candidate_template_requires_review_tests",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "recommended_action": "Review before promotion.",
+      "required_evidence_before_promotion": [
+        "review",
+        "focused test",
+        "promotion gate"
+      ],
+      "sample_cards": [
+        "Misdirection"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Misdirection"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "redirect_target",
+            "target_constraints": {
+              "zone": "stack"
+            },
+            "template_fields": {
+              "chooses_new_targets": true,
+              "target_scope": "spell_or_ability"
+            }
+          },
+          "subpattern_key": "35e921dbde48fc77"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "Misdirection"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "one_shot": 1
+      },
+      "battle_model_scope": "xmage_draw_card_variant_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 1,
+      "cards": [
+        "Wheel of Fate"
+      ],
+      "effect": "draw_cards",
+      "family_id": "targeted_interaction",
+      "lane": "split_scope_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:6ca1acf96dd5dd6f6b05",
+      "pattern_status": "candidate_template_requires_review_tests",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "recommended_action": "Review before promotion.",
+      "required_evidence_before_promotion": [
+        "review",
+        "focused test",
+        "promotion gate"
+      ],
+      "sample_cards": [
+        "Wheel of Fate"
+      ],
+      "subpattern_count": 1,
+      "subpatterns": [
+        {
+          "cards": [
+            "Wheel of Fate"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "split_family_scope_review_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "draw_cards",
+            "target_constraints": {},
+            "template_fields": {
+              "instant": false,
+              "sorcery": true
+            }
+          },
+          "subpattern_key": "927666f2d62567ee"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "WheelOfFate"
+      ]
+    },
+    {
+      "ability_kind_counts": {
+        "activated": 12,
+        "one_shot": 17,
+        "static": 19,
+        "triggered": 15
+      },
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "can_auto_promote_to_card_battle_rules": false,
+      "can_execute_in_battle": false,
+      "card_count": 63,
+      "cards": [
+        "All Is Dust",
+        "Altar of Dementia",
+        "Amphibian Downpour",
+        "Ancient Gold Dragon",
+        "Autumn's Veil",
+        "Blood Moon",
+        "Carpet of Flowers",
+        "Chandra's Ignition",
+        "Cloud Key",
+        "Collector Ouphe",
+        "Colonel Autumn",
+        "Commandeer",
+        "Defense Grid",
+        "Delney, Streetwise Lookout",
+        "Derevi, Empyrial Tactician",
+        "Dimensional Infiltrator",
+        "Dismember",
+        "Disruptor Flute",
+        "Food Chain",
+        "Freed from the Real",
+        "Ghoulcaller's Bell",
+        "Gilded Drake",
+        "Gisela, Blade of Goldnight",
+        "Helm of Awakening",
+        "Hunting Velociraptor",
+        "Karn, the Great Creator",
+        "Kayla's Music Box",
+        "Lantern of Insight",
+        "Leyline Dowser",
+        "Lim-Dul's Vault",
+        "Marvin, Murderous Mimic",
+        "Memnite",
+        "Metallurgic Summonings",
+        "Metamorphosis",
+        "Mirage Mirror",
+        "Mystic Reflection",
+        "Nyxbloom Ancient",
+        "Open the Omenpaths",
+        "Orcish Spy",
+        "Patrolling Peacemaker",
+        "Peer into the Abyss",
+        "Possibility Storm",
+        "Prototype Portal",
+        "Pyxis of Pandemonium",
+        "Rain of Filth",
+        "Roaming Throne",
+        "Rograkh, Son of Rohgahh",
+        "Sculpting Steel",
+        "Seedborn Muse",
+        "Spellskite",
+        "Steal Enchantment",
+        "Stitcher's Supplier",
+        "Strangleroot Geist",
+        "Subjugate the Hobbits",
+        "Subtlety",
+        "Swift Reconfiguration",
+        "Sylvan Library",
+        "Tayam, Luminous Enigma",
+        "Unwinding Clock",
+        "Vial Smasher the Fierce",
+        "Wandering Archaic",
+        "White Plume Adventurer",
+        "Young Wolf"
+      ],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "lane": "manual_mapper_backlog",
+      "package_refs": [],
+      "pattern_id": "xmage_pattern:1c4300d3a825055c0113",
+      "pattern_status": "manual_model_observation_only",
+      "promotion_status": "shadow_only",
+      "proposal_status_counts": {
+        "mapper_metadata_or_test_scenario_required": 63
+      },
+      "recommended_action": "Keep after package, split-scope, and homogeneous-runtime lanes.",
+      "required_evidence_before_promotion": [
+        "manual mapper review",
+        "Oracle/source provenance",
+        "focused test before promotion"
+      ],
+      "sample_cards": [
+        "All Is Dust",
+        "Altar of Dementia",
+        "Amphibian Downpour",
+        "Ancient Gold Dragon",
+        "Autumn's Veil",
+        "Blood Moon",
+        "Carpet of Flowers",
+        "Chandra's Ignition",
+        "Cloud Key",
+        "Collector Ouphe"
+      ],
+      "subpattern_count": 30,
+      "subpatterns": [
+        {
+          "cards": [
+            "Blood Moon",
+            "Cloud Key",
+            "Collector Ouphe",
+            "Defense Grid",
+            "Disruptor Flute",
+            "Gisela, Blade of Goldnight",
+            "Helm of Awakening",
+            "Hunting Velociraptor",
+            "Marvin, Murderous Mimic",
+            "Nyxbloom Ancient"
+          ],
+          "count": 10,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 10
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {},
+            "template_fields": {}
+          },
+          "subpattern_key": "0be839fd7cc5b569"
+        },
+        {
+          "cards": [
+            "All Is Dust",
+            "Lim-Dul's Vault",
+            "Memnite",
+            "Open the Omenpaths",
+            "Peer into the Abyss",
+            "Rain of Filth",
+            "Rograkh, Son of Rohgahh",
+            "Strangleroot Geist",
+            "Young Wolf"
+          ],
+          "count": 9,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 9
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {},
+            "template_fields": {}
+          },
+          "subpattern_key": "62d3ffefeeab0e69"
+        },
+        {
+          "cards": [
+            "Ancient Gold Dragon",
+            "Colonel Autumn",
+            "Patrolling Peacemaker",
+            "Possibility Storm",
+            "Prototype Portal",
+            "Stitcher's Supplier",
+            "Wandering Archaic"
+          ],
+          "count": 7,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 7
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {},
+            "template_fields": {}
+          },
+          "subpattern_key": "824f80965d4f62d1"
+        },
+        {
+          "cards": [
+            "Kayla's Music Box",
+            "Lantern of Insight",
+            "Orcish Spy",
+            "Pyxis of Pandemonium"
+          ],
+          "count": 4,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 4
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {},
+            "template_fields": {}
+          },
+          "subpattern_key": "2d48f69a3276bf28"
+        },
+        {
+          "cards": [
+            "Derevi, Empyrial Tactician",
+            "Vial Smasher the Fierce"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 2
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "0a802c8bf0968b53"
+        },
+        {
+          "cards": [
+            "Karn, the Great Creator",
+            "Unwinding Clock"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 2
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "62bb37e876e9b48a"
+        },
+        {
+          "cards": [
+            "Amphibian Downpour",
+            "Mystic Reflection"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 2
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "79e6c47acea25760"
+        },
+        {
+          "cards": [
+            "Delney, Streetwise Lookout",
+            "Roaming Throne"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 2
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "8029fc30fdf29549"
+        },
+        {
+          "cards": [
+            "Chandra's Ignition",
+            "Metamorphosis"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 2
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "84dbf163967aba72"
+        },
+        {
+          "cards": [
+            "Dismember",
+            "Subjugate the Hobbits"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 2
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "8f579d4748ae39f1"
+        },
+        {
+          "cards": [
+            "Autumn's Veil",
+            "Commandeer"
+          ],
+          "count": 2,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 2
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "zone": "stack"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "fccdd58cf0feb8e9"
+        },
+        {
+          "cards": [
+            "Mirage Mirror"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "01c57699f8c652c6"
+        },
+        {
+          "cards": [
+            "Swift Reconfiguration"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "14dfe2cca29cb407"
+        },
+        {
+          "cards": [
+            "Sylvan Library"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "3056ad9a32051cab"
+        },
+        {
+          "cards": [
+            "Altar of Dementia"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "318dc6827cc0640d"
+        },
+        {
+          "cards": [
+            "Subtlety"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "zone": "stack"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "403bf3ca7b9099cd"
+        },
+        {
+          "cards": [
+            "Gilded Drake"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "opponent"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "421d719396dc5a57"
+        },
+        {
+          "cards": [
+            "Tayam, Luminous Enigma"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller",
+              "zone": "graveyard"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "51cf6bc5f1f3404d"
+        },
+        {
+          "cards": [
+            "White Plume Adventurer"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "5e1dca6e858d177c"
+        },
+        {
+          "cards": [
+            "Carpet of Flowers"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ],
+              "controller_scope": "opponent"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "5e5cda2fb4882e26"
+        },
+        {
+          "cards": [
+            "Ghoulcaller's Bell"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "77c42662b3f0aab3"
+        },
+        {
+          "cards": [
+            "Dimensional Infiltrator"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "controller_scope": "opponent"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "7e82797ecf1e592f"
+        },
+        {
+          "cards": [
+            "Leyline Dowser"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "817ef6c5deaf9843"
+        },
+        {
+          "cards": [
+            "Food Chain"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "8892686748238bdd"
+        },
+        {
+          "cards": [
+            "Sculpting Steel"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "one_shot",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "8badb6ee10d653e1"
+        },
+        {
+          "cards": [
+            "Steal Enchantment"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "enchantment"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "8bbf1875651f0abe"
+        },
+        {
+          "cards": [
+            "Freed from the Real"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "9a9f8aaaea5d4e5f"
+        },
+        {
+          "cards": [
+            "Seedborn Muse"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "static",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "9b36050a83287151"
+        },
+        {
+          "cards": [
+            "Metallurgic Summonings"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "triggered",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ],
+              "controller_scope": "source_controller"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "ca300c76274fd0d9"
+        },
+        {
+          "cards": [
+            "Spellskite"
+          ],
+          "count": 1,
+          "proposal_status_counts": {
+            "mapper_metadata_or_test_scenario_required": 1
+          },
+          "signature": {
+            "ability_kind": "activated",
+            "effect": "external_reference_required_manual_model",
+            "target_constraints": {
+              "zone": "stack"
+            },
+            "template_fields": {}
+          },
+          "subpattern_key": "ef7dd9fc9aa1e966"
+        }
+      ],
+      "test_references": [],
+      "xmage_classes": [
+        "AllIsDust",
+        "AltarOfDementia",
+        "AmphibianDownpour",
+        "AncientGoldDragon",
+        "AutumnsVeil",
+        "BloodMoon",
+        "CarpetOfFlowers",
+        "ChandrasIgnition",
+        "CloudKey",
+        "CollectorOuphe",
+        "ColonelAutumn",
+        "Commandeer",
+        "DefenseGrid",
+        "DelneyStreetwiseLookout",
+        "DereviEmpyrialTactician",
+        "DimensionalInfiltrator",
+        "Dismember",
+        "DisruptorFlute",
+        "FoodChain",
+        "FreedFromTheReal"
+      ]
+    }
+  ],
+  "registry_contract": {
+    "consumer_boundary": "Patterns are advisory and must not be joined directly into deck-card consumers.",
+    "kind": "shadow_pattern_registry",
+    "postgresql_source_of_truth_table": "card_battle_rules",
+    "promotion_status": "shadow_only"
+  },
+  "source": {
+    "proposal_summary": {
+      "blocked_missing_xmage_source_count": 0,
+      "family_counts": {
+        "board_wipe_choice": 3,
+        "copy_spell_engine": 1,
+        "draw_engine": 4,
+        "free_cast": 9,
+        "life_total_change": 1,
+        "manual_model": 63,
+        "passive": 5,
+        "ramp_permanent": 7,
+        "ramp_ritual": 2,
+        "recursion": 11,
+        "targeted_interaction": 12,
+        "targeted_protection": 8,
+        "topdeck_play": 3,
+        "tutor": 10
+      },
+      "proposal_count": 139,
+      "proposal_status_counts": {
+        "mapper_metadata_or_test_scenario_required": 63,
+        "split_family_scope_review_required": 76
+      },
+      "runtime_family_required_count": 0,
+      "safe_for_batch_pg_package_count": 0
+    },
+    "recommended_decision_score": null,
+    "recommended_strategy_id": null,
+    "report_dir": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports",
+    "test_miner_status": null
+  },
+  "status": "ready",
+  "summary": {
+    "auto_promotable_pattern_count": 0,
+    "card_counts_by_pattern_status": {
+      "candidate_template_requires_review_tests": 11,
+      "manual_model_observation_only": 63,
+      "requires_subpattern_split_before_promotion": 65
+    },
+    "executable_pattern_count": 0,
+    "lane_counts": {
+      "manual_mapper_backlog": 63,
+      "split_scope_backlog": 76
+    },
+    "pattern_count": 21,
+    "pattern_status_counts": {
+      "candidate_template_requires_review_tests": 8,
+      "manual_model_observation_only": 1,
+      "requires_subpattern_split_before_promotion": 12
+    },
+    "promotion_status": "shadow_only",
+    "proposal_count": 139
+  }
+}

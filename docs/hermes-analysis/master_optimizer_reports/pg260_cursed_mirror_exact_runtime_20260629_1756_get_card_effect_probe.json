@@ -1,0 +1,14 @@
+[
+  {
+    "card_name": "Cursed Mirror",
+    "effect": "ramp_permanent",
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:e4964406f7479873bbab9b6266928a48",
+    "mana_produced": 1,
+    "oracle_hash": "93b50442db2c2249c10e34671728801b",
+    "produces": "R",
+    "review_status": "verified",
+    "scope": "red_mana_rock_etb_copy_creature_haste_annotation_v1",
+    "source": "curated"
+  }
+]

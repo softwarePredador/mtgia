@@ -7007,15 +7007,26 @@
     "battle_rule_logical_key": "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
   },
   "Cursed Mirror": {
+    "ability_kind": "one_shot",
+    "activation_requires_tap": true,
+    "battle_model_scope": "red_mana_rock_etb_copy_creature_haste_annotation_v1",
     "effect": "ramp_permanent",
+    "etb_copy_grants_haste": true,
+    "etb_copy_status": "annotation_only",
+    "etb_may_copy_any_creature_until_eot": true,
+    "is_mana_source": true,
     "mana_produced": 1,
+    "nonmana_abilities_require_separate_scope": true,
+    "nonmana_abilities_status": "etb_copy_creature_haste_annotation_only",
+    "permanent_type": "artifact",
     "produces": "R",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4e8274d5902cf8ca66ff01be157ffddb"
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e4964406f7479873bbab9b6266928a48",
+    "battle_rule_oracle_hash": "93b50442db2c2249c10e34671728801b"
   },
   "Cursed Recording": {
     "cmc": 4.0,
