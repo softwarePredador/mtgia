@@ -65,6 +65,8 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
             ],
         )
         self.assertEqual(plan["removed"], ["Bender's Waterskin", "The Scarlet Witch", "Molecule Man"])
+        self.assertTrue(any("cross-lane" in signal for signal in plan["external_signals"]))
+        self.assertFalse(any("cuts are narrow same-lane" in signal.lower() for signal in plan["external_signals"]))
 
     def test_v615_mana_engine_molecule_retest_reverts_only_one_ring_cut(self):
         plan = research.RESEARCH_PLANS["v615_mana_engine_molecule_retest_v1"]

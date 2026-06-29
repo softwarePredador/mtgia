@@ -182,7 +182,7 @@ RESEARCH_PLANS = {
         "external_signals": [
             "Promotion gate 2026-06-29 kept deck_607 as baseline but identified deck_615 as the best package-learning candidate.",
             "deck_615 traces showed Mana Vault cost_paid=20, Birgi spell_cast_mana=25, The One Ring cost_paid=7, and stronger Winota pressure results than deck_607.",
-            "The cuts are narrow same-lane or low-observed slots: Bender's Waterskin is slower ramp, The Scarlet Witch overlaps cost-reduction/engine space, and Molecule Man had access but no recorded use metric in the promotion gate.",
+            "Post-hoc cut-methodology reaudit keeps this as a battle-cleared package candidate, not final cut proof: Bender's Waterskin -> Mana Vault is same-lane ramp, The Scarlet Witch -> Birgi is same-macro spell-chain and needs confirmation, and Molecule Man -> The One Ring is cross-lane and must be recut before any final ideal-deck claim.",
         ],
     },
     "v615_mana_engine_molecule_retest_v1": {

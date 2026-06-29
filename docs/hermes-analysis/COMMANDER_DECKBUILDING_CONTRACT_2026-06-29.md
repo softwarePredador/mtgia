@@ -174,6 +174,11 @@ A Lorehold candidate can replace `607` only when all are true:
 - it keeps land/ramp/draw/removal/protection/wincon counts inside the frozen
   profile ranges unless a documented battle result justifies the deviation;
 - it does not cut protected anchors without same-lane replacement proof;
+- it does not use a cross-lane cut as deck-quality proof. Example: a
+  draw/protection value card such as `The One Ring` can be useful, but it must
+  not be treated as proof that a miracle-engine card such as `Molecule Man`
+  belongs out unless an explicit package hypothesis and equal-gate card-use
+  evidence prove that functional tradeoff;
 - it ties or beats `607` in the same opponent set and seed window;
 - it does not regress the fast pressure matchup, especially Winota-style
   combat pressure;
