@@ -132,6 +132,130 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertEqual(classification.canonical_summary["valid_package_row_count"], 1)
 
+    def test_focus_decision_wrapper_is_recognized(self) -> None:
+        payload = {
+            "generated_at": "2026-06-30T00:00:00Z",
+            "packages": [{"package_key": "candidate"}],
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "source_wrapper": "lorehold_profiled_cut_benchmark_gate_decision",
+            "status": "blocked",
+            "summary": {"ready_count": 0},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "decision_wrapper.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "focus_access_decision_wrapper")
+        self.assertEqual(classification.status, "pass")
+
+    def test_runtime_gap_subreports_are_recognized(self) -> None:
+        examples = [
+            (
+                "runtime_gap_blocked_coherence",
+                {
+                    "cards": [],
+                    "deck_id": 607,
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "scope": "lorehold_variant_only_cards_blocked_by_runtime_rule_gap",
+                    "severity_counts": {},
+                    "source": "lorehold_variant_gap_miner",
+                    "source_deck_ids": [607],
+                    "source_miner_summary": {},
+                    "total_cards": 0,
+                },
+            ),
+            (
+                "runtime_gap_family_subreport",
+                {
+                    "cards": [],
+                    "families": {},
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "mutations_performed": False,
+                    "source": "xmage_semantic_family_classifier",
+                    "status": "pass",
+                    "summary": {},
+                },
+            ),
+            (
+                "runtime_gap_validity_subreport",
+                {
+                    "cards": [],
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "mutations_performed": False,
+                    "source": "xmage_batch_validity_audit",
+                    "status": "pass",
+                    "summary": {},
+                },
+            ),
+            (
+                "runtime_gap_xmage_index_subreport",
+                {
+                    "cards": [],
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "mutations_performed": False,
+                    "source": "xmage_local_rule_indexer",
+                    "status": "pass",
+                    "summary": {},
+                    "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master",
+                },
+            ),
+        ]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            for expected_kind, payload in examples:
+                path = Path(tmp) / f"{expected_kind}.json"
+                classification = audit.classify_payload(path, payload)
+                self.assertEqual(classification.artifact_kind, expected_kind)
+                self.assertEqual(classification.status, "pass")
+
+    def test_unblock_readiness_and_package_manifests_are_recognized(self) -> None:
+        examples = [
+            (
+                "hidden_retreat_unblock_readiness",
+                {
+                    "blocker_chain": [],
+                    "env_status": {},
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "guardrails": {},
+                    "inputs": {},
+                    "manifest_extract": {},
+                    "postgres_precheck": {},
+                    "postgres_writes": False,
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
+            (
+                "expanded_package_manifest",
+                {
+                    "correction_note": "lane corrected",
+                    "generated_from": "hand_filter_cut_model",
+                    "packages": [],
+                    "purpose": "expanded hand-filter queue",
+                },
+            ),
+            (
+                "safe_cut_package_manifest",
+                {
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "packages": [],
+                    "postgres_writes": False,
+                    "purpose": "safe cut packages",
+                    "source_db_mutated": False,
+                    "source_ledger": "ledger.json",
+                },
+            ),
+        ]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            for expected_kind, payload in examples:
+                path = Path(tmp) / f"{expected_kind}.json"
+                classification = audit.classify_payload(path, payload)
+                self.assertEqual(classification.artifact_kind, expected_kind)
+                self.assertEqual(classification.status, "pass")
+
     def test_exposure_aware_gate_queue_is_recognized(self) -> None:
         payload = {
             "readiness_report": "runtime_gap_readiness.json",
