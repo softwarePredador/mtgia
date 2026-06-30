@@ -5,6 +5,10 @@ def test_default_planner_uses_current_rejection_integrated_report():
     assert gen.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 
 
+def test_default_trace_audit_uses_current_after_profiled_gate_report():
+    assert gen.DEFAULT_TRACE_AUDIT.name == "lorehold_failure_targeted_trace_audit_20260630_after_profiled_gate.json"
+
+
 def test_default_access_model_uses_post_pg276_assemble_access_density_report():
     assert (
         gen.DEFAULT_ACCESS_MODEL.name

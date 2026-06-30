@@ -257,5 +257,13 @@ irrelevant package output
     assert status["markdown"] == "/tmp/report.md"
 
 
-def test_default_planner_uses_minimum_used_sample_contract():
-    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260628_min_used_sample_v2.json"
+def test_defaults_use_current_after_profiled_gate_handoff():
+    assert (
+        queue.DEFAULT_READINESS.name
+        == "lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json"
+    )
+    assert (
+        queue.DEFAULT_HYPOTHESIS_QUEUE.name
+        == "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
+    )
+    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_after_profiled_gate.json"

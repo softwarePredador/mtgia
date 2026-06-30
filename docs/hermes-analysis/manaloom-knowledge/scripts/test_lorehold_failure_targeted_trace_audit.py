@@ -3,6 +3,13 @@ import json
 import lorehold_failure_targeted_trace_audit as audit
 
 
+def test_default_synthesis_uses_current_after_profiled_gate_handoff():
+    assert (
+        audit.DEFAULT_SYNTHESIS.name
+        == "lorehold_failure_targeted_synergy_hypotheses_20260630_after_profiled_gate.json"
+    )
+
+
 def write_json(path, payload):
     path.write_text(json.dumps(payload), encoding="utf-8")
     return path

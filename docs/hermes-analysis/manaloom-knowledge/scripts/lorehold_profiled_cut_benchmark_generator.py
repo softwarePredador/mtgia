@@ -20,14 +20,15 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import lorehold_synergy_package_gate as package_gate
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_MANUAL_REVIEW = (
-    REPORT_DIR / "lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json"
+    REPORT_DIR / "lorehold_manual_cut_review_20260630_post_pg276_lane_core_blocked.json"
 )
 DEFAULT_VARIANT_DECK_IDS = tuple(range(608, 617))
 ACTIVE_EXECUTION_STATUSES = {"active", "auto", "reviewed", "verified"}

@@ -18,12 +18,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from master_optimizer_common import resolve_default_knowledge_db
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_PACKAGE_GATE_REPORTS = [
     REPORT_DIR / "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_fixed.json",
     REPORT_DIR / "lorehold_614_615_hypothesis_gate_20260627_v1_seed42_akroma_fixed.json",

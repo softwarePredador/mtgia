@@ -25,7 +25,7 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
-DEFAULT_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
+DEFAULT_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260630_after_profiled_gate.json"
 DEFAULT_MINER_REPORT = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260628_v1.md"
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
@@ -1011,7 +1011,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--access-model", type=Path, default=DEFAULT_ACCESS_MODEL)
     parser.add_argument("--runtime-gap-queue", type=Path, default=DEFAULT_RUNTIME_GAP_QUEUE)
     parser.add_argument("--hand-filter-cut-model", type=Path, default=DEFAULT_HAND_FILTER_CUT_MODEL)
-    parser.add_argument("--stem", default="lorehold_focus_access_package_generator_20260628_v3")
+    parser.add_argument("--stem", default="lorehold_focus_access_package_generator_20260630_after_profiled_gate")
     return parser.parse_args()
 
 

@@ -1,0 +1,58 @@
+{
+  "decision": {
+    "status": "aligned_existing_flow_use_trace_runtime_before_new_swap",
+    "postgres_writes": false,
+    "source_db_mutated": false,
+    "create_new_flex_cut_flow_required": false,
+    "registry_runner_alone_is_correct_continuation": false
+  },
+  "current_flow": [
+    "lorehold_failure_targeted_synergy_hypotheses.py",
+    "lorehold_failure_targeted_trace_audit.py",
+    "lorehold_focus_access_package_generator.py",
+    "lorehold_exposure_aware_gate_queue.py"
+  ],
+  "evidence": {
+    "hypothesis_queue": {
+      "artifact": "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json",
+      "tested_negative_count": 13,
+      "gate_ready_count": 0
+    },
+    "planner": {
+      "artifact": "lorehold_next_action_planner_20260630_after_profiled_gate.json",
+      "recommended_next_action": "review_focus_access_trace_then_define_next_deck_or_runtime_package"
+    },
+    "failure_targeted_synthesis": {
+      "artifact": "lorehold_failure_targeted_synergy_hypotheses_20260630_after_profiled_gate.json",
+      "hypothesis_count": 4,
+      "recommended_next_action": "run_failure_targeted_trace_audit"
+    },
+    "trace_audit": {
+      "artifact": "lorehold_failure_targeted_trace_audit_20260630_after_profiled_gate.json",
+      "recommended_next_action": "review_focus_access_trace_then_define_next_deck_or_runtime_package",
+      "trace_status_counts": {
+        "focus_access_trace_available_review_conversion": 1,
+        "focus_access_trace_available_review_sequence": 1,
+        "runtime_trace_payload_available_review_model_scope": 1,
+        "trace_evidence_supports_sequencing_gap": 1
+      }
+    },
+    "focus_access_generator": {
+      "artifact": "lorehold_focus_access_package_generator_20260630_after_profiled_gate.json",
+      "gate_ready_package_count": 0,
+      "package_candidate_count": 52,
+      "top_operational_work_key": "runtime_rule_gap_batch"
+    },
+    "exposure_aware_gate_queue": {
+      "artifact": "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate.json",
+      "forced_exposure_probe_ready_count": 7,
+      "natural_gate_ready_count": 0,
+      "recommended_next_action": "run_forced_exposure_probe_before_natural_gate"
+    }
+  },
+  "next_work": [
+    "Review focus-access trace for seed 7 engine access and seed 20260625 conversion window.",
+    "Review Urza's Saga partial scope and Squee graveyard-entry sequencing before another blind swap.",
+    "Use forced-exposure queue only as diagnostic evidence; require natural confirmation before deck promotion."
+  ]
+}

@@ -26,9 +26,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_READINESS = REPORT_DIR / "lorehold_runtime_candidate_readiness_20260628_v1.json"
-DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
-DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260628_min_used_sample_v2.json"
+DEFAULT_READINESS = REPORT_DIR / "lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json"
+DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
+DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v3_runtime_readiness.json"
 
@@ -543,7 +543,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--opponent-limit", type=int, default=3)
     parser.add_argument("--opponent-seed", type=int, default=20260626)
     parser.add_argument("--simulation-seed", type=int, default=42)
-    parser.add_argument("--stem", default="lorehold_exposure_aware_gate_queue_20260628_v1")
+    parser.add_argument("--stem", default="lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--max-execute", type=int, default=1)
     return parser.parse_args()

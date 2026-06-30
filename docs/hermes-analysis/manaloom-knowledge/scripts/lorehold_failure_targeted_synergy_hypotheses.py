@@ -19,6 +19,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from master_optimizer_common import resolve_default_knowledge_db
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
@@ -27,12 +29,12 @@ DEFAULT_STRATEGY_AUDIT = (
     REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 )
 DEFAULT_HYPOTHESIS_QUEUE = (
-    REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
+    REPORT_DIR / "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
 )
 DEFAULT_NEXT_ACTION_PLANNER = (
-    REPORT_DIR / "lorehold_next_action_planner_20260628_v11_strategy_synthesis.json"
+    REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 )
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_DB = resolve_default_knowledge_db()
 
 DEFAULT_FOCUS_CARDS = [
     "Urza's Saga",
@@ -484,7 +486,7 @@ def build_report(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Failure-Targeted Synergy Hypotheses - 2026-06-28",
+        "# Lorehold Failure-Targeted Synergy Hypotheses - 2026-06-30",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Strategy audit: `{payload['strategy_audit']}`",
@@ -559,7 +561,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
     parser.add_argument("--next-action-planner", type=Path, default=DEFAULT_NEXT_ACTION_PLANNER)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
-    parser.add_argument("--stem", default="lorehold_failure_targeted_synergy_hypotheses_20260628_v1")
+    parser.add_argument("--stem", default="lorehold_failure_targeted_synergy_hypotheses_20260630_after_profiled_gate")
     return parser.parse_args()
 
 

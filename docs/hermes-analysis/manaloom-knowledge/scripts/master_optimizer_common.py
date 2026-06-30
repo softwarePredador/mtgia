@@ -30,7 +30,46 @@ DOCS_DIR = REPO_ROOT / "docs" / "hermes-analysis"
 REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 KNOWLEDGE_DIR = DOCS_DIR / "manaloom-knowledge"
 
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+
+def sqlite_has_table(path: Path, table_name: str) -> bool:
+    if not path.exists() or path.stat().st_size <= 0:
+        return False
+    try:
+        with sqlite3.connect(f"file:{path}?mode=ro", uri=True) as conn:
+            row = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
+                (table_name,),
+            ).fetchone()
+    except sqlite3.Error:
+        return False
+    return bool(row)
+
+
+def resolve_default_knowledge_db() -> Path:
+    env_path = os.environ.get("MANALOOM_KNOWLEDGE_DB")
+    if env_path:
+        return Path(env_path)
+    local_path = SCRIPT_DIR / "knowledge.db"
+    if sqlite_has_table(local_path, "battle_card_rules"):
+        return local_path
+    canonical_path = (
+        Path.home()
+        / "Documents"
+        / "rafa"
+        / "mtg"
+        / "mtgia"
+        / "docs"
+        / "hermes-analysis"
+        / "manaloom-knowledge"
+        / "scripts"
+        / "knowledge.db"
+    )
+    if canonical_path != local_path and sqlite_has_table(canonical_path, "battle_card_rules"):
+        return canonical_path
+    return local_path
+
+
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_BATTLE = Path(os.environ.get("MANALOOM_BATTLE_SCRIPT", SCRIPT_DIR / "battle_analyst_v9.py"))
 DEFAULT_BATTLE_GATE_SUMMARY = Path(
     os.environ.get(
