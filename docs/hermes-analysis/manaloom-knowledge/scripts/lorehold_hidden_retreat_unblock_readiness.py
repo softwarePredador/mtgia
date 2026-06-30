@@ -2,7 +2,7 @@
 """Report whether the Lorehold Hidden Retreat route is ready to unblock.
 
 This is intentionally read-only. It connects the current access/cut model,
-focus-package queue, exposure-outcome audit, and PG244 runtime package manifest
+focus-package queue, exposure-outcome audit, and PG271 runtime package manifest
 so the optimizer does not keep running blind three-game swaps when the tested
 card was not actually observed.
 """
@@ -25,9 +25,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_MANIFEST = REPORT_DIR / "pg244_hidden_retreat_runtime_scope_20260628_v1_manifest.json"
-DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_after_pg269_alhammarret.json"
-DEFAULT_FOCUS_QUEUE = REPORT_DIR / "lorehold_focus_access_package_generator_20260628_v4_current_queue.json"
+DEFAULT_MANIFEST = REPORT_DIR / "pg271_hidden_retreat_damage_prevention_20260630_manifest.json"
+DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.json"
+DEFAULT_FOCUS_QUEUE = REPORT_DIR / "lorehold_focus_access_package_generator_20260630_post_pg271_hidden_retreat_v2.json"
 DEFAULT_OUTCOME_AUDIT = REPORT_DIR / "lorehold_exposure_outcome_audit_20260628_v1.json"
 
 
@@ -233,6 +233,8 @@ def readiness_status(
         return "gate_ready_with_card_outcome_support"
     if gate_ready_count > 0:
         return "gate_ready_but_card_outcome_support_missing"
+    if hidden_retreat_status == "applied_synced":
+        return "hidden_retreat_synced_no_gate_ready_package"
     if hidden_retreat_status == "prepared_read_only_pending_apply_approval":
         last = precheck_attempts[-1] if precheck_attempts else {}
         if last.get("classification") == "success" and preflight_access_count == 0:
@@ -306,7 +308,7 @@ def build_report(
             "safe_to_run_battle_gate_now": safe_to_run_battle_gate_now,
             "hidden_retreat_package_status": hidden_retreat_status,
             "hidden_retreat_runtime_model_status": access_summary.get("hidden_retreat_runtime_model_status"),
-            "pg244_apply_gate": manifest.get("apply_gate"),
+            "pg271_apply_gate": manifest.get("apply_gate"),
             "gate_ready_package_count": gate_ready_count,
             "preflight_access_candidate_ready_count": preflight_access_count,
             "deeper_gate_candidate_count": deeper_gate_count,
@@ -317,9 +319,9 @@ def build_report(
             "access_model_recommended_next_action": access_summary.get("recommended_next_action"),
             "outcome_audit_recommended_next_action": outcome_summary.get("recommended_next_action"),
             "recommended_next_action": (
-                "fix_or_retry_pg244_precheck_access_before_requesting_apply; do_not_run_blind_battle_gate"
+                "fix_or_retry_pg271_precheck_access_before_requesting_apply; do_not_run_blind_battle_gate"
                 if status == "blocked_db_precheck_and_no_safe_cut"
-                else "request_explicit_pg244_apply_approval_then_sync_and_rerun_cut_model"
+                else "request_explicit_pg271_apply_approval_then_sync_and_rerun_cut_model"
                 if status == "pg_precheck_success_but_cut_model_still_blocks_battle"
                 else "continue_trace_targeted_cut_model_or_runtime_gap_work_before_more_battles"
             ),
@@ -341,9 +343,17 @@ def build_report(
                 "resolution": "find a seed-safe cut for the access/topdeck lane before battle gating",
             },
             {
-                "blocker": "hidden_retreat_not_product_truth",
-                "evidence": f"PG244 status={hidden_retreat_status}",
-                "resolution": "run precheck, obtain explicit approval for apply SQL, apply, postcheck, then sync Hermes",
+                "blocker": (
+                    "hidden_retreat_product_truth_confirmed"
+                    if hidden_retreat_status == "applied_synced"
+                    else "hidden_retreat_not_product_truth"
+                ),
+                "evidence": f"PG271 status={hidden_retreat_status}",
+                "resolution": (
+                    "no PostgreSQL action; continue cut/gate work"
+                    if hidden_retreat_status == "applied_synced"
+                    else "run precheck, obtain explicit approval for apply SQL, apply, postcheck, then sync Hermes"
+                ),
             },
             {
                 "blocker": "card_level_evidence_required",
@@ -359,8 +369,8 @@ def build_report(
             "Do not run blind three-game swaps when the package queue has zero gate-ready candidates.",
             "Do not treat aggregate battle record as card-level proof.",
             "Do not repeat exact rejected pairs without a new failure target or cut rationale.",
-            "Do not apply PG244 SQL without explicit approval for the exact command.",
-            "Hermes/runtime overlay is laboratory evidence until PostgreSQL apply and sync complete.",
+            "Do not rerun PG271 SQL when Hidden Retreat is already applied/synced.",
+            "Hermes/runtime overlay is laboratory evidence unless PostgreSQL apply and sync are complete.",
         ],
         "manifest_extract": {
             "deploy_id": manifest.get("deploy_id"),

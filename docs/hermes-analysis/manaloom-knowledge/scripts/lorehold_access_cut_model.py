@@ -28,11 +28,9 @@ DEFAULT_STRATEGY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_2026062
 DEFAULT_SEED_MATRIX = REPORT_DIR / "lorehold_seed_matrix_all_20260628_v1_run.json"
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST = (
-    REPORT_DIR / "pg244_hidden_retreat_runtime_scope_20260628_v1_manifest.json"
+    REPORT_DIR / "pg271_hidden_retreat_damage_prevention_20260630_manifest.json"
 )
-DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS = (
-    REPORT_DIR / "xmage_hidden_retreat_runtime_scope_20260628_v3_proposals.json",
-)
+DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS: tuple[Path, ...] = ()
 DEFAULT_CANDIDATES = [
     "Brainstone",
     "Penance",
@@ -611,10 +609,9 @@ def build_model(
     deck_cards_by_name = {normalize_key(row["card_name"]): row for row in deck_cards}
     all_names = sorted({*candidates, *(row["card_name"] for row in deck_cards)})
     proposal_paths = list(runtime_package_proposal_reports or [])
-    rules = merge_rule_summaries(
-        rule_summary(conn, all_names),
-        runtime_package_rule_summary(proposal_paths, all_names),
-    )
+    local_rules = rule_summary(conn, all_names)
+    overlay_rules = runtime_package_rule_summary(proposal_paths, all_names)
+    rules = merge_rule_summaries(local_rules, overlay_rules)
     usage = variant_usage(conn, all_names, variant_deck_ids)
     cut_safety = load_cut_safety(strategy_report)
     seed_matrix = load_seed_matrix(seed_matrix_report)
@@ -662,17 +659,27 @@ def build_model(
     status_counts = Counter(row["status"] for row in pair_rows)
     preflight_rows = [row for row in pair_rows if row["status"] == "preflight_access_candidate_ready"]
     manual_rows = [row for row in pair_rows if row["status"] in {"manual_same_lane_cut_required", "manual_review_required"}]
+    hidden_retreat_local_rule = local_rules.get(normalize_key("Hidden Retreat")) or {}
+    hidden_retreat_overlay_rule = overlay_rules.get(normalize_key("Hidden Retreat")) or {}
+    hidden_retreat_local_active = int(hidden_retreat_local_rule.get("active_rule_count") or 0)
+    hidden_retreat_overlay_active = int(hidden_retreat_overlay_rule.get("active_rule_count") or 0)
     hidden_retreat_package_status = (
-        "prepared_read_only_pending_apply_approval"
-        if DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST.exists()
-        else "not_prepared"
+        "applied_synced"
+        if hidden_retreat_local_active > 0
+        else (
+            "prepared_read_only_pending_apply_approval"
+            if DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST.exists()
+            else "not_prepared"
+        )
     )
-    hidden_retreat_rule = rules.get(normalize_key("Hidden Retreat")) or {}
     hidden_retreat_runtime_model_status = (
-        "runtime_proposal_overlay_active"
-        if hidden_retreat_rule.get("runtime_package_proposal_reports")
-        and int(hidden_retreat_rule.get("active_rule_count") or 0) > 0
-        else "local_db_runtime_only"
+        "local_db_active"
+        if hidden_retreat_local_active > 0
+        else (
+            "runtime_proposal_overlay_active"
+            if hidden_retreat_overlay_active > 0
+            else "local_db_runtime_only"
+        )
     )
     return {
         "generated_at": utc_now(),
@@ -704,16 +711,21 @@ def build_model(
                 f"gate_{preflight_rows[0]['candidate']}_over_{preflight_rows[0]['cut']}"
                 if preflight_rows
                 else (
-                    "no_access_swap_ready; apply_or_sync_hidden_retreat_package_then_gate_new_seed_safe_cut"
-                    if hidden_retreat_package_status == "prepared_read_only_pending_apply_approval"
-                    else "no_access_swap_ready; build_new_seed_safe_cut_or_upgrade_hidden_retreat_runtime"
+                    "no_access_swap_ready; build_new_seed_safe_cut"
+                    if hidden_retreat_package_status == "applied_synced"
+                    else (
+                        "no_access_swap_ready; apply_or_sync_hidden_retreat_package_then_gate_new_seed_safe_cut"
+                        if hidden_retreat_package_status == "prepared_read_only_pending_apply_approval"
+                        else "no_access_swap_ready; build_new_seed_safe_cut_or_upgrade_hidden_retreat_runtime"
+                    )
                 )
             ),
             "hidden_retreat_package_status": hidden_retreat_package_status,
             "hidden_retreat_runtime_model_status": hidden_retreat_runtime_model_status,
             "hidden_retreat_package_manifest": (
                 str(DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST)
-                if hidden_retreat_package_status == "prepared_read_only_pending_apply_approval"
+                if hidden_retreat_package_status
+                in {"prepared_read_only_pending_apply_approval", "applied_synced"}
                 else ""
             ),
             "runtime_package_overlay_card_count": sum(

@@ -13,13 +13,13 @@ def write_json(path: Path, payload: dict):
 
 
 def fixture_files(tmpdir: Path) -> dict[str, Path]:
-    precheck = tmpdir / "pg244_precheck.sql"
+    precheck = tmpdir / "pg271_precheck.sql"
     precheck.write_text("SELECT 1;\n", encoding="utf-8")
     manifest = tmpdir / "manifest.json"
     write_json(
         manifest,
         {
-            "deploy_id": "pg244",
+            "deploy_id": "pg271",
             "status": "prepared_read_only_pending_apply_approval",
             "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
             "selected_card_names": ["Hidden Retreat"],
@@ -69,6 +69,14 @@ def fixture_files(tmpdir: Path) -> dict[str, Path]:
         "outcome_audit": outcome_audit,
         "precheck": precheck,
     }
+
+
+def mark_hidden_retreat_synced(access_model: Path):
+    payload = json.loads(access_model.read_text(encoding="utf-8"))
+    payload["summary"]["hidden_retreat_package_status"] = "applied_synced"
+    payload["summary"]["hidden_retreat_runtime_model_status"] = "local_db_active"
+    payload["summary"]["recommended_next_action"] = "no_access_swap_ready; build_new_seed_safe_cut"
+    write_json(access_model, payload)
 
 
 class FakeRunner:
@@ -172,6 +180,30 @@ class LoreholdHiddenRetreatUnblockReadinessTest(unittest.TestCase):
                 "pg_precheck_success_but_cut_model_still_blocks_battle",
             )
             self.assertFalse(payload["summary"]["safe_to_run_battle_gate_now"])
+
+    def test_synced_hidden_retreat_routes_to_cut_work_not_pg_apply(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            files = fixture_files(Path(tmp))
+            mark_hidden_retreat_synced(files["access_model"])
+
+            payload = readiness.build_report(
+                manifest_path=files["manifest"],
+                access_model_path=files["access_model"],
+                focus_queue_path=files["focus_queue"],
+                outcome_audit_path=files["outcome_audit"],
+            )
+
+            self.assertEqual(
+                payload["summary"]["readiness_status"],
+                "hidden_retreat_synced_no_gate_ready_package",
+            )
+            self.assertEqual(payload["summary"]["hidden_retreat_package_status"], "applied_synced")
+            self.assertEqual(
+                payload["summary"]["recommended_next_action"],
+                "continue_trace_targeted_cut_model_or_runtime_gap_work_before_more_battles",
+            )
+            self.assertIn("product_truth_confirmed", payload["blocker_chain"][2]["blocker"])
+            self.assertIn("Do not rerun PG271", payload["guardrails"][3])
 
     def test_recovery_mode_precheck_error_is_classified(self):
         self.assertEqual(

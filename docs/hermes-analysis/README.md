@@ -74,7 +74,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     teste estreito de pacote, nao troca direta de deck.
   - Modelos ativos de corte/acesso Lorehold devem usar `607` como baseline
     default. Evidencia corrigida:
-    `master_optimizer_reports/lorehold_access_cut_model_20260630_after_pg269_alhammarret.md`.
+    `master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.md`.
   - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
     de declarar que scripts e docs estao conversando entre si.
   - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia

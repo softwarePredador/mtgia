@@ -278,7 +278,7 @@ def build_checks() -> list[Check]:
         ),
         check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
-            ["lorehold_access_cut_model_20260630_after_pg269_alhammarret.json"],
+            ["lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.json"],
             "scripts.lorehold_focus_generator_uses_corrected_access_model",
         ),
         check_contains(

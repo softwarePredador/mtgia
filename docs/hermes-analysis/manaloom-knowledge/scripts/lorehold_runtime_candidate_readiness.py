@@ -25,7 +25,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_SQLITE_DB = SCRIPT_DIR / "knowledge.db"
 
 DEFAULT_RUNTIME_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.json"
-DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_after_pg269_alhammarret.json"
+DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.json"
 DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
 DEFAULT_MANIFESTS = [
     REPORT_DIR / "pg245_lorehold_topdeck_damage_runtime_20260628_manifest.json",

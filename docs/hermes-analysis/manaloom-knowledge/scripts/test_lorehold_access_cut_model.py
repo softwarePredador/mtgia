@@ -8,6 +8,13 @@ def test_default_baseline_deck_is_protected_607():
     assert model.DEFAULT_BASELINE_DECK_ID == 607
 
 
+def test_default_hidden_retreat_manifest_uses_pg271_package():
+    assert model.DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST.name == (
+        "pg271_hidden_retreat_damage_prevention_20260630_manifest.json"
+    )
+    assert model.DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS == ()
+
+
 def memory_db():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
@@ -205,6 +212,43 @@ def test_hidden_retreat_runtime_proposal_overlay_makes_candidate_model_ready(tmp
     assert payload["summary"]["hidden_retreat_runtime_model_status"] == (
         "runtime_proposal_overlay_active"
     )
+
+
+def test_hidden_retreat_active_sqlite_rule_is_applied_synced_not_pending():
+    with memory_db() as conn:
+        conn.execute(
+            """
+            UPDATE battle_card_rules
+            SET review_status='verified',
+                execution_status='auto',
+                effect_json=?
+            WHERE normalized_name='hidden retreat'
+            """,
+            (
+                json.dumps(
+                    {
+                        "effect": "damage_prevention_shield",
+                        "battle_model_scope": (
+                            "activated_put_card_from_hand_on_top_library_"
+                            "prevent_damage_from_target_instant_or_sorcery_spell_v1"
+                        ),
+                    }
+                ),
+            ),
+        )
+        payload = model.build_model(
+            conn=conn,
+            strategy_report=strategy_report(),
+            seed_matrix_report=seed_matrix_report(),
+            candidates=["Hidden Retreat"],
+        )
+
+    hidden = payload["candidates"][0]
+    assert hidden["status"] == "ready"
+    assert hidden["rule_summary"]["active_rule_count"] == 1
+    assert payload["summary"]["hidden_retreat_package_status"] == "applied_synced"
+    assert payload["summary"]["hidden_retreat_runtime_model_status"] == "local_db_active"
+    assert payload["summary"]["recommended_next_action"] == "no_access_swap_ready; build_new_seed_safe_cut"
 
 
 def test_access_model_blocks_exact_and_repeated_rejected_cuts():

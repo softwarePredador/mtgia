@@ -376,7 +376,7 @@ PG267/PG271 runtime-rule checkpoint:
   `mapper_metadata_or_test_scenario_required=12` and
   `split_family_scope_review_required=8`.
 - Current Lorehold runtime readiness after PG271:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg271_hidden_retreat.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg271_hidden_retreat_v2.md`;
   `Hidden Retreat` is `pg_package_applied_synced`, not apply-pending.
 
 `Adagia, Windswept Bastion` is no longer blocked on

@@ -501,7 +501,7 @@ Cut-model baseline correction generated on 2026-06-30:
   `lorehold_safe_cut_replanner.py`, and `lorehold_manual_cut_review.py` now
   default to protected baseline deck `607`, not historical deck `6`.
 - The corrected access model is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_after_pg269_alhammarret.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.md`.
   It evaluated deck `607` directly (`94` deck rows), found `0` preflight-ready
   access swaps, and removed the invalid `Penance` over `Brainstone` path
   because `Brainstone` exists in deck `6`, not in protected deck `607`.
@@ -766,9 +766,9 @@ Runtime enablement checkpoint generated on 2026-06-30:
   superseded by
   `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.md`.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg271_hidden_retreat.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg271_hidden_retreat_v2.md`.
 - The current readiness output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg271_hidden_retreat.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg271_hidden_retreat_v2.md`;
   `Hidden Retreat` is applied/synced and must not be routed back to PG apply.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
