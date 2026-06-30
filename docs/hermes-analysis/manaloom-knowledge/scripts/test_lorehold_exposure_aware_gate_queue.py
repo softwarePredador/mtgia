@@ -260,7 +260,7 @@ irrelevant package output
 def test_defaults_use_current_after_profiled_gate_handoff():
     assert (
         queue.DEFAULT_READINESS.name
-        == "lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json"
+        == "lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.json"
     )
     assert (
         queue.DEFAULT_HYPOTHESIS_QUEUE.name

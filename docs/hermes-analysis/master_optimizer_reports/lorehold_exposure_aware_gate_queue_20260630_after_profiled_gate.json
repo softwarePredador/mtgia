@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T15:24:13Z",
+  "generated_at": "2026-06-30T18:26:35Z",
   "package_count": 25,
   "package_definition_files": [],
   "packages": [
@@ -2739,7 +2739,7 @@
     }
   ],
   "postgres_writes": false,
-  "readiness_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json",
+  "readiness_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight.json",
   "ready_queue": [
     {
       "adds": [
@@ -4177,7 +4177,7 @@
       "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
       "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_cloud_key_waterskin_gate_20260630_all_lanes_20260630_082705.json"
     ],
-    "readiness_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json",
+    "readiness_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.json",
     "registry": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json"
   },
   "summary": {

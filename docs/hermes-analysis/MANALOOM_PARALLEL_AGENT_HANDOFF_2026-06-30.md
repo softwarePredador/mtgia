@@ -14,20 +14,20 @@ current continuation is the trace/focus/exposure chain documented in
 - `deck 607` remains the protected Lorehold baseline.
 - Do not promote a deck replacement unless a current equal battle gate and
   decision trace proof clear the frozen Commander deckbuilding contract.
-- Post-PG280 runtime queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json`.
-- Post-PG280 deck/package queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg280_kayla_music_box.json`.
-- Runtime candidate readiness:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json`.
+- Current runtime queue after solo consolidation:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight.json`.
+- Current deck/package queue:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_after_profiled_gate.json`.
+- Current runtime candidate readiness:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.json`.
 - `lorehold_registry_candidate_runner.py` is no longer an operational handoff;
   it is blocked by default as a historical 2026-06-26 registry runner.
 
 Current queue summary:
 
-- blocked runtime rule gaps: `12`.
-- residual lane: `split_family_scope_review_required`.
-- local XMage source found for all 12 residual cards.
+- blocked runtime rule gaps: `0` after PG281/PG282 and current SQLite
+  verified/auto filtering.
+- residual runtime lane: none.
 - manual mapper backlog for this queue: `0`.
 - focus access package candidates: `52`.
 - gate-ready focus packages: `0`.
@@ -76,6 +76,13 @@ Expected current results:
 - The fourth agent is the integration/gate agent and should not promote
   PostgreSQL card rules unless it is fixing a contract/audit/schema issue
   needed to unblock the other agents.
+
+## Historical Obsolete Agent Commands
+
+The command blocks below are retained only to explain the temporary split that
+was later consolidated. Do not run them as current work. They reference the old
+post-PG280 runtime queue and assigned cards that are no longer the active
+handoff after `lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight`.
 
 ## Command For Agent 1
 

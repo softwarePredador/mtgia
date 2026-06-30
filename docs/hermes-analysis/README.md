@@ -119,14 +119,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Redirect Lightning` tratados como draw e bloqueia `Improvisation
     Capstone` como nucleo de spell-chain, nao flex topdeck.
   - Fila runtime atual:
-    `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.md`.
-    `Kayla's Music Box` agora esta aplicada/sincronizada como regra ativa; a
-    fila restante tem `12` gaps runtime, todos com XMage local encontrado,
-    `0` manual mappers, e todos ainda em
-    `split_family_scope_review_required`. O gerador de foco atual
-    `master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg280_kayla_music_box.md`
-    continua com `0` pacotes gate-ready porque falta split/runtime exato ou
-    corte seguro.
+    `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight.md`.
+    PG281/PG282 fecharam a fila residual: `61` cards brutos bloqueados por
+    runtime foram filtrados como regras `verified/auto`, e o total atual de
+    runtime gaps e `0`. O gerador de foco atual
+    `master_optimizer_reports/lorehold_focus_access_package_generator_20260630_after_profiled_gate.md`
+    continua com `0` pacotes gate-ready por corte/trace/gate natural, nao por
+    falta de regra runtime.
   - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
     de declarar que scripts e docs estao conversando entre si.
   - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia

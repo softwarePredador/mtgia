@@ -83,7 +83,7 @@
     }
   ],
   "gate_ready_packages": [],
-  "generated_at": "2026-06-30T15:25:07Z",
+  "generated_at": "2026-06-30T18:26:28Z",
   "guardrail_contract": {
     "prior_negative_exact_match_must_be_false": true,
     "protected_cards": [
@@ -149,124 +149,6 @@
   "miner_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json",
   "operational_work_queue": [
     {
-      "blocked_package_count": 0,
-      "blocked_package_samples": [],
-      "blocked_package_status_counts": {},
-      "blocked_runtime_rule_gap_count": 8,
-      "evidence_inputs": [
-        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"
-      ],
-      "failure_mode": "blocked_runtime_rule_gap",
-      "impact_score": 48,
-      "next_command": "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py --output-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box",
-      "postgres_write_required_to_promote": false,
-      "postgres_write_required_to_run": false,
-      "priority_rank": 1,
-      "promotion_criteria": [
-        "Group blocked cards by XMage semantic family.",
-        "Promote only cards with valid XMage source and a ManaLoom mapper/test scenario.",
-        "Rerun the variant gap miner before using newly modeled cards in deck gates."
-      ],
-      "reason": "8 variant-only cards still lack active runtime rules after filtering 53 current verified/auto rules from 61 raw runtime gaps.",
-      "runtime_gap_context": {
-        "blocked_runtime_rule_gap_count": 8,
-        "exact_xmage_found_count": 8,
-        "family_count": 6,
-        "filtered_current_verified_auto_rule_count": 53,
-        "promotion_lane_counts": {
-          "batch_metadata_candidate_requires_pg_precheck": 1,
-          "split_family_scope_review_required": 7
-        },
-        "raw_blocked_runtime_rule_gap_count": 61,
-        "ready_for_structured_pull_count": 8,
-        "top_families": [
-          {
-            "batch_strategy": "split_by_scope_before_metadata_batch",
-            "candidate_lane_counts": {
-              "contextual": 1,
-              "hand_filter": 1
-            },
-            "card_count": 2,
-            "family_id": "passive",
-            "promotion_lane_counts": {
-              "split_family_scope_review_required": 2
-            },
-            "sample_cards": [
-              "Blood Moon",
-              "Karn, the Great Creator"
-            ],
-            "support_status": "runtime_family_partially_supported_review_required"
-          },
-          {
-            "batch_strategy": "implement_family_before_metadata_batch",
-            "candidate_lane_counts": {
-              "contextual": 1,
-              "hand_filter": 1
-            },
-            "card_count": 2,
-            "family_id": "board_wipe_choice",
-            "promotion_lane_counts": {
-              "split_family_scope_review_required": 2
-            },
-            "sample_cards": [
-              "Chandra's Ignition",
-              "Karn's Sylex"
-            ],
-            "support_status": "runtime_family_required"
-          },
-          {
-            "batch_strategy": "split_by_scope_before_metadata_batch",
-            "candidate_lane_counts": {
-              "contextual": 1
-            },
-            "card_count": 1,
-            "family_id": "draw_engine",
-            "promotion_lane_counts": {
-              "split_family_scope_review_required": 1
-            },
-            "sample_cards": [
-              "Naktamun Lorespinner // Wheel of Fortune"
-            ],
-            "support_status": "runtime_family_partially_supported_review_required"
-          },
-          {
-            "batch_strategy": "split_by_scope_before_metadata_batch",
-            "candidate_lane_counts": {
-              "contextual": 1
-            },
-            "card_count": 1,
-            "family_id": "recursion",
-            "promotion_lane_counts": {
-              "split_family_scope_review_required": 1
-            },
-            "sample_cards": [
-              "Charmbreaker Devils"
-            ],
-            "support_status": "runtime_family_partially_supported_review_required"
-          },
-          {
-            "batch_strategy": "split_by_scope_before_metadata_batch",
-            "candidate_lane_counts": {
-              "contextual": 1
-            },
-            "card_count": 1,
-            "family_id": "tutor",
-            "promotion_lane_counts": {
-              "batch_metadata_candidate_requires_pg_precheck": 1
-            },
-            "sample_cards": [
-              "Deathbellow War Cry"
-            ],
-            "support_status": "runtime_family_partially_supported_review_required"
-          }
-        ]
-      },
-      "runtime_ready_for_structured_pull_count": 8,
-      "status": "actionable_modeling_required",
-      "target_seeds": [],
-      "work_key": "runtime_rule_gap_batch"
-    },
-    {
       "blocked_package_count": 9,
       "blocked_package_samples": [
         {
@@ -314,7 +196,7 @@
       "next_command": "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_access_cut_model.py --stem lorehold_access_cut_model_20260630_after_profiled_gate",
       "postgres_write_required_to_promote": false,
       "postgres_write_required_to_run": false,
-      "priority_rank": 2,
+      "priority_rank": 1,
       "promotion_criteria": [
         "Find a non-protected access package that improves Squee/Top/Rack/Library reach.",
         "Preserve seed-42 Squee, miracle, and topdeck telemetry before broader gates.",
@@ -356,7 +238,7 @@
       "next_command": "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_tutor_cut_model.py --stem lorehold_tutor_cut_model_20260630_after_profiled_gate",
       "postgres_write_required_to_promote": false,
       "postgres_write_required_to_run": false,
-      "priority_rank": 3,
+      "priority_rank": 2,
       "promotion_criteria": [
         "Find a tutor package that does not cut Land Tax, Thor, Creative Technique, or protected topdeck engines.",
         "Pass seed-7 access sequence review before any broader battle gate.",
@@ -417,7 +299,7 @@
       "next_command": "do_not_repeat_without_new_cut_or_runtime_evidence",
       "postgres_write_required_to_promote": false,
       "postgres_write_required_to_run": false,
-      "priority_rank": 4,
+      "priority_rank": 3,
       "promotion_criteria": [
         "Find a non-core hand-filter cut outside protected support slots.",
         "Reject Big Score, Esper Sentinel, Monument, Rise, and Artist's Talent cuts unless a same-lane benchmark proves safety.",
@@ -2717,14 +2599,14 @@
   ],
   "planner": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_after_profiled_gate.json",
   "postgres_writes": false,
-  "runtime_gap_queue": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json",
+  "runtime_gap_queue": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight.json",
   "source_db_mutated": false,
   "squee_probe": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_graveyard_entry_probe_20260628_v1.json",
   "summary": {
     "access_model_status": "squee_route_modeled_access_density_needed",
     "focus_failure_mode_count": 4,
     "gate_ready_package_count": 0,
-    "operational_work_count": 4,
+    "operational_work_count": 3,
     "package_candidate_count": 52,
     "package_status_counts": {
       "blocked_no_safe_cut": 30,
@@ -2738,7 +2620,7 @@
     "recommended_next_action": "do_not_create_blind_swap; run focused trace/runtime/cut-model work first",
     "seed_42_anchor_available": true,
     "squee_probe_status": "squee_route_modeled_but_access_gap_remains",
-    "top_operational_work_key": "runtime_rule_gap_batch"
+    "top_operational_work_key": "squee_access_density_model"
   },
   "trace_audit": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_trace_audit_20260630_after_profiled_gate.json"
 }

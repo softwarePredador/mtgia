@@ -84,11 +84,12 @@ Current expected state after the 2026-06-30 alignment:
 - natural gate-ready packages: `0`;
 - focus-access package candidates: `52`;
 - forced-exposure diagnostic packages: `11`;
-- current runtime-rule gaps after SQLite verified/auto filtering: `8`
-  (`7` split-scope, `1` metadata/precheck);
+- current runtime-rule gaps after SQLite verified/auto filtering: `0`
+  after `lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight`;
 - promotion from forced-exposure only: forbidden without natural confirmation;
-- next work: review focus-access trace/runtime/cut-model evidence before any
-  new deck package.
+- next work: review focus-access trace and cut-model evidence before any new
+  deck package; do not resurrect the old runtime-gap batch unless a fresh queue
+  shows new gaps.
 
 When `lorehold_exposure_aware_gate_queue.py` reports forced-exposure diagnostic
 packages but `natural_gate_ready_count` is `0`, treat that queue as diagnostic

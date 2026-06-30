@@ -26,7 +26,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_READINESS = REPORT_DIR / "lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json"
+DEFAULT_READINESS = REPORT_DIR / "lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.json"
 DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
 DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"

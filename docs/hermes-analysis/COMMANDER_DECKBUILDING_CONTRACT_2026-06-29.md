@@ -891,26 +891,15 @@ Runtime enablement checkpoint generated on 2026-06-30:
   removes one `free_cast` split item but is not deck-promotion evidence by
   itself.
 - The current runtime-gap queue is
-  superseded by
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.md`.
-  The PG276 follow-up mapper wave reduced the Lorehold runtime manual mapper
-  backlog from `12` to `0`; PG277 through PG280 plus the current SQLite
-  verified/auto filter reduce the structured residual to `8` cards across six
-  families. `7` cards remain split-scope runtime work and `Deathbellow War Cry`
-  is a `batch_metadata_candidate_requires_pg_precheck` item, so the next
-  deck-quality blocker remains exact runtime/scope work rather than card-by-card
-  identification.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight.md`.
+  PG281/PG282 closed the residual runtime queue; the current SQLite
+  verified/auto filter removes all `61` raw blocked runtime cards and the
+  remaining blocked runtime gap count is `0`.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg280_kayla_music_box.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_after_profiled_gate.md`.
 - The current readiness handoff is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.md`;
-  `Hidden Retreat` and `Brainstone` are applied/synced and must not be routed
-  back to PG apply. The paired post-PG280 runtime-gap queue filters `Codex
-  Shredder`, `Perpetual Timepiece`, `Chaos Wand`, `Assemble the Players`,
-  `Ghoulcaller's Bell`, `Lantern of Insight`, `Possibility Storm`, and
-  `Kayla's Music Box` as current active rules; the current SQLite filter also
-  removes `Leyline Dowser`, `Orcish Spy`, `Prototype Portal`, and
-  `Pyxis of Pandemonium` as verified/auto active rules.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.md`;
+  applied/synced runtime packages must not be routed back to PG apply.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and

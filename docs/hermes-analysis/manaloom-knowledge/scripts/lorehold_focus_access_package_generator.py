@@ -31,7 +31,7 @@ DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json"
 DEFAULT_RUNTIME_GAP_QUEUE = (
-    REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"
+    REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight.json"
 )
 DEFAULT_HAND_FILTER_CUT_MODEL = (
     REPORT_DIR / "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
@@ -619,7 +619,7 @@ def next_command_for_work(work_key: str) -> str:
         "runtime_rule_gap_batch": (
             "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py "
             "--output-prefix docs/hermes-analysis/master_optimizer_reports/"
-            "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"
+            "lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight"
         ),
     }
     return commands.get(work_key, "")

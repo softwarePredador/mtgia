@@ -420,27 +420,14 @@ PG267/PG271 runtime-rule checkpoint:
   `draw_engine=2`, `topdeck_play=2`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.md`;
-  blocked runtime gaps are now `8` after current SQLite verified/auto filtering,
-  manual mapper backlog remains `0`, `7` cards remain routed to
-  `split_family_scope_review_required`, and `Deathbellow War Cry` is now a
-  `batch_metadata_candidate_requires_pg_precheck` review item.
-  `Ghoulcaller's Bell` is filtered out as a current verified/auto rule after
-  PG277, and `Lantern of Insight` is filtered out as a current verified/auto
-  rule after PG278; `Possibility Storm` is filtered out as a current
-  verified/auto rule after PG279; `Kayla's Music Box` is filtered out as a
-  current verified/auto rule after PG280. The current filter also removes
-  `Leyline Dowser`, `Orcish Spy`, `Prototype Portal`, and `Pyxis of Pandemonium`
-  as verified/auto active rules. The remaining family counts are
-  `passive=2`, `board_wipe_choice=2`, `draw_engine=1`, `recursion=1`,
-  `token_maker=1`, and `tutor=1`.
-- Current Lorehold runtime readiness handoff after PG280:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.md`;
-  `Hidden Retreat` and `Brainstone` are `pg_package_applied_synced`, not
-  apply-pending. The paired post-PG280 runtime-gap queue filters `Codex
-  Shredder`, `Perpetual Timepiece`, `Chaos Wand`, `Assemble the Players`,
-  `Ghoulcaller's Bell`, `Lantern of Insight`, `Possibility Storm`, and
-  `Kayla's Music Box` as current verified/auto active rules.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight.md`;
+  blocked runtime gaps are now `0` after current SQLite verified/auto filtering.
+  The queue still records `61` raw runtime-gap candidates from the older miner,
+  but all are filtered by current active rules after PG281/PG282.
+- Current Lorehold runtime readiness handoff after PG282:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.md`;
+  applied/synced runtime packages are not apply-pending and must not be routed
+  back to PostgreSQL apply.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope

@@ -1,9 +1,9 @@
 # Lorehold Exposure-Aware Gate Queue - 2026-06-30
 
-- Generated at: `2026-06-30T15:24:13Z`
+- Generated at: `2026-06-30T18:26:35Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
-- Readiness report: `/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json`
+- Readiness report: `/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.json`
 - Hypothesis queue: `/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json`
 - Planner: `/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_after_profiled_gate.json`
 - Cut safety report: `/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v3_runtime_readiness.json`
