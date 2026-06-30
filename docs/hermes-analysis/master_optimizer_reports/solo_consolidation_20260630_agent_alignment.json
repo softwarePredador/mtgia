@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-30T14:09:54Z",
+  "branch": "codex/solo-consolidation-20260630",
+  "base": "origin/master@074a0c387",
+  "integrated": [
+    {
+      "source": "agent1_runtime_artifact_topdeck",
+      "commit": "6944e9d83",
+      "decision": "integrated",
+      "reason": "focused guardrail tests and evidence only"
+    },
+    {
+      "source": "agent_deck_gates",
+      "commit": "3c5045bfa",
+      "decision": "integrated",
+      "reason": "fixes candidate deck load id from 6 to 607 and aligns contract audit artifact"
+    },
+    {
+      "source": "agent3_finisher_draw_recursion",
+      "commit": "78f8ec8dd",
+      "decision": "integrated",
+      "reason": "adds focused runtime support and tests for Ancient Gold Dragon and Leyline Dowser"
+    }
+  ],
+  "held": [
+    {
+      "source": "agent2_mapper_static_wipe_tutor",
+      "state": "uncommitted_diff",
+      "decision": "hold",
+      "reason": "overlaps with duplicate mapper branch and exact-scope policy needs reconciliation"
+    },
+    {
+      "source": "duplicate_xmage_mapper_branch",
+      "commit": "4deadeb0d",
+      "decision": "hold",
+      "reason": "contains useful generic review-scope downgrade guard but conflicts with broader agent2 scope changes"
+    }
+  ],
+  "not_integrated": [
+    {
+      "source": "agent_integration_validation",
+      "commit": "078e25ed5",
+      "decision": "superseded_by_current_consolidation_report"
+    }
+  ],
+  "validation": {
+    "focused_deck_gate_tests": {"status": "pass", "result": "47 tests OK"},
+    "artifact_topdeck_runtime": {"status": "pass"},
+    "agent3_finisher_draw_recursion_runtime": {"status": "pass"},
+    "xmage_strategy_consistency_audit": {"status": "pass", "check_count": 26},
+    "operational_surface_alignment_audit": {"status": "pass"},
+    "deckbuilding_contract_surface_audit": {"status": "pass"},
+    "pg_hermes_sqlite_contract_audit_main_sqlite_skip_pg": {
+      "status": "pass",
+      "pass": 29,
+      "warn": 3,
+      "pg": "skipped"
+    },
+    "pg_hermes_sqlite_contract_audit_pg": {
+      "status": "blocked",
+      "reason": "DATABASE_URL/PG env absent"
+    }
+  },
+  "solo_path": [
+    "continue from codex/solo-consolidation-20260630",
+    "freeze mapper branches until one reconciled implementation is selected",
+    "do not promote mapper-only Blood Moon or Chandra's Ignition to PostgreSQL without runtime proof",
+    "treat Ancient Gold Dragon and Leyline Dowser as runtime-local until PG package validation"
+  ]
+}

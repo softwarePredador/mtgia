@@ -5529,6 +5529,32 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "_rule_logical_key": "battle_rule_v1:e2ac43c9f6e03e11e9fab994a5c15258",
         }
     ),
+    "Ancient Gold Dragon": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered",
+            "cmc": 7.0,
+            "effect": "token_maker",
+            "mana_cost": "{5}{W}{W}",
+            "colors": ["W"],
+            "type_line": "Creature - Elder Dragon",
+            "is_creature_permanent": True,
+            "power": 7,
+            "toughness": 10,
+            "flying": True,
+            "subtypes": ["Elder", "Dragon"],
+            "trigger": "combat_damage_to_player",
+            "trigger_source_deals_combat_damage_to_player": True,
+            "token_count_source": "d20_result",
+            "die_sides": 20,
+            "token_name": "Faerie Dragon Token",
+            "token_subtype": "Faerie Dragon",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_colors": ["U"],
+            "token_flying": True,
+            "battle_model_scope": "source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1",
+        }
+    ),
     "Zirda, the Dawnwaker": handcrafted_runtime_rule(
         {
             "ability_kind": "static_and_activated",
@@ -5614,6 +5640,22 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "battle_model_scope": "tap_self_mill_or_self_exile_graveyard_shuffle_artifact_v1",
             "_rule_oracle_hash": "71de2615587654002b225714c5130a68",
             "_rule_logical_key": "battle_rule_v1:ab583f78c19a22031bb99e0ac2d0d131",
+        }
+    ),
+    "Leyline Dowser": handcrafted_runtime_rule(
+        {
+            "ability_kind": "activated",
+            "cmc": 2.0,
+            "effect": "recursion",
+            "artifact": True,
+            "mana_cost": "{2}",
+            "activation_cost_generic": 1,
+            "activation_requires_tap": True,
+            "activated_self_mill_count": 1,
+            "mill_count": 1,
+            "milled_card_types_to_hand": ["instant", "sorcery"],
+            "secondary_untap_source_by_tapping_legendary_creature": True,
+            "battle_model_scope": "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1",
         }
     ),
     "Vedalken Orrery": handcrafted_runtime_rule(
@@ -5796,10 +5838,12 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "The Walls of Ba Sing Se",
     "Toralf, God of Fury // Toralf's Hammer",
     "Ancient Copper Dragon",
+    "Ancient Gold Dragon",
     "Zirda, the Dawnwaker",
     "Wild Ricochet",
     "Whispersilk Cloak",
     "Wand of Vertebrae",
+    "Leyline Dowser",
     "Vedalken Orrery",
     "The Warring Triad",
     "Goliath Daydreamer",
@@ -6033,6 +6077,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         ["manaloom_log_learning_audit_20260628_v14_after_boros_reckoner_runtime", "AncientCopperDragon.java"],
         "2026-06-28T21:55:00Z",
     ),
+    "Ancient Gold Dragon": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed combat-damage d20 Faerie Dragon token trigger semantics.",
+        ["AncientGoldDragon.java", "session_agent3_finisher_draw_recursion_20260630"],
+        "2026-06-30T14:00:00Z",
+    ),
     "Zirda, the Dawnwaker": manual_runtime_waiver_metadata(
         "Replace no_active battle-rule gap with XMage-backed activated-ability cost reduction and activated can't-block metadata.",
         ["manaloom_log_learning_audit_20260628_v15_after_ancient_copper_runtime", "ZirdaTheDawnwaker.java"],
@@ -6052,6 +6101,11 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed tap self-mill and self-exile graveyard shuffle artifact semantics.",
         ["manaloom_log_learning_audit_20260628_v18_after_whispersilk_cloak_runtime", "WandOfVertebrae.java"],
         "2026-06-28T23:25:00Z",
+    ),
+    "Leyline Dowser": manual_runtime_waiver_metadata(
+        "Replace split-family recursion gap with XMage-backed pay-one tap mill-one and milled instant/sorcery-to-hand semantics.",
+        ["LeylineDowser.java", "session_agent3_finisher_draw_recursion_20260630"],
+        "2026-06-30T14:00:00Z",
     ),
     "Vedalken Orrery": manual_runtime_waiver_metadata(
         "Replace generated ramp_permanent review_only evidence with XMage-backed static nonland-spells-as-flash timing permission.",
@@ -30302,7 +30356,7 @@ def process_combat_damage_resource_triggers(
     for permanent in list(player.battlefield):
         if not isinstance(permanent, dict):
             continue
-        if permanent.get("effect") != "ramp_engine":
+        if permanent.get("effect") not in ("ramp_engine", "token_maker"):
             continue
         if permanent.get("trigger") != "combat_damage_to_player":
             continue
@@ -30316,7 +30370,7 @@ def process_combat_damage_resource_triggers(
         else:
             trigger_names = list(trigger_creature_names)
 
-        def resolve_combat_damage_treasure_trigger(
+        def resolve_combat_damage_resource_trigger(
             permanent=permanent,
             trigger_creature_names=tuple(trigger_names),
             damaged_player_name=damaged_player_name,
@@ -30324,13 +30378,40 @@ def process_combat_damage_resource_triggers(
             treasures_before = player.treasures
             die_roll = None
             die_sides = None
-            if permanent.get("treasure_count_source") == "d20_result":
+            token_count = 0
+            if (
+                permanent.get("treasure_count_source") == "d20_result"
+                or permanent.get("token_count_source") == "d20_result"
+            ):
                 die_sides = int(permanent.get("die_sides") or 20)
                 die_roll = (rng or random.Random(turn or 0)).randint(1, die_sides)
+            if permanent.get("treasure_count_source") == "d20_result":
                 treasure_count = die_roll
             else:
-                treasure_count = max(1, int(permanent.get("treasure_count") or 1))
-            player.treasures += treasure_count
+                default_treasure_count = (
+                    0
+                    if permanent.get("token_count_source") or permanent.get("token_count") not in (None, "", False)
+                    else 1
+                )
+                treasure_count = max(0, int(permanent.get("treasure_count") or default_treasure_count))
+            if permanent.get("token_count_source") == "d20_result":
+                token_count = die_roll or 0
+            elif permanent.get("token_count") not in (None, "", False):
+                token_count = max(0, int(permanent.get("token_count") or 0))
+            if treasure_count:
+                player.treasures += treasure_count
+            if token_count:
+                create_creature_tokens_from_effect(
+                    player,
+                    permanent,
+                    count=token_count,
+                    opponents=opponents,
+                    turn=turn,
+                    source_event="combat_damage_token_trigger",
+                    stack=stack,
+                    active_player=player,
+                    all_players=all_players,
+                )
             emit_replay_event(
                 "trigger_resolved",
                 player=player.name,
@@ -30338,9 +30419,17 @@ def process_combat_damage_resource_triggers(
                 trigger="combat_damage_to_player",
                 trigger_creatures=list(trigger_creature_names),
                 damaged_player=damaged_player_name,
-                effect="ramp_engine",
+                effect=permanent.get("effect", "ramp_engine"),
                 treasures_created=treasure_count,
                 treasure_count_source=permanent.get("treasure_count_source"),
+                tokens_created=token_count,
+                token_count_source=permanent.get("token_count_source"),
+                token_name=permanent.get("token_name"),
+                token_power=permanent.get("token_power"),
+                token_toughness=permanent.get("token_toughness"),
+                token_subtype=permanent.get("token_subtype"),
+                token_colors=permanent.get("token_colors") or [],
+                token_flying=bool(permanent.get("token_flying") or permanent.get("flying")),
                 die_roll=die_roll,
                 die_sides=die_sides,
                 treasures_before=treasures_before,
@@ -30354,7 +30443,7 @@ def process_combat_damage_resource_triggers(
             player,
             permanent,
             "combat_damage_to_player",
-            resolve_combat_damage_treasure_trigger,
+            resolve_combat_damage_resource_trigger,
             stack=stack,
             active_player=player,
             all_players=all_players,
@@ -43528,7 +43617,14 @@ def apply_effect_immediate(
     elif effect == "redistribute_life_totals":
         apply_redistribute_life_totals(player, opponents, card, effect_data, turn)
     elif effect == "token_maker":
-        if effect_data.get("saga_chapter_effects"):
+        if (
+            effect_data.get("trigger") == "combat_damage_to_player"
+            and bool(effect_data.get("is_creature_permanent") or is_creature_card({**card, **effect_data}))
+        ):
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+            permanent["effect"] = "token_maker"
+            player.battlefield.append(permanent)
+        elif effect_data.get("saga_chapter_effects"):
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "token_maker"
             initialize_saga_runtime_state(permanent, turn=turn)

@@ -326,7 +326,7 @@ def deck_specs(
     candidate_key: str = "candidate_v7",
     candidate_name: str = "Lorehold strategy-first candidate v7",
     candidate_archetype: str = "strategy-first-candidate",
-    candidate_deck_id: int = 6,
+    candidate_deck_id: int = 607,
 ) -> list[dict[str, Any]]:
     metadata = load_deck_metadata(db, deck_ids)
     specs = []
@@ -1581,7 +1581,7 @@ def main() -> int:
     parser.add_argument("--candidate-key", default="candidate_v7")
     parser.add_argument("--candidate-name", default="Lorehold strategy-first candidate v7")
     parser.add_argument("--candidate-archetype", default="strategy-first-candidate")
-    parser.add_argument("--candidate-deck-id", type=int, default=6)
+    parser.add_argument("--candidate-deck-id", type=int, default=607)
     parser.add_argument("--no-candidate", action="store_true")
     parser.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     parser.add_argument("--games", type=int, default=1)
