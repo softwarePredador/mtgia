@@ -1,0 +1,96 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-30T12:22:38.877808+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_manifest.json",
+  "package_id": "pg279_possibility_storm_shared_type_free_cast_20260630_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
+          "card_name": "Possibility Storm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8",
+          "oracle_hash": "5da5211c6ce969ce3b5750e349c2b073",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
+          "card_name": "Possibility Storm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8",
+          "oracle_hash": "5da5211c6ce969ce3b5750e349c2b073",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
+          "battle_rule_version": 2,
+          "card_name": "Possibility Storm",
+          "logical_rule_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Possibility Storm",
+          "component_keys": [],
+          "effect": "free_cast",
+          "logical_rule_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

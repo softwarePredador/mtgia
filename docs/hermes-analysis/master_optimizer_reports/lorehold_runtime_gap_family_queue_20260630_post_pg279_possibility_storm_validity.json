@@ -1,0 +1,1089 @@
+{
+  "cards": [
+    {
+      "card_name": "Ancient Gold Dragon",
+      "checks": {
+        "focused_test_scenario_count": 2,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Creature \u2014 Elder Dragon",
+        "types": [
+          "CREATURE"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "DealsCombatDamageToAPlayerTriggeredAbility",
+          "FlyingAbility"
+        ],
+        "class_name": "AncientGoldDragon",
+        "condition_classes": [],
+        "cost_classes": [],
+        "effect_classes": [
+          "AncientGoldDragonEffect",
+          "OneShotEffect"
+        ],
+        "mana_cost": "{5}{W}{W}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AncientGoldDragon.java",
+        "primary_effect": {
+          "ability_kind": "triggered",
+          "battle_model_scope": "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+          "die_sides": 20,
+          "effect": "token_maker",
+          "flying": true,
+          "power": 7,
+          "token_colors": [
+            "U"
+          ],
+          "token_count_source": "d20_result",
+          "token_flying": true,
+          "token_name": "Faerie Dragon Token",
+          "token_power": 1,
+          "token_subtype": "Faerie Dragon",
+          "token_toughness": 1,
+          "toughness": 10,
+          "trigger": "combat_damage_to_player",
+          "trigger_effect": "roll_d20_create_tokens"
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "triggered_ability"
+        ],
+        "status": "found",
+        "subtypes": [
+          "DRAGON",
+          "ELDER"
+        ],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or resolve Ancient Gold Dragon",
+            "assertions": "expected tokens, stats, abilities and duration-limited effects match the model",
+            "card_name": "Ancient Gold Dragon",
+            "effect": "token_maker",
+            "id": "ancient_gold_dragon_1",
+            "setup": "source controller can cast the card; battlefield has representative affected/non-affected creatures if needed",
+            "status": "draft_requires_manual_review",
+            "title": "create expected token count and stats"
+          },
+          {
+            "actions": "cast or resolve Ancient Gold Dragon",
+            "assertions": "expected tokens, stats, abilities and duration-limited effects match the model",
+            "card_name": "Ancient Gold Dragon",
+            "effect": "token_maker",
+            "id": "ancient_gold_dragon_2",
+            "setup": "source controller can cast the card; battlefield has representative affected/non-affected creatures if needed",
+            "status": "draft_requires_manual_review",
+            "title": "apply duration-limited protection or indestructible effect"
+          }
+        ],
+        "target_classes": [],
+        "types": [
+          "CREATURE"
+        ]
+      }
+    },
+    {
+      "card_name": "Blood Moon",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Enchantment",
+        "types": [
+          "ENCHANTMENT"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "SimpleStaticAbility"
+        ],
+        "class_name": "BloodMoon",
+        "condition_classes": [],
+        "cost_classes": [],
+        "effect_classes": [
+          "NonbasicLandsAreMountainsEffect"
+        ],
+        "mana_cost": "{2}{R}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BloodMoon.java",
+        "primary_effect": {
+          "ability_kind": "static",
+          "affected_lands": "nonbasic",
+          "battle_model_scope": "xmage_nonbasic_lands_are_mountains_static_review_v1",
+          "effect": "passive",
+          "land_type_replacement": "nonbasic_lands_are_mountains",
+          "resulting_basic_land_type": "mountain",
+          "static_rule_restriction": true,
+          "suppresses_non_mountain_land_abilities": true
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "static_ability"
+        ],
+        "status": "found",
+        "subtypes": [],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Blood Moon through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Blood Moon",
+            "effect": "passive",
+            "id": "blood_moon_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for passive"
+          }
+        ],
+        "target_classes": [],
+        "types": [
+          "ENCHANTMENT"
+        ]
+      }
+    },
+    {
+      "card_name": "Chandra's Ignition",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Sorcery",
+        "types": [
+          "SORCERY"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [],
+        "class_name": "ChandrasIgnition",
+        "condition_classes": [],
+        "cost_classes": [],
+        "effect_classes": [
+          "ChandrasIgnitionEffect",
+          "OneShotEffect"
+        ],
+        "mana_cost": "{3}{R}{R}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ChandrasIgnition.java",
+        "primary_effect": {
+          "ability_kind": "one_shot",
+          "battle_model_scope": "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+          "damage_amount_source": "target_creature_power",
+          "damage_each_opponent": true,
+          "damage_each_other_creature": true,
+          "damage_source": "target_creature",
+          "effect": "sweeper_damage",
+          "sorcery": true,
+          "target": "controlled_creature",
+          "target_constraints": {
+            "card_types": [
+              "creature"
+            ],
+            "controller_scope": "source_controller"
+          }
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "targeting"
+        ],
+        "status": "found",
+        "subtypes": [],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Chandra's Ignition through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Chandra's Ignition",
+            "effect": "sweeper_damage",
+            "id": "chandra_s_ignition_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for sweeper_damage"
+          }
+        ],
+        "target_classes": [
+          "TargetControlledCreaturePermanent"
+        ],
+        "types": [
+          "SORCERY"
+        ]
+      }
+    },
+    {
+      "card_name": "Charmbreaker Devils",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Creature \u2014 Devil",
+        "types": [
+          "CREATURE"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "BeginningOfUpkeepTriggeredAbility",
+          "SpellCastControllerTriggeredAbility"
+        ],
+        "class_name": "CharmbreakerDevils",
+        "condition_classes": [],
+        "cost_classes": [],
+        "effect_classes": [
+          "BoostSourceEffect",
+          "ReturnFromGraveyardAtRandomEffect"
+        ],
+        "mana_cost": "{5}{R}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CharmbreakerDevils.java",
+        "primary_effect": {
+          "ability_kind": "triggered",
+          "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+          "effect": "recursion"
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "triggered_ability"
+        ],
+        "status": "found",
+        "subtypes": [
+          "DEVIL"
+        ],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Charmbreaker Devils through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Charmbreaker Devils",
+            "effect": "recursion",
+            "id": "charmbreaker_devils_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for recursion"
+          }
+        ],
+        "target_classes": [],
+        "types": [
+          "CREATURE"
+        ]
+      }
+    },
+    {
+      "card_name": "Deathbellow War Cry",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Sorcery",
+        "types": [
+          "SORCERY"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [],
+        "class_name": "DeathbellowWarCry",
+        "condition_classes": [],
+        "cost_classes": [],
+        "effect_classes": [
+          "SearchLibraryPutInPlayEffect"
+        ],
+        "mana_cost": "{5}{R}{R}{R}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeathbellowWarCry.java",
+        "primary_effect": {
+          "ability_kind": "one_shot",
+          "battle_model_scope": "xmage_library_search_variant_review_v1",
+          "effect": "tutor",
+          "instant": false,
+          "sorcery": true,
+          "target": "library_card",
+          "target_constraints": {
+            "card_types": [
+              "creature"
+            ]
+          },
+          "tutor_destination": "battlefield"
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "targeting"
+        ],
+        "status": "found",
+        "subtypes": [],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Deathbellow War Cry through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Deathbellow War Cry",
+            "effect": "tutor",
+            "id": "deathbellow_war_cry_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for tutor"
+          }
+        ],
+        "target_classes": [
+          "TargetCardWithDifferentNameInLibrary"
+        ],
+        "types": [
+          "SORCERY"
+        ]
+      }
+    },
+    {
+      "card_name": "Karn's Sylex",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Legendary Artifact",
+        "types": [
+          "ARTIFACT"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "ActivateAsSorceryActivatedAbility",
+          "CantPayLifeOrSacrificeAbility",
+          "EntersBattlefieldTappedAbility"
+        ],
+        "class_name": "KarnsSylex",
+        "condition_classes": [],
+        "cost_classes": [
+          "ExileSourceCost",
+          "TapSourceCost"
+        ],
+        "effect_classes": [
+          "KarnsSylexDestroyEffect",
+          "OneShotEffect"
+        ],
+        "mana_cost": "{3}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnsSylex.java",
+        "primary_effect": {
+          "ability_kind": "activated",
+          "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+          "effect": "board_wipe",
+          "instant": false,
+          "mass_effect": true,
+          "sorcery": false
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "activated_ability"
+        ],
+        "status": "found",
+        "subtypes": [],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Karn's Sylex through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Karn's Sylex",
+            "effect": "board_wipe",
+            "id": "karn_s_sylex_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for board_wipe"
+          }
+        ],
+        "target_classes": [],
+        "types": [
+          "ARTIFACT"
+        ]
+      }
+    },
+    {
+      "card_name": "Karn, the Great Creator",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Legendary Planeswalker \u2014 Karn",
+        "types": [
+          "PLANESWALKER"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "LoyaltyAbility",
+          "SimpleStaticAbility"
+        ],
+        "class_name": "KarnTheGreatCreator",
+        "condition_classes": [],
+        "cost_classes": [],
+        "effect_classes": [
+          "KarnTheGreatCreatorAnimateEffect",
+          "KarnTheGreatCreatorCantActivateEffect",
+          "RestrictionEffect",
+          "WishEffect"
+        ],
+        "mana_cost": "{4}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnTheGreatCreator.java",
+        "primary_effect": {
+          "ability_kind": "static",
+          "battle_model_scope": "xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+          "effect": "passive",
+          "minus_two_artifact_wish_or_exile_to_hand": true,
+          "opponent_artifact_activated_abilities_cant_be_activated": true,
+          "permanent_type": "planeswalker",
+          "plus_one_animates_noncreature_artifact_until_next_turn": true,
+          "starting_loyalty": 5,
+          "target_constraints": {
+            "card_types": [
+              "artifact"
+            ]
+          }
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "targeting",
+          "static_ability"
+        ],
+        "status": "found",
+        "subtypes": [
+          "KARN"
+        ],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Karn, the Great Creator through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Karn, the Great Creator",
+            "effect": "passive",
+            "id": "karn_the_great_creator_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for passive"
+          }
+        ],
+        "target_classes": [
+          "TargetPermanent"
+        ],
+        "types": [
+          "PLANESWALKER"
+        ]
+      }
+    },
+    {
+      "card_name": "Kayla's Music Box",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Legendary Artifact",
+        "types": [
+          "ARTIFACT"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "SimpleActivatedAbility"
+        ],
+        "class_name": "KaylasMusicBox",
+        "condition_classes": [],
+        "cost_classes": [
+          "TapSourceCost"
+        ],
+        "effect_classes": [
+          "ContinuousEffect",
+          "KaylasMusicBoxExileEffect",
+          "KaylasMusicBoxLookEffect",
+          "KaylasMusicBoxPlayFromExileEffect",
+          "OneShotEffect"
+        ],
+        "mana_cost": "{2}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KaylasMusicBox.java",
+        "primary_effect": {
+          "ability_kind": "activated",
+          "activated_exile_top_card_face_down": true,
+          "activated_play_owned_cards_exiled_with_source_until_eot": true,
+          "alternate_zone_permission": true,
+          "battle_model_scope": "xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+          "effect": "free_cast",
+          "exiled_card_look_permission_controller_only": true,
+          "legendary": true,
+          "may_cast_without_paying_mana_cost": false,
+          "permanent_type": "artifact"
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "activated_ability"
+        ],
+        "status": "found",
+        "subtypes": [],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Kayla's Music Box through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Kayla's Music Box",
+            "effect": "free_cast",
+            "id": "kayla_s_music_box_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for free_cast"
+          }
+        ],
+        "target_classes": [],
+        "types": [
+          "ARTIFACT"
+        ]
+      }
+    },
+    {
+      "card_name": "Leyline Dowser",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Artifact",
+        "types": [
+          "ARTIFACT"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "SimpleActivatedAbility"
+        ],
+        "class_name": "LeylineDowser",
+        "condition_classes": [],
+        "cost_classes": [
+          "GenericManaCost",
+          "TapSourceCost",
+          "TapTargetCost"
+        ],
+        "effect_classes": [
+          "MillThenPutInHandEffect",
+          "UntapSourceEffect"
+        ],
+        "mana_cost": "{2}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LeylineDowser.java",
+        "primary_effect": {
+          "ability_kind": "activated",
+          "activation_cost_generic": 1,
+          "activation_requires_tap": true,
+          "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+          "effect": "recursion",
+          "mill_count": 1,
+          "milled_card_types_to_hand": [
+            "instant",
+            "sorcery"
+          ],
+          "permanent_type": "artifact",
+          "secondary_untap_source_by_tapping_legendary_creature": true,
+          "target_constraints": {
+            "card_types": [
+              "creature"
+            ],
+            "controller_scope": "source_controller"
+          }
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "targeting",
+          "activated_ability"
+        ],
+        "status": "found",
+        "subtypes": [],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Leyline Dowser through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Leyline Dowser",
+            "effect": "recursion",
+            "id": "leyline_dowser_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for recursion"
+          }
+        ],
+        "target_classes": [
+          "TargetControlledPermanent"
+        ],
+        "types": [
+          "ARTIFACT"
+        ]
+      }
+    },
+    {
+      "card_name": "Naktamun Lorespinner // Wheel of Fortune",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Creature \u2014 Jackal Wizard",
+        "types": [
+          "CREATURE"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "BeginningOfUpkeepTriggeredAbility"
+        ],
+        "class_name": "NaktamunLorespinner",
+        "condition_classes": [
+          "NaktamunLorespinnerCondition"
+        ],
+        "cost_classes": [],
+        "effect_classes": [
+          "BecomePreparedSourceEffect",
+          "DiscardHandAllEffect",
+          "DrawCardAllEffect"
+        ],
+        "mana_cost": "{2}{R}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NaktamunLorespinner.java",
+        "primary_effect": {
+          "ability_kind": "triggered",
+          "battle_model_scope": "xmage_draw_card_variant_review_v1",
+          "effect": "draw_engine",
+          "instant": false,
+          "sorcery": true
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "draw",
+          "condition",
+          "triggered_ability"
+        ],
+        "status": "found",
+        "subtypes": [
+          "JACKAL",
+          "WIZARD"
+        ],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Naktamun Lorespinner // Wheel of Fortune through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Naktamun Lorespinner // Wheel of Fortune",
+            "effect": "draw_engine",
+            "id": "naktamun_lorespinner_wheel_of_fortune_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for draw_engine"
+          }
+        ],
+        "target_classes": [],
+        "types": [
+          "CREATURE",
+          "SORCERY"
+        ]
+      }
+    },
+    {
+      "card_name": "Orcish Spy",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Creature \u2014 Orc Rogue",
+        "types": [
+          "CREATURE"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "SimpleActivatedAbility"
+        ],
+        "class_name": "OrcishSpy",
+        "condition_classes": [],
+        "cost_classes": [
+          "TapSourceCost"
+        ],
+        "effect_classes": [
+          "LookLibraryTopCardTargetPlayerEffect"
+        ],
+        "mana_cost": "{R}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/o/OrcishSpy.java",
+        "primary_effect": {
+          "ability_kind": "activated",
+          "activation_requires_tap": true,
+          "alternate_zone_permission": false,
+          "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
+          "effect": "topdeck_play",
+          "look_target_player_library_top_count": 3,
+          "may_cast_without_paying_mana_cost": false,
+          "play_lands_from_top_library": false,
+          "power": 1,
+          "target_constraints": {
+            "target": "player"
+          },
+          "toughness": 1
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "targeting",
+          "activated_ability"
+        ],
+        "status": "found",
+        "subtypes": [
+          "ORC",
+          "ROGUE"
+        ],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Orcish Spy through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Orcish Spy",
+            "effect": "topdeck_play",
+            "id": "orcish_spy_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for topdeck_play"
+          }
+        ],
+        "target_classes": [
+          "TargetPlayer"
+        ],
+        "types": [
+          "CREATURE"
+        ]
+      }
+    },
+    {
+      "card_name": "Prototype Portal",
+      "checks": {
+        "focused_test_scenario_count": 2,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Artifact",
+        "types": [
+          "ARTIFACT"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "EntersBattlefieldTriggeredAbility",
+          "SimpleActivatedAbility"
+        ],
+        "class_name": "PrototypePortal",
+        "condition_classes": [],
+        "cost_classes": [
+          "TapSourceCost"
+        ],
+        "effect_classes": [
+          "OneShotEffect",
+          "PrototypePortalCreateTokenEffect",
+          "PrototypePortalEffect"
+        ],
+        "mana_cost": "{4}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrototypePortal.java",
+        "primary_effect": {
+          "ability_kind": "triggered_and_activated",
+          "activated_create_token_copy_of_imprinted_card": true,
+          "activation_requires_tap": true,
+          "activation_x_cost_source": "imprinted_card_mana_value",
+          "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+          "effect": "token_maker",
+          "imprint_artifact_card_from_hand_on_enter": true,
+          "permanent_type": "artifact",
+          "token_copy_source": "imprinted_card"
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "targeting",
+          "triggered_ability",
+          "activated_ability"
+        ],
+        "status": "found",
+        "subtypes": [],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or resolve Prototype Portal",
+            "assertions": "expected tokens, stats, abilities and duration-limited effects match the model",
+            "card_name": "Prototype Portal",
+            "effect": "token_maker",
+            "id": "prototype_portal_1",
+            "setup": "source controller can cast the card; battlefield has representative affected/non-affected creatures if needed",
+            "status": "draft_requires_manual_review",
+            "title": "create expected token count and stats"
+          },
+          {
+            "actions": "cast or resolve Prototype Portal",
+            "assertions": "expected tokens, stats, abilities and duration-limited effects match the model",
+            "card_name": "Prototype Portal",
+            "effect": "token_maker",
+            "id": "prototype_portal_2",
+            "setup": "source controller can cast the card; battlefield has representative affected/non-affected creatures if needed",
+            "status": "draft_requires_manual_review",
+            "title": "apply duration-limited protection or indestructible effect"
+          }
+        ],
+        "target_classes": [
+          "TargetCard"
+        ],
+        "types": [
+          "ARTIFACT"
+        ]
+      }
+    },
+    {
+      "card_name": "Pyxis of Pandemonium",
+      "checks": {
+        "focused_test_scenario_count": 1,
+        "focused_test_scenarios_present": true,
+        "mana_cost_match": null,
+        "specific_effect_candidate": true,
+        "type_match": true
+      },
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "expected": {
+        "mana_cost": null,
+        "type_line": "Artifact",
+        "types": [
+          "ARTIFACT"
+        ]
+      },
+      "oracle_hash": null,
+      "ready_for_structured_pull": true,
+      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage": {
+        "ability_classes": [
+          "SimpleActivatedAbility"
+        ],
+        "class_name": "PyxisOfPandemonium",
+        "condition_classes": [],
+        "cost_classes": [
+          "GenericManaCost",
+          "SacrificeSourceCost",
+          "TapSourceCost"
+        ],
+        "effect_classes": [
+          "OneShotEffect",
+          "PyxisOfPandemoniumExileEffect",
+          "PyxisOfPandemoniumPutOntoBattlefieldEffect"
+        ],
+        "mana_cost": "{1}",
+        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PyxisOfPandemonium.java",
+        "primary_effect": {
+          "ability_kind": "activated",
+          "activated_each_player_exile_top_face_down": true,
+          "activated_put_exiled_permanents_onto_battlefield": true,
+          "activation_requires_tap": true,
+          "alternate_zone_permission": true,
+          "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+          "effect": "free_cast",
+          "final_activation_cost_generic": 7,
+          "final_activation_requires_sacrifice": true,
+          "may_cast_without_paying_mana_cost": false,
+          "permanent_type": "artifact",
+          "put_permanent_cards_from_exile_onto_battlefield": true
+        },
+        "resolution": "direct_bucket_candidate",
+        "signals": [
+          "activated_ability"
+        ],
+        "status": "found",
+        "subtypes": [],
+        "suggested_test_scenarios": [
+          {
+            "actions": "cast or activate Pyxis of Pandemonium through the relevant supported phase",
+            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
+            "card_name": "Pyxis of Pandemonium",
+            "effect": "free_cast",
+            "id": "pyxis_of_pandemonium_1",
+            "setup": "minimal deterministic board state with legal targets and enough mana",
+            "status": "draft_requires_manual_review",
+            "title": "focused behavior scenario for free_cast"
+          }
+        ],
+        "target_classes": [],
+        "types": [
+          "ARTIFACT"
+        ]
+      }
+    }
+  ],
+  "generated_at": "2026-06-30T12:22:47+00:00",
+  "mutations_performed": [],
+  "source": {
+    "coherence_generated_at": "2026-06-30T12:22:47Z",
+    "coherence_severity_counts": {
+      "medium": 13
+    },
+    "deck_id": 6,
+    "external_harvest_status": null,
+    "xmage_index_summary": {
+      "not_found_count": 0,
+      "requested_card_count": 13,
+      "resolved_count": 13,
+      "xmage_class_index_size": 31747
+    },
+    "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master"
+  },
+  "status": "ready",
+  "summary": {
+    "audited_card_count": 13,
+    "exact_xmage_found_count": 13,
+    "focused_test_scenario_ready_count": 13,
+    "missing_xmage_class_count": 0,
+    "ready_for_structured_pull_count": 13,
+    "severity_counts": {
+      "medium": 13
+    },
+    "status_counts": {
+      "ready_for_structured_xmage_pull_review_required": 13
+    },
+    "valid_xmage_source_count": 13
+  }
+}

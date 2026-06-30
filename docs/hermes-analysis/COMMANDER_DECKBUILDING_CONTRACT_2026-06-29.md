@@ -802,24 +802,30 @@ Runtime enablement checkpoint generated on 2026-06-30:
   uses only revealed-top information when deciding whether to cash in the
   artifact, so this is runtime/scope evidence, not deck-promotion evidence by
   itself.
+- PG279 promoted and synced `Possibility Storm` with exact spell-cast
+  replacement runtime: hand-cast spells are exiled, the controller exiles from
+  the top until a shared card type, may cast the hit for free, and bottoms the
+  remaining cards randomly. Runtime marks the original spell as replaced so it
+  cannot resolve later from the stack. This is a high-impact `free_cast`
+  runtime unlock, not deck-promotion evidence by itself.
 - The current runtime-gap queue is
   superseded by
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg278_lantern.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg279_possibility_storm.md`.
   The PG276 follow-up mapper wave reduced the Lorehold runtime manual mapper
-  backlog from `12` to `0`; PG277 and PG278 then reduced the structured
-  split-scope residual from `16` to `14` cards across eight families, so the
+  backlog from `12` to `0`; PG277 through PG279 then reduced the structured
+  split-scope residual from `16` to `13` cards across eight families, so the
   next deck-quality blocker remains exact runtime/scope work rather than
   card-by-card identification.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg278_lantern.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg279_possibility_storm.md`.
 - The current readiness output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg278_lantern.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg279_possibility_storm.md`;
   `Hidden Retreat` and `Brainstone` are applied/synced and must not be routed
   back to PG apply, while `Codex Shredder` and `Perpetual Timepiece` are
   already filtered from runtime-gap work as current active rules; `Chaos Wand`
   and `Assemble the Players` are also filtered out after PG276; `Ghoulcaller's
   Bell` is filtered out after PG277; `Lantern of Insight` is filtered out after
-  PG278.
+  PG278; `Possibility Storm` is filtered out after PG279.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and

@@ -7722,7 +7722,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="free_cast",
-                scope="xmage_spell_from_hand_exile_until_shared_type_free_cast_review_v1",
+                scope="spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
                 reason=(
                     "XMage structure matches Possibility Storm: spell cast from hand is exiled, then "
                     "library cards are exiled until a nonland sharing a card type may be cast for free, "
@@ -7732,10 +7732,13 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields={
                     "trigger": "spell_cast_from_hand",
+                    "trigger_scope": "any_player",
+                    "possibility_storm_replacement": True,
                     "exile_original_spell": True,
                     "exile_from_top_until_shares_card_type": True,
                     "hit_card_may_cast_without_paying_mana_cost": True,
-                    "bottom_rest_random": True,
+                    "bottom_exiled_with_source_random": True,
+                    "source_zone_required": "hand",
                     "alternate_zone_permission": True,
                     "may_cast_without_paying_mana_cost": True,
                 },

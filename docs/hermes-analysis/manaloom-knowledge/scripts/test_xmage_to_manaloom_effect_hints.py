@@ -7714,7 +7714,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
                 },
                 "free_cast",
-                "xmage_spell_from_hand_exile_until_shared_type_free_cast_review_v1",
+                "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
             ),
             (
                 "PrototypePortal",
@@ -7759,7 +7759,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 self.assertEqual(primary["effect"], expected_effect)
                 self.assertEqual(primary["battle_model_scope"], expected_scope)
                 self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
-                if class_name in {"GhoulcallersBell", "LanternOfInsight"}:
+                if class_name in {"GhoulcallersBell", "LanternOfInsight", "PossibilityStorm"}:
                     self.assertFalse(expected_scope.startswith("xmage_"))
                     self.assertFalse(expected_scope.endswith("_review_v1"))
                 else:

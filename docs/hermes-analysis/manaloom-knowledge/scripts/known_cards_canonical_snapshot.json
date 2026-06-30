@@ -24122,6 +24122,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Possibility Storm": {
+    "ability_kind": "triggered",
+    "alternate_zone_permission": true,
+    "battle_model_scope": "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
+    "bottom_exiled_with_source_random": true,
+    "effect": "free_cast",
+    "exile_from_top_until_shares_card_type": true,
+    "exile_original_spell": true,
+    "hit_card_may_cast_without_paying_mana_cost": true,
+    "may_cast_without_paying_mana_cost": true,
+    "possibility_storm_replacement": true,
+    "source_zone_required": "hand",
+    "trigger": "spell_cast_from_hand",
+    "trigger_scope": "any_player",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8",
+    "battle_rule_oracle_hash": "5da5211c6ce969ce3b5750e349c2b073"
+  },
   "Power Depot": {
     "effect": "land",
     "battle_rule_source": "curated",

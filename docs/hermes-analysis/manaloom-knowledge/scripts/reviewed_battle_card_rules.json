@@ -1257,6 +1257,36 @@
     "oracle_hash": "861c960a37be744e45f13200349e2532",
     "notes": "PG-037 oracle-reviewed on 2026-06-22 against PostgreSQL/Scryfall text: Path to Exile exiles target creature. Runtime executes the exile destination; the target-controller basic-land search/tapped battlefield compensation remains annotation_only and is not a dynamic search/shuffle executor."
   },
+  "Possibility Storm": {
+    "effect_json": {
+      "ability_kind": "triggered",
+      "effect": "free_cast",
+      "trigger": "spell_cast_from_hand",
+      "trigger_scope": "any_player",
+      "possibility_storm_replacement": true,
+      "exile_original_spell": true,
+      "exile_from_top_until_shares_card_type": true,
+      "hit_card_may_cast_without_paying_mana_cost": true,
+      "bottom_exiled_with_source_random": true,
+      "source_zone_required": "hand",
+      "alternate_zone_permission": true,
+      "may_cast_without_paying_mana_cost": true,
+      "battle_model_scope": "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1"
+    },
+    "deck_role_json": {
+      "category": "chaos_free_cast",
+      "effect": "free_cast",
+      "subtype": "hand_spell_shared_type_library_replacement",
+      "timing": "spell_cast_trigger"
+    },
+    "logical_rule_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8",
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "oracle_hash": "5da5211c6ce969ce3b5750e349c2b073",
+    "notes": "Oracle-reviewed on 2026-06-30 against local XMage PossibilityStorm.java and PostgreSQL text: when a player casts a spell from hand, the original spell is exiled, cards are exiled from that player's library until one shares a card type, that hit may be cast without paying mana, and all remaining cards exiled with Possibility Storm go to the bottom randomly. Runtime marks the original as replaced so it cannot resolve later from the stack."
+  },
   "Splendid Reclamation": {
     "effect_json": {
       "cmc": 4.0,

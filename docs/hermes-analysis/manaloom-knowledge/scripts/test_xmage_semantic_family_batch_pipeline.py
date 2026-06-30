@@ -561,6 +561,53 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "topdeck_play")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_possibility_storm_shared_type_free_cast_scope_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Possibility Storm",
+                        "severity": "medium",
+                        "oracle_hash": "5da5211c6ce969ce3b5750e349c2b073",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "PossibilityStorm",
+                            "path": "/xmage/PossibilityStorm.java",
+                            "types": ["ENCHANTMENT"],
+                            "ability_classes": ["PossibilityStormTriggeredAbility"],
+                            "effect_classes": ["OneShotEffect", "PossibilityStormEffect"],
+                            "cost_classes": [],
+                            "target_classes": [],
+                            "primary_effect": {
+                                "effect": "free_cast",
+                                "battle_model_scope": (
+                                    "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1"
+                                ),
+                                "ability_kind": "triggered",
+                                "trigger": "spell_cast_from_hand",
+                                "trigger_scope": "any_player",
+                                "possibility_storm_replacement": True,
+                                "exile_original_spell": True,
+                                "exile_from_top_until_shares_card_type": True,
+                                "hit_card_may_cast_without_paying_mana_cost": True,
+                                "bottom_exiled_with_source_random": True,
+                                "source_zone_required": "hand",
+                                "may_cast_without_paying_mana_cost": True,
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "free_cast")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_variable_self_spell_cost_reducer_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

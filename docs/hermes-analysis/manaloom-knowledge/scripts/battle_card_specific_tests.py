@@ -20028,6 +20028,135 @@ def register_tests(battle, player):
             for decision in decisions
         )
 
+    def test_pg279_possibility_storm_replaces_hand_spell_with_shared_type_free_cast():
+        storm = {
+            "name": "Possibility Storm",
+            "effect": "free_cast",
+            "type_line": "Enchantment",
+            "battle_model_scope": "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
+            "trigger": "spell_cast_from_hand",
+            "trigger_scope": "any_player",
+            "possibility_storm_replacement": True,
+            "exile_original_spell": True,
+            "exile_from_top_until_shares_card_type": True,
+            "hit_card_may_cast_without_paying_mana_cost": True,
+            "bottom_exiled_with_source_random": True,
+            "source_zone_required": "hand",
+            "may_cast_without_paying_mana_cost": True,
+            "_rule_logical_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8",
+            "_rule_oracle_hash": "5da5211c6ce969ce3b5750e349c2b073",
+        }
+        original = {
+            "name": "Original Zero Sorcery",
+            "type_line": "Sorcery",
+            "cmc": 0,
+            "effect": "draw_cards",
+            "count": 1,
+            "sorcery": True,
+        }
+        miss = {
+            "name": "Miss Creature",
+            "type_line": "Creature",
+            "cmc": 2,
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        hit = {
+            "name": "Free Storm Hit",
+            "type_line": "Sorcery",
+            "cmc": 7,
+            "effect": "damage_each_opponent",
+            "amount": 3,
+            "sorcery": True,
+        }
+
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Storm Pilot")
+            opponent = player("Storm Opponent")
+            active.battlefield = [storm]
+            active.hand = [original]
+            active.library = [miss, hit]
+            stack = battle.Stack()
+            original_effect = battle.get_card_effect(original)
+            cast_ctx = battle.begin_cast_context(
+                active,
+                original,
+                "precombat_main",
+                effect_data=original_effect,
+                role="test_possibility_storm_original",
+            )
+
+            assert battle.commit_cast_payment(cast_ctx) is True
+            active.hand.remove(original)
+            battle.trigger_spell_cast_engines(
+                active,
+                [active, opponent],
+                original,
+                turn=6,
+                phase="precombat_main",
+                stack=stack,
+                active_player=active,
+            )
+            stack.push(original, active, original_effect)
+            battle.priority_round(
+                active,
+                [active, opponent],
+                stack,
+                turn=6,
+                rng=random.Random(2791),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert opponent.life == 37
+        assert original not in active.graveyard
+        assert hit in active.graveyard
+        assert set(card.get("name") for card in active.library if isinstance(card, dict)) == {
+            "Original Zero Sorcery",
+            "Miss Creature",
+        }
+        assert not active.exile
+        assert any(
+            event == "possibility_storm_resolved"
+            and data.get("card") == "Possibility Storm"
+            and data.get("original_spell") == "Original Zero Sorcery"
+            and data.get("hit_card") == "Free Storm Hit"
+            and data.get("exiled_until_count") == 3
+            and data.get("bottomed_count") == 2
+            and data.get("cast_without_paying_mana_cost") is True
+            and data.get("result") == "cast_without_paying_mana"
+            and data.get("rule_logical_key") == "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8"
+            for event, data in events
+        )
+        assert any(
+            event == "possibility_storm_free_cast"
+            and data.get("cast_card") == "Free Storm Hit"
+            and data.get("source_zone") == "exile"
+            and data.get("locked_cost", {}).get("spend_tags") == ["cast_without_paying_mana_cost"]
+            for event, data in events
+        )
+        assert any(
+            event == "spell_resolution_skipped"
+            and data.get("card") == "Original Zero Sorcery"
+            and data.get("reason") == "possibility_storm_replaced_original_spell"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "possibility_storm_replacement"
+            and decision.get("actual_outcome") == "cast_without_paying_mana"
+            and "cast_without_paying_mana" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
     def test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard():
         def perpetual_timepiece():
             return {
@@ -21708,6 +21837,7 @@ def register_tests(battle, player):
         test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player,
         test_pg277_ghoulcallers_bell_mills_each_player,
         test_pg278_lantern_of_insight_reveals_top_cards_and_shuffles_target_player,
+        test_pg279_possibility_storm_replaces_hand_spell_with_shared_type_free_cast,
         test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard,
         test_pg275_chaos_wand_exiles_opponent_library_until_free_cast_hit,
         test_pg276_assemble_the_players_casts_small_top_creature_once_with_paid_cost,

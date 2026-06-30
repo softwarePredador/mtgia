@@ -2137,13 +2137,13 @@ def begin_cast_context(
             additional_costs=ctx.additional_costs,
         )
     )
-    store_cast_context_fields(
-        ctx.effect_data,
-        {
-            "phase": phase,
-            **ctx.to_replay_fields(),
-        },
-    )
+    cast_context_fields = {
+        "phase": phase,
+        **ctx.to_replay_fields(),
+    }
+    store_cast_context_fields(ctx.effect_data, cast_context_fields)
+    if isinstance(card, dict):
+        card["_cast_context"] = copy.deepcopy(cast_context_fields)
     emit_replay_event(
         "cast_announced",
         player=player.name,
@@ -13165,6 +13165,19 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
     stack_depth_before_resolution = len(stack.items)
     item = stack.resolve_top()
     if item:
+        if isinstance(item.card, dict) and item.card.get("_possibility_storm_replaced"):
+            emit_replay_event(
+                "spell_resolution_skipped",
+                player=item.controller.name,
+                card=item.card.get("name", "?"),
+                reason="possibility_storm_replaced_original_spell",
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(item.effect_data),
+            )
+            check_sbas_until_stable(all_players)
+            flush_triggers_in_apnap(active_player, all_players, stack)
+            return True
         if item.effect_data.get("effect") == "triggered_ability":
             resolver = item.effect_data.get("resolver")
             if callable(resolver):
@@ -35247,6 +35260,288 @@ def apply_player_and_creatures_damage(player, opponents, card, effect_data, turn
     finish_resolved_spell(player, card, turn=turn)
 
 
+def spell_card_type_set(card):
+    if not isinstance(card, dict):
+        return set()
+    type_line = str(card.get("type_line") or "")
+    type_part = type_line.split("—", 1)[0].split("-", 1)[0].lower()
+    types = set()
+    for card_type in (
+        "artifact",
+        "battle",
+        "creature",
+        "enchantment",
+        "instant",
+        "land",
+        "planeswalker",
+        "sorcery",
+    ):
+        if card_type in type_part:
+            types.add(card_type)
+    effect_data = get_card_effect(card)
+    if effect_data.get("instant"):
+        types.add("instant")
+    if effect_data.get("sorcery"):
+        types.add("sorcery")
+    if effect_data.get("artifact") or effect_data.get("permanent_type") == "artifact":
+        types.add("artifact")
+    return types
+
+
+def shares_spell_card_type(left, right):
+    return bool(spell_card_type_set(left) & spell_card_type_set(right))
+
+
+def _possibility_storm_sources(all_players):
+    sources = []
+    for controller in all_players or []:
+        for permanent in list(getattr(controller, "battlefield", []) or []):
+            if not isinstance(permanent, dict):
+                continue
+            if permanent.get("possibility_storm_replacement") or (
+                permanent.get("effect") == "free_cast"
+                and permanent.get("battle_model_scope")
+                == "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1"
+            ):
+                sources.append((controller, permanent))
+    return sources
+
+
+def resolve_possibility_storm_replacement(
+    source_controller,
+    source_permanent,
+    spell_controller,
+    all_players,
+    spell,
+    turn,
+    phase,
+    *,
+    stack=None,
+    active_player=None,
+    rng=None,
+):
+    if not isinstance(spell, dict) or spell.get("_possibility_storm_replaced"):
+        return False
+    if is_effective_land(spell):
+        return False
+    cast_context = spell.get("_cast_context") or {}
+    if (cast_context.get("source_zone") or "hand") != "hand":
+        return False
+    rng = rng or random.Random((turn or 0) + len(getattr(spell_controller, "library", []) or []))
+
+    spell["_possibility_storm_replaced"] = True
+    spell["_possibility_storm_source"] = source_permanent.get("name", "Possibility Storm")
+    original_effect = get_card_effect(spell)
+    if spell in getattr(spell_controller, "hand", []):
+        spell_controller.hand.remove(spell)
+    move_to_exile(spell_controller, spell, reason="possibility_storm_original_spell", turn=turn)
+
+    exiled_until = [spell]
+    hit_card = None
+    original_types = spell_card_type_set(spell)
+    while getattr(spell_controller, "library", None):
+        candidate = spell_controller.library.pop(0)
+        if not isinstance(candidate, dict):
+            continue
+        move_to_exile(
+            spell_controller,
+            candidate,
+            reason="possibility_storm_reveal_until_shared_type",
+            turn=turn,
+        )
+        exiled_until.append(candidate)
+        if shares_spell_card_type(candidate, spell):
+            hit_card = candidate
+            break
+
+    hit_effect = get_card_effect(hit_card) if isinstance(hit_card, dict) else {}
+    cast_success = False
+    cast_result = "no_shared_type_hit"
+    if isinstance(hit_card, dict):
+        if is_effective_land(hit_card):
+            cast_result = "hit_land_not_castable"
+        elif hit_effect.get("effect") in {"unknown", "counter"}:
+            cast_result = "unsupported_or_reactive_hit"
+        else:
+            cast_ctx = begin_cast_context(
+                spell_controller,
+                hit_card,
+                phase or "precombat_main",
+                effect_data=hit_effect,
+                role="possibility_storm_free_cast",
+                modes=["cast_without_paying_mana", "possibility_storm"],
+                alternative_cost="{0}",
+                source_zone="exile",
+                alternative_cost_kind="cast_without_paying_mana",
+            )
+            cast_ctx.is_legal = True
+            cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+            store_cast_context_fields(
+                hit_effect,
+                {
+                    "phase": phase or "precombat_main",
+                    **cast_ctx.to_replay_fields(),
+                },
+            )
+            if commit_cast_payment(cast_ctx):
+                try:
+                    spell_controller.exile.remove(hit_card)
+                except ValueError:
+                    pass
+                emit_replay_event(
+                    "possibility_storm_free_cast",
+                    player=spell_controller.name,
+                    card=source_permanent.get("name", "Possibility Storm"),
+                    original_spell=spell.get("name", "?"),
+                    cast_card=hit_card.get("name", "?"),
+                    cast_effect=hit_effect.get("effect", "unknown"),
+                    cast_without_paying_mana_cost=True,
+                    turn=turn,
+                    phase=phase,
+                    **cast_ctx.to_replay_fields(),
+                    **replay_rule_fields(source_permanent),
+                )
+                emit_replay_event(
+                    "spell_cast",
+                    player=spell_controller.name,
+                    card=hit_card.get("name", "?"),
+                    effect=hit_effect.get("effect", "unknown"),
+                    type_line=hit_card.get("type_line", ""),
+                    cmc=hit_card.get("cmc", 0),
+                    turn=turn,
+                    phase=phase,
+                    **cast_ctx.to_replay_fields(),
+                    **replay_rule_fields(hit_effect),
+                )
+                mark_cast_ledger_emitted(hit_effect)
+                trigger_spell_cast_engines(
+                    spell_controller,
+                    all_players,
+                    hit_card,
+                    turn,
+                    phase,
+                    stack=stack,
+                    active_player=active_player or spell_controller,
+                )
+                trigger_opponent_spell_draw_engines(
+                    spell_controller,
+                    [candidate for candidate in (all_players or []) if candidate is not spell_controller],
+                    hit_card,
+                    turn,
+                    phase,
+                    rng,
+                    stack=stack,
+                    active_player=active_player or spell_controller,
+                    all_players=all_players,
+                )
+                apply_effect_immediate(
+                    spell_controller,
+                    [candidate for candidate in (all_players or []) if candidate is not spell_controller],
+                    hit_card,
+                    turn,
+                    rng,
+                    effect_data_override=hit_effect,
+                    stack=stack,
+                    phase=phase,
+                )
+                cast_success = True
+                cast_result = "cast_without_paying_mana"
+            else:
+                cast_result = "cast_payment_or_timing_failed"
+
+    bottomed = [
+        card
+        for card in exiled_until
+        if isinstance(card, dict) and card in getattr(spell_controller, "exile", [])
+    ]
+    if bottomed:
+        rng.shuffle(bottomed)
+    for card in bottomed:
+        try:
+            spell_controller.exile.remove(card)
+        except ValueError:
+            pass
+        spell_controller.library.append(card)
+
+    hit_score = (
+        threat_score(
+            hit_effect.get("effect", "unknown"),
+            hit_card.get("name", "?") if isinstance(hit_card, dict) else "",
+            spell_controller,
+            all_players or [spell_controller],
+            turn,
+        )
+        if isinstance(hit_card, dict)
+        else 0
+    )
+    emit_decision_trace(
+        decision_type="possibility_storm_replacement",
+        player=spell_controller,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                hit_card,
+                hit_effect,
+                score=hit_score,
+                action="cast_possibility_storm_hit" if cast_success else "bottom_possibility_storm_hit",
+                original_spell=spell.get("name", "?"),
+                original_types=sorted(original_types),
+            )
+        ],
+        chosen_option=decision_card_option(
+            hit_card,
+            hit_effect,
+            score=hit_score,
+            action="resolve_possibility_storm",
+            original_spell=spell.get("name", "?"),
+        ),
+        score_components={
+            "original_spell": spell.get("name", "?"),
+            "original_types": sorted(original_types),
+            "hit_card": hit_card.get("name", "?") if isinstance(hit_card, dict) else None,
+            "exiled_until_count": len(exiled_until),
+            "bottomed_count": len(bottomed),
+            "cast_result": cast_result,
+        },
+        rule_source=source_permanent.get("_rule_source", "possibility_storm_runtime_v1"),
+        rule_status=source_permanent.get("_rule_review_status", "active"),
+        confidence="medium",
+        expected_benefit_score=hit_score,
+        actual_outcome=cast_result,
+        reason="replace_hand_spell_with_first_library_card_sharing_card_type",
+        strategic_principle="model_randomized_hand-spell replacement separately from normal stack resolution",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "original_spell_replaced": 1,
+            "cards_bottomed": len(bottomed),
+            "free_casts": 1 if cast_success else 0,
+        },
+        risk_flags=["replacement_effect", "random_library_access", "cast_without_paying_mana"],
+    )
+    emit_replay_event(
+        "possibility_storm_resolved",
+        player=spell_controller.name,
+        controller=source_controller.name,
+        card=source_permanent.get("name", "Possibility Storm"),
+        original_spell=spell.get("name", "?"),
+        original_effect=original_effect.get("effect", "unknown"),
+        original_types=sorted(original_types),
+        hit_card=hit_card.get("name", "?") if isinstance(hit_card, dict) else None,
+        hit_effect=hit_effect.get("effect", "unknown") if isinstance(hit_effect, dict) else None,
+        exiled_until=[card.get("name", "?") for card in exiled_until if isinstance(card, dict)],
+        exiled_until_count=len(exiled_until),
+        bottomed=[card.get("name", "?") for card in bottomed if isinstance(card, dict)],
+        bottomed_count=len(bottomed),
+        cast_without_paying_mana_cost=cast_success,
+        result=cast_result,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(source_permanent),
+    )
+    return True
+
+
 def trigger_spell_cast_engines(
     player,
     all_players,
@@ -35257,6 +35552,27 @@ def trigger_spell_cast_engines(
     stack=None,
     active_player=None,
 ):
+    cast_context = spell.get("_cast_context") if isinstance(spell, dict) else {}
+    source_zone = (cast_context or {}).get("source_zone") or "hand"
+    if source_zone == "hand" and not (
+        isinstance(spell, dict) and spell.get("_possibility_storm_replaced")
+    ):
+        for source_controller, possibility_storm in _possibility_storm_sources(
+            all_players or [player]
+        ):
+            if resolve_possibility_storm_replacement(
+                source_controller,
+                possibility_storm,
+                player,
+                all_players or [player],
+                spell,
+                turn,
+                phase,
+                stack=stack,
+                active_player=active_player,
+            ):
+                break
+
     opponents = [candidate for candidate in (all_players or []) if candidate is not player]
     for permanent in list(player.battlefield):
         if not isinstance(permanent, dict):

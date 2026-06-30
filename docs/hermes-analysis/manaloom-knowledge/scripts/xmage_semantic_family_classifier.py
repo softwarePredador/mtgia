@@ -4074,6 +4074,27 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("attack_free_cast_counter_type") == "dream"
         )
 
+    if (
+        effect == "free_cast"
+        and scope == "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1"
+    ):
+        return (
+            types == {"ENCHANTMENT"}
+            and "PossibilityStormTriggeredAbility" in ability_classes
+            and "PossibilityStormEffect" in effect_classes
+            and not cost_classes
+            and not target_classes
+            and effect_json.get("trigger") == "spell_cast_from_hand"
+            and effect_json.get("trigger_scope") == "any_player"
+            and bool(effect_json.get("possibility_storm_replacement"))
+            and bool(effect_json.get("exile_original_spell"))
+            and bool(effect_json.get("exile_from_top_until_shares_card_type"))
+            and bool(effect_json.get("hit_card_may_cast_without_paying_mana_cost"))
+            and bool(effect_json.get("bottom_exiled_with_source_random"))
+            and effect_json.get("source_zone_required") == "hand"
+            and bool(effect_json.get("may_cast_without_paying_mana_cost"))
+        )
+
     if effect == "direct_damage" and scope == "damage_any_target_and_gain_life_v1":
         return (
             types.issubset({"INSTANT", "SORCERY"})
